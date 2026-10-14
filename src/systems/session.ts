@@ -122,7 +122,7 @@ export function dayState(d: Derived, t: Pick<Tuning, 'debtLockThreshold' | 'spri
 // ── Лимит утра (обход) и экспресс.
 
 export interface RoundPlan {
-  mode: 'day' | 'express';
+  mode: 'day' | 'express' | 'phonetic';
   /** Карточки раунда по порядку (первая — с грядки, по которой тапнули, если она due). */
   cards: string[];
   /** Сколько due до раунда (долг). */
@@ -135,15 +135,21 @@ export interface RoundPlan {
  * Раунд обхода (§4.8, §5.5): до obchodBatch карточек из dueQueue('obchod'); `fromItem` — растение,
  * по которому тапнули: его карточка встаёт первой. Экспресс (§4.5): dueQueue('express'), до
  * expressMaxCards и expressMaxMin минут; `minutes` переопределяет время («ещё 3 минуты», director.more3Min).
+ * Вечер (I-13, §4.3, §4.8): `phonetic` — минимальные пары красных и жёлтых кластеров, до phoneticPerDay
+ * (или `limit`: первый вечер — 3 пары), `cluster` — его пары первыми.
  */
 export function planRound(
   d: Derived,
   now: Ts,
   t: QueueTuning & SessionTuning & GardenTuning,
-  o: { mode: 'day' | 'express'; fromItem?: string; minutes?: number },
+  o: { mode: 'day' | 'express' | 'phonetic'; fromItem?: string; minutes?: number; limit?: number; cluster?: string },
 ): RoundPlan {
+  if (o.mode === 'phonetic') {
+    const cards = dueQueue(d, now, t, { mode: 'phonetic', ...(o.limit !== undefined ? { limit: o.limit } : {}), ...(o.cluster ? { preferCluster: o.cluster } : {}) });
+    return { mode: 'phonetic', cards, debt: d.debt, maxMs: (o.minutes ?? Infinity) * 60_000 };
+  }
   const mode = o.mode === 'express' ? 'express' : 'obchod';
-  const limit = mode === 'express' ? t.expressMaxCards : t.obchodBatch;
+  const limit = Math.min(o.limit ?? Infinity, mode === 'express' ? t.expressMaxCards : t.obchodBatch);
   let cards = dueQueue(d, now, t, { mode, limit });
   if (o.fromItem) {
     const g = gardenItems(d, now, t).find((x) => x.item === o.fromItem);

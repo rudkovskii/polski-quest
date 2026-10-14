@@ -13,6 +13,8 @@ export interface QueueOpts {
   mode: QueueMode;
   /** Верхняя граница от вызывающего; по умолчанию лимит режима из tuning. */
   limit?: number;
+  /** `phonetic`: пары этого кластера первыми (первый вечер — «самый красный», §5.0 F5). */
+  preferCluster?: string;
 }
 
 export type QueueTuning = Pick<
@@ -156,7 +158,12 @@ export function dueQueue(state: Derived, now: Ts, t: QueueTuning, opts: QueueOpt
   });
 
   const spring = mode === 'obchod' && isSpring(state, { springAfterDays: t.springAfterDays });
-  const ordered = mode === 'mine' ? free.sort(byLongest) : free.sort(byPriority);
+  let ordered = mode === 'mine' ? free.sort(byLongest) : free.sort(byPriority);
+  if (mode === 'phonetic' && opts.preferCluster) {
+    const pref = opts.preferCluster;
+    const mine = (c: Cand): number => (state.pairCluster[c.id] === pref ? 0 : 1);
+    ordered = [...ordered].sort((a, b) => mine(a) - mine(b));
+  }
   const pick: Cand[] = [];
   const seen = new Set<string>();
   const take = (c: Cand): void => {

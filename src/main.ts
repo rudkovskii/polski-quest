@@ -3,13 +3,15 @@ import { startInput } from './input';
 import { Boot, type BootStart } from './scenes/Boot';
 import { Location, type LocationData } from './scenes/Location';
 import { Title } from './scenes/Title';
-import { startCloud } from './cloud';
+import { offlineRpc, startCloud, type CloudOptions } from './cloud';
+import { startFlow } from './flow';
+import { mountGuide } from './ui/guide';
 import { bus } from './systems/bus';
 import { connectAudio } from './systems/platform/audio';
 import { getContent } from './systems/content';
 import { mountUi } from './ui';
 import { mountAudioToast } from './ui/audioToast';
-import { loadPortraits, mountPlay } from './ui/play';
+import { loadPortraits, mountPlay, type PlayDeps } from './ui/play';
 import { mountDpad } from './ui/dpad';
 import { startDay } from './day';
 import { createClock } from './systems/platform/clock';
@@ -19,14 +21,22 @@ import { busAudio } from './ui/overlay/kit';
 
 const params = new URLSearchParams(location.search);
 const dev = params.get('dev');
+/**
+ * Dev-прогон всей игры (I-13): `?dev=play` (или `?reset=1` без dev) — Title → LinkSetup → режиссёр, но прогресс
+ * в отдельной базе `polski-quest-play` и облако выключено (ничего не уходит в Supabase). `reset=1` стирает базу:
+ * чистый профиль. Повторный запуск — `?dev=play&mute=1` (база сохранилась), `&now=+8d` — весна.
+ */
+const playDev = dev === 'play' || (!dev && params.get('reset') === '1');
 // Dev-часы (I-12): `?now=<ISO>` или `?now=+1d` сдвигают время во всех deps; только вместе с `dev`.
-const clock = createClock(dev ? params.get('now') : null);
+const clock = createClock(dev || playDev ? params.get('now') : null);
 // Без звука вслух (AGENTS.md): `?mute=1` — `audio:play` только в консоль.
 const mute = params.get('mute') === '1';
 
 interface StartOptions {
   /** Хранилище без облака (dev=world): отдельная база, синк не запускается. */
   devStore?: Promise<GameStorage>;
+  /** Опции синка (dev=play: своя база и облако выключено). */
+  cloud?: CloudOptions;
 }
 
 // Склейка слоёв (ТЗ §2.1): DOM-оверлей, d-pad, ввод, Phaser. Порядок важен (I-03): сначала d-pad
@@ -40,10 +50,12 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
   else connectAudio(bus);
   mountAudioToast(overlay);
-  const store = opts.devStore ?? startCloud({ dev: dev === '1' }).then((c) => c.storage);
+  const store = opts.devStore ?? startCloud({ dev: dev === '1', ...opts.cloud }).then((c) => c.storage);
   // Диалоги и упражнения (I-08): world:interact → оверлей, события журнала → хранилище синка.
   const content = getContent();
-  const play = mountPlay(overlay, { content, store, portraits: loadPortraits(content), clock });
+  const portraits = loadPortraits(content);
+  const playDeps: PlayDeps = { content, store, portraits, clock };
+  const play = mountPlay(overlay, playDeps);
 
   // Конфигурация из ТЗ §2.4. WorldMap добавится в I-11.
   const game = new Phaser.Game({
@@ -85,7 +97,20 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
     hasLink: () => !!storeNow && !!storedSecret(storeNow),
     build: __BUILD_ID__,
   });
-  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game, play, day, store, clock, content };
+  // Режиссёр (I-13): строка «Сейчас», пузырь Казика, подсветка цели, запуск сразу в шаг, первый день.
+  const guide = mountGuide(overlay, { bus, content, portraits, coarse: () => matchMedia('(pointer: coarse)').matches, dev: !!dev || playDev });
+  const flow = startFlow({
+    content,
+    store,
+    clock,
+    play,
+    day,
+    audio: busAudio(bus),
+    portraits,
+    hasLink: () => !!storeNow && !!storedSecret(storeNow),
+  });
+  playDeps.claim = (p) => flow.claim(p);
+  if (dev || playDev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game, play, day, store, clock, content, flow, guide };
   return game;
 }
 
@@ -119,4 +144,21 @@ if (dev === 'audio') {
     bus.on(ev, (p) => console.info(`[${ev}]`, JSON.stringify(p)));
   bus.on('world:marks', (m) => console.info('[world:marks]', JSON.stringify({ location: m.location, due: m.dueItems, cells: m.plots.flatMap((p) => p.cells.filter((c) => c.item).map((c) => `${c.item}:${c.stage}/${c.interval}${c.due ? '!' : ''}${c.wilted ? '~' : ''}`)) })));
   if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
+} else if (playDev) {
+  const dbName = 'polski-quest-play';
+  const reset = params.get('reset') === '1';
+  if (reset) {
+    // Стираем один раз: перезагрузка вкладки (в том числе HMR) продолжает тот же мир, а не чистый.
+    params.delete('reset');
+    if (!params.get('dev')) params.set('dev', 'play');
+    history.replaceState(null, '', `${location.pathname}?${params.toString()}${location.hash}`);
+  }
+  const fresh = reset ? new Promise<void>((resolve) => {
+    const req = indexedDB.deleteDatabase(dbName);
+    req.onsuccess = req.onerror = req.onblocked = () => resolve();
+  }) : Promise.resolve();
+  void fresh.then(() => {
+    startGame(undefined, { cloud: { storage: new GameStorage({ dbName, ls: null }), rpc: offlineRpc } });
+    if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
+  });
 } else startGame();

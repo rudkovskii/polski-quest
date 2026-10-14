@@ -4,8 +4,9 @@ import { getContent } from '../systems/content';
 import type { TileHit } from '../input/pointer';
 import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap } from '../types/content';
-import type { BusEvents, PlotCellView, PlotView } from '../types/bus';
+import type { BusEvents, GuideTarget, PlotCellView, PlotView } from '../types/bus';
 import { cellAt } from '../world/dzialka';
+import { edgeArrow, faceTowards, guidePath, pointerCell, resolveGuide, type ResolvedGuide } from '../world/guide';
 import { tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
 import { pickZoom } from '../world/camera';
 import { DELTA, LocationModel, type Actor, type WorldEvent } from '../world/location';
@@ -50,7 +51,15 @@ export class Location extends Phaser.Scene {
   private plots: PlotView[] = [];
   private plants = new Map<string, { plant: Phaser.GameObjects.Sprite; mark: Phaser.GameObjects.Sprite | null; cell: PlotCellView }>();
   private wordMarks = new Map<string, Phaser.GameObjects.Sprite>();
+  private wordSprites = new Map<string, Phaser.GameObjects.Sprite>();
   private wasMoving = false;
+  /** Цель режиссёра (I-13): контур, путь пунктиром, стрелка у края, бобр-указатель. */
+  private guideTarget: GuideTarget | null = null;
+  private guide: ResolvedGuide | null = null;
+  private guideG!: Phaser.GameObjects.Graphics;
+  private guideKey = '';
+  /** Дом бобра на tap-карте (NPC bobr): сюда он возвращается, когда цели нет. */
+  private bobrHome: Xy | null = null;
 
   constructor() {
     super('Location');
@@ -65,7 +74,11 @@ export class Location extends Phaser.Scene {
     this.plots = [];
     this.plants = new Map();
     this.wordMarks = new Map();
+    this.wordSprites = new Map();
     this.wasMoving = false;
+    this.guide = null;
+    this.guideKey = '';
+    this.bobrHome = null;
   }
 
   preload(): void {
@@ -93,6 +106,8 @@ export class Location extends Phaser.Scene {
     this.buildActors();
     this.marker = this.add.graphics().setDepth(10_000);
     this.markerKey = '';
+    this.guideG = this.add.graphics().setDepth(9_500);
+    this.bobrHome = this.model.object('npc:bobr')?.at ?? null;
 
     this.layout();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.layout, this);
@@ -104,11 +119,16 @@ export class Location extends Phaser.Scene {
     const offMarks = bus.on('world:marks', (m) => {
       if (m.location === this.mapDef.id && !this.leaving) this.applyMarks(m);
     });
+    const offGuide = bus.on('guide:target', ({ target }) => {
+      this.guideTarget = target;
+      this.applyGuide();
+    });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       offIntent();
       offInput();
       offTeleport();
       offMarks();
+      offGuide();
       this.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
     });
     this.cameras.main.fadeIn(150, 26, 28, 44);
@@ -152,6 +172,91 @@ export class Location extends Phaser.Scene {
     this.syncActor(this.player, 'dima', this.model.player, time);
     if (this.companion && this.model.companion) this.syncActor(this.companion, 'bobr', this.model.companion, time);
     this.drawHighlight(time);
+    this.drawGuide(time);
+  }
+
+  // ───────────── цель режиссёра (I-13) ─────────────
+
+  /** Состояние подсветки для dev-проверок. */
+  get guideState(): { key: string | null; at: Xy | null; viaExit: boolean; pointer: Xy | null } {
+    return { key: this.guide?.key ?? null, at: this.guide?.at ?? null, viaExit: this.guide?.viaExit ?? false, pointer: this.model.pointing ?? this.model.object('npc:bobr')?.at ?? null };
+  }
+
+  private hiddenKeys(): Set<string> {
+    return new Set(this.model.objects.filter((o) => this.model.isHidden(o.key)).map((o) => o.key));
+  }
+
+  private applyGuide(): void {
+    if (!this.model || this.leaving) return;
+    this.guide = resolveGuide(this.model, this.guideTarget, this.plots, this.hiddenKeys());
+    this.guideKey = '';
+    const g = this.guide;
+    // Бобр-указатель (§4.12): в walk-локации идёт к клетке у цели и смотрит на неё; на tap-карте (działka)
+    // NPC-бобр садится у нужной грядки. Цель — сам бобр или цели нет: следом за Димой / домой.
+    const targetsBobr = this.guideTarget?.npc === 'bobr' && !this.guideTarget.plot && !this.guideTarget.object;
+    if (this.model.companion) {
+      if (g && !targetsBobr) {
+        const cell = pointerCell(this.model.grid, g, this.model.player.tile, this.model.companion.tile);
+        this.model.pointTo(cell, cell ? faceTowards(cell, g.at, g.size) : null);
+      } else this.model.pointTo(null);
+    }
+    const bobr = this.npcs.get('npc:bobr');
+    if (bobr && this.bobrHome) {
+      let cell: Xy | null = this.bobrHome;
+      let face: Dir = 'left';
+      if (g && !g.viaExit && !targetsBobr && g.key !== 'npc:bobr') {
+        const grid = { w: this.model.parsed.w, h: this.model.parsed.h, passable: (x: number, y: number) => this.model.passable(x, y) || (x === this.model.object('npc:bobr')!.at[0] && y === this.model.object('npc:bobr')!.at[1]) };
+        cell = pointerCell(grid, g, this.model.player.tile, this.model.object('npc:bobr')!.at) ?? this.bobrHome;
+        face = faceTowards(cell, g.at, g.size);
+      }
+      this.model.moveObject('npc:bobr', cell);
+      const sid = this.spriteFor(getContent().characters.get('bobr')?.sprite, 'bobr');
+      const x = cell[0] * T + T / 2;
+      const y = cell[1] * T + T;
+      if (bobr.x !== x || bobr.y !== y) this.tweens.add({ targets: bobr, x, y, duration: 260, ease: 'Sine.easeInOut', onUpdate: () => bobr.setDepth(10 + bobr.y) });
+      bobr.play(`${sid}:idle_${face}`);
+    }
+  }
+
+  private drawGuide(time: number): void {
+    const g = this.guide;
+    const cam = this.cameras.main;
+    const pulse = Math.floor(time / 250) % 4;
+    const [px, py] = this.model.player.tile;
+    const key = g ? `${g.key}:${g.at}:${pulse}:${px},${py}:${Math.round(cam.worldView.x)},${Math.round(cam.worldView.y)}` : '';
+    if (key === this.guideKey) return;
+    this.guideKey = key;
+    const gr = this.guideG.clear();
+    if (!g) return;
+    // Пульсирующий контур: две рамки, внешняя «дышит» на 1–2 пикселя.
+    const grow = pulse < 2 ? pulse : 4 - pulse;
+    const x0 = g.at[0] * T - 1 - grow;
+    const y0 = g.at[1] * T - 1 - grow;
+    const w = g.size[0] * T + 2 + grow * 2;
+    const h = g.size[1] * T + 2 + grow * 2;
+    gr.lineStyle(1, 0x141b1b, 1).strokeRect(x0 - 1, y0 - 1, w + 2, h + 2);
+    gr.lineStyle(1, pulse % 2 ? 0xffffff : 0x73eff7, 1).strokeRect(x0, y0, w, h);
+    // Путь пунктиром на 3 клетки (walk-локации, §4.12).
+    if (this.model.controls === 'walk' && !this.model.moving) {
+      for (const [cx, cy] of guidePath(this.model.grid, this.model.player.tile, g, 3)) {
+        gr.fillStyle(0x141b1b, 1).fillRect(cx * T + T / 2 - 2, cy * T + T / 2 - 2, 4, 4);
+        gr.fillStyle(0x73eff7, 1).fillRect(cx * T + T / 2 - 1, cy * T + T / 2 - 1, 2, 2);
+      }
+    }
+    // Стрелка у края экрана, если цель за кадром.
+    const view = cam.worldView;
+    const target = { x: (g.at[0] + g.size[0] / 2) * T, y: (g.at[1] + g.size[1] / 2) * T };
+    const arrow = edgeArrow({ x: view.x, y: view.y, width: view.width, height: view.height }, target, 10 / cam.zoom + 4);
+    if (arrow) {
+      const r = Math.max(5, 12 / cam.zoom) + (pulse % 2);
+      const a = arrow.angle;
+      const pt = (ang: number, len: number): [number, number] => [arrow.x + Math.cos(ang) * len, arrow.y + Math.sin(ang) * len];
+      const [ax, ay] = pt(a, r);
+      const [bx, by] = pt(a + 2.4, r);
+      const [cx2, cy2] = pt(a - 2.4, r);
+      gr.fillStyle(0x141b1b, 1).fillTriangle(ax + 1, ay + 1, bx + 1, by + 1, cx2 + 1, cy2 + 1);
+      gr.fillStyle(0x73eff7, 1).fillTriangle(ax, ay, bx, by, cx2, cy2);
+    }
   }
 
   /** Подсветка цели действия (ТЗ §5.4): уголки вокруг объекта, пульс 3 раза в секунду. */
@@ -245,6 +350,7 @@ export class Location extends Phaser.Scene {
         const sid = this.spriteFor((o.src as { sprite?: string }).sprite, 'sign_exit');
         const s = this.add.sprite(0, 0, ATLAS, this.sprites[sid]!.frames[0]);
         this.place(s, sid, o.at[0], o.at[1]);
+        this.wordSprites.set(o.key, s);
       }
     }
   }
@@ -264,6 +370,10 @@ export class Location extends Phaser.Scene {
 
   private applyMarks(m: BusEvents['world:marks']): void {
     this.plots = m.plots;
+    if (m.hidden && this.model.setHidden(m.hidden)) {
+      for (const [key, s] of this.npcs) s.setVisible(!this.model.isHidden(key));
+      for (const [key, s] of this.wordSprites) s.setVisible(!this.model.isHidden(key));
+    }
     const seen = new Set<string>();
     for (const p of m.plots)
       for (const cell of p.cells) {
@@ -290,6 +400,7 @@ export class Location extends Phaser.Scene {
         this.wordMarks.delete(o.key);
       }
     }
+    this.applyGuide(); // растение-цель могло переехать на другую клетку
   }
 
   private plantFrame(cell: PlotCellView): { sid: string; frame: number } | null {
@@ -406,7 +517,7 @@ export class Location extends Phaser.Scene {
     }
   }
 
-  private go(location: string, spawn: string): void {
+  private go(location: string, spawn: string | Xy): void {
     if (this.leaving) return;
     this.leaving = true;
     this.model.halt();

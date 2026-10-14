@@ -248,6 +248,8 @@ describe('награда и паспорт (§5.8, §5.10)', () => {
   it('play: первая сдача → module.onComplete (флаг, предмет), печать Praga в паспорте; lastBoss', async () => {
     const bus = testBus();
     const store = memStore();
+    // Босс закрыт, пока не сдан demo.s01 (requires, I-13).
+    store.append({ k: 'lesson', ts: T0 - 60_000, lesson: 'demo.s01', score: 1, firstTry: 1, ms: 1000, passed: true, answers: 4 });
     const pl = mountPlay(host, { content, store, bus, audio: fakeAudio(), coarse: true, typeMs: 0, clock: { now: () => T0, mono: () => 0 } });
     const before = passportModel(content, store.progress, derive(store.progress, deriveContent(content), T0));
     expect(before.pages).toMatchObject([{ biome: 'praga', stamped: false }]);

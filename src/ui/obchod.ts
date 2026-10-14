@@ -25,11 +25,21 @@ export interface ObchodDeps extends LessonDeps {
 }
 
 export interface ObchodOptions {
-  mode: 'day' | 'express';
+  /** day — обход, express — экспресс, phonetic — вечер на звуки (минимальные пары, I-13). */
+  mode: 'day' | 'express' | 'phonetic';
   /** Растение, по которому тапнули: его карточка первой. */
   fromItem?: string;
   /** «Ещё 3 минуты» из DaySummary: экспресс с director.more3Min, seg `more3`. */
   more3?: boolean;
+  /**
+   * Первый день F2 (I-13): полить одну грядку `fromItem` по просьбе Казика — практика без SRS
+   * (карточка ещё не due, appendGate ответ не пишет), без `seg` и без итоговой панели.
+   */
+  practice?: boolean;
+  /** Сколько карточек (вечер первого дня — 3 пары). */
+  limit?: number;
+  /** Вечер: пары этого кластера первыми. */
+  cluster?: string;
 }
 
 export interface ObchodResult {
@@ -47,10 +57,14 @@ export interface ObchodResult {
   again?: boolean;
 }
 
-/** Шаг полива для карточки: rec — выбор перевода, lis — на слух, pro — набрать по-польски. */
-export function cardStep(card: string, content: Pick<Content, 'vocab'>): Step | null {
+/** Шаг полива для карточки: rec — выбор перевода, lis — на слух, pro — набрать по-польски, pair — минимальная пара. */
+export function cardStep(card: string, content: Pick<Content, 'vocab'> & Partial<Pick<Content, 'pairs'>>): Step | null {
   const p = parseCardId(card);
-  if (!p || p.type === 'pair') return null;
+  if (!p) return null;
+  if (p.type === 'pair') {
+    const mp = content.pairs?.get(p.item);
+    return mp ? { t: 'minimal_pair', pair: [mp.a, mp.b], play: 'random', cluster: mp.cluster as 'R1', item: mp.id } : null;
+  }
   const v = content.vocab.get(p.item)?.value;
   if (!v) return null;
   if (p.type === 'lis') return wordStep(v, 'listen', content);
@@ -156,15 +170,34 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
   const now0 = clock.now();
   const d0 = derive(store.progress, dc, now0, deps.tz);
   const express = o.mode === 'express';
-  const plan = planRound(d0, now0, t, { mode: o.mode, ...(o.fromItem ? { fromItem: o.fromItem } : {}), ...(o.more3 ? { minutes: t.director.more3Min } : {}) });
+  const evening = o.mode === 'phonetic';
+  const plan = planRound(d0, now0, t, {
+    mode: o.mode,
+    ...(o.fromItem ? { fromItem: o.fromItem } : {}),
+    ...(o.more3 ? { minutes: t.director.more3Min } : {}),
+    ...(o.limit !== undefined ? { limit: o.limit } : {}),
+    ...(o.cluster ? { cluster: o.cluster } : {}),
+  });
+  // Первый вечер (§5.0 F5): пары кластера уже прогнаны сценой — те же пары практикой (ранний ответ SRS не двигает).
+  if (evening && !plan.cards.length && o.cluster) {
+    plan.cards = content.phonetics.pairs
+      .filter((p) => p.cluster === o.cluster)
+      .slice(0, o.limit ?? t.phoneticPerDay)
+      .map((p) => `${p.id}#pair`);
+  }
   const layer = deps.overlay.open('pq-obchod-layer');
   try {
-    if (o.fromItem && !express) {
+    if (o.practice && o.fromItem) return await practiceOne(deps, layer, o.fromItem);
+    if (o.fromItem && !express && !evening) {
       const g = gardenItems(d0, now0, t).find((x) => x.item === o.fromItem);
       if (!g?.dueCard) {
         await plantInfo(layer, content, g, now0);
         return { answered: 0, correct: 0, empty: true, left: gardenItems(d0, now0, t).filter((x) => x.dueCard).length };
       }
+    }
+    if (!plan.cards.length && evening) {
+      await panel(layer, 'Wieczór', [el('div', { class: 'line2' }, 'Сегодня звуки в порядке.')], [{ act: 'ok', label: 'OK', primary: true }], 'ok');
+      return { answered: 0, correct: 0, empty: true, left: 0 };
     }
     if (!plan.cards.length) {
       const tomorrow = summaryTomorrow(d0);
@@ -187,13 +220,13 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
       const step = cardStep(card, content);
       if (!step) continue;
       const lesson: Lesson = {
-        id: `${express ? 'express' : 'obchod'}.${card}`,
+        id: `${express ? 'express' : evening ? 'wieczor' : 'obchod'}.${card}`,
         kind: 'practice',
-        title: { pl: express ? 'Ekspres' : 'Obchód', ru: `${i + 1} из ${plan.cards.length}` },
+        title: { pl: express ? 'Ekspres' : evening ? 'Wieczór' : 'Obchód', ru: `${i + 1} из ${plan.cards.length}` },
         minutes: 1,
         steps: [step],
       };
-      const r = await runLesson(lesson, { ...deps, overlay: deps.overlay }, { drill: true, noSummary: true, layer, src: express ? 'express' : 'obchod' });
+      const r = await runLesson(lesson, { ...deps, overlay: deps.overlay }, { drill: true, noSummary: true, layer, src: express ? 'express' : evening ? 'phonetic' : 'obchod' });
       if (r.cancelled) break;
       answered++;
       if ((r.firstTry ?? 0) >= 1) correct++;
@@ -205,7 +238,7 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
     // Ждут полива сегодня = растения с «!» (братья политых слов ждут завтра, их в «ещё раунд» не зовём).
     const left = gardenItems(d1, now1, t).filter((g) => g.dueCard).length;
     if (answered > 0) {
-      const seg: Seg = o.more3 ? 'more3' : express ? 'express' : 'water';
+      const seg: Seg = o.more3 ? 'more3' : express ? 'express' : evening ? 'evening' : 'water';
       write(deps, { k: 'seg', ts: now1, seg });
       if (express) write(deps, { k: 'session', ts: now1, mode: 'express', ms: Math.round(clock.mono() - startMono), retrievalMs: retrievalSince(store.progress.log.events, startTs) });
       bus.emit('progress:changed', { kinds: ['cards'] });
@@ -213,6 +246,10 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
     if (answered === 0) return { answered, correct, empty: true, left };
 
     const minutes = Math.max(1, Math.round((clock.mono() - startMono) / 60_000));
+    if (evening) {
+      await panel(layer, 'Wieczór', [stat('Услышано верно', `${correct} из ${answered}`)], [{ act: 'ok', label: 'Gotowe', primary: true }], 'ok');
+      return { answered, correct, empty: false, left };
+    }
     if (express) {
       // Мини-итог (§4.5): две строки.
       await panel(
@@ -246,6 +283,17 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
   } finally {
     layer.close();
   }
+}
+
+/** F2: одна грядка без SRS — шаг слова в drill, без seg и итоговой панели. */
+async function practiceOne(deps: ObchodDeps, layer: Layer, item: string): Promise<ObchodResult> {
+  const v = deps.content.vocab.get(item)?.value;
+  if (!v) return { answered: 0, correct: 0, empty: true, left: 0 };
+  const lesson: Lesson = { id: `obchod.${item}`, kind: 'practice', title: { pl: 'Obchód', ru: '1 из 1' }, minutes: 1, steps: [wordStep(v, undefined, deps.content)] };
+  const r = await runLesson(lesson, deps, { drill: true, noSummary: true, layer, src: 'obchod' });
+  deps.bus.emit('progress:changed', { kinds: ['cards'] });
+  if (r.cancelled) return { answered: 0, correct: 0, empty: true, left: 0 };
+  return { answered: 1, correct: (r.firstTry ?? 0) >= 1 ? 1 : 0, empty: false, left: 0 };
 }
 
 function write(deps: ObchodDeps, draft: EventDraft): void {

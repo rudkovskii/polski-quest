@@ -1,6 +1,7 @@
 // Склейка петли дня (I-12), как cloud.ts: вызывается из main.ts одной строкой.
 //   • таймер активного времени (§4.8): касания (pointerdown/keydown на документе, intents) и видимость вкладки;
 //   • грядки и «!» (`world:marks`) на входе в локацию и после каждого изменения прогресса;
+//     там же объекты карты с ложным `if` (I-13);
 //   • позиция Димы → `local.position` (`world:position`, §3.10);
 //   • настройки `controls.*` → роутер ввода;
 //   • оверлей петли дня: обход, экспресс, DaySummary, Settings (src/ui/day.ts).
@@ -17,6 +18,9 @@ import { mountDay, type DayStore, type DayUi } from './ui/day';
 import type { Overlay } from './ui/overlay/host';
 import type { AudioPort } from './ui/overlay/kit';
 import { worldMarks } from './world/dzialka';
+import { buildObjects } from './world/location';
+import { condCtx, evaluator } from './systems/conditions';
+import type { Condition } from './types/content';
 
 export interface DayOptions {
   root: HTMLElement;
@@ -86,7 +90,12 @@ export function startDay(o: DayOptions): DayGlue {
     if (!map) return;
     const now = clock.now();
     const d = derive(store.progress, deriveContent(content), now);
-    bus.emit('world:marks', worldMarks(map, d, now, content.tuning));
+    // Объекты с ложным `if` (§3.7, I-13): сцена их прячет, они не цель и не препятствие.
+    const ok = evaluator(condCtx(content, d, store.progress.world, now));
+    const hidden = buildObjects(map)
+      .filter((o) => { const c = (o.src as { if?: Condition }).if; return !!c && !ok(c); })
+      .map((o) => o.key);
+    bus.emit('world:marks', { ...worldMarks(map, d, now, content.tuning), hidden });
   };
   const schedule = (): void => {
     if (queued) return;

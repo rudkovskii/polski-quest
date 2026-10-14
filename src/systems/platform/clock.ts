@@ -15,7 +15,8 @@ const UNIT: Record<string, number> = { d: 86_400_000, h: 3_600_000, m: 60_000 };
 
 /** Разобрать `?now=`: момент epoch ms или null (пусто, мусор). */
 export function parseNowParam(value: string | null | undefined, realNow: number): number | null {
-  const v = value?.trim();
+  // `?now=+8d` в адресной строке: URLSearchParams превращает «+» в пробел — « 8d» тоже сдвиг вперёд (I-13).
+  const v = value?.replace(/^\s+(?=\d)/, '+').trim();
   if (!v) return null;
   const rel = /^([+-])(\d+(?:\.\d+)?)([dhm])$/.exec(v);
   if (rel) return realNow + (rel[1] === '-' ? -1 : 1) * Number(rel[2]) * UNIT[rel[3]!]!;

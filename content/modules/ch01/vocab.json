@@ -276,6 +276,17 @@
     "tags": ["ch01.s05"]
   },
   {
+    "id": "lx.dzien_dobry",
+    "pl": "Dzień dobry",
+    "ru": "здравствуйте, добрый день",
+    "tr": "джень до́бры",
+    "pos": "phrase",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "clusters": ["R5"],
+    "tags": ["ch01.intro"]
+  },
+  {
     "id": "lx.dzien",
     "pl": "dzień",
     "ru": "день",

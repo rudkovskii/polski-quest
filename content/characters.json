@@ -125,5 +125,16 @@
     "portrait": "extra_k",
     "traits": "Окошко ZTM, именной проездной: numerek 147, «obsługujemy: 12». Сцена 1.12.",
     "hearts": false
+  },
+  {
+    "id": "narrator",
+    "name": "Narrator",
+    "kind": "extra",
+    "addressAs": "none",
+    "voice": { "engine": "none", "id": "none" },
+    "sprite": "extra_m",
+    "portrait": "narrator",
+    "traits": "Подписи вступления (СЮЖЕТ §2): коротко и сухо, как друг за кадром. Не персонаж, портрета нет.",
+    "hearts": false
   }
 ]

@@ -292,7 +292,9 @@ describe('склейка world:interact → оверлей (ui/play)', () => {
   });
 
   it('ui:lesson:start → урок, ui:lesson:end и progress:changed после событий', async () => {
-    const { bus, play: p, lessonEnd, events } = play();
+    const { bus, play: p, lessonEnd, events, store } = play();
+    // Босс закрыт, пока не сдан demo.s01 (requires, I-13).
+    store.append({ k: 'lesson', ts: Date.UTC(2026, 9, 1, 9), lesson: 'demo.s01', score: 1, firstTry: 1, ms: 1000, passed: true, answers: 4 });
     bus.emit('ui:lesson:start', { lessonId: 'demo.boss', src: 'npc' });
     await flush();
     act(host, 'start').click(); // экран босса (I-11): вступление с частями

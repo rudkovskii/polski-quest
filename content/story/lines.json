@@ -183,5 +183,15 @@
   },
   { "id": "kazik.ch01.s12.most", "who": "bobr", "ru": "Успеем построить ещё один мост." },
   { "id": "kazik.ch01.s06.ciasto", "who": "bobr", "todo": true },
-  { "id": "kazik.ch01.s06.kasza", "who": "bobr", "todo": true }
+  { "id": "kazik.ch01.s06.kasza", "who": "bobr", "todo": true },
+  { "id": "intro.caption.oct", "who": "narrator", "ru": "Октябрь. Варшава. Правый берег." },
+  { "id": "intro.caption.bobr", "who": "narrator", "ru": "Бобр. В Варшаве бывает." },
+  { "id": "intro.passport.k", "who": "narrator", "pl": "Dla następnego gościa. - K.", "plRu": "Для следующего гостя. - K." },
+  { "id": "intro.caption.empty", "who": "narrator", "ru": "Пустой. Почти." },
+  { "id": "intro.kazik.dzien_dobry", "who": "bobr", "pl": "Dzień dobry?" },
+  { "id": "intro.simba.miau", "who": "simba", "pl": "miau" },
+  { "id": "intro.caption.pokazalo", "who": "narrator", "ru": "Показалось." },
+  { "id": "kazik.evening", "who": "bobr", "todo": true },
+  { "id": "kazik.done", "who": "bobr", "todo": true },
+  { "id": "kazik.bridge.piles", "who": "bobr", "todo": true }
 ]

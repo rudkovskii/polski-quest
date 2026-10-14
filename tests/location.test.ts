@@ -206,6 +206,8 @@ describe('tap-локация (działka)', () => {
     m.intent({ type: 'focus', dir: 'right' });
     expect(m.highlight()?.key).toBe('trigger:altana_sleep');
     m.intent({ type: 'focus', dir: 'down' });
+    expect(m.highlight()?.key).toBe('trigger:ryby'); // берег Вислы: вечер на звуки (I-13)
+    m.intent({ type: 'focus', dir: 'left' });
     expect(m.highlight()?.key).toBe('npc:bobr');
     m.intent({ type: 'interact' });
     expect(of(run(m, 16), 'interact')[0]).toMatchObject({ kind: 'npc', id: 'bobr', via: 'action' });

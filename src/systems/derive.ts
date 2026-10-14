@@ -75,6 +75,8 @@ export interface Derived {
   /** Карточка `pair` → кластер (для фонетической очереди). */
   pairCluster: Record<CardId, string>;
   clusterStatus: Record<string, ClusterStatus>;
+  /** Точность по кластеру в последней диагностике (ok / n), 0..1; «самый красный» кластер первого дня (§5.0 F4–F5). */
+  clusterScore: Record<string, number>;
   // ── Заглушки, заполняются в следующих итерациях.
   zloty: number; // I-18
   pierogi: number; // I-18
@@ -309,6 +311,8 @@ export function derive(p: Progress, content: DeriveContent, now: Ts, tz?: string
   // Статус кластеров (§4.3).
   const clusterStatus: Record<string, ClusterStatus> = {};
   const diag = lastDiag as EventOf<'diag'> | null;
+  const clusterScore: Record<string, number> = {};
+  for (const [cl, r] of Object.entries(diag?.results ?? {})) if (r.n > 0) clusterScore[cl] = Math.round((r.ok / r.n) * 1000) / 1000;
   const allClusters = new Set([...Object.keys(pairsByCluster), ...Object.keys(repairLessons), ...Object.keys(diag?.results ?? {})]);
   for (const cl of [...allClusters].sort()) {
     let s = statusOf(diag?.results[cl]);
@@ -347,6 +351,7 @@ export function derive(p: Progress, content: DeriveContent, now: Ts, tz?: string
     newItemsByDay,
     pairCluster,
     clusterStatus,
+    clusterScore,
     zloty: 0,
     pierogi: 0,
     hearts: {},
