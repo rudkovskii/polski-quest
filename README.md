@@ -1,7 +1,7 @@
 # polski-quest — «Pierogi i Przypadki»
 
 Персональная пиксельная игра для изучения польского. Phaser 4 + Vite + TypeScript, PWA на GitHub Pages:
-https://rudkovskiid-blip.github.io/polski-quest/
+https://rudkovskii.github.io/polski-quest/
 
 Правила для агентов — `AGENTS.md`. ТЗ и план итераций лежат вне репозитория, в воркспейсе Шэфа.
 
