@@ -1,0 +1,172 @@
+{
+  "v": 1,
+  "worldId": "q3x7c2ab5fkm4tzw",
+  "createdAt": 1791791880000,
+  "log": {
+    "checkpoint": null,
+    "events": [
+      {
+        "id": "k7m2qa.1",
+        "ts": 1791792000000,
+        "k": "diag",
+        "results": {
+          "R1": {
+            "ok": 4,
+            "n": 5
+          },
+          "R10": {
+            "ok": 1,
+            "n": 4
+          }
+        }
+      },
+      {
+        "id": "k7m2qa.2",
+        "ts": 1791792300000,
+        "k": "seg",
+        "seg": "scene"
+      },
+      {
+        "id": "k7m2qa.3",
+        "ts": 1791792360000,
+        "k": "intro",
+        "item": "lx.dzien_dobry",
+        "lesson": "ch01.s01",
+        "ok": [
+          "rec"
+        ]
+      },
+      {
+        "id": "k7m2qa.4",
+        "ts": 1791792360001,
+        "k": "intro",
+        "item": "lx.czesc",
+        "lesson": "ch01.s01",
+        "ok": [
+          "rec",
+          "lis"
+        ]
+      },
+      {
+        "id": "k7m2qa.5",
+        "ts": 1791792420000,
+        "k": "lesson",
+        "lesson": "ch01.s01",
+        "score": 0.8,
+        "firstTry": 0.7,
+        "ms": 310000,
+        "passed": true,
+        "tags": {
+          "R10": 2
+        },
+        "answers": 14
+      },
+      {
+        "id": "k7m2qa.6",
+        "ts": 1791792480000,
+        "k": "seg",
+        "seg": "sleep"
+      },
+      {
+        "id": "k7m2qa.7",
+        "ts": 1791792480005,
+        "k": "session",
+        "mode": "day",
+        "ms": 480000,
+        "retrievalMs": 210000
+      },
+      {
+        "id": "k7m2qa.8",
+        "ts": 1791873000000,
+        "k": "rev",
+        "card": "lx.dzien_dobry#rec",
+        "g": 2,
+        "ms": 2400,
+        "src": "obchod"
+      },
+      {
+        "id": "k7m2qa.9",
+        "ts": 1791873060000,
+        "k": "rev",
+        "card": "lx.czesc#lis",
+        "g": 0,
+        "ms": 7100,
+        "src": "obchod",
+        "tags": [
+          "R1"
+        ]
+      },
+      {
+        "id": "k7m2qa.a",
+        "ts": 1791873120000,
+        "k": "seg",
+        "seg": "water"
+      },
+      {
+        "id": "k7m2qa.b",
+        "ts": 1791873600000,
+        "k": "pierog",
+        "lesson": "ch01.s02"
+      },
+      {
+        "id": "k7m2qa.c",
+        "ts": 1791874200000,
+        "k": "lesson",
+        "lesson": "ch01.s02",
+        "score": 0.55,
+        "firstTry": 0.4,
+        "ms": 420000,
+        "passed": false,
+        "answers": 18
+      },
+      {
+        "id": "k7m2qa.d",
+        "ts": 1791874800000,
+        "k": "found",
+        "secret": "simba",
+        "spot": "dzialka.shed"
+      },
+      {
+        "id": "imp.tr_142",
+        "ts": 1791875100000,
+        "k": "imp",
+        "card": "lx.kawa#rec",
+        "state": {
+          "reps": 3,
+          "interval": 7,
+          "ef": 2.5,
+          "due": 1792461600000
+        },
+        "from": "trainer"
+      },
+      {
+        "id": "k7m2qa.e",
+        "ts": 1791937800000,
+        "k": "seg",
+        "seg": "more3"
+      }
+    ]
+  },
+  "world": {
+    "flags": {
+      "hud.zloty": 1791792420000,
+      "beat.intro": 1791792000000
+    },
+    "items": {
+      "it.bilet_miesieczny": 1791792420000
+    },
+    "unlocked": {
+      "praga": {
+        "stage": 1,
+        "at": 1791791880000
+      }
+    },
+    "challenges": {}
+  },
+  "settings": {
+    "newItemsPerDay": {
+      "value": 6,
+      "at": 1791875400000
+    }
+  }
+}
