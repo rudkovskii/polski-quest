@@ -181,7 +181,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
   // ── Хром урока: шапка, точки, место под шаг.
   const layer = opts.layer ?? deps.overlay.open('pq-lesson-layer');
   const npc = lesson.npc ? exerciseContent(content).speaker(lesson.npc) : null;
-  const pic = npc ? portrait(npc, deps.portraits) : null;
+  const pic = npc ? portrait(npc, deps.portraits, 40) : null;
   const dots = el('div', { class: 'pq-dots', 'aria-hidden': 'true' });
   const main = el('div', { class: 'pq-lesson-main' });
   let stepHandler: IntentHandler | null = null;

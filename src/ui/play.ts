@@ -177,7 +177,8 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
         case 'word': {
           const v = p.item ? content.vocab.get(p.item)?.value : undefined;
           if (!v) return;
-          const lesson: Lesson = { id: `word.${p.location}.${p.id}`, kind: 'practice', title: { pl: v.pl, ru: v.ru }, minutes: 1, steps: [wordStep(v, p.ex, content)] };
+          // Заголовок без самого слова: у type/dictation он выдал бы ответ.
+          const lesson: Lesson = { id: `word.${p.location}.${p.id}`, kind: 'practice', title: { ru: 'Слово' }, minutes: 1, steps: [wordStep(v, p.ex, content)] };
           await runLesson(lesson, lessonDeps(store), { drill: true, noSummary: true });
           return;
         }
