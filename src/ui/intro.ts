@@ -175,8 +175,9 @@ function paint(c: HTMLCanvasElement, art: Art, atlas: IntroAtlas | null): void {
     case 'night': {
       R(0, 0, W, 60, '#1a1c2c');
       for (let i = 0; i < 60; i++) R(Math.floor(hash(i, 3) * W), Math.floor(hash(3, i) * 56), 1, 1, hash(i, 9) > 0.8 ? '#ffcd75' : hash(i, 5) > 0.5 ? '#f4f4f4' : '#566c86');
-      R(124, 10, 8, 8, '#f4f4f4');
-      R(126, 10, 8, 8, '#1a1c2c'); // месяц
+      R(124, 9, 8, 10, '#f4f4f4');
+      R(122, 10, 8, 8, '#f4f4f4');
+      R(127, 8, 7, 9, '#1a1c2c'); // месяц-серп
       // Старый город на том берегу: силуэты и пара окон
       let x = 0;
       for (let i = 0; x < W; i++) {
@@ -210,10 +211,10 @@ const css = `
 .pq-intro canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; }
 .pq-intro .board { position: absolute; left: 35%; top: 8%; width: 30%; height: 12.5%; display: flex; align-items: center; justify-content: center;
   font: 700 clamp(8px, 2.6vw, 14px)/1 ui-monospace, Menlo, monospace; color: #ffcd75; letter-spacing: .06em; white-space: nowrap; }
-.pq-intro .cover { position: absolute; left: 55%; top: 22%; width: 22%; display: flex; flex-direction: column; align-items: center; gap: 2px;
-  font: 800 clamp(7px, 2vw, 12px)/1.1 -apple-system, sans-serif; color: #f0e5d1; text-align: center; letter-spacing: .04em; }
+.pq-intro .cover { position: absolute; left: 51%; top: 18%; width: 30%; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font: 800 clamp(7px, 2vw, 12px)/1.1 -apple-system, sans-serif; color: #5a2a1e; text-align: center; letter-spacing: .06em; }
 .pq-intro .photo { position: absolute; left: 25.6%; top: 21.9%; width: 16.25%; height: 29.2%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.pq-intro .photo canvas { width: 100%; height: auto; image-rendering: pixelated; }
+.pq-intro .photo canvas { width: 100% !important; height: auto !important; image-rendering: pixelated; }
 .pq-intro .note { position: absolute; left: 21%; top: 58%; width: 27%; font: italic 600 clamp(7px, 2.1vw, 13px)/1.2 Georgia, serif; color: #5a2a1e; text-align: center; opacity: .75; }
 .pq-intro .stamp { position: absolute; left: 56%; top: 34%; width: 26%; aspect-ratio: 1; box-sizing: border-box; border: 4px solid #3b5dc9; border-radius: 50%; color: #3b5dc9;
   display: flex; flex-direction: column; align-items: center; justify-content: center; font: 800 clamp(7px, 1.9vw, 12px)/1.1 -apple-system, sans-serif; text-align: center;
@@ -335,7 +336,8 @@ export async function runTiles(deps: TilesDeps): Promise<IntroResult> {
   try {
     let attempts = 0;
     let firstTry = false;
-    let after: HTMLElement[] = [];
+    // «Tak?» Хели остаётся над плитками: игрок видит, на что отвечает.
+    let after: HTMLElement[] = [card.say(D01.helaTak)].filter((x): x is HTMLElement => x !== null);
     for (;;) {
       attempts++;
       const ok = await new Promise<boolean>((resolve) => {

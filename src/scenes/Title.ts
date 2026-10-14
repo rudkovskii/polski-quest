@@ -23,11 +23,11 @@ export class Title extends Phaser.Scene {
     });
     // Запуск сразу в шаг (§5.2, I-13): режиссёр выбрал локацию — уходим в неё, меню нет.
     let going = false;
-    const offTeleport = bus.on('world:teleport', ({ location, spawn }) => {
+    const offTeleport = bus.on('world:teleport', ({ location, spawn, facing }) => {
       if (going) return;
       going = true;
       this.cameras.main.fadeOut(150, 26, 28, 44);
-      this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.start('Location', { location, spawn }));
+      this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.start('Location', { location, spawn, ...(facing ? { facing } : {}) }));
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       offStart();

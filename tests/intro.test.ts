@@ -40,6 +40,7 @@ describe('карточки дня 1', () => {
     await flush();
     expect(root.querySelector('.art')).toBeNull(); // мир виден: коробка внизу без картинки
     expect(root.querySelectorAll('[data-tile]').length).toBe(2);
+    expect(lines()).toEqual(['d01.hela.bazar.1']); // «Tak?» над плитками
     act(root, 'wrong').click();
     await flush();
     expect(lines()).toEqual(['d01.hela.bazar.err.1', 'd01.rule.dzien_dobry', 'd01.rule.dzien_dobry.tr']);
