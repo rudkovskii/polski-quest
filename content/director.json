@@ -93,6 +93,14 @@
       "do": [{ "startDialogue": "dlg.ch01.list" }]
     },
     {
+      "id": "d02.znaki",
+      "slot": "afterScene",
+      "once": false,
+      "if": { "all": [{ "gameDay": { "min": 2 } }, { "lessonDone": "ch01.s00" }, { "not": { "lessonDone": "ch01.d02.znaki" } }] },
+      "target": { "location": "ch01.metro", "npc": "brzechwa" },
+      "do": [{ "startLesson": "ch01.d02.znaki" }]
+    },
+    {
       "id": "d02.peron",
       "slot": "afterScene",
       "if": { "all": [{ "gameDay": { "min": 2 } }, { "lessonDone": "ch01.s00" }] },

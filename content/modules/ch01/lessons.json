@@ -1574,6 +1574,7 @@
     "npc": "brzechwa",
     "location": "ch01.metro",
     "introduces": ["lx.wejscie", "lx.wyjscie", "lx.peron"],
+    "pass": { "firstTry": 0, "score": 0 },
     "steps": [
       { "t": "say", "who": "brzechwa", "pl": "Wejście.", "ru": "[вэ́йщче] Вход.", "item": "lx.wejscie" },
       { "t": "choice", "q": "WEJŚCIE — это…", "options": ["Вход", "Выход"], "answer": 0, "item": "lx.wejscie", "why": "Wejście [вэ́йщче]: вход. Входят тут." },

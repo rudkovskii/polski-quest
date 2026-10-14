@@ -379,8 +379,7 @@
     "if": { "not": { "always": true } },
     "nodes": {
       "n1": { "line": "d02.brzechwa.peron.1", "next": "n2" },
-      "n2": { "line": "d02.kazik.peron.1", "next": "znaki" },
-      "znaki": { "who": "brzechwa", "lesson": "ch01.d02.znaki", "next": "n3" },
+      "n2": { "line": "d02.kazik.peron.1", "next": "n3" },
       "n3": { "line": "d02.brzechwa.peron.2", "next": "end" },
       "end": { "end": true }
     }

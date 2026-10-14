@@ -297,6 +297,9 @@ describe('день 2 «Bramka słucha» (P-06): обход, письмо, мет
   it('после диагностики: перрон с обещанием «chrząszcz», вторая сцена в день 2 не нужна', () => {
     const w = afterDay1().flag('beat.d02.title', 'beat.d02.podlane', 'beat.d02.letter').flagAt(at(0, 10.1), sysFlag('obchod'));
     w.add(seg('water', at(0, 10.2)), diag(at(0, 10.5)), lesson('ch01.s00', at(0, 10.5)), seg('scene', at(0, 10.5)));
+    // P-10b: сразу после турникета — вывески метро у Брзехвы (три новых слова дня 2).
+    expect(w.step(at(0, 10.6))).toMatchObject({ kind: 'beat', beat: 'd02.znaki', target: { location: 'ch01.metro', npc: 'brzechwa' }, do: [{ startLesson: 'ch01.d02.znaki' }] });
+    w.add(lesson('ch01.d02.znaki', at(0, 10.55)));
     expect(w.step(at(0, 10.6))).toMatchObject({ kind: 'beat', beat: 'd02.peron', do: [{ startDialogue: 'dlg.ch01.peron' }] });
     w.flag('beat.d02.peron');
     const s = w.step(at(0, 10.7));
@@ -316,7 +319,7 @@ describe('день 2 «Bramka słucha» (P-06): обход, письмо, мет
 /** Диагностика «всё красное»: все ремонтные сцены играются. */
 const diagRed = (ts: number): EventDraft => ({ k: 'diag', ts, results: Object.fromEntries(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10'].map((c) => [c, { ok: 2, n: 10 }])) });
 const dayN = (n: number): World => {
-  const w = afterDay1().add(diagRed(at(0, 10.5)), lesson('ch01.s00', at(0, 10.5)));
+  const w = afterDay1().add(diagRed(at(0, 10.5)), lesson('ch01.s00', at(0, 10.5)), lesson('ch01.d02.znaki', at(0, 10.55)));
   w.flagAt(at(0, 10.1), sysFlag('obchod'));
   for (let d = 0; d < n - 2; d++) w.add(seg('water', at(d, 10.2)), seg('sleep', at(d, 12)));
   for (let k = 2; k <= n; k++) w.flag(`beat.d${String(k).padStart(2, '0')}.title`);
@@ -450,7 +453,7 @@ describe('правила 5–10 обычного дня', () => {
   const day2 = (): World =>
     new World()
       .flag(...ALL_FIRST, hudFlag('passport'), hudFlag('obchod'), 'beat.d02.title', 'beat.d02.podlane', 'beat.d02.letter', 'beat.d02.peron')
-      .add(diag(at(-1)), lesson('ch01.s00', at(-1)), lesson('ch01.intro', at(-1)), lesson('ch01.d01.brzechwa', at(-1)), intro('lx.woda', at(-1, 10.5)), seg('sleep', at(-1, 12)));
+      .add(diag(at(-1)), lesson('ch01.s00', at(-1)), lesson('ch01.d02.znaki', at(-1)), lesson('ch01.intro', at(-1)), lesson('ch01.d01.brzechwa', at(-1)), intro('lx.woda', at(-1, 10.5)), seg('sleep', at(-1, 12)));
 
   it('мечта Казика о мосте — сцена дня 1 (Висла): старых битов kazik_most / brzechwa_rym нет, день 2 начинается с полива', () => {
     expect(content.director.beats.some((b) => b.id === 'kazik_most' || b.id === 'brzechwa_rym')).toBe(false);

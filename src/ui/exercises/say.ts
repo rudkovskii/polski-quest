@@ -19,6 +19,8 @@ export const say: ExerciseModule<StepSay> = {
       translations: ctx.translations,
       ...(ctx.typeMs !== undefined ? { typeMs: ctx.typeMs } : {}),
       autoplay: step.audio !== false,
+      // Без звука (P-10b): ни ▶, ни «медленно», ни автозвука.
+      ...(ctx.silent ? { silent: true } : {}),
     });
     const { result } = runPlain(ctx, [], el('div', {}, view.node), { onNext: () => !view.skip() });
     void result.finally(() => view.dispose());

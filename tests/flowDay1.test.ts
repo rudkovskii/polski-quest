@@ -236,6 +236,7 @@ describe('день 1 через склейку режиссёра', () => {
     now = T + 86_400_000 + 2 * 3_600_000;
     const seen = await untilSleep();
     expect(seen).toContain('scene:ch01.s00');
+    expect(seen).toContain('beat:d02.znaki'); // P-10b: вывески метро у Брзехвы — три новых слова дня 2
     expect(calls).toContain('dlg:dlg.ch01.peron'); // бит перрона (без цели) играется сам: Брзехва, «chrząszcz», вывески
     expect(flow.step).toMatchObject({ kind: 'sleep', target: { location: 'ch01.chatka', object: 'poslanie' } });
     // Альтанка на działce больше не триггер сна: тап по ней режиссёр не забирает, итога нет.

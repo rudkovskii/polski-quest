@@ -120,17 +120,22 @@ describe('паспорт: печать базара и «Умею» по сце�
 
 describe('новые слова дней 2 и 3', () => {
   const dlg = (id: string) => content.dialogues.get(id)!.value;
-  it('день 2: после турникета на перроне — 3 вывески метро (сцена ≤ 3 новых слов, у каждого tr)', () => {
-    const peron = dlg('dlg.ch01.peron');
-    expect(Object.values(peron.nodes).some((n) => (n as { lesson?: string }).lesson === 'ch01.d02.znaki')).toBe(true);
+  it('день 2: после турникета — сцена у Брзехвы, 3 вывески метро (≤ 3 новых слов, у каждого tr)', () => {
     const l = lesson('ch01.d02.znaki');
+    // Бит после турникета: тап по Брзехве → урок; не сдан (или прерван) — бит повторится, пока слова не выучены.
+    const beat = content.director.beats.find((x) => x.id === 'd02.znaki')!;
+    expect(beat).toMatchObject({ slot: 'afterScene', once: false, target: { location: 'ch01.metro', npc: 'brzechwa' }, do: [{ startLesson: 'ch01.d02.znaki' }] });
+    const ids = content.director.beats.map((x) => x.id);
+    expect(ids.indexOf('d02.znaki')).toBeLessThan(ids.indexOf('d02.peron'));
+    expect(JSON.stringify(dlg('dlg.ch01.peron'))).not.toContain('ch01.d02.znaki');
     expect(l.introduces).toEqual(['lx.wejscie', 'lx.wyjscie', 'lx.peron']);
     for (const it of l.introduces!) {
       expect(content.vocab.get(it)!.value.srs).toBe(true);
       expect(content.vocab.get(it)!.value.tr).toBeTruthy();
       expect(l.steps!.some((s) => s.item === it && s.t !== 'say')).toBe(true); // у слова есть проверка
     }
-    expect(l.kind).toBe('practice'); // играет перрон, режиссёр не зовёт его отдельной сценой
+    expect(l.kind).toBe('practice'); // не сцена расписания: квоты сцен дней 2+ не меняются
+    expect(l.pass).toMatchObject({ firstTry: 0 }); // дошёл до конца — слова посажены, бит не повторяется
   });
 
   it('день 3: киоск «Kawa czy woda?» с тремя словами идёт и при зелёном R1 (разминка), и при красном (полностью)', () => {
@@ -215,6 +220,24 @@ describe('без звука: обход и турникет', () => {
     expect(main.querySelector('[data-audio]')).toBeNull();
     expect(main.querySelector('[data-fb="rule"]')).not.toBeNull();
     act(main, 'next').click();
+    await run;
+  });
+});
+
+describe('без звука: реплика-шаг урока (say)', () => {
+  it('у say в уроке без звука нет ▶ и «медленно», звук не играет', async () => {
+    let p = newProgress(T0 - DAY, 'w1');
+    p = setSetting(p, 'sound.mode', 'off', T0 - DAY);
+    const store = memStore(p);
+    const audio = fakeAudio();
+    const deps: LessonDeps = { overlay: createOverlay(host, { bus: testBus() }), content, store, audio, clock: { now: () => T0, mono: () => 0 }, coarse: true, typeMs: 0 };
+    const l = lesson('ch01.d02.znaki');
+    const run = runLesson({ ...l, steps: [l.steps![0]!] }, deps, { noSummary: true });
+    await flush(2);
+    expect(host.textContent).toContain('Wejście.');
+    expect(host.querySelector('[data-audio]')).toBeNull();
+    expect(audio.played).toEqual([]);
+    act(host, 'next').click();
     await run;
   });
 });
