@@ -1,5 +1,5 @@
 // Режиссёр (ТЗ §4.12, §5.0, I-13): каждое правило 1–10, слоты битов, раскрытие HUD, переходы
-// первого дня F1–F6 и последующих дней. Реальный контент (content/), журнал собирается событиями.
+// дня 1 по битам `d01.*` (P-05) и последующих дней. Реальный контент (content/), журнал собирается событиями.
 import { describe, expect, it } from 'vitest';
 import { getContent } from '../src/systems/content';
 import {
@@ -7,15 +7,17 @@ import {
   directorInput,
   FIRST_DAY,
   FIRST_DAY_DONE,
-  FIRST_REPAIR_FLAG,
+  FIRST_DAY_LINES,
+  day1Beats,
+  day1Done,
   firstFlag,
+  pocketSeeds,
   hudFlag,
   nextStep,
   reddestCluster,
   springFlag,
   stepKey,
   type DirectorStep,
-  type FirstStep,
   type LocalResume,
 } from '../src/systems/director';
 import type { EventDraft } from '../src/systems/log';
@@ -49,8 +51,11 @@ class World {
   }
 }
 
-const firstDone = (...fs: FirstStep[]): string[] => fs.map(firstFlag);
-const ALL_FIRST = [...firstDone('f1', 'f2', 'f3', 'f4', 'f5', 'f6'), FIRST_DAY_DONE];
+const D1 = day1Beats(content).map((b) => b.id);
+const firstDone = (...fs: string[]): string[] => fs.map(firstFlag);
+const ALL_FIRST = [...firstDone(...D1), FIRST_DAY_DONE];
+/** Биты дня 1 до `id` (не включая) сделаны. */
+const before = (id: string): string[] => firstDone(...D1.slice(0, D1.indexOf(id)));
 
 /** Диагностика: R3 красный (хуже всех), R6 жёлтый, остальные зелёные. */
 const diag = (ts: number): EventDraft => ({
@@ -85,55 +90,88 @@ describe('константы режиссёра ссылаются на суще
     const w = new World();
     const steps = [w.step(at(0))];
     for (const s of steps) if (s.line) expect(content.lines.has(s.line)).toBe(true);
-    for (const id of ['kazik.water.first', 'kazik.water.due', 'kazik.debt.jam', 'kazik.sunday', 'kazik.move.first', 'kazik.repair', 'kazik.resume', 'kazik.sleep', 'kazik.return.spring', 'kazik.evening', 'kazik.done'])
+    for (const id of ['kazik.water.due', 'kazik.debt.jam', 'kazik.sunday', 'kazik.repair', 'kazik.resume', 'kazik.sleep', 'kazik.return.spring', 'kazik.evening', 'sys.kazik.done', ...FIRST_DAY_LINES])
       expect(content.lines.has(id)).toBe(true);
+    // День 1 без заглушек (P-05): реплики кода и эффектов битов есть и не todo.
+    for (const id of FIRST_DAY_LINES) expect(content.lines.get(id)?.todo, id).toBeFalsy();
+    for (const b of day1Beats(content)) for (const e of b.do ?? []) if (e.line) expect(content.lines.get(e.line)?.todo, e.line).toBeFalsy();
   });
 });
 
-describe('правило 1: первый день F1–F6 (§5.0)', () => {
-  it('чистый мир → F1 вступление', () => {
+describe('правило 1: день 1 по битам d01.* (P-05, СЮЖЕТ_v2 §4)', () => {
+  it('биты дня 1 по сюжету: вокзал → … → сон; карты и цели существуют', () => {
+    expect(D1).toEqual([
+      'd01.dworzec', 'd01.fotobudka', 'd01.peron', 'd01.walizka', 'd01.ulica', 'd01.tablica', 'd01.wejscie', 'd01.bazar',
+      'd01.wisla', 'd01.dzialka', 'd01.podlewanie', 'd01.wiatr', 'd01.kapelusz', 'd01.brzechwa', 'd01.sadzenie', 'd01.wieczor', 'd01.sen',
+    ]);
+    for (const b of day1Beats(content)) {
+      const map = content.maps.get(b.target.location)?.value;
+      expect(map, b.id).toBeTruthy();
+      const t = b.target;
+      if (t.npc) expect(map!.objects.some((o) => o.type === 'npc' && o.id === t.npc), `${b.id}: npc ${t.npc}`).toBe(true);
+      if (t.object) expect(map!.objects.some((o) => 'id' in o && o.id === t.object), `${b.id}: ${t.object}`).toBe(true);
+      if (t.plot) expect(map!.objects.some((o) => o.type === 'plot' && o.id === t.plot), `${b.id}: ${t.plot}`).toBe(true);
+    }
+  });
+  it('чистый мир → карточка рассказчика, затем фотобудка в зале вокзала', () => {
     const s = new World().step(at(0));
-    expect(s).toMatchObject({ kind: 'intro', f: 'f1', target: { screen: 'intro' } });
+    expect(s).toMatchObject({ kind: 'intro', f: 'd01.dworzec', act: 'card', target: { location: 'ch01.dworzec', screen: 'intro' } });
     expect(s.reason).toMatch(/^1:/);
+    expect(new World().flag(...before('d01.fotobudka')).step(at(0))).toMatchObject({ f: 'd01.fotobudka', act: 'fotobudka', target: { location: 'ch01.dworzec', object: 'fotobudka' } });
   });
-  it('F1 → F2: полить одну грядку «Dzień dobry» без SRS; раскрывается паспорт', () => {
-    const s = new World().flag(firstFlag('f1')).add({ k: 'intro', ts: at(0), item: 'lx.dzien_dobry', lesson: 'ch01.intro', ok: ['rec'] }).step(at(0, 10.1));
-    expect(s).toMatchObject({ kind: 'intro', f: 'f2', mode: 'practice', target: { location: 'ch01.dzialka', plot: 'grzadki', item: 'lx.dzien_dobry' }, line: 'kazik.water.first' });
+  it('шаги идут строго по порядку: каждый флаг открывает следующий бит', () => {
+    const w = new World();
+    const seen: string[] = [];
+    for (let guard = 0; guard < 40; guard++) {
+      const s = w.step(at(0));
+      if (s.kind !== 'intro') break;
+      seen.push(s.f!);
+      if (s.act === 'brzechwa') w.flag('seed.lx.dziekuje', 'seed.lx.prosze', 'seed.lx.czesc');
+      if (s.act === 'plant') w.flag('plant.2_6.lx.dziekuje', 'plant.3_6.lx.prosze', 'plant.4_6.lx.czesc');
+      else w.flag(firstFlag(s.f!));
+      if (s.act === 'sleep') w.flag(FIRST_DAY_DONE).add(seg('sleep', at(0, 10.5)));
+    }
+    expect(seen).toEqual(D1);
+    expect(w.step(at(0, 11)).kind).toBe('done');
+  });
+  it('цели сцен: чемодан, табличка, вход на базар, лоток Хели, Казик у Вислы, шляпа, Брзехва, постель', () => {
+    const t = (id: string): DirectorStep => new World().flag(...before(id)).step(at(0));
+    expect(t('d01.peron')).toMatchObject({ target: { location: 'ch01.peron' }, do: [{ line: 'd01.kazik.platform.1' }, { line: 'd01.narr.platform.1' }] });
+    expect(t('d01.walizka')).toMatchObject({ act: 'sound', target: { npc: 'walizka' }, do: [{ startDialogue: 'dlg.ch01.d01_peron' }] });
+    expect(t('d01.tablica').target).toEqual({ location: 'ch01.bazar', object: 'tablica_bazar' });
+    expect(t('d01.wejscie').target).toEqual({ location: 'ch01.bazar', object: 'wejscie_bazar' });
+    expect(t('d01.bazar')).toMatchObject({ act: 'bazar', lesson: 'ch01.intro', target: { location: 'ch01.bazar', npc: 'pani_hela' } });
+    expect(t('d01.wisla')).toMatchObject({ target: { location: 'ch01.wisla', npc: 'bobr' }, do: [{ startDialogue: 'dlg.ch01.d01_wisla' }] });
+    expect(t('d01.kapelusz').target).toEqual({ location: 'ch01.dzialka', npc: 'kapelusz' });
+    expect(t('d01.brzechwa')).toMatchObject({ act: 'brzechwa', lesson: 'ch01.d01.brzechwa', target: { npc: 'brzechwa' } });
+    expect(t('d01.sen')).toMatchObject({ act: 'sleep', target: { location: 'ch01.chatka', object: 'poslanie' } });
+  });
+  it('полив: одна грядка «Dzień dobry» практикой без SRS, Казик рядом; паспорт раскрыт после лотка', () => {
+    const s = new World().flag(...before('d01.podlewanie')).add({ k: 'intro', ts: at(0), item: 'lx.dzien_dobry', lesson: 'ch01.intro', ok: ['rec'] }).step(at(0, 10.1));
+    expect(s).toMatchObject({ f: 'd01.podlewanie', act: 'water', mode: 'practice', target: { location: 'ch01.dzialka', plot: 'grzadki', item: 'lx.dzien_dobry', npc: 'bobr' } });
     expect(s.reveal).toEqual(['passport']);
+    expect(new World().flag(...before('d01.bazar')).step(at(0)).reveal).toBeUndefined();
   });
-  it('F2 → F3: путь к метро, к турникету Brzechwy; раскрывается Obchód', () => {
-    const s = new World().flag(...firstDone('f1', 'f2'), hudFlag('passport')).step(at(0));
-    expect(s).toMatchObject({ kind: 'intro', f: 'f3', target: { location: 'ch01.metro', npc: 'brzechwa' }, line: 'kazik.move.first' });
-    expect(s.reveal).toEqual(['obchod']);
+  it('посадка: шаг держится, пока в кармане есть семя; карман пуст → вечер у хатки', () => {
+    const w = new World().flag(...before('d01.sadzenie'), 'seed.lx.dziekuje', 'seed.lx.prosze', 'seed.lx.czesc');
+    expect(w.step(at(0))).toMatchObject({ f: 'd01.sadzenie', act: 'plant', target: { plot: 'grzadki' } });
+    w.flag('plant.2_6.lx.dziekuje', 'plant.3_6.lx.prosze');
+    expect(w.step(at(0)).f).toBe('d01.sadzenie');
+    w.flag('plant.4_6.lx.czesc');
+    expect(w.step(at(0)).f).toBe('d01.wieczor');
   });
-  it('F3 → F4: турникет = диагностика 1.0', () => {
-    const s = new World().flag(...firstDone('f1', 'f2', 'f3')).step(at(0));
-    expect(s).toMatchObject({ kind: 'intro', f: 'f4', lesson: 'ch01.s00', target: { location: 'ch01.metro', npc: 'brzechwa' } });
+  it('карман: семя без посадки; посаженное руками уходит из кармана', () => {
+    expect(pocketSeeds({ 'seed.lx.a': 1, 'seed.lx.b': 2, 'plant.3_4.lx.a': 3, 'beat.x': 4 })).toEqual(['lx.b']);
+    const plant = day1Beats(content).find((b) => b.act === 'plant')!;
+    expect(day1Done(plant, { 'seed.lx.a': 1 })).toBe(false);
+    expect(day1Done(plant, { 'seed.lx.a': 1, 'plant.1_1.lx.a': 2 })).toBe(true);
   });
-  it('диагностика уже есть (второе устройство): путь к метро не нужен', () => {
-    const s = new World().flag(...firstDone('f1', 'f2')).add(diag(at(0))).step(at(0, 11));
-    expect(s.f).toBe('f5');
-  });
-  it('F4: мало активных минут (флаг решения) → ремонтная сцена самого красного кластера', () => {
-    const w = new World().flag(...firstDone('f1', 'f2', 'f3'), FIRST_REPAIR_FLAG).add(diag(at(0)));
-    expect(reddestCluster({ clusterStatus: { R3: 'red', R6: 'yellow', R1: 'green', R9: 'red' }, clusterScore: { R3: 0.2, R6: 0.5, R9: 0.4 } })).toBe('R3');
-    expect(reddestCluster({ clusterStatus: { R6: 'yellow', R1: 'green' }, clusterScore: { R6: 0.7 } })).toBe('R6');
-    expect(reddestCluster({ clusterStatus: { R1: 'green' }, clusterScore: {} })).toBeNull();
-    const s = w.step(at(0, 10.5));
-    expect(s).toMatchObject({ kind: 'intro', f: 'f4', lesson: 'ch01.s03' });
-    // Ремонт попробован → F5.
-    w.add(lesson('ch01.s03', at(0, 10.6), false));
-    expect(w.step(at(0, 10.7)).f).toBe('f5');
-  });
-  it('F4 без флага решения (минут хватило) → сразу F5: 3 пары самого красного кластера', () => {
-    const s = new World().flag(...firstDone('f1', 'f2', 'f3')).add(diag(at(0))).step(at(0, 10.5));
-    expect(s).toMatchObject({ kind: 'intro', f: 'f5', mode: 'phonetic', limit: 3, cluster: 'R3', target: { object: 'ryby' } });
-  });
-  it('F5 → F6: альтанка; все кластеры зелёные — вечер пропускается', () => {
-    const w = new World().flag(...firstDone('f1', 'f2', 'f3', 'f4', 'f5')).add(diag(at(0)));
-    expect(w.step(at(0, 11))).toMatchObject({ kind: 'intro', f: 'f6', target: { object: 'altana_sleep' }, line: 'kazik.sleep' });
-    const green = new World().flag(...firstDone('f1', 'f2', 'f3', 'f4')).add({ k: 'diag', ts: at(0), results: { R1: { ok: 10, n: 10 } } });
-    expect(green.step(at(0, 11)).f).toBe('f6');
+  it('выход на следующую карту закрыт, пока сцена не сыграна (if по флагу бита)', () => {
+    const exits = (loc: string): string[] => content.maps.get(loc)!.value.objects.filter((o) => o.type === 'exit').map((o) => JSON.stringify(o.type === 'exit' ? o.if ?? null : null));
+    expect(exits('ch01.peron')).toContain(JSON.stringify({ flag: 'beat.d01.walizka' }));
+    expect(exits('ch01.bazar')).toContain(JSON.stringify({ flag: 'beat.d01.bazar' }));
+    expect(exits('ch01.wisla')).toContain(JSON.stringify({ flag: 'beat.d01.wisla' }));
+    expect(exits('ch01.dzialka')).toContain(JSON.stringify({ flag: 'beat.d01.wieczor' }));
   });
   it('первый день закрыт → дальше обычные правила (тот же день: до завтра)', () => {
     const w = new World().flag(...ALL_FIRST).add(diag(at(0)), seg('evening', at(0, 11)), seg('sleep', at(0, 12)));
@@ -174,12 +212,11 @@ describe('правила 4–10 обычного дня', () => {
   const day2 = (): World =>
     new World()
       .flag(...ALL_FIRST, hudFlag('passport'), hudFlag('obchod'))
-      .add(diag(at(-1)), lesson('ch01.intro', at(-1)), intro('lx.woda', at(-1, 10.5)), seg('evening', at(-1, 11)), seg('sleep', at(-1, 12)));
+      .add(diag(at(-1)), lesson('ch01.intro', at(-1)), lesson('ch01.d01.brzechwa', at(-1)), intro('lx.woda', at(-1, 10.5)), seg('evening', at(-1, 11)), seg('sleep', at(-1, 12)));
 
-  it('бит слота start (kazik_most) раньше полива; цель — бобр на działce', () => {
-    const s = day2().step(at(0));
-    expect(s).toMatchObject({ kind: 'beat', beat: 'kazik_most', line: 'kazik.dream.most', target: { location: 'ch01.dzialka', npc: 'bobr' } });
-    expect(s.do).toEqual([{ line: 'kazik.dream.gryze' }]);
+  it('мечта Казика о мосте теперь сцена дня 1 (Висла): бита kazik_most на день 2 нет, сразу полив', () => {
+    expect(content.director.beats.some((b) => b.id === 'kazik_most' || b.id === 'brzechwa_rym')).toBe(false);
+    expect(day2().step(at(0)).kind).toBe('water');
   });
   it('5: полив, пока сегодня не поливали', () => {
     const w = day2().flag('beat.kazik_most');
@@ -218,10 +255,6 @@ describe('правила 4–10 обычного дня', () => {
     const s = w.step(at(0, 10.3));
     expect(s).toMatchObject({ kind: 'boss', lesson: 'ch01.boss', target: { npc: 'konduktor' } });
   });
-  it('бит afterScene (Brzechwa рифмует имя) после сцены, до вечера', () => {
-    const w = day2().flag('beat.kazik_most').add(seg('water', at(0, 10.2)), lesson('ch01.s03', at(0, 10.4)), seg('scene', at(0, 10.4)));
-    expect(w.step(at(0, 10.5))).toMatchObject({ kind: 'beat', beat: 'brzechwa_rym', target: { npc: 'brzechwa' } });
-  });
   it('8 → 9 → 10: вечер на звуки, альтанка, до завтра с «ещё 3 минуты»', () => {
     const w = day2().flag('beat.kazik_most', 'beat.brzechwa_rym').add(seg('water', at(0, 10.2)), lesson('ch01.s03', at(0, 10.4)), seg('scene', at(0, 10.4)));
     expect(w.step(at(0, 10.5))).toMatchObject({ kind: 'evening', mode: 'phonetic', target: { object: 'ryby' } });
@@ -229,7 +262,7 @@ describe('правила 4–10 обычного дня', () => {
     expect(w.step(at(0, 10.7))).toMatchObject({ kind: 'sleep', line: 'kazik.sleep', target: { object: 'altana_sleep' } });
     w.add(seg('sleep', at(0, 10.8)));
     const done = w.step(at(0, 10.9));
-    expect(done).toMatchObject({ kind: 'done', line: 'kazik.done' });
+    expect(done).toMatchObject({ kind: 'done', line: 'sys.kazik.done' });
     expect(done.reason).toMatch(/^10:/);
   });
   it('done: «ещё 3 минуты» = экспресс, если есть что полить', () => {
@@ -249,10 +282,10 @@ describe('раскрытие HUD и детерминизм', () => {
     expect(w.flag(hudFlag('jars')).step(at(0)).reveal).toBeUndefined();
   });
   it('один и тот же вход → один и тот же шаг; stepKey меняется при смене шага', () => {
-    const w = new World().flag(...firstDone('f1', 'f2', 'f3'));
+    const w = new World().flag(...before('d01.bazar'));
     const a = w.step(at(0));
     expect(w.step(at(0))).toEqual(a);
-    const b = w.add(diag(at(0))).step(at(0, 10.5));
+    const b = w.flag(firstFlag('d01.bazar')).step(at(0, 10.5));
     expect(stepKey(a)).not.toBe(stepKey(b));
   });
 });

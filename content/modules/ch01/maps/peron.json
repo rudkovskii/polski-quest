@@ -1,0 +1,203 @@
+{
+  "id": "ch01.peron",
+  "title": {
+    "pl": "Peron",
+    "ru": "Перрон"
+  },
+  "tileset": "ninja16",
+  "controls": "walk",
+  "size": [
+    18,
+    26
+  ],
+  "defaultGround": ".",
+  "legend": {
+    ".": {
+      "tile": "peron"
+    },
+    "r": {
+      "tile": "rails",
+      "solid": true
+    },
+    "n": {
+      "tile": "train_nl",
+      "solid": true
+    },
+    "N": {
+      "tile": "train_nr",
+      "solid": true
+    },
+    "w": {
+      "tile": "train_wl",
+      "solid": true
+    },
+    "W": {
+      "tile": "train_wr",
+      "solid": true
+    },
+    "d": {
+      "tile": "train_dr",
+      "solid": true
+    },
+    "j": {
+      "tile": "train_jl",
+      "solid": true
+    },
+    "J": {
+      "tile": "train_jr",
+      "solid": true
+    },
+    "e": {
+      "tile": "peron_edge"
+    },
+    "E": {
+      "tile": "peron_edge_r"
+    },
+    "[": {
+      "tile": "pbench_l",
+      "solid": true
+    },
+    "-": {
+      "tile": "pbench_m",
+      "solid": true
+    },
+    "]": {
+      "tile": "pbench_r",
+      "solid": true
+    },
+    "l": {
+      "tile": "plamp_top",
+      "solid": true
+    },
+    "i": {
+      "tile": "plamp_pole",
+      "solid": true
+    },
+    "#": {
+      "tile": "wall",
+      "solid": true
+    },
+    "=": {
+      "tile": "stairs"
+    }
+  },
+  "layers": {
+    "ground": [
+      "rrre###==####Errrr",
+      "rrre.........Errrr",
+      "rnNe.........Errrr",
+      "rwde.........Errrr",
+      "rwWe..l...l..Errrr",
+      "rwWe..i...i..Errrr",
+      "rwde.........Errrr",
+      "rwWe.........Errrr",
+      "rjJe.........Errrr",
+      "rwde...####..Errrr",
+      "rwWe...#==#..Errrr",
+      "rwWe...#==#..Errrr",
+      "rwde.........Errrr",
+      "rwWe.........Errrr",
+      "rjJe..[-]....Errrr",
+      "rwde.........Errrr",
+      "rwWe..l...l..Errrr",
+      "rwWe..i...i..Errrr",
+      "rwde.........Errrr",
+      "rwWe.........Errrr",
+      "rjJe..[-]....Errrr",
+      "rwde.........Errrr",
+      "rwWe..l...l..Errrr",
+      "rwWe..i...i..Errrr",
+      "rwde.........Errrr",
+      "rwWe.........Errrr"
+    ]
+  },
+  "spawns": {
+    "default": [
+      8,
+      2
+    ],
+    "from_dworzec": [
+      8,
+      1
+    ],
+    "from_bazar": [
+      9,
+      12
+    ]
+  },
+  "objects": [
+    {
+      "type": "npc",
+      "id": "walizka",
+      "at": [
+        8,
+        7
+      ],
+      "if": {
+        "not": {
+          "flag": "beat.d01.walizka"
+        }
+      }
+    },
+    {
+      "type": "npc",
+      "id": "bobr",
+      "at": [
+        9,
+        7
+      ],
+      "facing": "left"
+    },
+    {
+      "type": "sign",
+      "at": [
+        7,
+        9
+      ],
+      "pl": "WYJŚCIE",
+      "ru": "Выход"
+    },
+    {
+      "type": "exit",
+      "at": [
+        7,
+        0
+      ],
+      "to": "ch01.dworzec",
+      "spawn": "from_peron"
+    },
+    {
+      "type": "exit",
+      "at": [
+        8,
+        0
+      ],
+      "to": "ch01.dworzec",
+      "spawn": "from_peron"
+    },
+    {
+      "type": "exit",
+      "at": [
+        8,
+        11
+      ],
+      "to": "ch01.bazar",
+      "spawn": "from_peron",
+      "if": {
+        "flag": "beat.d01.walizka"
+      }
+    },
+    {
+      "type": "exit",
+      "at": [
+        9,
+        11
+      ],
+      "to": "ch01.bazar",
+      "spawn": "from_peron",
+      "if": {
+        "flag": "beat.d01.walizka"
+      }
+    }
+  ]
+}

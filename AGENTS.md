@@ -182,6 +182,25 @@
 - Экран `src/ui/creator.ts`: `openCreator({ mode: 'new' | 'mirror' })` → `ui:creator:show`. Новый мир: `flow.ts` открывает
   его перед вступлением F1. Фото — `passportModel().owner`. Dev: `/?dev=creator&mute=1[&mode=mirror][&seed=N]`.
 
+## Играбельный день 1 (P-05)
+- День 1 = биты слота `day1` в `content/director.json` (id `d01.*`, флаг `beat.<id>`), по порядку СЮЖЕТ_v2 §4: вокзал (карточка) →
+  фотобудка → перрон → чемодан и выбор звука → улица → табличка → вход на базар → лоток Хели → Висла → działka → полив →
+  ветер → шляпа → Брзехва → посадка → вечер → сон. `firstDay()` в director.ts берёт первый несделанный бит с истинным `if`;
+  посадка сделана, когда карман пуст (`pocketSeeds`). После сна склейка ставит `beat.first_day_done`.
+- Бит без `npc/object/plot/screen` и без `act` играется сам, как только Дима на его карте (`isAutoBeat`, flow.ts); у бита с `act`
+  своё действие в `src/flow.ts` (`day1`): `card`, `fotobudka` (openCreator), `sound` (флаги `d01.sound.on|mute` → настройка
+  `sound.mode`), `bazar` (плитки, паспорт, печать — `ui/intro.ts`), `water`, `brzechwa` (урок `ch01.d01.brzechwa` по чанку на
+  слово: `play.openLesson(id, { item })`, семя `seed.<item>` до чанка), `plant` (руками), `sleep` (итог карточкой `SummaryView`, ночь).
+- Реплики, которые показывает код, — константа `D01` (director.ts); они и всё, что в `do` битов `day1` и их диалогах, входят в
+  проверку `validate:release` / `build:release` (`todo` в дне 1 = ошибка). Заглушки дней 2+ сюда не входят.
+- Карты дня 1: `ch01.dworzec`, `ch01.peron`, `ch01.bazar` (улица + базар), `ch01.wisla`, `ch01.chatka` (хатка) + `ch01.dzialka`.
+  Выход дальше закрыт `if` по флагу сцены; ширина ≥ 12 и высота ≥ 26 клеток (iPhone zoom 2 без пустоты, тест mapsDay1).
+  Пока виден d-pad, камера даёт карте уехать вверх на его высоту (`DPAD_INSET`, Location.ts). `world:teleport` принимает `facing`.
+- Предметы на карте, которые исчезают по ходу сцены (чемодан, шляпа), — NPC-персонажи `walizka`, `kapelusz` с `if`.
+  Компаньона на карте нет, если там стоит NPC `bobr` (в зале вокзала он спрятан `if` — Казик появляется на перроне).
+- Арт: `art/sprites/{fotobudka,train,peron,tablo,kamienica,poslanie,walizka,kapelusz}.sprite.json` + тайлы в `ninja16.json`.
+- Dev: `/?reset=1&mute=1` — весь день с нуля; в скрытой вкладке кадры шагать `window.__pq.game.loop.step(t)`.
+
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
 2. Id: модуль `[a-z0-9_]+`, урок `<module>.<name>`, слово `lx.<slug>` (глобально уникально),

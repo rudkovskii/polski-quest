@@ -1,0 +1,85 @@
+{
+ "id": "tile.peron",
+ "note": "Перрон (P-05): 0 бетонные плиты, 1 край перрона с жёлтой линией (путь слева), 2 рельсы на щебне, 3 край справа (зеркало 1).",
+ "size": [
+  16,
+  16
+ ],
+ "anchor": [
+  0,
+  0
+ ],
+ "keys": {
+  ".": null,
+  "o": "ink",
+  "a": "moss_3",
+  "A": "moss_2",
+  "y": "accent_window",
+  "Y": "sand_4",
+  "g": "grey_5",
+  "G": "grey_2",
+  "b": "brown_1",
+  "B": "brown_0",
+  "s": "moss_2",
+  "S": "blue_7"
+ },
+ "frames": [
+  [
+   "aaaaaaAaaaaaaaaA",
+   "AaaaaaaaaaAaaaaA",
+   "aaaaaaaaaaaaaAaA",
+   "AaaaaaaaaAaAaaAA",
+   "aaAAaaaaaaaaaaaA",
+   "aaAaaaaaaaaaaaAA",
+   "aaaAaaaaaaaaAaAA",
+   "AAAAAAAAAAAAAAAA",
+   "aaaaaaaaaaaaaaaA",
+   "aaaaaaaaaaaaaaaA",
+   "AaaaaaaaaaaaaaaA",
+   "aaaaaaaaaaaaaaaA",
+   "aaaaAaaaaaaAaaAA",
+   "aaaAaaaaaaAaaaaA",
+   "aAaaaaaaaaaaaaaA",
+   "AAAAAAAAAAAAAAAA"
+  ],
+  [
+   "oAayYyAaaaaaaaaA",
+   "oAayyyaaaaAaaaaA",
+   "oAayyyaaaaaaaAaA",
+   "oAayyyaaaAaAaaAA",
+   "oAAyYyaaaaaaaaaA",
+   "oAAyyyaaaaaaaaAA",
+   "oAayyyaaaaaaAaAA",
+   "oAAyyyAAAAAAAAAA",
+   "oAayYyaaaaaaaaaA",
+   "oAayyyaaaaaaaaaA",
+   "oAayyyaaaaaaaaaA",
+   "oAayyyaaaaaaaaaA",
+   "oAayYyaaaaaAaaAA",
+   "oAayyyaaaaAaaaaA",
+   "oAayyyaaaaaaaaaA",
+   "oAAyyyAAAAAAAAAA"
+  ],
+  [
+   "gggsSgggggggsSGg",
+   "gbbsSbbbbbbbsSbg",
+   "gbbsSbbbbbbbsSbg",
+   "gBBsSBBBBBBBsSBG",
+   "ggGsSggggGggsSGg",
+   "gGGsSgGggggGsSgg",
+   "gbbsSbbbbbbbsSbg",
+   "gbbsSbbbbbbbsSbg",
+   "gBBsSBBBBBBBsSBG",
+   "gGgsSgGgGGggsSgg",
+   "gGgsSggggGggsSgg",
+   "gbbsSbbbbbbbsSbg",
+   "gbbsSbbbbbbbsSbg",
+   "gBBsSBBBBBBBsSBG",
+   "gggsSgggGGggsSgG",
+   "GggsSgggGGggsSGG"
+  ],
+  {
+   "flip": 1
+  }
+ ]
+}

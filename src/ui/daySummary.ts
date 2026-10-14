@@ -34,6 +34,15 @@ export interface DaySummaryDeps {
   /** У мира есть приватная ссылка (секрет): тогда напоминаем сохранить её, пока чекбокс не отмечен. */
   hasLink?: () => boolean;
   onEvent?(e: LogEvent): void;
+  /** Своя карточка итога (P-05, день 1): строки вместо счётчиков, крючок на завтра, только «Dobranoc». */
+  view?: SummaryView;
+}
+
+/** Итог дня карточкой из реплик (СЮЖЕТ_v2 d01.s8): `lines` — строки итога, `hook` — «Jutro: …», `bobr` — реплика сверху (null — без неё). */
+export interface SummaryView {
+  bobr?: string | null;
+  lines: string[];
+  hook?: string;
 }
 
 export type SummaryOutcome = 'sleep' | 'more3' | 'express' | 'close';
@@ -49,6 +58,9 @@ const css = `
 .pq-sleep .row { display: flex; gap: 8px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
 .pq-sleep .more3 { font-size: 16px; text-decoration: underline; min-height: 44px; }
 .pq-sleep .remind { font-size: 16px; color: #8f3e56; }
+.pq-sleep .card-line { display: flex; flex-direction: column; gap: 2px; font-size: 20px; font-weight: 700; color: #3a2c38; }
+.pq-sleep .card-line small { font-size: 15px; font-weight: 400; color: #543c52; }
+.pq-sleep .hook { margin-top: 6px; color: #8f3e56; }
 `;
 
 function ensureStyle(doc: Document): void {
@@ -88,6 +100,25 @@ export function summaryBody(s: DaySummary, content: Pick<Content, 'vocab' | 'lin
   return out;
 }
 
+/** Тело карточки итога из реплик (день 1). */
+export function summaryCard(v: SummaryView, content: Pick<Content, 'vocab' | 'lines'>): HTMLElement[] {
+  const out: HTMLElement[] = [];
+  const line = v.bobr === null ? null : bobrLine(content, v.bobr ?? 'kazik.sleep');
+  if (line) out.push(line);
+  const row = (id: string, cls: string): HTMLElement | null => {
+    const l = content.lines.get(id);
+    if (!l || l.todo) return null;
+    return el('div', { class: `card-line ${cls}`.trim(), 'data-line': id }, el('span', { lang: 'pl' }, l.pl ?? l.ru ?? ''), l.pl && l.plRu ? el('small', {}, l.plRu) : null);
+  };
+  for (const id of v.lines) {
+    const r = row(id, '');
+    if (r) out.push(r);
+  }
+  const hook = v.hook ? row(v.hook, 'hook') : null;
+  if (hook) out.push(hook);
+  return out;
+}
+
 /** Открыть итог дня. Возвращает, чем закончился: сон, «ещё 3 минуты», экспресс (пустой день) или закрыт. */
 export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
   ensureStyle(document);
@@ -118,7 +149,9 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
     };
     const main = plBtn(BTN.dobranoc, dobranoc, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'sleep' });
     const actions: HTMLElement[] = [];
-    if (s.empty) actions.push(plBtn(BTN.express, () => finish('express'), '', { 'data-nav': true, 'data-act': 'express' }));
+    if (deps.view) {
+      // день 1: только «Dobranoc»
+    } else if (s.empty) actions.push(plBtn(BTN.express, () => finish('express'), '', { 'data-nav': true, 'data-act': 'express' }));
     else actions.push(btn('ещё 3 минуты повторений', () => finish('more3'), 'ghost more3', { 'data-nav': true, 'data-act': 'more3' }));
     actions.push(main);
 
@@ -136,7 +169,7 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
         : null;
 
     layer.el.replaceChildren(
-      el('div', { class: 'pq-wood pq-sleep', 'data-summary': s.day }, el('h2', {}, 'Итог дня'), ...summaryBody(s, content), remind, el('div', { class: 'row' }, ...actions)),
+      el('div', { class: 'pq-wood pq-sleep', 'data-summary': s.day }, el('h2', {}, 'Итог дня'), ...(deps.view ? summaryCard(deps.view, content) : summaryBody(s, content)), remind, el('div', { class: 'row' }, ...actions)),
     );
     layer.handle({ cancel: () => (finish('close'), true) });
     queueMicrotask(() => main.focus({ preventScroll: true }));

@@ -8,7 +8,7 @@
       "layer": "warszawa",
       "title": { "pl": "Praga", "ru": "Прага" },
       "mapRegion": [40, 60, 80, 70],
-      "locations": ["ch01.dzialka", "ch01.metro"],
+      "locations": ["ch01.dzialka", "ch01.metro", "ch01.dworzec", "ch01.peron", "ch01.bazar", "ch01.wisla", "ch01.chatka"],
       "modules": ["ch01"],
       "hosts": ["brzechwa", "bobr"],
       "stamp": "stamp.praga",

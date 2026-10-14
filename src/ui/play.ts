@@ -48,7 +48,8 @@ export interface PlayDeps {
 
 export interface Play {
   overlay: Overlay;
-  openLesson(id: string): Promise<LessonResult | null>;
+  /** Урок; `item` — только чанк этого слова (шаги с `item`, `introduces: [item]`, без итога): сцена дня 1 у забора (P-05). */
+  openLesson(id: string, o?: { item?: string }): Promise<LessonResult | null>;
   openDialog(id: string): Promise<void>;
   /** Паспорт (§5.10, I-11); то же по `ui:screen:open { screen: 'passport' }`. */
   openPassport(): Promise<void>;
@@ -121,8 +122,11 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
   });
 
-  const lessonById = async (store: PlayStore, id: string): Promise<LessonResult | null> => {
-    const l0 = content.lessons.get(id)?.value;
+  const lessonById = async (store: PlayStore, id: string, item?: string): Promise<LessonResult | null> => {
+    const full = content.lessons.get(id)?.value;
+    // Чанк одного слова (P-05): реплики сюжета идут между чанками, слово за словом.
+    const chunk = full && item ? (full.steps ?? []).filter((s) => s.item === item) : [];
+    const l0: Lesson | undefined = full && item && chunk.length ? { ...full, steps: chunk as [Step, ...Step[]], introduces: (full.introduces ?? []).filter((x) => x === item) } : full;
     if (!l0) {
       console.warn(`[ui] урока ${id} нет в контенте`);
       return null;
@@ -143,7 +147,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
       return null;
     }
     const wasPassed = l.kind === 'boss' && d.bossResults[id]?.passedAt !== undefined;
-    const result = await runLesson(l, lessonDeps(store));
+    const result = await runLesson(l, lessonDeps(store), item ? { noSummary: true } : {});
     // Отрезок дня (§3.11 seg, I-13): сцена, босс, диагностика → `scene`; лекарство → `remedy`. Пишет тот, кто
     // знает, что урок закончен (не прерван): склейка оверлея. Режиссёр читает seg за сегодня.
     if (!result.cancelled) {
@@ -320,7 +324,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
       await guard((s) => runLines(ids.map((id) => speechOfLine(id, content.lines)), dialogDeps(s)));
     },
     dialogFor,
-    openLesson: (id) => guard((s) => lessonById(s, id)).then((r) => r ?? null),
+    openLesson: (id, o) => guard((s) => lessonById(s, id, o?.item)).then((r) => r ?? null),
     openDialog: async (id) => {
       await guard((s) => dialogById(s, id));
     },

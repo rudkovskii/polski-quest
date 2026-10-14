@@ -16,8 +16,12 @@
         "required": ["id", "slot", "if", "target"],
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "Флаг показа: beat.<id>" },
-          "slot": { "enum": ["start", "afterWater", "afterScene", "beforeSleep"] },
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$", "description": "Флаг показа: beat.<id>; биты дня N — dNN.<сцена> (P-05)" },
+          "slot": { "enum": ["start", "afterWater", "afterScene", "beforeSleep", "day1"], "description": "day1 — сцены первого дня по порядку (P-05): режиссёр ведёт по ним до сна" },
+          "act": {
+            "enum": ["card", "fotobudka", "sound", "bazar", "water", "brzechwa", "plant", "sleep"],
+            "description": "Действие склейки (src/flow.ts) сверх эффектов do: карточка рассказчика, Fotobudka, выбор звука, лоток и паспорт, полив, урок у забора, посадка, сон"
+          },
           "once": { "type": "boolean" },
           "if": { "$ref": "common.schema.json#/$defs/cond" },
           "target": { "$ref": "common.schema.json#/$defs/target" },

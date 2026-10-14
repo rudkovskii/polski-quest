@@ -1,0 +1,202 @@
+{
+  "id": "ch01.dworzec",
+  "title": {
+    "pl": "Warszawa Wschodnia",
+    "ru": "Варшава-Восточная: зал"
+  },
+  "tileset": "ninja16",
+  "controls": "walk",
+  "size": [
+    18,
+    26
+  ],
+  "defaultGround": ".",
+  "legend": {
+    ".": {
+      "tile": "hall"
+    },
+    "#": {
+      "tile": "hall_wall",
+      "solid": true
+    },
+    "F": {
+      "tile": "fotobudka",
+      "solid": true,
+      "auto": true
+    },
+    "a": {
+      "tile": "tablo_l",
+      "solid": true
+    },
+    "b": {
+      "tile": "tablo_m",
+      "solid": true
+    },
+    "c": {
+      "tile": "tablo_r",
+      "solid": true
+    },
+    "[": {
+      "tile": "bench_l",
+      "solid": true
+    },
+    "-": {
+      "tile": "bench_m",
+      "solid": true
+    },
+    "]": {
+      "tile": "bench_r",
+      "solid": true
+    },
+    "m": {
+      "tile": "biletomat",
+      "solid": true
+    },
+    "p": {
+      "tile": "plant_t",
+      "solid": true
+    },
+    "q": {
+      "tile": "plant_b",
+      "solid": true
+    },
+    "D": {
+      "tile": "hall_door",
+      "solid": true
+    },
+    "=": {
+      "tile": "stairs"
+    }
+  },
+  "layers": {
+    "ground": [
+      "##################",
+      "#######abc########",
+      "#p..............p#",
+      "#q..............q#",
+      "#................#",
+      "#..FF............#",
+      "#..FF............#",
+      "#................#",
+      "D.......[-]......D",
+      "#................#",
+      "#..[-]......[-]..#",
+      "#................#",
+      "#m..............m#",
+      "#................#",
+      "#..[-]......[-]..#",
+      "#................#",
+      "#................#",
+      "#p......##......p#",
+      "#q.....#==#.....q#",
+      "#......#==#......#",
+      "#......#==#......#",
+      "#................#",
+      "#..[-]......[-]..#",
+      "#................#",
+      "#p..............p#",
+      "##################"
+    ]
+  },
+  "spawns": {
+    "default": [
+      3,
+      8
+    ],
+    "start": [
+      3,
+      7
+    ],
+    "from_peron": [
+      8,
+      21
+    ]
+  },
+  "objects": [
+    {
+      "type": "trigger",
+      "id": "fotobudka",
+      "at": [
+        3,
+        5
+      ],
+      "size": [
+        2,
+        2
+      ],
+      "on": "tap",
+      "do": []
+    },
+    {
+      "type": "sign",
+      "at": [
+        8,
+        1
+      ],
+      "pl": "WARSZAWA WSCHODNIA",
+      "ru": "Варшава-Восточная (вокзал)"
+    },
+    {
+      "type": "sign",
+      "at": [
+        1,
+        12
+      ],
+      "pl": "BILETY",
+      "ru": "Билеты"
+    },
+    {
+      "type": "sign",
+      "at": [
+        16,
+        12
+      ],
+      "pl": "BILETY",
+      "ru": "Билеты"
+    },
+    {
+      "type": "sign",
+      "at": [
+        8,
+        17
+      ],
+      "pl": "PERONY",
+      "ru": "Платформы"
+    },
+    {
+      "type": "npc",
+      "id": "bobr",
+      "at": [
+        1,
+        2
+      ],
+      "if": {
+        "flag": "never.dworzec"
+      }
+    },
+    {
+      "type": "exit",
+      "at": [
+        8,
+        20
+      ],
+      "to": "ch01.peron",
+      "spawn": "from_dworzec",
+      "if": {
+        "flag": "beat.d01.fotobudka"
+      }
+    },
+    {
+      "type": "exit",
+      "at": [
+        9,
+        20
+      ],
+      "to": "ch01.peron",
+      "spawn": "from_dworzec",
+      "if": {
+        "flag": "beat.d01.fotobudka"
+      }
+    }
+  ]
+}

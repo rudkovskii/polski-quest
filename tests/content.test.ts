@@ -574,14 +574,28 @@ describe('P-01: объяснение ошибки и бит первого дн�
   });
 
   it('без --release заглушки первого дня — одно предупреждение; с --release — ошибка на каждую', () => {
-    // В фикстуре: ремонтная сцена R3 = demo.s01, её запускает dlg.demo.marek, а там line bobr.after_kawa (todo).
-    expectIssue(run(), 'todo', /первый день: \d+ заглушек todo .*PQ_RELEASE=1/, 'story/lines.json', 'warn');
-    const rel = run(undefined, { release: true });
+    // P-05: день 1 — биты слота day1. В фикстуру добавлен бит с эффектом line bobr.after_kawa (todo) и диалогом dlg.demo.marek.
+    const day1 = (f: Parameters<Parameters<typeof run>[0] & object>[0]): void => {
+      fx.director(f).beats.push({ id: 'd01.demo', slot: 'day1', if: { always: true }, target: { location: 'demo.ogrod' }, do: [{ line: 'bobr.after_kawa' }, { startDialogue: 'dlg.demo.marek' }] });
+    };
+    expectIssue(run(day1), 'todo', /первый день: \d+ заглушек todo .*PQ_RELEASE=1/, 'story/lines.json', 'warn');
+    const rel = run(day1, { release: true });
     expectIssue(rel, 'todo', /первый день: реплика "bobr\.after_kawa" ещё todo, а сборка release/, 'story/lines.json');
-    expectIssue(rel, 'todo', /первый день: нет реплики "intro\.caption\.oct"/, 'director.json');
+    expectIssue(rel, 'todo', /первый день: нет реплики "d01\.narr\.card\.1"/, 'director.json');
     // Реплика написана — ошибки по ней нет.
-    const fixed = run((f) => Object.assign(fx.lines(f).find((l) => l.id === 'bobr.after_kawa')!, { todo: false, pl: 'Dobra kawa.', plRu: 'Хороший кофе.' }), { release: true });
+    const fixed = run((f) => {
+      day1(f);
+      Object.assign(fx.lines(f).find((l) => l.id === 'bobr.after_kawa')!, { todo: false, pl: 'Dobra kawa.', plRu: 'Хороший кофе.' });
+    }, { release: true });
     expect(fixed.some((i) => i.level === 'error' && /bobr\.after_kawa/.test(i.msg))).toBe(false);
+    // Бит не дня 1 (слот start) в проверку дня 1 не входит.
+    const other = run((f) => (at(fx.director(f).beats, 0).line = 'bobr.after_kawa'), { release: true });
+    expect(other.some((i) => i.level === 'error' && /первый день: реплика "bobr\.after_kawa"/.test(i.msg))).toBe(false);
+  });
+
+  it('реальный контент: в дне 1 нет ни одной заглушки (release)', () => {
+    const { issues } = validateDir({ release: true, base: 'HEAD' });
+    expect(issues.filter((i) => i.level === 'error'), issues.map((i) => i.msg).join('\n')).toEqual([]);
   });
 
   it('реальный контент: все реплики первого дня есть в story/lines.json (release ловит только todo)', () => {

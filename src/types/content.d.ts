@@ -361,10 +361,17 @@ export interface Director {
 }
 export interface Beat {
   /**
-   * Флаг показа: beat.<id>
+   * Флаг показа: beat.<id>; биты дня N — dNN.<сцена> (P-05)
    */
   id: string;
-  slot: 'start' | 'afterWater' | 'afterScene' | 'beforeSleep';
+  /**
+   * day1 — сцены первого дня по порядку (P-05): режиссёр ведёт по ним до сна
+   */
+  slot: 'start' | 'afterWater' | 'afterScene' | 'beforeSleep' | 'day1';
+  /**
+   * Действие склейки (src/flow.ts) сверх эффектов do: карточка рассказчика, Fotobudka, выбор звука, лоток и паспорт, полив, урок у забора, посадка, сон
+   */
+  act?: 'card' | 'fotobudka' | 'sound' | 'bazar' | 'water' | 'brzechwa' | 'plant' | 'sleep';
   once?: boolean;
   if: Condition;
   target: Target;

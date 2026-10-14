@@ -5,7 +5,7 @@
  "margin": 1,
  "spacing": 2,
  "columns": 16,
- "count": 85,
+ "count": 176,
  "tiles": {
   "altana": {
    "kind": "auto16",
@@ -28,10 +28,100 @@
     70
    ]
   },
+  "barrel": {
+   "kind": "single",
+   "frames": [
+    132
+   ]
+  },
+  "bench_l": {
+   "kind": "single",
+   "frames": [
+    144
+   ]
+  },
+  "bench_m": {
+   "kind": "single",
+   "frames": [
+    145
+   ]
+  },
+  "bench_r": {
+   "kind": "single",
+   "frames": [
+    146
+   ]
+  },
+  "biletomat": {
+   "kind": "single",
+   "frames": [
+    158
+   ]
+  },
+  "boat_l": {
+   "kind": "single",
+   "frames": [
+    167
+   ]
+  },
+  "boat_r": {
+   "kind": "single",
+   "frames": [
+    168
+   ]
+  },
   "bush": {
    "kind": "single",
    "frames": [
     84
+   ]
+  },
+  "chest": {
+   "kind": "single",
+   "frames": [
+    134
+   ]
+  },
+  "clothes_ne": {
+   "kind": "single",
+   "frames": [
+    154
+   ]
+  },
+  "clothes_nw": {
+   "kind": "single",
+   "frames": [
+    153
+   ]
+  },
+  "clothes_se": {
+   "kind": "single",
+   "frames": [
+    156
+   ]
+  },
+  "clothes_sw": {
+   "kind": "single",
+   "frames": [
+    155
+   ]
+  },
+  "cobble": {
+   "kind": "single",
+   "frames": [
+    87
+   ]
+  },
+  "crate": {
+   "kind": "single",
+   "frames": [
+    131
+   ]
+  },
+  "deck": {
+   "kind": "single",
+   "frames": [
+    105
    ]
   },
   "fence": {
@@ -66,10 +156,67 @@
     75
    ]
   },
+  "fotobudka": {
+   "kind": "auto16",
+   "frames": [
+    116,
+    116,
+    116,
+    118,
+    116,
+    116,
+    116,
+    116,
+    116,
+    119,
+    116,
+    116,
+    117,
+    116,
+    116,
+    116
+   ]
+  },
   "gate": {
    "kind": "single",
    "frames": [
     77
+   ]
+  },
+  "gr_bench_l": {
+   "kind": "single",
+   "frames": [
+    170
+   ]
+  },
+  "gr_bench_m": {
+   "kind": "single",
+   "frames": [
+    171
+   ]
+  },
+  "gr_bench_r": {
+   "kind": "single",
+   "frames": [
+    172
+   ]
+  },
+  "gr_crate": {
+   "kind": "single",
+   "frames": [
+    169
+   ]
+  },
+  "gr_lamp_pole": {
+   "kind": "single",
+   "frames": [
+    174
+   ]
+  },
+  "gr_lamp_top": {
+   "kind": "single",
+   "frames": [
+    173
    ]
   },
   "grass": {
@@ -87,6 +234,78 @@
    "kind": "single",
    "frames": [
     4
+   ]
+  },
+  "hall": {
+   "kind": "single",
+   "frames": [
+    85
+   ]
+  },
+  "hall_door": {
+   "kind": "single",
+   "frames": [
+    130
+   ]
+  },
+  "hall_wall": {
+   "kind": "single",
+   "frames": [
+    86
+   ]
+  },
+  "hut_crate": {
+   "kind": "single",
+   "frames": [
+    166
+   ]
+  },
+  "kam_drzwi": {
+   "kind": "single",
+   "frames": [
+    126
+   ]
+  },
+  "kam_gzyms": {
+   "kind": "single",
+   "frames": [
+    127
+   ]
+  },
+  "kam_kwiaty": {
+   "kind": "single",
+   "frames": [
+    125
+   ]
+  },
+  "kam_okno": {
+   "kind": "single",
+   "frames": [
+    124
+   ]
+  },
+  "kam_wall": {
+   "kind": "single",
+   "frames": [
+    123
+   ]
+  },
+  "kiosk": {
+   "kind": "single",
+   "frames": [
+    139
+   ]
+  },
+  "lamp_pole": {
+   "kind": "single",
+   "frames": [
+    141
+   ]
+  },
+  "lamp_top": {
+   "kind": "single",
+   "frames": [
+    140
    ]
   },
   "lodge_ne": {
@@ -134,6 +353,153 @@
     20
    ]
   },
+  "pbench_l": {
+   "kind": "single",
+   "frames": [
+    147
+   ]
+  },
+  "pbench_m": {
+   "kind": "single",
+   "frames": [
+    148
+   ]
+  },
+  "pbench_r": {
+   "kind": "single",
+   "frames": [
+    149
+   ]
+  },
+  "peron": {
+   "kind": "single",
+   "frames": [
+    106
+   ]
+  },
+  "peron_edge": {
+   "kind": "single",
+   "frames": [
+    107
+   ]
+  },
+  "peron_edge_r": {
+   "kind": "single",
+   "frames": [
+    175
+   ]
+  },
+  "plamp_pole": {
+   "kind": "single",
+   "frames": [
+    143
+   ]
+  },
+  "plamp_top": {
+   "kind": "single",
+   "frames": [
+    142
+   ]
+  },
+  "plant_b": {
+   "kind": "single",
+   "frames": [
+    160
+   ]
+  },
+  "plant_t": {
+   "kind": "single",
+   "frames": [
+    159
+   ]
+  },
+  "poslanie_l": {
+   "kind": "single",
+   "frames": [
+    128
+   ]
+  },
+  "poslanie_r": {
+   "kind": "single",
+   "frames": [
+    129
+   ]
+  },
+  "pot": {
+   "kind": "single",
+   "frames": [
+    164
+   ]
+  },
+  "railing_l": {
+   "kind": "single",
+   "frames": [
+    150
+   ]
+  },
+  "railing_m": {
+   "kind": "single",
+   "frames": [
+    151
+   ]
+  },
+  "railing_r": {
+   "kind": "single",
+   "frames": [
+    152
+   ]
+  },
+  "rails": {
+   "kind": "single",
+   "frames": [
+    108
+   ]
+  },
+  "road": {
+   "kind": "single",
+   "frames": [
+    88
+   ]
+  },
+  "sack": {
+   "kind": "single",
+   "frames": [
+    133
+   ]
+  },
+  "sand": {
+   "kind": "auto16",
+   "frames": [
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104
+   ]
+  },
+  "shelf": {
+   "kind": "single",
+   "frames": [
+    165
+   ]
+  },
+  "signpost": {
+   "kind": "single",
+   "frames": [
+    157
+   ]
+  },
   "soil": {
    "kind": "auto16",
    "frames": [
@@ -161,10 +527,112 @@
     78
    ]
   },
+  "stall_l": {
+   "kind": "single",
+   "frames": [
+    135
+   ]
+  },
+  "stall_m": {
+   "kind": "single",
+   "frames": [
+    136
+   ]
+  },
+  "stall_r": {
+   "kind": "single",
+   "frames": [
+    137
+   ]
+  },
+  "stall_s": {
+   "kind": "single",
+   "frames": [
+    138
+   ]
+  },
+  "stool": {
+   "kind": "single",
+   "frames": [
+    163
+   ]
+  },
   "stump": {
    "kind": "single",
    "frames": [
     83
+   ]
+  },
+  "table": {
+   "kind": "single",
+   "frames": [
+    162
+   ]
+  },
+  "tablo_l": {
+   "kind": "single",
+   "frames": [
+    120
+   ]
+  },
+  "tablo_m": {
+   "kind": "single",
+   "frames": [
+    121
+   ]
+  },
+  "tablo_r": {
+   "kind": "single",
+   "frames": [
+    122
+   ]
+  },
+  "train_dr": {
+   "kind": "single",
+   "frames": [
+    113
+   ]
+  },
+  "train_jl": {
+   "kind": "single",
+   "frames": [
+    114
+   ]
+  },
+  "train_jr": {
+   "kind": "single",
+   "frames": [
+    115
+   ]
+  },
+  "train_nl": {
+   "kind": "single",
+   "frames": [
+    109
+   ]
+  },
+  "train_nr": {
+   "kind": "single",
+   "frames": [
+    110
+   ]
+  },
+  "train_wl": {
+   "kind": "single",
+   "frames": [
+    111
+   ]
+  },
+  "train_wr": {
+   "kind": "single",
+   "frames": [
+    112
+   ]
+  },
+  "trash": {
+   "kind": "single",
+   "frames": [
+    161
    ]
   },
   "tree": {

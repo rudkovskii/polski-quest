@@ -36,6 +36,18 @@ export interface LocationData {
 
 const url = (p: string): string => `${import.meta.env.BASE_URL}${p}`;
 
+/**
+ * Высота d-pad снизу в CSS-пикселях (src/ui/dpad.ts: крест 120 px + отступ 16 px + запас): пока он виден, камера
+ * разрешает карте уехать вверх на эту высоту — нижний ряд не прячется под крестом (P-05).
+ */
+export const DPAD_INSET = 148;
+let dpadVisible = false;
+bus.on('input:dpad', ({ visible }) => {
+  dpadVisible = visible;
+  for (const fn of dpadWatchers) fn();
+});
+const dpadWatchers = new Set<() => void>();
+
 export class Location extends Phaser.Scene {
   private model!: LocationModel;
   private mapDef!: LocationMap;
@@ -137,7 +149,9 @@ export class Location extends Phaser.Scene {
     const onHidden = (): void => this.model.halt();
     this.game.events.on(Phaser.Core.Events.HIDDEN, onHidden);
     this.events.on(Phaser.Scenes.Events.RENDER, this.emitAnchor, this);
-    const offTeleport = bus.on('world:teleport', ({ location, spawn }) => this.go(location, spawn));
+    const offTeleport = bus.on('world:teleport', ({ location, spawn, facing }) => this.go(location, spawn, facing));
+    const onDpad = (): void => this.layout();
+    dpadWatchers.add(onDpad);
     const offMarks = bus.on('world:marks', (m) => {
       if (m.location === this.mapDef.id && !this.leaving) this.applyMarks(m);
     });
@@ -149,6 +163,7 @@ export class Location extends Phaser.Scene {
       offIntent();
       offInput();
       offTeleport();
+      dpadWatchers.delete(onDpad);
       offMarks();
       offGuide();
       this.game.events.off(Phaser.Core.Events.HIDDEN, onHidden);
@@ -592,7 +607,9 @@ export class Location extends Phaser.Scene {
       cam.centerOn(mw / 2, mh / 2);
     } else {
       // Карта больше экрана: камера следует за Димой в границах карты (по оси, где не влезает).
-      cam.setBounds(fitsW ? (mw - width / zoom) / 2 : 0, fitsH ? (mh - height / zoom) / 2 : 0, fitsW ? width / zoom : mw, fitsH ? height / zoom : mh);
+      // Крест на экране: снизу запас на его высоту, чтобы низ карты можно было поднять над d-pad.
+      const inset = dpadVisible && !fitsH ? DPAD_INSET / zoom : 0;
+      cam.setBounds(fitsW ? (mw - width / zoom) / 2 : 0, fitsH ? (mh - height / zoom) / 2 : 0, fitsW ? width / zoom : mw, fitsH ? height / zoom : mh + inset);
       cam.startFollow(this.player, true);
     }
   }
@@ -631,12 +648,12 @@ export class Location extends Phaser.Scene {
     }
   }
 
-  private go(location: string, spawn: string | Xy): void {
+  private go(location: string, spawn: string | Xy, facing?: Dir): void {
     if (this.leaving) return;
     this.leaving = true;
     this.model.halt();
     const cam = this.cameras.main;
-    cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ location, spawn }));
+    cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ location, spawn, ...(facing ? { facing } : {}) }));
     cam.fadeOut(150, 26, 28, 44);
   }
 

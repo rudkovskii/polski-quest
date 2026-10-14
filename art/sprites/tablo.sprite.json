@@ -1,0 +1,75 @@
+{
+ "id": "tile.tablo",
+ "note": "Табло WARSZAWA WSCHODNIA (P-05), 3 клетки: панель и янтарные строки точками. Надпись — DOM (табличка), не canvas.",
+ "size": [
+  16,
+  16
+ ],
+ "anchor": [
+  0,
+  0
+ ],
+ "keys": {
+  ".": null,
+  "o": "ink",
+  "n": "plum_0",
+  "N": "blue_0",
+  "y": "accent_amber"
+ },
+ "frames": [
+  [
+   "................",
+   "oooooooooooooooo",
+   "oNNNNNNNNNNNNNNN",
+   "onnnnnnnnnnnnnnn",
+   "onnyyynnyynnnyyy",
+   "onnnnnnnnnnnnnnn",
+   "onnnnnnnnnnnnnnn",
+   "onnyyyynyyyyynnn",
+   "onnnnnnnnnnnnnnn",
+   "onnnnnnnnnnnnnnn",
+   "onnyyyyyynyyyyyn",
+   "onnnnnnnnnnnnnnn",
+   "oooooooooooooooo",
+   "..........o.....",
+   "..........o.....",
+   "..........o....."
+  ],
+  [
+   "................",
+   "oooooooooooooooo",
+   "NNNNNNNNNNNNNNNN",
+   "nnnnnnnnnnnnnnnn",
+   "yynnyyynyynyyyyy",
+   "nnnnnnnnnnnnnnnn",
+   "nnnnnnnnnnnnnnnn",
+   "yynyyyyyynyyyynn",
+   "nnnnnnnnnnnnnnnn",
+   "nnnnnnnnnnnnnnnn",
+   "nyyyyyynyyynnyyy",
+   "nnnnnnnnnnnnnnnn",
+   "oooooooooooooooo",
+   "................",
+   "................",
+   "................"
+  ],
+  [
+   "................",
+   "oooooooooooooooo",
+   "NNNNNNNNNNNNNNNo",
+   "nnnnnnnnnnnnnnno",
+   "nnnyyyynyyynnnno",
+   "nnnnnnnnnnnnnnno",
+   "nnnnnnnnnnnnnnno",
+   "nyynnnyyynyynnno",
+   "nnnnnnnnnnnnnnno",
+   "nnnnnnnnnnnnnnno",
+   "yynnyyynyyyyyyno",
+   "nnnnnnnnnnnnnnno",
+   "oooooooooooooooo",
+   ".....o..........",
+   ".....o..........",
+   ".....o.........."
+  ]
+ ]
+}

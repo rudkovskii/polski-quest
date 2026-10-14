@@ -303,5 +303,63 @@
     "register": "pan",
     "start": "czeka",
     "nodes": { "czeka": { "who": "konduktor", "todo": true, "end": true } }
+  },
+  {
+    "id": "dlg.ch01.d01_peron",
+    "npc": "walizka",
+    "register": "ty",
+    "start": "dima",
+    "if": { "not": { "flag": "beat.d01.walizka" } },
+    "nodes": {
+      "dima": { "line": "d01.dima.platform.1", "next": "k2" },
+      "k2": { "line": "d01.kazik.platform.2", "next": "k3" },
+      "k3": { "line": "d01.kazik.platform.3", "next": "k4" },
+      "k4": { "line": "d01.kazik.platform.4", "next": "k5" },
+      "k5": { "line": "d01.kazik.platform.5", "next": "sound" },
+      "sound": { "who": "dima", "choices": [{ "pl": "Z dźwiękiem", "ru": "Со звуком", "next": "k6a", "do": [{ "setFlag": "d01.sound.on" }] }, { "pl": "Bez dźwięku", "ru": "Без звука", "next": "k6b", "do": [{ "setFlag": "d01.sound.mute" }] }] },
+      "k6a": { "line": "d01.kazik.platform.6a", "next": "k7" },
+      "k6b": { "line": "d01.kazik.platform.6b", "next": "k7" },
+      "k7": { "line": "d01.kazik.platform.7", "next": "k8" },
+      "k8": { "line": "d01.kazik.platform.8", "next": "go" },
+      "go": { "line": "d01.kazik.platform.go", "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.d01_wisla",
+    "npc": "bobr",
+    "register": "ty",
+    "start": "k1",
+    "if": { "all": [{ "flag": "beat.d01.bazar" }, { "not": { "flag": "beat.d01.wisla" } }] },
+    "nodes": {
+      "k1": { "line": "d01.kazik.wisla.1", "next": "k2" },
+      "k2": { "line": "d01.kazik.wisla.2", "next": "k3" },
+      "k3": { "line": "d01.kazik.wisla.3", "next": "tak" },
+      "tak": { "who": "dima", "choices": [{ "pl": "Tak.", "ru": "Да.", "next": "k4" }, { "pl": "Tak!", "ru": "Да!", "next": "k4" }] },
+      "k4": { "line": "d01.kazik.wisla.4", "next": "k5" },
+      "k5": { "line": "d01.kazik.wisla.5", "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.d01_imie",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "b3",
+    "if": { "all": [{ "flag": "beat.d01.kapelusz" }, { "not": { "flag": "beat.d01.brzechwa" } }] },
+    "nodes": {
+      "b3": { "line": "d01.brzechwa.plot.3", "next": "imie" },
+      "imie": { "who": "dima", "choices": [{ "pl": "Dima.", "ru": "Дима.", "next": "b4" }] },
+      "b4": { "line": "d01.brzechwa.plot.4", "next": "b5" },
+      "b5": { "line": "d01.brzechwa.plot.5", "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.hela",
+    "npc": "pani_hela",
+    "register": "pan",
+    "start": "idle",
+    "if": { "flag": "beat.d01.bazar" },
+    "nodes": {
+      "idle": { "line": "idle.hela.1", "end": true }
+    }
   }
 ]

@@ -136,5 +136,61 @@
     "portrait": "narrator",
     "traits": "Подписи вступления (СЮЖЕТ §2): коротко и сухо, как друг за кадром. Не персонаж, портрета нет.",
     "hearts": false
+  },
+  {
+    "id": "fotobudka",
+    "name": "Fotobudka",
+    "kind": "extra",
+    "addressAs": "none",
+    "voice": {
+      "engine": "say",
+      "id": "Zosia"
+    },
+    "sprite": "fotobudka",
+    "portrait": "fotobudka",
+    "traits": "Автомат на вокзале Warszawa Wschodnia (P-05, d01.s1): говорит одну фразу перед вспышкой.",
+    "hearts": false
+  },
+  {
+    "id": "tablica",
+    "name": "Tablica",
+    "kind": "extra",
+    "addressAs": "none",
+    "voice": {
+      "engine": "say",
+      "id": "Zosia"
+    },
+    "sprite": "sign_exit",
+    "portrait": "sign_exit",
+    "traits": "Табличка на улице (P-05, d01.s3): «BAZAR →», «ZARAZ WRACAM».",
+    "hearts": false
+  },
+  {
+    "id": "walizka",
+    "name": "Walizka",
+    "kind": "extra",
+    "addressAs": "none",
+    "voice": {
+      "engine": "none",
+      "id": "none"
+    },
+    "sprite": "walizka",
+    "portrait": "walizka",
+    "traits": "Предмет-NPC (P-05, d01.s2): чемодан Димы на перроне, A по нему — сцена с Казиком.",
+    "hearts": false
+  },
+  {
+    "id": "kapelusz",
+    "name": "Kapelusz",
+    "kind": "extra",
+    "addressAs": "none",
+    "voice": {
+      "engine": "none",
+      "id": "none"
+    },
+    "sprite": "kapelusz",
+    "portrait": "kapelusz",
+    "traits": "Предмет-NPC (P-05, d01.s7): шляпа Брзехвы на грядках, A — поднять.",
+    "hearts": false
   }
 ]

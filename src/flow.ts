@@ -1,46 +1,48 @@
 // Склейка режиссёра (I-13, ТЗ §4.12, §5.0, §5.2): «пришёл, и игра сама повела». Как cloud.ts и day.ts,
 // вызывается из main.ts одной строкой. Делает:
-//   • запуск сразу в шаг: после Title и LinkSetup (`link:ready`) — `nextStep`; новый мир → вступление F1
-//     (src/ui/intro.ts), иначе телепорт в локацию шага (`local.position`, если шаг в той же локации) и,
-//     для прерванного урока, сразу урок;
+//   • запуск сразу в шаг: после Title и LinkSetup (`link:ready`) — `nextStep`; новый мир → карточка рассказчика
+//     (src/ui/intro.ts) и зал Warszawa Wschodnia, иначе телепорт в локацию шага (`local.position`, если шаг в той же
+//     локации) и, для прерванного урока, сразу урок;
 //   • после любого изменения прогресса шаг пересчитывается: `guide:step` (строка «Сейчас», реплика бобра),
 //     `guide:target` (подсветка, бобр-указатель), раскрытие HUD по `reveals` (флаги hud.*);
 //   • действие шага: тап по цели (play.claim) или по строке «Сейчас» (`guide:act`) запускает урок, обход,
-//     вечер, итог дня, бит; флаги первого дня `beat.first.f1…f6` и `beat.first_day_done` ставятся здесь.
+//     вечер, итог дня, бит;
+//   • день 1 (P-05): биты `d01.*` из director.json по порядку — сцены на картах. Бит без цели-объекта играется сам,
+//     как только Дима на его карте; у бита с `act` своё действие (фотобудка, лоток и паспорт, полив, урок у забора,
+//     посадка руками, сон). Флаги `beat.d01.*` и `beat.first_day_done` ставятся здесь.
 // Отрезки `seg`: water/express/more3/evening — обход (ui/obchod.ts), scene/remedy — конец урока (ui/play.ts),
 // sleep — «Dobranoc» (ui/daySummary.ts).
 import { bus } from './systems/bus';
 import type { Content } from './systems/content';
 import { derive, deriveContent, isPlayedDay, type Derived } from './systems/derive';
 import {
-  diagDone,
+  D01,
   directorInput,
   FIRST_DAY,
   FIRST_DAY_DONE,
-  FIRST_REPAIR_FLAG,
   firstFlag,
   hudFlag,
   nextStep,
-  reddestCluster,
+  SOUND_FLAGS,
   springFlag,
   stepKey,
   type DirectorStep,
 } from './systems/director';
 import type { LogEvent } from './systems/log';
 import type { Clock } from './systems/platform/clock';
-import { setFlag, type Progress } from './systems/progress';
+import { getSetting, setFlag, setSetting, type Progress } from './systems/progress';
 import { appearanceOf, hasAppearance } from './systems/avatar';
 import type { GuideStepView, WorldInteract } from './types/bus';
-import type { Lesson } from './types/content';
+import type { Lesson, MapObject } from './types/content';
 import type { DayGlue } from './day';
 import type { DayStore } from './ui/day';
 import { withAvatarAtlas } from './ui/avatar';
 import { openCreator } from './ui/creator';
-import { loadIntroAtlas, runIntro } from './ui/intro';
+import { loadIntroAtlas, runCaption, runNight, runPassport, runTiles } from './ui/intro';
 import type { AudioPort, PortraitSource } from './ui/overlay/kit';
 import { STAMP_FIRST } from './ui/passport';
 import type { Play } from './ui/play';
-import { gardenItems, plantOnCell } from './world/dzialka';
+import { gardenItems, plantOnCell, seedFlag } from './world/dzialka';
 
 /** Сколько первых игровых дней строка «Сейчас» спрятана: ведёт Казик (ПОЛИРОВКА §2 р. 11). */
 export const NOW_HIDDEN_DAYS = 3;
@@ -49,6 +51,12 @@ export const NOW_HIDDEN_DAYS = 3;
 export function gameDayNo(d: Pick<Derived, 'days' | 'today'>): number {
   return Object.entries(d.days).filter(([day, st]) => day < d.today && isPlayedDay(st)).length + 1;
 }
+
+/** Карты, на которых в день 1 показывается подсказка управления (первая ходьба). */
+const MOVE_HINT_MAPS = new Set(['ch01.dworzec', 'ch01.peron']);
+
+/** Бит дня 1 без цели в мире: играется сам, когда Дима на его карте. */
+export const isAutoBeat = (s: DirectorStep): boolean => s.kind === 'intro' && !s.act && !s.target.npc && !s.target.object && !s.target.plot && !s.target.screen;
 
 /** Флаг «Я сохранил ссылку» (тот же, что LINK_SAVED_FLAG в cloud.ts). */
 const LINK_SAVED = 'link.saved';
@@ -111,20 +119,7 @@ export function startFlow(o: FlowOptions): Flow {
     let text: string;
     switch (s.kind) {
       case 'intro':
-        text =
-          s.f === 'f1'
-            ? 'вступление'
-            : s.f === 'f2'
-              ? `полей грядку «${word(s.target.item)}»`
-              : s.f === 'f3'
-                ? 'спустись в метро к турникету'
-                : s.f === 'f4'
-                  ? lesson?.kind === 'diag'
-                    ? 'турникет метро'
-                    : `сцена: ${title}`
-                  : s.f === 'f5'
-                    ? 'вечер: звуки у реки'
-                    : 'альтанка: спать';
+        text = introLabel(s);
         break;
       case 'resume':
         text = `продолжить: ${title}`;
@@ -160,6 +155,28 @@ export function startFlow(o: FlowOptions): Flow {
     return there ? `${text} → ${content.maps.get(s.target.location)?.value.title.pl ?? s.target.location}` : text;
   }
 
+  /** Подпись шага дня 1 (строка «Сейчас» спрятана первые дни и всплывает при бездействии). */
+  function introLabel(s: DirectorStep): string {
+    const t = s.target;
+    const npcName = (id: string): string => content.characters.get(id)?.name ?? id;
+    switch (s.act) {
+      case 'card':
+        return 'вступление';
+      case 'fotobudka':
+        return 'фотобудка: фото на документы';
+      case 'water':
+        return `полей грядку «${content.vocab.get(t.item ?? FIRST_DAY.introItem)?.value.pl ?? ''}»`;
+      case 'plant':
+        return 'посади семена: к грядке и A';
+      case 'sleep':
+        return 'хатка Казика: спать';
+      default:
+        if (t.npc) return `подойди: ${npcName(t.npc)}`;
+        if (t.object) return t.object === 'tablica_bazar' ? 'прочитай табличку' : 'иди дальше';
+        return `иди: ${content.maps.get(t.location)?.value.title.pl ?? t.location}`;
+    }
+  }
+
   function view(s: DirectorStep): GuideStepView {
     const here = s.target.screen === 'intro' || (s.target.location === location && s.kind !== 'done');
     return {
@@ -171,9 +188,8 @@ export function startFlow(o: FlowOptions): Flow {
       ...(s.line && !(s.kind === 'beat' && (s.target.npc || s.target.object)) ? { line: s.line } : {}),
       here,
       ...(s.kind === 'done' && s.more3 ? { more3: true } : {}),
-      // Подсказка управления (при 3 с бездействия): первая локация — działka в F2, первый вход в метро — F3 и
-      // диагностика F4.
-      ...(s.f === 'f2' || s.f === 'f3' || (s.f === 'f4' && content.lessons.get(s.lesson ?? '')?.value.kind === 'diag') ? { moveHint: true } : {}),
+      // Подсказка управления (при 3 с бездействия): первые карты с ходьбой дня 1 — зал вокзала и перрон.
+      ...(s.kind === 'intro' && MOVE_HINT_MAPS.has(s.target.location) ? { moveHint: true } : {}),
       ...(nowHidden ? { nowHidden: true } : {}),
       ...(s.kind === 'spring' ? { spring: true } : {}),
       reason: s.reason,
@@ -222,13 +238,6 @@ export function startFlow(o: FlowOptions): Flow {
           continue;
         }
       }
-      // F3 выполнен, как только Дима в метро.
-      if (next.kind === 'intro' && next.f === 'f3' && location === next.target.location) {
-        if (s.setProgress(setFlag(s.progress, firstFlag('f3'), now))) {
-          bus.emit('progress:changed', { kinds: ['world'] });
-          continue;
-        }
-      }
       const hide = gameDayNo(input.derived) <= NOW_HIDDEN_DAYS;
       const changed = !step || stepKey(step) !== stepKey(next) || step.reason !== next.reason || hide !== nowHidden;
       nowHidden = hide;
@@ -236,6 +245,8 @@ export function startFlow(o: FlowOptions): Flow {
       if (changed) publish();
       // Бит без цели-персонажа: реплика пузырём и эффекты сразу.
       if (next.kind === 'beat' && !next.target.npc && !next.target.object) void runBeat(next);
+      // День 1: сцена без цели в мире играется, как только Дима на её карте (реплики Казика при входе).
+      if (isAutoBeat(next) && location === next.target.location) queueMicrotask(() => void act());
       return;
     }
   }
@@ -267,29 +278,16 @@ export function startFlow(o: FlowOptions): Flow {
     else await play.openLesson(lessonId);
   }
 
-  async function firstDayLesson(s: DirectorStep): Promise<void> {
-    if (!s.lesson) return;
-    const isDiag = content.lessons.get(s.lesson)?.value.kind === 'diag';
-    await lessonFlow(s.lesson);
-    const st = await o.store;
-    const d = derive(st.progress, deriveContent(content), clock.now());
-    if (isDiag) {
-      if (!diagDone(d)) return; // прервали диагностику
-      // §5.0 F4: активных минут меньше порога → сначала ремонтная сцена самого красного кластера.
-      const red = reddestCluster(d);
-      const repair = red ? content.phonetics.clusters.find((c) => c.id === red)?.repairLesson : undefined;
-      if (repair && activeMin() < content.tuning.director.firstDayRepairIfActiveMinLt && !d.lessons[repair]) await flag(FIRST_REPAIR_FLAG);
-      else await flag(firstFlag('f4'));
-    } else if (d.lessons[s.lesson]) await flag(firstFlag('f4'));
-  }
-
   async function sleepFlow(s: DirectorStep): Promise<void> {
-    await day.ui.summary();
+    const first = s.kind === 'intro';
+    // День 1: итог одной карточкой (СЮЖЕТ_v2 d01.s8), Казик уже сказал «Idziemy spać» у хатки.
+    await day.ui.summary(first ? { bobr: null, lines: [D01.summary, D01.summaryUmiem], hook: D01.hook } : undefined);
     const st = await o.store;
     const d = derive(st.progress, deriveContent(content), clock.now());
     const slept = d.days[d.today]?.segs.includes('sleep');
     if (!slept || s.kind !== 'intro') return;
-    await flag(firstFlag('f6'), FIRST_DAY_DONE);
+    await flag(firstFlag(s.f ?? 'd01.sen'), FIRST_DAY_DONE);
+    await runNight({ ...introDeps(st), atlas: withAvatarAtlas(loadIntroAtlas(), appearanceOf(st.progress)) });
     // F6: мир создан на этом устройстве и ссылка ещё не сохранена → экран «Сохрани свою ссылку» (§5.2).
     if (o.hasLink?.() && !(LINK_SAVED in st.progress.world.flags)) bus.emit('ui:screen:open', { screen: 'link' });
   }
@@ -310,22 +308,7 @@ export function startFlow(o: FlowOptions): Flow {
   async function perform(s: DirectorStep): Promise<void> {
     switch (s.kind) {
       case 'intro':
-        switch (s.f) {
-          case 'f1':
-            return introFlow();
-          case 'f2':
-            await day.ui.obchod({ mode: 'day', fromItem: s.target.item ?? FIRST_DAY.introItem, practice: true });
-            return flag(firstFlag('f2'));
-          case 'f4':
-            return firstDayLesson(s);
-          case 'f5':
-            await day.ui.obchod({ mode: 'phonetic', ...(s.limit ? { limit: s.limit } : {}), ...(s.cluster ? { cluster: s.cluster } : {}) });
-            return flag(firstFlag('f5'));
-          case 'f6':
-            return sleepFlow(s);
-          default:
-            return; // F3: идти ногами
-        }
+        return day1(s);
       case 'spring': {
         const st = await o.store;
         const now = clock.now();
@@ -401,29 +384,142 @@ export function startFlow(o: FlowOptions): Flow {
       void play.lines([s.line]);
       return true;
     }
+    if (!hit && p.kind === 'npc' && p.id === 'bobr' && s.kind === 'intro') {
+      // День 1: Казик ведёт сам, его сцены идут по порядку; не по делу — «Kłoda!» (просто встретил).
+      void play.lines([D01.idleKazik]);
+      return true;
+    }
     if (!hit) return false;
     void act();
     return true;
   }
 
-  async function introFlow(): Promise<void> {
+  // ── День 1 (P-05, СЮЖЕТ_v2 §4 d01): сцены на картах по битам `d01.*`.
+
+  const lines = (ids: readonly string[]): Promise<void> => play.lines(ids);
+
+  /** Бит дня 1: действие `act` или эффекты `do` (реплики, диалог), потом флаг `beat.<id>`. */
+  async function day1(s: DirectorStep): Promise<void> {
+    const id = s.f ?? s.beat ?? '';
+    switch (s.act) {
+      case 'card':
+        await runCaption(introDeps(await o.store));
+        await flag(firstFlag(id));
+        teleportTo(FIRST_DAY.start, FIRST_DAY.startSpawn, await compute()); // лицом к фотобудке
+        return;
+      case 'fotobudka': {
+        await lines([D01.fotobudka]);
+        const st = await o.store;
+        const a = await openCreator({ mode: hasAppearance(st.progress) ? 'mirror' : 'new' });
+        if (!a && !hasAppearance(st.progress)) return; // экрана нет или закрыли: будка ждёт
+        await lines([D01.fotoNarr]);
+        return flag(firstFlag(id));
+      }
+      case 'bazar':
+        return bazarScene(id);
+      case 'water': {
+        await day.ui.obchod({ mode: 'day', fromItem: s.target.item ?? FIRST_DAY.introItem, practice: true });
+        await flag(firstFlag(id));
+        return lines([D01.watered]);
+      }
+      case 'brzechwa':
+        return plotScene(id);
+      case 'plant':
+        return; // сажает Дима руками: A по пустой клетке грядки (claim → plant)
+      case 'sleep':
+        return sleepFlow(s);
+      default:
+        break;
+    }
+    // Сцена без цели (реплики при входе на карту): флаг сразу — второй раз не сыграет, даже если окно закроют;
+    // то, что появляется в этой сцене (шляпа и Брзехва), видно уже во время реплик.
+    if (isAutoBeat(s)) await flag(firstFlag(id));
+    if (s.do?.length) await play.effects(s.do);
+    if (s.act === 'sound') {
+      // Выбор звука (d01.s2, СЮЖЕТ_v2 §7): флаг варианта → настройка sound.mode. Окно закрыли до выбора — сцена ждёт.
+      if (!(await applySound())) return;
+    }
+    if (!isAutoBeat(s)) await flag(firstFlag(id));
+  }
+
+  /** Флаги выбора «Z dźwiękiem / Bez dźwięku» → настройка `sound.mode` (последний выбор). */
+  async function applySound(): Promise<boolean> {
     const st = await o.store;
-    // P-03: новый мир → Fotobudka до вступления (`ui:creator:show`; бит дня 1 встроит режиссёр P-06).
-    if (!hasAppearance(st.progress)) await openCreator({ mode: 'new' });
-    await runIntro({
-      overlay: play.overlay,
-      content,
-      store: st,
-      audio: o.audio,
-      portraits: await Promise.resolve(o.portraits ?? null),
-      clock,
-      atlas: withAvatarAtlas(loadIntroAtlas(), appearanceOf(st.progress)),
-      onStamp: () => void flag(STAMP_FIRST),
-      ...(o.onEvent ? { onEvent: o.onEvent } : {}),
-    });
+    const f = st.progress.world.flags;
+    const on = f[SOUND_FLAGS.on];
+    const mute = f[SOUND_FLAGS.mute];
+    if (on === undefined && mute === undefined) return false;
+    const mode = (mute ?? -1) > (on ?? -1) ? 'mute' : 'sound';
+    if (getSetting(st.progress, 'sound.mode') !== mode && st.setProgress(setSetting(st.progress, 'sound.mode', mode, clock.now())))
+      bus.emit('progress:changed', { kinds: ['settings'] });
+    return true;
+  }
+
+  function introDeps(st: FlowStore): Parameters<typeof runCaption>[0] {
+    return { overlay: play.overlay, content, audio: o.audio, portraits: portraitsNow, clock };
+  }
+  let portraitsNow: PortraitSource | null = null;
+  void Promise.resolve(o.portraits ?? null).then((p) => (portraitsNow = p));
+
+  /** Лоток пани Хели (d01.s4): «Tak?» → плитки → ящик, книжечка → паспорт крупно → печать → Казик про печати. */
+  async function bazarScene(id: string): Promise<void> {
+    await lines([D01.helaTak]);
+    const st = await o.store;
+    await runTiles({ ...introDeps(st), store: st, ...(o.onEvent ? { onEvent: o.onEvent } : {}) });
     bus.emit('progress:changed', { kinds: ['cards'] });
-    await flag(firstFlag('f1'));
-    bus.emit('world:teleport', { location: FIRST_DAY.dzialka, spawn: 'default' });
+    await lines([D01.helaHello, D01.goscMowi, D01.umiem, D01.zaDarmo, D01.teZaDarmo, D01.prawieKloda]);
+    await runPassport({ ...introDeps(st), appearance: appearanceOf(st.progress), onStamp: () => void flag(STAMP_FIRST) });
+    await flag(firstFlag(id));
+    await lines([D01.stampKazik, D01.passportWho, D01.praga, D01.notK]);
+  }
+
+  /**
+   * Забор działki (d01.s7): «Dziękuję!» → чанк 1 → шёпот Казика → чанк 2 → знакомство → чанк 3. Каждое слово сразу
+   * семенем в карман (`seed.<item>`, до урока: на грядке оно не мелькнёт), сажает Дима сам. Прервал — с того же чанка.
+   */
+  async function plotScene(id: string): Promise<void> {
+    const lesson = content.lessons.get(FIRST_DAY.plotLesson)?.value;
+    const items = lesson?.introduces ?? [];
+    const st = await o.store;
+    const known = (item: string): boolean => st.progress.log.events.some((e) => e.k === 'intro' && e.item === item);
+    const chunk = async (item: string | undefined, before: () => Promise<void>): Promise<boolean> => {
+      if (!item || known(item)) return true;
+      await flag(seedFlag(item)); // семя в карман до урока: на грядке слово не мелькнёт; порядок семян = порядок слов
+      await before();
+      const r = await play.openLesson(FIRST_DAY.plotLesson, { item });
+      return !!r && !r.cancelled;
+    };
+    if (!(await chunk(items[0], () => lines([D01.dziekuje])))) return;
+    if (!(await chunk(items[1], () => lines([D01.proszeHint])))) return;
+    if (!(await chunk(items[2], () => play.openDialog(FIRST_DAY.plotDialogue)))) return;
+    await flag(firstFlag(id)); // Брзехва уходит по бульвару
+    await lines([D01.seeds, D01.pierogi, D01.pierogi2]);
+  }
+
+  /** Телепорт в локацию шага: спавн у цели, лицом к ней. */
+  function teleportTo(loc: string, spawn: string | [number, number], s: DirectorStep | null | undefined): void {
+    const facing = s ? facingTo(loc, spawn, s) : undefined;
+    bus.emit('world:teleport', { location: loc, spawn, ...(facing ? { facing } : {}) });
+  }
+
+  /** Куда смотреть со спавна, чтобы цель шага была впереди (A сработает без поворота). */
+  function facingTo(locId: string, spawn: string | [number, number], s: DirectorStep): 'up' | 'down' | 'left' | 'right' | undefined {
+    const map = content.maps.get(locId)?.value;
+    const obj = map ? targetObject(map, s) : undefined;
+    const at = typeof spawn === 'string' ? map?.spawns[spawn] : spawn;
+    if (!obj || !at) return undefined;
+    const size = 'size' in obj && obj.size ? obj.size : [1, 1];
+    const cx = Math.max(obj.at[0], Math.min(at[0]!, obj.at[0] + size[0]! - 1));
+    const cy = Math.max(obj.at[1], Math.min(at[1]!, obj.at[1] + size[1]! - 1));
+    const dx = cx - at[0]!;
+    const dy = cy - at[1]!;
+    if (!dx && !dy) return undefined;
+    return Math.abs(dx) >= Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : dy < 0 ? 'up' : 'down';
+  }
+
+  function targetObject(map: { objects: readonly MapObject[] }, s: DirectorStep): MapObject | undefined {
+    const t = s.target;
+    return map.objects.find((x) => (t.npc && x.type === 'npc' && x.id === t.npc) || (t.object && 'id' in x && x.id === t.object) || (t.plot && x.type === 'plot' && x.id === t.plot));
   }
 
   /** Спавн локации, ближайший к цели шага. */
@@ -451,10 +547,10 @@ export function startFlow(o: FlowOptions): Flow {
     launched = true;
     const s = await compute();
     if (!s) return;
-    if (s.kind === 'intro' && s.f === 'f1') {
+    if (s.kind === 'intro' && s.act === 'card') {
       running = true;
       try {
-        await introFlow();
+        await day1(s);
       } finally {
         running = false;
       }
@@ -467,7 +563,7 @@ export function startFlow(o: FlowOptions): Flow {
     // local.position — только если шаг не требует другой локации.
     const spawn: string | [number, number] = pos && pos.location === loc && isMap(loc) ? [pos.x, pos.y] : spawnFor(loc, s);
     if (s.kind === 'resume' && s.lesson) pendingResume = s.lesson;
-    bus.emit('world:teleport', { location: loc, spawn });
+    teleportTo(loc, spawn, s);
   }
 
   bus.on('link:ready', () => void launch());

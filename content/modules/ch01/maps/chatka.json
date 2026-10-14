@@ -1,0 +1,112 @@
+{
+  "id": "ch01.chatka",
+  "title": {
+    "pl": "Chatka Kazika",
+    "ru": "Хатка Казика"
+  },
+  "tileset": "ninja16",
+  "controls": "walk",
+  "size": [
+    12,
+    10
+  ],
+  "defaultGround": ".",
+  "legend": {
+    ".": {
+      "tile": "deck"
+    },
+    "#": {
+      "tile": "wall",
+      "solid": true
+    },
+    "p": {
+      "tile": "poslanie_l",
+      "solid": true
+    },
+    "P": {
+      "tile": "poslanie_r",
+      "solid": true
+    },
+    "t": {
+      "tile": "table",
+      "solid": true
+    },
+    "s": {
+      "tile": "stool",
+      "solid": true
+    },
+    "o": {
+      "tile": "pot",
+      "solid": true
+    },
+    "h": {
+      "tile": "shelf",
+      "solid": true
+    },
+    "c": {
+      "tile": "hut_crate",
+      "solid": true
+    },
+    "=": {
+      "tile": "stairs"
+    }
+  },
+  "layers": {
+    "ground": [
+      "############",
+      "#.pP...h.co#",
+      "#..........#",
+      "#.......ts.#",
+      "#..........#",
+      "#c.........#",
+      "#..........#",
+      "#.....c....#",
+      "#..........#",
+      "#####==#####"
+    ]
+  },
+  "spawns": {
+    "default": [
+      5,
+      8
+    ],
+    "from_dzialka": [
+      5,
+      8
+    ]
+  },
+  "objects": [
+    {
+      "type": "trigger",
+      "id": "poslanie",
+      "at": [
+        2,
+        1
+      ],
+      "size": [
+        2,
+        1
+      ],
+      "on": "tap",
+      "do": []
+    },
+    {
+      "type": "exit",
+      "at": [
+        5,
+        9
+      ],
+      "to": "ch01.dzialka",
+      "spawn": "from_chatka"
+    },
+    {
+      "type": "exit",
+      "at": [
+        6,
+        9
+      ],
+      "to": "ch01.dzialka",
+      "spawn": "from_chatka"
+    }
+  ]
+}
