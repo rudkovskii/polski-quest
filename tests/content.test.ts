@@ -490,6 +490,9 @@ describe('CLI tools/validate_content.ts', () => {
     const r = spawnSync(join(ROOT, 'node_modules', '.bin', 'tsx'), ['tools/validate_content.ts', '--root', dir, '--quiet', ...extra], {
       cwd: ROOT,
       encoding: 'utf8',
+      // Фикстура нарочно содержит todo: релизный флаг из окружения CI сюда не протекает,
+      // релизный режим тесты включают явно через `--release`.
+      env: { ...process.env, PQ_RELEASE: '' },
     });
     return { code: r.status ?? -1, out: `${r.stdout}${r.stderr}` };
   }
