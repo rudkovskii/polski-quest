@@ -14,6 +14,9 @@ export interface Rule {
 }
 
 const inPureSystems = (p: string): boolean => p.startsWith('src/systems/') && !p.startsWith('src/systems/platform/');
+/** Сцены, мир и экраны: ввод только через intents (src/input); исключение — поля ввода (src/ui/keyboard). */
+const inScenesOrScreens = (p: string): boolean =>
+  /^src\/(scenes|world|ui)\//.test(p) && !p.startsWith('src/ui/keyboard/');
 
 export const RULES: Rule[] = [
   // Phaser 3 API, удалённое или заменённое в Phaser 4
@@ -42,6 +45,12 @@ export const RULES: Rule[] = [
   { re: /\bindexedDB\b/, why: 'indexedDB вне src/systems/platform/', scope: inPureSystems },
   { re: /\bfetch\s*\(/, why: 'fetch вне src/systems/platform/', scope: inPureSystems },
   { re: /\bDate\.now\s*\(|\bnew Date\(\s*\)/, why: 'Текущее время в systems: передавай параметр now', scope: inPureSystems },
+  // Ввод: прямые keydown/pointerdown в сценах и экранах (ТЗ §2.1, §2.7)
+  {
+    re: /['"`](keydown|keyup|keypress|pointerdown|pointerup)['"`]|\bon(keydown|keyup|keypress|pointerdown|pointerup)\b|\binput\.keyboard\b/,
+    why: 'Ввод только через src/input (intents в bus); keydown/pointerdown слушают src/input и src/ui/keyboard',
+    scope: inScenesOrScreens,
+  },
   // Секрет приватной ссылки
   { re: /#k=[a-z2-7]{26}\b/, why: 'Похоже на секрет приватной ссылки в коде' },
 ];

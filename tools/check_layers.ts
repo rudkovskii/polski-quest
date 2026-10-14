@@ -4,24 +4,27 @@ import { dirname, join, normalize } from 'node:path';
 import ts from 'typescript';
 import { isMain, listFiles, ROOT } from './lib/files';
 
-type Layer = 'systems' | 'platform' | 'world' | 'ui' | 'types' | 'root';
+type Layer = 'systems' | 'platform' | 'world' | 'ui' | 'input' | 'types' | 'root';
 
 export function layerOf(path: string): Layer {
   if (path.startsWith('src/systems/platform/')) return 'platform';
   if (path.startsWith('src/systems/')) return 'systems';
   if (path.startsWith('src/scenes/') || path.startsWith('src/world/')) return 'world';
   if (path.startsWith('src/ui/')) return 'ui';
+  if (path.startsWith('src/input/')) return 'input';
   if (path.startsWith('src/types/')) return 'types';
   return 'root';
 }
 
 /** Слой → слои, которые ему запрещено импортировать. `phaser` — пакет. */
 const FORBIDDEN: Record<Layer, (Layer | 'phaser')[]> = {
-  systems: ['phaser', 'platform', 'world', 'ui', 'root'],
-  platform: ['phaser', 'world', 'ui', 'root'],
+  systems: ['phaser', 'platform', 'world', 'ui', 'input', 'root'],
+  platform: ['phaser', 'world', 'ui', 'input', 'root'],
   world: ['ui', 'root'],
   ui: ['phaser', 'world', 'root'],
-  types: ['phaser', 'platform', 'world', 'ui', 'root'],
+  // Ввод (ТЗ §2.1): читает DOM-события и шлёт intents в bus, сцены и экраны не знает.
+  input: ['phaser', 'platform', 'world', 'ui', 'root'],
+  types: ['phaser', 'platform', 'world', 'ui', 'input', 'root'],
   root: [],
 };
 
@@ -61,7 +64,8 @@ export function checkFile(file: string, source: string): Violation[] {
     if (spec === 'phaser' || spec.startsWith('phaser/')) target = 'phaser';
     else if (spec.startsWith('.')) {
       const resolved = normalize(join(dirname(file), spec)).split('\\').join('/');
-      if (resolved.startsWith('src/')) target = layerOf(resolved.endsWith('.ts') ? resolved : `${resolved}.ts`);
+      // `/` в конце: импорт папки (`../input` → src/input/index.ts) попадает в слой папки.
+      if (resolved.startsWith('src/')) target = layerOf(resolved.endsWith('.ts') ? resolved : `${resolved}/`);
     }
     if (target && FORBIDDEN[from].includes(target)) {
       v.push({ file, detail: `слой ${from} не импортирует ${target}: '${spec}'` });

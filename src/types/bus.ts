@@ -1,4 +1,5 @@
 // Полный список событий шины (ТЗ §2.2). Новые события добавлять сюда же.
+import type { DpadSide, RoutedIntent, Source } from './input';
 
 export type LessonSrc = 'npc' | 'trigger' | 'remedy' | 'map';
 export type ScreenId = 'passport' | 'settings' | 'summary' | 'export' | 'diary';
@@ -26,4 +27,10 @@ export interface BusEvents {
   'progress:merged': { remoteEvents: number };
   'sync:status': { state: SyncState; at?: number; detail?: string };
   'audio:blocked': Record<string, never>;
+  /** Intent после роутера (ТЗ §2.7): `to` = мир или оверлей по фокусу (I-03). */
+  'input:intent': RoutedIntent;
+  /** Сменился последний источник ввода (I-03). */
+  'input:source': { source: Source };
+  /** Показать или спрятать d-pad; решает роутер по источнику, устройству и настройке (I-03). */
+  'input:dpad': { visible: boolean; side: DpadSide };
 }
