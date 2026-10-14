@@ -25,6 +25,8 @@ export interface IntroDeps {
   audio: AudioPort;
   portraits?: PortraitSource | null;
   clock?: { now(): number; mono(): number };
+  /** Режим без звука (P-10b): у плиток нет ▶. */
+  silent?: boolean;
 }
 
 export interface TilesDeps extends IntroDeps {
@@ -42,6 +44,8 @@ export interface PassportDeps extends IntroDeps {
 
 export interface NightDeps extends IntroDeps {
   atlas?: Promise<IntroAtlas | null> | IntroAtlas | null;
+  /** Реплики в темноте (P-10b): день 1 — «miau» и Казик, дни 2+ — «miau». По умолчанию как в день 1. */
+  dark?: readonly string[];
   /** Сколько держать звёзды, мс (СЮЖЕТ_v2 d01.s8: 2 с; тесты: 0). */
   starsMs?: number;
 }
@@ -301,7 +305,7 @@ function openCard(deps: IntroDeps, cls: string, atlas: IntroAtlas | null, withAr
         return;
       }
       box.replaceChildren(...shown, el('div', { class: 'row' }, next));
-      if (o.speak) audio.play(o.speak.text, { who: o.speak.who });
+      if (o.speak && !deps.silent) audio.play(o.speak.text, { who: o.speak.who });
       queueMicrotask(() => next.focus({ preventScroll: true }));
     });
 
@@ -349,7 +353,7 @@ export async function runTiles(deps: TilesDeps): Promise<IntroResult> {
             'data-act': k === answer ? 'right' : 'wrong',
           }),
         );
-        card.box.replaceChildren(...after, el('div', { class: 'row' }, ...audioButtons(audio, phrase)), el('div', { class: 'tiles', role: 'group' }, ...tiles));
+        card.box.replaceChildren(...after, ...(deps.silent ? [] : [el('div', { class: 'row' }, ...audioButtons(audio, phrase))]), el('div', { class: 'tiles', role: 'group' }, ...tiles));
         queueMicrotask(() => tiles[0]?.focus({ preventScroll: true }));
       });
       if (attempts === 1) firstTry = ok;
@@ -402,7 +406,7 @@ export async function runNight(deps: NightDeps): Promise<void> {
   const atlas = await Promise.resolve(deps.atlas ?? null);
   const card = openCard(deps, '', atlas);
   try {
-    await card.page([D01.miau, D01.notMe], { art: 'dark' });
+    await card.page([...(deps.dark ?? [D01.miau, D01.notMe])], { art: 'dark' });
     card.setArt('night');
     await card.page([D01.dobranoc], { art: 'night' });
     const ms = deps.starsMs ?? 2000;

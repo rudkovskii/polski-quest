@@ -30,7 +30,7 @@ import {
 } from './systems/director';
 import type { LogEvent } from './systems/log';
 import type { Clock } from './systems/platform/clock';
-import { dayLines, entryOf, lineFor, sysFlag } from './systems/pace';
+import { entryOf, lineFor, sysFlag } from './systems/pace';
 import { getSetting, setFlag, setSetting, type Progress } from './systems/progress';
 import type { PaceSystem } from './types/content';
 import { appearanceOf, hasAppearance } from './systems/avatar';
@@ -148,7 +148,7 @@ export function startFlow(o: FlowOptions): Flow {
         text = s.choose ? 'вечер: рыбалка или табличка' : 'вечер: звуки у реки';
         break;
       case 'sleep':
-        text = 'альтанка: спать';
+        text = 'хатка Казика: спать';
         break;
       default:
         text = 'до завтра';
@@ -294,20 +294,22 @@ export function startFlow(o: FlowOptions): Flow {
     else await play.openLesson(lessonId);
   }
 
+  /**
+   * Сон (P-10b): один конец дня — постель в хатке Казика. Итог дня (один формат и одни цифры для всех дней,
+   * daySummary.ts; день 1 — с «Umiem» и крючком из director.days), потом ночь: «miau» в темноте, «Dobranoc», звёзды,
+   * «Do jutra». День 1 ещё ставит `beat.first_day_done` и открывает экран ссылки.
+   */
   async function sleepFlow(s: DirectorStep): Promise<void> {
     const first = s.kind === 'intro';
-    // День 1: итог одной карточкой (СЮЖЕТ_v2 d01.s8), Казик уже сказал «Idziemy spać» у хатки; крючок — director.days[1]
-    // (P-06). Дни 2+ — итог по director.days (daySummary.ts).
-    const hook = dayLines(content.director.days, 1)?.hook ?? D01.hook;
-    await day.ui.summary(first ? { bobr: null, lines: [D01.summary, D01.summaryUmiem], hook } : undefined);
+    await day.ui.summary();
     const st = await o.store;
     const d = derive(st.progress, deriveContent(content), clock.now());
     const slept = d.days[d.today]?.segs.includes('sleep');
-    if (!slept || s.kind !== 'intro') return;
-    await flag(firstFlag(s.f ?? 'd01.sen'), FIRST_DAY_DONE);
-    await runNight({ ...introDeps(st), atlas: withAvatarAtlas(loadIntroAtlas(), appearanceOf(st.progress)) });
+    if (!slept) return;
+    if (first) await flag(firstFlag(s.f ?? 'd01.sen'), FIRST_DAY_DONE);
+    await runNight({ ...introDeps(st), atlas: withAvatarAtlas(loadIntroAtlas(), appearanceOf(st.progress)), dark: first ? [D01.miau, D01.notMe] : [D01.miau] });
     // F6: мир создан на этом устройстве и ссылка ещё не сохранена → экран «Сохрани свою ссылку» (§5.2).
-    if (o.hasLink?.() && !(LINK_SAVED in st.progress.world.flags)) bus.emit('ui:screen:open', { screen: 'link' });
+    if (first && o.hasLink?.() && !(LINK_SAVED in st.progress.world.flags)) bus.emit('ui:screen:open', { screen: 'link' });
   }
 
   /** Система расписания показана (P-06): флаг `sys.<запись>` — с сегодняшнего дня она открыта. */
@@ -501,7 +503,7 @@ export function startFlow(o: FlowOptions): Flow {
   }
 
   function introDeps(st: FlowStore): Parameters<typeof runCaption>[0] {
-    return { overlay: play.overlay, content, audio: o.audio, portraits: portraitsNow, clock };
+    return { overlay: play.overlay, content, audio: o.audio, portraits: portraitsNow, clock, ...(getSetting(st.progress, 'sound.mode') === 'off' ? { silent: true } : {}) };
   }
   let portraitsNow: PortraitSource | null = null;
   void Promise.resolve(o.portraits ?? null).then((p) => (portraitsNow = p));
@@ -538,7 +540,8 @@ export function startFlow(o: FlowOptions): Flow {
     if (!(await chunk(items[1], () => lines([D01.proszeHint])))) return;
     if (!(await chunk(items[2], () => play.openDialog(FIRST_DAY.plotDialogue)))) return;
     await flag(firstFlag(id)); // Брзехва уходит по бульвару
-    await lines([D01.seeds, D01.pierogi, D01.pierogi2]);
+    // P-10b: «пироги» (d01.kazik.plot.3–4) убраны — третья метафора подряд сбивала, день 1 короче.
+    await lines([D01.seeds]);
   }
 
   /** Телепорт в локацию шага: спавн у цели, лицом к ней. */

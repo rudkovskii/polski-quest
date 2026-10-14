@@ -208,7 +208,7 @@ describe('диагностика дня 2 в оверлее', () => {
 });
 
 describe('без звука в уроке', () => {
-  it('listen: «Как это пишется? [транскрипция]», кнопок ▶ нет, карточка lis не пишется', async () => {
+  it('listen: «Как это пишется? [транскрипция]», кнопок ▶ нет, ответ чтением идёт в карточку lis (P-10b)', async () => {
     let p = newProgress(T0 - 3 * 86_400_000, 'w1');
     p = setSetting(p, 'sound.mode', 'off', T0 - 86_400_000);
     const store = memStore(p);
@@ -223,7 +223,8 @@ describe('без звука в уроке', () => {
     await flush(1);
     act(main(), 'next').click();
     await run;
-    expect(events.some((e) => e.k === 'rev' && e.card.endsWith('#lis'))).toBe(false);
+    // P-10b: карточка «на слух» без звука не пропадает — чтение транскрипции засчитывается в неё.
+    expect(events.some((e) => e.k === 'rev' && e.card.endsWith('#lis'))).toBe(true);
   });
   it('реакция мира на ошибку: реплика NPC урока перед правилом', async () => {
     const store = memStore(newProgress(T0 - 86_400_000, 'w1'));

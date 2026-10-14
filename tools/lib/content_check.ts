@@ -776,6 +776,8 @@ export function checkContent(input: CheckInput): Issue[] {
     ctx.ref(ctx.biomes, m.biome, sub(w, 'biome'), 'biome', WHERE.biomes);
     walkCond(ctx, m.unlock.hard, sub(w, 'unlock', 'hard'));
     m.unlock.soft?.forEach((s, i) => walkCond(ctx, s.if, sub(w, 'unlock', 'soft', i, 'if')));
+    // P-10b: «Умею» засчитывается по сценам главы — ссылки условия проверяются как у unlock.
+    m.canDo?.forEach((c, i) => walkCond(ctx, c.when, sub(w, 'canDo', i, 'when')));
     m.lessons.forEach((l, i) => {
       const lw = sub(w, 'lessons', i);
       if (!ctx.ref(ctx.lessons, l, lw, 'lesson', WHERE.lessons)) return;

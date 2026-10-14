@@ -66,8 +66,8 @@ const day = {
   ui: {
     busy: false,
     obchod: async (o: unknown) => void calls.push(`obchod:${JSON.stringify(o)}`),
-    summary: async (view?: { lines: string[]; hook?: string }) => {
-      calls.push(`summary:${view?.hook ?? ''}`);
+    summary: async () => {
+      calls.push('summary');
       store.append({ k: 'seg', ts: (now += 1000), seg: 'sleep' });
     },
     settings: async () => undefined,
@@ -188,16 +188,81 @@ describe('день 1 через склейку режиссёра', () => {
       expect(Object.keys(flags()).filter((k) => k.startsWith('plant.')).length).toBe(i);
     }
     expect(Object.keys(flags()).filter((k) => k.startsWith('plant.')).sort()).toEqual(['plant.3_6.lx.dziekuje', 'plant.4_6.lx.prosze', 'plant.5_6.lx.czesc']);
-    expect(calls).toContain('line:d01.kazik.hut.2');
+    expect(calls).toContain('line:d01.kazik.hut.1');
+    expect(calls).not.toContain('line:d01.kazik.hut.2'); // P-10b: повтор «спать» убран
     expect(flow.step?.target).toMatchObject({ location: 'ch01.chatka', object: 'poslanie' });
   });
 
-  it('хатка: A по постели → итог дня с крючком «Jutro: list.» → ночь; день 1 закрыт', async () => {
+  it('хатка: A по постели → итог дня → ночь («miau», Казик); день 1 закрыт', async () => {
     await at('ch01.chatka');
     await tap({ location: 'ch01.chatka', kind: 'trigger', id: 'poslanie' });
-    expect(calls).toContain('summary:d01.ui.hook');
+    expect(calls.filter((c) => c === 'summary')).toHaveLength(1);
     expect(intro.runNight).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(intro.runNight).mock.calls[0]![0]).toMatchObject({ dark: ['d01.simba.night', 'd01.kazik.hut.3'] });
     expect('beat.first_day_done' in flags()).toBe(true);
+    expect(flow.step?.kind).toBe('done');
+  });
+
+  // ── P-10b: дни 2 и 3 кончаются так же — один итог в хатке и ночь; альтанка спать не кладёт.
+
+  /** Пройти шаг режиссёра «как игрок»: склейка делает действие, журнал пишем за подменённые обход и урок. */
+  async function complete(): Promise<void> {
+    const s = flow.step!;
+    if (s.kind === 'beat' || s.kind === 'water' || s.kind === 'scene' || s.kind === 'remedy' || s.kind === 'evening') await flow.act();
+    const ts = (now += 60_000);
+    if (s.kind === 'water') store.append({ k: 'seg', ts, seg: 'water' });
+    if (s.kind === 'evening') store.append({ k: 'seg', ts, seg: 'evening' });
+    if ((s.kind === 'scene' || s.kind === 'remedy') && s.lesson) {
+      const l = content.lessons.get(s.lesson)!.value;
+      if (l.kind === 'diag') store.append({ k: 'diag', ts, results: Object.fromEntries(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10'].map((c) => [c, { n: 1, ok: 1 }])) });
+      for (const item of l.introduces ?? []) store.append({ k: 'intro', ts, item, lesson: l.id, ok: ['rec'] });
+      store.append({ k: 'lesson', ts, lesson: l.id, score: 1, firstTry: 1, ms: 60_000, passed: true, answers: 3 });
+      store.append({ k: 'seg', ts, seg: s.kind === 'remedy' ? 'remedy' : 'scene' });
+    }
+    bus.emit('progress:changed', { kinds: ['cards'] });
+    await flush(6);
+  }
+  async function untilSleep(): Promise<string[]> {
+    const seen: string[] = [];
+    await flow.refresh();
+    for (let g = 0; g < 30 && flow.step && flow.step.kind !== 'sleep'; g++) {
+      seen.push(`${flow.step.kind}:${flow.step.lesson ?? flow.step.beat ?? ''}`);
+      await complete();
+    }
+    return seen;
+  }
+
+  it('день 2: обход, письмо, турникет, перрон → сон в хатке (не альтанка) → итог → ночь с «miau»', async () => {
+    now = T + 86_400_000 + 2 * 3_600_000;
+    const seen = await untilSleep();
+    expect(seen).toContain('scene:ch01.s00');
+    expect(seen).toContain('beat:d02.znaki'); // P-10b: вывески метро у Брзехвы — три новых слова дня 2
+    expect(calls).toContain('dlg:dlg.ch01.peron'); // бит перрона (без цели) играется сам: Брзехва, «chrząszcz», вывески
+    expect(flow.step).toMatchObject({ kind: 'sleep', target: { location: 'ch01.chatka', object: 'poslanie' } });
+    // Альтанка на działce больше не триггер сна: тап по ней режиссёр не забирает, итога нет.
+    await at('ch01.dzialka');
+    expect(await tap({ location: 'ch01.dzialka', kind: 'trigger', id: 'altana_sleep' })).toBe(false);
+    expect(calls.filter((c) => c === 'summary')).toHaveLength(1);
+    await at('ch01.chatka');
+    await tap({ location: 'ch01.chatka', kind: 'trigger', id: 'poslanie' });
+    await flush(20);
+    expect(calls.filter((c) => c === 'summary')).toHaveLength(2);
+    expect(intro.runNight).toHaveBeenCalledTimes(1); // счётчик мока — за этот тест
+    expect(vi.mocked(intro.runNight).mock.calls[0]![0]).toMatchObject({ dark: ['d01.simba.night'] });
+    expect(flow.step?.kind).toBe('done');
+  });
+
+  it('день 3: киоск s01 идёт и при зелёном R1 (новые слова дня), табличка, сон → итог → ночь', async () => {
+    now = T + 2 * 86_400_000 + 2 * 3_600_000;
+    const seen = await untilSleep();
+    expect(seen).toContain('scene:ch01.s01');
+    expect(seen).toContain('beat:d03.tabliczka');
+    expect(flow.step).toMatchObject({ kind: 'sleep', target: { location: 'ch01.chatka' } });
+    await at('ch01.chatka');
+    await tap({ location: 'ch01.chatka', kind: 'trigger', id: 'poslanie' });
+    await flush(20);
+    expect(calls.filter((c) => c === 'summary')).toHaveLength(3);
+    expect(intro.runNight).toHaveBeenCalledTimes(1);
     expect(flow.step?.kind).toBe('done');
   });
 });

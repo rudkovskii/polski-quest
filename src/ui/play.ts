@@ -185,13 +185,14 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
   const names = new Set([...content.characters.values()].flatMap((c) => nameWords(c.name)));
   // Имя игрока меняется в Fotobudka (P-10a): «Andrzej» в реплике — имя, а не незнакомое слово.
   const isName = (w: string): boolean => names.has(w) || [...content.characters.values()].some((c) => c.kind === 'player' && nameWords(c.name).includes(w));
-  const wordPort = (store: PlayStore): { port: WordPort; day: string } => {
+  const wordPort = (store: PlayStore): { port: WordPort; day: string; gameDay: number } => {
     const now = deps.clock?.now() ?? Date.now();
     const d = derive(store.progress, deriveContent(content), now);
     wordIndex ??= buildWordIndex([...content.vocab.values()].map((x) => x.value));
     const vocab = (id: string): VocabEntry | undefined => content.vocab.get(content.renames.get(id) ?? id)?.value;
     return {
       day: d.today,
+      gameDay: paceCtxOf(content, d, store.progress.world.flags).day,
       port: {
         index: wordIndex,
         vocab,
@@ -216,7 +217,9 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
       portraits,
       words: w.port,
       seed: w.day,
+      day: w.gameDay,
       translations: getSetting(store.progress, 'translations'),
+      ...(getSetting(store.progress, 'sound.mode') === 'off' ? { silent: true } : {}),
       ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
       ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
       cond: cond(store),

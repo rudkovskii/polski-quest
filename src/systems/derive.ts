@@ -329,7 +329,7 @@ export function derive(p: Progress, content: DeriveContent, now: Ts, tz?: string
   }
 
   // Без звука (P-06, СЮЖЕТ_v2 §7): карточки «на слух» не просрочиваются и не идут в полив, пока звук выключен.
-  if (getSetting(p, 'sound.mode') === 'off') for (const id of Object.keys(cards)) if (parseCardId(id)?.type === 'lis') delete cards[id];
+  // Без звука (P-10b): карточки «на слух» остаются и в полив идут чтением (транскрипция → написание), см. ui/obchod.ts.
 
   let debt = 0;
   for (const [id, c] of Object.entries(cards)) {

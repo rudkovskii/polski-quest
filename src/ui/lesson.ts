@@ -244,7 +244,8 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
   const exContent = exerciseContent(content);
   // Реакция мира на ошибку (P-06): реплика NPC урока; без звука — её вариант `.mute`, если есть.
   const errLine = lineSpeech(content, lesson.errLine, settings.silent);
-  const verdicts = diag ? diagVerdicts(content) : undefined;
+  // «Pip!» / «Hyk!» — звуки турникета; без звука (P-10b) отклик текстом: «Dobrze!» и правило с ответом.
+  const verdicts = diag && !settings.silent ? diagVerdicts(content) : undefined;
 
   const saveResume = (stepIndex: number): void => {
     if (drill) return;

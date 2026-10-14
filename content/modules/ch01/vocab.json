@@ -372,7 +372,8 @@
     "ru": "платформа (перрон)",
     "tr": "пэ́рон",
     "pos": "sign",
-    "srs": false,
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
     "clusters": ["R1"],
     "tags": ["sign", "metro"]
   },

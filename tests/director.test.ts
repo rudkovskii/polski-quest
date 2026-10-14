@@ -20,6 +20,7 @@ import {
   type LocalResume,
   LINES,
   LINES_MORE,
+  waterable,
 } from '../src/systems/director';
 import type { EventDraft } from '../src/systems/log';
 import { append, newProgress, setFlag, setSetting, type Progress } from '../src/systems/progress';
@@ -89,7 +90,10 @@ describe('константы режиссёра ссылаются на суще
   it('карты, объекты, урок вступления, слово', () => {
     const dz = content.maps.get(FIRST_DAY.dzialka)!.value;
     expect(content.maps.get(FIRST_DAY.metro)).toBeTruthy();
-    for (const id of [FIRST_DAY.sleepObject, FIRST_DAY.eveningObject, FIRST_DAY.plot, 'skrzynka']) expect(dz.objects.some((o) => 'id' in o && o.id === id)).toBe(true);
+    for (const id of [FIRST_DAY.eveningObject, FIRST_DAY.plot, 'skrzynka']) expect(dz.objects.some((o) => 'id' in o && o.id === id)).toBe(true);
+    // P-10b: спать только в хатке Казика — постель там, альтанка на działce не кладёт спать.
+    expect(content.maps.get(FIRST_DAY.chatka)!.value.objects.some((o) => 'id' in o && o.id === FIRST_DAY.sleepObject)).toBe(true);
+    expect(dz.objects.some((o) => 'id' in o && o.id === 'altana_sleep')).toBe(false);
     expect(content.lessons.get(FIRST_DAY.introLesson)?.value.introduces).toEqual([FIRST_DAY.introItem]);
     expect(content.vocab.get(FIRST_DAY.introItem)?.value.pl).toBe('Dzień dobry');
   });
@@ -293,6 +297,9 @@ describe('день 2 «Bramka słucha» (P-06): обход, письмо, мет
   it('после диагностики: перрон с обещанием «chrząszcz», вторая сцена в день 2 не нужна', () => {
     const w = afterDay1().flag('beat.d02.title', 'beat.d02.podlane', 'beat.d02.letter').flagAt(at(0, 10.1), sysFlag('obchod'));
     w.add(seg('water', at(0, 10.2)), diag(at(0, 10.5)), lesson('ch01.s00', at(0, 10.5)), seg('scene', at(0, 10.5)));
+    // P-10b: сразу после турникета — вывески метро у Брзехвы (три новых слова дня 2).
+    expect(w.step(at(0, 10.6))).toMatchObject({ kind: 'beat', beat: 'd02.znaki', target: { location: 'ch01.metro', npc: 'brzechwa' }, do: [{ startLesson: 'ch01.d02.znaki' }] });
+    w.add(lesson('ch01.d02.znaki', at(0, 10.55)));
     expect(w.step(at(0, 10.6))).toMatchObject({ kind: 'beat', beat: 'd02.peron', do: [{ startDialogue: 'dlg.ch01.peron' }] });
     w.flag('beat.d02.peron');
     const s = w.step(at(0, 10.7));
@@ -312,7 +319,7 @@ describe('день 2 «Bramka słucha» (P-06): обход, письмо, мет
 /** Диагностика «всё красное»: все ремонтные сцены играются. */
 const diagRed = (ts: number): EventDraft => ({ k: 'diag', ts, results: Object.fromEntries(['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7', 'R8', 'R9', 'R10'].map((c) => [c, { ok: 2, n: 10 }])) });
 const dayN = (n: number): World => {
-  const w = afterDay1().add(diagRed(at(0, 10.5)), lesson('ch01.s00', at(0, 10.5)));
+  const w = afterDay1().add(diagRed(at(0, 10.5)), lesson('ch01.s00', at(0, 10.5)), lesson('ch01.d02.znaki', at(0, 10.55)));
   w.flagAt(at(0, 10.1), sysFlag('obchod'));
   for (let d = 0; d < n - 2; d++) w.add(seg('water', at(d, 10.2)), seg('sleep', at(d, 12)));
   for (let k = 2; k <= n; k++) w.flag(`beat.d${String(k).padStart(2, '0')}.title`);
@@ -446,7 +453,7 @@ describe('правила 5–10 обычного дня', () => {
   const day2 = (): World =>
     new World()
       .flag(...ALL_FIRST, hudFlag('passport'), hudFlag('obchod'), 'beat.d02.title', 'beat.d02.podlane', 'beat.d02.letter', 'beat.d02.peron')
-      .add(diag(at(-1)), lesson('ch01.s00', at(-1)), lesson('ch01.intro', at(-1)), lesson('ch01.d01.brzechwa', at(-1)), intro('lx.woda', at(-1, 10.5)), seg('sleep', at(-1, 12)));
+      .add(diag(at(-1)), lesson('ch01.s00', at(-1)), lesson('ch01.d02.znaki', at(-1)), lesson('ch01.intro', at(-1)), lesson('ch01.d01.brzechwa', at(-1)), intro('lx.woda', at(-1, 10.5)), seg('sleep', at(-1, 12)));
 
   it('мечта Казика о мосте — сцена дня 1 (Висла): старых битов kazik_most / brzechwa_rym нет, день 2 начинается с полива', () => {
     expect(content.director.beats.some((b) => b.id === 'kazik_most' || b.id === 'brzechwa_rym')).toBe(false);
@@ -486,7 +493,7 @@ describe('правила 5–10 обычного дня', () => {
   });
   it('8 → 9 → 10: альтанка, до завтра', () => {
     const w = day2().add(seg('water', at(0, 10.2)), seg('scene', at(0, 10.4)));
-    expect(w.step(at(0, 10.7))).toMatchObject({ kind: 'sleep', line: 'd02.kazik.hut.1', target: { object: 'altana_sleep' } });
+    expect(w.step(at(0, 10.7))).toMatchObject({ kind: 'sleep', line: 'd02.kazik.hut.1', target: { location: 'ch01.chatka', object: 'poslanie' } });
     w.add(seg('sleep', at(0, 10.8)));
     const done = w.step(at(0, 10.9));
     expect(done).toMatchObject({ kind: 'done', line: 'sys.kazik.done' });
@@ -518,12 +525,19 @@ describe('раскрытие HUD и детерминизм', () => {
   });
 });
 
-describe('режим без звука (P-06): карточки на слух не просрочиваются', () => {
-  it('sound.mode off → lis-карточек нет в выводе, полив их не зовёт', () => {
+describe('режим без звука (P-10b): карточки на слух не пропадают', () => {
+  it('sound.mode off → lis-карточки на месте, растения с «!» те же; туда и обратно ничего не теряется', () => {
     const w = afterDay1();
-    const lis = (p: Progress): number => Object.keys(directorInput(p, content, at(0), { tz: TZ }).derived.cards).filter((c) => c.endsWith('#lis')).length;
-    expect(lis(w.p)).toBeGreaterThan(0);
-    w.p = setSetting(w.p, 'sound.mode', 'off', at(-1));
-    expect(lis(w.p)).toBe(0);
+    const input = (p: Progress) => directorInput(p, content, at(0, 10), { tz: TZ });
+    const lis = (p: Progress): number => Object.keys(input(p).derived.cards).filter((c) => c.endsWith('#lis')).length;
+    const n = lis(w.p);
+    const due = waterable(input(w.p));
+    expect(n).toBeGreaterThan(0);
+    const off = setSetting(w.p, 'sound.mode', 'off', at(-1));
+    expect(lis(off)).toBe(n);
+    expect(waterable(input(off))).toBe(due);
+    const on = setSetting(off, 'sound.mode', 'on', at(-1, 1));
+    expect(lis(on)).toBe(n);
+    expect(waterable(input(on))).toBe(due);
   });
 });

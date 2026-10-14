@@ -233,7 +233,8 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
     const answerParts = [
       showAnswer && ans ? el('span', { class: 'answer' }, right ? '' : 'Правильно: ', el('b', {}, ans)) : null,
       showAnswer && spec.tr ? el('span', { class: 'tr' }, `[${spec.tr}]`) : null,
-      showAnswer && spec.sayCorrect ? btn('▶', () => ctx.audio.play(spec.sayCorrect!), 'icon', { 'aria-label': 'Послушать ответ', 'data-nav': true }) : null,
+      // Без звука (P-10b) ▶ нет: кнопка, которая молчит, выглядит как пропущенное задание.
+      showAnswer && spec.sayCorrect && !ctx.silent ? btn('▶', () => ctx.audio.play(spec.sayCorrect!), 'icon', { 'aria-label': 'Послушать ответ', 'data-nav': true, 'data-audio': 'answer' }) : null,
     ];
     if (right) feedback(v.cls, [verdictEl, ...answerParts]);
     else {

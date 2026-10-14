@@ -21,12 +21,14 @@ export const listen: ExerciseModule<StepListen> = {
       : noAudio
         ? [el('span', { class: 'q' }, 'Что здесь написано? ', el('b', { lang: 'pl' }, step.say)), el('span', { class: 'pq-noaudio' }, '🔇 звука нет')]
         : [el('span', { class: 'q' }, 'Что ты слышишь?'), ...audioButtons(ctx.audio, step.say)];
+    // Без звука с транскрипцией (P-10b) — это чтение звука: ответ засчитывается в карточку `lis`, она не пропадает.
+    const reading = ctx.silent === true && !!tr;
     const run = runGraded<number>(ctx, {
       kind: 'listen',
       head,
       body: opts.box,
       instant: true,
-      noAudio,
+      noAudio: noAudio && !reading,
       read: () => opts.picked,
       check: (i) => (i === answer ? { verdict: 'exact', score: 1, tags: [] } : { verdict: 'wrong', score: 0, tags: [...(step.tags ?? [])] }),
       correct: () => options[answer] ?? '',

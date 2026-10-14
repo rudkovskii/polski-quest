@@ -335,10 +335,12 @@ describe('działka с ходьбой (P-02)', () => {
     m.setGarden(garden, 0);
     expect(m.targetAt([px0 + 3, py0])).toBeNull();
   });
-  it('альтанка и берег — A перед ними; выход — шаг в калитку', () => {
-    const alt = dz.objects.find((o) => o.type === 'trigger' && o.id === 'altana_sleep') as Extract<LocationMap['objects'][number], { type: 'trigger' }>;
-    const m = new LocationModel(dz, [alt.at[0], alt.at[1] + alt.size![1]!], { facing: 'up' });
-    expect(m.actionHint()?.key).toBe('trigger:altana_sleep');
+  it('берег — A перед ним; выход — шаг в калитку', () => {
+    // P-10b: альтанка больше не триггер сна (спать только в хатке), A проверяем на береге Вислы.
+    expect(dz.objects.some((o) => o.type === 'trigger' && o.id === 'altana_sleep')).toBe(false);
+    const alt = dz.objects.find((o) => o.type === 'trigger' && o.id === 'ryby') as Extract<LocationMap['objects'][number], { type: 'trigger' }>;
+    const m = new LocationModel(dz, [alt.at[0] - 1, alt.at[1]], { facing: 'right' });
+    expect(m.actionHint()?.key).toBe('trigger:ryby');
     const ex = dz.objects.find((o) => o.type === 'exit')!;
     const m2 = new LocationModel(dz, [ex.at[0], ex.at[1] - 1], { facing: 'down' });
     m2.intent({ type: 'move', dir: 'down', held: true });

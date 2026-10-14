@@ -53,7 +53,9 @@ describe('вариант ремонтной сцены (§4.3: green пропу�
     for (const id of repairs) {
       const l = c.lessons.get(id!)!.value;
       expect(l.kind, id).toBe('repair');
-      expect(l.skipIf, id).toBeDefined();
+      // P-10b: киоск дня 3 (s01) несёт новые слова дня — при зелёном R1 он не пропускается, а идёт разминкой (short).
+      if (id === 'ch01.s01') expect(l.skipIf, id).toBeUndefined();
+      else expect(l.skipIf, id).toBeDefined();
       expect(l.short?.steps.length, id).toBeGreaterThan(0);
       expect(Math.max(...l.short!.steps), id).toBeLessThan(l.steps!.length);
     }

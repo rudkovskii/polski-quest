@@ -8,7 +8,7 @@
 // Порядок отрезков ведёт режиссёр (I-13): здесь только факты для него.
 import type { Tuning } from '../types/content';
 import { derive, isPlayedDay, type DeriveContent, type Derived } from './derive';
-import { gardenItems, plantStage, stageRank, type GardenTuning, type PlantStage } from './garden';
+import { gardenItems, lookRank, plantLook, type GardenTuning, type PlantLook } from './garden';
 import type { EventOf, LogEvent, Seg, Src } from './log';
 import type { Progress } from './progress';
 import { dueQueue, isSpring, type QueueTuning } from './queue';
@@ -188,23 +188,30 @@ export function retrievalMsOf(events: readonly LogEvent[], since: Ts, until: Ts 
 
 export interface DaySummary {
   day: Day;
-  /** Политых грядок сегодня: ответы обхода и экспресса (rev src obchod/express и ранний полив агрегатом). */
+  /** Ответов полива сегодня: обход и экспресс (rev src obchod/express и ранний полив агрегатом). */
   answered: number;
-  /** Из них верно (grade ≥ 1, у раннего полива — с первой попытки): «полито N из M». */
+  /** Из них верно (grade ≥ 1, у раннего полива — с первой попытки). */
   watered: number;
+  /**
+   * Политых растений сегодня (P-10b): разные слова, которые полил обход или экспресс (и ранний полив дня 1). Это то
+   * же число, что было на кнопке «Obchód (N)» перед обходом: одно растение — одна карточка в день.
+   */
+  plants: number;
   /** Разных карточек повторено / было due сегодня (повторено + ещё due) — покрытие. */
   reviewed: number;
   wasDue: number;
   /** Минуты вспоминания: уроки и диагностика целиком + ответы вне уроков (retrievalMsOf). */
   retrievalMs: number;
-  /** Слова, сменившие стадию сегодня (росток → куст и т.п.). */
-  grew: { item: string; from: PlantStage; to: PlantStage }[];
+  /** Слова, сменившие вид на грядке сегодня (росток → большой росток → куст …, P-10b: как на экране). */
+  grew: { item: string; from: PlantLook; to: PlantLook }[];
   /** Слова, сегодня получившие банку. */
   matured: string[];
   /** Посажено сегодня (`intro`). */
   planted: string[];
-  /** К поливу завтра (due до конца завтрашнего игрового дня, включая оставшийся долг). */
+  /** К поливу завтра (due до конца завтрашнего игрового дня, включая оставшийся долг), карточек. */
   tomorrow: number;
+  /** Растений, которые завтра попросят полива (P-10b: в итоге — растения, как на кнопке Obchód). */
+  tomorrowPlants: number;
   /** złoty за день — экономика I-18, пока null. */
   zloty: number | null;
   segs: Seg[];
@@ -245,17 +252,31 @@ export function summarizeDay(p: Progress, dc: DeriveContent, now: Ts, tz?: strin
     const a = after.cards[cardId(item, 'rec')];
     const b = before.cards[cardId(item, 'rec')];
     if (!a || !b) continue;
-    const from = plantStage(b, gt);
-    const to = plantStage(a, gt);
-    if (stageRank(to) > stageRank(from)) {
+    const from = plantLook(b, gt);
+    const to = plantLook(a, gt);
+    if (lookRank(to) > lookRank(from)) {
       grew.push({ item, from, to });
       if (to === 'jar') matured.push(item);
     }
   }
 
   let tomorrow = 0;
+  const tomorrowItems = new Set<string>();
   const tomorrowEnd = dayStartAfter(now, 2, opts);
-  for (const [id, c] of Object.entries(after.cards)) if (c.due < tomorrowEnd && parseCardId(id)?.type !== 'pair') tomorrow++;
+  for (const [id, c] of Object.entries(after.cards)) {
+    const pc = parseCardId(id);
+    if (c.due < tomorrowEnd && pc && pc.type !== 'pair') {
+      tomorrow++;
+      tomorrowItems.add(pc.item);
+    }
+  }
+  // Политые растения: слово карточки полива или слово раннего полива (`obchod.<item>` / `express.<item>#<type>`).
+  const wateredItems = new Set<string>();
+  for (const e of water) {
+    const pc = parseCardId(e.card);
+    if (pc) wateredItems.add(pc.item);
+  }
+  for (const e of early) wateredItems.add(e.lesson.replace(WATER_LESSON, '').replace(/#.*$/, ''));
 
   const s = after.days[after.today];
   const segs = [...(s?.segs ?? [])].sort() as Seg[];
@@ -264,6 +285,7 @@ export function summarizeDay(p: Progress, dc: DeriveContent, now: Ts, tz?: strin
     day: after.today,
     answered: water.length + early.reduce((x, e) => x + e.answers, 0),
     watered: water.filter((e) => e.g >= 1).length + early.reduce((x, e) => x + Math.round(e.firstTry * e.answers), 0),
+    plants: wateredItems.size,
     reviewed: reviewedCards.size,
     wasDue: reviewedCards.size + stillDue,
     retrievalMs: retrievalMsOf(today, start, now),
@@ -271,6 +293,7 @@ export function summarizeDay(p: Progress, dc: DeriveContent, now: Ts, tz?: strin
     matured,
     planted,
     tomorrow,
+    tomorrowPlants: tomorrowItems.size,
     zloty: null,
     segs,
     counted,

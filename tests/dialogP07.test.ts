@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { newProgress, getSetting, setSetting } from '../src/systems/progress';
 import { buildWordIndex, captionHidden, captionMode, formKey, isFamiliar, isLatin, matchWords, tokenize } from '../src/systems/words';
 import type { Dialogue, VocabEntry } from '../src/types/content';
-import { runDialog, screenChoices, type DialogDeps } from '../src/ui/dialog';
+import { choiceRuShown, runDialog, screenChoices, type DialogDeps } from '../src/ui/dialog';
 import { BOX_COLS, captionsFor, sentences, splitBoxes, wrapLines } from '../src/ui/dialog/boxes';
 import { lineBox, type WordPort } from '../src/ui/dialog/line';
 import { createOverlay } from '../src/ui/overlay/host';
@@ -276,11 +276,9 @@ describe('диалог P-07: листание и выбор', () => {
     expect(host.querySelector('.pq-line-page')?.textContent).toBe('2/2');
     expect(choices.hidden).toBe(false);
     expect(host.querySelector<HTMLElement>('[data-act="next"]')!.hidden).toBe(true);
-    // Перевод варианта по «?», вариант не выбирается.
-    const q = host.querySelector<HTMLButtonElement>('[data-act="choice-ru"]')!;
-    const forIdx = q.dataset.for!;
-    q.click();
-    expect(host.querySelector(`[data-choice="${forIdx}"] .ru`)?.hasAttribute('hidden')).toBe(false);
+    // Служебные ответы (без проверки) — русская подпись видна сразу, «?» не нужен (P-10b).
+    expect(host.querySelector('[data-act="choice-ru"]')).toBeNull();
+    for (const ru of host.querySelectorAll('[data-choice] .ru')) expect(ru.hasAttribute('hidden')).toBe(false);
     bus.emit('input:intent', { type: 'cancel', to: 'ui', source: 'keyboard' });
     expect((await p).cancelled).toBe(true);
 
@@ -375,5 +373,57 @@ describe('долгое нажатие на вариант (src/input/press.ts)',
     b.dispatchEvent(ev('pointerup'));
     b.click();
     expect((await p).ended).toBe(true);
+  });
+});
+
+describe('P-10b: подпись под вариантами и режим без звука в репликах', () => {
+  const kawa = { pl: 'Mała kawa, proszę.', ru: 'Маленький кофе, пожалуйста.', words: ['lx.maly', 'lx.kawa', 'lx.prosze'] as [string, ...string[]] };
+  it('служебный ответ — подпись всегда; вариант с проверкой — до дня 7 и пока слова не знакомы; потом гаснет', () => {
+    const all = port(['lx.maly', 'lx.kawa', 'lx.prosze']);
+    expect(choiceRuShown({ pl: 'Tak.', ru: 'Да.' }, { test: false, day: 30, words: all })).toBe(true);
+    expect(choiceRuShown(kawa, { test: true, day: 3, words: all })).toBe(true);
+    expect(choiceRuShown(kawa, { test: true, day: 8, words: port(['lx.maly']) })).toBe(true);
+    expect(choiceRuShown(kawa, { test: true, day: 8, words: all })).toBe(false);
+    expect(choiceRuShown(kawa, { test: true, day: 8, words: all, translations: 'always' })).toBe(true);
+    expect(choiceRuShown({ pl: 'Tak.', ru: 'Да.' }, { test: false, day: 1, words: all, translations: 'never' })).toBe(false);
+    expect(choiceRuShown({ pl: 'Tak.' }, { test: false })).toBe(false);
+  });
+
+  it('диалог: в первые дни подпись видна сразу, без «?»; на 8-й день со знакомыми словами — за «?»', async () => {
+    const dlg: Dialogue = {
+      id: 'dlg.demo.p10b',
+      npc: 'pan_marek',
+      start: 'a',
+      nodes: {
+        a: { who: 'pan_marek', pl: 'Tak?', ru: 'Да?', choices: [{ ...kawa, next: 'b' }, { pl: 'Mała kawa, prosię.', ru: 'Маленький кофе, поросёнок.', ok: false, next: 'b' }] },
+        b: { end: true },
+      },
+    };
+    const run = async (day: number) => {
+      const bus = testBus();
+      const d: DialogDeps = { overlay: createOverlay(host, { bus }), content: fixture(), audio: fakeAudio(), typeMs: 0, reactMs: 0, coarse: true, words: port(['lx.maly', 'lx.kawa', 'lx.prosze']), day };
+      const p = runDialog(dlg, d);
+      await flush();
+      const right = [...host.querySelectorAll<HTMLElement>('[data-choice]')].find((b) => b.dataset.choice === '0')!;
+      const out = { q: host.querySelectorAll('[data-act="choice-ru"]').length, ruHidden: right.querySelector('.ru')!.hasAttribute('hidden') };
+      bus.emit('input:intent', { type: 'cancel', to: 'ui', source: 'keyboard' });
+      await p;
+      return out;
+    };
+    expect(await run(2)).toEqual({ q: 0, ruHidden: false });
+    expect(await run(8)).toMatchObject({ ruHidden: true });
+    expect((await run(8)).q).toBeGreaterThan(0);
+  });
+
+  it('без звука: у реплики нет ▶, «медленно» и «🔇», звук сам не играет', () => {
+    const audio = fakeAudio();
+    const v = lineBox({ speaker: { id: 'pan_marek', name: 'Marek' }, pl: 'Mała kawa, proszę.', ru: 'Маленький кофе, пожалуйста.', audio, translations: 'auto', typeMs: 0, silent: true, autoplay: true });
+    expect(v.node.querySelector('[data-audio]')).toBeNull();
+    expect(v.node.querySelector('.pq-noaudio')).toBeNull();
+    expect(audio.played).toEqual([]);
+    v.dispose();
+    const loud = lineBox({ speaker: { id: 'pan_marek', name: 'Marek' }, pl: 'Mała kawa, proszę.', ru: 'Маленький кофе, пожалуйста.', audio, translations: 'auto', typeMs: 0 });
+    expect(loud.node.querySelector('[data-audio]') !== null || loud.node.querySelector('.pq-noaudio') !== null).toBe(true);
+    loud.dispose();
   });
 });

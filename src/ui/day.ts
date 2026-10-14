@@ -10,7 +10,7 @@ import { derive, deriveContent } from '../systems/derive';
 import { cellar, gardenItems } from '../systems/garden';
 import type { LogEvent } from '../systems/log';
 import type { BusEvents, SyncState } from '../types/bus';
-import { runDaySummary, type SummaryView } from './daySummary';
+import { runDaySummary } from './daySummary';
 import { el } from './dom';
 import type { LessonStore } from './lesson';
 import { runObchod, stageLabel, type ObchodOptions } from './obchod';
@@ -45,8 +45,8 @@ export interface DayDeps {
 export interface DayUi {
   readonly busy: boolean;
   obchod(o: ObchodOptions): Promise<void>;
-  /** Итог дня; `view` — своя карточка (день 1, P-05). */
-  summary(view?: SummaryView): Promise<void>;
+  /** Итог дня (P-10b: один формат для всех дней, зовёт только сон в хатке — src/flow.ts). */
+  summary(): Promise<void>;
   settings(): Promise<void>;
   dispose(): void;
 }
@@ -102,8 +102,7 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
     ...(deps.onEvent ? { onEvent: deps.onEvent } : {}),
   });
 
-  const summaryDeps = (store: DayStore, view?: SummaryView) => ({
-    ...(view ? { view } : {}),
+  const summaryDeps = (store: DayStore) => ({
     overlay: deps.overlay,
     content,
     store,
@@ -121,14 +120,13 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
     let opts = o;
     for (let guard = 0; guard < 20; guard++) {
       const r = await runObchod(obchodDeps(store), opts);
-      if (r.sleep) return summaryFlow(store);
       if (!r.again) return;
       opts = { mode: 'day' };
     }
   }
 
-  async function summaryFlow(store: DayStore, view?: SummaryView): Promise<void> {
-    const out = await runDaySummary(summaryDeps(store, view));
+  async function summaryFlow(store: DayStore): Promise<void> {
+    const out = await runDaySummary(summaryDeps(store));
     if (out === 'more3') await runObchod(obchodDeps(store), { mode: 'express', more3: true });
     else if (out === 'express') await runObchod(obchodDeps(store), { mode: 'express' });
   }
@@ -138,7 +136,7 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
       return busy;
     },
     obchod: (o) => once((s) => obchodLoop(s, o)),
-    summary: (view) => once((s) => summaryFlow(s, view)),
+    summary: () => once((s) => summaryFlow(s)),
     settings: () =>
       once((s) =>
         runSettings({
@@ -229,9 +227,9 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
 
   const offs = [
     bus.on('ui:obchod:start', ({ mode, fromItem }) => void ui.obchod({ mode, ...(fromItem ? { fromItem } : {}) })),
+    // P-10b: итог дня открывает только сон в хатке (src/flow.ts), экран `summary` по шине — не второй конец дня.
     bus.on('ui:screen:open', ({ screen }) => {
-      if (screen === 'summary') void ui.summary();
-      else if (screen === 'settings' || screen === 'export') void ui.settings();
+      if (screen === 'settings' || screen === 'export') void ui.settings();
     }),
     bus.on('world:location', () => {
       hudOn = true;
