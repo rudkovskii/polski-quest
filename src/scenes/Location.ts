@@ -8,6 +8,7 @@ import type { BusEvents, GuideTarget, PlotCellView, PlotView } from '../types/bu
 import { cellAt } from '../world/dzialka';
 import { edgeArrow, faceTowards, guidePath, pointerCell, resolveGuide, type ResolvedGuide } from '../world/guide';
 import { tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
+import { playerTextureKey } from '../world/avatar';
 import { pickZoom } from '../world/camera';
 import { DELTA, LocationModel, type Actor, type WorldEvent } from '../world/location';
 
@@ -40,6 +41,8 @@ export class Location extends Phaser.Scene {
   private mapDef!: LocationMap;
   private sprites!: SpritesMeta;
   private player!: Phaser.GameObjects.Sprite;
+  /** Спрайт игрока: `avatar` из Fotobudka (P-03) или `dima` из атласа. */
+  private playerSid = 'dima';
   private companion: Phaser.GameObjects.Sprite | null = null;
   private npcs = new Map<string, Phaser.GameObjects.Sprite>();
   private marker!: Phaser.GameObjects.Graphics;
@@ -194,7 +197,7 @@ export class Location extends Phaser.Scene {
       bus.emit('world:position', { location: this.mapDef.id, x, y });
     }
     this.wasMoving = moving;
-    this.syncActor(this.player, 'dima', this.model.player, time);
+    this.syncActor(this.player, this.playerSid, this.model.player, time);
     if (this.companion && this.model.companion) this.syncActor(this.companion, 'bobr', this.model.companion, time);
     this.drawHighlight(time);
     this.drawActionBubble(time);
@@ -465,8 +468,9 @@ export class Location extends Phaser.Scene {
 
   private buildActors(): void {
     const p = this.model.player;
-    this.player = this.add.sprite(0, 0, ATLAS, 'dima/1');
-    this.place(this.player, 'dima', p.tile[0], p.tile[1]);
+    this.playerSid = playerTextureKey(this, this.sprites);
+    this.player = this.add.sprite(0, 0, this.playerSid === 'dima' ? ATLAS : this.playerSid, `${this.playerSid}/1`);
+    this.place(this.player, this.playerSid, p.tile[0], p.tile[1]);
     const c = this.model.companion;
     if (c) {
       this.companion = this.add.sprite(0, 0, ATLAS, 'bobr/0');

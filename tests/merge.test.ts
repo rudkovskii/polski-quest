@@ -92,8 +92,11 @@ function checkpoint(c: Record<string, number>, asOf: number, tag: number): Check
 
 const FLAG_KEYS = ['beat.first.f1', 'beat.first.f2', 'hud.obchod', 'spring.2026-10-20', 'link.saved'];
 const BIOMES = ['praga', 'dzialka', 'metro'];
-const SETTING_KEYS = ['diacritics', 'newItemsPerDay', 'reducedMotion', 'controls.dpad', 'custom'];
-const SETTING_VALUES: unknown[] = ['warn', 'ok', 'fail', 8, 12, true, false, { a: 1, b: 2 }, { b: 2, a: 1 }, ['x', 'y']];
+const SETTING_KEYS = ['diacritics', 'newItemsPerDay', 'reducedMotion', 'controls.dpad', 'custom', 'avatar'];
+// Внешность (P-03, settings.avatar): объект целиком, в том числе с теми же полями в другом порядке.
+const AVATAR_A = { skin: 'tan', hair: 'curly', hairColor: 'ginger', beard: 'none', glasses: 'round', top: 'tee', topColor: 'red', name: 'Dima' };
+const AVATAR_B = { name: 'Dima', topColor: 'red', top: 'tee', glasses: 'round', beard: 'none', hairColor: 'ginger', hair: 'curly', skin: 'tan' };
+const SETTING_VALUES: unknown[] = ['warn', 'ok', 'fail', 8, 12, true, false, { a: 1, b: 2 }, { b: 2, a: 1 }, ['x', 'y'], AVATAR_A, AVATAR_B, { ...AVATAR_A, hair: 'long' }];
 
 function stamps(r: R, keys: readonly string[]): Record<string, number> {
   const out: Record<string, number> = {};

@@ -10,6 +10,8 @@
   art/sprites/*.sprite.json     sprite-as-data: keys (символ → имя цвета | null), frames, anims
   art/imports.json              кадры из листов art/vendor (персонажи NA), квантуются в палитру
   art/tilesets/<id>.json        тайлсет локаций: имя тайла → клетка листа / кадр спрайта / auto16
+  art/avatar/*.sprite.json      слои аватара (P-03) + avatar.json: только проверка, в атлас не идут
+                                (кадр может быть ссылкой: число i или {"flip": i})
 
 Выходы (руками не править, AGENTS.md):
   public/atlas/custom.png + custom.json      Phaser atlas JSON hash, кадры `<id>/<n>`, padding 1, extrude 1
@@ -165,6 +167,14 @@ def load_sprite(path: Path, pal: Palette) -> SpriteDef:
         colors[ch] = (*pal.names[name], 255)
     frames: list[Image.Image] = []
     for fi, rows in enumerate(d['frames']):
+        # Ссылка на кадр (P-03): число = копия кадра i, {"flip": i} = зеркало кадра i по горизонтали (i < fi).
+        if isinstance(rows, int) or isinstance(rows, dict):
+            ref = rows if isinstance(rows, int) else rows.get('flip')
+            if not isinstance(ref, int) or not 0 <= ref < fi or (isinstance(rows, dict) and set(rows) != {'flip'}):
+                raise BuildError(f'{rel}: кадр {fi}: ссылка {json.dumps(rows)} должна указывать на кадр раньше {fi} (число или {{"flip": i}})')
+            src = frames[ref]
+            frames.append(src.copy() if isinstance(rows, int) else src.transpose(Image.Transpose.FLIP_LEFT_RIGHT))
+            continue
         if len(rows) != h:
             raise BuildError(f'{rel}: кадр {fi}: строк {len(rows)}, а size[1] = {h}')
         img = Image.new('RGBA', (w, h), (0, 0, 0, 0))
@@ -213,6 +223,59 @@ def load_imports(pal: Palette) -> tuple[list[SpriteDef], list[str]]:
     return out, notes
 
 
+AVATAR_KINDS = ('skin', 'hair', 'hairColor', 'beard', 'glasses', 'top', 'topColor')
+
+
+def check_avatar(pal: Palette, sprites: dict[str, SpriteDef]) -> list[SpriteDef]:
+    """art/avatar (P-03): слои аватара собираются в игре (src/systems/avatar.ts), в атлас не идут.
+    Проверка: палитра, кадры и якорь как у Димы, подстановки ramp из палитры, слои из avatar.json существуют."""
+    root = ART / 'avatar'
+    if not root.exists():
+        return []
+    layers: dict[str, SpriteDef] = {}
+    for p in sorted(root.glob('*.sprite.json')):
+        s = load_sprite(p, pal)
+        if s.id in layers or s.id in sprites:
+            raise BuildError(f'{s.source}: дубль id "{s.id}"')
+        layers[s.id] = s
+    ref = sprites.get('dima')
+    for s in layers.values():
+        if ref and (s.size != ref.size or tuple(s.anchor) != tuple(ref.anchor) or len(s.frames) != len(ref.frames) or s.anims != ref.anims):
+            raise BuildError(f'{s.source}: размер, якорь, число кадров и anims должны совпадать с dima')
+    opt_path = root / 'avatar.json'
+    rel = opt_path.relative_to(ROOT).as_posix()
+    if not opt_path.exists():
+        raise BuildError(f'{rel}: нет файла (опции аватара)')
+    opt = json.loads(opt_path.read_text('utf8'))
+
+    def color(name: str, where: str) -> None:
+        if name not in pal.names:
+            raise BuildError(f'{rel}: {where}: цвета "{name}" нет в art/palette.json')
+
+    for kind, names in opt['base'].items():
+        for n in names:
+            color(n, f'base.{kind}')
+    ramp_len = {'skin': len(opt['base']['skin']), 'hairColor': len(opt['base']['hair']), 'topColor': len(opt['base']['top'])}
+    for kind in AVATAR_KINDS:
+        ids = set()
+        for o in opt[kind]:
+            if o['id'] in ids:
+                raise BuildError(f'{rel}: {kind}: дубль id "{o["id"]}"')
+            ids.add(o['id'])
+            if 'ramp' in o:
+                if len(o['ramp']) != ramp_len[kind]:
+                    raise BuildError(f'{rel}: {kind}.{o["id"]}: ramp длины {ramp_len[kind]}')
+                for n in o['ramp']:
+                    color(n, f'{kind}.{o["id"]}')
+            if 'beard' in o:
+                color(o['beard'], f'{kind}.{o["id"]}.beard')
+            if o.get('layer') and o['layer'] not in layers:
+                raise BuildError(f'{rel}: {kind}.{o["id"]}: нет слоя art/avatar/{o["layer"]}.sprite.json')
+        if opt['default'][kind] not in ids:
+            raise BuildError(f'{rel}: default.{kind}: нет варианта "{opt["default"][kind]}"')
+    return list(layers.values())
+
+
 def load_sprites(pal: Palette) -> tuple[dict[str, SpriteDef], list[str]]:
     sprites: dict[str, SpriteDef] = {}
     for p in sorted((ART / 'sprites').glob('*.sprite.json')):
@@ -225,6 +288,9 @@ def load_sprites(pal: Palette) -> tuple[dict[str, SpriteDef], list[str]]:
         if s.id in sprites:
             raise BuildError(f'art/imports.json: дубль id "{s.id}"')
         sprites[s.id] = s
+    avatar = check_avatar(pal, sprites)
+    if avatar:
+        notes.append(f'art/avatar: {len(avatar)} слоёв аватара проверено (в атлас не идут, собираются в игре)')
     return sprites, notes
 
 

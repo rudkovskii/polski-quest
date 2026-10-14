@@ -1,13 +1,15 @@
 // Паспорт (ТЗ §5.10, I-11, минимальный): обложка, страница на каждый биом (печать или пустой силуэт и
 // условие словами), предметы (билет), can-do главы с галочками. Челленджи, słoiki, spiżarnia и «Секреты»
 // придут в следующих итерациях. Печать = стадия биома `stages.stamp` истинна (Praga: флаг ch01.done).
+import { appearanceOf, hasAppearance, type Appearance } from '../systems/avatar';
 import type { Content } from '../systems/content';
 import type { Derived } from '../systems/derive';
 import type { Progress } from '../systems/progress';
 import type { Condition } from '../types/content';
 import { el } from './dom';
 import type { Overlay } from './overlay/host';
-import { BTN, plBtn } from './overlay/kit';
+import { avatarPhotoEl } from './avatar';
+import { BTN, btn, plBtn } from './overlay/kit';
 
 export interface PassportPage {
   biome: string;
@@ -19,6 +21,8 @@ export interface PassportPage {
 }
 
 export interface PassportModel {
+  /** Владелец (P-03): фото из Fotobudka и имя. `fromBooth: false` — Fotobudka не пройдена, фото пресета «Дима». */
+  owner: { appearance: Appearance; name: string; fromBooth: boolean };
   /**
    * Первая страница (СЮЖЕТ §2, I-13): выцветшая запись «Dla następnego gościa. - K.» и печать №1
    * «Warszawa. Praga» за первое «Dzień dobry» (флаг STAMP_FIRST). null — паспорт ещё не найден.
@@ -93,7 +97,8 @@ export function passportModel(
       const done = m.boss ? d.bossResults[m.boss]?.passedAt !== undefined : false;
       return (m.canDo ?? []).map((x) => ({ id: x.id, ru: x.ru, done }));
     });
-  return { first, pages, items, canDo };
+  const appearance = appearanceOf(p);
+  return { owner: { appearance, name: appearance.name, fromBooth: hasAppearance(p) }, first, pages, items, canDo };
 }
 
 const css = `
@@ -106,6 +111,9 @@ const css = `
 .pq-passport .seal.off { border: 3px dashed #b8a58a; color: #b8a58a; }
 .pq-passport ul { margin: 0; padding-left: 4px; list-style: none; display: flex; flex-direction: column; gap: 4px; }
 .pq-passport .muted { color: #695953; font-size: 15px; }
+.pq-passport .owner { display: flex; align-items: center; gap: 12px; border: 2px solid #c8966b; border-radius: 6px; padding: 8px 10px; background: #fce2ca; }
+.pq-passport .owner .photo { flex: none; padding: 3px; background: #b8dce5; border: 3px solid #3b3643; transform: rotate(-2deg); line-height: 0; }
+.pq-passport .owner b { font-size: 20px; }
 `;
 
 /** Открыть паспорт поверх мира. Закрыть: кнопка, Esc, «B». */
@@ -124,6 +132,12 @@ export function openPassport(overlay: Overlay, model: PassportModel): Promise<vo
         'div',
         { class: 'pq-wood pq-passport', 'data-screen': 'passport' },
         el('h2', { lang: 'pl' }, 'PASZPORT GOŚCIA'),
+        el(
+          'div',
+          { class: 'owner', 'data-page': 'owner', 'data-booth': String(model.owner.fromBooth) },
+          el('div', { class: 'photo' }, avatarPhotoEl(model.owner.appearance, 4)),
+          el('div', {}, el('div', { class: 'muted', lang: 'pl' }, 'Imię · имя'), el('b', { lang: 'pl', 'data-role': 'owner-name' }, model.owner.name), el('div', { class: 'muted', lang: 'pl' }, 'Gość · Warszawa')),
+        ),
         model.first
           ? el(
               'div',
