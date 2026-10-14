@@ -344,7 +344,7 @@
     "if": { "all": [{ "flag": "beat.d01.kapelusz" }, { "not": { "flag": "beat.d01.brzechwa" } }] },
     "nodes": {
       "b3": { "line": "d01.brzechwa.plot.3", "next": "imie" },
-      "imie": { "who": "dima", "choices": [{ "pl": "Dima.", "ru": "Дима.", "next": "b4" }] },
+      "imie": { "who": "dima", "choices": [{ "pl": "{name}.", "ru": "{name}.", "next": "b4" }] },
       "b4": { "line": "d01.brzechwa.plot.4", "next": "b5" },
       "b5": { "line": "d01.brzechwa.plot.5", "end": true }
     }

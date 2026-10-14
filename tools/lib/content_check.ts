@@ -29,6 +29,7 @@ import type {
 import { FIRST_DAY, FIRST_DAY_LINES } from '../../src/systems/director';
 import { scheduleIssues } from '../../src/systems/pace';
 import { buildWordIndex, matchWords, refIds, type WordIndex } from '../../src/systems/words';
+import { ANY_NAME_SUFFIX, defaultNamed, NAME_FIELDS, NAME_TOKEN } from '../../src/systems/playerName';
 
 // ───────────────────────────── типы ─────────────────────────────
 
@@ -56,7 +57,8 @@ export type IssueCode =
   | 'orphan' // сиротский узел / урок вне module.lessons (предупреждение)
   | 'tr' // транскрипция
   | 'long-lesson' // урок длиннее minutes × 1.5 (предупреждение)
-  | 'words'; // разметка words реплики (P-07): id слова есть в vocab, слово стоит в строке
+  | 'words' // разметка words реплики (P-07): id слова есть в vocab, слово стоит в строке
+  | 'name'; // плейсхолдер {name} и реплики <id>.anyname (P-10a)
 
 export interface Issue {
   level: Level;
@@ -616,7 +618,8 @@ export function voiceTexts(lessons: Lesson[], vocab: VocabEntry[], dialogues: Di
       if (s.t === 'stress') out.add(s.word);
     }
   for (const d of dialogues) for (const n of Object.values(d.nodes)) if (n.pl && !unvoiced.has(n.who ?? '')) out.add(n.pl);
-  return [...out].map((t) => t.normalize('NFC').trim());
+  // `{name}` озвучен под «Dima» (P-10a): tools/build_audio.py подставляет то же имя.
+  return [...out].map((t) => defaultNamed(t).normalize('NFC').trim());
 }
 
 export function checkContent(input: CheckInput): Issue[] {
@@ -1003,6 +1006,7 @@ export function checkContent(input: CheckInput): Issue[] {
   }
 
   checkWords(ctx);
+  checkNames(ctx);
 
   // Реплики (п. 8) и todo.
   for (const r of ctx.lineRefs) {
@@ -1105,6 +1109,44 @@ function checkWords(ctx: Ctx): void {
     if (l.ru && l.who !== 'narrator' && kind !== 'companion' && kind !== 'player')
       ctx.warn('line', sub(def, 'ru'), `${l.who} говорит по-русски (ru): польские NPC говорят только по-польски, перевод — в plRu`);
   }
+}
+
+/**
+ * Имя игрока (P-10a, src/systems/playerName.ts): `{name}` — единственный плейсхолдер в строках контента, и только
+ * в pl/ru/plRu реплик, узлов и вариантов диалога и шагов `say` (в ответах и заданиях на ввод имени не угадать).
+ * Реплика `<id>.anyname` — замена `<id>` для имени не «Dima»: у неё есть основная реплика с тем же `who`.
+ */
+function checkNames(ctx: Ctx): void {
+  const BRACE = /\{[^{}]*\}/g;
+  const scan = (v: unknown, w: Where, allowed: boolean): void => {
+    if (typeof v === 'string') {
+      for (const m of v.match(BRACE) ?? [])
+        if (m !== NAME_TOKEN) ctx.err('name', w, `неизвестный плейсхолдер ${m}: в строках контента есть только ${NAME_TOKEN}`);
+      if (!allowed && v.includes(NAME_TOKEN)) ctx.err('name', w, `${NAME_TOKEN} здесь нельзя: имя подставляется только в pl/ru/plRu реплик, диалогов и шагов say`);
+    } else if (Array.isArray(v)) v.forEach((x, i) => scan(x, sub(w, i), false));
+    else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) scan(x, sub(w, k), false);
+  };
+  const fields = (o: Record<string, unknown>, w: Where): void => {
+    for (const [k, x] of Object.entries(o)) {
+      if (k === 'choices' && Array.isArray(x)) x.forEach((c, i) => fields(c as Record<string, unknown>, sub(w, k, i)));
+      else scan(x, sub(w, k), NAME_FIELDS.includes(k));
+    }
+  };
+  for (const [id, def] of ctx.lines) {
+    fields(def.value as unknown as Record<string, unknown>, def);
+    if (!id.endsWith(ANY_NAME_SUFFIX)) continue;
+    const base = ctx.lines.get(id.slice(0, -ANY_NAME_SUFFIX.length));
+    if (!base) ctx.err('name', sub(def, 'id'), `реплика ${id}: нет основной реплики ${id.slice(0, -ANY_NAME_SUFFIX.length)}, которую она заменяет для имени не «Dima»`);
+    else if (base.value.who !== def.value.who) ctx.err('name', sub(def, 'who'), `реплика ${id}: who "${def.value.who}" не совпадает с основной ("${base.value.who}")`);
+  }
+  for (const [, def] of ctx.dialogues)
+    for (const [key, n] of Object.entries(def.value.nodes)) fields(n as unknown as Record<string, unknown>, sub(def, 'nodes', key));
+  for (const [, def] of ctx.lessons)
+    for (const { step, path } of lessonSteps(def.value)) {
+      const w = sub(def, ...path);
+      if (step.t === 'say') fields(step as unknown as Record<string, unknown>, w);
+      else scan(step, w, false);
+    }
 }
 
 /**

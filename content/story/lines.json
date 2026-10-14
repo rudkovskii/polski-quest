@@ -274,7 +274,8 @@
   { "id": "d02.kazik.most.1", "who": "bobr", "pl": "Ładny most. Mój będzie lepszy.", "plRu": "Красивый мост. Мой будет лучше." },
   { "id": "d02.kazik.schody.1", "who": "bobr", "pl": "To nie moje.", "plRu": "Это не моё." },
   { "id": "d02.kazik.schody.2", "who": "bobr", "ru": "У меня лапы с перепонками. Тут кто-то поменьше." },
-  { "id": "d02.brzechwa.bramka.1", "who": "brzechwa", "pl": "Cześć, Dima! Zima!", "plRu": "Привет, Дима! Зима!" },
+  { "id": "d02.brzechwa.bramka.1", "who": "brzechwa", "pl": "Cześć, {name}! Zima!", "plRu": "Привет, {name}! Зима!" },
+  { "id": "d02.brzechwa.bramka.1.anyname", "who": "brzechwa", "pl": "Cześć, {name}!", "plRu": "Привет, {name}!" },
   { "id": "d02.brzechwa.bramka.2", "who": "brzechwa", "pl": "Ta bramka słucha.", "plRu": "Этот турникет слушает." },
   { "id": "d02.kazik.bramka.1", "who": "bobr", "ru": "Пускает тех, кто слышит город. Не экзамен: 12 звуков." },
   { "id": "d02.dima.bramka.start", "who": "dima", "pl": "Słucham!", "plRu": "Слушаю!", "words": ["lx.slucham"] },
@@ -430,14 +431,21 @@
   {
     "id": "d01.brzechwa.plot.4",
     "who": "brzechwa",
-    "pl": "Dima? Rymuje się z „zima”!",
-    "plRu": "Дима? Рифмуется с «зима»!"
+    "pl": "{name}? Rymuje się z „zima”!",
+    "plRu": "{name}? Рифмуется с «зима»!"
+  },
+  {
+    "id": "d01.brzechwa.plot.4.anyname",
+    "who": "brzechwa",
+    "pl": "{name}? Ładne imię!",
+    "plRu": "{name}? Хорошее имя!",
+    "words": ["lx.imie"]
   },
   {
     "id": "d01.brzechwa.plot.5",
     "who": "brzechwa",
-    "pl": "Cześć, Dima! Do jutra!",
-    "plRu": "Пока, Дима! До завтра!",
+    "pl": "Cześć, {name}! Do jutra!",
+    "plRu": "Пока, {name}! До завтра!",
     "words": [
       "lx.czesc"
     ]
@@ -517,7 +525,7 @@
   { "id": "idle.basia.2", "who": "pani_basia", "pl": "Kolano? Tak sobie.", "plRu": "Колено? Так себе." },
   { "id": "idle.basia.3", "who": "pani_basia", "pl": "Krówkę? Proszę.", "plRu": "Конфетку? Пожалуйста." },
   { "id": "idle.ola.1", "who": "ola", "pl": "Hej! Uwaga, drzwi!", "plRu": "Привет! Осторожно, двери!" },
-  { "id": "idle.ola.2", "who": "ola", "pl": "Cześć, Dima! Co słychać?", "plRu": "Привет, Дима! Как дела?" },
+  { "id": "idle.ola.2", "who": "ola", "pl": "Cześć, {name}! Co słychać?", "plRu": "Привет, {name}! Как дела?" },
   { "id": "idle.kasia.1", "who": "kasia", "pl": "Cześć! Jestem z Krakowa.", "plRu": "Привет! Я из Кракова." },
   { "id": "idle.kasia.2", "who": "kasia", "pl": "Warszawa? Spoko. Kraków lepszy.", "plRu": "Варшава? Нормально. Краков лучше." },
   { "id": "idle.urzedniczka.1", "who": "urzedniczka", "pl": "Numerek, proszę.", "plRu": "Номерок, пожалуйста." },
@@ -644,6 +652,7 @@
   { "id": "d14.kazik.bridge.1", "who": "bobr", "pl": "No to budujemy.", "plRu": "Ну, строим." },
   { "id": "d14.kazik.bridge.2", "who": "bobr", "ru": "Первый пролёт. Я дерево, ты слова." },
   { "id": "d14.letter.chopin", "who": "narrator", "pl": "Panie Dimo, zapraszam na Rynek. F.C.", "plRu": "Пан Дима, приглашаю на Рынок. Ф.Ш." },
+  { "id": "d14.letter.chopin.anyname", "who": "narrator", "pl": "Zapraszam na Rynek. F.C.", "plRu": "Приглашаю на Рынок. Ф.Ш." },
   { "id": "d14.kazik.letter", "who": "bobr", "ru": "Ещё один на букву. Не на K, уже легче." },
   { "id": "d14.ui.hook", "who": "narrator", "pl": "Jutro: Stare Miasto.", "plRu": "Завтра: Старый город." },
   { "id": "sys.kazik.prawie", "who": "bobr", "pl": "Prawie. Jeszcze raz.", "plRu": "Почти. Ещё раз." },

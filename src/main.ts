@@ -5,7 +5,7 @@ import { Location, type LocationData } from './scenes/Location';
 import { Title } from './scenes/Title';
 import { offlineRpc, startCloud, type CloudOptions } from './cloud';
 import { startFlow } from './flow';
-import { startAvatar } from './avatarGlue';
+import { startAvatar, startPlayerName } from './avatarGlue';
 import { withAvatarPortraits } from './ui/avatar';
 import { mountCreator } from './ui/creator';
 import { mountGuide } from './ui/guide';
@@ -68,6 +68,8 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   const content = getContent();
   // Внешность из Fotobudka (P-03): `avatar:changed` → текстура `avatar` в мире, голова аватара в портретах.
   const avatar = startAvatar(store);
+  // Имя из Fotobudka в репликах (P-10a): `{name}` → имя игрока, раньше подписчиков play/flow.
+  startPlayerName(content, store);
   const portraits = loadPortraits(content).then((src) => withAvatarPortraits(src, avatar.current));
   const playDeps: PlayDeps = { content, store, portraits, clock };
   const play = mountPlay(overlay, playDeps);

@@ -11,7 +11,9 @@
 // Это склейка слоёв, как main.ts.
 import { startInput } from '../input';
 import { bus } from '../systems/bus';
+import { DEFAULT_NAME } from '../systems/avatar';
 import { buildContent, getContent, type Content } from '../systems/content';
+import { personalize } from '../systems/playerName';
 import { GameStorage, memoryKV } from '../systems/platform/storage';
 import { el } from '../ui/dom';
 import { loadPortraits, mountPlay } from '../ui/play';
@@ -37,6 +39,8 @@ export async function mountLessonDev(params: URLSearchParams): Promise<void> {
   const useFixture = dlgId ? dlgId.includes('.demo.') : lessonId.includes('.demo.') || lessonId.startsWith('demo.');
   const content = useFixture ? fixtureContent() : getContent();
   if (!useFixture) addP07Demo(content);
+  // `{name}` в репликах (P-10a): `&name=Andrzej` — как после Fotobudka, без него «Dima».
+  personalize(content, params.get('name') ?? DEFAULT_NAME);
 
   const storage = new GameStorage(params.get('reset') ? { kv: memoryKV(), ls: null } : { dbName: 'polski-quest-dev', ls: null });
   await storage.load(Date.now());
