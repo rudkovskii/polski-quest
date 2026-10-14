@@ -66,6 +66,26 @@ export interface WorldInteract {
   ex?: string;
 }
 
+/** Клетка грядки для отрисовки (I-12, ТЗ §5.5): что растёт и нужен ли полив. Считает src/world/dzialka.ts. */
+export interface PlotCellView {
+  at: [number, number];
+  /** lxId слова; нет — пустая грядка. */
+  item?: string;
+  stage: 'empty' | 'seed' | 'sprout' | 'bush' | 'jar';
+  /** Интервал rec в днях: росток 1–2 маленький, 3–6 большой. */
+  interval: number;
+  /** «!»: есть карточка к поливу. */
+  due: boolean;
+  /** Просрочено больше 2 дней. */
+  wilted: boolean;
+}
+
+/** Грядки одного объекта `plot` карты. */
+export interface PlotView {
+  plot: string;
+  cells: PlotCellView[];
+}
+
 export interface BusEvents {
   'ui:dialog:open': { dialogueId: string; npcId: string };
   'ui:lesson:start': { lessonId: string; src: LessonSrc };
@@ -84,6 +104,13 @@ export interface BusEvents {
   /** Локация загружена: склейка переключает режим ввода `walk | tap` (I-07). */
   'world:location': { id: string; controls: MapControls };
   'world:teleport': { location: string; spawn: string };
+  /**
+   * Пометки мира из прогресса (I-12): грядки `plot` (стадии, «!», подвявшие) и «!» над объектами `word`
+   * с due-словами. Шлёт склейка (src/day.ts) на `world:location` и после изменений прогресса.
+   */
+  'world:marks': { location: string; plots: PlotView[]; dueItems: string[] };
+  /** Дима остановился (ТЗ §5.4): склейка пишет позицию в `local.position` (I-12). */
+  'world:position': { location: string; x: number; y: number };
   'progress:changed': { kinds: ProgressKind[] };
   'progress:merged': { remoteEvents: number };
   'sync:status': { state: SyncState; at?: number; detail?: string };

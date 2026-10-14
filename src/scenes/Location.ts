@@ -4,6 +4,8 @@ import { getContent } from '../systems/content';
 import type { TileHit } from '../input/pointer';
 import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap } from '../types/content';
+import type { BusEvents, PlotCellView, PlotView } from '../types/bus';
+import { cellAt } from '../world/dzialka';
 import { tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
 import { pickZoom } from '../world/camera';
 import { DELTA, LocationModel, type Actor, type WorldEvent } from '../world/location';
@@ -44,6 +46,11 @@ export class Location extends Phaser.Scene {
   private bump: { dir: Dir; until: number } | null = null;
   private data0: LocationData = {};
   private leaving = false;
+  /** Грядки и «!» (I-12, `world:marks`): спрайты растений по клеткам, метки над словами. */
+  private plots: PlotView[] = [];
+  private plants = new Map<string, { plant: Phaser.GameObjects.Sprite; mark: Phaser.GameObjects.Sprite | null; cell: PlotCellView }>();
+  private wordMarks = new Map<string, Phaser.GameObjects.Sprite>();
+  private wasMoving = false;
 
   constructor() {
     super('Location');
@@ -55,6 +62,10 @@ export class Location extends Phaser.Scene {
     this.npcs = new Map();
     this.companion = null;
     this.bump = null;
+    this.plots = [];
+    this.plants = new Map();
+    this.wordMarks = new Map();
+    this.wasMoving = false;
   }
 
   preload(): void {
@@ -90,10 +101,14 @@ export class Location extends Phaser.Scene {
       if (!enabled) this.model.halt();
     });
     const offTeleport = bus.on('world:teleport', ({ location, spawn }) => this.go(location, spawn));
+    const offMarks = bus.on('world:marks', (m) => {
+      if (m.location === this.mapDef.id && !this.leaving) this.applyMarks(m);
+    });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       offIntent();
       offInput();
       offTeleport();
+      offMarks();
       this.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
     });
     this.cameras.main.fadeIn(150, 26, 28, 44);
@@ -128,6 +143,12 @@ export class Location extends Phaser.Scene {
   override update(time: number, delta: number): void {
     if (this.leaving) return;
     for (const ev of this.model.update(Math.min(delta, 100))) this.onWorldEvent(ev, time);
+    const moving = this.model.moving;
+    if (this.wasMoving && !moving && !this.leaving) {
+      const [x, y] = this.model.player.tile;
+      bus.emit('world:position', { location: this.mapDef.id, x, y });
+    }
+    this.wasMoving = moving;
     this.syncActor(this.player, 'dima', this.model.player, time);
     if (this.companion && this.model.companion) this.syncActor(this.companion, 'bobr', this.model.companion, time);
     this.drawHighlight(time);
@@ -239,6 +260,95 @@ export class Location extends Phaser.Scene {
     }
   }
 
+  // ───────────── грядки и «!» (I-12) ─────────────
+
+  private applyMarks(m: BusEvents['world:marks']): void {
+    this.plots = m.plots;
+    const seen = new Set<string>();
+    for (const p of m.plots)
+      for (const cell of p.cells) {
+        const key = `${cell.at[0]},${cell.at[1]}`;
+        seen.add(key);
+        this.drawPlant(key, cell);
+      }
+    for (const [key, v] of this.plants) {
+      if (seen.has(key)) continue;
+      v.plant.destroy();
+      v.mark?.destroy();
+      this.plants.delete(key);
+    }
+    // «!» над объектами-словами с due (ТЗ §5.4).
+    const due = new Set(m.dueItems);
+    for (const o of this.model.objects) {
+      if (o.kind !== 'word') continue;
+      const item = (o.src as { item?: string }).item;
+      const want = !!item && due.has(item);
+      const cur = this.wordMarks.get(o.key);
+      if (want && !cur) this.wordMarks.set(o.key, this.markAt(o.at[0], o.at[1] - 1));
+      else if (!want && cur) {
+        cur.destroy();
+        this.wordMarks.delete(o.key);
+      }
+    }
+  }
+
+  private plantFrame(cell: PlotCellView): { sid: string; frame: number } | null {
+    switch (cell.stage) {
+      case 'seed':
+        return { sid: 'plant_seed', frame: 0 };
+      case 'sprout':
+        return { sid: 'plant_sprout', frame: (cell.interval >= 3 ? 1 : 0) + (cell.wilted ? 2 : 0) };
+      case 'bush':
+        return { sid: 'plant_bush', frame: cell.wilted ? 1 : 0 };
+      case 'jar':
+        return { sid: 'plant_jar', frame: 0 };
+      default:
+        return null;
+    }
+  }
+
+  private drawPlant(key: string, cell: PlotCellView): void {
+    const prev = this.plants.get(key);
+    const f = this.plantFrame(cell);
+    if (!f || !this.sprites[f.sid]) {
+      prev?.plant.destroy();
+      prev?.mark?.destroy();
+      this.plants.delete(key);
+      return;
+    }
+    const frameName = this.sprites[f.sid]!.frames[f.frame] ?? this.sprites[f.sid]!.frames[0]!;
+    let plant = prev?.plant;
+    if (!plant) {
+      plant = this.add.sprite(0, 0, ATLAS, frameName);
+      this.place(plant, f.sid, cell.at[0], cell.at[1]);
+    } else plant.setFrame(frameName);
+    plant.setDepth(5 + cell.at[1]);
+    let mark = prev?.mark ?? null;
+    if (cell.due && !mark) mark = this.markAt(cell.at[0], cell.at[1] - 1);
+    if (!cell.due && mark) {
+      mark.destroy();
+      mark = null;
+    }
+    // Полито: было «!», стало без — растение подпрыгивает (§5.5 «после верного ответа растение анимируется»).
+    const watered = prev && prev.cell.item === cell.item && prev.cell.due && !cell.due;
+    const grew = prev && prev.cell.item === cell.item && prev.cell.stage !== cell.stage;
+    if (watered || grew) {
+      const y0 = cell.at[1] * T + T;
+      this.tweens.add({ targets: plant, y: y0 - 4, duration: 120, yoyo: true, repeat: 1, ease: 'Sine.easeOut', onComplete: () => plant!.setY(y0) });
+    }
+    this.plants.set(key, { plant, mark, cell });
+  }
+
+  /** «!» над клеткой (спрайт mark_due, покачивается). */
+  private markAt(tx: number, ty: number): Phaser.GameObjects.Sprite {
+    const s = this.add.sprite(0, 0, ATLAS, this.sprites.mark_due?.frames[0] ?? 'mark_due/0');
+    if (this.sprites.mark_due) this.place(s, 'mark_due', tx, ty);
+    s.setY(s.y + 5); // ближе к макушке растения: «!» висит над ним, а не на клетке выше
+    s.setDepth(9_000);
+    this.tweens.add({ targets: s, y: s.y - 2, duration: 450, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    return s;
+  }
+
   // ───────────── камера ─────────────
 
   private layout(): void {
@@ -279,7 +389,9 @@ export class Location extends Phaser.Scene {
           const sid = this.spriteFor(getContent().characters.get(ev.id)?.sprite, 'extra_m');
           npc.play(`${sid}:idle_${opp[facing]}`);
         }
-        bus.emit('world:interact', { location: this.mapDef.id, ...rest, tile: [ev.tile[0], ev.tile[1]] });
+        // Грядка: слово под пальцем знает только отрисовка (I-12) — кладём его в `item`.
+        const plantItem = ev.kind === 'plot' ? cellAt(this.plots, ev.tile)?.item : undefined;
+        bus.emit('world:interact', { location: this.mapDef.id, ...rest, tile: [ev.tile[0], ev.tile[1]], ...(plantItem ? { item: plantItem } : {}) });
         break;
       }
       case 'exit':

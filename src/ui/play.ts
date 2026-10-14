@@ -78,7 +78,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
       if (c.flag !== undefined) return c.flag in store.progress.world.flags;
       if (c.item !== undefined) return c.item in store.progress.world.items;
       if (c.lessonDone !== undefined) {
-        done ??= derive(store.progress, deriveContent(content), Date.now()).lessonsDone;
+        done ??= derive(store.progress, deriveContent(content), deps.clock?.now() ?? Date.now()).lessonsDone;
         return done.has(c.lessonDone);
       }
       return false;
@@ -165,6 +165,11 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
   }
 
   async function interact(p: WorldInteract): Promise<void> {
+    // Грядка (I-12): полив ведёт оверлей петли дня (src/ui/day.ts); клетку → слово уже разобрала сцена.
+    if (p.kind === 'plot') {
+      bus.emit('ui:obchod:start', { mode: 'day', ...(p.item ? { fromItem: p.item } : {}) });
+      return;
+    }
     await guard(async (store) => {
       switch (p.kind) {
         case 'npc': {
@@ -197,7 +202,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
           return;
         }
         default:
-          // plot (обход, I-12), board (банки, I-45), secret (Симба, I-29) — не оверлей I-08.
+          // board (банки, I-45), secret (Симба, I-29) — не оверлей I-08.
           console.info('[ui] world:interact без обработчика в I-08:', p.kind, p.key);
       }
     });
