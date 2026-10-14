@@ -6,7 +6,10 @@
     "tr": "ма́ўы",
     "pos": "adj",
     "srs": true,
-    "clusters": ["R3"]
+    "cards": ["rec", "lis", "pro"],
+    "forms": { "f": "mała" },
+    "clusters": ["R3"],
+    "tags": ["ch01.s03", "kawiarnia"]
   },
   {
     "id": "lx.slucham",
@@ -15,7 +18,9 @@
     "tr": "сўу́хам",
     "pos": "phrase",
     "srs": true,
-    "clusters": ["R3"]
+    "cards": ["rec", "lis", "pro"],
+    "clusters": ["R3", "R2"],
+    "tags": ["ch01.s03", "kawiarnia"]
   },
   {
     "id": "lx.stol",
@@ -23,12 +28,13 @@
     "ru": "стол",
     "tr": "стуў",
     "pos": "noun",
-    "gender": "m",
     "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "gender": "m",
+    "ex": { "pl": "Stół jest mały.", "ru": "Стол маленький." },
     "ff": { "ru": "стул", "means": "krzesło" },
     "clusters": ["R3", "R10"],
-    "tags": ["dom", "ff"],
-    "ex": { "pl": "Stół jest mały.", "ru": "Стол маленький." }
+    "tags": ["ch01.s03", "dom", "ff"]
   },
   {
     "id": "lx.wyjscie",
@@ -37,6 +43,346 @@
     "tr": "вы́йщче",
     "pos": "sign",
     "srs": true,
-    "tags": ["sign"]
+    "cards": ["rec", "lis", "pro"],
+    "clusters": ["R5", "R2"],
+    "tags": ["sign", "metro"]
+  },
+  {
+    "id": "lx.woda",
+    "pl": "woda",
+    "ru": "вода",
+    "tr": "во́да",
+    "pos": "noun",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "gender": "f",
+    "clusters": ["R1"],
+    "tags": ["ch01.s01", "kawiarnia"]
+  },
+  {
+    "id": "lx.kawa",
+    "pl": "kawa",
+    "ru": "кофе",
+    "tr": "ка́ва",
+    "pos": "noun",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "gender": "f",
+    "clusters": ["R1", "R2"],
+    "tags": ["ch01.s01", "kawiarnia"]
+  },
+  {
+    "id": "lx.telefon",
+    "pl": "telefon",
+    "ru": "телефон",
+    "tr": "тэлэ́фон",
+    "pos": "noun",
+    "srs": false,
+    "gender": "m",
+    "clusters": ["R1"],
+    "tags": ["ch01.s01"]
+  },
+  {
+    "id": "lx.teatr",
+    "pl": "teatr",
+    "ru": "театр",
+    "tr": "тэ́атр",
+    "pos": "noun",
+    "srs": false,
+    "gender": "m",
+    "clusters": ["R1"],
+    "tags": ["ch01.s01"]
+  },
+  {
+    "id": "lx.problem",
+    "pl": "problem",
+    "ru": "проблема",
+    "tr": "про́блем",
+    "pos": "noun",
+    "srs": false,
+    "gender": "m",
+    "clusters": ["R1"],
+    "tags": ["ch01.s01"]
+  },
+  {
+    "id": "lx.warszawa",
+    "pl": "Warszawa",
+    "ru": "Варшава",
+    "tr": "варша́ва",
+    "pos": "name",
+    "srs": false,
+    "clusters": ["R1", "R4"],
+    "tags": ["ch01.s01", "miasto"]
+  },
+  {
+    "id": "lx.herbata",
+    "pl": "herbata",
+    "ru": "чай",
+    "tr": "хэрба́та",
+    "pos": "noun",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "gender": "f",
+    "clusters": ["R2"],
+    "tags": ["ch01.s02", "kawiarnia"]
+  },
+  {
+    "id": "lx.chleb",
+    "pl": "chleb",
+    "ru": "хлеб",
+    "tr": "хлеп",
+    "pos": "noun",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "gender": "m",
+    "clusters": ["R2", "R9"],
+    "tags": ["ch01.s02", "jedzenie"]
+  },
+  {
+    "id": "lx.ile",
+    "pl": "ile",
+    "ru": "сколько",
+    "tr": "и́лэ",
+    "pos": "pron",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "clusters": ["R2"],
+    "tags": ["ch01.s02"]
+  },
+  {
+    "id": "lx.cena",
+    "pl": "cena",
+    "ru": "цена",
+    "tr": "цэ́на",
+    "pos": "noun",
+    "srs": false,
+    "gender": "f",
+    "clusters": ["R2"],
+    "tags": ["ch01.s02"]
+  },
+  {
+    "id": "lx.krakow",
+    "pl": "Kraków",
+    "ru": "Краков",
+    "tr": "кра́куф",
+    "pos": "name",
+    "srs": false,
+    "clusters": ["R2", "R9"],
+    "tags": ["ch01.s02", "miasto"]
+  },
+  { "id": "lx.my", "pl": "my", "ru": "мы", "tr": "мы", "pos": "pron", "srs": false, "clusters": ["R2"], "tags": ["ch01.s02"] },
+  { "id": "lx.mi", "pl": "mi", "ru": "мне", "tr": "ми", "pos": "pron", "srs": false, "clusters": ["R2"], "tags": ["ch01.s02"] },
+  {
+    "id": "lx.lazienka",
+    "pl": "łazienka",
+    "ru": "ванная",
+    "tr": "ўажье́нка",
+    "pos": "noun",
+    "srs": false,
+    "gender": "f",
+    "clusters": ["R3", "R5"],
+    "tags": ["ch01.s03", "dom"]
+  },
+  {
+    "id": "lx.mleko",
+    "pl": "mleko",
+    "ru": "молоко",
+    "tr": "млэ́ко",
+    "pos": "noun",
+    "srs": false,
+    "gender": "n",
+    "clusters": ["R3"],
+    "tags": ["ch01.s03", "jedzenie"]
+  },
+  {
+    "id": "lx.przepraszam",
+    "pl": "przepraszam",
+    "ru": "извините",
+    "tr": "пшэпра́шам",
+    "pos": "phrase",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "clusters": ["R4", "R9"],
+    "tags": ["ch01.s04"]
+  },
+  {
+    "id": "lx.czas",
+    "pl": "czas",
+    "ru": "время",
+    "tr": "час",
+    "pos": "noun",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "gender": "m",
+    "ff": { "ru": "час", "means": "godzina" },
+    "clusters": ["R4"],
+    "tags": ["ch01.s04", "ff"]
+  },
+  {
+    "id": "lx.moze",
+    "pl": "może",
+    "ru": "может; может быть",
+    "tr": "мо́жэ",
+    "pos": "part",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "clusters": ["R4", "R10"],
+    "tags": ["ch01.s04"]
+  },
+  {
+    "id": "lx.krzeslo",
+    "pl": "krzesło",
+    "ru": "стул",
+    "tr": "кшэ́сўо",
+    "pos": "noun",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "gender": "n",
+    "ff": { "ru": "кресло", "means": "fotel" },
+    "clusters": ["R4", "R3"],
+    "tags": ["ch01.s04", "dom", "ff"]
+  },
+  {
+    "id": "lx.rzeka",
+    "pl": "rzeka",
+    "ru": "река",
+    "tr": "жэ́ка",
+    "pos": "noun",
+    "srs": false,
+    "gender": "f",
+    "clusters": ["R4", "R10"],
+    "tags": ["ch01.s04"]
+  },
+  { "id": "lx.trzy", "pl": "trzy", "ru": "три", "tr": "тшы", "pos": "num", "srs": false, "clusters": ["R4"], "tags": ["ch01.s04"] },
+  {
+    "id": "lx.czy_q",
+    "pl": "czy",
+    "ru": "ли (вопросительная частица)",
+    "tr": "чы",
+    "pos": "part",
+    "srs": false,
+    "clusters": ["R4"],
+    "tags": ["ch01.s04"]
+  },
+  {
+    "id": "lx.czesc",
+    "pl": "cześć",
+    "ru": "привет / пока",
+    "tr": "чещчь",
+    "pos": "phrase",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "clusters": ["R5", "R4"],
+    "tags": ["ch01.s05"]
+  },
+  {
+    "id": "lx.dzien",
+    "pl": "dzień",
+    "ru": "день",
+    "tr": "джень",
+    "pos": "noun",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "gender": "m",
+    "clusters": ["R5"],
+    "tags": ["ch01.s05"]
+  },
+  {
+    "id": "lx.ciasto",
+    "pl": "ciasto",
+    "ru": "пирог, торт",
+    "tr": "чя́сто",
+    "pos": "noun",
+    "srs": false,
+    "gender": "n",
+    "clusters": ["R5"],
+    "tags": ["ch01.s05", "jedzenie"]
+  },
+  { "id": "lx.siedem", "pl": "siedem", "ru": "семь", "tr": "ще́дэм", "pos": "num", "srs": false, "clusters": ["R5"], "tags": ["ch01.s05"] },
+  {
+    "id": "lx.sroda",
+    "pl": "środa",
+    "ru": "среда",
+    "tr": "щро́да",
+    "pos": "noun",
+    "srs": false,
+    "gender": "f",
+    "clusters": ["R5"],
+    "tags": ["ch01.s05"]
+  },
+  { "id": "lx.nic", "pl": "nic", "ru": "ничего", "tr": "ниц", "pos": "pron", "srs": false, "clusters": ["R5"], "tags": ["ch01.s05"] },
+  {
+    "id": "lx.wejscie",
+    "pl": "wejście",
+    "ru": "вход",
+    "tr": "вэ́йщче",
+    "pos": "sign",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "clusters": ["R5"],
+    "tags": ["sign", "metro"]
+  },
+  {
+    "id": "lx.dworzec",
+    "pl": "dworzec",
+    "ru": "вокзал",
+    "tr": "дво́жэц",
+    "pos": "noun",
+    "srs": true,
+    "cards": ["rec", "lis", "pro"],
+    "gender": "m",
+    "ff": { "ru": "дворец", "means": "pałac" },
+    "clusters": ["R4", "R2"],
+    "tags": ["sign", "metro", "ff"]
+  },
+  {
+    "id": "lx.kasa",
+    "pl": "kasa",
+    "ru": "касса",
+    "tr": "ка́са",
+    "pos": "sign",
+    "srs": false,
+    "clusters": ["R6"],
+    "tags": ["sign", "metro"]
+  },
+  {
+    "id": "lx.toaleta",
+    "pl": "toaleta",
+    "ru": "туалет",
+    "tr": "тоалэ́та",
+    "pos": "sign",
+    "srs": false,
+    "clusters": ["R3"],
+    "tags": ["sign", "metro"]
+  },
+  {
+    "id": "lx.peron",
+    "pl": "peron",
+    "ru": "платформа (перрон)",
+    "tr": "пэ́рон",
+    "pos": "sign",
+    "srs": false,
+    "clusters": ["R1"],
+    "tags": ["sign", "metro"]
+  },
+  {
+    "id": "lx.informacja",
+    "pl": "informacja",
+    "ru": "справочная, информация",
+    "tr": "информа́цйа",
+    "pos": "sign",
+    "srs": false,
+    "clusters": ["R1"],
+    "tags": ["sign", "metro"]
+  },
+  {
+    "id": "lx.centrum",
+    "pl": "Centrum",
+    "ru": "центр (станция метро)",
+    "tr": "цэ́нтрум",
+    "pos": "name",
+    "srs": false,
+    "clusters": ["R2"],
+    "tags": ["sign", "metro"]
   }
 ]
