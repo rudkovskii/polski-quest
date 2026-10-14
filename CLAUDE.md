@@ -81,6 +81,18 @@
   тесты в `tests/location.test.ts`), сцена `src/scenes/Location.ts` только рисует и шлёт `world:*` в bus.
 - Dev: `/?dev=world&map=ch01.metro[&spawn=<имя>]`, события мира в консоли.
 
+## Аудио (ТЗ §7, I-09)
+- `npm run audio` (только Mac: `say -v Zosia` → `afconvert`, AAC 64 кбит/с) озвучивает все польские строки `content/`
+  инкрементально по `sha1(engine|voice|rate|text)` → `public/audio/<sha12>.m4a` + `manifest.json` (`entries` по ТЗ §7.1,
+  плюс `files` с длительностью и `ids`: `lx.*`, `<lessonId>#<i>`, `dlg.*#<node>`, id реплик). Медленная версия — для слов,
+  `listen`, `dictation`, `shadow`, `minimal_pair`, пар phonetics. `--voice engine:id`, `--prune`, `--force`, `--dry-run`.
+- `npm run audio:check` (в `npm run check` и CI): ready-модуль без озвучки = ошибка, draft = предупреждение.
+  Реплики `todo` и персонажи с `voice.engine: "none"` (Дима, бобр) не озвучиваются.
+- В рантайме только шина: `bus.emit('audio:play', { id?, text?, slow?, queue?, done? })`, `audio:stop`; состояние —
+  `audio:state`. Файл → Web Speech pl-PL → `'none'`. `playbackRate` для медленной речи не использовать (iOS меняет тембр).
+- Разблокировка: Title (`unlockAudio`) и первый click/touchend (`connectAudio`); после фона `audio:blocked` → тост → `audio:unlock`.
+- Dev: `/?dev=audio`. Сравнение голосов: `python3 tools/voice_compare/build.py` → `tools/voice_compare/index.html`.
+
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
 2. Id: модуль `[a-z0-9_]+`, урок `<module>.<name>`, слово `lx.<slug>` (глобально уникально),

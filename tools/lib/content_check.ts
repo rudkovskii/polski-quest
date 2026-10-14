@@ -71,7 +71,7 @@ export interface CheckInput {
   schemas: ReadonlyMap<string, object>;
   /** Слова предыдущей версии (п. 7): lxId → файл, где оно было. `null` = сравнивать не с чем. */
   prevVocab?: ReadonlyMap<string, string> | null;
-  /** `public/audio/manifest.json` (п. 6). До I-09 его нет: проверка только предупреждает. */
+  /** `public/audio/manifest.json` (п. 6, пишет tools/build_audio.py). Нет файла = предупреждение «не проверена». */
   audioManifest?: unknown;
 }
 
@@ -588,19 +588,24 @@ function walkNfc(ctx: Ctx, v: unknown, w: Where): void {
 const SECONDS_PER_STEP = 20;
 
 /** Тексты модуля, которые должны быть озвучены (п. 6). Используется и I-09 для манифеста. */
-export function voiceTexts(lessons: Lesson[], vocab: VocabEntry[], dialogues: Dialogue[]): string[] {
+/**
+ * Строки, которые должны быть озвучены (ТЗ §7.1 п. 1). `unvoiced` — персонажи с `voice.engine: "none"`
+ * (Дима и др.): их реплики не озвучиваются. Полный список с голосами и медленными версиями — tools/build_audio.py.
+ */
+export function voiceTexts(lessons: Lesson[], vocab: VocabEntry[], dialogues: Dialogue[], unvoiced: ReadonlySet<string> = new Set()): string[] {
   const out = new Set<string>();
   for (const v of vocab) out.add(v.pl);
   for (const l of lessons)
     for (const { step: s } of lessonSteps(l)) {
-      if (s.t === 'say' || s.t === 'shadow') out.add(s.pl);
+      if (s.t === 'say' && s.audio !== false && !unvoiced.has(s.who)) out.add(s.pl);
+      if (s.t === 'shadow') out.add(s.pl);
       if ((s.t === 'listen' || s.t === 'dictation') && s.say) out.add(s.say);
       if ((s.t === 'order' || s.t === 'type' || s.t === 'gap') && s.say) out.add(s.say);
       if (s.t === 'minimal_pair') s.pair.forEach((p) => out.add(p));
       if (s.t === 'stress') out.add(s.word);
     }
-  for (const d of dialogues) for (const n of Object.values(d.nodes)) if (n.pl) out.add(n.pl);
-  return [...out];
+  for (const d of dialogues) for (const n of Object.values(d.nodes)) if (n.pl && !unvoiced.has(n.who)) out.add(n.pl);
+  return [...out].map((t) => t.normalize('NFC').trim());
 }
 
 export function checkContent(input: CheckInput): Issue[] {
@@ -968,15 +973,33 @@ export function checkContent(input: CheckInput): Issue[] {
   if (todo.length)
     ctx.warn('todo', { file: 'story/lines.json', path: '' }, `${todo.length} реплик с todo: true (${todo.slice(0, 6).map((l) => l.value.id).join(', ')}${todo.length > 6 ? ', …' : ''})`);
 
-  // п. 6: озвучка. Манифест появится в I-09, до тех пор только предупреждение.
+  // п. 6: озвучка. Есть ли для строки запись в манифесте (любым голосом); файлы и голоса сверяет
+  // `npm run audio:check`. ready без озвучки = ошибка, draft = одно предупреждение на модуль.
+  const unvoiced = new Set([...ctx.characters].filter(([, c]) => c.value.voice.engine === 'none').map(([cid]) => cid));
+  const manifest = input.audioManifest;
+  const voiced = new Set<string>();
+  const entries = manifest && typeof manifest === 'object' ? (manifest as { entries?: unknown }).entries : undefined;
+  if (entries && typeof entries === 'object')
+    for (const key of Object.keys(entries)) voiced.add(key.split('|').slice(2).join('|'));
   for (const [id, def] of ctx.modules) {
-    if (input.audioManifest !== undefined && input.audioManifest !== null) continue;
     const texts = voiceTexts(
       [...ctx.lessons.values()].filter((l) => l.module === id).map((l) => l.value),
       [...ctx.vocab.values()].filter((v) => v.module === id).map((v) => v.value),
       [...ctx.dialogues.values()].filter((d) => d.module === id).map((d) => d.value),
+      unvoiced,
     );
-    ctx.warn('audio', { file: def.file, path: '/status' }, `озвучка не проверена: нет public/audio/manifest.json (${texts.length} строк, модуль ${def.value.status}; ошибкой для ready станет в I-09)`);
+    const w = { file: def.file, path: '/status' };
+    const status = def.value.status;
+    if (manifest === undefined || manifest === null) {
+      ctx.warn('audio', w, `озвучка не проверена: нет public/audio/manifest.json (${texts.length} строк, модуль ${status}); запусти npm run audio`);
+      continue;
+    }
+    const missing = texts.filter((t) => !voiced.has(t));
+    if (!missing.length) continue;
+    const list = `${missing.slice(0, 5).map((t) => `"${t}"`).join(', ')}${missing.length > 5 ? ', …' : ''}`;
+    const msg = `не озвучено ${missing.length} из ${texts.length} строк (${list}): npm run audio на Mac`;
+    if (status === 'ready') ctx.err('audio', w, `модуль ready: ${msg}`);
+    else ctx.warn('audio', w, msg);
   }
 
   // п. 7: удалённые id слов.

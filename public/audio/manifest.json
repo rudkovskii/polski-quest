@@ -1,0 +1,212 @@
+{
+ "v": 1,
+ "default": "say:Zosia",
+ "entries": {
+  "say:Zosia|normal|Mała kawa, proszę.": "0a108f18bfca.m4a",
+  "say:Zosia|normal|Stół jest mały.": "484ec5748417.m4a",
+  "say:Zosia|normal|Słucham?": "3e7e47216ddf.m4a",
+  "say:Zosia|normal|lata": "2557515eae2a.m4a",
+  "say:Zosia|normal|lawa": "4f005637ef69.m4a",
+  "say:Zosia|normal|mała kawa": "766b883e81f1.m4a",
+  "say:Zosia|normal|mały": "dd09b14a7107.m4a",
+  "say:Zosia|normal|stół": "c39427cb11eb.m4a",
+  "say:Zosia|normal|słucham": "a7a811b4d7f4.m4a",
+  "say:Zosia|normal|wyjście": "e1a5184e3a92.m4a",
+  "say:Zosia|normal|łata": "a2dd455e6744.m4a",
+  "say:Zosia|normal|ława": "5c6a80444cd5.m4a",
+  "say:Zosia|slow|Mała kawa, proszę.": "2ea77465478c.m4a",
+  "say:Zosia|slow|lata": "43ee8e69f485.m4a",
+  "say:Zosia|slow|lawa": "e171955ee6f8.m4a",
+  "say:Zosia|slow|mała kawa": "3bedc728bc3b.m4a",
+  "say:Zosia|slow|mały": "77faf8053576.m4a",
+  "say:Zosia|slow|stół": "4110bf30282e.m4a",
+  "say:Zosia|slow|słucham": "59130cdc4be6.m4a",
+  "say:Zosia|slow|wyjście": "346573fed79c.m4a",
+  "say:Zosia|slow|łata": "d5febdc1ef49.m4a",
+  "say:Zosia|slow|ława": "5be2d8a6be55.m4a"
+ },
+ "files": {
+  "0a108f18bfca.m4a": {
+   "dur": 1.75,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "2557515eae2a.m4a": {
+   "dur": 0.61,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "2ea77465478c.m4a": {
+   "dur": 2.79,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "346573fed79c.m4a": {
+   "dur": 1.07,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "3bedc728bc3b.m4a": {
+   "dur": 1.65,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "3e7e47216ddf.m4a": {
+   "dur": 0.91,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "4110bf30282e.m4a": {
+   "dur": 0.81,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "43ee8e69f485.m4a": {
+   "dur": 0.78,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "484ec5748417.m4a": {
+   "dur": 1.18,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "4f005637ef69.m4a": {
+   "dur": 0.55,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "59130cdc4be6.m4a": {
+   "dur": 1.13,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "5be2d8a6be55.m4a": {
+   "dur": 0.73,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "5c6a80444cd5.m4a": {
+   "dur": 0.58,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "766b883e81f1.m4a": {
+   "dur": 0.9,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "77faf8053576.m4a": {
+   "dur": 0.72,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "a2dd455e6744.m4a": {
+   "dur": 0.64,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "a7a811b4d7f4.m4a": {
+   "dur": 0.88,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "c39427cb11eb.m4a": {
+   "dur": 0.64,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "d5febdc1ef49.m4a": {
+   "dur": 0.81,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "dd09b14a7107.m4a": {
+   "dur": 0.56,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "e171955ee6f8.m4a": {
+   "dur": 0.7,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "e1a5184e3a92.m4a": {
+   "dur": 0.84,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  }
+ },
+ "ids": {
+  "ch01.s03#1.0": {
+   "text": "łata",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "ch01.s03#1.1": {
+   "text": "lata",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "ch01.s03#2.0": {
+   "text": "ława",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "ch01.s03#2.1": {
+   "text": "lawa",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "ch01.s03#3": {
+   "text": "mała kawa",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "ch01.s03#4": {
+   "text": "Mała kawa, proszę.",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "ch01.s03#5": {
+   "text": "Słucham?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "lx.maly": {
+   "text": "mały",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "lx.slucham": {
+   "text": "słucham",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "lx.stol": {
+   "text": "stół",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "lx.stol#ex": {
+   "text": "Stół jest mały.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "lx.wyjscie": {
+   "text": "wyjście",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "mp.lata_lata#a": {
+   "text": "łata",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "mp.lata_lata#b": {
+   "text": "lata",
+   "voice": "say:Zosia",
+   "slow": true
+  }
+ }
+}
