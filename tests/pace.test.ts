@@ -55,11 +55,12 @@ describe('шаги урока по расписанию и без звука (pa
     }
   });
   it('lessonForToday: id шагов сохраняются (озвучка), всё отфильтровано — исходный урок', () => {
-    const s01 = content.lessons.get('ch01.s01')!.value;
+    // P-12: в ch01.s01 shadow больше нет (урок сокращён до 12 шагов) — берём первый урок с shadow не первым шагом.
+    const s01 = [...content.lessons.values()].map((x) => x.value).find((l) => (l.steps ?? []).findIndex((s) => s.t === 'shadow') > 1)!;
     const day3 = lessonForToday(s01, gate({ closed: (s) => s === 'shadow' }));
     expect(day3.steps!.length).toBe(s01.steps!.length - s01.steps!.filter((s) => s.t === 'shadow').length);
     expect(day3.steps!.some((s) => s.t === 'shadow')).toBe(false);
-    expect(day3.steps![1]!.id).toBe('ch01.s01#1');
+    expect(day3.steps![1]!.id).toBe(`${s01.id}#1`);
     expect(lessonForToday(s01, gate())).toBe(s01);
   });
   it('реплики без звука: `<id>.mute`, если есть', () => {
