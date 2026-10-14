@@ -57,6 +57,14 @@ export type PaceSystem1 =
   | 'map'
   | 'boss';
 /**
+ * P-07: значимые польские слова строки (гаснущая подпись, тап по слову). Элемент: id слова (в строке стоит его pl или форма из forms) или {pl, lx}: форма ровно как в строке и id слова. Без поля слова ищутся в vocab автоматически.
+ *
+ * @minItems 1
+ */
+export type LineWords = [LineWord, ...LineWord[]];
+export type LineWord = LxId | LineWordForm;
+export type LxId = string;
+/**
  * content/story/lines.json: реплики бобра, сюжета, кота (ТЗ §3.8). Текст переносится из ../СЮЖЕТ.md, не сочиняется. todo: true = реплики ещё нет (ru можно не указывать). Без todo нужен ru или pl; plRu — перевод pl.
  */
 export type Lines = Line[];
@@ -85,7 +93,6 @@ export type ErrorTagId = string;
  * content/errorTags.json: теги ошибок → сцена-лекарство (ТЗ §3.8, §4.4). Префиксы R1..R10, orth.*, gr.*, ff.*, ph.*.
  */
 export type ErrorTags = ErrorTag[];
-export type LxId = string;
 /**
  * content/modules/<id>/vocab.json (ТЗ §3.4). Id глобальные и стабильные: удалять нельзя, только module.renames.
  */
@@ -471,7 +478,12 @@ export interface Line {
    * Перевод pl (скобки в СЮЖЕТ.md); ru — отдельная русская реплика
    */
   plRu?: string;
+  words?: LineWords;
   todo?: boolean;
+}
+export interface LineWordForm {
+  pl: string;
+  lx: LxId;
 }
 export interface Secret {
   id: CharId;
@@ -1069,6 +1081,7 @@ export interface DialogueNode {
   who?: CharId;
   pl?: string;
   ru?: string;
+  words?: LineWords;
   line?: LineId2;
   /**
    * Реплики ещё нет в СЮЖЕТ.md: в игре [todo: <dlg>.<узел>]
@@ -1086,6 +1099,7 @@ export interface DialogueNode {
 export interface DialogueChoice {
   pl: string;
   ru?: string;
+  words?: LineWords;
   ok?: boolean;
   next: string;
   errorTag?: ErrorTagId;
