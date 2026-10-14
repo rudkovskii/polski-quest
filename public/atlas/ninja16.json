@@ -5,7 +5,7 @@
  "margin": 1,
  "spacing": 2,
  "columns": 16,
- "count": 79,
+ "count": 85,
  "tiles": {
   "altana": {
    "kind": "auto16",
@@ -26,6 +26,12 @@
     70,
     70,
     70
+   ]
+  },
+  "bush": {
+   "kind": "single",
+   "frames": [
+    84
    ]
   },
   "fence": {
@@ -83,6 +89,30 @@
     4
    ]
   },
+  "lodge_ne": {
+   "kind": "single",
+   "frames": [
+    80
+   ]
+  },
+  "lodge_nw": {
+   "kind": "single",
+   "frames": [
+    79
+   ]
+  },
+  "lodge_se": {
+   "kind": "single",
+   "frames": [
+    82
+   ]
+  },
+  "lodge_sw": {
+   "kind": "single",
+   "frames": [
+    81
+   ]
+  },
   "path": {
    "kind": "auto16",
    "frames": [
@@ -129,6 +159,12 @@
    "kind": "single",
    "frames": [
     78
+   ]
+  },
+  "stump": {
+   "kind": "single",
+   "frames": [
+    83
    ]
   },
   "tree": {

@@ -18,6 +18,8 @@ import { createClock } from './systems/platform/clock';
 import { storedSecret } from './systems/platform/secret';
 import { GameStorage, memoryKV } from './systems/platform/storage';
 import { busAudio } from './ui/overlay/kit';
+import { setFlag } from './systems/progress';
+import { seedFlag } from './world/dzialka';
 
 const params = new URLSearchParams(location.search);
 const dev = params.get('dev');
@@ -136,6 +138,11 @@ if (dev === 'audio') {
     for (const item of (params.get('plant') ?? '').split(',').filter(Boolean)) {
       if (s.progress.log.events.some((e) => e.k === 'intro' && e.item === item)) continue;
       s.append({ k: 'intro', ts: clock.now(), item, lesson: 'dev.plant', ok: ['lis', 'rec'] });
+    }
+    // P-02: `&seed=lx.a,lx.b` — слова семенами в кармане: сажать руками (A или тап по пустой клетке грядки).
+    for (const item of (params.get('seed') ?? '').split(',').filter(Boolean)) {
+      if (!s.progress.log.events.some((e) => e.k === 'intro' && e.item === item)) s.append({ k: 'intro', ts: clock.now(), item, lesson: 'dev.seed', ok: ['lis', 'rec'] });
+      s.setProgress(setFlag(s.progress, seedFlag(item), clock.now()));
     }
     return s;
   })();

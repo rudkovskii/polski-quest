@@ -108,6 +108,12 @@ export function createKeyboardSource(router: Router, target: Window | Document |
     if (isTextTarget(e.target)) releaseAll();
   };
   target.addEventListener('focusin', onFocusIn);
+  // Вкладку свернули с зажатой стрелкой (P-02): blur приходит не всегда (iOS, Cmd+Tab в полноэкранном), отпускаем сами.
+  const doc = typeof document !== 'undefined' ? document : null;
+  const onVisibility = (): void => {
+    if (doc?.visibilityState === 'hidden') releaseAll();
+  };
+  doc?.addEventListener('visibilitychange', onVisibility);
 
   return {
     dispose() {
@@ -116,6 +122,7 @@ export function createKeyboardSource(router: Router, target: Window | Document |
       target.removeEventListener('keyup', onKeyUp);
       target.removeEventListener('focusin', onFocusIn);
       win?.removeEventListener('blur', releaseAll);
+      doc?.removeEventListener('visibilitychange', onVisibility);
     },
   };
 }

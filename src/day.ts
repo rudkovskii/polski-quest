@@ -95,7 +95,7 @@ export function startDay(o: DayOptions): DayGlue {
     const hidden = buildObjects(map)
       .filter((o) => { const c = (o.src as { if?: Condition }).if; return !!c && !ok(c); })
       .map((o) => o.key);
-    bus.emit('world:marks', { ...worldMarks(map, d, now, content.tuning), hidden });
+    bus.emit('world:marks', { ...worldMarks(map, d, now, content.tuning, store.progress.world.flags), hidden });
   };
   const schedule = (): void => {
     if (queued) return;

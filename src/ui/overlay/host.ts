@@ -53,7 +53,10 @@ export function createOverlay(root: HTMLElement, opts: OverlayOptions = {}): Ove
         if (h?.interact?.() !== true) activate(top.el);
         return;
       case 'cancel':
-        h?.cancel?.();
+        // B/Esc закрывает любое окно (P-02, исследование §6в п. 8): слой без своего обработчика закрывается
+        // кнопкой «✕» (`data-act="close"`). Тап мимо окна (source pointer) так не закрывает: промах пальцем
+        // не должен обрывать урок.
+        if (h?.cancel?.() !== true && i.source !== 'pointer') top.el.querySelector<HTMLElement>('[data-act="close"]')?.click();
         return;
       default:
         return;

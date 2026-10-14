@@ -133,6 +133,38 @@ describe('KeyboardSource', () => {
     key('keyup', 'KeyW', input);
     expect(got).toHaveLength(2);
   });
+
+  it('диагональ (↑ и → вместе): идёт по последней нажатой оси, отпустил её — по первой (P-02)', () => {
+    const r = router();
+    keyboard(r);
+    key('keydown', 'ArrowUp');
+    key('keydown', 'ArrowRight');
+    expect(r.state.heldDir).toBe('right');
+    key('keyup', 'ArrowRight');
+    expect(r.state.heldDir).toBe('up');
+    key('keydown', 'KeyA');
+    expect(r.state.heldDir).toBe('left');
+    key('keyup', 'KeyA');
+    key('keyup', 'ArrowUp');
+    expect(r.state.heldDir).toBeNull();
+    expect(got.map((i) => (i.type === 'move' ? `${i.dir}:${i.held}` : i.type))).toEqual(['up:true', 'right:true', 'up:true', 'left:true', 'up:true', 'up:false']);
+  });
+
+  it('вкладку свернули с зажатой стрелкой: удержание снимается (P-02)', () => {
+    const r = router();
+    keyboard(r);
+    key('keydown', 'ArrowLeft');
+    const vis = Object.getOwnPropertyDescriptor(Document.prototype, 'visibilityState') ?? Object.getOwnPropertyDescriptor(document, 'visibilityState');
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
+    try {
+      document.dispatchEvent(new Event('visibilitychange'));
+    } finally {
+      if (vis) Object.defineProperty(document, 'visibilityState', vis);
+      else delete (document as unknown as Record<string, unknown>).visibilityState;
+    }
+    expect(r.state.heldDir).toBeNull();
+    expect(got.map((i) => (i.type === 'move' ? `${i.dir}:${i.held}` : i.type))).toEqual(['left:true', 'left:false']);
+  });
 });
 
 describe('DpadSource', () => {

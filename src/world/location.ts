@@ -6,8 +6,14 @@ import type { Dir, Intent, MapControls } from '../types/input';
 import { parseAscii, type ParsedMap, type Xy } from './ascii';
 import { findPath, pathToAdjacent, type Grid } from './pathfind';
 
-/** 6 клеток в секунду (ТЗ §2.7). */
-export const STEP_MS = 1000 / 6;
+/** Скорость ходьбы: 4,5 клетки в секунду (P-02, исследование §6в п. 2: «~4–5 клеток в секунду»). */
+export const CELLS_PER_SEC = 4.5;
+export const STEP_MS = 1000 / CELLS_PER_SEC;
+/**
+ * Поворот на месте (P-02): нажатие в сторону, куда Дима не смотрит, сначала только разворачивает его.
+ * Держишь дольше TURN_MS — пошёл; отпустил раньше — просто повернулся. Как в Pokémon/Stardew на крестовине.
+ */
+export const TURN_MS = 90;
 
 export const DELTA: Record<Dir, Xy> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 const OPPOSITE: Record<Dir, Dir> = { up: 'down', down: 'up', left: 'right', right: 'left' };
@@ -119,6 +125,13 @@ export class LocationModel {
   readonly companion: Actor | null;
   /** Выделенный объект в tap-локации (Tab/стрелки, ТЗ §2.7). */
   selected: string | null = null;
+  /**
+   * Грядки (P-02): клетка `x,y` → с ней можно что-то сделать (растёт слово → полив; пусто и есть семя → посадка).
+   * null — сведений о грядках ещё нет (`world:marks` не пришёл): любая клетка грядки — цель, как раньше.
+   */
+  private garden: Map<string, boolean> | null = null;
+  /** Сколько ещё ждать до первого шага после поворота на месте, мс (0 — не ждём). */
+  private turnWait = 0;
 
   private heldDir: Dir | null = null;
   /** Короткое нажатие во время шага: ещё один шаг после него (иначе быстрые тапы стрелки теряются). */
@@ -176,6 +189,16 @@ export class LocationModel {
 
   isHidden(key: string): boolean {
     return this.hidden.has(key);
+  }
+
+  /**
+   * Что растёт на грядках (P-02, из `world:marks`): клетка со словом — цель полива; пустая клетка — цель
+   * посадки, только если есть семена (`seeds > 0`). Пустая клетка без семян — просто земля под ногами.
+   */
+  setGarden(cells: readonly { at: readonly [number, number]; item?: string }[], seeds: number): void {
+    const g = new Map<string, boolean>();
+    for (const c of cells) g.set(`${c.at[0]},${c.at[1]}`, !!c.item || seeds > 0);
+    this.garden = g;
   }
 
   /** Переставить объект (бобр на działce садится у нужной грядки). */
@@ -267,9 +290,16 @@ export class LocationModel {
     }
   }
 
+  /** С этой клеткой объекта можно что-то сделать: для грядки — по клетке (полив или посадка), остальное — целиком. */
+  cellActionable(o: WorldObject, cell: Xy): boolean {
+    if (!this.actionable(o)) return false;
+    if (o.kind !== 'plot' || !this.garden) return true;
+    return this.garden.get(`${cell[0]},${cell[1]}`) ?? false;
+  }
+
   /** Что под пальцем: ключ объекта (`key` или `key@x,y` для многоклеточных) или null. */
   targetAt(tile: Xy): string | null {
-    const o = this.objects.find((ob) => covers(ob, tile) && this.actionable(ob));
+    const o = this.objects.find((ob) => covers(ob, tile) && this.cellActionable(ob, tile));
     if (!o) return null;
     return o.size[0] * o.size[1] > 1 ? `${o.key}@${tile[0]},${tile[1]}` : o.key;
   }
@@ -282,6 +312,15 @@ export class LocationModel {
     }
     if (this.player.step || this.path.length) return null;
     return this.actionTarget();
+  }
+
+  /**
+   * «A»-пузырёк (P-02): с чем сработает кнопка действия с текущей клетки. Только в walk-локации, когда Дима
+   * стоит (во время шага и пути пузырька нет). То же, что highlight(), но с явным именем для сцены и тестов.
+   */
+  actionHint(): { key: string; tile: Xy } | null {
+    if (this.controls !== 'walk') return null;
+    return this.highlight();
   }
 
   /** Положение актёра в клетках с долей шага (для отрисовки). */
@@ -307,18 +346,28 @@ export class LocationModel {
       case 'move':
         if (this.controls === 'tap') return; // роутер шлёт сюда focus, не move
         if (i.held) {
+          const walking = this.player.step !== null || this.path.length > 0;
           this.heldDir = i.dir;
           this.bumped = false;
           this.path = [];
           this.pending = null;
-          if (!this.player.step) this.tryStep(i.dir);
-          else this.queuedDir = i.dir;
-        } else if (this.heldDir === i.dir) this.heldDir = null;
+          if (this.player.step) this.queuedDir = i.dir;
+          else if (!walking && this.turnWait === 0 && this.player.facing !== i.dir) {
+            // Стоим и смотрим в другую сторону: сначала поворот на месте, шаг — если кнопку держат.
+            this.player.facing = i.dir;
+            this.turnWait = TURN_MS;
+          } else if (this.turnWait > 0) this.player.facing = i.dir; // передумал во время поворота
+          else this.tryStep(i.dir);
+        } else if (this.heldDir === i.dir) {
+          this.heldDir = null;
+          this.turnWait = 0;
+        }
         return;
       case 'goto':
         if (this.controls === 'tap') return; // пустая клетка в tap-локации: ходьбы нет
         this.heldDir = null;
         this.queuedDir = null;
+        this.turnWait = 0;
         this.pending = null;
         this.path = findPath(this.grid, this.from(), i.tile).path;
         return;
@@ -344,6 +393,7 @@ export class LocationModel {
   halt(): void {
     this.heldDir = null;
     this.queuedDir = null;
+    this.turnWait = 0;
     this.path = [];
     this.pending = null;
     this.actionQueued = false;
@@ -354,6 +404,13 @@ export class LocationModel {
   update(dt: number): WorldEvent[] {
     this.updateCompanion(dt);
     let budget = dt;
+    if (this.turnWait > 0) {
+      // Поворот на месте: шаг начнётся, только если кнопку ещё держат, когда пауза кончится.
+      const use = Math.min(this.turnWait, budget);
+      this.turnWait -= use;
+      budget -= use;
+      if (this.turnWait > 0) return this.out.splice(0);
+    }
     for (let guard = 0; guard < 16 && !this.exited; guard++) {
       const st = this.player.step;
       if (st) {
@@ -463,7 +520,9 @@ export class LocationModel {
       const p = this.pending;
       this.pending = null;
       const o = this.object(p.key);
-      if (o && this.near(o)) {
+      const [px, py] = this.player.tile;
+      const close = o?.kind === 'plot' && p.tile ? Math.abs(p.tile[0] - px) + Math.abs(p.tile[1] - py) === 1 : !!o && this.near(o);
+      if (o && close) {
         this.faceTo(o, p.tile);
         this.fire(o.key, p.tile, 'tap');
       }
@@ -485,8 +544,9 @@ export class LocationModel {
 
   private faceTo(o: WorldObject, tile: Xy | null): void {
     const [x, y] = this.player.tile;
-    if (covers(o, [x, y])) return;
     const target = tile && covers(o, tile) ? tile : null;
+    // Стоит на объекте (на грядке): к конкретной клетке всё равно повернуться, к объекту целиком — нет.
+    if (target ? eq(target, [x, y]) : covers(o, [x, y])) return;
     for (const d of DIR_ORDER) {
       const c: Xy = [x + DELTA[d][0], y + DELTA[d][1]];
       if (target ? eq(c, target) : covers(o, c)) {
@@ -497,16 +557,22 @@ export class LocationModel {
     for (const d of DIR_ORDER) if (covers(o, [x + DELTA[d][0], y + DELTA[d][1]])) this.player.facing = d;
   }
 
-  /** Цель кнопки действия: объект перед Димой, иначе соседний, иначе тот, на котором он стоит. */
+  /**
+   * Цель кнопки действия: клетка перед лицом (исследование §6в п. 4). Если перед лицом пусто — соседний
+   * NPC/табличка/триггер (не надо выцеливать человека с точностью до клетки), иначе то, на чём стоит Дима.
+   * Грядка — только перед лицом: у соседних клеток разные слова, A не должна полить «не то» растение.
+   */
   private actionTarget(): { key: string; tile: Xy } | null {
     const [x, y] = this.player.tile;
+    const at = (c: Xy, plots: boolean): WorldObject | undefined =>
+      this.objects.find((ob) => covers(ob, c) && (plots || ob.kind !== 'plot') && this.cellActionable(ob, c));
     const order = [this.player.facing, ...DIR_ORDER.filter((d) => d !== this.player.facing)];
     for (const d of order) {
       const c: Xy = [x + DELTA[d][0], y + DELTA[d][1]];
-      const o = this.objects.find((ob) => covers(ob, c) && this.actionable(ob));
+      const o = at(c, d === this.player.facing);
       if (o) return { key: o.key, tile: c };
     }
-    const here = this.objects.find((ob) => covers(ob, [x, y]) && this.actionable(ob));
+    const here = at([x, y], false);
     return here ? { key: here.key, tile: [x, y] } : null;
   }
 
@@ -530,13 +596,19 @@ export class LocationModel {
     }
     this.heldDir = null;
     this.queuedDir = null;
-    if (!this.player.step && this.near(o)) {
+    this.turnWait = 0;
+    // Грядка: тап по конкретной клетке — подойти именно к ней (рядом, не на неё) и сделать с ней.
+    // Тап никогда не действует на соседнюю клетку (исследование §6в п. 3).
+    const plotCell = o.kind === 'plot' && tile ? tile : null;
+    const [px, py] = this.player.tile;
+    const close = plotCell ? Math.abs(plotCell[0] - px) + Math.abs(plotCell[1] - py) === 1 : this.near(o);
+    if (!this.player.step && close) {
       this.path = [];
       this.faceTo(o, tile);
       this.fire(o.key, tile, 'tap');
       return;
     }
-    const res = pathToAdjacent(this.grid, this.from(), o.at, o.size);
+    const res = plotCell ? pathToAdjacent(this.grid, this.from(), plotCell) : pathToAdjacent(this.grid, this.from(), o.at, o.size);
     this.path = res.path;
     this.pending = res.exact ? { key: o.key, tile } : null;
   }
