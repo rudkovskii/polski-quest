@@ -2,12 +2,13 @@
 // детерминированная `nextStep(input)`: правила 1–10 по приоритету, слоты сюжетных битов из director.json,
 // раскрытие элементов HUD (`reveals`). Ничего не пишет: флаги `beat.*`, `hud.*`, `spring.*` ставит склейка
 // (src/flow.ts), когда шаг показан или выполнен. Меню режимов нет: что делать, решает только этот модуль.
-import type { Effect, HudElement, Lesson, Tuning } from '../types/content';
+import type { Condition, Effect, HudElement, Lesson, PaceSystem, Tuning } from '../types/content';
 import type { Content } from './content';
 import { condCtx, evaluate, lessonVariant, type CondCtx } from './conditions';
 import { derive, deriveContent, isPlayedDay, type Derived } from './derive';
 import { gardenItems } from './garden';
 import type { LogEvent } from './log';
+import { dayLines, isOpen, storyDay, systemState, type PaceCtx } from './pace';
 import type { LocalState, Progress, WorldState } from './progress';
 import { dueQueue, newContentLock, pickRemedy } from './queue';
 import { cardId } from './srs';
@@ -56,6 +57,8 @@ export interface DirectorInput {
   events: readonly LogEvent[];
   /** Пояс (тесты); по умолчанию пояс устройства. */
   tz?: string;
+  /** Игровой день главы (P-06, pace.storyDay): день 1 — вступление, дальше +1 за засчитанный день. */
+  day: number;
 }
 
 export interface DirectorStep {
@@ -72,6 +75,12 @@ export interface DirectorStep {
   cluster?: string;
   /** Реплика бобра при входе в шаг (story/lines.json). */
   line?: string;
+  /** Следующие коробки той же реплики (P-06: одна коробка = 2 строки по 40 символов). */
+  lines?: string[];
+  /** Шаг впервые показывает систему из расписания (P-06): склейка ставит флаг `sys.<system>`. */
+  system?: PaceSystem;
+  /** Вечер с выбором (день 6+): рыбалка или табличка. */
+  choose?: boolean;
   /** Что раскрыть сейчас (правило `reveals`). */
   reveal?: HudElement[];
   /** Бит: id (флаг `beat.<id>`), эффекты. */
@@ -109,21 +118,42 @@ export const hudFlag = (e: HudElement): string => `hud.${e}`;
 /** Флаг показа бита: `once` (по умолчанию) — навсегда, иначе — на игровой день. */
 export const beatFlag = (id: string, once: boolean, today: Day): string => (once ? `beat.${id}` : `beat.${id}.${today.replace(/-/g, '_')}`);
 
-/** Реплики переходов (СЮЖЕТ §3, story/lines.json). `todo` там, где реплики пока нет. */
+/**
+ * Реплики переходов (СЮЖЕТ_v2 §5 «Системные реплики sys.*», story/lines.json). Первый день (waterFirst, move)
+ * ведёт вступление P-05; реплики конкретного дня — `director.json` → `days`.
+ */
 export const LINES = {
   waterFirst: 'kazik.water.first',
-  waterDue: 'kazik.water.due',
-  debtJam: 'kazik.debt.jam',
-  sunday: 'kazik.sunday',
+  waterDue: 'sys.kazik.obchod',
+  debtJam: 'sys.kazik.jam',
+  sunday: 'sys.kazik.sunday.1',
   move: 'kazik.move.first',
-  repair: 'kazik.repair',
-  resume: 'kazik.resume',
-  sleep: 'kazik.sleep',
-  spring: 'kazik.return.spring',
-  evening: 'kazik.evening',
-  done: 'kazik.done',
-  more3: 'kazik.express',
+  repair: 'sys.kazik.repair',
+  extraRepair: 'sys.kazik.extra_repair',
+  resume: 'sys.kazik.resume',
+  sleep: 'sys.kazik.sleep',
+  spring: 'sys.kazik.return',
+  evening: 'sys.kazik.evening',
+  done: 'sys.kazik.done',
+  more3: 'sys.kazik.express',
 } as const;
+
+/** Вторые коробки системных реплик (СЮЖЕТ_v2: `<id>.2`). */
+export const LINES_MORE: Readonly<Record<string, readonly string[]>> = {
+  'sys.kazik.jam': ['sys.kazik.jam.2'],
+  'sys.kazik.sunday.1': ['sys.kazik.sunday.2'],
+  'sys.kazik.repair': ['sys.kazik.repair.2'],
+  'sys.kazik.resume': ['sys.kazik.resume.2'],
+  'sys.kazik.return': ['sys.kazik.return.2'],
+  'sys.kazik.done': ['sys.kazik.done.2'],
+};
+
+/** Реплика шага и её продолжение: первая — `line`, остальные — `lines`. */
+function withLines(ids: readonly string[] | undefined, fallback?: string): Pick<DirectorStep, 'line' | 'lines'> {
+  const list = ids?.length ? [...ids] : fallback ? [fallback, ...(LINES_MORE[fallback] ?? [])] : [];
+  if (!list.length) return {};
+  return { line: list[0]!, ...(list.length > 1 ? { lines: list.slice(1) } : {}) };
+}
 
 /** Реплики вступления F1 (src/ui/intro.ts), по порядку карточек. */
 export const INTRO_LINES = {
@@ -192,7 +222,65 @@ export function directorInput(p: Progress, content: Content, now: Ts, o: InputOp
     resume: o.local?.resume ?? null,
     events: p.log.events,
     ...(o.tz ? { tz: o.tz } : {}),
+    day: storyDay(derived, p.world.flags, { dayStartHour: content.tuning.dayStartHour, ...(o.tz ? { tz: o.tz } : {}) }),
   };
+}
+
+/** Контекст расписания систем для входа режиссёра. */
+export function paceOf(i: Pick<DirectorInput, 'day' | 'today' | 'world' | 'content' | 'tz'>): PaceCtx {
+  return {
+    day: i.day,
+    today: i.today,
+    flags: i.world.flags,
+    schedule: i.content.director.schedule ?? [],
+    opts: { dayStartHour: i.content.tuning.dayStartHour, ...(i.tz ? { tz: i.tz } : {}) },
+  };
+}
+
+/** Система открыта сегодня (расписание P-06). */
+export const systemOpen = (i: Pick<DirectorInput, 'day' | 'today' | 'world' | 'content' | 'tz'>, sys: PaceSystem): boolean => isOpen(sys, paceOf(i));
+
+/** День урока: `gameDay.min` в его `requires` (P-06, расписание сцен по дням); нет — 1. */
+export function lessonDay(l: Pick<Lesson, 'requires'>): number {
+  const walk = (c: Condition | undefined): number => {
+    if (!c) return 1;
+    if (c.gameDay?.min !== undefined) return c.gameDay.min;
+    if (c.all) return Math.max(1, ...c.all.map(walk));
+    return 1;
+  };
+  return walk(l.requires);
+}
+
+/** Сцена главы (не практика и не лекарство): у неё есть день и квота. */
+const isScene = (l: Lesson): boolean => l.kind !== 'practice' && l.kind !== 'remedy';
+
+/** Сцен (уроков главы с итогом) сегодня: события `lesson`/`boss` с начала игрового дня. */
+export function scenesToday(i: Pick<DirectorInput, 'events' | 'derived' | 'content'>): number {
+  const ids = new Set<string>();
+  for (const e of i.events) {
+    if (e.ts < i.derived.todayStart || (e.k !== 'lesson' && e.k !== 'boss')) continue;
+    const l = i.content.lessons.get(e.lesson)?.value;
+    if (l && isScene(l)) ids.add(e.lesson);
+  }
+  return ids.size;
+}
+
+/**
+ * Сколько сцен можно сегодня (P-06): сцены этого дня по расписанию (кроме пропущенных зелёным кластером) и ещё
+ * одна, если с прошлых дней осталась несыгранная («ещё одна свая»). Без расписания (урок без gameDay) — одна.
+ */
+export function sceneQuota(i: DirectorInput): { quota: number; backlog: boolean } {
+  const ctx = ctxOf(i);
+  let planned = 0;
+  let backlog = false;
+  for (const { value: l } of i.content.lessons.values()) {
+    if (!isScene(l)) continue;
+    const day = lessonDay(l);
+    const v = lessonVariant(l, ctx);
+    if (day === i.day && v !== 'skip') planned++;
+    else if (day < i.day && v !== 'skip' && v !== 'locked' && !lessonDoneFor(l, i.derived) && l.id !== FIRST_DAY.introLesson) backlog = true;
+  }
+  return { quota: Math.max(planned, backlog ? 0 : 1) + (backlog ? 1 : 0), backlog };
 }
 
 // ── Помощники (экспорт для склейки и тестов).
@@ -292,14 +380,16 @@ function firstDay(i: DirectorInput): DirectorStep | null {
   if (!has('f1')) return step({ f: 'f1', target: { location: F.dzialka, screen: 'intro' } }, 'вступление');
   if (!has('f2')) return step({ f: 'f2', target: { location: F.dzialka, plot: F.plot, item: F.introItem, npc: 'bobr' }, mode: 'practice', line: LINES.waterFirst }, 'одна грядка по просьбе Казика');
 
-  const diag = [...i.content.lessons.values()].map((x) => x.value).find((l) => l.kind === 'diag') ?? null;
+  // P-06: диагностика — день 2, вечер — день 5 (расписание). В первый день их нет: после полива — посадка и сон.
+  const diagToday = systemOpen(i, 'diag');
+  const diag = diagToday ? ([...i.content.lessons.values()].map((x) => x.value).find((l) => l.kind === 'diag') ?? null) : null;
   const isDiag = diagDone(d);
-  if (!has('f3') && !isDiag) return step({ f: 'f3', target: { location: diag?.location ?? F.metro, ...(diag?.npc ? { npc: diag.npc } : {}) }, line: LINES.move }, 'путь к метро');
+  if (diag && !has('f3') && !isDiag) return step({ f: 'f3', target: { location: diag?.location ?? F.metro, ...(diag?.npc ? { npc: diag.npc } : {}) }, line: LINES.move }, 'путь к метро');
 
   const red = reddestCluster(d);
   const repair = repairOf(i, red);
   const repairTried = !!repair && d.lessons[repair.id] !== undefined;
-  const f4done = has('f4') || (isDiag && (!(FIRST_REPAIR_FLAG in flags) || !repair || repairTried));
+  const f4done = !diagToday || has('f4') || (isDiag && (!(FIRST_REPAIR_FLAG in flags) || !repair || repairTried));
   if (!f4done) {
     if (!isDiag && diag) return step({ f: 'f4', target: lessonTarget(diag, i), lesson: diag.id }, 'турникет = диагностика');
     if (repair) {
@@ -310,7 +400,7 @@ function firstDay(i: DirectorInput): DirectorStep | null {
 
   // F5: пары из очереди; если ремонтная сцена их уже прогнала сегодня — те же пары кластера практикой (без SRS).
   const pairs = phoneticDue(i) + (red ? i.content.phonetics.pairs.filter((p) => p.cluster === red).length : 0);
-  if (!has('f5') && !i.todayDone.evening && pairs > 0)
+  if (systemOpen(i, 'evening') && !has('f5') && !i.todayDone.evening && pairs > 0)
     return step(
       { f: 'f5', target: { location: F.dzialka, object: F.eveningObject }, mode: 'phonetic', limit: F.firstEveningPairs, ...(red ? { cluster: red } : {}), line: LINES.evening },
       'вечер: пары самого красного кластера',
@@ -333,11 +423,14 @@ function beatAt(i: DirectorInput, slot: BeatSlot): DirectorStep | null {
     if (b.slot !== slot) continue;
     if (beatFlag(b.id, b.once !== false, i.today) in i.world.flags) continue;
     if (!evaluate(b.if, ctx)) continue;
+    // Бит вводит систему (P-06): ждёт её дня и того, чтобы сегодня не показывали другую.
+    if (b.system && systemState(b.system, paceOf(i)) === 'closed') continue;
     return {
       kind: 'beat',
       beat: b.id,
       target: { ...b.target },
       ...(b.line ? { line: b.line } : {}),
+      ...(b.system ? { system: b.system } : {}),
       ...(b.do?.length ? { do: b.do } : {}),
       reason: `4: бит ${b.id} (слот ${slot})`,
     };
@@ -362,7 +455,7 @@ export function nextStep(i: DirectorInput): DirectorStep {
   const r = i.resume;
   if (r && i.now - r.startedAt < t.resumeHours * 3_600_000 && i.now >= r.startedAt) {
     const l = i.content.lessons.get(r.lessonId)?.value;
-    if (l) return withReveal({ kind: 'resume', target: lessonTarget(l, i), lesson: l.id, line: LINES.resume, reason: '2: прерванный урок' });
+    if (l) return withReveal({ kind: 'resume', target: lessonTarget(l, i), lesson: l.id, ...withLines(undefined, LINES.resume), reason: '2: прерванный урок' });
   }
 
   // 3. Весна: пауза ≥ springAfterDays, сегодня ещё ничего, за эту паузу весны не было.
@@ -372,7 +465,7 @@ export function nextStep(i: DirectorInput): DirectorStep {
       kind: 'spring',
       target: { location: FIRST_DAY.dzialka, plot: FIRST_DAY.plot, npc: 'bobr' },
       mode: 'day',
-      line: i.content.director.spring?.line ?? LINES.spring,
+      ...withLines(undefined, i.content.director.spring?.line ?? LINES.spring),
       reason: `3: весна (${daysBetween(i.lastPlayedDay, i.today)} дн. без игры)`,
     });
 
@@ -382,61 +475,91 @@ export function nextStep(i: DirectorInput): DirectorStep {
   const b0 = beatAt(i, 'start');
   if (b0) return withReveal(b0);
 
-  // 5. Полив: есть «!» и (сегодня ещё не поливали или затор).
+  // 5. Полив: есть «!» и (сегодня ещё не поливали или затор). Утренний обход с зарубками — система дня 2 (P-06).
   const locked = d.debt > t.debtLockThreshold;
-  if (waterable(i) > 0 && (!i.todayDone.water || locked))
+  const pace = paceOf(i);
+  const days = i.content.director.days;
+  const today = dayLines(days, i.day);
+  const obchod = systemState('obchod', pace);
+  const sunday = i.weekday === 7 && isOpen('sunday', pace);
+  if (obchod !== 'closed' && waterable(i) > 0 && (!i.todayDone.water || locked))
     return withReveal({
       kind: 'water',
       target: { location: FIRST_DAY.dzialka, plot: FIRST_DAY.plot, npc: 'bobr' },
       mode: 'day',
-      line: locked ? LINES.debtJam : i.weekday === 7 ? LINES.sunday : LINES.waterDue,
+      ...(locked ? withLines(undefined, LINES.debtJam) : sunday ? withLines(undefined, LINES.sunday) : withLines(today?.water, LINES.waterDue)),
+      ...(obchod === 'new' ? { system: 'obchod' as const } : {}),
       reason: locked ? `5: затор, долг ${d.debt} > ${t.debtLockThreshold}` : '5: утренний полив',
     });
 
   const b1 = beatAt(i, 'afterWater');
   if (b1) return withReveal(b1);
 
-  // 6. Лекарство по тегам ошибок (§4.4), одно в день.
+  // 6. Лекарство по тегам ошибок (§4.4), одно в день; урок, закрытый расписанием или зелёным кластером, не зовём.
   const rem = pickRemedy(i.events, i.now, t, i.content.errorTags, { dayStartHour: t.dayStartHour, tz: i.tz });
   const remLesson = rem ? i.content.lessons.get(rem.lesson)?.value : undefined;
-  if (rem && remLesson && !i.todayDone.remedy)
-    return withReveal({ kind: 'remedy', target: lessonTarget(remLesson, i), lesson: remLesson.id, line: LINES.repair, reason: `6: лекарство по тегу ${rem.tag} (${rem.errors} ошибок)` });
+  const remOk = !!remLesson && !['skip', 'locked'].includes(lessonVariant(remLesson, ctxOf(i))) && !(isScene(remLesson) && !lessonDoneFor(remLesson, d));
+  if (rem && remLesson && remOk && !i.todayDone.remedy)
+    return withReveal({ kind: 'remedy', target: lessonTarget(remLesson, i), lesson: remLesson.id, ...withLines(undefined, LINES.repair), reason: `6: лекарство по тегу ${rem.tag} (${rem.errors} ошибок)` });
 
-  // 7. Сцена дня или босс: не воскресенье, есть следующий урок, новые слова не закрыты.
-  if (!i.todayDone.scene && i.weekday !== 7) {
-    const l = nextLesson(i);
-    if (l)
+  // 7. Сцены дня или босс (P-06: по расписанию дней, квота дня + одна из прошлых); в воскресенье — нет.
+  if (!sunday) {
+    const done = scenesToday(i);
+    const { quota, backlog } = sceneQuota(i);
+    const l = done < quota ? nextLesson(i) : null;
+    if (l) {
+      const extra = done > 0 && backlog && lessonDay(l) < i.day;
       return withReveal({
         kind: l.kind === 'boss' ? 'boss' : 'scene',
         target: lessonTarget(l, i),
         lesson: l.id,
-        reason: `7: ${l.kind === 'boss' ? 'босс' : 'сцена'} ${l.id}`,
+        ...(extra ? withLines(undefined, LINES.extraRepair) : done === 0 ? withLines(today?.scene) : {}),
+        ...(l.kind === 'diag' && systemState('diag', pace) === 'new' ? { system: 'diag' as const } : {}),
+        reason: `7: ${l.kind === 'boss' ? 'босс' : 'сцена'} ${l.id} (${done + 1} из ${quota})`,
       });
+    }
   }
 
   const b2 = beatAt(i, 'afterScene');
   if (b2) return withReveal(b2);
 
-  // 8. Вечер: пары красных/жёлтых кластеров (письмо и мастерская — этап 2).
-  if (!i.todayDone.evening && phoneticDue(i) > 0)
-    return withReveal({ kind: 'evening', target: { location: FIRST_DAY.dzialka, object: FIRST_DAY.eveningObject }, mode: 'phonetic', line: LINES.evening, reason: '8: вечер на звуки' });
+  // 8. Вечер: пары красных/жёлтых кластеров. Вечер — система дня 5, выбор вечера — дня 6 (P-06).
+  const evening = systemState('evening', pace);
+  const choice = systemState('eveningChoice', pace);
+  const red = reddestCluster(d);
+  const pairs = phoneticDue(i) + (evening === 'new' && red ? i.content.phonetics.pairs.filter((p) => p.cluster === red).length : 0);
+  if (!i.todayDone.evening && evening !== 'closed' && pairs > 0) {
+    const choose = choice !== 'closed' && evening === 'open';
+    const first = choose ? choice === 'new' : evening === 'new';
+    return withReveal({
+      kind: 'evening',
+      target: { location: FIRST_DAY.dzialka, object: FIRST_DAY.eveningObject },
+      mode: 'phonetic',
+      ...(choose ? { choose: true } : {}),
+      ...(evening === 'new' && red && !phoneticDue(i) ? { cluster: red, limit: i.tuning.phoneticPerDay } : {}),
+      ...withLines(first ? today?.evening : undefined, LINES.evening),
+      ...(first ? { system: choose ? ('eveningChoice' as const) : ('evening' as const) } : {}),
+      reason: choose ? '8: вечер с выбором' : '8: вечер на звуки',
+    });
+  }
 
   const b3 = beatAt(i, 'beforeSleep');
   if (b3) return withReveal(b3);
 
   // 9. Сон.
-  if (!i.todayDone.sleep) return withReveal({ kind: 'sleep', target: { location: FIRST_DAY.dzialka, object: FIRST_DAY.sleepObject }, line: LINES.sleep, reason: '9: альтанка' });
+  if (!i.todayDone.sleep) return withReveal({ kind: 'sleep', target: { location: FIRST_DAY.dzialka, object: FIRST_DAY.sleepObject }, ...withLines(today?.sleep, LINES.sleep), reason: '9: альтанка' });
 
   // 10. До завтра + «ещё 3 минуты».
   return withReveal(doneStep(i));
 }
 
 function doneStep(i: DirectorInput): DirectorStep {
-  const more3 = i.derived.debt > 0 && waterable(i) > 0 ? 'express' : phoneticDue(i) > 0 ? 'phonetic' : undefined;
+  // «Ещё 3 минуты»: экспресс — система дня 7, вечерние пары — дня 5 (P-06).
+  const more3 = i.derived.debt > 0 && waterable(i) > 0 && systemOpen(i, 'express') ? 'express' : phoneticDue(i) > 0 && systemOpen(i, 'evening') ? 'phonetic' : undefined;
   return {
     kind: 'done',
     target: { location: FIRST_DAY.dzialka },
-    line: i.content.director.done?.line ?? LINES.done,
+    ...withLines(undefined, i.content.director.done?.line ?? LINES.done),
     ...(more3 ? { more3 } : {}),
     reason: '10: день закрыт',
   };

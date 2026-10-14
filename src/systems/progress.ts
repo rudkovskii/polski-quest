@@ -94,6 +94,11 @@ export interface SettingsMap {
   'keyboard.mode': 'auto' | 'full' | 'strip';
   /** Внешность из Fotobudka (P-03, src/systems/avatar.ts): LWW целиком; null — ещё не выбрана. */
   avatar: Appearance | null;
+  /**
+   * Режим звука (P-06, ПОЛИРОВКА §2 р. 6): `off` — «без звука»: задания на слух читаются по транскрипции
+   * или пропускаются, карточки `lis` не пишутся и не просрочиваются. Спрашивает Казик в первый день (P-05).
+   */
+  'sound.mode': 'on' | 'off';
 }
 
 export const SETTINGS_DEFAULTS: SettingsMap = {
@@ -109,6 +114,7 @@ export const SETTINGS_DEFAULTS: SettingsMap = {
   'controls.dpadSide': 'left',
   'keyboard.mode': 'auto',
   avatar: null,
+  'sound.mode': 'on',
 };
 
 export function getSetting<K extends keyof SettingsMap>(p: Progress, key: K): SettingsMap[K] {

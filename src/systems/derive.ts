@@ -5,7 +5,7 @@
 import type { Tuning, VocabEntry } from '../types/content';
 import type { Content } from './content';
 import { compareEvents, isSorted, revVerdict, type EventOf, type LogEvent } from './log';
-import type { AppendOpts, CardId, CardState, CardType, DayStats, Progress } from './progress';
+import { getSetting, type AppendOpts, type CardId, type CardState, type CardType, type DayStats, type Progress } from './progress';
 import { cardId, fresh, orderEarlyDays, parseCardId, review } from './srs';
 import { dayStart, dayStartAfter, daysBetween, dayOf, DEFAULT_DAY_START_HOUR, type Day, type TimeOpts, type Ts } from './time';
 import { DEFAULT_TUNING } from './tuning';
@@ -317,6 +317,8 @@ export function derive(p: Progress, content: DeriveContent, now: Ts, tz?: string
   for (const cl of [...allClusters].sort()) {
     let s = statusOf(diag?.results[cl]);
     if (s === 'red' && (repairPassedAt[cl] ?? -Infinity) > lastDiagTs) s = 'yellow';
+    // Диагностику прервали до пункта кластера (P-06): его проверяет ремонтная сцена; сдал — как после красного.
+    if (s === 'unknown' && diag && (repairPassedAt[cl] ?? -Infinity) > lastDiagTs) s = 'yellow';
     if (s === 'red' || s === 'yellow') {
       const good = Object.values(clusterDays[cl] ?? {}).filter(
         (x) => x.n >= t.clusters.closeMinAnswers && x.ok / x.n >= t.clusters.closeScore,
@@ -325,6 +327,9 @@ export function derive(p: Progress, content: DeriveContent, now: Ts, tz?: string
     }
     clusterStatus[cl] = s;
   }
+
+  // Без звука (P-06, СЮЖЕТ_v2 §7): карточки «на слух» не просрочиваются и не идут в полив, пока звук выключен.
+  if (getSetting(p, 'sound.mode') === 'off') for (const id of Object.keys(cards)) if (parseCardId(id)?.type === 'lis') delete cards[id];
 
   let debt = 0;
   for (const [id, c] of Object.entries(cards)) {

@@ -16,7 +16,8 @@
         "required": ["id", "slot", "if", "target"],
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "Флаг показа: beat.<id>" },
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$", "description": "Флаг показа: beat.<id>; биты дней — d02.letter (P-06)" },
+          "system": { "$ref": "#/$defs/system", "description": "Бит вводит систему из schedule: пропускается, пока она закрыта; показ ставит флаг sys.<entry>" },
           "slot": { "enum": ["start", "afterWater", "afterScene", "beforeSleep"] },
           "once": { "type": "boolean" },
           "if": { "$ref": "common.schema.json#/$defs/cond" },
@@ -40,6 +41,40 @@
         }
       }
     },
+    "schedule": {
+      "type": "array",
+      "description": "Раскрытие систем по игровым дням (P-06, СЮЖЕТ_v2 §3): одна запись = одна новая система дня; with — что входит в неё же (письмо, метро, диагностика у обхода дня 2).",
+      "items": {
+        "title": "ScheduleEntry",
+        "type": "object",
+        "required": ["day", "system", "ru"],
+        "additionalProperties": false,
+        "properties": {
+          "day": { "type": "integer", "minimum": 1 },
+          "system": { "$ref": "#/$defs/system" },
+          "with": { "type": "array", "items": { "$ref": "#/$defs/system" } },
+          "ru": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "days": {
+      "type": "array",
+      "description": "Реплики шагов режиссёра по игровым дням (P-06): полив, сцена, вечер, сон, крючок в итоге дня. Заголовок дня — бит dNN.title.",
+      "items": {
+        "title": "DayLines",
+        "type": "object",
+        "required": ["day"],
+        "additionalProperties": false,
+        "properties": {
+          "day": { "type": "integer", "minimum": 1 },
+          "water": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
+          "evening": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
+          "scene": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
+          "sleep": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
+          "hook": { "$ref": "common.schema.json#/$defs/lineId" }
+        }
+      }
+    },
     "spring": {
       "type": "object",
       "required": ["line"],
@@ -56,6 +91,12 @@
         "line": { "$ref": "common.schema.json#/$defs/lineId" },
         "more3Line": { "$ref": "common.schema.json#/$defs/lineId" }
       }
+    }
+  },
+  "$defs": {
+    "system": {
+      "title": "PaceSystem",
+      "enum": ["walk", "obchod", "letter", "metro", "diag", "keyboard", "shadow", "evening", "eveningChoice", "express", "sunday", "reallife", "map", "boss"]
     }
   }
 }

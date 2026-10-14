@@ -27,6 +27,7 @@ import type {
   World,
 } from '../../src/types/content';
 import { FIRST_DAY_LINES } from '../../src/systems/director';
+import { scheduleIssues } from '../../src/systems/pace';
 
 // ───────────────────────────── типы ─────────────────────────────
 
@@ -357,6 +358,8 @@ function walkCond(ctx: Ctx, c: Condition | undefined, w: Where): void {
   if (c.jars?.module) ctx.ref(ctx.modules, c.jars.module, sub(w, 'jars', 'module'), 'jars.module', WHERE.modules);
   if (c.stage) ctx.ref(ctx.biomes, c.stage.biome, sub(w, 'stage', 'biome'), 'stage.biome', WHERE.biomes);
   ctx.ref(ctx.secrets, c.found, sub(w, 'found'), 'found', WHERE.secrets);
+  if (c.gameDay && c.gameDay.min !== undefined && c.gameDay.max !== undefined && c.gameDay.min > c.gameDay.max)
+    ctx.err('ref', sub(w, 'gameDay'), `gameDay: min ${c.gameDay.min} больше max ${c.gameDay.max}`);
 }
 
 function walkEffects(ctx: Ctx, effs: Effect[] | undefined, w: Where, strictLines = false): void {
@@ -892,7 +895,8 @@ export function checkContent(input: CheckInput): Issue[] {
     }
   }
 
-  if (todoNodes.length)
+  if (input.release) for (const x of todoNodes) ctx.err('todo', { file: x.file, path: '' }, `узел диалога "${x.id}" ещё todo, а сборка release`);
+  else if (todoNodes.length)
     ctx.warn('todo', { file: todoNodes[0]!.file, path: '' }, `${todoNodes.length} узлов диалогов с todo: true (${todoNodes.slice(0, 6).map((x) => x.id).join(', ')}${todoNodes.length > 6 ? ', …' : ''})`);
 
   // maps
@@ -932,6 +936,20 @@ export function checkContent(input: CheckInput): Issue[] {
     director.reveals.forEach((r, i) => {
       walkCond(ctx, r.if, sub(w, 'reveals', i, 'if'));
       ctx.line(r.line, sub(w, 'reveals', i, 'line'));
+    });
+    // Темп (P-06): в игровой день не больше одной новой системы; реплики дней.
+    for (const msg of scheduleIssues(director.schedule ?? [])) ctx.err('ref', sub(w, 'schedule'), msg);
+    const inSchedule = new Set((director.schedule ?? []).flatMap((e) => [e.system, ...(e.with ?? [])]));
+    director.beats.forEach((b, i) => {
+      if (b.system !== undefined && !inSchedule.has(b.system)) ctx.err('ref', sub(w, 'beats', i, 'system'), `система "${b.system}" не входит в schedule`);
+    });
+    const dayNos = new Set<number>();
+    (director.days ?? []).forEach((d, i) => {
+      const dw = sub(w, 'days', i);
+      if (dayNos.has(d.day)) ctx.err('dup', sub(dw, 'day'), `день ${d.day} в days уже есть`);
+      dayNos.add(d.day);
+      ctx.line(d.hook, sub(dw, 'hook'));
+      for (const key of ['water', 'evening', 'scene', 'sleep'] as const) (d[key] ?? []).forEach((id, k) => ctx.line(id, sub(dw, key, k)));
     });
     ctx.line(director.spring?.line, sub(w, 'spring', 'line'));
     ctx.line(director.done?.line, sub(w, 'done', 'line'));
@@ -992,7 +1010,9 @@ export function checkContent(input: CheckInput): Issue[] {
     if (l.value.todo && r.strict) ctx.err('todo', r.w, `реплика "${r.id}" ещё todo, а модуль status: ready`);
   }
   const todo = [...ctx.lines.values()].filter((l) => l.value.todo);
-  if (todo.length)
+  // Сборка для людей (P-06): заглушка в любом бите, в любой реплике или узле диалога — ошибка.
+  if (input.release) for (const l of todo) ctx.err('todo', { file: l.file, path: l.path }, `реплика "${l.value.id}" ещё todo, а сборка release`);
+  else if (todo.length)
     ctx.warn('todo', { file: 'story/lines.json', path: '' }, `${todo.length} реплик с todo: true (${todo.slice(0, 6).map((l) => l.value.id).join(', ')}${todo.length > 6 ? ', …' : ''})`);
 
   // Бит первого дня (P-01): реплики вступления и переходов, диалоги диагностики и ремонтных сцен.

@@ -7,8 +7,9 @@ import type { Content } from './content';
 import { variantSteps, type RepairVariant } from './clusters';
 import type { Derived } from './derive';
 import type { WorldState } from './progress';
+import { storyDay } from './pace';
 import { cardId, parseCardId } from './srs';
-import { isoWeekday, type Ts } from './time';
+import { isoWeekday, type TimeOpts, type Ts } from './time';
 
 /** Отрезки дня, которые закрывают атом `stepDone` (§3.9): экспресс и «ещё 3 минуты» — тоже полив. */
 const STEP_SEGS: Record<'water' | 'scene' | 'evening' | 'sleep', readonly string[]> = {
@@ -33,6 +34,8 @@ export interface CondCtx {
   itemModule?: (item: string) => string | undefined;
   /** Порог банки, дни (tuning.jars.thresholds[0]). */
   jarFrom?: number;
+  /** Граница игрового дня для атома `gameDay` (tuning.dayStartHour, пояс устройства). */
+  time?: TimeOpts;
   /** Неизвестный атом (контент новее движка): по умолчанию молча false. */
   onUnknown?: (c: Condition) => void;
 }
@@ -48,6 +51,7 @@ export function condCtx(content: Pick<Content, 'modules' | 'vocab' | 'tuning'>, 
     moduleItems: (m) => byModule.get(m) ?? [],
     itemModule: (item) => content.vocab.get(item)?.module,
     jarFrom: content.tuning.jars.thresholds[0] ?? DEFAULT_JAR_FROM,
+    time: { dayStartHour: content.tuning.dayStartHour },
   };
 }
 
@@ -116,6 +120,10 @@ export function evaluate(c: Condition, ctx: CondCtx): boolean {
   if (c.jars !== undefined) return jarCount(ctx, { ...(c.jars.module ? { module: c.jars.module } : {}), ...(c.jars.full ? { full: true } : {}) }) >= c.jars.min;
   if (c.hud !== undefined) return `hud.${c.hud}` in ctx.world.flags;
   if (c.daysSinceLast !== undefined) return d.daysSinceLast !== null && d.daysSinceLast >= c.daysSinceLast;
+  if (c.gameDay !== undefined) {
+    const n = storyDay(d, ctx.world.flags, ctx.time);
+    return (c.gameDay.min === undefined || n >= c.gameDay.min) && (c.gameDay.max === undefined || n <= c.gameDay.max);
+  }
   if (c.stepDone !== undefined) {
     const segs = d.days[d.today]?.segs ?? [];
     return STEP_SEGS[c.stepDone].some((s) => segs.includes(s as never));

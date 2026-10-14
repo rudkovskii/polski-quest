@@ -15,159 +15,25 @@
   {
     "id": "ch01.s00",
     "kind": "diag",
-    "title": { "pl": "Bramka metra", "ru": "Турникет метро: диагностика" },
-    "minutes": 8,
+    "title": { "pl": "Bramka metra", "ru": "Турникет метро: 12 звуков" },
+    "minutes": 4,
     "npc": "brzechwa",
     "location": "ch01.metro",
+    "requires": { "gameDay": { "min": 2 } },
+    "pass": { "firstTry": 0, "score": 0 },
     "steps": [
-      {
-        "t": "explain",
-        "md": "Турникет слушает. Три блока: **услышь слово и выбери, как оно пишется** (20), **где ударение** (5), **диктант** (8). Это не экзамен: результат — карта звуков. Зелёное пропустим, жёлтое и красное подлатаем."
-      },
-      {
-        "t": "stress",
-        "word": "telefon",
-        "syllables": ["te", "le", "fon"],
-        "answer": 1,
-        "say": true,
-        "cluster": "R1",
-        "tags": ["ph.stress"]
-      },
-      { "t": "listen", "say": "my", "options": ["my", "mi", "mój"], "answer": 0, "cluster": "R2" },
-      { "t": "listen", "say": "łata", "options": ["łata", "lata", "wata"], "answer": 0, "cluster": "R3" },
-      { "t": "listen", "say": "rzeka", "options": ["rzeka", "reka", "żeka"], "answer": 0, "cluster": "R4" },
-      { "t": "listen", "say": "siedem", "options": ["siedem", "śedem", "szedem"], "answer": 0, "cluster": "R5" },
-      { "t": "listen", "say": "Kasia", "options": ["Kasia", "kasza", "Kasa"], "answer": 0, "cluster": "R6" },
-      { "t": "listen", "say": "ręka", "options": ["ręka", "renka", "rąka"], "answer": 0, "cluster": "R7" },
-      { "t": "choice", "q": "Сколько слогов в слове miasto?", "options": ["2", "3"], "answer": 0, "cluster": "R8" },
-      { "t": "listen", "say": "wszystko", "options": ["wszystko", "fszystko", "wschystko"], "answer": 0, "cluster": "R9" },
-      {
-        "t": "listen",
-        "say": "góra",
-        "options": ["góra", "gura"],
-        "answer": 0,
-        "cluster": "R10",
-        "hint": "Оба варианта звучат одинаково: какое слово написано правильно?"
-      },
-      { "t": "listen", "say": "woda", "options": ["woda", "wada", "wuda"], "answer": 0, "cluster": "R1" },
-      { "t": "listen", "say": "cena", "options": ["cena", "sena", "kena"], "answer": 0, "cluster": "R2" },
-      { "t": "listen", "say": "mleko", "options": ["mleko", "młeko", "mliko"], "answer": 0, "cluster": "R3" },
-      { "t": "listen", "say": "czy", "options": ["czy", "ci", "cy"], "answer": 0, "cluster": "R4" },
-      { "t": "listen", "say": "środa", "options": ["środa", "sroda", "szroda"], "answer": 0, "cluster": "R5" },
-      { "t": "listen", "say": "prosię", "options": ["proszę", "prosię", "prose"], "answer": 1, "cluster": "R6" },
-      { "t": "listen", "say": "ząb", "options": ["ząb", "zab", "zęb"], "answer": 0, "cluster": "R7" },
-      { "t": "choice", "q": "Сколько слогов в слове nie?", "options": ["1", "2"], "answer": 0, "cluster": "R8" },
-      { "t": "listen", "say": "twój", "options": ["twój", "tój", "dwój"], "answer": 0, "cluster": "R9" },
-      {
-        "t": "listen",
-        "say": "chleb",
-        "options": ["chleb", "hleb"],
-        "answer": 0,
-        "cluster": "R10",
-        "hint": "Оба варианта звучат одинаково: какое слово написано правильно?"
-      },
-      {
-        "t": "stress",
-        "word": "Warszawa",
-        "syllables": ["War", "sza", "wa"],
-        "answer": 1,
-        "say": true,
-        "cluster": "R1",
-        "tags": ["ph.stress"]
-      },
-      {
-        "t": "stress",
-        "word": "kobieta",
-        "syllables": ["ko", "bie", "ta"],
-        "answer": 1,
-        "say": true,
-        "cluster": "R1",
-        "tags": ["ph.stress"]
-      },
-      { "t": "stress", "word": "teatr", "syllables": ["te", "atr"], "answer": 0, "say": true, "cluster": "R1", "tags": ["ph.stress"] },
-      { "t": "stress", "word": "problem", "syllables": ["pro", "blem"], "answer": 0, "say": true, "cluster": "R1", "tags": ["ph.stress"] },
-      {
-        "t": "stress",
-        "word": "dziękuję",
-        "syllables": ["dzię", "ku", "ję"],
-        "answer": 1,
-        "say": true,
-        "cluster": "R1",
-        "tags": ["ph.stress"]
-      },
-      {
-        "t": "dictation",
-        "say": "cześć",
-        "accept": ["cześć"],
-        "slowFirst": true,
-        "lenient": { "diacritics": "warn", "ortho": true },
-        "cluster": "R5"
-      },
-      {
-        "t": "dictation",
-        "say": "przepraszam",
-        "accept": ["przepraszam"],
-        "slowFirst": true,
-        "lenient": { "diacritics": "warn", "ortho": true },
-        "cluster": "R4"
-      },
-      {
-        "t": "dictation",
-        "say": "ręka",
-        "accept": ["ręka"],
-        "slowFirst": true,
-        "lenient": { "diacritics": "warn", "ortho": true },
-        "cluster": "R7"
-      },
-      {
-        "t": "dictation",
-        "say": "mały",
-        "accept": ["mały"],
-        "slowFirst": true,
-        "lenient": { "diacritics": "warn", "ortho": true },
-        "cluster": "R3"
-      },
-      {
-        "t": "dictation",
-        "say": "chleb",
-        "accept": ["chleb"],
-        "slowFirst": true,
-        "lenient": { "diacritics": "warn", "ortho": true },
-        "cluster": "R2"
-      },
-      {
-        "t": "dictation",
-        "say": "środa",
-        "accept": ["środa"],
-        "slowFirst": true,
-        "lenient": { "diacritics": "warn", "ortho": true },
-        "cluster": "R5"
-      },
-      {
-        "t": "dictation",
-        "say": "wszystko",
-        "accept": ["wszystko"],
-        "slowFirst": true,
-        "lenient": { "diacritics": "warn", "ortho": true },
-        "cluster": "R9"
-      },
-      {
-        "t": "dictation",
-        "say": "krzesło",
-        "accept": ["krzesło"],
-        "slowFirst": true,
-        "lenient": { "diacritics": "warn", "ortho": true },
-        "cluster": "R4"
-      },
-      {
-        "t": "listen",
-        "say": "Peron",
-        "options": ["PERON", "KASA", "WYJŚCIE"],
-        "answer": 0,
-        "show": "sign",
-        "item": "lx.peron",
-        "hint": "Вывеска: какую табличку назвали?"
-      }
+      { "t": "stress", "word": "telefon", "syllables": ["te", "le", "fon"], "answer": 1, "say": true, "cluster": "R1", "tags": ["ph.stress"], "why": "Ударение почти всегда на предпоследний слог: te-LE-fon. Telefon: телефон." },
+      { "t": "stress", "word": "Warszawa", "syllables": ["War", "sza", "wa"], "answer": 1, "say": true, "cluster": "R1", "tags": ["ph.stress"], "why": "Предпоследний слог: War-SZA-wa. Warszawa: Варшава." },
+      { "t": "listen", "say": "my", "options": ["my", "mi", "mój"], "answer": 0, "cluster": "R2", "tr": "мы", "why": "y = [ы], i = [и]. My: мы. Mi: мне." },
+      { "t": "listen", "say": "łata", "options": ["łata", "lata", "wata"], "answer": 0, "cluster": "R3", "tr": "ўа́та", "why": "ł звучит как английское w. Łata: заплатка. Lata: годы." },
+      { "t": "listen", "say": "rzeka", "options": ["rzeka", "reka", "szeka"], "answer": 0, "cluster": "R4", "tr": "жэ́ка", "why": "rz звучит как ж. Rzeka: река." },
+      { "t": "listen", "say": "czy", "options": ["czy", "ci", "szy"], "answer": 0, "cluster": "R4", "tr": "чы", "why": "cz твёрдое [ч], ci мягкое [чьи]. Czy: ли. Ci: тебе." },
+      { "t": "listen", "say": "siedem", "options": ["siedem", "szedem", "sedem"], "answer": 0, "cluster": "R5", "tr": "ще́дэм", "why": "si = мягкое [щ]. Siedem: семь." },
+      { "t": "listen", "say": "Kasia", "options": ["Kasia", "kasza", "kasa"], "answer": 0, "cluster": "R6", "tr": "ка́ща", "why": "si мягкое [щ], sz твёрдое [ш]. Kasia: Катя. Kasza: каша." },
+      { "t": "listen", "say": "ręka", "options": ["ręka", "reka", "ranka"], "answer": 0, "cluster": "R7", "tr": "рэ́нка", "why": "ę перед k звучит [эн]. Ręka: рука." },
+      { "t": "choice", "q": "Сколько слогов в слове miasto?", "options": ["2", "3"], "answer": 0, "cluster": "R8", "why": "i перед гласной только смягчает: mia-sto. Miasto: город." },
+      { "t": "listen", "say": "wszystko", "options": ["wszystko", "szystko", "wszytko"], "answer": 0, "cluster": "R9", "tr": "фшы́стко", "why": "w перед глухим звучит [ф]. Wszystko: всё." },
+      { "t": "choice", "q": "Звучат одинаково. Как пишется «гора»?", "options": ["góra", "gura"], "answer": 0, "cluster": "R10", "why": "ó и u звучат одинаково, тут пишется ó. Góra: гора." }
     ]
   },
   {
@@ -177,8 +43,9 @@
     "minutes": 4,
     "npc": "brzechwa",
     "location": "ch01.metro",
+    "errLine": "d03.brzechwa.kiosk.err",
     "introduces": ["lx.woda", "lx.kawa"],
-    "requires": { "not": { "cluster": { "id": "R1", "status": "unknown" } } },
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 3 } }] },
     "skipIf": { "cluster": { "id": "R1", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R1", "status": "yellow" } }, "steps": [0, 4, 7, 11, 12, 15] },
     "steps": [
@@ -273,8 +140,9 @@
     "minutes": 4,
     "npc": "pan_marek",
     "location": "ch01.metro",
+    "errLine": "d04.marek.cart.err",
     "introduces": ["lx.herbata", "lx.chleb", "lx.ile"],
-    "requires": { "not": { "cluster": { "id": "R2", "status": "unknown" } } },
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 4 } }] },
     "skipIf": { "cluster": { "id": "R2", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R2", "status": "yellow" } }, "steps": [0, 1, 4, 10, 11, 12] },
     "steps": [
@@ -334,7 +202,7 @@
     "npc": "pan_marek",
     "location": "ch01.metro",
     "introduces": ["lx.maly", "lx.slucham", "lx.stol"],
-    "requires": { "not": { "cluster": { "id": "R3", "status": "unknown" } } },
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 4 } }] },
     "skipIf": { "cluster": { "id": "R3", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R3", "status": "yellow" } }, "steps": [0, 1, 9, 12, 14, 18] },
     "steps": [
@@ -348,7 +216,7 @@
       { "t": "minimal_pair", "pair": ["łuk", "luk"], "play": "random", "cluster": "R3", "item": "mp.luk_luk" },
       { "t": "minimal_pair", "pair": ["dał", "dal"], "play": "random", "cluster": "R3", "item": "mp.dal_dal" },
       { "t": "minimal_pair", "pair": ["cała", "cala"], "play": "random", "cluster": "R3", "item": "mp.cala_cala" },
-      { "t": "listen", "say": "mleko", "options": ["mleko", "młeko"], "answer": 0, "cluster": "R3", "hint": "ł или l?", "tags": ["ph.l_w"] },
+      { "t": "listen", "say": "mleko", "options": ["mleko", "młeko"], "answer": 0, "cluster": "R3", "hint": "ł или l?", "tags": ["ph.l_w"], "tr": "мле́ко" },
       {
         "t": "listen",
         "say": "łazienka",
@@ -356,7 +224,8 @@
         "answer": 0,
         "cluster": "R3",
         "hint": "ł или l?",
-        "tags": ["ph.l_w"]
+        "tags": ["ph.l_w"],
+        "tr": "ўаже́нка"
       },
       {
         "t": "listen",
@@ -418,8 +287,9 @@
     "minutes": 4,
     "npc": "pasazer",
     "location": "ch01.metro",
-    "introduces": ["lx.przepraszam", "lx.czas", "lx.moze", "lx.krzeslo", "lx.dworzec"],
-    "requires": { "not": { "cluster": { "id": "R4", "status": "unknown" } } },
+    "errLine": "d05.pasazer.err",
+    "introduces": ["lx.przepraszam", "lx.czas", "lx.krzeslo"],
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 5 } }] },
     "skipIf": { "cluster": { "id": "R4", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R4", "status": "yellow" } }, "steps": [0, 1, 2, 7, 11, 12, 15] },
     "steps": [
@@ -437,10 +307,10 @@
         "cluster": "R4",
         "tags": ["ph.rz_sz"]
       },
-      { "t": "listen", "say": "czy", "options": ["czy", "ci"], "answer": 0, "cluster": "R4", "tags": ["ph.cz_soft"] },
+      { "t": "listen", "say": "czy", "options": ["czy", "ci"], "answer": 0, "cluster": "R4", "tags": ["ph.cz_soft"], "tr": "чы" },
       { "t": "minimal_pair", "pair": ["czy", "trzy"], "play": "random", "cluster": "R4", "item": "mp.czy_trzy" },
       { "t": "minimal_pair", "pair": ["rak", "żak"], "play": "random", "cluster": "R4", "item": "mp.rak_zak" },
-      { "t": "listen", "say": "rzeka", "options": ["rzeka", "ręka", "reka"], "answer": 0, "cluster": "R4" },
+      { "t": "listen", "say": "rzeka", "options": ["rzeka", "ręka", "reka"], "answer": 0, "cluster": "R4", "tr": "жэ́ка" },
       { "t": "listen", "say": "może", "options": ["może", "moje", "moce"], "answer": 0, "item": "lx.moze", "cluster": "R4" },
       {
         "t": "choice",
@@ -502,8 +372,8 @@
     "minutes": 4,
     "npc": "brzechwa",
     "location": "ch01.metro",
-    "introduces": ["lx.czesc", "lx.dzien"],
-    "requires": { "not": { "cluster": { "id": "R5", "status": "unknown" } } },
+    "introduces": ["lx.czesc", "lx.dzien", "lx.wyjscie"],
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 6 } }] },
     "skipIf": { "cluster": { "id": "R5", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R5", "status": "yellow" } }, "steps": [0, 1, 3, 11, 12, 13, 14, 15] },
     "steps": [
@@ -539,7 +409,7 @@
         "cluster": "R5",
         "tags": ["ph.soft_spelling"]
       },
-      { "t": "listen", "say": "środa", "options": ["środa", "sroda", "szroda"], "answer": 0, "cluster": "R5" },
+      { "t": "listen", "say": "środa", "options": ["środa", "sroda", "szroda"], "answer": 0, "cluster": "R5", "tr": "щро́да" },
       { "t": "listen", "say": "cześć", "options": ["cześć", "czesc", "szejść"], "answer": 0, "item": "lx.czesc", "cluster": "R5" },
       { "t": "listen", "say": "dzień", "options": ["dzień", "dzeń", "dżeń"], "answer": 0, "item": "lx.dzien", "cluster": "R5" },
       { "t": "minimal_pair", "pair": ["pan", "pań"], "play": "random", "cluster": "R5", "item": "mp.pan_pan" },
@@ -583,7 +453,8 @@
     "minutes": 5,
     "npc": "pan_marek",
     "location": "ch01.metro",
-    "requires": { "not": { "cluster": { "id": "R6", "status": "unknown" } } },
+    "errLine": "d06.marek.err",
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 6 } }] },
     "skipIf": { "cluster": { "id": "R6", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R6", "status": "yellow" } }, "steps": [0, 1, 2, 3, 13, 14, 16, 17, 18] },
     "steps": [
@@ -658,8 +529,9 @@
     "minutes": 5,
     "npc": "pani_basia",
     "location": "ch01.metro",
+    "errLine": "d08.basia.err",
     "introduces": ["lx.dziekuje", "lx.prosze", "lx.reka"],
-    "requires": { "not": { "cluster": { "id": "R7", "status": "unknown" } } },
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 8 } }] },
     "skipIf": { "cluster": { "id": "R7", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R7", "status": "yellow" } }, "steps": [0, 2, 3, 9, 10, 13, 14, 17] },
     "steps": [
@@ -772,8 +644,9 @@
     "minutes": 4,
     "npc": "ola",
     "location": "ch01.metro",
+    "errLine": "d09.kasia.err",
     "introduces": ["lx.nie"],
-    "requires": { "not": { "cluster": { "id": "R8", "status": "unknown" } } },
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 9 } }] },
     "skipIf": { "cluster": { "id": "R8", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R8", "status": "yellow" } }, "steps": [0, 1, 2, 6, 10, 11, 12, 14] },
     "steps": [
@@ -837,8 +710,9 @@
     "minutes": 5,
     "npc": "brzechwa",
     "location": "ch01.metro",
+    "errLine": "d10.kazik.err",
     "introduces": ["lx.przystanek", "lx.wszystko"],
-    "requires": { "not": { "cluster": { "id": "R9", "status": "unknown" } } },
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 10 } }] },
     "skipIf": { "cluster": { "id": "R9", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R9", "status": "yellow" } }, "steps": [0, 1, 4, 8, 9, 11, 12, 13, 15] },
     "steps": [
@@ -933,8 +807,9 @@
     "minutes": 5,
     "npc": "brzechwa",
     "location": "ch01.metro",
-    "introduces": ["lx.dworzec"],
-    "requires": { "not": { "cluster": { "id": "R10", "status": "unknown" } } },
+    "errLine": "d11.brzechwa.err",
+    "introduces": ["lx.dworzec", "lx.moze"],
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 11 } }] },
     "skipIf": { "cluster": { "id": "R10", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R10", "status": "yellow" } }, "steps": [0, 1, 2, 7, 8, 11, 12, 13, 16] },
     "steps": [
@@ -1066,8 +941,8 @@
     "minutes": 5,
     "npc": "brzechwa",
     "location": "ch01.metro",
-    "introduces": ["lx.wyjscie", "lx.wejscie", "lx.otwarte", "lx.zamkniete", "lx.sklep"],
-    "requires": { "not": { "cluster": { "id": "R1", "status": "unknown" } } },
+    "introduces": ["lx.otwarte", "lx.zamkniete", "lx.sklep"],
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 12 } }] },
     "steps": [
       {
         "t": "explain",
@@ -1180,8 +1055,9 @@
     "minutes": 5,
     "npc": "urzedniczka",
     "location": "ch01.metro",
-    "introduces": ["lx.imie", "lx.nazwisko", "lx.jak_to_sie_pisze", "lx.prosze_przeliterowac"],
-    "requires": { "not": { "cluster": { "id": "R1", "status": "unknown" } } },
+    "errLine": "d13.urzedniczka.err",
+    "introduces": ["lx.imie", "lx.nazwisko", "lx.prosze_przeliterowac"],
+    "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 13 } }] },
     "steps": [
       {
         "t": "explain",
@@ -1202,10 +1078,10 @@
       { "t": "choice", "q": "Как называется буква W?", "options": ["wu", "we", "dablju"], "answer": 0 },
       { "t": "choice", "q": "Как называется буква Y?", "options": ["igrek", "i", "uj"], "answer": 0 },
       { "t": "choice", "q": "Как называется буква J?", "options": ["jot", "je", "dżej"], "answer": 0 },
-      { "t": "listen", "say": "ce", "options": ["C", "S", "K"], "answer": 0, "cluster": "R2", "hint": "Какую букву назвали?" },
-      { "t": "listen", "say": "eł", "options": ["Ł", "L", "W"], "answer": 0, "cluster": "R3", "hint": "Какую букву назвали?" },
-      { "t": "dictation", "say": "en, o, wu, a, ka", "accept": ["Nowak"], "slowFirst": false, "hint": "Фамилия по буквам" },
-      { "t": "dictation", "say": "ka, o, wu, a, el, es, ka, a", "accept": ["Kowalska"], "slowFirst": false, "hint": "Фамилия по буквам" },
+      { "t": "listen", "say": "ce", "options": ["C", "S", "K"], "answer": 0, "cluster": "R2", "hint": "Какую букву назвали?", "tr": "цэ" },
+      { "t": "listen", "say": "eł", "options": ["Ł", "L", "W"], "answer": 0, "cluster": "R3", "hint": "Какую букву назвали?", "tr": "эў" },
+      { "t": "dictation", "say": "en, o, wu, a, ka", "tr": "en, o, wu, a, ka", "accept": ["Nowak"], "slowFirst": false, "hint": "Фамилия по буквам" },
+      { "t": "dictation", "say": "ka, o, wu, a, el, es, ka, a", "tr": "ka, o, wu, a, el, es, ka, a", "accept": ["Kowalska"], "slowFirst": false, "hint": "Фамилия по буквам" },
       {
         "t": "listen",
         "say": "Jak to się pisze?",
@@ -1265,8 +1141,9 @@
     "minutes": 4,
     "npc": "urzedniczka",
     "location": "ch01.metro",
-    "introduces": ["lx.nie_rozumiem", "lx.prosze_powtorzyc", "lx.prosze_wolniej", "lx.co_to_znaczy"],
-    "requires": { "lessonDone": "ch01.s12" },
+    "errLine": "d13.urzedniczka.err",
+    "introduces": ["lx.nie_rozumiem", "lx.prosze_powtorzyc", "lx.co_to_znaczy"],
+    "requires": { "all": [{ "lessonDone": "ch01.s12" }, { "gameDay": { "min": 13 } }] },
     "steps": [
       {
         "t": "explain",
@@ -1380,7 +1257,8 @@
     "minutes": 8,
     "npc": "konduktor",
     "location": "ch01.metro",
-    "requires": { "all": [{ "lessonDone": "ch01.s11" }, { "lessonDone": "ch01.s12" }, { "lessonDone": "ch01.s12r" }] },
+    "errLine": "d14.konduktor.err",
+    "requires": { "all": [{ "lessonDone": "ch01.s11" }, { "lessonDone": "ch01.s12" }, { "lessonDone": "ch01.s12r" }, { "gameDay": { "min": 14 } }] },
     "pass": { "score": 0.8, "redClusterMin": 0.6 },
     "parts": [
       {
@@ -1584,10 +1462,10 @@
         "weight": 0.2,
         "steps": [
           { "t": "say", "who": "konduktor", "pl": "Nazwisko? Proszę przeliterować.", "ru": "Фамилия? Продиктуйте по буквам." },
-          { "t": "dictation", "say": "zet, o, ef, i, a", "accept": ["Zofia"], "slowFirst": false },
-          { "t": "dictation", "say": "en, o, wu, i, ce, ka, a", "accept": ["Nowicka"], "slowFirst": false },
-          { "t": "dictation", "say": "te, a, er, gie, o, wu, a", "accept": ["Targowa"], "slowFirst": false },
-          { "t": "dictation", "say": "be, er, zet, e, es, ka, a", "accept": ["Brzeska"], "slowFirst": false }
+          { "t": "dictation", "say": "zet, o, ef, i, a", "tr": "zet, o, ef, i, a", "accept": ["Zofia"], "slowFirst": false },
+          { "t": "dictation", "say": "en, o, wu, i, ce, ka, a", "tr": "en, o, wu, i, ce, ka, a", "accept": ["Nowicka"], "slowFirst": false },
+          { "t": "dictation", "say": "te, a, er, gie, o, wu, a", "tr": "te, a, er, gie, o, wu, a", "accept": ["Targowa"], "slowFirst": false },
+          { "t": "dictation", "say": "be, er, zet, e, es, ka, a", "tr": "be, er, zet, e, es, ka, a", "accept": ["Brzeska"], "slowFirst": false }
         ]
       },
       {
@@ -1658,5 +1536,25 @@
         ]
       }
     ]
+  },
+  {
+    "id": "ch01.tabliczka",
+    "kind": "practice",
+    "title": { "pl": "Tabliczka", "ru": "Первая табличка на мосту" },
+    "minutes": 1,
+    "npc": "bobr",
+    "location": "ch01.dzialka",
+    "steps": [
+      { "t": "type", "prompt": "Табличка на мост: «пожалуйста, проходите»", "accept": ["proszę"], "item": "lx.prosze", "tags": ["ph.nasal_end"], "hint": "В конце ę с хвостиком. Хвостик зовут ogonek.", "why": "Proszę: p-r-o-sz-ę. На конце ę звучит как [э]." }
+    ]
+  },
+  {
+    "id": "ch01.chrzaszcz",
+    "kind": "practice",
+    "title": { "pl": "Chrząszcz", "ru": "Самое страшное слово" },
+    "minutes": 1,
+    "npc": "brzechwa",
+    "location": "ch01.metro",
+    "steps": [{ "t": "shadow", "pl": "Chrząszcz.", "ru": "Жук.", "repeat": 1, "slow": true }]
   }
 ]
