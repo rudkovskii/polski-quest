@@ -1,6 +1,6 @@
 {
   "id": "ch01.metro",
-  "title": { "pl": "Metro Dworzec Wileński", "ru": "Метро «Дворец Виленьски»" },
+  "title": { "pl": "Metro Centrum", "ru": "Метро «Центрум»" },
   "tileset": "ninja16",
   "controls": "walk",
   "size": [20, 14],
@@ -41,6 +41,12 @@
     { "type": "npc", "id": "brzechwa", "at": [8, 8], "facing": "down" },
     { "type": "npc", "id": "pan_marek", "at": [15, 2], "facing": "down" },
     { "type": "npc", "id": "pasazer", "at": [7, 4], "facing": "left" },
+    { "type": "npc", "id": "pani_basia", "at": [7, 12], "facing": "right" },
+    { "type": "npc", "id": "ola", "at": [16, 9], "facing": "left" },
+    { "type": "npc", "id": "kasia", "at": [17, 9], "facing": "left" },
+    { "type": "npc", "id": "urzedniczka", "at": [2, 11], "facing": "up" },
+    { "type": "npc", "id": "konduktor", "at": [11, 1], "facing": "down" },
+    { "type": "sign", "at": [1, 11], "pl": "Obsługujemy: 12", "ru": "Обслуживаем номер 12 (у тебя 147)" },
     { "type": "exit", "at": [9, 13], "to": "ch01.dzialka", "spawn": "from_metro" }
   ]
 }

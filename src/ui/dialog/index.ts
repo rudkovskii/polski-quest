@@ -48,15 +48,23 @@ class Cancelled extends Error {}
 interface Speech {
   who: string;
   pl?: string;
+  /** Перевод pl (скрыт до тапа). */
   ru?: string;
+  /** Русская речь персонажа рядом с польской (реплики Казика, `line.ru` при `line.pl`): видна сразу. */
+  rus?: string;
   todo?: string;
 }
 
-/** Строка из story/lines.json для эффекта `line`. */
+/**
+ * Строка из story/lines.json для эффекта и узла `line` (I-11): pl + перевод `plRu` по тапу + русская
+ * речь `ru` сразу; реплика только по-русски — одной строкой; todo — заглушка.
+ */
 export function speechOfLine(id: string, lines: ReadonlyMap<string, Line>): Speech {
   const l = lines.get(id);
   if (!l) return { who: 'bobr', todo: id };
-  return l.todo || !l.pl ? { who: l.who, todo: id, ...(l.ru ? { ru: l.ru } : {}) } : { who: l.who, pl: l.pl, ...(l.ru ? { ru: l.ru } : {}) };
+  if (l.todo || (!l.pl && !l.ru)) return { who: l.who, todo: id };
+  if (!l.pl) return { who: l.who, rus: l.ru! };
+  return { who: l.who, pl: l.pl, ...(l.plRu ? { ru: l.plRu } : {}), ...(l.ru ? { rus: l.ru } : {}) };
 }
 
 export function runDialog(dlg: Dialogue, deps: DialogDeps): Promise<DialogOutcome> {
@@ -81,6 +89,7 @@ function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
         ...(sp.pl ? { pl: sp.pl } : {}),
         ...(sp.ru ? { ru: sp.ru } : {}),
         ...(sp.todo ? { todo: sp.todo } : {}),
+        ...(sp.rus ? { rus: sp.rus } : {}),
         audio: deps.audio,
         portraits: deps.portraits ?? null,
         translations: deps.translations ?? 'tap',
@@ -170,10 +179,16 @@ async function playDialog(dlg: Dialogue, deps: DialogDeps, layer: Layer, box: HT
       if (!node) break;
       out.path.push(id);
       let nextId: string | undefined = node.next;
-      // Узел без текста, урока и эффектов — заглушка: показываем `[todo: <dlg>.<узел>]`.
-      const silent = !node.pl && !node.lesson && !node.do?.length;
-      if (node.pl || silent || node.choices) {
-        const sp: Speech = node.pl ? { who: node.who, pl: node.pl, ...(node.ru ? { ru: node.ru } : {}) } : { who: node.who, todo: `${dlg.id}.${id}` };
+      // Узел без текста, урока и эффектов (или с `todo: true`) — заглушка `[todo: <dlg>.<узел>]`.
+      // Узел `line` — реплика из story/lines.json. Чистый `end` без who (I-11) молчит.
+      const silent = !node.pl && !node.line && !node.lesson && !node.do?.length && !(node.end && node.who === undefined);
+      if (node.pl || node.line || silent || node.todo || node.choices) {
+        const who = node.who ?? 'bobr';
+        const sp: Speech = node.line
+          ? speechOfLine(node.line, deps.content.lines)
+          : node.pl
+            ? { who, pl: node.pl, ...(node.ru ? { ru: node.ru } : {}) }
+            : { who, todo: `${dlg.id}.${id}` };
         const pick = await ui.say(sp, node.choices);
         const ch: DialogueChoice | undefined = pick >= 0 ? node.choices?.[pick] : undefined;
         if (ch) {

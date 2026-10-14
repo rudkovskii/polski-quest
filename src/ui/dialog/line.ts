@@ -10,6 +10,8 @@ export interface LineOpts {
   ru?: string;
   /** Реплика ещё не написана: показываем id заглушки. */
   todo?: string;
+  /** Русская речь рядом с польской (реплики Казика): видна сразу, не озвучивается. */
+  rus?: string;
   audio: AudioPort;
   portraits?: PortraitSource | null;
   translations: 'tap' | 'always';
@@ -54,7 +56,7 @@ export function lineBox(o: LineOpts): LineView {
     'div',
     { class: 'pq-wood pq-line' },
     el('div', { class: 'pq-line-who' }, pic, el('div', { class: 'pq-line-name' }, o.speaker.name)),
-    el('div', { class: 'pq-line-text' }, pl, ru, tools),
+    el('div', { class: 'pq-line-text' }, plText ? pl : null, ru, o.rus ? el('div', { class: 'pq-line-rus', lang: 'ru', 'data-role': 'rus' }, o.rus) : null, tools),
   );
 
   let shown = 0;

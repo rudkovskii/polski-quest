@@ -285,18 +285,30 @@ describe('resume (§5.7: local.resume после каждого шага)', () =
   });
 });
 
-describe('босс и упражнение у слова', () => {
-  it('урок с parts → событие boss со score по частям', async () => {
-    const boss = content.lessons.get('demo.boss')!.value;
+describe('диагностика (kind: diag) пишет diag по кластерам (§4.3, I-11)', () => {
+  it('точность первых попыток по cluster шага; шаги без кластера не считаются; затем lesson', async () => {
+    const diag: Lesson = {
+      id: 'demo.diag',
+      kind: 'diag',
+      title: { ru: 'Диагностика' },
+      minutes: 2,
+      steps: [
+        { t: 'minimal_pair', pair: ['łata', 'lata'], play: 0, cluster: 'R3' },
+        { t: 'minimal_pair', pair: ['ława', 'lawa'], play: 0, cluster: 'R3' },
+        { t: 'choice', q: 'kawa — это…', options: ['кофе', 'квас'], answer: 0, cluster: 'R1' },
+        { t: 'choice', q: 'mały — это…', options: ['маленький', 'малый'], answer: 0 },
+      ],
+    };
     const store = memStore();
     const { d, events } = deps(store);
-    const r = await playThrough(boss, runLesson(boss, d), [0]);
-    const ev = events.find((e) => e.k === 'boss')!;
-    expect(ev).toMatchObject({ lesson: 'demo.boss', parts: { a: 0, b: 1 }, score: 0.5, passed: false });
-    expect(r.passed).toBe(false);
-    expect(events.some((e) => e.k === 'lesson')).toBe(false);
+    await playThrough(diag, runLesson(diag, d), [1]);
+    expect(events.map((e) => e.k)).toEqual(['diag', 'lesson']);
+    expect(events[0]).toMatchObject({ k: 'diag', results: { R3: { ok: 1, n: 2 }, R1: { ok: 1, n: 1 } } });
   });
+});
 
+describe('упражнение у слова', () => {
+  // Урок с parts (босс) ведёт src/ui/boss.ts: tests/boss.test.ts (I-11).
   it('drill (объект-слово в мире): src world, без lesson/intro, без resume и итога', async () => {
     const store = memStore(seed(newProgress(T0 - 5 * DAY, 'w1'), ['lx.kawa'], T0 - 3 * DAY));
     const { d, events } = deps(store);

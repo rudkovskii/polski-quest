@@ -133,8 +133,10 @@ describe('п. 1: нарушение схемы', () => {
   it('id не по шаблону', () => {
     expectIssue(run((f) => (at(fx.vocab(f), 0).id = 'maly')), 'schema', /"maly" не подходит под шаблон/);
   });
-  it('реплика без ru и без todo', () => {
-    expectIssue(run((f) => delete at(fx.lines(f), 0).todo), 'schema', /нет обязательного поля "ru"/);
+  it('реплика без ru, без pl и без todo (I-11: достаточно pl, plRu — перевод)', () => {
+    expectIssue(run((f) => delete at(fx.lines(f), 0).todo), 'schema', /не подходит ни под один из вариантов/);
+    expect(errorsOf(run((f) => Object.assign(at(fx.lines(f), 0), { todo: false, pl: 'Ja wysiadam.', plRu: 'Я выхожу.' })))).toEqual([]);
+    expect(errorsOf(run((f) => Object.assign(at(fx.lines(f), 0), { todo: false, ru: 'Только по-русски.' })))).toEqual([]);
   });
   it('битый JSON, неизвестный и отсутствующий файл', () => {
     const tmp = mkdtempSync(join(tmpdir(), 'pq-json-'));
@@ -444,6 +446,27 @@ describe('граф диалога', () => {
   });
   it('у узла и next, и end', () => {
     expectIssue(run((f) => (fx.dialogue(f).nodes.c!.next = 'a')), 'dialogue', /ровно одно из next \/ choices \/ end \(сейчас 2\)/);
+  });
+  it('I-11: who обязателен у узла с pl, choices или todo; чистый end и узел line — без who', () => {
+    expectIssue(run((f) => delete (fx.dialogue(f).nodes.a as { who?: string }).who), 'dialogue', /у узла "a" с pl, choices или todo нет who/);
+    const ok = run((f) => {
+      const d = fx.dialogue(f);
+      d.nodes.c = { line: 'bobr.after_kawa', next: 'e' };
+      d.nodes.e = { end: true };
+    });
+    expect(errorsOf(ok)).toEqual([]);
+  });
+  it('I-11: узел line — ссылка на story/lines.json; не вместе с pl', () => {
+    expectIssue(run((f) => (fx.dialogue(f).nodes.c = { line: 'bobr.nie_ma', end: true })), 'line', /"bobr.nie_ma" нет/, `${D}dialogues.json`);
+    expectIssue(run((f) => (fx.dialogue(f).nodes.c = { who: 'bobr', line: 'bobr.after_kawa', pl: 'Tak.', end: true })), 'dialogue', /line вместе с pl или todo/);
+  });
+  it('I-11: узел todo — предупреждение, в модуле ready — ошибка; todo и pl вместе — ошибка', () => {
+    expectIssue(run((f) => (fx.dialogue(f).nodes.c = { who: 'pan_marek', todo: true, end: true })), 'todo', /1 узлов диалогов с todo: true \(dlg.demo.marek.c\)/, `${D}dialogues.json`, 'warn');
+    expectIssue(run((f) => {
+      fx.module(f).status = 'ready';
+      fx.dialogue(f).nodes.c = { who: 'pan_marek', todo: true, end: true };
+    }), 'todo', /узел "c" ещё todo, а модуль status: ready/);
+    expectIssue(run((f) => (fx.dialogue(f).nodes.c = { who: 'pan_marek', todo: true, pl: 'Tak.', end: true })), 'dialogue', /и pl, и todo/);
   });
   it('end не достижим из start', () => {
     expectIssue(run((f) => {

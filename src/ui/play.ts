@@ -14,6 +14,7 @@ import { el } from './dom';
 import { runLesson, type LessonStore } from './lesson';
 import { shuffled } from './exercises/options';
 import { createOverlay, type Overlay } from './overlay/host';
+import { openPassport, passportModel } from './passport';
 import { audioButtons, btn, busAudio, type AudioPort, type PortraitFrame, type PortraitSource } from './overlay/kit';
 
 export interface PlayStore extends LessonStore {
@@ -39,6 +40,8 @@ export interface Play {
   overlay: Overlay;
   openLesson(id: string): Promise<LessonResult | null>;
   openDialog(id: string): Promise<void>;
+  /** Паспорт (§5.10, I-11); то же по `ui:screen:open { screen: 'passport' }`. */
+  openPassport(): Promise<void>;
   interact(p: WorldInteract): Promise<void>;
   /** Идёт диалог или урок. */
   readonly busy: boolean;
@@ -67,7 +70,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     bus.emit('progress:changed', { kinds: ['cards'] });
   };
 
-  /** Условие `if` (§3.9) до conditions.ts (I-17): флаги, предметы, сданные уроки; прочие атомы ложны. */
+  /** Условие `if` (§3.9) до conditions.ts (I-17): флаги, предметы, сданные уроки и боссы; прочие атомы ложны. */
   const condLite = (store: PlayStore): ((c: Condition) => boolean) => {
     let done: ReadonlySet<string> | null = null;
     const ev = (c: Condition): boolean => {
@@ -81,6 +84,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
         done ??= derive(store.progress, deriveContent(content), Date.now()).lessonsDone;
         return done.has(c.lessonDone);
       }
+      if (c.bossPassed !== undefined) return derive(store.progress, deriveContent(content), Date.now()).bossResults[c.bossPassed]?.passedAt !== undefined;
       return false;
     };
     return ev;
@@ -115,8 +119,15 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
       console.warn(`[ui] урока ${id} нет в контенте`);
       return null;
     }
+    const now = deps.clock?.now() ?? Date.now();
+    const wasPassed = l.kind === 'boss' && derive(store.progress, deriveContent(content), now).bossResults[id]?.passedAt !== undefined;
     const result = await runLesson(l, lessonDeps(store));
     bus.emit('ui:lesson:end', { lessonId: id, result });
+    // Первая сдача босса (§5.8, I-11): reward урока и module.onComplete (билет, флаг главы → печать биома, реплики).
+    if (l.kind === 'boss' && result.passed && !wasPassed) {
+      const mod = content.modules.get(content.lessons.get(id)?.module ?? '')?.module;
+      for (const e of [...(l.reward ?? []), ...(mod?.boss === id ? (mod.onComplete ?? []) : [])]) await effect(store, e);
+    }
     return result;
   };
 
@@ -207,13 +218,24 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     bus.on('world:interact', (p) => void interact(p)),
     bus.on('ui:dialog:open', ({ dialogueId }) => void guard((s) => dialogById(s, dialogueId))),
     bus.on('ui:lesson:start', ({ lessonId }) => void guard((s) => lessonById(s, lessonId))),
+    bus.on('ui:screen:open', ({ screen }) => {
+      if (screen === 'passport') void guard((s) => passport(s));
+    }),
   ];
+
+  function passport(store: PlayStore): Promise<void> {
+    const d = derive(store.progress, deriveContent(content), deps.clock?.now() ?? Date.now());
+    return openPassport(overlay, passportModel(content, store.progress, d));
+  }
 
   return {
     overlay,
     openLesson: (id) => guard((s) => lessonById(s, id)).then((r) => r ?? null),
     openDialog: async (id) => {
       await guard((s) => dialogById(s, id));
+    },
+    openPassport: async () => {
+      await guard((s) => passport(s));
     },
     interact,
     get busy() {

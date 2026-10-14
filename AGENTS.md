@@ -105,6 +105,18 @@
   (`&dlg=dlg.demo.marek`, `&days=N` — сдвиг часов, `&reset=1` — журнал в памяти, `&sound=1` — Web Speech),
   события журнала в консоли `[log]`.
 
+## Босс, паспорт, кластеры (ТЗ §4.3, §5.8, §5.10, I-11)
+- Урок с `parts` = босс: `runLesson` отдаёт его `src/ui/boss.ts`. Части по порядку без подсказок, после каждой части —
+  `local.resume` (7 дней). Итог и выбор частей для повтора — чистые `bossVerdict` (`src/systems/clusters.ts`) и `bossPlan`
+  (`boss.ts`): score ≥ `pass.score`, красный кластер ≥ `pass.redClusterMin` (решает при ≥ 2 ответах); повтор — части ниже порога
+  и части со шагами проваленного красного кластера, сданные части берутся из последнего события `boss` (≤ 7 дней).
+- Первая сдача босса: `play.ts` применяет `lesson.reward` и `module.onComplete` (предмет, флаг главы → печать биома, реплики).
+- Диагностика (`kind: diag`) пишет `diag` по `cluster` шагов (или кластеру слова `item`) → статусы кластеров в derive.
+- Паспорт: `src/ui/passport.ts` (`passportModel` чистая), открыть — `ui:screen:open { screen: 'passport' }` или
+  `/?dev=lesson&passport=1`; после урока в dev — кнопка «Паспорт».
+- Диалоги: узел `line` (реплика из `story/lines.json`), `todo: true` (реплики нет), чистый `end` без `who`.
+  В `lines.json`: `pl` + перевод `plRu` + русская речь `ru` (видна сразу).
+
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
 2. Id: модуль `[a-z0-9_]+`, урок `<module>.<name>`, слово `lx.<slug>` (глобально уникально),

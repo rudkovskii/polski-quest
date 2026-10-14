@@ -6,11 +6,11 @@
     { "id": "R3", "title": "ł и l", "repairLesson": "ch01.s03" },
     { "id": "R4", "title": "Твёрдые шипящие: sz, cz, rz/ż, dz, dż", "repairLesson": "ch01.s04" },
     { "id": "R5", "title": "Мягкий ряд и «две записи одного звука»", "repairLesson": "ch01.s05" },
-    { "id": "R6", "title": "Три ряда рядом: s/sz/ś, c/cz/ć, z/ż/ź" },
-    { "id": "R7", "title": "Носовые ą, ę" },
-    { "id": "R8", "title": "i как знак мягкости (ie, ia, io)" },
-    { "id": "R9", "title": "Кластеры и оглушение" },
-    { "id": "R10", "title": "Один звук — две буквы (только письмо)" }
+    { "id": "R6", "title": "Три ряда рядом: s/sz/ś, c/cz/ć, z/ż/ź", "repairLesson": "ch01.s06" },
+    { "id": "R7", "title": "Носовые ą, ę", "repairLesson": "ch01.s07" },
+    { "id": "R8", "title": "i как знак мягкости (ie, ia, io)", "repairLesson": "ch01.s08" },
+    { "id": "R9", "title": "Кластеры и оглушение", "repairLesson": "ch01.s09" },
+    { "id": "R10", "title": "Один звук — две буквы (только письмо)", "repairLesson": "ch01.s10" }
   ],
   "pairs": [
     { "id": "mp.woda_wada", "a": "woda", "b": "wada", "cluster": "R1", "ru": ["вода", "недостаток"] },
@@ -39,6 +39,9 @@
     { "id": "mp.sok_szok", "a": "sok", "b": "szok", "cluster": "R6", "ru": ["сок", "шок"] },
     { "id": "mp.syk_szyk", "a": "syk", "b": "szyk", "cluster": "R6", "ru": ["шипение", "строй; шик"] },
     { "id": "mp.kasa_kasza", "a": "kasa", "b": "kasza", "cluster": "R6", "ru": ["касса", "каша"] },
+    { "id": "mp.kosz_kos", "a": "kosz", "b": "koś", "cluster": "R6", "ru": ["корзина", "коси!"] },
+    { "id": "mp.szal_sal", "a": "szal", "b": "sal", "cluster": "R6", "ru": ["шаль", "залов (род. мн. от sala)"] },
+    { "id": "mp.czar_car", "a": "czar", "b": "car", "cluster": "R6", "ru": ["чары", "царь"] },
     { "id": "mp.was_was", "a": "wąs", "b": "was", "cluster": "R7", "ru": ["ус", "вас"] },
     { "id": "mp.maka_meka", "a": "mąka", "b": "męka", "cluster": "R7", "ru": ["мука (для теста)", "мука (страдание)"] },
     { "id": "mp.waz_waz", "a": "wąż", "b": "waż", "cluster": "R7", "ru": ["змея", "взвешивай!"] },

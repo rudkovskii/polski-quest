@@ -186,6 +186,39 @@ describe('окно реплики', () => {
     expect(speechOfLine('nope', content.lines)).toEqual({ who: 'bobr', todo: 'nope' });
   });
 
+  it('speechOfLine (I-11): pl + перевод plRu по тапу + русская речь ru сразу; только ru — одной строкой', () => {
+    const lines = new Map([
+      ['k.a', { id: 'k.a', who: 'bobr', pl: 'Zator.', plRu: 'Затор.', ru: 'Брёвна сбились.' }],
+      ['k.b', { id: 'k.b', who: 'bobr', ru: 'Успеем построить ещё один мост.' }],
+      ['k.c', { id: 'k.c', who: 'bobr', pl: 'Ja wysiadam.', plRu: 'Я выхожу.' }],
+    ]);
+    expect(speechOfLine('k.a', lines)).toEqual({ who: 'bobr', pl: 'Zator.', ru: 'Затор.', rus: 'Брёвна сбились.' });
+    expect(speechOfLine('k.b', lines)).toEqual({ who: 'bobr', rus: 'Успеем построить ещё один мост.' });
+    expect(speechOfLine('k.c', lines)).toEqual({ who: 'bobr', pl: 'Ja wysiadam.', ru: 'Я выхожу.' });
+  });
+
+  it('узлы I-11: line (говорящий из реплики, русская речь видна), todo: true → заглушка, чистый end без who молчит', async () => {
+    const lines = new Map(content.lines);
+    lines.set('k.a', { id: 'k.a', who: 'bobr', pl: 'Zator.', plRu: 'Затор.', ru: 'Брёвна сбились.' });
+    const { d } = setup({ content: { characters: content.characters, lines } });
+    const dlg: Dialogue = {
+      id: 'dlg.demo.i11',
+      npc: 'pan_marek',
+      start: 'a',
+      nodes: { a: { line: 'k.a', next: 'b' }, b: { who: 'pan_marek', todo: true, next: 'c' }, c: { end: true } },
+    };
+    const p = runDialog(dlg, d);
+    await flush();
+    expect(host.querySelector('.pq-line-name')?.textContent).toBe('Kazimierz Bóbr');
+    expect(pl()).toBe('Zator.');
+    expect(host.querySelector('[data-role="rus"]')?.textContent).toBe('Брёвна сбились.');
+    await next();
+    expect(pl()).toBe(todoText('dlg.demo.i11.b'));
+    await next();
+    expect(await p).toMatchObject({ ended: true, path: ['a', 'b', 'c'] });
+    expect(host.querySelector('.pq-layer')).toBeNull();
+  });
+
   it('runLines показывает реплики по очереди; отмена → false', async () => {
     const { d, bus } = setup();
     const p = runLines([{ who: 'bobr', todo: 'bobr.meets' }, { who: 'pan_marek', pl: 'Słucham?' }], d);
@@ -261,6 +294,8 @@ describe('склейка world:interact → оверлей (ui/play)', () => {
   it('ui:lesson:start → урок, ui:lesson:end и progress:changed после событий', async () => {
     const { bus, play: p, lessonEnd, events } = play();
     bus.emit('ui:lesson:start', { lessonId: 'demo.boss', src: 'npc' });
+    await flush();
+    act(host, 'start').click(); // экран босса (I-11): вступление с частями
     await flush();
     byText(host, 'ława').click();
     act(host, 'next').click();

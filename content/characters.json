@@ -83,5 +83,47 @@
     "portrait": "extra_m",
     "traits": "Пассажир в вагоне метро (сцена 1.4).",
     "hearts": false
+  },
+  {
+    "id": "pani_basia",
+    "name": "pani Basia",
+    "kind": "extra",
+    "addressAs": "pani",
+    "voice": { "engine": "say", "id": "Zosia" },
+    "sprite": "extra_k",
+    "portrait": "extra_k",
+    "traits": "Соседка, 70+, хозяйка działki, колено «tak sobie». Главный источник заказов. «Zawsze jest miejsce dla gościa.»"
+  },
+  {
+    "id": "ola",
+    "name": "Ola",
+    "kind": "extra",
+    "addressAs": "ty",
+    "voice": { "engine": "say", "id": "Zosia" },
+    "sprite": "extra_k",
+    "portrait": "extra_k",
+    "traits": "Сестра Каси, камео (бывшая проводница из черновика методиста). Сцена 1.8.",
+    "hearts": false
+  },
+  {
+    "id": "kasia",
+    "name": "Kasia",
+    "kind": "extra",
+    "addressAs": "ty",
+    "voice": { "engine": "say", "id": "Zosia" },
+    "sprite": "extra_k",
+    "portrait": "extra_k",
+    "traits": "28 лет, из Кракова, только на «ty». Будущая коллега по коворкингу (гл. 3); в гл. 1 знакомство в сцене 1.8."
+  },
+  {
+    "id": "urzedniczka",
+    "name": "Urzędniczka",
+    "kind": "extra",
+    "addressAs": "pani",
+    "voice": { "engine": "say", "id": "Zosia" },
+    "sprite": "extra_k",
+    "portrait": "extra_k",
+    "traits": "Окошко ZTM, именной проездной: numerek 147, «obsługujemy: 12». Сцена 1.12.",
+    "hearts": false
   }
 ]

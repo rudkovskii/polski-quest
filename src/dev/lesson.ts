@@ -4,6 +4,7 @@
 //   days=N              часы игры сдвинуты на N дней вперёд: карточки прошлого прогона становятся due → `rev`
 //   reset=1             начать с чистого журнала (в памяти; иначе отдельная база polski-quest-dev, игру не трогает)
 //   sound=1             озвучивать через Web Speech; по умолчанию звука нет (мок `audio:play`: только лог)
+//   passport=1          сразу открыть паспорт (I-11); после урока — кнопка «Паспорт»
 // Каждое событие журнала печатается в консоль `[log] {...}`, озвучка — `[audio] …`.
 // Это склейка слоёв, как main.ts.
 import { startInput } from '../input';
@@ -21,6 +22,7 @@ function fixtureContent(): Content {
 const css = `
 .pq-devlesson { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
   font: 16px/1.4 -apple-system, BlinkMacSystemFont, sans-serif; color: #f4f4f4; background: #345a52; padding: 16px; box-sizing: border-box; text-align: center; }
+#game { display: none; } /* без Phaser: пустой #game перекрывал кнопки страницы для мыши */
 .pq-devlesson pre { max-width: min(100%, 680px); max-height: 40vh; overflow: auto; text-align: left; font-size: 12px; background: #141b1b; padding: 8px; border-radius: 6px; white-space: pre-wrap; }
 `;
 
@@ -75,6 +77,13 @@ export async function mountLessonDev(params: URLSearchParams): Promise<void> {
   });
   (window as unknown as { __pq?: unknown }).__pq = { bus, storage, play, content };
 
+  const passportBtn = (): HTMLButtonElement =>
+    el('button', { type: 'button', class: 'pq-btn', 'data-nav': true, 'data-act': 'passport', onclick: () => void play.openPassport() }, 'Паспорт');
+  if (params.get('passport') === '1') {
+    page.replaceChildren(el('div', {}, 'Паспорт'), passportBtn());
+    await play.openPassport();
+    return;
+  }
   const run = async (): Promise<void> => {
     page.replaceChildren(el('div', {}, dlgId ? `Диалог ${dlgId}` : `Урок ${lessonId}`, offset ? ` · +${offset} дн.` : ''));
     seen.length = 0;
@@ -89,7 +98,7 @@ export async function mountLessonDev(params: URLSearchParams): Promise<void> {
     page.replaceChildren(
       el('div', {}, 'Готово. События этого прогона (они же в консоли, [log]):'),
       el('pre', { 'data-testid': 'log' }, seen.join('\n') || '—'),
-      el('div', { style: 'display:flex;gap:12px' }, again, later),
+      el('div', { style: 'display:flex;gap:12px' }, again, later, passportBtn()),
     );
     later.focus();
   };
