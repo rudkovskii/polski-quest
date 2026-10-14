@@ -6,11 +6,11 @@ import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap } from '../types/content';
 import type { BusEvents, GuideTarget, PlotCellView, PlotView } from '../types/bus';
 import { cellAt } from '../world/dzialka';
-import { edgeArrow, faceTowards, guidePath, pointerCell, resolveGuide, type ResolvedGuide } from '../world/guide';
+import { besideCell, edgeArrow, faceTowards, guidePath, pointerCell, resolveGuide, type ResolvedGuide } from '../world/guide';
 import { tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
 import { playerTextureKey } from '../world/avatar';
 import { pickZoom } from '../world/camera';
-import { DELTA, LocationModel, type Actor, type WorldEvent } from '../world/location';
+import { BOBR_KEY, DELTA, LocationModel, type Actor, type WorldEvent } from '../world/location';
 
 // Location (ТЗ §5.4–5.5): ASCII-карта, Дима, NPC, слова, выходы, бобр-компаньон. Логика в
 // world/location.ts, сцена только рисует и переводит события модели в шину. Ввод приходит
@@ -41,7 +41,24 @@ const url = (p: string): string => `${import.meta.env.BASE_URL}${p}`;
  * разрешает карте уехать вверх на эту высоту — нижний ряд не прячется под крестом (P-05).
  */
 export const DPAD_INSET = 148;
+/**
+ * Сверху экран занимает строка «Сейчас» и кнопки HUD (CSS-пиксели): стрелка к цели за краем не прячется под ними,
+ * так же как снизу — под d-pad (P-10a).
+ */
+export const HUD_TOP_INSET = 64;
 let dpadVisible = false;
+
+/** `env(safe-area-inset-*)` в CSS-пикселях (iPhone: «чёлка» сверху, полоска «домой» снизу). */
+function safeArea(): { top: number; bottom: number } {
+  if (typeof document === 'undefined' || !document.body) return { top: 0, bottom: 0 };
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;left:0;top:0;width:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)';
+  document.body.append(probe);
+  const cs = getComputedStyle(probe);
+  const out = { top: parseFloat(cs.paddingTop) || 0, bottom: parseFloat(cs.paddingBottom) || 0 };
+  probe.remove();
+  return out;
+}
 bus.on('input:dpad', ({ visible }) => {
   dpadVisible = visible;
   for (const fn of dpadWatchers) fn();
@@ -84,6 +101,10 @@ export class Location extends Phaser.Scene {
   private inputOn = true;
   /** Последняя отправленная экранная точка Казика (`world:anchor`). */
   private anchorKey = '';
+  /** Цель шага — бобр-компаньон: контур и стрелка идут за ним каждый кадр (P-10a). */
+  private guideLive = false;
+  /** Запас сверху и снизу под HUD и d-pad, CSS-пиксели (layout). */
+  private insets = { top: 0, bottom: 0 };
 
   constructor() {
     super('Location');
@@ -106,6 +127,7 @@ export class Location extends Phaser.Scene {
     this.aKey = '';
     this.aHiddenMark = null;
     this.anchorKey = '';
+    this.guideLive = false;
   }
 
   preload(): void {
@@ -210,6 +232,8 @@ export class Location extends Phaser.Scene {
     if (this.wasMoving && !moving && !this.leaving) {
       const [x, y] = this.model.player.tile;
       bus.emit('world:position', { location: this.mapDef.id, x, y });
+      // Цель шага — Казик (P-10a): Дима остановился — Казик снова подходит к нему.
+      if (this.targetsBobr()) this.applyGuide();
     }
     this.wasMoving = moving;
     this.syncActor(this.player, this.playerSid, this.model.player, time);
@@ -309,39 +333,65 @@ export class Location extends Phaser.Scene {
     return new Set(this.model.objects.filter((o) => this.model.isHidden(o.key)).map((o) => o.key));
   }
 
+  /** Цель шага — сам Казик (NPC `bobr` или компаньон). */
+  private targetsBobr(): boolean {
+    const t = this.guideTarget;
+    return !!t && t.location === this.mapDef.id && t.npc === 'bobr' && !t.plot && !t.object;
+  }
+
   private applyGuide(): void {
     if (!this.model || this.leaving) return;
-    this.guide = resolveGuide(this.model, this.guideTarget, this.plots, this.hiddenKeys());
-    this.guideKey = '';
-    const g = this.guide;
-    // Бобр-указатель (§4.12): в walk-локации идёт к клетке у цели и смотрит на неё; на tap-карте (działka)
-    // NPC-бобр садится у нужной грядки. Цель — сам бобр или цели нет: следом за Димой / домой.
-    const targetsBobr = this.guideTarget?.npc === 'bobr' && !this.guideTarget.plot && !this.guideTarget.object;
-    if (this.model.companion) {
+    const m = this.model;
+    const targetsBobr = this.targetsBobr();
+    const reserved = m.reserved();
+    const free = (x: number, y: number): boolean => m.passable(x, y) && !reserved.some((r) => r[0] === x && r[1] === y);
+    let g = resolveGuide(m, this.guideTarget, this.plots, this.hiddenKeys());
+    // Бобр-указатель (§4.12): в walk-локации идёт к клетке у цели и смотрит на неё; на карте, где он NPC,
+    // садится у цели. Цель — сам Казик (P-10a): подходит к Диме сзади-сбоку, компаньон просто идёт следом.
+    if (m.companion) {
       if (g && !targetsBobr) {
-        const cell = pointerCell(this.model.grid, g, this.model.player.tile, this.model.companion.tile);
-        this.model.pointTo(cell, cell ? faceTowards(cell, g.at, g.size) : null);
-      } else this.model.pointTo(null);
+        const cell = pointerCell({ w: m.parsed.w, h: m.parsed.h, passable: free }, g, m.player.tile, m.companion.tile);
+        m.pointTo(cell, cell ? faceTowards(cell, g.at, g.size) : null);
+      } else m.pointTo(null);
     }
-    const bobr = this.npcs.get('npc:bobr');
-    if (bobr && this.bobrHome) {
-      let cell: Xy | null = this.bobrHome;
+    const bobr = this.npcs.get(BOBR_KEY);
+    const bobrObj = m.object(BOBR_KEY);
+    if (bobr && this.bobrHome && bobrObj && bobrObj.kind === 'npc' && !m.isHidden(BOBR_KEY)) {
+      const now = bobrObj.at;
+      let cell: Xy = this.bobrHome;
       let face: Dir = 'left';
-      if (g && !g.viaExit && !targetsBobr && g.key !== 'npc:bobr') {
-        const grid = { w: this.model.parsed.w, h: this.model.parsed.h, passable: (x: number, y: number) => this.model.passable(x, y) || (x === this.model.object('npc:bobr')!.at[0] && y === this.model.object('npc:bobr')!.at[1]) };
-        cell = pointerCell(grid, g, this.model.player.tile, this.model.object('npc:bobr')!.at) ?? this.bobrHome;
+      const grid = { w: m.parsed.w, h: m.parsed.h, passable: (x: number, y: number) => free(x, y) || (x === now[0] && y === now[1]) };
+      if (targetsBobr) {
+        cell = besideCell(grid, m.player.tile, m.player.facing, reserved, now) ?? now;
+        face = faceTowards(cell, m.player.tile, [1, 1]);
+      } else if (g && !g.viaExit && g.key !== BOBR_KEY) {
+        cell = pointerCell(grid, g, m.player.tile, now) ?? this.bobrHome;
         face = faceTowards(cell, g.at, g.size);
       }
-      this.model.moveObject('npc:bobr', cell);
+      if (!m.moveObject(BOBR_KEY, cell)) cell = m.object(BOBR_KEY)!.at;
       const sid = this.spriteFor(getContent().characters.get('bobr')?.sprite, 'bobr');
       const x = cell[0] * T + T / 2;
       const y = cell[1] * T + T;
-      if (bobr.x !== x || bobr.y !== y) this.tweens.add({ targets: bobr, x, y, duration: 260, ease: 'Sine.easeInOut', onUpdate: () => bobr.setDepth(10 + bobr.y) });
+      if (bobr.x !== x || bobr.y !== y) {
+        const dist = Math.abs(bobr.x - x) + Math.abs(bobr.y - y);
+        this.tweens.add({ targets: bobr, x, y, duration: Math.min(900, 260 + dist * 4), ease: 'Sine.easeInOut', onUpdate: () => bobr.setDepth(10 + bobr.y) });
+      }
       bobr.play(`${sid}:idle_${face}`);
+      // Казик переехал: контур и стрелка — туда, где он теперь (раньше рамка оставалась на пустой клетке).
+      if (targetsBobr) g = resolveGuide(m, this.guideTarget, this.plots, this.hiddenKeys());
     }
+    this.guideLive = targetsBobr && !g && !!m.companion;
+    if (this.guideLive) g = { key: BOBR_KEY, at: m.companion!.tile, size: [1, 1], viaExit: false };
+    this.guide = g;
+    this.guideKey = '';
+    m.setGoal(g);
   }
 
   private drawGuide(time: number): void {
+    if (this.guideLive && this.guide && this.model.companion) {
+      const [cx, cy] = LocationModel.pos(this.model.companion);
+      this.guide = { ...this.guide, at: [Math.round(cx), Math.round(cy)] };
+    }
     const g = this.guide;
     const cam = this.cameras.main;
     const pulse = Math.floor(time / 250) % 4;
@@ -367,9 +417,12 @@ export class Location extends Phaser.Scene {
       }
     }
     // Стрелка у края экрана, если цель за кадром.
+    // Видимая часть: без полосы HUD сверху и d-pad снизу (P-10a) — цель под кнопкой тоже «за краем».
     const view = cam.worldView;
+    const top = this.insets.top / cam.zoom;
+    const bottom = this.insets.bottom / cam.zoom;
     const target = { x: (g.at[0] + g.size[0] / 2) * T, y: (g.at[1] + g.size[1] / 2) * T };
-    const arrow = edgeArrow({ x: view.x, y: view.y, width: view.width, height: view.height }, target, 10 / cam.zoom + 4);
+    const arrow = edgeArrow({ x: view.x, y: view.y + top, width: view.width, height: Math.max(T, view.height - top - bottom) }, target, 10 / cam.zoom + 4);
     if (arrow) {
       const r = Math.max(5, 12 / cam.zoom) + (pulse % 2);
       const a = arrow.angle;
@@ -599,18 +652,27 @@ export class Location extends Phaser.Scene {
     const zoom = pickZoom(width, height, mw, mh);
     cam.setZoom(zoom);
     cam.stopFollow();
+    const safe = safeArea();
+    // Видимая зона карты (P-10a): между строкой «Сейчас» сверху и d-pad снизу (вместе с safe-area iPhone).
+    const bottom = dpadVisible ? DPAD_INSET + safe.bottom : 0;
+    this.insets = { top: HUD_TOP_INSET + safe.top, bottom };
     const fitsW = mw * zoom <= width;
-    const fitsH = mh * zoom <= height;
+    const fitsH = mh * zoom <= height - bottom;
+    const shift = bottom / zoom / 2;
     // tap-локация всегда по центру: ходьбы нет, следовать не за кем.
     if ((fitsW && fitsH) || this.model.controls === 'tap') {
       cam.removeBounds();
-      cam.centerOn(mw / 2, mh / 2);
+      // Центр карты — в центре видимой зоны над d-pad, а не всего экрана: нет пустой полосы сверху (P-10a).
+      cam.centerOn(mw / 2, mh / 2 + (fitsH ? shift : 0));
     } else {
       // Карта больше экрана: камера следует за Димой в границах карты (по оси, где не влезает).
-      // Крест на экране: снизу запас на его высоту, чтобы низ карты можно было поднять над d-pad.
-      const inset = dpadVisible && !fitsH ? DPAD_INSET / zoom : 0;
-      cam.setBounds(fitsW ? (mw - width / zoom) / 2 : 0, fitsH ? (mh - height / zoom) / 2 : 0, fitsW ? width / zoom : mw, fitsH ? height / zoom : mh + inset);
+      // Крест на экране: снизу запас на его высоту, чтобы низ карты (выход, калитка) поднимался над d-pad,
+      // а Дима стоял в центре видимой зоны над крестом (followOffset), а не всего экрана.
+      const inset = !fitsH ? bottom / zoom : 0;
+      const by = fitsH ? mh / 2 + shift - height / zoom / 2 : 0;
+      cam.setBounds(fitsW ? (mw - width / zoom) / 2 : 0, by, fitsW ? width / zoom : mw, fitsH ? height / zoom : mh + inset);
       cam.startFollow(this.player, true);
+      cam.setFollowOffset(0, fitsH ? 0 : -shift);
     }
   }
 

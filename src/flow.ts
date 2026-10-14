@@ -264,7 +264,14 @@ export function startFlow(o: FlowOptions): Flow {
     if (!step) return;
     bus.emit('guide:step', { step: view(step) });
     const t = step.target;
-    bus.emit('guide:target', { target: t.screen || !isMap(t.location) ? null : { location: t.location, ...(t.npc ? { npc: t.npc } : {}), ...(t.object ? { object: t.object } : {}), ...(t.plot ? { plot: t.plot } : {}), ...(t.item ? { item: t.item } : {}) } });
+    // Бит «поговори: Kazik» без цели-объекта (P-10a): подсвечен сам Казик — он подходит, A и тап говорят с ним.
+    const npc = t.npc ?? (talksToKazik(step) ? 'bobr' : undefined);
+    bus.emit('guide:target', { target: t.screen || !isMap(t.location) ? null : { location: t.location, ...(npc ? { npc } : {}), ...(t.object ? { object: t.object } : {}), ...(t.plot ? { plot: t.plot } : {}), ...(t.item ? { item: t.item } : {}) } });
+  }
+
+  /** Бит дней 2+ без цели-персонажа: в строке «Сейчас» «поговори: Kazik», играется сам или по Казику. */
+  function talksToKazik(s: DirectorStep): boolean {
+    return s.kind === 'beat' && !s.target.npc && !s.target.object && !s.target.plot && !s.target.screen;
   }
 
   let queued = false;
@@ -416,6 +423,7 @@ export function startFlow(o: FlowOptions): Flow {
     if (t.plot && p.kind === 'plot') hit = s.mode === 'practice' || s.kind === 'spring' || (s.kind === 'intro' && !!t.item);
     else if (t.object && p.id === t.object) hit = true;
     else if (t.npc && p.kind === 'npc' && p.id === t.npc && !t.plot) hit = true;
+    else if (talksToKazik(s) && p.kind === 'npc' && p.id === 'bobr') hit = true;
     if (!hit && p.kind === 'npc' && p.id === 'bobr' && s.line) {
       // Тап по Казику не по делу: он повторяет, что сейчас делать.
       void play.lines([s.line]);
