@@ -12,6 +12,25 @@
     "charId": { "title": "CharId", "type": "string", "pattern": "^[a-z_]+$" },
     "lineId": { "title": "LineId", "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$" },
     "dlgId": { "title": "DlgId", "type": "string", "pattern": "^dlg\\.[a-z0-9_]+\\.[a-z0-9_]+$" },
+    "words": {
+      "title": "LineWords",
+      "description": "P-07: значимые польские слова строки (гаснущая подпись, тап по слову). Элемент: id слова (в строке стоит его pl или форма из forms) или {pl, lx}: форма ровно как в строке и id слова. Без поля слова ищутся в vocab автоматически.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "title": "LineWord",
+        "anyOf": [
+          { "$ref": "#/$defs/lxId" },
+          {
+            "title": "LineWordForm",
+            "type": "object",
+            "required": ["pl", "lx"],
+            "additionalProperties": false,
+            "properties": { "pl": { "type": "string", "minLength": 1 }, "lx": { "$ref": "#/$defs/lxId" } }
+          }
+        ]
+      }
+    },
     "errorTag": { "title": "ErrorTagId", "type": "string", "pattern": "^(R[1-9]|R10|(orth|gr|ff|ph)\\.[a-z0-9_.]+)$" },
     "cluster": { "title": "Cluster", "enum": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10"] },
     "pos": {

@@ -1,5 +1,6 @@
 // Общий интерфейс шагов урока (ТЗ §3.5, §5.7, I-08): `mount(step, ctx) → Promise<StepResult>`.
 // Каждый тип шага — отдельный модуль в src/ui/exercises/, реестр в registry.ts.
+import type { CaptionMode } from '../../systems/words';
 import type { DiacriticsMode, Verdict } from '../../systems/answer';
 import type { Step, VocabEntry } from '../../types/content';
 import type { KeyboardMode } from '../keyboard';
@@ -58,7 +59,8 @@ export interface ExerciseCtx {
   portraits?: PortraitSource | null;
   /** Настройка `diacritics` (по умолчанию warn), если у шага нет своей `lenient.diacritics`. */
   diacritics: DiacriticsMode;
-  translations: 'tap' | 'always';
+  /** Подпись-перевод реплик `say` (P-07): always / auto / never. */
+  translations: CaptionMode;
   keyboardMode: KeyboardMode;
   /** Для attachKeyboard в тестах; по умолчанию matchMedia. */
   coarse?: boolean;

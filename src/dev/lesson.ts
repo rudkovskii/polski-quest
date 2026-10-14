@@ -5,6 +5,8 @@
 //   reset=1             начать с чистого журнала (в памяти; иначе отдельная база polski-quest-dev, игру не трогает)
 //   sound=1             озвучивать через Web Speech; по умолчанию звука нет (мок `audio:play`: только лог)
 //   passport=1          сразу открыть паспорт (I-11); после урока — кнопка «Паспорт»
+//   dlg=dlg.dev.p07     демо окна диалога P-07 (src/dev/p07.ts)
+//   learn=dlg|lx.a,lx.b слова диалога (или перечисленные) «выучены»: intro + rev, интервал 3 дня (P-07)
 // Каждое событие журнала печатается в консоль `[log] {...}`, озвучка — `[audio] …`.
 // Это склейка слоёв, как main.ts.
 import { startInput } from '../input';
@@ -13,6 +15,7 @@ import { buildContent, getContent, type Content } from '../systems/content';
 import { GameStorage, memoryKV } from '../systems/platform/storage';
 import { el } from '../ui/dom';
 import { loadPortraits, mountPlay } from '../ui/play';
+import { addP07Demo, dialogueWords, learnDrafts } from './p07';
 
 function fixtureContent(): Content {
   const files = import.meta.glob<unknown>(['/tests/fixtures/content-mini/**/*.json'], { eager: true, import: 'default' });
@@ -30,8 +33,10 @@ export async function mountLessonDev(params: URLSearchParams): Promise<void> {
   const lessonId = params.get('id') ?? 'demo.s01';
   const dlgId = params.get('dlg');
   const days = Number(params.get('days') ?? 0) || 0;
-  const useFixture = (dlgId ?? lessonId).includes('.demo.') || lessonId.startsWith('demo.');
+  // С dlg решает id диалога (раньше `dlg=dlg.ch01.*` без `id` уходил в фикстуру из-за id урока по умолчанию).
+  const useFixture = dlgId ? dlgId.includes('.demo.') : lessonId.includes('.demo.') || lessonId.startsWith('demo.');
   const content = useFixture ? fixtureContent() : getContent();
+  if (!useFixture) addP07Demo(content);
 
   const storage = new GameStorage(params.get('reset') ? { kv: memoryKV(), ls: null } : { dbName: 'polski-quest-dev', ls: null });
   await storage.load(Date.now());
@@ -46,6 +51,14 @@ export async function mountLessonDev(params: URLSearchParams): Promise<void> {
 
   let offset = days;
   const clock = { now: () => Date.now() + offset * 86_400_000, mono: () => performance.now() };
+  const learn = params.get('learn');
+  if (learn) {
+    const items = learn === 'dlg' ? (dlgId ? dialogueWords(content, dlgId) : []) : learn.split(',').filter((x) => content.vocab.has(x));
+    // Уже выученные не трогаем: повторный заход не плодит события.
+    const fresh = items.filter((x) => !storage.progress.log.events.some((e) => e.k === 'intro' && e.item === x));
+    for (const d of learnDrafts(fresh, clock.now())) storage.append(d);
+    console.info('[learn]', items.join(', ') || '—');
+  }
   const seen: string[] = [];
   const sound = params.get('sound') === '1';
   bus.on('audio:play', ({ text, slow }) => {
