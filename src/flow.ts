@@ -66,6 +66,11 @@ const MOVE_HINT_MAPS = new Set(['ch01.dworzec', 'ch01.peron']);
 /** Бит дня 1 без цели в мире: играется сам, когда Дима на его карте. */
 export const isAutoBeat = (s: DirectorStep): boolean => s.kind === 'intro' && !s.act && !s.target.npc && !s.target.object && !s.target.plot && !s.target.screen;
 
+/** Шаг, для которого строка «Сейчас» видна и в первые дни (P-12): разговор с человеком, предмет, сон. */
+export function nowShown(s: Pick<DirectorStep, 'kind' | 'target'>): boolean {
+  return s.kind === 'sleep' || (s.kind === 'beat' && !!(s.target.npc || s.target.object));
+}
+
 /** Флаг «Я сохранил ссылку» (тот же, что LINK_SAVED_FLAG в cloud.ts). */
 const LINK_SAVED = 'link.saved';
 /** Экран ссылки уже показан сам (после дня 1). */
@@ -203,7 +208,9 @@ export function startFlow(o: FlowOptions): Flow {
       ...(s.kind === 'done' && s.more3 ? { more3: true } : {}),
       // Подсказка управления (при 3 с бездействия): первые карты с ходьбой дня 1 — зал вокзала и перрон.
       ...(s.kind === 'intro' && MOVE_HINT_MAPS.has(s.target.location) ? { moveHint: true } : {}),
-      ...(nowHidden ? { nowHidden: true } : {}),
+      // P-12: «Сейчас» видна сразу, когда шаг — подойти к человеку/предмету или спать (после турникета 10 с не было
+      // ни строки, ни цели); первые дни прячется только там, где ведёт Казик (полив, вступление).
+      ...(nowHidden && !nowShown(s) ? { nowHidden: true } : {}),
       ...(s.kind === 'spring' ? { spring: true } : {}),
       reason: s.reason,
     };

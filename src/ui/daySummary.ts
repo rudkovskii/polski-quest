@@ -48,7 +48,7 @@ const css = `
 .pq-sleep { width: min(100% - 16px, 520px); max-height: calc(100% - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); margin: auto; padding: 18px;
   display: flex; flex-direction: column; gap: 10px; }
 /* P-12: итог прокручивается, «Dobranoc» прибита к низу окна (на iPhone уезжала под край). */
-.pq-sleep .body { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+.pq-sleep .body { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; padding-right: 8px; scrollbar-gutter: stable; }
 .pq-sleep > .row { flex: none; padding-top: 6px; border-top: 2px solid #d3865f; }
 .pq-sleep h2 { margin: 0; font-size: 24px; color: #543c52; }
 .pq-sleep .stat { display: flex; justify-content: space-between; gap: 12px; font-size: 18px; border-bottom: 2px dotted #c8966b; padding: 4px 0; }
