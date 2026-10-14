@@ -18,7 +18,7 @@ export const WRONG_LINE = 'Jeszcze raz.';
 export const NEAR_LINE = 'Prawie. Jeszcze raz.';
 export const RIGHT_LINE = 'Dobrze!';
 /** Русские подписи реплик отклика (ПОЛИРОВКА §2.10: польское слово + мелкая подпись). */
-const VERDICT_RU: Record<string, string> = { [WRONG_LINE]: 'Ещё раз.', [NEAR_LINE]: 'Почти. Ещё раз.', 'Prawie.': 'Почти.', [RIGHT_LINE]: 'Хорошо!' };
+const VERDICT_RU: Record<string, string> = { [WRONG_LINE]: 'Ещё раз.', [NEAR_LINE]: 'Почти. Ещё раз.', 'Prawie.': 'Почти.', [RIGHT_LINE]: 'Хорошо!', 'Pip!': 'Пип!', 'Hyk!': 'Ик!' };
 /** После стольких неверных попыток появляется «Пропустить», чтобы шаг не держал вечно. */
 export const SKIP_AFTER = 2;
 
@@ -224,6 +224,9 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
     const right = isRight(c);
     // Ошибки уже исправлены по ходу (match): «ещё раз» не нужен; «Prawie.» — если половина пар верна.
     if (!right && spec.noRetry) v.text = c.score > 0 || isNear(c) ? 'Prawie.' : '';
+    // Свои отклики (P-06: турникет «Pip!» / «Hyk!»); одна попытка — без «ещё раз».
+    if (ctx.verdicts) v.text = right ? ctx.verdicts.ok : ctx.verdicts.bad;
+    else if (!right && ctx.oneShot) v.text = '';
     const verdictEl = v.text ? el('span', { class: 'verdict', lang: 'pl' }, v.text, VERDICT_RU[v.text] ? el('small', { class: 'ru', lang: 'ru' }, ` ${VERDICT_RU[v.text]}`) : null) : null;
     const showAnswer = !right || v.cls === 'part';
     const ans = spec.correct();
@@ -237,7 +240,10 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
       // Ошибка объясняет (P-01): ответ, правило одной строкой, перевод — и только потом «Prawie. Jeszcze raz.».
       const rule = ruleLine(ctx, spec, c.tags);
       const gloss = ans ? glossLine(ctx, spec, ans) : null;
+      // Реакция мира (P-06, СЮЖЕТ_v2 §1 п. 10): реплика NPC сцены на первую ошибку шага.
+      const react = ctx.errLine && isFirst ? el('span', { class: 'react', 'data-fb': 'react' }, el('b', {}, `${ctx.errLine.who}: `), el('span', { lang: 'pl' }, ctx.errLine.pl), ctx.errLine.plRu ? el('small', { class: 'ru', lang: 'ru' }, ` ${ctx.errLine.plRu}`) : null) : null;
       feedback(v.cls, [
+        react,
         ...answerParts,
         rule ? el('span', { class: 'rule', 'data-fb': 'rule' }, '💡 ', rule) : null,
         gloss ? el('span', { class: 'gloss', 'data-fb': 'gloss', lang: 'ru' }, gloss) : null,
@@ -245,7 +251,7 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
       ]);
     }
     if (hintBtn) hintBtn.hidden = true;
-    if (right || spec.noRetry) {
+    if (right || spec.noRetry || ctx.oneShot) {
       phase = 'feedback';
       ctx.react?.(right ? 'happy' : 'confused');
       show(nextBtn, true);

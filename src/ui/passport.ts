@@ -10,6 +10,7 @@ import { el } from './dom';
 import type { Overlay } from './overlay/host';
 import { avatarPhotoEl } from './avatar';
 import { BTN, btn, plBtn } from './overlay/kit';
+import { ensureSoundStyle, soundGrid, soundMapModel, type SoundDot } from './soundMap';
 
 export interface PassportPage {
   biome: string;
@@ -31,6 +32,8 @@ export interface PassportModel {
   pages: PassportPage[];
   items: { id: string; title: string; titleRu: string }[];
   canDo: { id: string; ru: string; done: boolean }[];
+  /** Карта звуков (P-06): страница паспорта после турникета; null — диагностики ещё не было. */
+  sounds?: SoundDot[] | null;
 }
 
 /** Флаг печати №1 (вступление, I-13). */
@@ -73,7 +76,7 @@ export function condWords(c: Condition, content: Pick<Content, 'lessons' | 'modu
 export function passportModel(
   content: Content,
   p: Progress,
-  d: Pick<Derived, 'bossResults' | 'lessonsDone'>,
+  d: Pick<Derived, 'bossResults' | 'lessonsDone'> & Partial<Pick<Derived, 'clusterStatus'>>,
   condition?: (c: Condition) => boolean,
 ): PassportModel {
   const cond = condition ?? passportCond(p, d);
@@ -98,7 +101,8 @@ export function passportModel(
       return (m.canDo ?? []).map((x) => ({ id: x.id, ru: x.ru, done }));
     });
   const appearance = appearanceOf(p);
-  return { owner: { appearance, name: appearance.name, fromBooth: hasAppearance(p) }, first, pages, items, canDo };
+  const sounds = d.clusterStatus ? soundMapModel(content, { clusterStatus: d.clusterStatus }) : null;
+  return { owner: { appearance, name: appearance.name, fromBooth: hasAppearance(p) }, first, pages, items, canDo, ...(sounds ? { sounds } : {}) };
 }
 
 const css = `
@@ -121,6 +125,7 @@ export function openPassport(overlay: Overlay, model: PassportModel): Promise<vo
   const layer = overlay.open('pq-passport-layer');
   const doc = layer.el.ownerDocument;
   if (!doc.getElementById('pq-passport-style')) doc.head.append(el('style', { id: 'pq-passport-style' }, css));
+  if (model.sounds) ensureSoundStyle(doc);
   layer.el.style.justifyContent = 'center';
   return new Promise((resolve) => {
     const close = (): void => {
@@ -146,6 +151,8 @@ export function openPassport(overlay: Overlay, model: PassportModel): Promise<vo
               el('div', {}, model.first.note ? el('i', { lang: 'pl' }, model.first.note) : null, el('div', { class: 'muted', lang: 'pl' }, 'Warszawa. Praga · №1')),
             )
           : null,
+        model.sounds ? el('b', { lang: 'pl' }, 'Mapa dźwięków', el('small', { class: 'muted' }, ' · карта звуков')) : null,
+        model.sounds ? el('div', { class: 'page', 'data-page': 'sounds' }, soundGrid(model.sounds)) : null,
         ...model.pages.map((pg) =>
           el(
             'div',

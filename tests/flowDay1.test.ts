@@ -130,7 +130,7 @@ describe('день 1 через склейку режиссёра', () => {
     expect(calls.at(-1)).toBe('line:idle.kazik.1');
     await tap({ location: 'ch01.peron', kind: 'npc', id: 'walizka' });
     expect(calls).toContain('dlg:dlg.ch01.d01_peron');
-    expect(getSetting(store.progress, 'sound.mode')).toBe('mute');
+    expect(getSetting(store.progress, 'sound.mode')).toBe('off');
     expect(f()).toBe('d01.ulica');
   });
 

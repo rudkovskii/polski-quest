@@ -6,7 +6,7 @@
   "efMax": 2.8,
   "fuzz": 0.05,
   "newItemsPerDay": 8,
-  "maxIntroducesPerLesson": 5,
+  "maxIntroducesPerLesson": 3,
   "productionAfterReps": 3,
   "obchodBatch": 15,
   "debtLockThreshold": 60,

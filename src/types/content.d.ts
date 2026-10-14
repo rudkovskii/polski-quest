@@ -7,7 +7,8 @@ export type ModuleId = string;
 export type CharId = string;
 export type ItemId = string;
 export type Cluster = 'R1' | 'R2' | 'R3' | 'R4' | 'R5' | 'R6' | 'R7' | 'R8' | 'R9' | 'R10';
-export type HudElement = 'obchod' | 'pierogi' | 'zloty' | 'passport' | 'map' | 'jars' | 'orders' | 'kitchen' | 'diary';
+export type HudElement =
+  'obchod' | 'express' | 'pierogi' | 'zloty' | 'passport' | 'map' | 'jars' | 'orders' | 'kitchen' | 'diary';
 /**
  * content/characters.json: игрок, NPC, компаньон bobr, кот simba (kind: secret), ТЗ §3.2.
  */
@@ -16,12 +17,45 @@ export type Characters = Character[];
  * content/items.json: только уникальные предметы (билет, ключ), расходников нет (ТЗ §3.8).
  */
 export type Items = Item[];
+/**
+ * Бит вводит систему из schedule (P-06): пропускается, пока она закрыта; показ ставит флаг sys.<entry>
+ */
+export type PaceSystem =
+  | 'walk'
+  | 'obchod'
+  | 'letter'
+  | 'metro'
+  | 'diag'
+  | 'keyboard'
+  | 'shadow'
+  | 'evening'
+  | 'eveningChoice'
+  | 'express'
+  | 'sunday'
+  | 'reallife'
+  | 'map'
+  | 'boss';
 export type LineId = string;
 export type DlgId = string;
 /**
  * Список эффектов (ТЗ §3.9). Эффектов «дать złoty / сердце / карточку» нет и не будет.
  */
 export type Effects = Effect[];
+export type PaceSystem1 =
+  | 'walk'
+  | 'obchod'
+  | 'letter'
+  | 'metro'
+  | 'diag'
+  | 'keyboard'
+  | 'shadow'
+  | 'evening'
+  | 'eveningChoice'
+  | 'express'
+  | 'sunday'
+  | 'reallife'
+  | 'map'
+  | 'boss';
 /**
  * P-07: значимые польские слова строки (гаснущая подпись, тап по слову). Элемент: id слова (в строке стоит его pl или форма из forms) или {pl, lx}: форма ровно как в строке и id слова. Без поля слова ищутся в vocab автоматически.
  *
@@ -64,6 +98,10 @@ export type ErrorTags = ErrorTag[];
  */
 export type Vocab = VocabEntry[];
 /**
+ * Реакция мира на ошибку (P-06, СЮЖЕТ_v2 dNN.<npc>.err): реплика NPC сцены перед правилом
+ */
+export type LineId1 = string;
+/**
  * Шаг урока (ТЗ §3.5), дискриминатор t. Новый тип = ветка здесь + файл в src/ui/exercises/ + тест.
  */
 export type Step =
@@ -86,7 +124,7 @@ export type Lessons = Lesson[];
 /**
  * Реплика из story/lines.json (говорящий — её who), вместо pl/ru
  */
-export type LineId1 = string;
+export type LineId2 = string;
 /**
  * content/modules/<id>/dialogues.json (ТЗ §3.6). У узла ровно одно из next / choices / end (проверяет валидатор). who обязателен у узла с pl, choices или todo; узел line берёт говорящего из story/lines.json; чистый end — без who (I-11).
  */
@@ -213,6 +251,13 @@ export interface Condition {
   hud?: HudElement;
   daysSinceLast?: number;
   stepDone?: 'water' | 'scene' | 'evening' | 'sleep';
+  /**
+   * Номер игрового дня главы (P-06): день 1 длится до флага beat.first_day_done, дальше +1 за каждый засчитанный день. min/max включительно.
+   */
+  gameDay?: {
+    min?: number;
+    max?: number;
+  };
 }
 export interface Character {
   id: CharId;
@@ -351,6 +396,14 @@ export interface Director {
   schema: 1;
   beats: Beat[];
   reveals: Reveal[];
+  /**
+   * Раскрытие систем по игровым дням (P-06, СЮЖЕТ_v2 §3): одна запись = одна новая система дня; with — что входит в неё же (письмо, метро, диагностика у обхода дня 2).
+   */
+  schedule?: ScheduleEntry[];
+  /**
+   * Реплики шагов режиссёра по игровым дням (P-06): полив, сцена, вечер, сон, крючок в итоге дня. Заголовок дня — бит dNN.title. День 1 (P-05): итог — своя карточка в flow.ts, отсюда берётся крючок.
+   */
+  days?: DayLines[];
   spring?: {
     line: LineId;
   };
@@ -361,17 +414,18 @@ export interface Director {
 }
 export interface Beat {
   /**
-   * Флаг показа: beat.<id>; биты дня N — dNN.<сцена> (P-05)
+   * Флаг показа: beat.<id>; биты дня N — dNN.<сцена> (P-05, P-06)
    */
   id: string;
   /**
-   * day1 — сцены первого дня по порядку (P-05): режиссёр ведёт по ним до сна
+   * day1 — сцены первого дня по порядку (P-05): режиссёр ведёт по ним до сна; остальные слоты — дни 2+
    */
   slot: 'start' | 'afterWater' | 'afterScene' | 'beforeSleep' | 'day1';
   /**
-   * Действие склейки (src/flow.ts) сверх эффектов do: карточка рассказчика, Fotobudka, выбор звука, лоток и паспорт, полив, урок у забора, посадка, сон
+   * Действие склейки (src/flow.ts) сверх эффектов do у бита day1: карточка рассказчика, Fotobudka, выбор звука, лоток и паспорт, полив, урок у забора, посадка, сон
    */
   act?: 'card' | 'fotobudka' | 'sound' | 'bazar' | 'water' | 'brzechwa' | 'plant' | 'sleep';
+  system?: PaceSystem;
   once?: boolean;
   if: Condition;
   target: Target;
@@ -407,6 +461,20 @@ export interface Reveal {
   element: HudElement;
   if: Condition;
   line?: LineId;
+}
+export interface ScheduleEntry {
+  day: number;
+  system: PaceSystem1;
+  with?: PaceSystem1[];
+  ru: string;
+}
+export interface DayLines {
+  day: number;
+  water?: LineId[];
+  evening?: LineId[];
+  scene?: LineId[];
+  sleep?: LineId[];
+  hook?: LineId;
 }
 export interface Line {
   id: LineId;
@@ -493,6 +561,10 @@ export interface Phonetics {
 export interface PhoneticCluster {
   id: Cluster;
   title: string;
+  /**
+   * Короткая русская подпись на карте звуков (P-06)
+   */
+  short?: string;
   repairLesson?: Id;
 }
 export interface MinimalPair {
@@ -605,6 +677,7 @@ export interface Lesson {
   minutes: number;
   npc?: CharId;
   location?: Id;
+  errLine?: LineId1;
   /**
    * @maxItems 8
    */
@@ -735,6 +808,10 @@ export interface StepListen {
    * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
    */
   why?: string;
+  /**
+   * Транскрипция кириллицей с ударением для режима без звука (P-06): «прочитай и выбери» вместо «услышь»
+   */
+  tr?: string;
 }
 /**
  * Выбор варианта
@@ -863,6 +940,10 @@ export interface StepDictation {
    * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
    */
   why?: string;
+  /**
+   * Транскрипция кириллицей с ударением для режима без звука (P-06): «прочитай и выбери» вместо «услышь»
+   */
+  tr?: string;
 }
 /**
  * Соединяет пары pl↔ru
@@ -951,6 +1032,10 @@ export interface StepMinimalPair {
    * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
    */
   why?: string;
+  /**
+   * Транскрипция кириллицей с ударением для режима без звука (P-06): «прочитай и выбери» вместо «услышь»
+   */
+  tr?: string;
 }
 /**
  * Тапает ударный слог
@@ -1004,7 +1089,7 @@ export interface DialogueNode {
   pl?: string;
   ru?: string;
   words?: LineWords;
-  line?: LineId1;
+  line?: LineId2;
   /**
    * Реплики ещё нет в СЮЖЕТ.md: в игре [todo: <dlg>.<узел>]
    */

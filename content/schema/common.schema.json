@@ -39,7 +39,7 @@
     },
     "hud": {
       "title": "HudElement",
-      "enum": ["obchod", "pierogi", "zloty", "passport", "map", "jars", "orders", "kitchen", "diary"]
+      "enum": ["obchod", "express", "pierogi", "zloty", "passport", "map", "jars", "orders", "kitchen", "diary"]
     },
     "text2": {
       "title": "Text2",

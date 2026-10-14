@@ -143,7 +143,7 @@
   `lessonVariant` (requires → locked, skipIf → skip, short.if → short) + `lessonOfVariant` (шаги short с исходными id).
   `play.ts` применяет их в `lessonById`; объекты карты с ложным `if` уходят в `world:marks.hidden` (src/day.ts).
 - Режиссёр: чистая `nextStep(directorInput(progress, content, now, {local, activeMin}))` в `src/systems/director.ts`
-  (правила 1–10, слоты битов, `reveals`). Ничего не пишет: флаги `beat.first.f1…f6`, `beat.first_day_done`,
+  (правила 1–10, слоты битов, `reveals`). Ничего не пишет: флаги `beat.d01.*` (день 1, P-05), `beat.first_day_done`, `sys.*` (P-06),
   `beat.<id>`, `hud.<el>`, `spring.<день>`, `stamp.first` ставит склейка `src/flow.ts`. После сна в тот же день — только `done`.
 - Склейка `src/flow.ts`: `link:ready` → запуск сразу в шаг (F1 → `ui/intro.ts`, иначе `world:teleport`, resume —
   урок сразу); `guide:step` / `guide:target` после каждого `progress:changed`; действие шага — тап по цели
@@ -200,6 +200,38 @@
   Компаньона на карте нет, если там стоит NPC `bobr` (в зале вокзала он спрятан `if` — Казик появляется на перроне).
 - Арт: `art/sprites/{fotobudka,train,peron,tablo,kamienica,poslanie,walizka,kapelusz}.sprite.json` + тайлы в `ninja16.json`.
 - Dev: `/?reset=1&mute=1` — весь день с нуля; в скрытой вкладке кадры шагать `window.__pq.game.loop.step(t)`.
+
+## Темп и контент дней 2–14 (P-06, P-08)
+- Игровой день главы: `storyDay` (`src/systems/pace.ts`, атом условия `gameDay: { min, max }`): день 1 — до флага
+  `beat.first_day_done`, дальше +1 за каждый засчитанный день. Пропуск календарных дней день не двигает.
+- Расписание систем — данные `director.json` → `schedule` (одна запись = одна новая система дня, `with` — её части):
+  1 ходьба · 2 обход+письмо+метро+диагностика · 3 клавиатура · 4 «повтори вслух» · 5 вечер · 6 выбор вечера ·
+  7 экспресс (+ воскресенье) · 8 «скажи в жизни» · 14 карта и босс. `systemState` = closed / new / open; показ ставит
+  флаг `sys.<запись>` (склейка `flow.ts`, шаг с `system`), в день не больше одной новой; валидатор — `scheduleIssues`.
+- Сцены по дням: `requires: { gameDay: { min: N } }` у уроков ch01; режиссёр даёт столько сцен, сколько у дня в
+  расписании, + одну с прошлых дней (`sceneQuota`, реплика `sys.kazik.extra_repair`). Биты дней — `director.json`
+  (`dNN.*`, `system` у бита), реплики шагов дня — `director.days` (полив, сцена, вечер, сон, крючок итога).
+- Шаги урока на сегодня: `lessonForToday` (play.ts) — type/dictation до клавиатуры и shadow до дня 4 не играются;
+  без звука — listen/dictation только с `tr` (шаг) или `vocab.tr`, пары — «какое слово значит …».
+- Без звука: настройка `sound.mode: 'on' | 'off'` — один ключ: выбор на перроне в день 1 (P-05, флаги `d01.sound.on|mute` →
+  `applySound` в flow.ts) и переключатель в настройках; старые значения `sound`/`mute` читаются как `on`/`off` (`getSetting`). `derive` выкидывает карточки
+  `lis`; упражнения получают `ctx.silent`; реплика `<id>.mute` подменяет `<id>` (`lineFor`, `muteLines`).
+- Диагностика `ch01.s00`: 12 пунктов, `ctx.oneShot` (ошибка → правило и «Hyk!», без повтора), «Wyjdź» в шапке:
+  выход после ответа пишет `diag` + `lesson` по отвеченному, непроверенные кластеры `unknown` → ремонт полной сценой.
+  Карта звуков — `src/ui/soundMap.ts` сразу после (play.ts) и страница паспорта.
+- Реакция мира на ошибку: `lesson.errLine` (реплика NPC перед правилом, `ctx.errLine`).
+- Сборка для людей: `PQ_RELEASE=1` в CI (`deploy.yml`) — `todo` в любой реплике/узле = ошибка.
+- Dev: `/?reset=1&mute=1&now=+1d` — день 2 (после сна дня 1), `&now=+2d` — день 3 и т.д.; `/?reset=1&mute=1&day=N` — чистый
+  мир сразу в день N (`src/dev/seedDay.ts`: биты `d01.*` и прошлых дней, сцены, диагностика «всё красное»); `window.__pq.flow.step.reason`.
+
+## Стык дня 1 и дней 2–14 (слияние P-05 + P-06)
+- День 1 целиком P-05: `firstDay()` идёт по битам слота `day1`, пока нет `beat.first_day_done`; расписание P-06 в нём не
+  участвует (`systemState` для записей дня 1 — `open`, системы дней 2+ — `closed`, т.к. `storyDay` = 1). Флаг ставит сон
+  дня 1 (`sleepFlow`), со следующего календарного дня `storyDay` = 2 и шаги ведут правила 2–10 с расписанием P-06.
+- Итог дня 1 — своя карточка (`SummaryView`, flow.ts: `d01.ui.summary`, `.umiem`, крючок из `director.days[day 1].hook`),
+  только «Dobranoc». Дни 2+ — `summaryBody` с репликами `director.days[N].sleep` и крючком `.hook`; «ещё 3 минуты» с дня 7.
+- Схема `director`: биты со слотами `start/afterWater/afterScene/beforeSleep` (дни 2+, поле `system`) и `day1` (поле `act`);
+  `schedule`, `days` (включая день 1), атом условия `gameDay`.
 
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.

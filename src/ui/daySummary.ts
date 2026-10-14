@@ -5,7 +5,9 @@
 // «Сегодня ещё ничего, полей хоть пару грядок?» и кнопка экспресса. Крючок (реплика следующей сцены) — I-13.
 import type { Bus } from '../systems/bus';
 import type { Content } from '../systems/content';
-import { deriveContent } from '../systems/derive';
+import { derive, deriveContent } from '../systems/derive';
+import { dayLines, isOpen, lineFor, paceCtxOf } from '../systems/pace';
+import { getSetting } from '../systems/progress';
 import type { EventDraft, LogEvent } from '../systems/log';
 import type { AppendResult, Progress } from '../systems/progress';
 import { retrievalSince, summarizeDay, type DaySummary } from '../systems/session';
@@ -60,7 +62,9 @@ const css = `
 .pq-sleep .remind { font-size: 16px; color: #8f3e56; }
 .pq-sleep .card-line { display: flex; flex-direction: column; gap: 2px; font-size: 20px; font-weight: 700; color: #3a2c38; }
 .pq-sleep .card-line small { font-size: 15px; font-weight: 400; color: #543c52; }
-.pq-sleep .hook { margin-top: 6px; color: #8f3e56; }
+.pq-sleep .card-line.hook { margin-top: 6px; color: #8f3e56; }
+.pq-sleep .hook { font-size: 19px; color: #345a52; }
+.pq-sleep .hook .ru { font-size: 16px; }
 `;
 
 function ensureStyle(doc: Document): void {
@@ -74,12 +78,24 @@ function ensureStyle(doc: Document): void {
 const stat = (label: string, value: string, key: string): HTMLElement =>
   el('div', { class: 'stat', 'data-stat': key }, el('span', {}, label), el('b', {}, value));
 
+/** Реплики итога по игровому дню (P-06): сон дня (`director.days[].sleep`, иначе sys.kazik.sleep) и крючок на завтра. */
+export interface SummaryLines {
+  sleep?: readonly string[];
+  hook?: string;
+}
+
 /** Тело итога (без кнопок): удобно проверять в тестах. */
-export function summaryBody(s: DaySummary, content: Pick<Content, 'vocab' | 'lines'>): HTMLElement[] {
+export function summaryBody(s: DaySummary, content: Pick<Content, 'vocab' | 'lines'>, lines: SummaryLines = {}): HTMLElement[] {
   const pl = (id: string): string => content.vocab.get(id)?.value.pl ?? id;
   const out: HTMLElement[] = [];
-  const line = bobrLine(content, 'kazik.sleep');
-  if (line) out.push(line);
+  for (const id of lines.sleep?.length ? lines.sleep : ['sys.kazik.sleep']) {
+    const line = bobrLine(content, id);
+    if (line) out.push(line);
+  }
+  // Крючок на завтра (ПОЛИРОВКА §2 р. 8): «Jutro: list.» и т.п.
+  const hook = lines.hook ? content.lines.get(lines.hook) : undefined;
+  if (hook?.pl && !hook.todo)
+    out.push(el('div', { class: 'hook', 'data-hook': hook.id }, el('b', { lang: 'pl' }, hook.pl), hook.plRu ? el('span', { class: 'ru' }, ` ${hook.plRu}`) : null));
   if (s.empty) {
     out.push(el('div', { class: 'empty', 'data-empty': true }, 'Сегодня ещё ничего, полей хоть пару грядок?'));
     return out;
@@ -103,7 +119,7 @@ export function summaryBody(s: DaySummary, content: Pick<Content, 'vocab' | 'lin
 /** Тело карточки итога из реплик (день 1). */
 export function summaryCard(v: SummaryView, content: Pick<Content, 'vocab' | 'lines'>): HTMLElement[] {
   const out: HTMLElement[] = [];
-  const line = v.bobr === null ? null : bobrLine(content, v.bobr ?? 'kazik.sleep');
+  const line = v.bobr === null ? null : bobrLine(content, v.bobr ?? 'sys.kazik.sleep');
   if (line) out.push(line);
   const row = (id: string, cls: string): HTMLElement | null => {
     const l = content.lines.get(id);
@@ -126,6 +142,12 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
   const clock = deps.clock ?? { now: () => Date.now(), mono: () => performance.now() };
   const now = clock.now();
   const s = summarizeDay(store.progress, deriveContent(content), now, deps.tz);
+  const pace = paceCtxOf(content, derive(store.progress, deriveContent(content), now, deps.tz), store.progress.world.flags, deps.tz);
+  const dl = dayLines(content.director.days, pace.day);
+  const silent = getSetting(store.progress, 'sound.mode') === 'off';
+  const lines: SummaryLines = { ...(dl?.sleep ? { sleep: dl.sleep.map((id) => lineFor(id, silent, content.lines)) } : {}), ...(dl?.hook ? { hook: dl.hook } : {}) };
+  // «Ещё 3 минуты» — экспресс, система дня 7 (P-06): раньше в итоге только сон.
+  const express = isOpen('express', pace);
   const layer = deps.overlay.open('pq-sleep-layer');
   layer.el.style.justifyContent = 'center';
 
@@ -149,8 +171,8 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
     };
     const main = plBtn(BTN.dobranoc, dobranoc, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'sleep' });
     const actions: HTMLElement[] = [];
-    if (deps.view) {
-      // день 1: только «Dobranoc»
+    if (deps.view || !express) {
+      // день 1 своей карточкой (P-05) — только «Dobranoc»; до дня 7 экспресса нет (P-06)
     } else if (s.empty) actions.push(plBtn(BTN.express, () => finish('express'), '', { 'data-nav': true, 'data-act': 'express' }));
     else actions.push(btn('ещё 3 минуты повторений', () => finish('more3'), 'ghost more3', { 'data-nav': true, 'data-act': 'more3' }));
     actions.push(main);
@@ -169,7 +191,7 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
         : null;
 
     layer.el.replaceChildren(
-      el('div', { class: 'pq-wood pq-sleep', 'data-summary': s.day }, el('h2', {}, 'Итог дня'), ...(deps.view ? summaryCard(deps.view, content) : summaryBody(s, content)), remind, el('div', { class: 'row' }, ...actions)),
+      el('div', { class: 'pq-wood pq-sleep', 'data-summary': s.day }, el('h2', {}, 'Итог дня'), ...(deps.view ? summaryCard(deps.view, content) : summaryBody(s, content, lines)), remind, el('div', { class: 'row' }, ...actions)),
     );
     layer.handle({ cancel: () => (finish('close'), true) });
     queueMicrotask(() => main.focus({ preventScroll: true }));

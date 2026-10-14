@@ -44,7 +44,7 @@ const CHOICES = {
   keyboard: { key: 'keyboard.mode', label: 'Клавиатура на экране', options: [{ value: 'auto', label: 'сама решит' }, { value: 'full', label: 'вся' }, { value: 'strip', label: 'только ą ć ę…' }] },
   dpad: { key: 'controls.dpad', label: 'Крестик управления на экране', options: [{ value: 'auto', label: 'на телефоне' }, { value: 'always', label: 'всегда' }, { value: 'never', label: 'никогда' }] },
   dpadSide: { key: 'controls.dpadSide', label: 'Крестик управления: с какой стороны', options: [{ value: 'left', label: 'слева' }, { value: 'right', label: 'справа' }] },
-  sound: { key: 'sound.mode', label: 'Без звука: задания на слух заменяются чтением', options: [{ value: 'sound', label: 'со звуком' }, { value: 'mute', label: 'без звука' }] },
+  sound: { key: 'sound.mode', label: 'Без звука: задания на слух заменяются чтением', options: [{ value: 'on', label: 'со звуком' }, { value: 'off', label: 'без звука' }] },
   slow: { key: 'audioSlowDefault', label: 'Медленная озвучка сразу', options: [{ value: false, label: 'нет' }, { value: true, label: 'да' }] },
   motion: { key: 'reducedMotion', label: 'Меньше анимации', options: [{ value: false, label: 'нет' }, { value: true, label: 'да' }] },
   debt: { key: 'showDebtNumber', label: 'Сколько слов ждёт полива (на элементах экрана)', options: [{ value: true, label: 'числом' }, { value: false, label: 'словами' }] },

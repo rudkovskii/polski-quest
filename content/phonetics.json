@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "clusters": [
-    { "id": "R1", "title": "Ударение и «честные» гласные", "repairLesson": "ch01.s01" },
-    { "id": "R2", "title": "Знакомые буквы, другие звуки: c, ch/h, w, j, y/i, ó, e", "repairLesson": "ch01.s02" },
-    { "id": "R3", "title": "ł и l", "repairLesson": "ch01.s03" },
-    { "id": "R4", "title": "Твёрдые шипящие: sz, cz, rz/ż, dz, dż", "repairLesson": "ch01.s04" },
-    { "id": "R5", "title": "Мягкий ряд и «две записи одного звука»", "repairLesson": "ch01.s05" },
-    { "id": "R6", "title": "Три ряда рядом: s/sz/ś, c/cz/ć, z/ż/ź", "repairLesson": "ch01.s06" },
-    { "id": "R7", "title": "Носовые ą, ę", "repairLesson": "ch01.s07" },
-    { "id": "R8", "title": "i как знак мягкости (ie, ia, io)", "repairLesson": "ch01.s08" },
-    { "id": "R9", "title": "Кластеры и оглушение", "repairLesson": "ch01.s09" },
-    { "id": "R10", "title": "Один звук — две буквы (только письмо)", "repairLesson": "ch01.s10" }
+    { "id": "R1", "title": "Ударение и «честные» гласные", "short": "ударение", "repairLesson": "ch01.s01" },
+    { "id": "R2", "title": "Знакомые буквы, другие звуки: c, ch/h, w, j, y/i, ó, e", "short": "c, ch, y, ó", "repairLesson": "ch01.s02" },
+    { "id": "R3", "title": "ł и l", "short": "ł и l", "repairLesson": "ch01.s03" },
+    { "id": "R4", "title": "Твёрдые шипящие: sz, cz, rz/ż, dz, dż", "short": "sz, cz, rz", "repairLesson": "ch01.s04" },
+    { "id": "R5", "title": "Мягкий ряд и «две записи одного звука»", "short": "ś, ć, ń", "repairLesson": "ch01.s05" },
+    { "id": "R6", "title": "Три ряда рядом: s/sz/ś, c/cz/ć, z/ż/ź", "short": "три ряда шипящих", "repairLesson": "ch01.s06" },
+    { "id": "R7", "title": "Носовые ą, ę", "short": "ą и ę", "repairLesson": "ch01.s07" },
+    { "id": "R8", "title": "i как знак мягкости (ie, ia, io)", "short": "i смягчает", "repairLesson": "ch01.s08" },
+    { "id": "R9", "title": "Кластеры и оглушение", "short": "оглушение", "repairLesson": "ch01.s09" },
+    { "id": "R10", "title": "Один звук — две буквы (только письмо)", "short": "rz/ż, ó/u на письме", "repairLesson": "ch01.s10" }
   ],
   "pairs": [
     { "id": "mp.woda_wada", "a": "woda", "b": "wada", "cluster": "R1", "ru": ["вода", "недостаток"] },

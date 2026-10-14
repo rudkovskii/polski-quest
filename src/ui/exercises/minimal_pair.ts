@@ -13,7 +13,7 @@ export const minimal_pair: ExerciseModule<StepMinimalPair> = {
   mount(step, ctx) {
     const [a, b] = step.pair;
     const pick = (): 0 | 1 => (step.play === 'random' ? (ctx.random() < 0.5 ? 0 : 1) : step.play);
-    const noAudio = !ctx.audio.has(a) || !ctx.audio.has(b);
+    const noAudio = ctx.silent === true || !ctx.audio.has(a) || !ctx.audio.has(b);
     const sameDiff = step.mode === 'same_diff';
 
     // which: target — какое слово звучит; same_diff: звучат pair[0] и pair[target] (0 = одинаковые).
@@ -28,7 +28,14 @@ export const minimal_pair: ExerciseModule<StepMinimalPair> = {
     const answer = sameDiff ? (target === 0 ? 0 : 1) : order.indexOf(target);
     const opts = optionList(labels, () => run.submit(), { row: true, lang: sameDiff ? undefined : 'pl' });
 
-    const head: (Node | string)[] = noAudio
+    // Без звука (P-06, СЮЖЕТ_v2 §7): «какое слово значит „каша“» по переводу пары, или по транскрипции шага.
+    const pairRu = step.item ? ctx.content?.pair?.(step.item)?.ru : undefined;
+    const meaning = !sameDiff && ctx.silent ? (pairRu?.[target] ?? null) : null;
+    const head: (Node | string)[] = meaning
+      ? [el('span', { class: 'q' }, 'Какое слово значит ', el('b', {}, `«${meaning}»`), '?')]
+      : !sameDiff && ctx.silent && step.tr
+        ? [el('span', { class: 'q' }, 'Как это пишется? ', el('b', { class: 'tr', 'data-tr': '' }, `[${step.tr}]`))]
+        : noAudio
       ? [el('span', { class: 'q' }, sameDiff ? 'Одинаково пишутся? ' : 'Какое слово? ', el('b', { lang: 'pl' }, words.join(' … '))), el('span', { class: 'pq-noaudio' }, '🔇 звука нет')]
       : [
           el('span', { class: 'q' }, sameDiff ? 'Это одно и то же слово?' : 'Какое слово звучит?'),
@@ -56,7 +63,7 @@ export const minimal_pair: ExerciseModule<StepMinimalPair> = {
       },
       hint: () => {
         if (!noAudio) play(true);
-        return 'Медленно. Слушай первую согласную.';
+        return noAudio ? 'Смотри на первую согласную.' : 'Медленно. Слушай первую согласную.';
       },
       focus: () => opts.focusFirst(),
       word: step.pair[target],

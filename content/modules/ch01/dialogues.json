@@ -3,208 +3,143 @@
     "id": "dlg.ch01.bramka",
     "npc": "brzechwa",
     "register": "ty",
-    "start": "kazik",
-    "if": { "cluster": { "id": "R1", "status": "unknown" } },
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 2 } }, { "not": { "lessonDone": "ch01.s00" } }] },
     "nodes": {
-      "kazik": { "who": "bobr", "do": [{ "line": "kazik.diag" }], "next": "hello" },
-      "hello": {
-        "who": "brzechwa",
-        "pl": "Cześć! Jestem Jan Brzechwa. Sprawdzimy, jak słyszysz Warszawę.",
-        "ru": "Привет! Я Ян Бжехва. Проверим, как ты слышишь Варшаву.",
-        "next": "start"
-      },
-      "start": { "who": "dima", "choices": [{ "pl": "Start", "ru": "Начать", "next": "diag" }] },
-      "diag": { "who": "brzechwa", "lesson": "ch01.s00", "next": "result" },
-      "result": { "who": "bobr", "do": [{ "line": "kazik.ch01.diag_result" }], "end": true }
+      "n1": { "line": "d02.kazik.schody.1", "next": "n2" },
+      "n2": { "line": "d02.kazik.schody.2", "next": "n3" },
+      "n3": { "line": "d02.brzechwa.bramka.1", "next": "n4" },
+      "n4": { "line": "d02.brzechwa.bramka.2", "next": "n5" },
+      "n5": { "line": "d02.kazik.bramka.1", "next": "n6" },
+      "n6": { "who": "dima", "choices": [{ "pl": "Słucham!", "ru": "Слушаю!", "next": "n7", "words": ["lx.slucham"] }] },
+      "n7": { "who": "brzechwa", "lesson": "ch01.s00", "next": "end" },
+      "end": { "end": true }
     }
   },
   {
     "id": "dlg.ch01.s01",
     "npc": "brzechwa",
     "register": "ty",
-    "start": "wada",
+    "start": "n1",
     "if": {
       "all": [
-        { "not": { "cluster": { "id": "R1", "status": "unknown" } } },
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 3 } },
         { "not": { "lessonDone": "ch01.s01" } },
         { "not": { "cluster": { "id": "R1", "status": "green" } } }
       ]
     },
     "nodes": {
-      "wada": { "who": "bobr", "do": [{ "line": "kazik.ch01.s01.wada" }], "next": "lesson" },
-      "lesson": { "who": "brzechwa", "lesson": "ch01.s01", "next": "end" },
-      "end": { "who": "dima", "end": true }
-    }
-  },
-  {
-    "id": "dlg.ch01.s05",
-    "npc": "brzechwa",
-    "register": "ty",
-    "start": "lesson",
-    "if": {
-      "all": [
-        { "not": { "cluster": { "id": "R5", "status": "unknown" } } },
-        { "not": { "lessonDone": "ch01.s05" } },
-        { "not": { "cluster": { "id": "R5", "status": "green" } } }
-      ]
-    },
-    "nodes": { "lesson": { "who": "brzechwa", "lesson": "ch01.s05", "next": "end" }, "end": { "who": "dima", "end": true } }
-  },
-  {
-    "id": "dlg.ch01.bobr_kreska",
-    "npc": "brzechwa",
-    "register": "ty",
-    "start": "kreska",
-    "if": { "all": [{ "not": { "cluster": { "id": "R1", "status": "unknown" } } }, { "not": { "flag": "ch01.bobr_kreska" } }] },
-    "nodes": {
-      "kreska": { "who": "brzechwa", "pl": "Bóbr. „Ó” z kreską!", "ru": "Бобр. «Ó» с чёрточкой!", "next": "kazik" },
-      "kazik": { "who": "bobr", "do": [{ "line": "kazik.bobr_kreska" }], "next": "rym" },
-      "rym": {
-        "who": "brzechwa",
-        "pl": "Bóbr... bóbr... Nic się nie rymuje.",
-        "ru": "Бобр... бобр... Ничего не рифмуется.",
-        "do": [{ "setFlag": "ch01.bobr_kreska" }],
-        "end": true
-      }
-    }
-  },
-  {
-    "id": "dlg.ch01.s09",
-    "npc": "brzechwa",
-    "register": "ty",
-    "start": "lesson",
-    "if": {
-      "all": [
-        { "not": { "cluster": { "id": "R9", "status": "unknown" } } },
-        { "not": { "lessonDone": "ch01.s09" } },
-        { "not": { "cluster": { "id": "R9", "status": "green" } } }
-      ]
-    },
-    "nodes": {
-      "lesson": { "who": "brzechwa", "lesson": "ch01.s09", "next": "kazik" },
-      "kazik": { "line": "kazik.ch01.s09.wysiadam", "next": "end" },
+      "n1": { "line": "d03.brzechwa.kiosk.1", "next": "n2" },
+      "n2": { "line": "d03.kazik.kiosk.1", "next": "n3" },
+      "n3": { "line": "d03.brzechwa.kiosk.2", "next": "n4" },
+      "n4": { "who": "brzechwa", "lesson": "ch01.s01", "next": "n5" },
+      "n5": { "line": "d03.kazik.kiosk.2", "next": "n6" },
+      "n6": { "line": "d03.dima.kiosk.1", "next": "n7" },
+      "n7": { "line": "d03.brzechwa.kiosk.3", "next": "n8" },
+      "n8": { "line": "d03.kazik.kiosk.3", "next": "end" },
       "end": { "end": true }
     }
-  },
-  {
-    "id": "dlg.ch01.s10",
-    "npc": "brzechwa",
-    "register": "ty",
-    "start": "lesson",
-    "if": {
-      "all": [
-        { "not": { "cluster": { "id": "R10", "status": "unknown" } } },
-        { "not": { "lessonDone": "ch01.s10" } },
-        { "not": { "cluster": { "id": "R10", "status": "green" } } }
-      ]
-    },
-    "nodes": {
-      "lesson": { "who": "brzechwa", "lesson": "ch01.s10", "next": "kazik" },
-      "kazik": { "line": "kazik.ch01.s10.rzeka", "next": "end" },
-      "end": { "end": true }
-    }
-  },
-  {
-    "id": "dlg.ch01.s11",
-    "npc": "brzechwa",
-    "register": "ty",
-    "start": "kazik",
-    "if": { "all": [{ "not": { "cluster": { "id": "R1", "status": "unknown" } } }, { "not": { "lessonDone": "ch01.s11" } }] },
-    "nodes": {
-      "kazik": { "line": "kazik.dream.gryze", "next": "lesson" },
-      "lesson": { "who": "brzechwa", "lesson": "ch01.s11", "next": "okno" },
-      "okno": { "line": "kazik.simba.okno", "next": "end" },
-      "end": { "end": true }
-    }
-  },
-  {
-    "id": "dlg.ch01.brzechwa",
-    "npc": "brzechwa",
-    "register": "ty",
-    "start": "sluchaj",
-    "if": { "not": { "cluster": { "id": "R1", "status": "unknown" } } },
-    "nodes": { "sluchaj": { "who": "brzechwa", "pl": "Słuchaj Warszawy.", "ru": "Слушай Варшаву.", "end": true } }
   },
   {
     "id": "dlg.ch01.s02",
     "npc": "pan_marek",
     "register": "pan",
-    "start": "juz",
+    "start": "n1",
     "if": {
       "all": [
-        { "not": { "cluster": { "id": "R2", "status": "unknown" } } },
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 4 } },
         { "not": { "lessonDone": "ch01.s02" } },
         { "not": { "cluster": { "id": "R2", "status": "green" } } }
       ]
     },
     "nodes": {
-      "juz": { "who": "pan_marek", "pl": "Już, już!", "ru": "Сейчас-сейчас!", "next": "lesson" },
-      "lesson": { "who": "pan_marek", "lesson": "ch01.s02", "next": "end" },
-      "end": { "who": "dima", "end": true }
+      "n1": { "line": "d04.marek.cart.1", "next": "n2" },
+      "n2": { "line": "d04.kazik.cart.1", "next": "n3" },
+      "n3": { "who": "pan_marek", "lesson": "ch01.s02", "next": "n4" },
+      "n4": { "line": "d04.marek.cart.3", "next": "end" },
+      "end": { "end": true }
     }
   },
   {
     "id": "dlg.ch01.s03",
     "npc": "pan_marek",
     "register": "pan",
-    "start": "kazik",
+    "start": "n1",
     "if": {
       "all": [
-        { "not": { "cluster": { "id": "R3", "status": "unknown" } } },
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 4 } },
         { "not": { "lessonDone": "ch01.s03" } },
         { "not": { "cluster": { "id": "R3", "status": "green" } } }
       ]
     },
     "nodes": {
-      "kazik": { "who": "bobr", "do": [{ "line": "kazik.ch01.s03.slucham" }], "next": "lesson" },
-      "lesson": { "who": "pan_marek", "lesson": "ch01.s03", "next": "end" },
-      "end": { "who": "dima", "end": true }
+      "n1": { "line": "d04.marek.cart.2", "next": "n2" },
+      "n2": { "line": "d04.kazik.cart.2", "next": "n3" },
+      "n3": { "who": "pan_marek", "lesson": "ch01.s03", "next": "n4" },
+      "n4": { "line": "d04.brzechwa.cart.1", "next": "n5" },
+      "n5": { "line": "d04.marek.simba", "next": "end" },
+      "end": { "end": true }
     }
-  },
-  {
-    "id": "dlg.ch01.marek",
-    "npc": "pan_marek",
-    "register": "pan",
-    "start": "juz",
-    "nodes": { "juz": { "who": "pan_marek", "pl": "Już, już!", "ru": "Сейчас-сейчас!", "end": true } }
   },
   {
     "id": "dlg.ch01.s04",
     "npc": "pasazer",
     "register": "pan",
-    "start": "lesson",
+    "start": "n1",
     "if": {
       "all": [
-        { "not": { "cluster": { "id": "R4", "status": "unknown" } } },
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 5 } },
         { "not": { "lessonDone": "ch01.s04" } },
         { "not": { "cluster": { "id": "R4", "status": "green" } } }
       ]
     },
-    "nodes": { "lesson": { "who": "pasazer", "lesson": "ch01.s04", "next": "end" }, "end": { "who": "dima", "end": true } }
+    "nodes": {
+      "n1": { "line": "d05.kazik.wagon.1", "next": "n2" },
+      "n2": { "line": "d05.pasazer.1", "next": "n3" },
+      "n3": { "line": "d05.kazik.wagon.2", "next": "n4" },
+      "n4": { "who": "pasazer", "lesson": "ch01.s04", "next": "n5" },
+      "n5": { "line": "d05.pasazer.2", "next": "end" },
+      "end": { "end": true }
+    }
   },
   {
-    "id": "dlg.ch01.pasazer",
-    "npc": "pasazer",
-    "register": "pan",
-    "start": "nie_szkodzi",
-    "nodes": { "nie_szkodzi": { "who": "pasazer", "pl": "Nie szkodzi.", "ru": "Ничего страшного.", "end": true } }
+    "id": "dlg.ch01.s05",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "n1",
+    "if": {
+      "all": [
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 6 } },
+        { "not": { "lessonDone": "ch01.s05" } },
+        { "not": { "cluster": { "id": "R5", "status": "green" } } }
+      ]
+    },
+    "nodes": { "n1": { "who": "brzechwa", "lesson": "ch01.s05", "next": "n2" }, "n2": { "line": "d06.brzechwa.1", "next": "end" }, "end": { "end": true } }
   },
   {
     "id": "dlg.ch01.s06",
     "npc": "pan_marek",
     "register": "pan",
-    "start": "juz",
+    "start": "n1",
     "if": {
       "all": [
-        { "not": { "cluster": { "id": "R6", "status": "unknown" } } },
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 6 } },
         { "not": { "lessonDone": "ch01.s06" } },
         { "not": { "cluster": { "id": "R6", "status": "green" } } }
       ]
     },
     "nodes": {
-      "juz": { "who": "pan_marek", "pl": "Już, już!", "ru": "Сейчас-сейчас!", "next": "kazik" },
-      "kazik": { "line": "kazik.ch01.s06.ciasto", "next": "lesson" },
-      "lesson": { "who": "pan_marek", "lesson": "ch01.s06", "next": "end" },
+      "n1": { "line": "d06.kazik.cart.1", "next": "n2" },
+      "n2": { "line": "d06.marek.1", "next": "n3" },
+      "n3": { "who": "pan_marek", "lesson": "ch01.s06", "next": "n4" },
+      "n4": { "line": "d06.marek.2", "next": "n5" },
+      "n5": { "line": "d06.kazik.cart.2", "next": "end" },
       "end": { "end": true }
     }
   },
@@ -212,59 +147,126 @@
     "id": "dlg.ch01.s07",
     "npc": "pani_basia",
     "register": "pani",
-    "start": "torby",
+    "start": "n1",
     "if": {
       "all": [
-        { "not": { "cluster": { "id": "R7", "status": "unknown" } } },
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 8 } },
         { "not": { "lessonDone": "ch01.s07" } },
         { "not": { "cluster": { "id": "R7", "status": "green" } } }
       ]
     },
     "nodes": {
-      "torby": { "who": "pani_basia", "todo": true, "next": "lesson" },
-      "lesson": { "who": "pani_basia", "lesson": "ch01.s07", "next": "end" },
+      "n1": { "line": "d08.basia.stairs.1", "next": "n2" },
+      "n2": { "line": "d08.kazik.stairs.1", "next": "n3" },
+      "n3": { "who": "pani_basia", "lesson": "ch01.s07", "next": "n4" },
+      "n4": { "line": "d08.basia.stairs.2", "next": "n5" },
+      "n5": { "line": "d08.basia.stairs.3", "next": "n6" },
+      "n6": { "line": "d08.basia.dzialka", "next": "n7" },
+      "n7": { "line": "d08.basia.simba", "next": "end" },
       "end": { "end": true }
     }
-  },
-  {
-    "id": "dlg.ch01.basia",
-    "npc": "pani_basia",
-    "register": "pani",
-    "start": "gosc",
-    "nodes": { "gosc": { "who": "pani_basia", "pl": "Zawsze jest miejsce dla gościa.", "ru": "Для гостя всегда есть место.", "end": true } }
   },
   {
     "id": "dlg.ch01.s08",
     "npc": "ola",
     "register": "ty",
-    "start": "lesson",
+    "start": "n1",
     "if": {
       "all": [
-        { "not": { "cluster": { "id": "R8", "status": "unknown" } } },
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 9 } },
         { "not": { "lessonDone": "ch01.s08" } },
         { "not": { "cluster": { "id": "R8", "status": "green" } } }
       ]
     },
-    "nodes": { "lesson": { "who": "ola", "lesson": "ch01.s08", "next": "end" }, "end": { "end": true } }
+    "nodes": {
+      "n1": { "line": "d09.ola.1", "next": "n2" },
+      "n2": { "line": "d09.ola.2", "next": "n3" },
+      "n3": { "line": "d09.kasia.1", "next": "n4" },
+      "n4": { "who": "ola", "lesson": "ch01.s08", "next": "n5" },
+      "n5": { "line": "d09.kazik.1", "next": "n6" },
+      "n6": { "line": "d09.kasia.2", "next": "n7" },
+      "n7": { "line": "d09.kazik.2", "next": "n8" },
+      "n8": { "line": "d09.ola.simba", "next": "end" },
+      "end": { "end": true }
+    }
   },
-  { "id": "dlg.ch01.ola", "npc": "ola", "register": "ty", "start": "hej", "nodes": { "hej": { "who": "ola", "todo": true, "end": true } } },
   {
-    "id": "dlg.ch01.kasia",
-    "npc": "kasia",
+    "id": "dlg.ch01.s09",
+    "npc": "brzechwa",
     "register": "ty",
-    "start": "hej",
-    "nodes": { "hej": { "who": "kasia", "todo": true, "end": true } }
+    "start": "n1",
+    "if": {
+      "all": [
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 10 } },
+        { "not": { "lessonDone": "ch01.s09" } },
+        { "not": { "cluster": { "id": "R9", "status": "green" } } }
+      ]
+    },
+    "nodes": {
+      "n1": { "line": "d10.announce.1", "next": "n2" },
+      "n2": { "line": "d10.kazik.1", "next": "n3" },
+      "n3": { "line": "d10.brzechwa.1", "next": "n4" },
+      "n4": { "who": "brzechwa", "lesson": "ch01.s09", "next": "n5" },
+      "n5": { "line": "d10.kazik.2", "next": "end" },
+      "end": { "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.s10",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "n1",
+    "if": {
+      "all": [
+        { "lessonDone": "ch01.s00" },
+        { "gameDay": { "min": 11 } },
+        { "not": { "lessonDone": "ch01.s10" } },
+        { "not": { "cluster": { "id": "R10", "status": "green" } } }
+      ]
+    },
+    "nodes": {
+      "n1": { "line": "d11.brzechwa.1", "next": "n2" },
+      "n2": { "line": "d11.kazik.morze.1", "next": "n3" },
+      "n3": { "who": "brzechwa", "lesson": "ch01.s10", "next": "n4" },
+      "n4": { "line": "d11.brzechwa.2", "next": "end" },
+      "end": { "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.s11",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "n1",
+    "if": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 12 } }, { "not": { "lessonDone": "ch01.s11" } }] },
+    "nodes": {
+      "n1": { "line": "d12.kazik.1", "next": "n2" },
+      "n2": { "who": "brzechwa", "lesson": "ch01.s11", "next": "n3" },
+      "n3": { "line": "d12.kazik.pchac", "next": "n4" },
+      "n4": { "line": "d12.kazik.sklep", "next": "n5" },
+      "n5": { "line": "d12.kazik.simba.1", "next": "end" },
+      "end": { "end": true }
+    }
   },
   {
     "id": "dlg.ch01.s12",
     "npc": "urzedniczka",
     "register": "pani",
-    "start": "numerek",
-    "if": { "not": { "lessonDone": "ch01.s12" } },
+    "start": "n1",
+    "if": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 13 } }, { "not": { "lessonDone": "ch01.s12" } }] },
     "nodes": {
-      "numerek": { "line": "kazik.ch01.s12.most", "next": "po_literze" },
-      "po_literze": { "who": "urzedniczka", "lesson": "ch01.s12", "next": "ratunek" },
-      "ratunek": { "who": "urzedniczka", "lesson": "ch01.s12r", "next": "end" },
+      "n1": { "line": "d13.sign.numerek", "next": "n2" },
+      "n2": { "line": "d13.kazik.numerek.1", "next": "n3" },
+      "n3": { "line": "d13.urzedniczka.1", "next": "n4" },
+      "n4": { "who": "urzedniczka", "lesson": "ch01.s12", "next": "n5" },
+      "n5": { "line": "d13.urzedniczka.2", "next": "n6" },
+      "n6": { "line": "d13.kazik.bilet", "next": "n7" },
+      "n7": { "who": "urzedniczka", "lesson": "ch01.s12r", "next": "n8" },
+      "n8": { "line": "d13.urzedniczka.3", "next": "n9" },
+      "n9": { "line": "d13.konduktor.1", "next": "n10" },
+      "n10": { "line": "d13.kazik.simba", "next": "end" },
       "end": { "end": true }
     }
   },
@@ -272,37 +274,32 @@
     "id": "dlg.ch01.s12r",
     "npc": "urzedniczka",
     "register": "pani",
-    "start": "ratunek",
-    "if": { "not": { "lessonDone": "ch01.s12r" } },
-    "nodes": { "ratunek": { "who": "urzedniczka", "lesson": "ch01.s12r", "next": "end" }, "end": { "end": true } }
-  },
-  {
-    "id": "dlg.ch01.urzedniczka",
-    "npc": "urzedniczka",
-    "register": "pani",
-    "start": "numerek",
-    "nodes": { "numerek": { "who": "urzedniczka", "todo": true, "end": true } }
+    "start": "n1",
+    "if": { "all": [{ "lessonDone": "ch01.s12" }, { "gameDay": { "min": 13 } }, { "not": { "lessonDone": "ch01.s12r" } }] },
+    "nodes": {
+      "n1": { "line": "d13.urzedniczka.2", "next": "n2" },
+      "n2": { "line": "d13.kazik.bilet", "next": "n3" },
+      "n3": { "who": "urzedniczka", "lesson": "ch01.s12r", "next": "n4" },
+      "n4": { "line": "d13.urzedniczka.3", "next": "n5" },
+      "n5": { "line": "d13.konduktor.1", "next": "end" },
+      "end": { "end": true }
+    }
   },
   {
     "id": "dlg.ch01.boss",
     "npc": "konduktor",
     "register": "pan",
-    "start": "bilety",
+    "start": "n1",
     "if": {
-      "all": [{ "lessonDone": "ch01.s11" }, { "lessonDone": "ch01.s12" }, { "lessonDone": "ch01.s12r" }, { "not": { "flag": "ch01.done" } }]
+      "all": [
+        { "lessonDone": "ch01.s11" },
+        { "lessonDone": "ch01.s12" },
+        { "lessonDone": "ch01.s12r" },
+        { "gameDay": { "min": 14 } },
+        { "not": { "flag": "ch01.done" } }
+      ]
     },
-    "nodes": {
-      "bilety": { "who": "konduktor", "pl": "Bilety do kontroli!", "ru": "Билеты к проверке!", "next": "boss" },
-      "boss": { "who": "konduktor", "lesson": "ch01.boss", "next": "end" },
-      "end": { "end": true }
-    }
-  },
-  {
-    "id": "dlg.ch01.konduktor",
-    "npc": "konduktor",
-    "register": "pan",
-    "start": "czeka",
-    "nodes": { "czeka": { "who": "konduktor", "todo": true, "end": true } }
+    "nodes": { "n1": { "line": "d14.konduktor.1", "next": "n2" }, "n2": { "who": "konduktor", "lesson": "ch01.boss", "next": "end" }, "end": { "end": true } }
   },
   {
     "id": "dlg.ch01.d01_peron",
@@ -361,5 +358,278 @@
     "nodes": {
       "idle": { "line": "idle.hela.1", "end": true }
     }
+  },
+  {
+    "id": "dlg.ch01.list",
+    "npc": "bobr",
+    "register": "ty",
+    "start": "n1",
+    "if": { "not": { "always": true } },
+    "nodes": {
+      "n1": { "line": "d02.kazik.mail.1", "next": "n2" },
+      "n2": { "line": "d02.letter.brzechwa", "next": "n3" },
+      "n3": { "line": "d02.kazik.mail.2", "next": "n4" },
+      "n4": { "line": "d02.kazik.mail.3", "next": "end" },
+      "end": { "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.peron",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "n1",
+    "if": { "not": { "always": true } },
+    "nodes": {
+      "n1": { "line": "d02.brzechwa.peron.1", "next": "n2" },
+      "n2": { "line": "d02.kazik.peron.1", "next": "n3" },
+      "n3": { "line": "d02.brzechwa.peron.2", "next": "end" },
+      "end": { "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.tabliczka",
+    "npc": "bobr",
+    "register": "ty",
+    "start": "n1",
+    "if": { "not": { "always": true } },
+    "nodes": {
+      "n1": { "line": "d03.kazik.evening.1", "next": "n2" },
+      "n2": { "line": "d03.kazik.evening.2", "next": "n3" },
+      "n3": { "line": "d03.kazik.keyboard.1", "next": "n4" },
+      "n4": { "line": "d03.kazik.keyboard.2", "next": "n5" },
+      "n5": { "who": "bobr", "lesson": "ch01.tabliczka", "next": "n6" },
+      "n6": { "line": "d03.kazik.evening.3", "next": "end" },
+      "end": { "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.k",
+    "npc": "bobr",
+    "register": "ty",
+    "start": "n1",
+    "if": { "not": { "always": true } },
+    "nodes": {
+      "n1": { "line": "d07.kazik.zaraz", "next": "n2" },
+      "n2": { "line": "d07.kazik.k.1", "next": "n3" },
+      "n3": { "line": "d07.passport.note", "next": "n4" },
+      "n4": { "line": "d07.kazik.k.2", "next": "end" },
+      "end": { "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.adwokat",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "n1",
+    "if": { "not": { "always": true } },
+    "nodes": {
+      "n1": { "line": "d10.brzechwa.k.1", "next": "n2" },
+      "n2": { "line": "d10.brzechwa.k.2", "next": "n3" },
+      "n3": { "line": "d10.brzechwa.k.3", "next": "n4" },
+      "n4": { "line": "d10.kazik.k.1", "next": "end" },
+      "end": { "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.bobr_kreska",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "n1",
+    "if": { "not": { "always": true } },
+    "nodes": {
+      "n1": { "line": "d11.brzechwa.bobr.1", "next": "n2" },
+      "n2": { "line": "d11.kazik.bobr.1", "next": "n3" },
+      "n3": { "line": "d11.brzechwa.bobr.2", "next": "end" },
+      "end": { "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.most",
+    "npc": "bobr",
+    "register": "ty",
+    "start": "n1",
+    "if": { "not": { "always": true } },
+    "nodes": {
+      "n1": { "line": "d14.kazik.bridge.1", "next": "n2" },
+      "n2": { "line": "d14.kazik.bridge.2", "next": "n3" },
+      "n3": { "line": "d14.letter.chopin", "next": "n4" },
+      "n4": { "line": "d14.kazik.letter", "next": "end" },
+      "end": { "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.idle_brzechwa_2",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 3 } }, { "weekday": [2, 5] }] },
+    "nodes": { "n1": { "line": "idle.brzechwa.2", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_brzechwa_3",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 4 } }, { "weekday": [3, 6] }] },
+    "nodes": { "n1": { "line": "idle.brzechwa.3", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_brzechwa_1",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "n1",
+    "if": { "gameDay": { "min": 2 } },
+    "nodes": { "n1": { "line": "idle.brzechwa.1", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_marek_3",
+    "npc": "pan_marek",
+    "register": "pan",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 4 } }, { "weekday": [1] }] },
+    "nodes": { "n1": { "line": "idle.marek.3", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_marek_2",
+    "npc": "pan_marek",
+    "register": "pan",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 4 } }, { "weekday": [3, 5, 7] }] },
+    "nodes": { "n1": { "line": "idle.marek.2", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_marek_1",
+    "npc": "pan_marek",
+    "register": "pan",
+    "start": "n1",
+    "if": { "gameDay": { "min": 4 } },
+    "nodes": { "n1": { "line": "idle.marek.1", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_pasazer_2",
+    "npc": "pasazer",
+    "register": "pan",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 5 } }, { "weekday": [2, 4, 6] }] },
+    "nodes": { "n1": { "line": "idle.pasazer.2", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_pasazer_1",
+    "npc": "pasazer",
+    "register": "pan",
+    "start": "n1",
+    "if": { "gameDay": { "min": 5 } },
+    "nodes": { "n1": { "line": "idle.pasazer.1", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_basia_2",
+    "npc": "pani_basia",
+    "register": "pani",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 8 } }, { "weekday": [2, 5] }] },
+    "nodes": { "n1": { "line": "idle.basia.2", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_basia_3",
+    "npc": "pani_basia",
+    "register": "pani",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 8 } }, { "weekday": [3, 6] }] },
+    "nodes": { "n1": { "line": "idle.basia.3", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_basia_1",
+    "npc": "pani_basia",
+    "register": "pani",
+    "start": "n1",
+    "if": { "gameDay": { "min": 8 } },
+    "nodes": { "n1": { "line": "idle.basia.1", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_ola_2",
+    "npc": "ola",
+    "register": "ty",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 9 } }, { "weekday": [2, 4, 6] }] },
+    "nodes": { "n1": { "line": "idle.ola.2", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_ola_1",
+    "npc": "ola",
+    "register": "ty",
+    "start": "n1",
+    "if": { "gameDay": { "min": 9 } },
+    "nodes": { "n1": { "line": "idle.ola.1", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_kasia_2",
+    "npc": "kasia",
+    "register": "ty",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 9 } }, { "weekday": [2, 4, 6] }] },
+    "nodes": { "n1": { "line": "idle.kasia.2", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_kasia_1",
+    "npc": "kasia",
+    "register": "ty",
+    "start": "n1",
+    "if": { "gameDay": { "min": 9 } },
+    "nodes": { "n1": { "line": "idle.kasia.1", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_urzedniczka_2",
+    "npc": "urzedniczka",
+    "register": "pani",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 13 } }, { "weekday": [2, 4, 6] }] },
+    "nodes": { "n1": { "line": "idle.urzedniczka.2", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_urzedniczka_1",
+    "npc": "urzedniczka",
+    "register": "pani",
+    "start": "n1",
+    "if": { "gameDay": { "min": 13 } },
+    "nodes": { "n1": { "line": "idle.urzedniczka.1", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_konduktor_2",
+    "npc": "konduktor",
+    "register": "pan",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 9 } }, { "weekday": [2, 4, 6] }] },
+    "nodes": { "n1": { "line": "idle.konduktor.2", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_konduktor_1",
+    "npc": "konduktor",
+    "register": "pan",
+    "start": "n1",
+    "if": { "gameDay": { "min": 9 } },
+    "nodes": { "n1": { "line": "idle.konduktor.1", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_kazik_2",
+    "npc": "bobr",
+    "register": "ty",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 2 } }, { "weekday": [2, 5] }] },
+    "nodes": { "n1": { "line": "idle.kazik.2", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_kazik_3",
+    "npc": "bobr",
+    "register": "ty",
+    "start": "n1",
+    "if": { "all": [{ "gameDay": { "min": 3 } }, { "weekday": [3, 6] }] },
+    "nodes": { "n1": { "line": "idle.kazik.3", "next": "end" }, "end": { "end": true } }
+  },
+  {
+    "id": "dlg.ch01.idle_kazik_1",
+    "npc": "bobr",
+    "register": "ty",
+    "start": "n1",
+    "nodes": { "n1": { "line": "idle.kazik.1", "next": "end" }, "end": { "end": true } }
   }
 ]

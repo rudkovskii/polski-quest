@@ -24,6 +24,7 @@
       "minutes": { "type": "number", "minimum": 1, "maximum": 15 },
       "npc": { "$ref": "common.schema.json#/$defs/charId" },
       "location": { "$ref": "common.schema.json#/$defs/id" },
+      "errLine": { "$ref": "common.schema.json#/$defs/lineId", "description": "Реакция мира на ошибку (P-06, СЮЖЕТ_v2 dNN.<npc>.err): реплика NPC сцены перед правилом" },
       "introduces": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lxId" }, "maxItems": 8 },
       "warmup": {
         "type": "object",

@@ -16,12 +16,13 @@
         "required": ["id", "slot", "if", "target"],
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$", "description": "Флаг показа: beat.<id>; биты дня N — dNN.<сцена> (P-05)" },
-          "slot": { "enum": ["start", "afterWater", "afterScene", "beforeSleep", "day1"], "description": "day1 — сцены первого дня по порядку (P-05): режиссёр ведёт по ним до сна" },
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$", "description": "Флаг показа: beat.<id>; биты дня N — dNN.<сцена> (P-05, P-06)" },
+          "slot": { "enum": ["start", "afterWater", "afterScene", "beforeSleep", "day1"], "description": "day1 — сцены первого дня по порядку (P-05): режиссёр ведёт по ним до сна; остальные слоты — дни 2+" },
           "act": {
             "enum": ["card", "fotobudka", "sound", "bazar", "water", "brzechwa", "plant", "sleep"],
-            "description": "Действие склейки (src/flow.ts) сверх эффектов do: карточка рассказчика, Fotobudka, выбор звука, лоток и паспорт, полив, урок у забора, посадка, сон"
+            "description": "Действие склейки (src/flow.ts) сверх эффектов do у бита day1: карточка рассказчика, Fotobudka, выбор звука, лоток и паспорт, полив, урок у забора, посадка, сон"
           },
+          "system": { "$ref": "#/$defs/system", "description": "Бит вводит систему из schedule (P-06): пропускается, пока она закрыта; показ ставит флаг sys.<entry>" },
           "once": { "type": "boolean" },
           "if": { "$ref": "common.schema.json#/$defs/cond" },
           "target": { "$ref": "common.schema.json#/$defs/target" },
@@ -44,6 +45,40 @@
         }
       }
     },
+    "schedule": {
+      "type": "array",
+      "description": "Раскрытие систем по игровым дням (P-06, СЮЖЕТ_v2 §3): одна запись = одна новая система дня; with — что входит в неё же (письмо, метро, диагностика у обхода дня 2).",
+      "items": {
+        "title": "ScheduleEntry",
+        "type": "object",
+        "required": ["day", "system", "ru"],
+        "additionalProperties": false,
+        "properties": {
+          "day": { "type": "integer", "minimum": 1 },
+          "system": { "$ref": "#/$defs/system" },
+          "with": { "type": "array", "items": { "$ref": "#/$defs/system" } },
+          "ru": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "days": {
+      "type": "array",
+      "description": "Реплики шагов режиссёра по игровым дням (P-06): полив, сцена, вечер, сон, крючок в итоге дня. Заголовок дня — бит dNN.title. День 1 (P-05): итог — своя карточка в flow.ts, отсюда берётся крючок.",
+      "items": {
+        "title": "DayLines",
+        "type": "object",
+        "required": ["day"],
+        "additionalProperties": false,
+        "properties": {
+          "day": { "type": "integer", "minimum": 1 },
+          "water": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
+          "evening": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
+          "scene": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
+          "sleep": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
+          "hook": { "$ref": "common.schema.json#/$defs/lineId" }
+        }
+      }
+    },
     "spring": {
       "type": "object",
       "required": ["line"],
@@ -60,6 +95,12 @@
         "line": { "$ref": "common.schema.json#/$defs/lineId" },
         "more3Line": { "$ref": "common.schema.json#/$defs/lineId" }
       }
+    }
+  },
+  "$defs": {
+    "system": {
+      "title": "PaceSystem",
+      "enum": ["walk", "obchod", "letter", "metro", "diag", "keyboard", "shadow", "evening", "eveningChoice", "express", "sunday", "reallife", "map", "boss"]
     }
   }
 }

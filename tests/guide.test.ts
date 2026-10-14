@@ -134,7 +134,7 @@ describe('ui/guide: строка «Сейчас», пузырь, раскрыт�
   });
   afterEach(() => root.remove());
 
-  const view = (o: Partial<GuideStepView> = {}): GuideStepView => ({ key: 'water|', kind: 'water', label: 'полей грядки', here: true, reason: '5', line: 'kazik.water.due', ...o });
+  const view = (o: Partial<GuideStepView> = {}): GuideStepView => ({ key: 'water|', kind: 'water', label: 'полей грядки', here: true, reason: '5', line: 'sys.kazik.obchod', ...o });
 
   it('строка «Сейчас» видна в локации; тап — guide:act, если цель здесь', () => {
     const bus = testBus();
@@ -159,27 +159,29 @@ describe('ui/guide: строка «Сейчас», пузырь, раскрыт�
     bus.emit('guide:step', { step: view() });
     const bubble = root.querySelector<HTMLElement>('.pq-bubble')!;
     expect(bubble.hidden).toBe(false);
-    expect(bubble.dataset.line).toBe('kazik.water.due');
+    expect(bubble.dataset.line).toBe('sys.kazik.obchod');
     for (let i = 0; i < 10 && !bubble.hidden; i++) bubble.click(); // тап листает страницы, после последней — гаснет
     expect(bubble.hidden).toBe(true);
     bus.emit('guide:step', { step: view() });
     expect(bubble.hidden).toBe(true); // тот же шаг — не повторяется
-    bus.emit('guide:step', { step: view({ key: 'sleep|', kind: 'sleep', line: 'kazik.sleep' }) });
-    expect(bubble.dataset.line).toBe('kazik.sleep');
+    bus.emit('guide:step', { step: view({ key: 'sleep|', kind: 'sleep', line: 'sys.kazik.sleep' }) });
+    expect(bubble.dataset.line).toBe('sys.kazik.sleep');
   });
   it('реплика-заглушка (todo) в игре не показывается, в dev — [todo: id]', () => {
+    // В контенте заглушек больше нет (P-06): своя реплика-todo.
+    const withTodo = { ...content, lines: new Map([...content.lines, ['test.todo', { id: 'test.todo', who: 'bobr', todo: true }]]) } as typeof content;
     const bus = testBus();
-    mountGuide(root, { bus, content });
+    mountGuide(root, { bus, content: withTodo });
     bus.emit('world:location', { id: 'ch01.dzialka', controls: 'tap' });
-    bus.emit('guide:step', { step: view({ key: 'done|', kind: 'done', line: 'kazik.done' }) });
+    bus.emit('guide:step', { step: view({ key: 'done|', kind: 'done', line: 'test.todo' }) });
     expect(root.querySelector<HTMLElement>('.pq-bubble')!.hidden).toBe(true);
     const root2 = document.createElement('div');
     document.body.append(root2);
     const bus2 = testBus();
-    mountGuide(root2, { bus: bus2, content, dev: true });
+    mountGuide(root2, { bus: bus2, content: withTodo, dev: true });
     bus2.emit('world:location', { id: 'ch01.dzialka', controls: 'tap' });
-    bus2.emit('guide:step', { step: view({ key: 'done|', kind: 'done', line: 'kazik.done', more3: true }) });
-    expect(root2.querySelector('.pq-bubble')!.textContent).toContain('[todo: kazik.done]');
+    bus2.emit('guide:step', { step: view({ key: 'done|', kind: 'done', line: 'test.todo', more3: true }) });
+    expect(root2.querySelector('.pq-bubble')!.textContent).toContain('[todo: test.todo]');
     const more: string[] = [];
     bus2.on('guide:more3', () => more.push('x'));
     root2.querySelector<HTMLElement>('[data-act=more3]')!.click();
@@ -193,9 +195,9 @@ describe('ui/guide: строка «Сейчас», пузырь, раскрыт�
     root.append(btn);
     mountGuide(root, { bus, content });
     bus.emit('world:location', { id: 'ch01.dzialka', controls: 'tap' });
-    bus.emit('guide:reveal', { element: 'jars', line: 'kazik.jar.first' });
+    bus.emit('guide:reveal', { element: 'jars', line: 'sys.kazik.jar.first' });
     expect(btn.classList.contains('pq-reveal')).toBe(true);
-    expect(root.querySelector<HTMLElement>('.pq-bubble')!.dataset.line).toBe('kazik.jar.first');
+    expect(root.querySelector<HTMLElement>('.pq-bubble')!.dataset.line).toBe('sys.kazik.jar.first');
   });
   it('подсказка управления — только после 3 с без ввода: пиктограмма клавиш (Mac) или пульс d-pad и «A» (телефон)', () => {
     vi.useFakeTimers();
@@ -281,7 +283,7 @@ describe('ui/guide: пузырь Казика в мире, строка «Сей
     document.body.append(root);
   });
   afterEach(() => root.remove());
-  const view = (o: Partial<GuideStepView> = {}): GuideStepView => ({ key: 'water|', kind: 'water', label: 'полей грядки', here: true, reason: '5', line: 'kazik.water.due', ...o });
+  const view = (o: Partial<GuideStepView> = {}): GuideStepView => ({ key: 'water|', kind: 'water', label: 'полей грядки', here: true, reason: '5', line: 'sys.kazik.obchod', ...o });
 
   it('реплика режется на страницы до 2 строк', () => {
     const pages = bubblePages({ pl: 'Idziemy!', ru: 'Идём!', rus: 'Это не огурец, это слово. Подвяло - значит, пора вспомнить. Полей вот это одно, и пойдём дальше к реке, там тоже дела.' });

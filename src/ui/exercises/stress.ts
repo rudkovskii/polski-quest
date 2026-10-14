@@ -9,7 +9,7 @@ import type { ExerciseModule } from './types';
 export const stress: ExerciseModule<StepStress> = {
   graded: true,
   mount(step, ctx) {
-    const canPlay = step.say !== false && ctx.audio.has(step.word);
+    const canPlay = step.say !== false && !ctx.silent && ctx.audio.has(step.word);
     const opts = optionList(step.syllables, () => run.submit(), { row: true, lang: 'pl' });
     const run = runGraded<number>(ctx, {
       kind: 'stress',

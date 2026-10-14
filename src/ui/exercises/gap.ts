@@ -17,7 +17,12 @@ export const gap: ExerciseModule<StepGap> = {
     const sentence = el('div', { class: 'pq-gap', lang: 'pl' }, before, slot, after);
     const accept = step.accept ?? [step.answer];
     const head: (Node | string)[] = [el('span', { class: 'q' }, 'Заполни пропуск')];
-    if (step.say && ctx.audio.has(step.say)) head.push(...audioButtons(ctx.audio, step.say));
+    // Без звука (P-06): вместо ▶ — транскрипция слова шага, если есть.
+    if (step.say && !ctx.silent && ctx.audio.has(step.say)) head.push(...audioButtons(ctx.audio, step.say));
+    else if (step.say && ctx.silent) {
+      const tr = (step.item ? ctx.content?.vocab(step.item)?.tr : undefined);
+      if (tr) head.push(el('b', { class: 'tr', 'data-tr': '' }, `[${tr}]`));
+    }
     const full = `${before}${step.answer}${after}`;
     const item = step.item ? ctx.content?.vocab(step.item) : undefined;
     const common = {

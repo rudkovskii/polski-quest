@@ -18,6 +18,7 @@
         "properties": {
           "id": { "$ref": "common.schema.json#/$defs/cluster" },
           "title": { "type": "string", "minLength": 1 },
+          "short": { "type": "string", "minLength": 1, "description": "Короткая русская подпись на карте звуков (P-06)" },
           "repairLesson": { "$ref": "common.schema.json#/$defs/id" }
         }
       }

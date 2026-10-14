@@ -102,6 +102,9 @@ export const BTN = {
   round: { pl: 'Jeszcze runda', ru: 'Ещё раунд' },
   start: { pl: 'Zaczynamy', ru: 'Начать' },
   more: { pl: 'Dalej', ru: 'Продолжить' },
+  exit: { pl: 'Wyjdź', ru: 'Выйти' },
+  fish: { pl: 'Ryby', ru: 'Рыбалка' },
+  sign: { pl: 'Tabliczka', ru: 'Табличка' },
 } as const satisfies Record<string, PlLabel>;
 
 export function plLabel(l: PlLabel): DocumentFragment {

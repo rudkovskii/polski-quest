@@ -10,7 +10,8 @@ export const shadow: ExerciseModule<StepShadow> = {
   graded: false,
   mount(step, ctx) {
     const times = Math.max(1, Math.min(3, step.repeat));
-    const canPlay = ctx.audio.has(step.pl);
+    // Без звука (P-06, СЮЖЕТ_v2 §7): «Скажи про себя» — без проверки, как и со звуком.
+    const canPlay = !ctx.silent && ctx.audio.has(step.pl);
     let done = 0;
     const ru = step.ru ? el('div', { class: 'pq-line-ru', lang: 'ru' }, step.ru) : null;
     const body = el(
@@ -18,11 +19,11 @@ export const shadow: ExerciseModule<StepShadow> = {
       { class: 'pq-ex-body' },
       el('div', { class: 'pq-big', lang: 'pl' }, step.pl),
       ru,
-      el('div', { class: 'pq-line-tools' }, ...(canPlay ? audioButtons(ctx.audio, step.pl) : [el('span', { class: 'pq-noaudio' }, '🔇 звука нет — прочитай вслух')])),
+      el('div', { class: 'pq-line-tools' }, ...(canPlay ? audioButtons(ctx.audio, step.pl) : [el('span', { class: 'pq-noaudio' }, ctx.silent ? 'скажи про себя, губами' : '🔇 звука нет — прочитай вслух')])),
     );
     // Без рода (плейтест Марины): «Повторено», не «Повторил».
     const label = (): PlLabel => (times > 1 ? { pl: `Powtórzone (${done}/${times})`, ru: 'Повторено' } : { pl: 'Powtórzone', ru: 'Повторено' });
-    const { result, next } = runPlain(ctx, [el('span', { class: 'q' }, 'Послушай и повтори вслух')], body, {
+    const { result, next } = runPlain(ctx, [el('span', { class: 'q' }, ctx.silent ? 'Скажи про себя' : 'Послушай и повтори вслух')], body, {
       label: label(),
       onNext: () => {
         done++;

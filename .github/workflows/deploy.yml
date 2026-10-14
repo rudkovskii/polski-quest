@@ -28,7 +28,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install Pillow==12.2.0
+      # P-06: сборка для людей — заглушка `todo` в любой реплике или узле диалога валит validate и build.
       - run: npm run check
+        env:
+          PQ_RELEASE: '1'
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist

@@ -238,6 +238,7 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
     const q = queue.shift();
     if (!q) return;
     showLine(q.id);
+    bubble.dataset.key = q.key;
   }
 
   /** Казик говорит, и он виден на карте: пузырь над ним; иначе — угловой с портретом. */
@@ -383,8 +384,11 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
       const changed = s?.key !== step?.key;
       step = s;
       if (changed) {
+        // Реплики битов и раскрытий (`reveal.*`: заголовок дня, «Wszystko podlane») не привязаны к шагу (P-06).
+        const keep = queue.filter((q) => q.key.startsWith('reveal.'));
         queue.length = 0;
-        if (!bubble.hidden) hideBubble();
+        queue.push(...keep);
+        if (!bubble.hidden && !bubble.dataset.key?.startsWith('reveal.')) hideBubble();
       }
       if (!s?.nowHidden) nowIdle = false;
       paintBar();

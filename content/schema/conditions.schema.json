@@ -82,6 +82,16 @@
     },
     "hud": { "$ref": "common.schema.json#/$defs/hud" },
     "daysSinceLast": { "type": "integer", "minimum": 0 },
-    "stepDone": { "enum": ["water", "scene", "evening", "sleep"] }
+    "stepDone": { "enum": ["water", "scene", "evening", "sleep"] },
+    "gameDay": {
+      "type": "object",
+      "description": "Номер игрового дня главы (P-06): день 1 длится до флага beat.first_day_done, дальше +1 за каждый засчитанный день. min/max включительно.",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "min": { "type": "integer", "minimum": 1 },
+        "max": { "type": "integer", "minimum": 1 }
+      }
+    }
   }
 }

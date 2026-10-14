@@ -41,6 +41,11 @@ export interface ObchodOptions {
   limit?: number;
   /** Вечер: пары этого кластера первыми. */
   cluster?: string;
+  /**
+   * Выбор вечера (P-06, день 6+): Казик спрашивает «рыбалка или табличка?». Рыбалка — пары на звуки (без
+   * звука — «какое слово значит …»), табличка — написать знакомые слова с экранной клавиатурой.
+   */
+  choose?: boolean;
 }
 
 export interface ObchodResult {
@@ -197,6 +202,17 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
   const layer = deps.overlay.open('pq-obchod-layer');
   try {
     if (o.practice && o.fromItem) return await practiceOne(deps, layer, o.fromItem);
+    if (evening && o.choose) {
+      const pick = await panel(layer, WIECZOR, [bobrLine(content, 'd06.kazik.evening.1') ?? bobrLine(content, 'sys.kazik.evening')], [
+        { act: 'ryby', label: BTN.fish, primary: true },
+        { act: 'tabliczka', label: BTN.sign },
+      ], 'ryby');
+      if (pick === 'tabliczka') {
+        // Табличка: до phoneticPerDay знакомых слов набрать по-польски (карточка pro, если она есть и пора).
+        const items = Object.keys(d0.cards).filter((c) => c.endsWith('#rec')).map((c) => parseCardId(c)!.item).slice(0, t.phoneticPerDay);
+        plan.cards = items.map((it) => `${it}#pro`);
+      }
+    }
     if (o.fromItem && !express && !evening) {
       const g = gardenItems(d0, now0, t).find((x) => x.item === o.fromItem);
       if (!g?.dueCard) {
@@ -247,7 +263,7 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
     // Ждут полива сегодня = растения с «!» (братья политых слов ждут завтра, их в «ещё раунд» не зовём).
     const left = gardenItems(d1, now1, t).filter((g) => g.dueCard).length;
     if (answered > 0) {
-      const seg: Seg = o.more3 ? 'more3' : express ? 'express' : evening ? 'evening' : 'water';
+      const seg: Seg = o.more3 ? 'more3' : express ? 'express' : evening || o.choose ? 'evening' : 'water';
       write(deps, { k: 'seg', ts: now1, seg });
       if (express) write(deps, { k: 'session', ts: now1, mode: 'express', ms: Math.round(clock.mono() - startMono), retrievalMs: retrievalSince(store.progress.log.events, startTs) });
       bus.emit('progress:changed', { kinds: ['cards'] });
@@ -280,10 +296,12 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
       layer,
       { pl: 'Obchód', ru: 'обход грядок' },
       [
-        ds.locked ? bobrLine(content, 'kazik.debt.jam') : null,
+        ds.locked ? bobrLine(content, 'sys.kazik.jam') : null,
         stat('Полито', `${correct} из ${answered}`),
         stat('Ещё ждут полива', String(left)),
-        sleepy ? bobrLine(content, 'kazik.sleep') : null,
+        // Ошибка на обходе (СЮЖЕТ_v2 d02.kazik.obchod.err): Казик делает вторую зарубку.
+        correct < answered ? bobrLine(content, 'd02.kazik.obchod.err') : null,
+        sleepy ? bobrLine(content, 'sys.kazik.sleep') : null,
       ],
       actions,
       'ok',

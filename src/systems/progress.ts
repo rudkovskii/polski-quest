@@ -95,8 +95,12 @@ export interface SettingsMap {
   'keyboard.mode': 'auto' | 'full' | 'strip';
   /** Внешность из Fotobudka (P-03, src/systems/avatar.ts): LWW целиком; null — ещё не выбрана. */
   avatar: Appearance | null;
-  /** Режим без звука (P-05, СЮЖЕТ_v2 §7): выбор в первом разговоре с Казиком; `mute` — задания на слух заменяются чтением. */
-  'sound.mode': 'sound' | 'mute';
+  /**
+   * Режим звука (P-06, ПОЛИРОВКА §2 р. 6): `off` — «без звука»: задания на слух читаются по транскрипции
+   * или пропускаются, карточки `lis` не пишутся и не просрочиваются. Выбор — в первом разговоре с Казиком
+   * на перроне (P-05, флаги `d01.sound.on|mute`) и переключатель в настройках.
+   */
+  'sound.mode': 'on' | 'off';
 }
 
 export const SETTINGS_DEFAULTS: SettingsMap = {
@@ -112,13 +116,15 @@ export const SETTINGS_DEFAULTS: SettingsMap = {
   'controls.dpadSide': 'left',
   'keyboard.mode': 'auto',
   avatar: null,
-  'sound.mode': 'sound',
+  'sound.mode': 'on',
 };
 
 export function getSetting<K extends keyof SettingsMap>(p: Progress, key: K): SettingsMap[K] {
   const s = p.settings[key];
   // До P-07 перевод был 'tap' (по нажатию): теперь это «по ситуации».
   if (key === 'translations' && s?.value === 'tap') return 'auto' as SettingsMap[K];
+  // Ветка P-05 писала 'sound' | 'mute': читаем как 'on' | 'off'.
+  if (key === 'sound.mode' && (s?.value === 'mute' || s?.value === 'sound')) return (s.value === 'mute' ? 'off' : 'on') as SettingsMap[K];
   return s ? (s.value as SettingsMap[K]) : SETTINGS_DEFAULTS[key];
 }
 
