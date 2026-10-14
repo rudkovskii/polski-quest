@@ -422,3 +422,11 @@ describe('Андрей: задания на слух и клавиатура', (
     root.remove();
   });
 });
+
+describe('слой оверлея не съедает тапы по миру', () => {
+  it('#overlay > * — нулевая специфичность: pointer-events: none у HUD, «Сейчас» и подписи растения работает', () => {
+    const html = readFileSync('index.html', 'utf8');
+    expect(html).toContain('#overlay > :where(*) { pointer-events: auto; }');
+    expect(html).not.toMatch(/#overlay > \* \{ pointer-events: auto; \}/);
+  });
+});
