@@ -1,0 +1,168 @@
+{
+ "id": "ninja16",
+ "image": "ninja16.png",
+ "tileSize": 16,
+ "margin": 1,
+ "spacing": 2,
+ "columns": 16,
+ "count": 79,
+ "tiles": {
+  "altana": {
+   "kind": "auto16",
+   "frames": [
+    70,
+    70,
+    70,
+    72,
+    70,
+    70,
+    70,
+    70,
+    70,
+    73,
+    70,
+    70,
+    71,
+    70,
+    70,
+    70
+   ]
+  },
+  "fence": {
+   "kind": "auto16",
+   "frames": [
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69
+   ]
+  },
+  "floor": {
+   "kind": "variants",
+   "frames": [
+    74,
+    74,
+    74,
+    74,
+    74,
+    75
+   ]
+  },
+  "gate": {
+   "kind": "single",
+   "frames": [
+    77
+   ]
+  },
+  "grass": {
+   "kind": "variants",
+   "frames": [
+    0,
+    0,
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  "grass_flowers": {
+   "kind": "single",
+   "frames": [
+    4
+   ]
+  },
+  "path": {
+   "kind": "auto16",
+   "frames": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+   ]
+  },
+  "soil": {
+   "kind": "auto16",
+   "frames": [
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36
+   ]
+  },
+  "stairs": {
+   "kind": "single",
+   "frames": [
+    78
+   ]
+  },
+  "tree": {
+   "kind": "single",
+   "frames": [
+    53
+   ]
+  },
+  "wall": {
+   "kind": "single",
+   "frames": [
+    76
+   ]
+  },
+  "water": {
+   "kind": "auto16",
+   "frames": [
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52
+   ]
+  }
+ }
+}

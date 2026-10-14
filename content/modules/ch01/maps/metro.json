@@ -3,7 +3,7 @@
   "title": { "pl": "Metro Dworzec Wileński", "ru": "Метро «Дворец Виленьски»" },
   "tileset": "ninja16",
   "controls": "walk",
-  "size": [10, 7],
+  "size": [20, 14],
   "defaultGround": ".",
   "legend": {
     ".": { "tile": "floor" },
@@ -13,19 +13,26 @@
   },
   "layers": {
     "ground": [
-      "##########",
-      "#........#",
-      "#........#",
-      "#.||.||..#",
-      "#........#",
-      "#........#",
-      "####=#####"
+      "####################",
+      "#..................#",
+      "#..................#",
+      "#...##......##.....#",
+      "#...##......##.....#",
+      "#..................#",
+      "#..................#",
+      "#.||.||.||..||.||..#",
+      "#..................#",
+      "#..................#",
+      "#...##......##.....#",
+      "#..................#",
+      "#..................#",
+      "#########=##########"
     ]
   },
-  "spawns": { "default": [4, 5], "from_dzialka": [4, 5] },
+  "spawns": { "default": [9, 11], "from_dzialka": [9, 12] },
   "objects": [
-    { "type": "word", "id": "tablica_wyjscie", "at": [3, 1], "item": "lx.wyjscie", "ex": "listen", "sprite": "sign_exit" },
-    { "type": "npc", "id": "pan_marek", "at": [7, 1], "facing": "down" },
-    { "type": "exit", "at": [4, 6], "to": "ch01.dzialka", "spawn": "from_metro" }
+    { "type": "word", "id": "tablica_wyjscie", "at": [11, 12], "item": "lx.wyjscie", "ex": "listen", "sprite": "sign_exit" },
+    { "type": "npc", "id": "pan_marek", "at": [15, 2], "facing": "down" },
+    { "type": "exit", "at": [9, 13], "to": "ch01.dzialka", "spawn": "from_metro" }
   ]
 }

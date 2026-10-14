@@ -1,0 +1,41 @@
+{
+ "id": "sign_exit",
+ "note": "Табличка «выход» для объекта word (ТЗ §3.7, sprite: \"sign_exit\"): дверь и стрелка, без текста в canvas.",
+ "size": [
+  16,
+  16
+ ],
+ "anchor": [
+  8,
+  15
+ ],
+ "keys": {
+  ".": null,
+  "o": "ink",
+  "g": "green_0",
+  "G": "moss_0",
+  "w": "white",
+  "p": "grey_3",
+  "P": "grey_1"
+ },
+ "frames": [
+  [
+   "................",
+   ".oooooooooooooo.",
+   ".oggggggggggggo.",
+   ".ogwwwgggggwggo.",
+   ".ogwgwggggggwgo.",
+   ".ogwgwggwwwwwwo.",
+   ".ogwgwggggggwgo.",
+   ".ogwwwgggggwggo.",
+   ".oGGGGGGGGGGGGo.",
+   ".oooooooooooooo.",
+   "......opPo......",
+   "......opPo......",
+   "......opPo......",
+   "......opPo......",
+   ".....oopPoo.....",
+   ".....oooooo....."
+  ]
+ ]
+}

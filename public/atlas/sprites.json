@@ -1,0 +1,321 @@
+{
+ "bobr": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "bobr/0",
+   "bobr/1",
+   "bobr/2",
+   "bobr/3",
+   "bobr/4",
+   "bobr/5",
+   "bobr/6",
+   "bobr/7"
+  ],
+  "anims": {
+   "walk_down": [
+    "bobr/0",
+    "bobr/1"
+   ],
+   "walk_up": [
+    "bobr/2",
+    "bobr/3"
+   ],
+   "walk_left": [
+    "bobr/4",
+    "bobr/5"
+   ],
+   "walk_right": [
+    "bobr/6",
+    "bobr/7"
+   ],
+   "idle_down": [
+    "bobr/0"
+   ],
+   "idle_up": [
+    "bobr/2"
+   ],
+   "idle_left": [
+    "bobr/4"
+   ],
+   "idle_right": [
+    "bobr/6"
+   ]
+  }
+ },
+ "bramka": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "bramka/0",
+   "bramka/1"
+  ],
+  "anims": {}
+ },
+ "dima": {
+  "size": [
+   16,
+   32
+  ],
+  "anchor": [
+   8,
+   31
+  ],
+  "frames": [
+   "dima/0",
+   "dima/1",
+   "dima/2",
+   "dima/3",
+   "dima/4",
+   "dima/5",
+   "dima/6",
+   "dima/7",
+   "dima/8",
+   "dima/9",
+   "dima/10",
+   "dima/11"
+  ],
+  "anims": {
+   "walk_down": [
+    "dima/0",
+    "dima/1",
+    "dima/2",
+    "dima/1"
+   ],
+   "walk_up": [
+    "dima/3",
+    "dima/4",
+    "dima/5",
+    "dima/4"
+   ],
+   "walk_left": [
+    "dima/6",
+    "dima/7",
+    "dima/8",
+    "dima/7"
+   ],
+   "walk_right": [
+    "dima/9",
+    "dima/10",
+    "dima/11",
+    "dima/10"
+   ],
+   "idle_down": [
+    "dima/1"
+   ],
+   "idle_up": [
+    "dima/4"
+   ],
+   "idle_left": [
+    "dima/7"
+   ],
+   "idle_right": [
+    "dima/10"
+   ]
+  }
+ },
+ "extra_k": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "extra_k/0",
+   "extra_k/1",
+   "extra_k/2",
+   "extra_k/3",
+   "extra_k/4",
+   "extra_k/5",
+   "extra_k/6",
+   "extra_k/7",
+   "extra_k/8",
+   "extra_k/9",
+   "extra_k/10",
+   "extra_k/11",
+   "extra_k/12",
+   "extra_k/13",
+   "extra_k/14",
+   "extra_k/15"
+  ],
+  "anims": {
+   "walk_down": [
+    "extra_k/0",
+    "extra_k/4",
+    "extra_k/8",
+    "extra_k/12"
+   ],
+   "walk_up": [
+    "extra_k/1",
+    "extra_k/5",
+    "extra_k/9",
+    "extra_k/13"
+   ],
+   "walk_left": [
+    "extra_k/2",
+    "extra_k/6",
+    "extra_k/10",
+    "extra_k/14"
+   ],
+   "walk_right": [
+    "extra_k/3",
+    "extra_k/7",
+    "extra_k/11",
+    "extra_k/15"
+   ],
+   "idle_down": [
+    "extra_k/0"
+   ],
+   "idle_up": [
+    "extra_k/1"
+   ],
+   "idle_left": [
+    "extra_k/2"
+   ],
+   "idle_right": [
+    "extra_k/3"
+   ]
+  }
+ },
+ "extra_m": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "extra_m/0",
+   "extra_m/1",
+   "extra_m/2",
+   "extra_m/3",
+   "extra_m/4",
+   "extra_m/5",
+   "extra_m/6",
+   "extra_m/7",
+   "extra_m/8",
+   "extra_m/9",
+   "extra_m/10",
+   "extra_m/11",
+   "extra_m/12",
+   "extra_m/13",
+   "extra_m/14",
+   "extra_m/15"
+  ],
+  "anims": {
+   "walk_down": [
+    "extra_m/0",
+    "extra_m/4",
+    "extra_m/8",
+    "extra_m/12"
+   ],
+   "walk_up": [
+    "extra_m/1",
+    "extra_m/5",
+    "extra_m/9",
+    "extra_m/13"
+   ],
+   "walk_left": [
+    "extra_m/2",
+    "extra_m/6",
+    "extra_m/10",
+    "extra_m/14"
+   ],
+   "walk_right": [
+    "extra_m/3",
+    "extra_m/7",
+    "extra_m/11",
+    "extra_m/15"
+   ],
+   "idle_down": [
+    "extra_m/0"
+   ],
+   "idle_up": [
+    "extra_m/1"
+   ],
+   "idle_left": [
+    "extra_m/2"
+   ],
+   "idle_right": [
+    "extra_m/3"
+   ]
+  }
+ },
+ "sign_exit": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "sign_exit/0"
+  ],
+  "anims": {}
+ },
+ "tile.altana": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   0,
+   0
+  ],
+  "frames": [
+   "tile.altana/0",
+   "tile.altana/1",
+   "tile.altana/2",
+   "tile.altana/3"
+  ],
+  "anims": {}
+ },
+ "tile.fence": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   0,
+   0
+  ],
+  "frames": [
+   "tile.fence/0",
+   "tile.fence/1",
+   "tile.fence/2",
+   "tile.fence/3",
+   "tile.fence/4",
+   "tile.fence/5",
+   "tile.fence/6",
+   "tile.fence/7",
+   "tile.fence/8",
+   "tile.fence/9",
+   "tile.fence/10",
+   "tile.fence/11",
+   "tile.fence/12",
+   "tile.fence/13",
+   "tile.fence/14",
+   "tile.fence/15"
+  ],
+  "anims": {}
+ }
+}

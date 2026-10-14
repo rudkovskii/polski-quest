@@ -1,0 +1,203 @@
+{
+ "id": "bobr",
+ "note": "Бобр Kazik (СЮЖЕТ.md §3), черновик: прораб в жёлтой каске, резцы, плоский хвост. «Показывает лапой» добавится в I-13.",
+ "size": [
+  16,
+  16
+ ],
+ "anchor": [
+  8,
+  15
+ ],
+ "keys": {
+  ".": null,
+  "o": "ink",
+  "y": "sand_4",
+  "Y": "sand_7",
+  "q": "sand_0",
+  "b": "brown_1",
+  "B": "grey_3",
+  "g": "brown_5",
+  "n": "ink",
+  "w": "white",
+  "t": "grey_1",
+  "T": "grey_2",
+  "e": "ink"
+ },
+ "anims": {
+  "walk_down": [
+   0,
+   1
+  ],
+  "walk_up": [
+   2,
+   3
+  ],
+  "walk_left": [
+   4,
+   5
+  ],
+  "walk_right": [
+   6,
+   7
+  ],
+  "idle_down": [
+   0
+  ],
+  "idle_up": [
+   2
+  ],
+  "idle_left": [
+   4
+  ],
+  "idle_right": [
+   6
+  ]
+ },
+ "frames": [
+  [
+   "................",
+   ".....oooooo.....",
+   "....oYyyyyqo....",
+   "...ooyyyyyqoo...",
+   "..obooooooooBo..",
+   "..obbbbbbbbbBo..",
+   "..obebbbbbbebo..",
+   "..obbbbnnbbbBo..",
+   "..obgbbwwbbgBo..",
+   "...obgbwwbgBo...",
+   "..obbggggggBBo..",
+   ".obbgggggggbBBo.",
+   ".obbgggggggbBBo.",
+   "..obbgggggbBBo..",
+   "...oboooooobo...",
+   "...ooo....ooo..."
+  ],
+  [
+   "................",
+   ".....oooooo.....",
+   "....oYyyyyqo....",
+   "...ooyyyyyqoo...",
+   "..obooooooooBo..",
+   "..obbbbbbbbbBo..",
+   "..obebbbbbbebo..",
+   "..obbbbnnbbbBo..",
+   "..obgbbwwbbgBo..",
+   "...obgbwwbgBo...",
+   "..obbggggggBBo..",
+   ".obbgggggggbBBo.",
+   ".obbgggggggbBBo.",
+   "..obbgggggbBBo..",
+   "...obooooooboo..",
+   "...oo.....ooo..."
+  ],
+  [
+   "................",
+   ".....oooooo.....",
+   "....oYyyyyqo....",
+   "...ooyyyyyqoo...",
+   "..obooooooooBo..",
+   "..obbbbbbbbbBo..",
+   "..obbbbbbbbbBo..",
+   "..obbbbbbbbbBo..",
+   "...obbbbbbbBo...",
+   "..obbbbbbbbbBo..",
+   ".obbbbbbbbbbBBo.",
+   ".obbbottttobBBo.",
+   "..obottTtttoBo..",
+   "...ottTtTttto...",
+   "...ottttTttto...",
+   "....oooooooo...."
+  ],
+  [
+   "................",
+   ".....oooooo.....",
+   "....oYyyyyqo....",
+   "...ooyyyyyqoo...",
+   "..obooooooooBo..",
+   "..obbbbbbbbbBo..",
+   "..obbbbbbbbbBo..",
+   "..obbbbbbbbbBo..",
+   "...obbbbbbbBo...",
+   "..obbbbbbbbbBo..",
+   ".obbbbbbbbbbBBo.",
+   ".obbbottttobBBo.",
+   "..obottTtttoBo..",
+   "...otttTtTtto...",
+   "...ottTttttto...",
+   "....oooooooo...."
+  ],
+  [
+   "................",
+   "...oooooo.......",
+   "..oYyyyyqo......",
+   ".ooyyyyyqoo.....",
+   ".obooooooBo.....",
+   "obebbbbbbBBo....",
+   "onbbbbbbbbBo....",
+   "owwbbbbbbbBBo...",
+   ".owgbbbbbbbBBo..",
+   "..oggbbbbbbbBBoo",
+   "..oggggbbbbbBotT",
+   "..oggggbbbbbBotT",
+   "...oggggbbbBBoTt",
+   "...obboooobboot.",
+   "...ooo....ooo.o.",
+   "................"
+  ],
+  [
+   "................",
+   "...oooooo.......",
+   "..oYyyyyqo......",
+   ".ooyyyyyqoo.....",
+   ".obooooooBo.....",
+   "obebbbbbbBBo....",
+   "onbbbbbbbbBo....",
+   "owwbbbbbbbBBo...",
+   ".owgbbbbbbbBBo..",
+   "..oggbbbbbbbBBoo",
+   "..oggggbbbbbBotT",
+   "..oggggbbbbbBotT",
+   "...oggggbbbBBoTt",
+   "....obbooobbbot.",
+   "....ooo...ooo.o.",
+   "................"
+  ],
+  [
+   "................",
+   ".......oooooo...",
+   "......oqyyyyYo..",
+   ".....ooqyyyyyoo.",
+   ".....oBoooooobo.",
+   "....oBBbbbbbbebo",
+   "....oBbbbbbbbbno",
+   "...oBBbbbbbbbwwo",
+   "..oBBbbbbbbbgwo.",
+   "ooBBbbbbbbbggo..",
+   "TtoBbbbbbggggo..",
+   "TtoBbbbbbggggo..",
+   "tToBBbbbggggo...",
+   ".toobboooobbo...",
+   ".o.ooo....ooo...",
+   "................"
+  ],
+  [
+   "................",
+   ".......oooooo...",
+   "......oqyyyyYo..",
+   ".....ooqyyyyyoo.",
+   ".....oBoooooobo.",
+   "....oBBbbbbbbebo",
+   "....oBbbbbbbbbno",
+   "...oBBbbbbbbbwwo",
+   "..oBBbbbbbbbgwo.",
+   "ooBBbbbbbbbggo..",
+   "TtoBbbbbbggggo..",
+   "TtoBbbbbbggggo..",
+   "tToBBbbbggggo...",
+   ".tobbbooobbo....",
+   ".o.ooo...ooo....",
+   "................"
+  ]
+ ]
+}

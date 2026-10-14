@@ -1,0 +1,520 @@
+// Модель локации (ТЗ §2.7, §5.4–5.5): движение по клеткам по intents, путь по тапу, кнопка действия,
+// подсветка цели, выходы, триггеры, бобр-компаньон. Чистый TS без Phaser: сцена Location рисует
+// состояние и переводит события модели в шину, тесты гоняют модель напрямую.
+import type { LocationMap, MapObject } from '../types/content';
+import type { Dir, Intent, MapControls } from '../types/input';
+import { parseAscii, type ParsedMap, type Xy } from './ascii';
+import { findPath, pathToAdjacent, type Grid } from './pathfind';
+
+/** 6 клеток в секунду (ТЗ §2.7). */
+export const STEP_MS = 1000 / 6;
+
+export const DELTA: Record<Dir, Xy> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+const OPPOSITE: Record<Dir, Dir> = { up: 'down', down: 'up', left: 'right', right: 'left' };
+const DIR_ORDER: readonly Dir[] = ['up', 'right', 'down', 'left'];
+
+export type ObjKind = MapObject['type'];
+
+export interface WorldObject {
+  /** Ключ для тапа и подсветки: `npc:bobr`, `word:tablica_wyjscie`, `exit:5,9`, `plot:grzadki`… */
+  key: string;
+  kind: ObjKind;
+  id: string;
+  at: Xy;
+  size: Xy;
+  /** Клетки объекта непроходимы (NPC, слово, табличка, доска). */
+  solid: boolean;
+  src: MapObject;
+}
+
+export type InteractVia = 'action' | 'tap' | 'enter';
+
+export interface InteractEvent {
+  type: 'interact';
+  kind: Exclude<ObjKind, 'exit'>;
+  id: string;
+  key: string;
+  /** Клетка объекта, с которой взаимодействовали (для грядки — конкретная клетка). */
+  tile: Xy;
+  via: InteractVia;
+  /** Куда смотрит Дима (NPC может развернуться к нему). */
+  facing: Dir;
+  item?: string;
+  ex?: string;
+}
+export interface ExitEvent {
+  type: 'exit';
+  to: string;
+  spawn?: string;
+  tile: Xy;
+}
+export interface BumpEvent {
+  type: 'bump';
+  dir: Dir;
+}
+export interface StepEvent {
+  type: 'step';
+  from: Xy;
+  to: Xy;
+}
+export type WorldEvent = InteractEvent | ExitEvent | BumpEvent | StepEvent;
+
+export interface Actor {
+  tile: Xy;
+  facing: Dir;
+  /** Текущий шаг: из from в to, прошло t мс из STEP_MS. */
+  step: { from: Xy; to: Xy; t: number } | null;
+}
+
+export interface LocationOptions {
+  /** Бобр идёт следом (walk-локации без своего NPC bobr). По умолчанию по правилу выше. */
+  companion?: boolean;
+  facing?: Dir;
+}
+
+const eq = (a: Xy, b: Xy): boolean => a[0] === b[0] && a[1] === b[1];
+const dirBetween = (from: Xy, to: Xy): Dir => {
+  const dx = to[0] - from[0];
+  const dy = to[1] - from[1];
+  if (Math.abs(dx) >= Math.abs(dy)) return dx < 0 ? 'left' : 'right';
+  return dy < 0 ? 'up' : 'down';
+};
+
+function keyOf(o: MapObject): { key: string; id: string } {
+  switch (o.type) {
+    case 'npc':
+    case 'word':
+    case 'trigger':
+    case 'plot':
+    case 'secret':
+      return { key: `${o.type}:${o.id}`, id: o.id };
+    case 'board':
+      return { key: `board:${o.board}`, id: o.board };
+    case 'exit':
+    case 'sign': {
+      const id = `${o.at[0]},${o.at[1]}`;
+      return { key: `${o.type}:${id}`, id };
+    }
+  }
+}
+
+export function buildObjects(map: LocationMap): WorldObject[] {
+  return map.objects.map((o) => {
+    const { key, id } = keyOf(o);
+    const size: Xy = 'size' in o && o.size ? [o.size[0], o.size[1]] : [1, 1];
+    const solid = o.type === 'npc' || o.type === 'word' || o.type === 'sign' || o.type === 'board';
+    return { key, kind: o.type, id, at: [o.at[0], o.at[1]], size, solid, src: o };
+  });
+}
+
+const covers = (o: WorldObject, [x, y]: Xy): boolean =>
+  x >= o.at[0] && y >= o.at[1] && x < o.at[0] + o.size[0] && y < o.at[1] + o.size[1];
+
+export class LocationModel {
+  readonly map: LocationMap;
+  readonly parsed: ParsedMap;
+  readonly controls: MapControls;
+  readonly objects: WorldObject[];
+  readonly player: Actor;
+  readonly companion: Actor | null;
+  /** Выделенный объект в tap-локации (Tab/стрелки, ТЗ §2.7). */
+  selected: string | null = null;
+
+  private heldDir: Dir | null = null;
+  /** Короткое нажатие во время шага: ещё один шаг после него (иначе быстрые тапы стрелки теряются). */
+  private queuedDir: Dir | null = null;
+  private bumped = false;
+  private path: Xy[] = [];
+  private pending: { key: string; tile: Xy | null } | null = null;
+  private actionQueued = false;
+  private fired = new Set<string>();
+  private exited = false;
+  private out: WorldEvent[] = [];
+  private solidObj: boolean[][];
+  readonly grid: Grid;
+
+  constructor(map: LocationMap, spawn: Xy, opts: LocationOptions = {}) {
+    this.map = map;
+    this.parsed = parseAscii(map);
+    this.controls = map.controls;
+    this.objects = buildObjects(map);
+    const { w, h } = this.parsed;
+    this.solidObj = Array.from({ length: h }, () => Array<boolean>(w).fill(false));
+    for (const o of this.objects)
+      if (o.solid)
+        for (let y = o.at[1]; y < o.at[1] + o.size[1]; y++)
+          for (let x = o.at[0]; x < o.at[0] + o.size[0]; x++) if (y < h && x < w) this.solidObj[y]![x] = true;
+    this.grid = { w, h, passable: (x, y) => this.passable(x, y) };
+    this.player = { tile: [spawn[0], spawn[1]], facing: opts.facing ?? 'down', step: null };
+    const wantCompanion = opts.companion ?? (map.controls === 'walk' && !this.objects.some((o) => o.key === 'npc:bobr'));
+    this.companion = wantCompanion ? { tile: this.companionSpawn(), facing: this.player.facing, step: null } : null;
+  }
+
+  // ───────────── запросы ─────────────
+
+  passable(x: number, y: number): boolean {
+    const { w, h } = this.parsed;
+    if (x < 0 || y < 0 || x >= w || y >= h) return false;
+    return !this.parsed.solid[y]![x] && !this.solidObj[y]![x];
+  }
+
+  object(key: string): WorldObject | undefined {
+    return this.objects.find((o) => o.key === key);
+  }
+
+  /** Объекты, с которыми можно что-то сделать кнопкой или тапом. Выход — только в tap-режиме. */
+  actionable(o: WorldObject): boolean {
+    switch (o.kind) {
+      case 'npc':
+      case 'word':
+      case 'sign':
+      case 'board':
+      case 'plot':
+        return true;
+      case 'trigger':
+        return (o.src as { on: string }).on === 'tap';
+      case 'exit':
+        return this.controls === 'tap';
+      case 'secret':
+        return false; // кот Симба приходит в I-27 (secrets.json), пока точка пустая
+    }
+  }
+
+  /** Что под пальцем: ключ объекта (`key` или `key@x,y` для многоклеточных) или null. */
+  targetAt(tile: Xy): string | null {
+    const o = this.objects.find((ob) => covers(ob, tile) && this.actionable(ob));
+    if (!o) return null;
+    return o.size[0] * o.size[1] > 1 ? `${o.key}@${tile[0]},${tile[1]}` : o.key;
+  }
+
+  /** Куда сейчас уйдёт кнопка действия: объект и клетка. Для подсветки цели (ТЗ §5.4). */
+  highlight(): { key: string; tile: Xy } | null {
+    if (this.controls === 'tap') {
+      const o = this.selected ? this.object(this.selected) : undefined;
+      return o ? { key: o.key, tile: o.at } : null;
+    }
+    if (this.player.step || this.path.length) return null;
+    return this.actionTarget();
+  }
+
+  /** Положение актёра в клетках с долей шага (для отрисовки). */
+  static pos(a: Actor): [number, number] {
+    if (!a.step) return [a.tile[0], a.tile[1]];
+    const k = Math.min(1, a.step.t / STEP_MS);
+    return [a.step.from[0] + (a.step.to[0] - a.step.from[0]) * k, a.step.from[1] + (a.step.to[1] - a.step.from[1]) * k];
+  }
+
+  get moving(): boolean {
+    return this.player.step !== null;
+  }
+
+  get done(): boolean {
+    return this.exited;
+  }
+
+  // ───────────── intents ─────────────
+
+  intent(i: Intent): void {
+    if (this.exited) return;
+    switch (i.type) {
+      case 'move':
+        if (this.controls === 'tap') return; // роутер шлёт сюда focus, не move
+        if (i.held) {
+          this.heldDir = i.dir;
+          this.bumped = false;
+          this.path = [];
+          this.pending = null;
+          if (!this.player.step) this.tryStep(i.dir);
+          else this.queuedDir = i.dir;
+        } else if (this.heldDir === i.dir) this.heldDir = null;
+        return;
+      case 'goto':
+        if (this.controls === 'tap') return; // пустая клетка в tap-локации: ходьбы нет
+        this.heldDir = null;
+        this.queuedDir = null;
+        this.pending = null;
+        this.path = findPath(this.grid, this.from(), i.tile).path;
+        return;
+      case 'interact':
+        if (i.target) this.interactTarget(i.target);
+        else if (this.controls === 'tap') {
+          if (this.selected) this.fire(this.selected, null, 'action');
+        } else if (this.player.step) this.actionQueued = true;
+        else this.doAction();
+        return;
+      case 'focus':
+        if (this.controls === 'tap') this.moveFocus(i.dir);
+        return;
+      case 'cancel':
+        this.queuedDir = null;
+        this.path = [];
+        this.pending = null;
+        return;
+    }
+  }
+
+  /** Оверлей открылся или локация уходит: стоп без событий. */
+  halt(): void {
+    this.heldDir = null;
+    this.queuedDir = null;
+    this.path = [];
+    this.pending = null;
+    this.actionQueued = false;
+  }
+
+  // ───────────── время ─────────────
+
+  update(dt: number): WorldEvent[] {
+    let budget = dt;
+    for (let guard = 0; guard < 16 && !this.exited; guard++) {
+      const st = this.player.step;
+      if (st) {
+        const need = STEP_MS - st.t;
+        if (budget < need) {
+          st.t += budget;
+          if (this.companion?.step) this.companion.step.t = st.t;
+          break;
+        }
+        budget -= need;
+        this.arrive();
+        continue;
+      }
+      if (!this.next()) break;
+    }
+    return this.out.splice(0);
+  }
+
+  // ───────────── внутреннее ─────────────
+
+  /** Клетка, от которой считать путь: куда идём, если шаг уже начат. */
+  private from(): Xy {
+    return this.player.step ? this.player.step.to : this.player.tile;
+  }
+
+  private companionSpawn(): Xy {
+    const [px, py] = this.player.tile;
+    const back = DELTA[OPPOSITE[this.player.facing]];
+    const options: Xy[] = [[px + back[0], py + back[1]], ...DIR_ORDER.map((d): Xy => [px + DELTA[d][0], py + DELTA[d][1]])];
+    return options.find(([x, y]) => this.passable(x, y)) ?? [px, py];
+  }
+
+  private tryStep(dir: Dir): boolean {
+    this.player.facing = dir;
+    const [x, y] = this.player.tile;
+    const to: Xy = [x + DELTA[dir][0], y + DELTA[dir][1]];
+    if (!this.passable(to[0], to[1])) {
+      if (!this.bumped) this.out.push({ type: 'bump', dir });
+      this.bumped = true;
+      return false;
+    }
+    this.startStep(to);
+    return true;
+  }
+
+  private startStep(to: Xy): void {
+    const from = this.player.tile;
+    this.player.facing = dirBetween(from, to);
+    this.player.step = { from, to, t: 0 };
+    this.out.push({ type: 'step', from, to });
+    const c = this.companion;
+    if (c && !eq(c.tile, from)) {
+      const adjacent = Math.abs(c.tile[0] - from[0]) + Math.abs(c.tile[1] - from[1]) === 1;
+      if (adjacent) {
+        c.facing = dirBetween(c.tile, from);
+        c.step = { from: c.tile, to: from, t: 0 };
+      } else c.tile = from; // отстал (телепорт, путь сквозь узкое место): догоняет сразу
+    }
+  }
+
+  private arrive(): void {
+    const st = this.player.step!;
+    this.player.tile = st.to;
+    this.player.step = null;
+    const c = this.companion;
+    if (c?.step) {
+      c.tile = c.step.to;
+      c.step = null;
+    }
+    const here = this.player.tile;
+    for (const o of this.objects) {
+      if (!covers(o, here)) continue;
+      if (o.kind === 'exit') {
+        const ex = o.src as Extract<MapObject, { type: 'exit' }>;
+        this.out.push({ type: 'exit', to: ex.to, ...(ex.spawn ? { spawn: ex.spawn } : {}), tile: here });
+        this.exited = true;
+        this.halt();
+        return;
+      }
+      if (o.kind === 'trigger' && (o.src as { on: string }).on === 'enter') {
+        const once = (o.src as { once?: boolean }).once === true;
+        if (once && this.fired.has(o.key)) continue;
+        this.fired.add(o.key);
+        this.emitInteract(o, here, 'enter');
+      }
+    }
+  }
+
+  /** Следующее действие без начатого шага. true = начался шаг. */
+  private next(): boolean {
+    const queued = this.queuedDir;
+    this.queuedDir = null;
+    if (this.heldDir) return this.tryStep(this.heldDir);
+    if (queued) return this.tryStep(queued);
+    if (this.path.length) {
+      const nxt = this.path[0]!;
+      if (!this.passable(nxt[0], nxt[1])) {
+        this.path = [];
+        this.pending = null;
+        return false;
+      }
+      this.path.shift();
+      this.startStep(nxt);
+      return true;
+    }
+    if (this.pending) {
+      const p = this.pending;
+      this.pending = null;
+      const o = this.object(p.key);
+      if (o && this.near(o)) {
+        this.faceTo(o, p.tile);
+        this.fire(o.key, p.tile, 'tap');
+      }
+      return false;
+    }
+    if (this.actionQueued) {
+      this.actionQueued = false;
+      this.doAction();
+    }
+    return false;
+  }
+
+  /** Дима рядом с объектом (4-соседство) или стоит на его проходимой клетке. */
+  private near(o: WorldObject): boolean {
+    const [x, y] = this.player.tile;
+    if (covers(o, [x, y])) return true;
+    return DIR_ORDER.some((d) => covers(o, [x + DELTA[d][0], y + DELTA[d][1]]));
+  }
+
+  private faceTo(o: WorldObject, tile: Xy | null): void {
+    const [x, y] = this.player.tile;
+    if (covers(o, [x, y])) return;
+    const target = tile && covers(o, tile) ? tile : null;
+    for (const d of DIR_ORDER) {
+      const c: Xy = [x + DELTA[d][0], y + DELTA[d][1]];
+      if (target ? eq(c, target) : covers(o, c)) {
+        this.player.facing = d;
+        return;
+      }
+    }
+    for (const d of DIR_ORDER) if (covers(o, [x + DELTA[d][0], y + DELTA[d][1]])) this.player.facing = d;
+  }
+
+  /** Цель кнопки действия: объект перед Димой, иначе соседний, иначе тот, на котором он стоит. */
+  private actionTarget(): { key: string; tile: Xy } | null {
+    const [x, y] = this.player.tile;
+    const order = [this.player.facing, ...DIR_ORDER.filter((d) => d !== this.player.facing)];
+    for (const d of order) {
+      const c: Xy = [x + DELTA[d][0], y + DELTA[d][1]];
+      const o = this.objects.find((ob) => covers(ob, c) && this.actionable(ob));
+      if (o) return { key: o.key, tile: c };
+    }
+    const here = this.objects.find((ob) => covers(ob, [x, y]) && this.actionable(ob));
+    return here ? { key: here.key, tile: [x, y] } : null;
+  }
+
+  private doAction(): void {
+    const t = this.actionTarget();
+    if (!t) return;
+    const o = this.object(t.key)!;
+    this.faceTo(o, t.tile);
+    this.fire(t.key, t.tile, 'action');
+  }
+
+  private interactTarget(target: string): void {
+    const [key, cell] = target.split('@') as [string, string | undefined];
+    const o = this.object(key);
+    if (!o) return;
+    const tile: Xy | null = cell ? (cell.split(',').map(Number) as unknown as Xy) : null;
+    if (this.controls === 'tap') {
+      this.selected = o.key;
+      this.fire(o.key, tile, 'tap');
+      return;
+    }
+    this.heldDir = null;
+    this.queuedDir = null;
+    if (!this.player.step && this.near(o)) {
+      this.path = [];
+      this.faceTo(o, tile);
+      this.fire(o.key, tile, 'tap');
+      return;
+    }
+    const res = pathToAdjacent(this.grid, this.from(), o.at, o.size);
+    this.path = res.path;
+    this.pending = res.exact ? { key: o.key, tile } : null;
+  }
+
+  private fire(key: string, tile: Xy | null, via: InteractVia): void {
+    const o = this.object(key);
+    if (!o) return;
+    const cell: Xy = tile && covers(o, tile) ? tile : o.at;
+    if (o.kind === 'exit') {
+      const ex = o.src as Extract<MapObject, { type: 'exit' }>;
+      this.out.push({ type: 'exit', to: ex.to, ...(ex.spawn ? { spawn: ex.spawn } : {}), tile: cell });
+      this.exited = true;
+      this.halt();
+      return;
+    }
+    if (o.kind === 'trigger' && (o.src as { once?: boolean }).once === true) {
+      if (this.fired.has(o.key)) return;
+      this.fired.add(o.key);
+    }
+    this.emitInteract(o, cell, via);
+  }
+
+  private emitInteract(o: WorldObject, tile: Xy, via: InteractVia): void {
+    const ev: InteractEvent = { type: 'interact', kind: o.kind as InteractEvent['kind'], id: o.id, key: o.key, tile, via, facing: this.player.facing };
+    const src = o.src;
+    if (src.type === 'word') {
+      ev.item = src.item;
+      if (src.ex) ev.ex = src.ex;
+    } else if (src.type === 'sign' && src.item) ev.item = src.item;
+    this.out.push(ev);
+  }
+
+  /** Tab/стрелки в tap-локации: next/prev по порядку чтения, стрелка — ближайший объект в ту сторону. */
+  private moveFocus(dir: Dir | 'next' | 'prev'): void {
+    const list = this.objects
+      .filter((o) => this.actionable(o))
+      .sort((a, b) => a.at[1] - b.at[1] || a.at[0] - b.at[0]);
+    if (!list.length) return;
+    const cur = list.findIndex((o) => o.key === this.selected);
+    if (cur < 0) {
+      this.selected = (dir === 'prev' ? list[list.length - 1] : list[0])!.key;
+      return;
+    }
+    if (dir === 'next' || dir === 'prev') {
+      this.selected = list[(cur + (dir === 'next' ? 1 : list.length - 1)) % list.length]!.key;
+      return;
+    }
+    const c = list[cur]!;
+    const cx = c.at[0] + c.size[0] / 2;
+    const cy = c.at[1] + c.size[1] / 2;
+    const [dx, dy] = DELTA[dir];
+    let best: WorldObject | null = null;
+    let bestScore = Infinity;
+    for (const o of list) {
+      if (o === c) continue;
+      const ox = o.at[0] + o.size[0] / 2 - cx;
+      const oy = o.at[1] + o.size[1] / 2 - cy;
+      const along = ox * dx + oy * dy;
+      if (along <= 0) continue;
+      const across = Math.abs(ox * dy) + Math.abs(oy * dx);
+      const score = along + across * 2;
+      if (score < bestScore) {
+        bestScore = score;
+        best = o;
+      }
+    }
+    if (best) this.selected = best.key;
+  }
+}

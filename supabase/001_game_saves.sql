@@ -74,7 +74,7 @@ begin
     return jsonb_build_object('ok', false, 'old_client', true, 'schema_v', cur.schema_v);
   end if;
   -- Оптимистическая блокировка: клиент писал поверх не той ревизии → отдать текущую для слияния.
-  if cur.rev <> p_base_rev then
+  if cur.rev is distinct from p_base_rev then
     return jsonb_build_object('ok', false, 'conflict', true, 'data', cur.data, 'rev', cur.rev);
   end if;
 

@@ -71,6 +71,15 @@
 - Слияние только через `merge()` (`src/systems/merge.ts`, чистый). Новое поле в `Progress` = правило слияния
   в `merge.ts` + поле в генераторе `tests/merge.test.ts` (коммутативность, ассоциативность, идемпотентность).
 - `?dev=1`: устройство пишет в облако с `updated_by = 'test-<deviceId>'`, чистится SQL из README.
+## Арт и мир (ТЗ §8, I-07)
+- `art/palette.json` (≤ 64 цвета, у каждого имя) собирает `npm run palette` из `art/vendor/ninja-adventure`.
+- Спрайты: `art/sprites/*.sprite.json` (sprite-as-data, ключи = имена цветов, hex запрещён), кадры из листов
+  паков: `art/imports.json`, тайлсет локаций: `art/tilesets/ninja16.json` (имя тайла = `legend[*].tile` в картах).
+- `npm run sprites` → `public/atlas/*` (руками не править), `npm run sprites:check` в `npm run check`:
+  палитра, альфа 0/255, кратность 16, атлас не устарел.
+- Мир: `src/world/ascii.ts` (карта → слои и коллизии), `pathfind.ts` (BFS), `location.ts` (модель без Phaser,
+  тесты в `tests/location.test.ts`), сцена `src/scenes/Location.ts` только рисует и шлёт `world:*` в bus.
+- Dev: `/?dev=world&map=ch01.metro[&spawn=<имя>]`, события мира в консоли.
 
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
