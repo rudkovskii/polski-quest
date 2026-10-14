@@ -761,6 +761,12 @@ export interface Lesson {
   location?: Id;
   errLine?: LineId1;
   /**
+   * Реакция мира по тегу ошибки (P-12): тег → реплика. Есть errLines — реплика только для перечисленных тегов (prosię не получает «Ta-TA?» про ударение); нет — errLine на любую ошибку
+   */
+  errLines?: {
+    [k: string]: LineId;
+  };
+  /**
    * @maxItems 8
    */
   introduces?: LxId[];

@@ -6,7 +6,7 @@ import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap } from '../types/content';
 import type { BusEvents, GuideTarget, PlotCellView, PlotView } from '../types/bus';
 import { cellAt } from '../world/dzialka';
-import { bobrSpot, besideCell, edgeArrow, faceTowards, guidePath, pointerCell, resolveGuide, type ResolvedGuide } from '../world/guide';
+import { bobrSpot, besideCell, edgeArrow, faceTowards, guidePath, nextHop, pointerCell, resolveGuide, type ResolvedGuide } from '../world/guide';
 import { tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
 import { playerTextureKey } from '../world/avatar';
 import { hudDodge, pickZoom, type ScreenRect } from '../world/camera';
@@ -441,6 +441,12 @@ export class Location extends Phaser.Scene {
     return { key: this.guide?.key ?? null, at: this.guide?.at ?? null, viaExit: this.guide?.viaExit ?? false, pointer: this.model.pointing ?? this.model.object('npc:bobr')?.at ?? null };
   }
 
+  /** Следующая карта по пути к цели в другой локации (P-12). */
+  private readonly route = (from: string, to: string): string | null => {
+    const maps = new Map([...getContent().maps].map(([id, d]) => [id, d.value as unknown as { objects: readonly { type: string; to?: string }[] }]));
+    return nextHop(maps, from, to);
+  };
+
   private hiddenKeys(): Set<string> {
     return new Set(this.model.objects.filter((o) => this.model.isHidden(o.key)).map((o) => o.key));
   }
@@ -460,7 +466,7 @@ export class Location extends Phaser.Scene {
     const exits = m.objects.filter((o) => o.kind === 'exit' && !m.isHidden(o.key)).map((o) => o.at);
     const free = (x: number, y: number): boolean =>
       m.passable(x, y) && !reserved.some((r) => r[0] === x && r[1] === y) && !exits.some((e) => e[0] === x && e[1] === y);
-    let g = resolveGuide(m, this.guideTarget, this.plots, this.hiddenKeys());
+    let g = resolveGuide(m, this.guideTarget, this.plots, this.hiddenKeys(), this.route);
     // Бобр-указатель (§4.12): в walk-локации идёт к клетке у цели и смотрит на неё; на карте, где он NPC,
     // садится у цели. Цель — сам Казик (P-10a): подходит к Диме сзади-сбоку, компаньон просто идёт следом.
     if (m.companion) {
@@ -503,7 +509,7 @@ export class Location extends Phaser.Scene {
       }
       bobr.play(`${sid}:idle_${face}`);
       // Казик переехал: контур и стрелка — туда, где он теперь (раньше рамка оставалась на пустой клетке).
-      if (targetsBobr) g = resolveGuide(m, this.guideTarget, this.plots, this.hiddenKeys());
+      if (targetsBobr) g = resolveGuide(m, this.guideTarget, this.plots, this.hiddenKeys(), this.route);
     }
     this.guideLive = targetsBobr && !g && !!m.companion;
     if (this.guideLive) g = { key: BOBR_KEY, at: m.companion!.tile, size: [1, 1], viaExit: false };

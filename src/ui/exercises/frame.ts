@@ -251,7 +251,8 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
       const rule = ruleLine(ctx, spec, c.tags);
       const gloss = ans ? glossLine(ctx, spec, ans) : null;
       // Реакция мира (P-06, СЮЖЕТ_v2 §1 п. 10): реплика NPC сцены на первую ошибку шага.
-      const react = ctx.errLine && isFirst ? el('span', { class: 'react', 'data-fb': 'react' }, el('b', {}, `${ctx.errLine.who}: `), el('span', { lang: 'pl' }, ctx.errLine.pl), ctx.errLine.plRu ? el('small', { class: 'ru', lang: 'ru' }, ` ${ctx.errLine.plRu}`) : null) : null;
+      const errLine = ctx.errLineFor ? ctx.errLineFor(c.tags.length ? c.tags : spec.cluster ? [spec.cluster] : []) : ctx.errLine;
+      const react = errLine && isFirst ? el('span', { class: 'react', 'data-fb': 'react' }, el('b', {}, `${errLine.who}: `), el('span', { lang: 'pl' }, errLine.pl), errLine.plRu ? el('small', { class: 'ru', lang: 'ru' }, ` ${errLine.plRu}`) : null) : null;
       feedback(v.cls, [
         react,
         ...answerParts,

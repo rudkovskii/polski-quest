@@ -15,3 +15,13 @@ export function updateAction(o: { started: boolean; lastReloadAt: number | null;
   if (o.lastReloadAt !== null && o.now - o.lastReloadAt >= 0 && o.now - o.lastReloadAt < RELOAD_GUARD_MS) return 'toast';
   return 'reload';
 }
+
+/**
+ * Сборка на экране не та, что на сервере (P-12): `local` — `__BUILD_ID__` кода, `index` — `<meta name="pq-build">`
+ * из index.html (null — нет), `remote` — `version.json` без кэша (null — не прочитали: офлайн, dev). Расхождение —
+ * повод перезагрузиться на титуле или показать тост (`updateAction`).
+ */
+export function staleBuild(o: { local: string; index: string | null; remote: string | null }): boolean {
+  if (o.index && o.index !== o.local) return true;
+  return !!o.remote && o.remote !== o.local;
+}

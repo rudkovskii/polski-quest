@@ -89,6 +89,11 @@ export interface ExerciseCtx {
   oneShot?: boolean;
   /** Реакция мира на ошибку (P-06, `lesson.errLine`): реплика NPC перед правилом. */
   errLine?: { who: string; pl: string; plRu?: string };
+  /**
+   * Реакция мира по тегу ошибки (P-12, `lesson.errLines`): есть — главнее `errLine`; вернула undefined — реплики нет
+   * (prosię не получает «Ta-TA? Nie. TA-ta!» про ударение).
+   */
+  errLineFor?(tags: readonly string[]): { who: string; pl: string; plRu?: string } | undefined;
   /** Свои отклики вместо «Dobrze!» / «Jeszcze raz.» (турникет: «Pip!» / «Hyk!»). */
   verdicts?: { ok: string; bad: string };
 }

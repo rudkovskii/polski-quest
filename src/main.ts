@@ -16,8 +16,8 @@ import { getContent } from './systems/content';
 import { mountUi } from './ui';
 import { mountAudioToast } from './ui/audioToast';
 import { mountUpdateToast } from './ui/updateToast';
-import { lastReloadAt, registerPwa, reloadForUpdate } from './systems/platform/pwa';
-import { updateAction } from './systems/update';
+import { lastReloadAt, registerPwa, reloadForUpdate, watchVersion } from './systems/platform/pwa';
+import { staleBuild, updateAction } from './systems/update';
 import { loadPortraits, mountPlay, type PlayDeps } from './ui/play';
 import { dpadLabelsOn, mountDpad } from './ui/dpad';
 import { setTodoVisible } from './ui/todo';
@@ -125,7 +125,10 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   bus.once('title:start', () => (started = true));
   const reload = (): void => void reloadForUpdate(() => storeNow?.flush());
   bus.on('app:reload', reload);
-  registerPwa({ onNeedReload: () => (updateAction({ started, lastReloadAt: lastReloadAt(), now: Date.now() }) === 'reload' ? reload() : bus.emit('app:update', {})) });
+  const needReload = (): void => (updateAction({ started, lastReloadAt: lastReloadAt(), now: Date.now() }) === 'reload' ? reload() : bus.emit('app:update', {}));
+  registerPwa({ onNeedReload: needReload });
+  // P-12: страница из старого кэша (HTTP-кэш index.html, встроенный браузер без SW) — версия с сервера без кэша.
+  watchVersion({ base: import.meta.env.BASE_URL, local: __BUILD_ID__, isStale: staleBuild, onStale: needReload });
   const day = startDay({
     root: overlay,
     overlay: play.overlay,

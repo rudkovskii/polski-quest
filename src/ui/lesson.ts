@@ -248,6 +248,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
   const exContent = exerciseContent(content, (id) => Object.keys(derived.cards).some((c) => c.startsWith(`${id}#`)));
   // Реакция мира на ошибку (P-06): реплика NPC урока; без звука — её вариант `.mute`, если есть.
   const errLine = lineSpeech(content, lesson.errLine, settings.silent);
+  const errLineFor = errLinesOf(content, lesson, settings.silent);
   // «Pip!» / «Hyk!» — звуки турникета; без звука (P-10b) отклик текстом: «Dobrze!» и правило с ответом.
   const verdicts = diag && !settings.silent ? diagVerdicts(content) : undefined;
 
@@ -312,6 +313,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
       cantHear: () => setSoundUnavailable(true),
       ...(diag ? { oneShot: true } : {}),
       ...(errLine ? { errLine } : {}),
+      ...(errLineFor ? { errLineFor } : {}),
       ...(verdicts ? { verdicts } : {}),
     };
     const res = await mountStep(step, ctx);
@@ -468,6 +470,22 @@ export function lineSpeech(content: Pick<Content, 'lines' | 'characters'>, id: s
   const l = content.lines.get(alt ?? id);
   if (!l || l.todo || !l.pl) return undefined;
   return { who: content.characters.get(l.who)?.name ?? l.who, pl: l.pl, ...(l.plRu ? { plRu: l.plRu } : {}) };
+}
+
+/**
+ * Реакция мира по тегу ошибки (P-12, `lesson.errLines`): первый тег ошибки, у которого есть реплика. Нет `errLines` —
+ * undefined (действует общий `errLine`).
+ */
+export function errLinesOf(content: Pick<Content, 'lines' | 'characters'>, lesson: Pick<Lesson, 'errLines'>, silent: boolean): ((tags: readonly string[]) => { who: string; pl: string; plRu?: string } | undefined) | undefined {
+  const map = lesson.errLines;
+  if (!map || !Object.keys(map).length) return undefined;
+  return (tags) => {
+    for (const t of tags) {
+      const id = map[t];
+      if (id) return lineSpeech(content, id, silent);
+    }
+    return undefined;
+  };
 }
 
 /** Отклики турникета (d02.bramka.ok / err): «Pip!» и «Hyk!». */

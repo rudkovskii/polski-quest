@@ -50,7 +50,6 @@
   "say:Zosia|normal|Herbata?": "53be3da66a5b.m4a",
   "say:Zosia|normal|I pieczątka. Gratis.": "74933a96f2b2.m4a",
   "say:Zosia|normal|I pieczątka: Praga.": "a16c42f398ef.m4a",
-  "say:Zosia|normal|Informacja": "b4547b087c3f.m4a",
   "say:Zosia|normal|Jak to się pisze?": "51c21729b84f.m4a",
   "say:Zosia|normal|Jestem Jan Brzechwa. A ty?": "9cb4a42514f9.m4a",
   "say:Zosia|normal|Jestem adwokatem. To ciekawe.": "3bd845fc8c39.m4a",
@@ -144,7 +143,6 @@
   "say:Zosia|normal|Warszawa? Spoko. Kraków lepszy.": "21e6b4b18842.m4a",
   "say:Zosia|normal|Wejście": "be99c8632153.m4a",
   "say:Zosia|normal|Wejście.": "2df96010bf52.m4a",
-  "say:Zosia|normal|Woda. Kawa. Telefon. Teatr. Warszawa.": "02655e8fd898.m4a",
   "say:Zosia|normal|Wyjście": "60c68899a2f5.m4a",
   "say:Zosia|normal|Wyjście jest tam.": "0c0805736521.m4a",
   "say:Zosia|normal|Wyjście.": "be0857b42cbf.m4a",
@@ -289,6 +287,7 @@
   "say:Zosia|normal|żona": "0fe444aaeac0.m4a",
   "say:Zosia|normal|„Morze” — rz czy ż?": "8b7cc5021cbd.m4a",
   "say:Zosia|normal|„Morze”: rz czy ż?": "7adc4fb47893.m4a",
+  "say:Zosia|normal|„Wada”? Woda nie ma wad!": "0b60f08f4320.m4a",
   "say:Zosia|slow|Apteka": "36cf3dd2c833.m4a",
   "say:Zosia|slow|Centrum": "3e449b90e99a.m4a",
   "say:Zosia|slow|Chrząszcz.": "e8ac173b872d.m4a",
@@ -298,7 +297,6 @@
   "say:Zosia|slow|Dzień dobry": "0e3b67aea9f5.m4a",
   "say:Zosia|slow|Dziękuję. Proszę. Są.": "6317b5372a78.m4a",
   "say:Zosia|slow|Herbata. Chleb. Ile? Cena. Kraków.": "ab8f07875354.m4a",
-  "say:Zosia|slow|Informacja": "8a056823b278.m4a",
   "say:Zosia|slow|Jak to się pisze?": "fd6bc5e566bf.m4a",
   "say:Zosia|slow|Kasa": "1f6de78ccb2f.m4a",
   "say:Zosia|slow|Kasia": "bcfc2b6d4cb0.m4a",
@@ -326,7 +324,6 @@
   "say:Zosia|slow|Toaleta": "acde7b948ecf.m4a",
   "say:Zosia|slow|Warszawa": "a8b85bfc07d7.m4a",
   "say:Zosia|slow|Wejście": "b740f54a7220.m4a",
-  "say:Zosia|slow|Woda. Kawa. Telefon. Teatr. Warszawa.": "2513edf25567.m4a",
   "say:Zosia|slow|Wyjście": "77a33986faa9.m4a",
   "say:Zosia|slow|Zamknięte": "57f3f7165b71.m4a",
   "say:Zosia|slow|apteka": "16118e9e2a89.m4a",
@@ -490,11 +487,6 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
-  "02655e8fd898.m4a": {
-   "dur": 4.01,
-   "voice": "say:Zosia",
-   "rate": "normal"
-  },
   "030929d1b7b3.m4a": {
    "dur": 0.77,
    "voice": "say:Zosia",
@@ -569,6 +561,11 @@
    "dur": 1.07,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "0b60f08f4320.m4a": {
+   "dur": 2.06,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "0b69d319af70.m4a": {
    "dur": 0.8,
@@ -827,11 +824,6 @@
   },
   "24fdf928dc90.m4a": {
    "dur": 0.91,
-   "voice": "say:Zosia",
-   "rate": "slow"
-  },
-  "2513edf25567.m4a": {
-   "dur": 6.36,
    "voice": "say:Zosia",
    "rate": "slow"
   },
@@ -1730,11 +1722,6 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
-  "8a056823b278.m4a": {
-   "dur": 1.34,
-   "voice": "say:Zosia",
-   "rate": "slow"
-  },
   "8a2d25c888f5.m4a": {
    "dur": 1.02,
    "voice": "say:Zosia",
@@ -2159,11 +2146,6 @@
    "dur": 1.05,
    "voice": "say:Zosia",
    "rate": "slow"
-  },
-  "b4547b087c3f.m4a": {
-   "dur": 1.05,
-   "voice": "say:Zosia",
-   "rate": "normal"
   },
   "b53173da6ebf.m4a": {
    "dur": 0.68,
@@ -3023,69 +3005,39 @@
    "slow": true
   },
   "ch01.s01#1": {
-   "text": "telefon",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s01#10": {
-   "text": "Woda. Kawa. Telefon. Teatr. Warszawa.",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s01#11": {
-   "text": "Kawa czy woda?",
-   "voice": "say:Zosia",
-   "slow": false
-  },
-  "ch01.s01#14": {
-   "text": "Herbata?",
-   "voice": "say:Zosia",
-   "slow": false
-  },
-  "ch01.s01#16": {
-   "text": "informacja",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s01#17": {
-   "text": "Informacja",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s01#2": {
    "text": "teatr",
    "voice": "say:Zosia",
    "slow": true
   },
+  "ch01.s01#11": {
+   "text": "informacja",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "ch01.s01#2": {
+   "text": "woda",
+   "voice": "say:Zosia",
+   "slow": true
+  },
   "ch01.s01#3": {
-   "text": "problem",
+   "text": "woda",
    "voice": "say:Zosia",
    "slow": true
   },
   "ch01.s01#4": {
-   "text": "Warszawa",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s01#5": {
-   "text": "woda",
+   "text": "kawa",
    "voice": "say:Zosia",
    "slow": true
   },
   "ch01.s01#6": {
-   "text": "kawa",
+   "text": "Kawa czy woda?",
    "voice": "say:Zosia",
-   "slow": true
+   "slow": false
   },
-  "ch01.s01#7": {
-   "text": "woda",
+  "ch01.s01#9": {
+   "text": "Herbata?",
    "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s01#8": {
-   "text": "kawa",
-   "voice": "say:Zosia",
-   "slow": true
+   "slow": false
   },
   "ch01.s02#1.0": {
    "text": "my",
@@ -3989,6 +3941,11 @@
   },
   "d03.brzechwa.kiosk.err": {
    "text": "Ta-TA? Nie. TA-ta!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d03.brzechwa.kiosk.err2": {
+   "text": "„Wada”? Woda nie ma wad!",
    "voice": "say:Zosia",
    "slow": false
   },

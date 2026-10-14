@@ -47,102 +47,23 @@
     "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 3 } }] },
     "short": {
       "if": { "any": [{ "cluster": { "id": "R1", "status": "yellow" } }, { "cluster": { "id": "R1", "status": "green" } }] },
-      "steps": [0, 5, 7, 8, 11, 12, 13, 14, 15]
+      "steps": [0, 2, 3, 4, 6, 7, 8, 9, 10]
     },
     "steps": [
-      {
-        "t": "explain",
-        "md": "Ударение в польском **всегда на предпоследнем слоге**: **wo**·da, War·**sza**·wa, te·**le**·fon. **o** всегда [о], **e** всегда [э], никакого аканья: woda = [во́да], не [ва́да]. Ловушка — русское ударение в похожих словах (телефо́н → te·**le**·fon)."
-      },
-      {
-        "t": "stress",
-        "word": "telefon",
-        "syllables": ["te", "le", "fon"],
-        "answer": 1,
-        "say": true,
-        "cluster": "R1",
-        "tags": ["ph.stress"]
-      },
+      { "t": "explain", "md": "Ударение — **на предпоследнем слоге**: **wo**·da, **ka**·wa, in·for·**ma**·cja. **o** всегда [о]: woda = [во́да], не [ва́да]." },
       { "t": "stress", "word": "teatr", "syllables": ["te", "atr"], "answer": 0, "say": true, "cluster": "R1", "tags": ["ph.stress"] },
-      { "t": "stress", "word": "problem", "syllables": ["pro", "blem"], "answer": 0, "say": true, "cluster": "R1", "tags": ["ph.stress"] },
-      {
-        "t": "stress",
-        "word": "Warszawa",
-        "syllables": ["War", "sza", "wa"],
-        "answer": 1,
-        "say": true,
-        "cluster": "R1",
-        "tags": ["ph.stress"]
-      },
       { "t": "stress", "word": "woda", "syllables": ["wo", "da"], "answer": 0, "say": true, "cluster": "R1", "tags": ["ph.stress"] },
-      { "t": "stress", "word": "kawa", "syllables": ["ka", "wa"], "answer": 0, "say": true, "cluster": "R1", "tags": ["ph.stress"] },
-      {
-        "t": "listen",
-        "say": "woda",
-        "options": ["woda", "wada"],
-        "answer": 0,
-        "item": "lx.woda",
-        "cluster": "R1",
-        "tags": ["ph.vowel_o"],
-        "hint": "[во́да] или [ва́да]: какой вариант польский?"
-      },
-      {
-        "t": "listen",
-        "say": "kawa",
-        "options": ["kawa", "kowa", "kewa"],
-        "answer": 0,
-        "item": "lx.kawa",
-        "cluster": "R1",
-        "tags": ["ph.vowel_o"]
-      },
+      { "t": "listen", "say": "woda", "options": ["woda", "wada"], "answer": 0, "item": "lx.woda", "cluster": "R1", "tags": ["ph.vowel_o"], "hint": "[во́да] или [ва́да]: какой вариант польский?" },
+      { "t": "listen", "say": "kawa", "options": ["kawa", "kowa", "kewa"], "answer": 0, "item": "lx.kawa", "cluster": "R1", "tags": ["ph.vowel_o"] },
       { "t": "choice", "q": "woda — это…", "options": ["вода", "водка", "еда"], "answer": 0, "item": "lx.woda", "dir": "pl-ru" },
-      {
-        "t": "shadow",
-        "pl": "Woda. Kawa. Telefon. Teatr. Warszawa.",
-        "ru": "Вода. Кофе. Телефон. Театр. Варшава.",
-        "repeat": 1,
-        "slow": true
-      },
       { "t": "say", "who": "brzechwa", "pl": "Kawa czy woda?", "ru": "Кофе или вода?" },
-      {
-        "t": "choice",
-        "q": "Ответь: «Воду, пожалуйста.»",
-        "options": ["Woda, proszę.", "Wada, proszę.", "Woda, prosię."],
-        "answer": 0,
-        "item": "lx.woda",
-        "dir": "ru-pl",
-        "errorTagByOption": { "1": "ph.vowel_o", "2": "R6" }
-      },
+      { "t": "choice", "q": "Ответь: «Воду, пожалуйста.»", "options": ["Woda, proszę.", "Wada, proszę.", "Woda, prosię."], "answer": 0, "item": "lx.woda", "dir": "ru-pl", "errorTagByOption": { "1": "ph.vowel_o", "2": "ph.prosie" } },
       { "t": "choice", "q": "kawa — это…", "options": ["кофе", "какао", "квас"], "answer": 0, "item": "lx.kawa", "dir": "pl-ru" },
       { "t": "say", "who": "brzechwa", "pl": "Herbata?", "ru": "[хэрба́та] Чай?", "item": "lx.herbata" },
-      {
-        "t": "choice",
-        "q": "herbata — это…",
-        "options": ["чай", "кофе", "вода"],
-        "answer": 0,
-        "item": "lx.herbata",
-        "dir": "pl-ru",
-        "why": "Herbata [хэрба́та]: чай. Kawa: кофе. Woda: вода."
-      },
-      {
-        "t": "stress",
-        "word": "informacja",
-        "syllables": ["in", "for", "ma", "cja"],
-        "answer": 2,
-        "say": true,
-        "cluster": "R1",
-        "tags": ["ph.stress"]
-      },
-      {
-        "t": "listen",
-        "say": "Informacja",
-        "options": ["INFORMACJA", "KASA", "TOALETA"],
-        "answer": 0,
-        "show": "sign",
-        "item": "lx.informacja",
-        "hint": "Вывеска: какую табличку назвали?"
-      }
-    ]
+      { "t": "choice", "q": "herbata — это…", "options": ["чай", "кофе", "вода"], "answer": 0, "item": "lx.herbata", "dir": "pl-ru", "why": "Herbata [хэрба́та]: чай. Kawa: кофе. Woda: вода." },
+      { "t": "stress", "word": "informacja", "syllables": ["in", "for", "ma", "cja"], "answer": 2, "say": true, "cluster": "R1", "tags": ["ph.stress"] }
+    ],
+    "errLines": { "ph.stress": "d03.brzechwa.kiosk.err", "ph.vowel_o": "d03.brzechwa.kiosk.err2" }
   },
   {
     "id": "ch01.s02",

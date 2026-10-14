@@ -301,6 +301,7 @@
   { "id": "d03.brzechwa.kiosk.2", "who": "brzechwa", "pl": "Nie „wada”. Wo-da!", "plRu": "Не «вада». Во-да!" },
   { "id": "d03.kazik.kiosk.2", "who": "bobr", "ru": "«Wada» у них «недостаток». Понял. Молчу." },
   { "id": "d03.brzechwa.kiosk.err", "who": "brzechwa", "pl": "Ta-TA? Nie. TA-ta!", "plRu": "Та-ТА? Нет. ТА-та!" },
+  { "id": "d03.brzechwa.kiosk.err2", "who": "brzechwa", "pl": "„Wada”? Woda nie ma wad!", "plRu": "«Вада»? У воды нет недостатков!", "words": ["lx.woda"] },
   { "id": "d03.dima.kiosk.1", "who": "dima", "pl": "Woda, proszę.", "plRu": "Воду, пожалуйста.", "words": ["lx.woda","lx.prosze"] },
   { "id": "d03.brzechwa.kiosk.3", "who": "brzechwa", "pl": "Proszę!", "plRu": "Пожалуйста!", "words": ["lx.prosze"] },
   { "id": "d03.kazik.kiosk.3", "who": "bobr", "ru": "Хорошая вода. Речная лучше." },

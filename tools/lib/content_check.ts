@@ -819,6 +819,12 @@ export function checkContent(input: CheckInput): Issue[] {
     l.warmup?.fromModules?.forEach((m, i) => ctx.ref(ctx.modules, m, sub(w, 'warmup', 'fromModules', i), 'модуль', WHERE.modules));
     walkCond(ctx, l.requires, sub(w, 'requires'));
     walkCond(ctx, l.skipIf, sub(w, 'skipIf'));
+    // P-12: реакция мира на ошибку — висячая реплика ловится как у битов.
+    ctx.line(l.errLine, sub(w, 'errLine'));
+    for (const [tag, line] of Object.entries(l.errLines ?? {})) {
+      ctx.line(line, sub(w, 'errLines', tag));
+      if (!ctx.errorTags.has(tag)) ctx.warn('ref', sub(w, 'errLines', tag), `errLines: тега "${tag}" нет в errorTags.json`);
+    }
     walkEffects(ctx, l.reward, sub(w, 'reward'), strict);
     const intro = l.introduces ?? [];
     if (intro.length > maxIntro)

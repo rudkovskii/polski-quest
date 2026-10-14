@@ -21,6 +21,7 @@
   { "id": "orth.typo", "ru": "Опечатка в длинном слове" },
   { "id": "ph.stress", "ru": "Ударение не на предпоследнем слоге", "hint": "Ударение на предпоследний слог: WO-da, KA-wa.", "remedy": "ch01.s01", "cluster": "R1" },
   { "id": "ph.vowel_o", "ru": "Аканье: o читается как [а]", "hint": "o всегда [о], без аканья: [во́да].", "remedy": "ch01.s01", "cluster": "R1" },
+  { "id": "ph.prosie", "ru": "proszę или prosię: sz твёрдое, si мягкое", "hint": "sz = [ш], si = [щ]. Proszę [про́шэ]: пожалуйста. Prosię [про́ще]: поросёнок.", "remedy": "ch01.s06", "cluster": "R6" },
   { "id": "ph.c_ts", "ru": "c читается как [к] или [с], а надо [ц]", "hint": "c = [ц]: cena [цэ́на]. Цена, а не сено.", "remedy": "ch01.s02", "cluster": "R2" },
   { "id": "ph.l_w", "ru": "ł и l перепутаны: ł = [ў], l — среднее л", "hint": "ł звучит как английское w: łata [ўа́та].", "remedy": "ch01.s03", "cluster": "R3" },
   { "id": "ph.cz_soft", "ru": "cz/sz смягчены: czy = [чы], не [чи]", "hint": "cz и sz твёрдые: czy = [чы], szyba = [шы́ба].", "remedy": "ch01.s04", "cluster": "R4" },

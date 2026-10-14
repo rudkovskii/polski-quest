@@ -41,11 +41,19 @@ function rectOf(o: WorldObject): Pick<ResolvedGuide, 'at' | 'size'> {
  * Цель → что подсветить на этой карте. Растение (`plot` + `item`): клетка с этим словом; без `item` —
  * первая клетка с «!», иначе вся грядка. Скрытые объекты (`if` ложно) не цель.
  */
-export function resolveGuide(m: ModelLike, t: GuideTarget | null, plots: readonly PlotView[] = [], hidden: ReadonlySet<string> = new Set()): ResolvedGuide | null {
+export function resolveGuide(
+  m: ModelLike,
+  t: GuideTarget | null,
+  plots: readonly PlotView[] = [],
+  hidden: ReadonlySet<string> = new Set(),
+  route?: (from: string, to: string) => string | null,
+): ResolvedGuide | null {
   if (!t) return null;
   const visible = m.objects.filter((o) => !hidden.has(o.key));
   if (t.location !== m.map.id) {
-    const ex = visible.find((o) => o.kind === 'exit' && (o.src as { to: string }).to === t.location);
+    // Цель через карту (P-12: из метро спать в хатку — сначала на działkę): выход к следующей карте пути.
+    const to = visible.some((o) => o.kind === 'exit' && (o.src as { to: string }).to === t.location) ? t.location : (route?.(m.map.id, t.location) ?? t.location);
+    const ex = visible.find((o) => o.kind === 'exit' && (o.src as { to: string }).to === to);
     return ex ? { key: ex.key, ...rectOf(ex), viaExit: true } : null;
   }
   if (t.plot) {
@@ -62,6 +70,30 @@ export function resolveGuide(m: ModelLike, t: GuideTarget | null, plots: readonl
   if (t.npc) {
     const o = visible.find((x) => x.kind === 'npc' && x.id === t.npc);
     if (o) return { key: o.key, ...rectOf(o), viaExit: false };
+  }
+  return null;
+}
+
+/**
+ * Следующая карта по пути `from` → `to` через выходы карт (P-12): BFS по графу `map.exits`. Условия выходов (`if`) не
+ * учитываются — открытость выхода на текущей карте проверяет resolveGuide. Нет пути — null.
+ */
+export function nextHop(maps: ReadonlyMap<string, { objects: readonly { type: string; to?: string }[] }>, from: string, to: string): string | null {
+  if (from === to) return null;
+  const prev = new Map<string, string>([[from, '']]);
+  const queue = [from];
+  for (let qi = 0; qi < queue.length; qi++) {
+    const cur = queue[qi]!;
+    for (const o of maps.get(cur)?.objects ?? []) {
+      if (o.type !== 'exit' || !o.to || prev.has(o.to) || !maps.has(o.to)) continue;
+      prev.set(o.to, cur);
+      if (o.to === to) {
+        let step = to;
+        while (prev.get(step) !== from) step = prev.get(step)!;
+        return step;
+      }
+      queue.push(o.to);
+    }
   }
   return null;
 }

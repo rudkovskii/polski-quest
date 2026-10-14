@@ -25,6 +25,11 @@
       "npc": { "$ref": "common.schema.json#/$defs/charId" },
       "location": { "$ref": "common.schema.json#/$defs/id" },
       "errLine": { "$ref": "common.schema.json#/$defs/lineId", "description": "Реакция мира на ошибку (P-06, СЮЖЕТ_v2 dNN.<npc>.err): реплика NPC сцены перед правилом" },
+      "errLines": {
+        "type": "object",
+        "description": "Реакция мира по тегу ошибки (P-12): тег → реплика. Есть errLines — реплика только для перечисленных тегов (prosię не получает «Ta-TA?» про ударение); нет — errLine на любую ошибку",
+        "additionalProperties": { "$ref": "common.schema.json#/$defs/lineId" }
+      },
       "introduces": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lxId" }, "maxItems": 8 },
       "warmup": {
         "type": "object",

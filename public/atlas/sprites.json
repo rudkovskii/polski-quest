@@ -64,6 +64,48 @@
   ],
   "anims": {}
  },
+ "brzechwa": {
+  "size": [
+   16,
+   32
+  ],
+  "anchor": [
+   8,
+   31
+  ],
+  "frames": [
+   "brzechwa/0",
+   "brzechwa/1",
+   "brzechwa/2",
+   "brzechwa/3"
+  ],
+  "anims": {
+   "walk_down": [
+    "brzechwa/0"
+   ],
+   "walk_up": [
+    "brzechwa/1"
+   ],
+   "walk_left": [
+    "brzechwa/2"
+   ],
+   "walk_right": [
+    "brzechwa/3"
+   ],
+   "idle_down": [
+    "brzechwa/0"
+   ],
+   "idle_up": [
+    "brzechwa/1"
+   ],
+   "idle_left": [
+    "brzechwa/2"
+   ],
+   "idle_right": [
+    "brzechwa/3"
+   ]
+  }
+ },
  "dima": {
   "size": [
    16,

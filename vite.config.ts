@@ -19,6 +19,26 @@ function buildId(): string {
   return `${pkg.version}+${sha}`;
 }
 
+const BUILD_ID = buildId();
+
+/**
+ * Версия сборки снаружи кэша (P-12, Андрей увидел старую c732548 без тоста): `index.html` несёт
+ * `<meta name="pq-build">`, рядом лежит `version.json` `{ "build": … }`. Игра читает его с `cache: 'no-store'`
+ * (src/systems/platform/pwa.ts `checkVersion`) и при расхождении со своим `__BUILD_ID__` перезагружается на титуле
+ * или показывает тост. version.json не кладётся в precache service worker'а (globIgnores ниже).
+ */
+function buildVersion(): Plugin {
+  return {
+    name: 'pq-build-version',
+    transformIndexHtml(html) {
+      return html.replace('</head>', `    <meta name="pq-build" content="${BUILD_ID}" />\n  </head>`);
+    },
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'version.json', source: `${JSON.stringify({ build: BUILD_ID })}\n` });
+    },
+  };
+}
+
 const ROOT_DIR = fileURLToPath(new URL('./', import.meta.url));
 const CONTENT_DIR = fileURLToPath(new URL('./content/', import.meta.url));
 const TSX = fileURLToPath(new URL('./node_modules/.bin/tsx', import.meta.url));
@@ -89,7 +109,7 @@ function releaseGate(): Plugin {
 export default defineConfig({
   base: BASE,
   define: {
-    __BUILD_ID__: JSON.stringify(buildId()),
+    __BUILD_ID__: JSON.stringify(BUILD_ID),
   },
   build: {
     target: 'es2022',
@@ -98,6 +118,7 @@ export default defineConfig({
   plugins: [
     contentValidator(),
     releaseGate(),
+    buildVersion(),
     VitePWA({
       // P-10a: новая сборка берёт страницу сразу (skipWaiting + clientsClaim), регистрация из кода
       // (src/systems/platform/pwa.ts): на титуле — перезагрузка, в игре — тост «Есть обновление».
@@ -128,6 +149,8 @@ export default defineConfig({
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,png,json,webmanifest}'],
+        // version.json — всегда из сети (P-12): по нему видно, что страница из старого кэша.
+        globIgnores: ['**/version.json'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: 'index.html',
         navigateFallbackDenylist: [/supabase/],

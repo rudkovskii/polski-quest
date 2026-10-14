@@ -45,7 +45,11 @@ export type SummaryOutcome = 'sleep' | 'more3' | 'express' | 'close';
 const STAGE_RU = { seed: 'семя', sprout: 'росток', sprout_big: 'крепкий росток', bush: 'куст', jar: 'банка' } as const;
 
 const css = `
-.pq-sleep { width: min(100% - 16px, 520px); max-height: calc(100% - 24px); overflow-y: auto; margin: auto; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.pq-sleep { width: min(100% - 16px, 520px); max-height: calc(100% - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); margin: auto; padding: 18px;
+  display: flex; flex-direction: column; gap: 10px; }
+/* P-12: итог прокручивается, «Dobranoc» прибита к низу окна (на iPhone уезжала под край). */
+.pq-sleep .body { flex: 1 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+.pq-sleep > .row { flex: none; padding-top: 6px; border-top: 2px solid #d3865f; }
 .pq-sleep h2 { margin: 0; font-size: 24px; color: #543c52; }
 .pq-sleep .stat { display: flex; justify-content: space-between; gap: 12px; font-size: 18px; border-bottom: 2px dotted #c8966b; padding: 4px 0; }
 .pq-sleep .list { font-size: 17px; color: #345a52; }
@@ -105,7 +109,15 @@ export function summaryBody(s: DaySummary, content: Pick<Content, 'vocab' | 'lin
   } else {
     out.push(stat('Полито', String(s.plants), 'watered'));
     out.push(stat('Выросло', String(s.grew.length), 'grew'));
-    if (s.grew.length) out.push(el('div', { class: 'list', lang: 'pl' }, s.grew.map((g) => `${pl(g.item)}: ${STAGE_RU[g.from]} → ${STAGE_RU[g.to]}`).join(', ')));
+    // P-12: компактно — слова по переходу: «cześć, dziękuję: росток → крепкий росток».
+    if (s.grew.length) {
+      const groups = new Map<string, string[]>();
+      for (const g of s.grew) {
+        const k = `${STAGE_RU[g.from]} → ${STAGE_RU[g.to]}`;
+        groups.set(k, [...(groups.get(k) ?? []), pl(g.item)]);
+      }
+      out.push(el('div', { class: 'list', lang: 'pl' }, [...groups].map(([k, w]) => `${w.join(', ')}: ${k}`).join('; ')));
+    }
     if (s.matured.length) {
       out.push(stat('Созрело (в банку)', String(s.matured.length), 'matured'));
       out.push(el('div', { class: 'list', lang: 'pl' }, s.matured.map(pl).join(', ')));
@@ -200,7 +212,13 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
         : null;
 
     layer.el.replaceChildren(
-      el('div', { class: 'pq-wood pq-sleep', 'data-summary': s.day }, el('h2', {}, 'Итог дня'), ...summaryBody(s, content, lines, active), remind, el('div', { class: 'row' }, ...actions)),
+      el(
+        'div',
+        { class: 'pq-wood pq-sleep', 'data-summary': s.day },
+        el('h2', {}, 'Итог дня'),
+        el('div', { class: 'body' }, ...summaryBody(s, content, lines, active), remind),
+        el('div', { class: 'row' }, ...actions),
+      ),
     );
     layer.handle({ cancel: () => (finish('close'), true) });
     queueMicrotask(() => main.focus({ preventScroll: true }));

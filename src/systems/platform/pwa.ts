@@ -40,6 +40,49 @@ export async function reloadForUpdate(flush?: () => Promise<void> | void, o: { n
   }
 }
 
+/** `version.json` рядом с index.html без кэша браузера и service worker'а: `build` или null (офлайн, нет файла). */
+export async function fetchRemoteBuild(base: string, o: { fetch?: typeof fetch; now?: number } = {}): Promise<string | null> {
+  const f = o.fetch ?? (typeof fetch === 'undefined' ? null : fetch.bind(globalThis));
+  if (!f) return null;
+  try {
+    const r = await f(`${base}version.json?t=${o.now ?? Date.now()}`, { cache: 'no-store' });
+    if (!r.ok) return null;
+    const j = (await r.json()) as { build?: unknown };
+    return typeof j.build === 'string' && j.build ? j.build : null;
+  } catch {
+    return null;
+  }
+}
+
+/** `<meta name="pq-build">` из index.html (P-12): какой сборкой отдана страница. */
+export function indexBuild(doc: Document | null = typeof document === 'undefined' ? null : document): string | null {
+  return doc?.querySelector<HTMLMetaElement>('meta[name="pq-build"]')?.content || null;
+}
+
+/**
+ * Проверка версии (P-12): сейчас и при каждом возврате во вкладку. Сборка устарела — сначала просим service worker
+ * обновиться (новый SW возьмёт страницу и сам вызовет onNeedReload), потом `onStale` (политика — systems/update.ts).
+ */
+export function watchVersion(o: { base: string; local: string; isStale: (x: { local: string; index: string | null; remote: string | null }) => boolean; onStale(): void }): void {
+  if (!import.meta.env.PROD || typeof document === 'undefined') return;
+  let fired = false;
+  const check = async (): Promise<void> => {
+    if (fired || document.visibilityState !== 'visible') return;
+    const remote = await fetchRemoteBuild(o.base);
+    if (fired || !o.isStale({ local: o.local, index: indexBuild(), remote })) return;
+    fired = true;
+    try {
+      const r = await navigator.serviceWorker?.getRegistration();
+      await r?.update();
+    } catch {
+      // без SW (встроенные браузеры, приватный режим): просто перезагрузка или тост
+    }
+    o.onStale();
+  };
+  void check();
+  document.addEventListener('visibilitychange', () => void check());
+}
+
 export function registerPwa(o: PwaOptions): void {
   if (!import.meta.env.PROD || typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
   void import('virtual:pwa-register').then(({ registerSW }) => {
