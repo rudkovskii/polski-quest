@@ -5,7 +5,9 @@ import { Location, type LocationData } from './scenes/Location';
 import { Title } from './scenes/Title';
 import { startCloud } from './cloud';
 import { bus } from './systems/bus';
+import { getContent } from './systems/content';
 import { mountUi } from './ui';
+import { loadPortraits, mountPlay } from './ui/play';
 import { mountDpad } from './ui/dpad';
 
 // Склейка слоёв (ТЗ §2.1): DOM-оверлей, d-pad, ввод, Phaser. Порядок важен (I-03): сначала d-pad
@@ -15,7 +17,10 @@ function startGame(start?: BootStart): Phaser.Game {
   const parent = document.getElementById('game');
   if (!overlay || !parent) throw new Error('#overlay или #game не найден');
   mountUi(overlay);
-  void startCloud({ dev: new URLSearchParams(window.location.search).get('dev') === '1' });
+  const cloud = startCloud({ dev: new URLSearchParams(window.location.search).get('dev') === '1' });
+  // Диалоги и упражнения (I-08): world:interact → оверлей, события журнала → хранилище синка.
+  const content = getContent();
+  mountPlay(overlay, { content, store: cloud.then((c) => c.storage), portraits: loadPortraits(content) });
 
   // Конфигурация из ТЗ §2.4. WorldMap добавится в I-11.
   const game = new Phaser.Game({
@@ -51,6 +56,9 @@ const dev = params.get('dev');
 if (dev === 'input') {
   // Dev-страница без Phaser (I-03).
   void import('./dev/input').then((m) => m.mountInputDev(document.body));
+} else if (dev === 'lesson') {
+  // `/?dev=lesson&id=<lessonId>[&dlg=<dialogueId>][&days=N]`: урок или диалог без мира, журнал в консоль (I-08).
+  void import('./dev/lesson').then((m) => m.mountLessonDev(params));
 } else if (dev === 'world') {
   // `/?dev=world&map=ch01.metro[&spawn=from_dzialka]`: сразу в локацию, события мира в консоль (I-07).
   const data: LocationData = { location: params.get('map') ?? 'ch01.metro' };

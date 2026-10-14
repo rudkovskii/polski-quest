@@ -27,9 +27,18 @@ export type SyncState =
 export type ConnectResult = 'ok' | 'offline' | 'not_found' | 'invalid';
 export type LinkMode = 'stored' | 'url' | 'new' | 'joined';
 
-/** Результат урока. Уточняется в I-07. */
+/** Результат урока (I-08). Поля, кроме passed, необязательны: их нет у отменённого до начала урока. */
 export interface LessonResult {
   passed: boolean;
+  /** Урок прерван (Esc / «B» / ×): позиция лежит в `local.resume`, событие `lesson` не записано. */
+  cancelled?: boolean;
+  /** Средний score первых попыток по проверяемым шагам, 0..1. */
+  score?: number;
+  /** Доля проверяемых шагов, верных с первой попытки, 0..1. */
+  firstTry?: number;
+  ms?: number;
+  /** Слова, посаженные в конце сцены (`intro`). */
+  planted?: string[];
 }
 
 /** Действие с объектом локации: кнопка «A»/пробел, тап или вход в триггер (I-07, ТЗ §5.4). */
@@ -80,6 +89,11 @@ export interface BusEvents {
   /** Секрет есть, мир выбран: дальше шаг режиссёра (I-13). `mode` — откуда взялся мир. */
   'link:ready': { mode: LinkMode };
   'audio:blocked': Record<string, never>;
+  /**
+   * Озвучить польский текст (I-08 → I-09). Шлёт оверлей (▶, «медленно», автозвук шага), слушает
+   * platform/audio: клип из манифеста по `id` или по тексту, иначе Web Speech. `who` — голос NPC.
+   */
+  'audio:play': { text: string; id?: string; slow?: boolean; who?: string };
   /** Intent после роутера (ТЗ §2.7): `to` = мир или оверлей по фокусу (I-03). */
   'input:intent': RoutedIntent;
   /** Сменился последний источник ввода (I-03). */
