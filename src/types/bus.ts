@@ -210,4 +210,8 @@ export interface BusEvents {
   'ui:creator:show': { mode: 'new' | 'mirror'; done: (a: Appearance | null) => void; opened?: () => void };
   /** Внешность игрока известна или сменилась (склейка src/avatarGlue.ts): мир пересобирает текстуру `avatar`. */
   'avatar:changed': { appearance: Appearance; key: string };
+  /** Новая сборка уже управляет страницей, игрок играет (P-10a): тост «Есть обновление» (ui/updateToast.ts). */
+  'app:update': Record<string, never>;
+  /** Игрок нажал «Обновить» в тосте: дописать прогресс и перезагрузиться (main.ts). */
+  'app:reload': Record<string, never>;
 }

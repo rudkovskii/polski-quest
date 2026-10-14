@@ -14,6 +14,9 @@ import { connectAudio } from './systems/platform/audio';
 import { getContent } from './systems/content';
 import { mountUi } from './ui';
 import { mountAudioToast } from './ui/audioToast';
+import { mountUpdateToast } from './ui/updateToast';
+import { lastReloadAt, registerPwa, reloadForUpdate } from './systems/platform/pwa';
+import { updateAction } from './systems/update';
 import { loadPortraits, mountPlay, type PlayDeps } from './ui/play';
 import { dpadLabelsOn, mountDpad } from './ui/dpad';
 import { setTodoVisible } from './ui/todo';
@@ -61,6 +64,7 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
   else connectAudio(bus);
   mountAudioToast(overlay);
+  mountUpdateToast(overlay);
   const store0 = opts.devStore ?? startCloud({ dev: dev === '1', ...opts.cloud }).then((c) => c.storage);
   const seedDay = opts.seedDay;
   const store = seedDay ? Promise.all([store0, import('./dev/seedDay')]).then(([s, m]) => (m.seedStoryDay(s, getContent(), seedDay, clock.now()), s)) : store0;
@@ -105,6 +109,12 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   // Петля дня (I-12): грядки, обход, экспресс, итог дня, настройки, позиция, таймер сессии.
   let storeNow: GameStorage | null = null;
   void store.then((s) => (storeNow = s));
+  // Новая сборка (P-10a): service worker уже новый — на титуле перезагрузка сразу, в игре тост «Есть обновление».
+  let started = false;
+  bus.once('title:start', () => (started = true));
+  const reload = (): void => void reloadForUpdate(() => storeNow?.flush());
+  bus.on('app:reload', reload);
+  registerPwa({ onNeedReload: () => (updateAction({ started, lastReloadAt: lastReloadAt(), now: Date.now() }) === 'reload' ? reload() : bus.emit('app:update', {})) });
   const day = startDay({
     root: overlay,
     overlay: play.overlay,

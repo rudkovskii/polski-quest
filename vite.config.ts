@@ -99,7 +99,10 @@ export default defineConfig({
     contentValidator(),
     releaseGate(),
     VitePWA({
+      // P-10a: новая сборка берёт страницу сразу (skipWaiting + clientsClaim), регистрация из кода
+      // (src/systems/platform/pwa.ts): на титуле — перезагрузка, в игре — тост «Есть обновление».
       registerType: 'autoUpdate',
+      injectRegister: false,
       includeAssets: ['icons/apple-touch-icon.png'],
       manifest: {
         id: BASE,
@@ -121,6 +124,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,png,json,webmanifest}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: 'index.html',
