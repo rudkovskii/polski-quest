@@ -1,31 +1,10 @@
 [
   {
-    "id": "kazik.move.first",
-    "who": "bobr",
-    "ru": "Стрелки или кружок слева внизу. Подходи к вещам и жми A. Тут каждая табличка что-то говорит.",
-    "pl": "Idziemy!",
-    "plRu": "Идём!"
-  },
-  {
-    "id": "kazik.water.first",
-    "who": "bobr",
-    "ru": "Это не огурец, это слово. Подвяло - значит, пора вспомнить. Полей вот это одно.",
-    "pl": "Szefie, podlewamy.",
-    "plRu": "Шеф, поливаем."
-  },
-  {
     "id": "kazik.water.due",
     "who": "bobr",
     "ru": "Где зарубка, там слово просится. Обойдём и пойдём гулять.",
     "pl": "Zrobiłem znak.",
     "plRu": "Я сделал зарубку."
-  },
-  {
-    "id": "kazik.pierogi.first",
-    "who": "bobr",
-    "ru": "Новые слова как пироги: три в день. Съешь больше, ночью приснятся падежи.",
-    "pl": "Trzy pierogi dziennie. Więcej nie zjesz.",
-    "plRu": "Три пирога в день. Больше не съешь."
   },
   {
     "id": "kazik.jar.first",
@@ -149,24 +128,8 @@
   },
   { "id": "kazik.prawie", "who": "bobr", "pl": "Prawie. Jeszcze raz.", "plRu": "Почти. Ещё раз." },
   { "id": "kazik.name.odwrotnie", "who": "bobr", "pl": "Ja robię odwrotnie.", "plRu": "А я наоборот." },
-  {
-    "id": "kazik.dream.most",
-    "who": "bobr",
-    "pl": "Wszystkie bobry budują tamy. Ja buduję most.",
-    "plRu": "Все бобры строят плотины. Я строю мост."
-  },
   { "id": "kazik.dream.gryze", "who": "bobr", "pl": "Ja nie czytam. Ja gryzę.", "plRu": "Я не читаю. Я грызу." },
-  { "id": "intro.kazik.kloda", "who": "bobr", "pl": "Dobra kłoda!", "plRu": "Хорошее бревно!" },
-  { "id": "intro.hela.za_darmo", "who": "pani_hela", "pl": "Pan bierze? Za darmo.", "plRu": "Берёте? Даром." },
-  { "id": "intro.kazik.gosc_mowi", "who": "bobr", "pl": "No proszę. Gość mówi!", "plRu": "Ну надо же. Гость говорит!" },
-  { "id": "intro.kazik.dopiero", "who": "bobr", "pl": "Do widzenia? Dopiero przyszedłeś.", "plRu": "До свидания? Ты только пришёл." },
-  {
-    "id": "intro.kazik.po_rusku",
-    "who": "bobr",
-    "ru": "О, ты по-русски? Я с Буга, у нас граница течёт через всё. Kazimierz, для своих Казик. Пошли, покажу участок. Ничей. Теперь наш."
-  },
   { "id": "brzechwa.powtorz", "who": "brzechwa", "pl": "Powtórz!", "plRu": "Повтори!" },
-  { "id": "brzechwa.rym_dima", "who": "brzechwa", "pl": "Dima? Rymuje się z „zima”!", "plRu": "Дима? Рифмуется с «зима»!" },
   { "id": "brzechwa.adwokat", "who": "brzechwa", "pl": "Jestem adwokatem. Cytuj krótko.", "plRu": "Я адвокат. Цитируй коротко." },
   { "id": "brzechwa.prawdziwa_polska", "who": "brzechwa", "pl": "Tam, gdzie mówią „chrząszcz”!", "plRu": "Там, где говорят «chrząszcz»!" },
   { "id": "kazik.bobr_kreska", "who": "bobr", "ru": "Я знаю, как я пишусь." },
@@ -184,14 +147,398 @@
   { "id": "kazik.ch01.s12.most", "who": "bobr", "ru": "Успеем построить ещё один мост." },
   { "id": "kazik.ch01.s06.ciasto", "who": "bobr", "todo": true },
   { "id": "kazik.ch01.s06.kasza", "who": "bobr", "todo": true },
-  { "id": "intro.caption.oct", "who": "narrator", "ru": "Октябрь. Варшава. Правый берег." },
-  { "id": "intro.caption.bobr", "who": "narrator", "ru": "Бобр. В Варшаве бывает." },
-  { "id": "intro.passport.k", "who": "narrator", "pl": "Dla następnego gościa. - K.", "plRu": "Для следующего гостя. - K." },
-  { "id": "intro.caption.empty", "who": "narrator", "ru": "Пустой. Почти." },
-  { "id": "intro.kazik.dzien_dobry", "who": "bobr", "pl": "Dzień dobry?" },
-  { "id": "intro.simba.miau", "who": "simba", "pl": "miau" },
-  { "id": "intro.caption.pokazalo", "who": "narrator", "ru": "Показалось." },
   { "id": "kazik.evening", "who": "bobr", "todo": true },
-  { "id": "kazik.done", "who": "bobr", "todo": true },
-  { "id": "kazik.bridge.piles", "who": "bobr", "todo": true }
+  { "id": "kazik.bridge.piles", "who": "bobr", "todo": true },
+  {
+    "id": "d01.narr.card.1",
+    "who": "narrator",
+    "ru": "Октябрь. Варшава. Правый берег."
+  },
+  {
+    "id": "d01.fotobudka.1",
+    "who": "fotobudka",
+    "pl": "Bez uśmiechu, proszę.",
+    "plRu": "Без улыбки, пожалуйста."
+  },
+  {
+    "id": "d01.narr.fotobudka.1",
+    "who": "narrator",
+    "ru": "Фото на документы. Документов пока нет."
+  },
+  {
+    "id": "d01.kazik.platform.1",
+    "who": "bobr",
+    "pl": "Dobra kłoda!",
+    "plRu": "Хорошее бревно!"
+  },
+  {
+    "id": "d01.narr.platform.1",
+    "who": "narrator",
+    "ru": "Бобр. В Варшаве бывает."
+  },
+  {
+    "id": "d01.dima.platform.1",
+    "who": "dima",
+    "ru": "#@!%"
+  },
+  {
+    "id": "d01.kazik.platform.2",
+    "who": "bobr",
+    "ru": "О! По-русски ругаешься? Свои. Держи чемодан."
+  },
+  {
+    "id": "d01.kazik.platform.3",
+    "who": "bobr",
+    "ru": "Я Казик. С Буга: это река на границе."
+  },
+  {
+    "id": "d01.kazik.platform.4",
+    "who": "bobr",
+    "ru": "Рыбы там на двух языках. Я тоже."
+  },
+  {
+    "id": "d01.kazik.platform.5",
+    "who": "bobr",
+    "ru": "Звук у тебя есть? Если ты в метро, скажи: буду буквами."
+  },
+  {
+    "id": "d01.kazik.platform.6a",
+    "who": "bobr",
+    "pl": "Dobra.",
+    "plRu": "Ладно."
+  },
+  {
+    "id": "d01.kazik.platform.6b",
+    "who": "bobr",
+    "ru": "Понял. Тихо, как бобр в засаде."
+  },
+  {
+    "id": "d01.kazik.platform.7",
+    "who": "bobr",
+    "ru": "Мне на базар, там ящик. Со мной люди не говорят: я бобр."
+  },
+  {
+    "id": "d01.kazik.platform.8",
+    "who": "bobr",
+    "ru": "Скажешь за меня? Пошли."
+  },
+  {
+    "id": "d01.kazik.platform.go",
+    "who": "bobr",
+    "pl": "Idziemy!",
+    "plRu": "Идём!"
+  },
+  {
+    "id": "d01.kazik.street.1",
+    "who": "bobr",
+    "ru": "Что там написано?"
+  },
+  {
+    "id": "d01.kazik.street.2",
+    "who": "bobr",
+    "pl": "Ja nie czytam. Ja gryzę.",
+    "plRu": "Я не читаю. Я грызу."
+  },
+  {
+    "id": "d01.sign.bazar",
+    "who": "tablica",
+    "pl": "BAZAR →",
+    "plRu": "Базар →"
+  },
+  {
+    "id": "d01.kazik.street.3",
+    "who": "bobr",
+    "ru": "Базар. Значит, ты будешь читать, я грызть. Честно."
+  },
+  {
+    "id": "d01.sign.zaraz",
+    "who": "tablica",
+    "pl": "ZARAZ WRACAM",
+    "plRu": "Сейчас вернусь"
+  },
+  {
+    "id": "d01.kazik.street.zaraz",
+    "who": "bobr",
+    "ru": "Висит всегда. «Zaraz» тут от минуты до вечера."
+  },
+  {
+    "id": "d01.kazik.bazar.1",
+    "who": "bobr",
+    "ru": "Вон ящик. Скажи ей «Dzień dobry»: здравствуйте."
+  },
+  {
+    "id": "d01.hela.bazar.1",
+    "who": "pani_hela",
+    "pl": "Tak?",
+    "plRu": "Да?"
+  },
+  {
+    "id": "d01.hela.bazar.2",
+    "who": "pani_hela",
+    "pl": "Dzień dobry!",
+    "plRu": "Здравствуйте!"
+  },
+  {
+    "id": "d01.kazik.bazar.2",
+    "who": "bobr",
+    "pl": "No proszę. Gość mówi!",
+    "plRu": "Ну надо же. Гость говорит!"
+  },
+  {
+    "id": "d01.ui.umiem.1",
+    "who": "narrator",
+    "pl": "Umiem: przywitać się",
+    "plRu": "Умею: здороваться"
+  },
+  {
+    "id": "d01.hela.bazar.err.1",
+    "who": "pani_hela",
+    "pl": "Do widzenia? Pan dopiero przyszedł!",
+    "plRu": "До свидания? Вы же только пришли!"
+  },
+  {
+    "id": "d01.rule.dzien_dobry",
+    "who": "narrator",
+    "ru": "Dzień dobry: при встрече. Do widzenia: на прощание."
+  },
+  {
+    "id": "d01.rule.dzien_dobry.tr",
+    "who": "narrator",
+    "pl": "Do widzenia",
+    "plRu": "До свидания"
+  },
+  {
+    "id": "d01.hela.bazar.3",
+    "who": "pani_hela",
+    "pl": "Pan bierze? Za darmo.",
+    "plRu": "Берёте? Даром."
+  },
+  {
+    "id": "d01.hela.bazar.4",
+    "who": "pani_hela",
+    "pl": "To też za darmo.",
+    "plRu": "Это тоже даром."
+  },
+  {
+    "id": "d01.kazik.bazar.3",
+    "who": "bobr",
+    "pl": "Prawie kłoda.",
+    "plRu": "Почти бревно."
+  },
+  {
+    "id": "d01.passport.note",
+    "who": "narrator",
+    "pl": "Dla następnego gościa. - K.",
+    "plRu": "Для следующего гостя. - K."
+  },
+  {
+    "id": "d01.narr.passport.1",
+    "who": "narrator",
+    "ru": "Паспорт гостя. Пустой. Фото подошло."
+  },
+  {
+    "id": "d01.hela.bazar.5",
+    "who": "pani_hela",
+    "pl": "I pieczątka. Gratis.",
+    "plRu": "И печать. Бесплатно."
+  },
+  {
+    "id": "d01.kazik.bazar.4",
+    "who": "bobr",
+    "ru": "Первая печать. Кривая, но наша."
+  },
+  {
+    "id": "d01.kazik.bazar.5",
+    "who": "bobr",
+    "ru": "Это паспорт гостя. Печать ставит тот, с кем ты поговорил."
+  },
+  {
+    "id": "d01.kazik.bazar.6",
+    "who": "bobr",
+    "ru": "Главная тут Прага. Её ставит контролёр в метро. Доберёмся."
+  },
+  {
+    "id": "d01.kazik.bazar.7",
+    "who": "bobr",
+    "ru": "А что там за «K.»? Не я. Я не пишу. Я грызу."
+  },
+  {
+    "id": "idle.hela.1",
+    "who": "pani_hela",
+    "pl": "Pan znowu? Dzień dobry!",
+    "plRu": "Вы опять? Здравствуйте!"
+  },
+  {
+    "id": "idle.hela.2",
+    "who": "pani_hela",
+    "pl": "Za darmo nie ma nic. Prawie nic.",
+    "plRu": "Даром ничего нет. Почти ничего."
+  },
+  {
+    "id": "idle.hela.3",
+    "who": "pani_hela",
+    "pl": "Kot? Tu nie ma kota.",
+    "plRu": "Кот? Тут нет кота."
+  },
+  {
+    "id": "d01.kazik.wisla.1",
+    "who": "bobr",
+    "pl": "Bobry budują tamy. Ja buduję most.",
+    "plRu": "Бобры строят плотины. Я строю мост."
+  },
+  {
+    "id": "d01.kazik.wisla.2",
+    "who": "bobr",
+    "ru": "Вон туда, на тот берег. Дерево у меня есть. Слов нет."
+  },
+  {
+    "id": "d01.kazik.wisla.3",
+    "who": "bobr",
+    "ru": "На мосту нужны таблички. Ты слова, я дерево. Идёт?"
+  },
+  {
+    "id": "d01.kazik.wisla.4",
+    "who": "bobr",
+    "ru": "Оба «да». Я так и думал. У кого слова, тот и шеф."
+  },
+  {
+    "id": "d01.kazik.wisla.5",
+    "who": "bobr",
+    "pl": "Szefie! Idziemy.",
+    "plRu": "Шеф! Идём."
+  },
+  {
+    "id": "d01.kazik.dzialka.1",
+    "who": "bobr",
+    "ru": "Это działka. Участок. Ничей. Теперь наш."
+  },
+  {
+    "id": "d01.kazik.dzialka.2",
+    "who": "bobr",
+    "ru": "Твоё «Dzień dobry» я посадил. Сказанное слово растёт."
+  },
+  {
+    "id": "d01.kazik.dzialka.3",
+    "who": "bobr",
+    "pl": "Szefie, podlewamy.",
+    "plRu": "Шеф, поливаем."
+  },
+  {
+    "id": "d01.kazik.dzialka.4",
+    "who": "bobr",
+    "ru": "Это не огурец, это слово. Подвяло, значит, пора вспомнить."
+  },
+  {
+    "id": "d01.kazik.dzialka.5",
+    "who": "bobr",
+    "pl": "Dobra.",
+    "plRu": "Хорошо."
+  },
+  {
+    "id": "d01.brzechwa.plot.1",
+    "who": "brzechwa",
+    "pl": "Mój kapelusz!",
+    "plRu": "Моя шляпа!"
+  },
+  {
+    "id": "d01.brzechwa.plot.2",
+    "who": "brzechwa",
+    "pl": "Dziękuję!",
+    "plRu": "Спасибо!"
+  },
+  {
+    "id": "d01.kazik.plot.1",
+    "who": "bobr",
+    "ru": "На «спасибо» тут говорят «proszę»: пожалуйста."
+  },
+  {
+    "id": "d01.brzechwa.plot.3",
+    "who": "brzechwa",
+    "pl": "Jestem Jan Brzechwa. A ty?",
+    "plRu": "Я Ян Бжехва. А ты?"
+  },
+  {
+    "id": "d01.brzechwa.plot.4",
+    "who": "brzechwa",
+    "pl": "Dima? Rymuje się z „zima”!",
+    "plRu": "Дима? Рифмуется с «зима»!"
+  },
+  {
+    "id": "d01.brzechwa.plot.5",
+    "who": "brzechwa",
+    "pl": "Cześć, Dima! Do jutra!",
+    "plRu": "Пока, Дима! До завтра!"
+  },
+  {
+    "id": "d01.kazik.plot.2",
+    "who": "bobr",
+    "ru": "Три слова, три семечка. Сажай сам: к грядке и A."
+  },
+  {
+    "id": "d01.kazik.plot.3",
+    "who": "bobr",
+    "pl": "Trzy pierogi dziennie. Więcej nie zjesz.",
+    "plRu": "Три пирога в день. Больше не съешь."
+  },
+  {
+    "id": "d01.kazik.plot.4",
+    "who": "bobr",
+    "ru": "Новые слова как пироги. Съешь больше, ночью приснятся падежи."
+  },
+  {
+    "id": "d01.kazik.hut.1",
+    "who": "bobr",
+    "pl": "Idziemy spać. Jutro też jest dzień.",
+    "plRu": "Идём спать. Завтра тоже день."
+  },
+  {
+    "id": "d01.kazik.hut.2",
+    "who": "bobr",
+    "ru": "На сегодня хватит. Ночью слова пускают корни."
+  },
+  {
+    "id": "d01.ui.summary",
+    "who": "narrator",
+    "pl": "Podlane: 1. Posadzone: 3.",
+    "plRu": "Полито: 1. Посажено: 3."
+  },
+  {
+    "id": "d01.ui.summary.umiem",
+    "who": "narrator",
+    "pl": "Umiem: przywitać się",
+    "plRu": "Умею: здороваться"
+  },
+  {
+    "id": "d01.ui.hook",
+    "who": "narrator",
+    "pl": "Jutro: list.",
+    "plRu": "Завтра: письмо."
+  },
+  {
+    "id": "d01.simba.night",
+    "who": "simba",
+    "pl": "miau"
+  },
+  {
+    "id": "d01.kazik.hut.3",
+    "who": "bobr",
+    "ru": "Это не я. Котов тут нет. Спи."
+  },
+  {
+    "id": "d01.ui.dobranoc",
+    "who": "narrator",
+    "pl": "Dobranoc",
+    "plRu": "Спокойной ночи"
+  },
+  {
+    "id": "sys.kazik.done",
+    "who": "bobr",
+    "pl": "Do jutra!",
+    "plRu": "До завтра!"
+  },
+  {
+    "id": "sys.kazik.done.2",
+    "who": "bobr",
+    "ru": "На сегодня всё. Завтра польём. Хочешь ещё, жми «+3 минуты»."
+  }
 ]

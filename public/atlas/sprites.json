@@ -258,6 +258,33 @@
    ]
   }
  },
+ "kapelusz": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "kapelusz/0"
+  ],
+  "anims": {
+   "idle_down": [
+    "kapelusz/0"
+   ],
+   "idle_up": [
+    "kapelusz/0"
+   ],
+   "idle_left": [
+    "kapelusz/0"
+   ],
+   "idle_right": [
+    "kapelusz/0"
+   ]
+  }
+ },
  "mark_due": {
   "size": [
    16,
@@ -405,5 +432,135 @@
    "tile.fence/15"
   ],
   "anims": {}
+ },
+ "tile.fotobudka": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   0,
+   0
+  ],
+  "frames": [
+   "tile.fotobudka/0",
+   "tile.fotobudka/1",
+   "tile.fotobudka/2",
+   "tile.fotobudka/3"
+  ],
+  "anims": {}
+ },
+ "tile.kamienica": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   0,
+   0
+  ],
+  "frames": [
+   "tile.kamienica/0",
+   "tile.kamienica/1",
+   "tile.kamienica/2",
+   "tile.kamienica/3",
+   "tile.kamienica/4"
+  ],
+  "anims": {}
+ },
+ "tile.peron": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   0,
+   0
+  ],
+  "frames": [
+   "tile.peron/0",
+   "tile.peron/1",
+   "tile.peron/2",
+   "tile.peron/3"
+  ],
+  "anims": {}
+ },
+ "tile.poslanie": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   0,
+   0
+  ],
+  "frames": [
+   "tile.poslanie/0",
+   "tile.poslanie/1"
+  ],
+  "anims": {}
+ },
+ "tile.tablo": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   0,
+   0
+  ],
+  "frames": [
+   "tile.tablo/0",
+   "tile.tablo/1",
+   "tile.tablo/2"
+  ],
+  "anims": {}
+ },
+ "tile.train": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   0,
+   0
+  ],
+  "frames": [
+   "tile.train/0",
+   "tile.train/1",
+   "tile.train/2",
+   "tile.train/3",
+   "tile.train/4",
+   "tile.train/5",
+   "tile.train/6"
+  ],
+  "anims": {}
+ },
+ "walizka": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "walizka/0"
+  ],
+  "anims": {
+   "idle_down": [
+    "walizka/0"
+   ],
+   "idle_up": [
+    "walizka/0"
+   ],
+   "idle_left": [
+    "walizka/0"
+   ],
+   "idle_right": [
+    "walizka/0"
+   ]
+  }
  }
 }
