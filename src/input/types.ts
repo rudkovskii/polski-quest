@@ -1,0 +1,12 @@
+// Intent, Source, Dir по ТЗ §2.7. Определения в src/types/input.ts (на них ссылается шина).
+export type {
+  ControlsSettings,
+  Dir,
+  DpadSetting,
+  DpadSide,
+  Focus,
+  Intent,
+  MapControls,
+  RoutedIntent,
+  Source,
+} from '../types/input';

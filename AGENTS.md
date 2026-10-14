@@ -42,6 +42,8 @@
   не трогает `window`, `document`, `navigator`, `localStorage`, `indexedDB`, `fetch`, `requestAnimationFrame`.
 - `src/systems/platform/**`: адаптеры браузера, без `phaser`, `scenes|world`, `ui`.
 - `src/scenes|world/**` ⇄ `src/ui/**`: друг друга не импортируют. `ui` не импортирует `phaser`.
+- `src/input/**`: без `phaser`, `platform/`, `scenes|world`, `ui`; шлёт intents в `bus`. Прямой `keydown`/`pointerdown`
+  только в `src/input/` и `src/ui/keyboard/` (сцены, мир, экраны ловит check:banned).
 - Склейка слоёв только в `src/main.ts`.
 
 ## Как добавить модуль
