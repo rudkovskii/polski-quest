@@ -5,7 +5,7 @@ import { Location, type LocationData } from './scenes/Location';
 import { Title } from './scenes/Title';
 import { offlineRpc, startCloud, type CloudOptions } from './cloud';
 import { startFlow } from './flow';
-import { startAvatar } from './avatarGlue';
+import { startAvatar, startPlayerName } from './avatarGlue';
 import { withAvatarPortraits } from './ui/avatar';
 import { mountCreator } from './ui/creator';
 import { mountGuide } from './ui/guide';
@@ -14,6 +14,9 @@ import { connectAudio } from './systems/platform/audio';
 import { getContent } from './systems/content';
 import { mountUi } from './ui';
 import { mountAudioToast } from './ui/audioToast';
+import { mountUpdateToast } from './ui/updateToast';
+import { lastReloadAt, registerPwa, reloadForUpdate } from './systems/platform/pwa';
+import { updateAction } from './systems/update';
 import { loadPortraits, mountPlay, type PlayDeps } from './ui/play';
 import { dpadLabelsOn, mountDpad } from './ui/dpad';
 import { setTodoVisible } from './ui/todo';
@@ -32,7 +35,9 @@ const dev = params.get('dev');
  * в отдельной базе `polski-quest-play` и облако выключено (ничего не уходит в Supabase). `reset=1` стирает базу:
  * чистый профиль. Повторный запуск — `?dev=play&mute=1` (база сохранилась), `&now=+8d` — весна.
  */
-const playDev = dev === 'play' || (!dev && params.get('reset') === '1');
+// Свой профиль параллельной проверки (`?dev=p10a`): тот же прогон, отдельная база `polski-quest-p10a`.
+const playProfile = !!dev && /^p\d+[a-z]?$/.test(dev);
+const playDev = dev === 'play' || playProfile || (!dev && params.get('reset') === '1');
 // Dev-часы (I-12): `?now=<ISO>` или `?now=+1d` сдвигают время во всех deps; только вместе с `dev`.
 const clock = createClock(dev || playDev ? params.get('now') : null);
 // Без звука вслух (AGENTS.md): `?mute=1` — `audio:play` только в консоль.
@@ -61,6 +66,7 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
   else connectAudio(bus);
   mountAudioToast(overlay);
+  mountUpdateToast(overlay);
   const store0 = opts.devStore ?? startCloud({ dev: dev === '1', ...opts.cloud }).then((c) => c.storage);
   const seedDay = opts.seedDay;
   const store = seedDay ? Promise.all([store0, import('./dev/seedDay')]).then(([s, m]) => (m.seedStoryDay(s, getContent(), seedDay, clock.now()), s)) : store0;
@@ -68,6 +74,8 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   const content = getContent();
   // Внешность из Fotobudka (P-03): `avatar:changed` → текстура `avatar` в мире, голова аватара в портретах.
   const avatar = startAvatar(store);
+  // Имя из Fotobudka в репликах (P-10a): `{name}` → имя игрока, раньше подписчиков play/flow.
+  startPlayerName(content, store);
   const portraits = loadPortraits(content).then((src) => withAvatarPortraits(src, avatar.current));
   const playDeps: PlayDeps = { content, store, portraits, clock };
   const play = mountPlay(overlay, playDeps);
@@ -103,6 +111,12 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   // Петля дня (I-12): грядки, обход, экспресс, итог дня, настройки, позиция, таймер сессии.
   let storeNow: GameStorage | null = null;
   void store.then((s) => (storeNow = s));
+  // Новая сборка (P-10a): service worker уже новый — на титуле перезагрузка сразу, в игре тост «Есть обновление».
+  let started = false;
+  bus.once('title:start', () => (started = true));
+  const reload = (): void => void reloadForUpdate(() => storeNow?.flush());
+  bus.on('app:reload', reload);
+  registerPwa({ onNeedReload: () => (updateAction({ started, lastReloadAt: lastReloadAt(), now: Date.now() }) === 'reload' ? reload() : bus.emit('app:update', {})) });
   const day = startDay({
     root: overlay,
     overlay: play.overlay,
@@ -170,7 +184,7 @@ if (dev === 'creator') {
   bus.on('world:marks', (m) => console.info('[world:marks]', JSON.stringify({ location: m.location, due: m.dueItems, cells: m.plots.flatMap((p) => p.cells.filter((c) => c.item).map((c) => `${c.item}:${c.stage}/${c.interval}${c.due ? '!' : ''}${c.wilted ? '~' : ''}`)) })));
   if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
 } else if (playDev) {
-  const dbName = 'polski-quest-play';
+  const dbName = playProfile ? `polski-quest-${dev}` : 'polski-quest-play';
   const reset = params.get('reset') === '1';
   if (reset) {
     // Стираем один раз: перезагрузка вкладки (в том числе HMR) продолжает тот же мир, а не чистый.

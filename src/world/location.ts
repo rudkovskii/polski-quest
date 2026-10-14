@@ -79,6 +79,18 @@ export interface LocationOptions {
 }
 
 const eq = (a: Xy, b: Xy): boolean => a[0] === b[0] && a[1] === b[1];
+const adjacent = (a: Xy, b: Xy): boolean => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) === 1;
+
+/** Ключ Казика: NPC `bobr` на карте или бобр-компаньон, который идёт следом (P-10a: цель шага «поговори: Kazik»). */
+export const BOBR_KEY = 'npc:bobr';
+
+/** Цель режиссёра для кнопки A (P-10a): что подсвечено контуром. Для компаньона клетка берётся живая. */
+export interface ActionGoal {
+  key: string;
+  at: Xy;
+  size: Xy;
+  viaExit: boolean;
+}
 const dirBetween = (from: Xy, to: Xy): Dir => {
   const dx = to[0] - from[0];
   const dy = to[1] - from[1];
@@ -151,6 +163,8 @@ export class LocationModel {
   private pointGoal: Xy | null = null;
   private pointFace: Dir | null = null;
   private companionPath: Xy[] = [];
+  /** Цель режиссёра (P-10a): A сначала берёт её, если она перед лицом или рядом. */
+  private goal: ActionGoal | null = null;
 
   constructor(map: LocationMap, spawn: Xy, opts: LocationOptions = {}) {
     this.map = map;
@@ -202,11 +216,14 @@ export class LocationModel {
   }
 
   /** Переставить объект (бобр на działce садится у нужной грядки). */
-  moveObject(key: string, at: Xy): void {
-    const o = this.object(key);
-    if (!o || (o.at[0] === at[0] && o.at[1] === at[1])) return;
+  moveObject(key: string, at: Xy): boolean {
+    const o = this.objects.find((x) => x.key === key);
+    if (!o || (o.at[0] === at[0] && o.at[1] === at[1])) return false;
+    // На клетку Димы (и куда он шагает) NPC не встаёт (P-10a: Казик на клетке игрока).
+    if (o.solid && this.isReserved(at)) return false;
     o.at = [at[0], at[1]];
     this.rebuildSolid();
+    return true;
   }
 
   /** Бобр идёт к клетке `goal` и смотрит в сторону `face`; null — снова следом за Димой. */
@@ -222,6 +239,37 @@ export class LocationModel {
 
   get pointing(): Xy | null {
     return this.pointGoal;
+  }
+
+  /** Цель режиссёра для A (P-10a): контур, который видит игрок. null — цели на карте нет. */
+  setGoal(g: ActionGoal | null): void {
+    this.goal = g ? { key: g.key, at: [g.at[0], g.at[1]], size: [g.size[0], g.size[1]], viaExit: g.viaExit } : null;
+  }
+
+  /** Цель — сам бобр-компаньон (на карте нет NPC `bobr`). */
+  get companionIsGoal(): boolean {
+    return this.goal?.key === BOBR_KEY && !!this.companion && !this.objects.some((o) => o.key === BOBR_KEY);
+  }
+
+  /** Клетки, которые заняты Димой сейчас и вот-вот: клетка, куда он шагает, и конец пути. NPC и бобр туда не встают. */
+  reserved(): Xy[] {
+    const out: Xy[] = [this.player.tile];
+    if (this.player.step) out.push(this.player.step.to);
+    const end = this.path[this.path.length - 1];
+    if (end) out.push(end);
+    return out;
+  }
+
+  private isReserved(c: Xy): boolean {
+    return this.reserved().some((r) => eq(r, c));
+  }
+
+  /** Бобр-компаньон как объект (для A и тапа): только если на карте нет NPC `bobr`. */
+  private companionObject(): WorldObject | undefined {
+    const c = this.companion;
+    if (!c || this.objects.some((o) => o.key === BOBR_KEY)) return undefined;
+    const at: Xy = c.step ? c.step.to : c.tile;
+    return { key: BOBR_KEY, kind: 'npc', id: 'bobr', at, size: [1, 1], solid: false, src: { type: 'npc', id: 'bobr', at: [at[0], at[1]] } };
   }
 
   private updateCompanion(dt: number): void {
@@ -254,6 +302,17 @@ export class LocationModel {
         this.companionPath = [];
         return;
       }
+      if (this.isReserved(nxt)) {
+        // Клетка Димы (P-10a): Казик не встаёт на неё — обходит; обойти нельзя или это сама цель — ждёт рядом.
+        const around = eq(nxt, this.pointGoal) ? null : findPath({ w: this.parsed.w, h: this.parsed.h, passable: (x, y) => this.passable(x, y) && !this.isReserved([x, y]) }, c.tile, this.pointGoal);
+        if (around?.exact && around.path.length) {
+          this.companionPath = around.path;
+          continue;
+        }
+        this.companionPath = [];
+        if (this.pointFace) c.facing = this.pointFace;
+        return;
+      }
       c.facing = dirBetween(c.tile, nxt);
       c.step = { from: c.tile, to: nxt, t: 0 };
     }
@@ -268,7 +327,7 @@ export class LocationModel {
   }
 
   object(key: string): WorldObject | undefined {
-    return this.objects.find((o) => o.key === key);
+    return this.objects.find((o) => o.key === key) ?? (key === BOBR_KEY ? this.companionObject() : undefined);
   }
 
   /** Объекты, с которыми можно что-то сделать кнопкой или тапом. Выход — только в tap-режиме. */
@@ -299,7 +358,7 @@ export class LocationModel {
 
   /** Что под пальцем: ключ объекта (`key` или `key@x,y` для многоклеточных) или null. */
   targetAt(tile: Xy): string | null {
-    const o = this.objects.find((ob) => covers(ob, tile) && this.cellActionable(ob, tile));
+    const o = this.objects.find((ob) => covers(ob, tile) && this.cellActionable(ob, tile)) ?? this.companionAt(tile);
     if (!o) return null;
     return o.size[0] * o.size[1] > 1 ? `${o.key}@${tile[0]},${tile[1]}` : o.key;
   }
@@ -321,6 +380,13 @@ export class LocationModel {
   actionHint(): { key: string; tile: Xy } | null {
     if (this.controls !== 'walk') return null;
     return this.highlight();
+  }
+
+  /** Бобр-компаньон под пальцем (P-10a: тап по Казику — дойти и поговорить). */
+  private companionAt(tile: Xy): WorldObject | undefined {
+    const o = this.companionObject();
+    const c = this.companion;
+    return o && c && (eq(c.tile, tile) || eq(o.at, tile)) ? o : undefined;
   }
 
   /** Положение актёра в клетках с долей шага (для отрисовки). */
@@ -443,6 +509,21 @@ export class LocationModel {
     return options.find(([x, y]) => this.passable(x, y)) ?? [px, py];
   }
 
+  /**
+   * Дима шагает на клетку Казика (бобр-указатель стоит): Казик уступает дорогу — в сторону, поперёк шага;
+   * некуда — меняется с Димой местами (P-10a: Казик никогда не стоит на клетке игрока).
+   */
+  private yieldCompanion(to: Xy, from: Xy): void {
+    const c = this.companion!;
+    const d = dirBetween(from, to);
+    const side: Dir[] = d === 'up' || d === 'down' ? ['left', 'right'] : ['up', 'down'];
+    const options: Xy[] = [...side.map((s): Xy => [to[0] + DELTA[s][0], to[1] + DELTA[s][1]]), from];
+    const cell = options.find((x) => this.passable(x[0], x[1]) && !eq(x, to)) ?? from;
+    c.facing = dirBetween(c.tile, cell);
+    c.step = { from: c.tile, to: cell, t: 0 };
+    this.companionPath = [];
+  }
+
   private tryStep(dir: Dir): boolean {
     this.player.facing = dir;
     const [x, y] = this.player.tile;
@@ -462,7 +543,8 @@ export class LocationModel {
     this.player.step = { from, to, t: 0 };
     this.out.push({ type: 'step', from, to });
     const c = this.companion;
-    if (c && !this.pointGoal && !eq(c.tile, from)) {
+    if (c && this.pointGoal && !c.step && eq(c.tile, to)) this.yieldCompanion(to, from);
+    else if (c && !this.pointGoal && !eq(c.tile, from)) {
       const adjacent = Math.abs(c.tile[0] - from[0]) + Math.abs(c.tile[1] - from[1]) === 1;
       if (adjacent) {
         c.facing = dirBetween(c.tile, from);
@@ -508,8 +590,19 @@ export class LocationModel {
     if (this.path.length) {
       const nxt = this.path[0]!;
       if (!this.passable(nxt[0], nxt[1])) {
+        // Путь перегородили (NPC-бобр пересел к цели): к цели тапа — новый путь, действие не теряется (P-10a).
+        const p = this.pending;
+        const o = p ? this.object(p.key) : undefined;
         this.path = [];
         this.pending = null;
+        if (p && o) {
+          const res = o.kind === 'plot' && p.tile ? pathToAdjacent(this.grid, this.player.tile, p.tile) : pathToAdjacent(this.grid, this.player.tile, o.at, o.size);
+          if (res.exact && (res.path.length === 0 || this.passable(res.path[0]![0], res.path[0]![1]))) {
+            this.path = res.path;
+            this.pending = p;
+            return this.next();
+          }
+        }
         return false;
       }
       this.path.shift();
@@ -558,28 +651,66 @@ export class LocationModel {
   }
 
   /**
-   * Цель кнопки действия: клетка перед лицом (исследование §6в п. 4). Если перед лицом пусто — соседний
-   * NPC/табличка/триггер (не надо выцеливать человека с точностью до клетки), иначе то, на чём стоит Дима.
-   * Грядка — только перед лицом: у соседних клеток разные слова, A не должна полить «не то» растение.
+   * Цель кнопки действия (P-10a, приоритет):
+   *   1. цель режиссёра (контур), если она перед лицом или рядом (компаньон-цель — тоже);
+   *   2. объект перед лицом (исследование §6в п. 4);
+   *   3. соседний NPC/табличка/триггер (не надо выцеливать человека с точностью до клетки);
+   *   4. Казик — только если больше ничего нет: он не перехватывает A, когда он не цель шага;
+   *   5. то, на чём стоит Дима.
+   * Грядка — только перед лицом (у соседних клеток разные слова), кроме подсвеченной режиссёром клетки.
    */
   private actionTarget(): { key: string; tile: Xy } | null {
     const [x, y] = this.player.tile;
-    const at = (c: Xy, plots: boolean): WorldObject | undefined =>
-      this.objects.find((ob) => covers(ob, c) && (plots || ob.kind !== 'plot') && this.cellActionable(ob, c));
+    const goal = this.goalTarget();
+    if (goal) return goal;
+    const isBobr = (o: WorldObject): boolean => o.key === BOBR_KEY;
+    const at = (c: Xy, plots: boolean, bobr: boolean): WorldObject | undefined =>
+      this.objects.find((ob) => covers(ob, c) && (plots || ob.kind !== 'plot') && isBobr(ob) === bobr && this.cellActionable(ob, c));
     const order = [this.player.facing, ...DIR_ORDER.filter((d) => d !== this.player.facing)];
+    for (const bobr of [false, true])
+      for (const d of order) {
+        const c: Xy = [x + DELTA[d][0], y + DELTA[d][1]];
+        const o = at(c, d === this.player.facing && !bobr, bobr);
+        if (o) return { key: o.key, tile: c };
+      }
+    const here = at([x, y], false, false);
+    return here ? { key: here.key, tile: [x, y] } : null;
+  }
+
+  /** Цель режиссёра под рукой: перед лицом, рядом (4-соседство) или под ногами. */
+  private goalTarget(): { key: string; tile: Xy } | null {
+    const g = this.goal;
+    if (!g || this.controls !== 'walk') return null;
+    const [x, y] = this.player.tile;
+    const order = [this.player.facing, ...DIR_ORDER.filter((d) => d !== this.player.facing)];
+    if (this.companionIsGoal) {
+      const c = this.companionObject()!;
+      return adjacent(c.at, [x, y]) || eq(c.at, [x, y]) ? { key: BOBR_KEY, tile: c.at } : null;
+    }
+    const o = this.objects.find((ob) => ob.key === g.key);
+    if (!o || this.hidden.has(o.key)) return null;
+    // Выход на другую карту — шаг в него; грядка — подсвеченная клетка; остальное — весь объект.
+    const inGoal = (c: Xy): boolean => c[0] >= g.at[0] && c[1] >= g.at[1] && c[0] < g.at[0] + g.size[0] && c[1] < g.at[1] + g.size[1];
+    const ok = (c: Xy): boolean => covers(o, c) && inGoal(c) && (o.kind === 'exit' || this.cellActionable(o, c));
     for (const d of order) {
       const c: Xy = [x + DELTA[d][0], y + DELTA[d][1]];
-      const o = at(c, d === this.player.facing);
-      if (o) return { key: o.key, tile: c };
+      if (ok(c)) return { key: o.key, tile: c };
     }
-    const here = at([x, y], false);
-    return here ? { key: here.key, tile: [x, y] } : null;
+    if (o.kind !== 'exit' && o.kind !== 'plot' && ok([x, y])) return { key: o.key, tile: [x, y] };
+    return null;
   }
 
   private doAction(): void {
     const t = this.actionTarget();
     if (!t) return;
-    const o = this.object(t.key)!;
+    const o = this.object(t.key);
+    if (!o) return;
+    if (o.kind === 'exit' && this.controls === 'walk') {
+      // Подсвеченный выход рядом: A — шаг в него (выход срабатывает, когда Дима на клетке).
+      if (eq(t.tile, this.player.tile)) return;
+      this.path = [t.tile];
+      return;
+    }
     this.faceTo(o, t.tile);
     this.fire(t.key, t.tile, 'action');
   }

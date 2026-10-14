@@ -55,9 +55,15 @@ PIPER_MODELS = Path.home() / '.cache' / 'piper'
 BITRATE = 64000
 
 
+# Имя игрока в репликах (P-10a, src/systems/playerName.ts): озвучка собирается под имя по умолчанию,
+# другое имя рантайм отдаёт Web Speech (или без озвучки).
+NAME_TOKEN = '{name}'
+DEFAULT_NAME = 'Dima'
+
+
 def norm(text: str) -> str:
-    """NFC + trim: так же нормализует рантайм (src/systems/platform/audio.ts)."""
-    return unicodedata.normalize('NFC', text).strip()
+    """NFC + trim: так же нормализует рантайм (src/systems/platform/audio.ts); `{name}` → «Dima»."""
+    return unicodedata.normalize('NFC', text.replace(NAME_TOKEN, DEFAULT_NAME)).strip()
 
 
 @dataclass
@@ -207,6 +213,8 @@ def collect(content: Path, default_voice: str) -> Collected:
         if line.get('todo'):
             c.skipped_todo.append(line['id'])
             continue
+        if line['id'].endswith('.anyname') and NAME_TOKEN in (line.get('pl') or ''):
+            continue  # звучит только с именем не «Dima»: в рантайме Web Speech
         add(line.get('pl'), voice_of_char(chars.get(line['who'])), one, ready=False, id_=line['id'], src='story/lines.json')
     ph = content / 'phonetics.json'
     if ph.exists():

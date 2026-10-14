@@ -422,7 +422,7 @@
         "dir": "pl-ru"
       },
       { "t": "choice", "q": "dzień — это…", "options": ["день", "дань", "дым"], "answer": 0, "item": "lx.dzien", "dir": "pl-ru" },
-      { "t": "say", "who": "brzechwa", "pl": "Cześć, Dima!", "ru": "Привет, Дима!" },
+      { "t": "say", "who": "brzechwa", "pl": "Cześć, {name}!", "ru": "Привет, {name}!" },
       { "t": "say", "who": "dima", "pl": "Cześć! Dzień dobry!", "ru": "Привет! Добрый день!" },
       { "t": "say", "who": "brzechwa", "pl": "Albo „cześć”, albo „dzień dobry”.", "ru": "Либо «привет», либо «добрый день»." },
       {

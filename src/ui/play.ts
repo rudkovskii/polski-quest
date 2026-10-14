@@ -181,7 +181,10 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
 
   // Слова реплик (P-07): словарь строится один раз, «знакомо ли» — по карточкам на момент открытия диалога.
   let wordIndex: WordIndex | null = null;
-  const names = new Set([...content.characters.values()].flatMap((c) => tokenize(c.name).filter((t) => t.word && /^\p{Lu}/u.test(t.text)).map((t) => t.text)));
+  const nameWords = (name: string): string[] => tokenize(name).filter((t) => t.word && /^\p{Lu}/u.test(t.text)).map((t) => t.text);
+  const names = new Set([...content.characters.values()].flatMap((c) => nameWords(c.name)));
+  // Имя игрока меняется в Fotobudka (P-10a): «Andrzej» в реплике — имя, а не незнакомое слово.
+  const isName = (w: string): boolean => names.has(w) || [...content.characters.values()].some((c) => c.kind === 'player' && nameWords(c.name).includes(w));
   const wordPort = (store: PlayStore): { port: WordPort; day: string } => {
     const now = deps.clock?.now() ?? Date.now();
     const d = derive(store.progress, deriveContent(content), now);
@@ -196,7 +199,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
           const v = vocab(id);
           return !!v && isFamiliar(d.cards, v.id, v);
         },
-        ignore: (w) => names.has(w),
+        ignore: isName,
       },
     };
   };
