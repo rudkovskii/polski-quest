@@ -11,21 +11,39 @@ import { mountUi } from './ui';
 import { mountAudioToast } from './ui/audioToast';
 import { loadPortraits, mountPlay } from './ui/play';
 import { mountDpad } from './ui/dpad';
+import { startDay } from './day';
+import { createClock } from './systems/platform/clock';
+import { storedSecret } from './systems/platform/secret';
+import { GameStorage, memoryKV } from './systems/platform/storage';
+import { busAudio } from './ui/overlay/kit';
+
+const params = new URLSearchParams(location.search);
+const dev = params.get('dev');
+// Dev-часы (I-12): `?now=<ISO>` или `?now=+1d` сдвигают время во всех deps; только вместе с `dev`.
+const clock = createClock(dev ? params.get('now') : null);
+// Без звука вслух (AGENTS.md): `?mute=1` — `audio:play` только в консоль.
+const mute = params.get('mute') === '1';
+
+interface StartOptions {
+  /** Хранилище без облака (dev=world): отдельная база, синк не запускается. */
+  devStore?: Promise<GameStorage>;
+}
 
 // Склейка слоёв (ТЗ §2.1): DOM-оверлей, d-pad, ввод, Phaser. Порядок важен (I-03): сначала d-pad
 // (он слушает `input:dpad`), потом startInput, тап по карте разбирает активная сцена Location.
-function startGame(start?: BootStart): Phaser.Game {
+function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   const overlay = document.getElementById('overlay');
   const parent = document.getElementById('game');
   if (!overlay || !parent) throw new Error('#overlay или #game не найден');
   mountUi(overlay);
   // Озвучка (I-09): `audio:play` из UI, разблокировка на Title и первом жесте, тост после фона.
-  connectAudio(bus);
+  if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
+  else connectAudio(bus);
   mountAudioToast(overlay);
-  const cloud = startCloud({ dev: new URLSearchParams(window.location.search).get('dev') === '1' });
+  const store = opts.devStore ?? startCloud({ dev: dev === '1' }).then((c) => c.storage);
   // Диалоги и упражнения (I-08): world:interact → оверлей, события журнала → хранилище синка.
   const content = getContent();
-  mountPlay(overlay, { content, store: cloud.then((c) => c.storage), portraits: loadPortraits(content) });
+  const play = mountPlay(overlay, { content, store, portraits: loadPortraits(content), clock });
 
   // Конфигурация из ТЗ §2.4. WorldMap добавится в I-11.
   const game = new Phaser.Game({
@@ -53,11 +71,24 @@ function startGame(start?: BootStart): Phaser.Game {
   });
   // Режим локации (`map.controls`, ТЗ §2.7): walk = все источники, tap = только тап, d-pad скрыт.
   bus.on('world:location', ({ controls }) => input.router.setMapControls(controls));
+  // Петля дня (I-12): грядки, обход, экспресс, итог дня, настройки, позиция, таймер сессии.
+  let storeNow: GameStorage | null = null;
+  void store.then((s) => (storeNow = s));
+  const day = startDay({
+    root: overlay,
+    overlay: play.overlay,
+    content,
+    store,
+    audio: busAudio(bus),
+    clock,
+    router: input.router,
+    hasLink: () => !!storeNow && !!storedSecret(storeNow),
+    build: __BUILD_ID__,
+  });
+  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game, play, day, store, clock, content };
   return game;
 }
 
-const params = new URLSearchParams(location.search);
-const dev = params.get('dev');
 if (dev === 'audio') {
   // Dev-страница озвучки без Phaser (I-09).
   void import('./dev/audio').then((m) => m.mountAudioDev(document.body));
@@ -69,11 +100,23 @@ if (dev === 'audio') {
   void import('./dev/lesson').then((m) => m.mountLessonDev(params));
 } else if (dev === 'world') {
   // `/?dev=world&map=ch01.metro[&spawn=from_dzialka]`: сразу в локацию, события мира в консоль (I-07).
+  // I-12: `&now=<ISO>|+1d` — часы; `&mute=1` — без звука; `&reset=1` — журнал в памяти; `&plant=lx.a,lx.b` —
+  // посадить слова (dev-событие intro, как после сцены). Прогресс в отдельной базе polski-quest-dev, без облака.
   const data: LocationData = { location: params.get('map') ?? 'ch01.metro' };
   const spawn = params.get('spawn');
   if (spawn) data.spawn = spawn;
-  const game = startGame({ scene: 'Location', data });
-  for (const ev of ['world:interact', 'world:exit', 'world:location'] as const)
+  const devStore = (async (): Promise<GameStorage> => {
+    const s = new GameStorage(params.get('reset') ? { kv: memoryKV(), ls: null } : { dbName: 'polski-quest-dev', ls: null });
+    await s.load(clock.now());
+    for (const item of (params.get('plant') ?? '').split(',').filter(Boolean)) {
+      if (s.progress.log.events.some((e) => e.k === 'intro' && e.item === item)) continue;
+      s.append({ k: 'intro', ts: clock.now(), item, lesson: 'dev.plant', ok: ['lis', 'rec'] });
+    }
+    return s;
+  })();
+  startGame({ scene: 'Location', data }, { devStore });
+  for (const ev of ['world:interact', 'world:exit', 'world:location', 'world:position'] as const)
     bus.on(ev, (p) => console.info(`[${ev}]`, JSON.stringify(p)));
-  (window as unknown as { __pq?: unknown }).__pq = { bus, game };
+  bus.on('world:marks', (m) => console.info('[world:marks]', JSON.stringify({ location: m.location, due: m.dueItems, cells: m.plots.flatMap((p) => p.cells.filter((c) => c.item).map((c) => `${c.item}:${c.stage}/${c.interval}${c.due ? '!' : ''}${c.wilted ? '~' : ''}`)) })));
+  if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
 } else startGame();

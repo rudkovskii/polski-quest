@@ -116,6 +116,15 @@
   `/?dev=lesson&passport=1`; после урока в dev — кнопка «Паспорт».
 - Диалоги: узел `line` (реплика из `story/lines.json`), `todo: true` (реплики нет), чистый `end` без `who`.
   В `lines.json`: `pl` + перевод `plRu` + русская речь `ru` (видна сразу).
+## Петля дня (ТЗ §4.5, §4.8, §5.5, §5.9, §5.11–5.12, I-12)
+- Чистое: `src/systems/session.ts` (активное время, бюджет, `dayState`, `planRound`, `summarizeDay`), `src/systems/garden.ts`
+  (стадия растения по rec, «!», подвявшие, банки), `src/world/dzialka.ts` (слова → клетки `plot`, `world:marks`).
+- Склейка `src/day.ts` (из main.ts): таймер, `world:marks` на `world:location`/`progress:changed`, `world:position` →
+  `local.position`, `controls.*` → роутер. Оверлей `src/ui/day.ts`: `ui:obchod:start` (полив = `runLesson` drill c `src`
+  obchod/express), `ui:screen:open` summary/settings/export, мини-HUD działki. Экраны: `ui/obchod.ts`, `ui/daySummary.ts`, `ui/settings.ts`.
+- `seg` пишут: раунд обхода (`water`), экспресс (`express`), «ещё 3 минуты» (`more3`), «Dobranoc» (`sleep` + `session`).
+- Dev: `/?dev=world&map=ch01.dzialka&now=2026-10-14T10:00&mute=1[&plant=lx.woda,lx.kawa][&reset=1]` — `now` ISO или `+1d/-2h/+90m`
+  (часы во всех deps, только с `dev`), `plant` — dev-событие `intro`, прогресс в базе `polski-quest-dev` без облака.
 
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.

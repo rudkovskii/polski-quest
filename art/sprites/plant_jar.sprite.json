@@ -1,0 +1,44 @@
+{
+ "id": "plant_jar",
+ "note": "Słoik (банка) на грядке: слово созрело, interval ≥ 35 (ТЗ §4.13). Только визуал, траты — I-19/I-45. Черновик I-12.",
+ "size": [
+  16,
+  16
+ ],
+ "anchor": [
+  8,
+  15
+ ],
+ "keys": {
+  ".": null,
+  "o": "ink",
+  "l": "orange_0",
+  "L": "accent_brick",
+  "b": "blue_6",
+  "B": "blue_3",
+  "w": "white",
+  "g": "green_3",
+  "G": "green_1",
+  "s": "sand_8"
+ },
+ "frames": [
+  [
+   "................",
+   "................",
+   "................",
+   ".....oooooo.....",
+   "....olllllLo....",
+   "....oLLLLLLo....",
+   ".....oooooo.....",
+   "....obbbbbBo....",
+   "...obwbbbbbBo...",
+   "...obwssssbBo...",
+   "...obwsoosbBo...",
+   "...obgsssgGBo...",
+   "...obgGgGgGBo...",
+   "...obGgGgGgBo...",
+   "....oBBBBBBo....",
+   ".....oooooo....."
+  ]
+ ]
+}

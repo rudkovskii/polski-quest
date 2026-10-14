@@ -1,0 +1,62 @@
+{
+ "id": "plant_bush",
+ "note": "Растение działki, стадия «куст» (interval 7–34): кадр 0 здоровый, 1 подвявший. Черновик I-12.",
+ "size": [
+  16,
+  16
+ ],
+ "anchor": [
+  8,
+  15
+ ],
+ "keys": {
+  ".": null,
+  "o": "ink",
+  "g": "green_1",
+  "G": "green_0",
+  "r": "red_0",
+  "y": "green_2",
+  "Y": "sand_0",
+  "q": "sand_5",
+  "w": "brown_1",
+  "W": "brown_0"
+ },
+ "frames": [
+  [
+   "................",
+   "................",
+   ".....oooooo.....",
+   "...ooggGgggoo...",
+   "..oggGggggrggo..",
+   ".ogGgggggGgggGo.",
+   ".oggrggGggggggo.",
+   "oGgggggggggrgGgo",
+   "oggGggrgggGgggGo",
+   "oGgggggGgggggggo",
+   ".oGggGgggggrgGo.",
+   ".ooGgggGgggGgoo.",
+   "...oooGGGGooo...",
+   ".....owGGwo.....",
+   "....owwwwwWo....",
+   "....oooooooo...."
+  ],
+  [
+   "................",
+   "................",
+   ".....oooooo.....",
+   "...ooyyYyyyoo...",
+   "..oyyYyyyyqyyo..",
+   ".oyYyyyyyYyyyYo.",
+   ".oyyqyyYyyyyyyo.",
+   "oYyyyyyyyyyqyYyo",
+   "oyyYyyqyyyYyyyYo",
+   "oYyyyyyYyyyyyyyo",
+   ".oYyyYyyyyyqyYo.",
+   ".ooYyyyYyyyYyoo.",
+   "...oooYYYYooo...",
+   ".....owYYwo.....",
+   "....owwwwwWo....",
+   "....oooooooo...."
+  ]
+ ]
+}

@@ -144,6 +144,8 @@ export interface RunOptions {
   noSummary?: boolean;
   /** Слово в мире (`world:interact` kind word): src 'world', без события `lesson` и без resume. */
   drill?: boolean;
+  /** Источник `rev` вместо вычисленного по виду урока: полив на działce — 'obchod', экспресс — 'express' (I-12). */
+  src?: Src;
 }
 
 /**
@@ -158,7 +160,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
   const { steps } = lessonSteps(lesson);
   const startNow = clock.now();
   const drill = opts.drill === true;
-  const src = srcOf(drill ? 'world' : lesson.kind);
+  const src = opts.src ?? srcOf(drill ? 'world' : lesson.kind);
 
   // Resume (§5.7): тот же урок, не старше resumeHours.
   let records: StepRecord[] = [];
