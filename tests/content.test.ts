@@ -591,3 +591,38 @@ describe('P-01: объяснение ошибки и бит первого дн�
     expect(first.every((i) => i.code === 'todo')).toBe(true);
   });
 });
+
+describe('P-07: разметка words, варианты, русская речь NPC', () => {
+  it('words: схема принимает id и {pl, lx}; висячий id — ошибка ref; формы нет в строке — предупреждение', () => {
+    const ok = run((f) => {
+      fx.dialogue(f).nodes.a!.words = ['lx.slucham'];
+      fx.dialogue(f).nodes.a!.choices![0]!.words = [{ pl: 'Mała', lx: 'lx.maly' }, 'lx.kawa'];
+    });
+    expect(errorsOf(ok), dump(ok)).toEqual([]);
+    expect(ok.filter((i) => i.code === 'words'), dump(ok)).toEqual([]);
+    expectIssue(run((f) => (fx.dialogue(f).nodes.a!.words = ['lx.nie_ma'])), 'ref', /words "lx\.nie_ma"/, `${D}dialogues.json`);
+    expectIssue(run((f) => (fx.dialogue(f).nodes.a!.words = ['lx.stol'])), 'words', /lx\.stol не найдено в строке «Słucham\?»/, `${D}dialogues.json`, 'warn');
+    expectIssue(run((f) => (fx.dialogue(f).nodes.a!.choices![0]!.words = ['lx.maly'])), 'words', /форма не из pl\/forms/, `${D}dialogues.json`, 'warn');
+    expectIssue(run((f) => (fx.dialogue(f).nodes.a!.words = [{ pl: 'kawy', lx: 'lx.kawa' }])), 'words', /«kawy» не найдено/, `${D}dialogues.json`, 'warn');
+    // Реплика Казика: польское вкрапление в русской речи.
+    const kazik = run((f) => fx.lines(f).push({ id: 'bobr.p07', who: 'bobr', ru: 'Скажи «słucham»: это «что желаете».', words: ['lx.slucham'] }));
+    expect(kazik.filter((i) => i.code === 'words' || i.level === 'error'), dump(kazik)).toEqual([]);
+    expectIssue(run((f) => fx.lines(f).push({ id: 'bobr.p07', who: 'bobr', ru: 'Скажи что-нибудь.', words: [{ pl: 'x', lx: 'lx.nope' }] })), 'ref', /words "lx\.nope"/, 'story/lines.json');
+    expect(run((f) => (fx.dialogue(f).nodes.a!.words = [] as unknown as ['lx.kawa'])).some((i) => i.code === 'schema')).toBe(true);
+  });
+
+  it('больше 2 вариантов — предупреждение; польский NPC с русской речью — предупреждение', () => {
+    expectIssue(
+      run((f) => fx.dialogue(f).nodes.a!.choices!.push({ pl: 'Herbata.', next: 'b' })),
+      'dialogue',
+      /3 варианта: на экране только 2/,
+      `${D}dialogues.json`,
+      'warn',
+    );
+    expectIssue(run((f) => fx.lines(f).push({ id: 'marek.ru', who: 'pan_marek', ru: 'Привет!' })), 'line', /pan_marek говорит по-русски/, 'story/lines.json', 'warn');
+    expectIssue(run((f) => (fx.dialogue(f).nodes.b = { who: 'pan_marek', ru: 'Привет!', next: 'c' })), 'dialogue', /по-русски без pl/, `${D}dialogues.json`, 'warn');
+    // Казик и рассказчик по-русски говорят.
+    const fine = run((f) => fx.lines(f).push({ id: 'bobr.ru', who: 'bobr', ru: 'Привет!' }));
+    expect(fine.filter((i) => /по-русски/.test(i.msg))).toEqual([]);
+  });
+});

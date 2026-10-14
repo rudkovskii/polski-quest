@@ -82,7 +82,8 @@ export interface WorldState {
 
 export interface SettingsMap {
   diacritics: 'warn' | 'ok' | 'fail';
-  translations: 'tap' | 'always';
+  /** Подпись-перевод реплик (P-07): всегда / по ситуации (гаснет на знакомых словах) / никогда (только «?»). */
+  translations: 'auto' | 'always' | 'never';
   audioSlowDefault: boolean;
   newItemsPerDay: number;
   sfxVolume: number;
@@ -98,7 +99,7 @@ export interface SettingsMap {
 
 export const SETTINGS_DEFAULTS: SettingsMap = {
   diacritics: 'warn',
-  translations: 'tap',
+  translations: 'auto',
   audioSlowDefault: false,
   newItemsPerDay: 8,
   sfxVolume: 0.8,
@@ -113,6 +114,8 @@ export const SETTINGS_DEFAULTS: SettingsMap = {
 
 export function getSetting<K extends keyof SettingsMap>(p: Progress, key: K): SettingsMap[K] {
   const s = p.settings[key];
+  // До P-07 перевод был 'tap' (по нажатию): теперь это «по ситуации».
+  if (key === 'translations' && s?.value === 'tap') return 'auto' as SettingsMap[K];
   return s ? (s.value as SettingsMap[K]) : SETTINGS_DEFAULTS[key];
 }
 

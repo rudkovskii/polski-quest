@@ -4,21 +4,32 @@
 // узел без текста и эффект `line` на `todo`-строку в dev показываются как `[todo: id]`, в игре
 // пропускаются (P-01): узел идёт дальше, у узла с вариантами остаются только варианты.
 // Прерывание (Esc, «B») закрывает диалог; при возврате он начнётся с `start` (диалоги короткие).
+// P-07: реплика листается коробками (line.ts), варианты появляются на последней коробке, на экране не
+// больше двух (выбор с проверкой перемешан по seed, P-01), вариант выбирается с первого тапа, даже если
+// строка ещё печатается; перевод варианта — по «?» или долгому нажатию.
+import { attachLongPress } from '../../input/press';
 import type { Content } from '../../systems/content';
+import type { CaptionMode } from '../../systems/words';
 import type { LessonResult } from '../../types/bus';
-import type { Condition, Dialogue, DialogueChoice, DialogueNode, Effect, Line } from '../../types/content';
+import type { Condition, Dialogue, DialogueChoice, DialogueNode, Effect, Line, LineWord } from '../../types/content';
 import { el } from '../dom';
+import { shuffled } from '../exercises/options';
 import type { Layer, Overlay } from '../overlay/host';
 import { btn, react, type AudioPort, type PortraitSource, type React } from '../overlay/kit';
 import { todoVisible } from '../todo';
-import { lineBox, type LineView } from './line';
+import { lineBox, type LineStyle, type LineView, type WordPort } from './line';
 
 export interface DialogDeps {
   overlay: Overlay;
   content: Pick<Content, 'characters' | 'lines'>;
   audio: AudioPort;
   portraits?: PortraitSource | null;
-  translations?: 'tap' | 'always';
+  /** Настройка `translations` (P-07): always / auto / never; `tap` — старое значение, = auto. */
+  translations?: CaptionMode | 'tap';
+  /** Словарь и «знакомо ли слово» (P-07): гаснущая подпись и тап по слову. Нет — подпись видна всегда. */
+  words?: WordPort | null;
+  /** Добавка к seed перемешивания вариантов (игровой день, как у упражнений P-01). */
+  seed?: string;
   typeMs?: number;
   /** Пауза на реакцию NPC после неверного выбора, мс (тесты: 0). */
   reactMs?: number;
@@ -55,6 +66,27 @@ interface Speech {
   /** Русская речь персонажа рядом с польской (реплики Казика, `line.ru` при `line.pl`): видна сразу. */
   rus?: string;
   todo?: string;
+  /** Разметка `words` (P-07). */
+  words?: readonly LineWord[];
+}
+
+/** На экране не больше стольких вариантов (research/05 §6б п. 8). */
+export const MAX_CHOICES = 2;
+
+/**
+ * Варианты на экран (P-07): выбор с проверкой (есть `ok: false`) перемешан по seed, вкусовой — по порядку
+ * контента; лишние отбрасываются (валидатор предупреждает), но верный вариант остаётся всегда.
+ */
+export function screenChoices<T extends { c: Pick<DialogueChoice, 'ok'> }>(list: readonly T[], seed: string): T[] {
+  const test = list.some((x) => x.c.ok === false);
+  const order = test ? shuffled(list, seed) : list.slice();
+  if (order.length <= MAX_CHOICES) return order;
+  const out = order.slice(0, MAX_CHOICES);
+  if (test && !out.some((x) => x.c.ok !== false)) {
+    const right = order.find((x) => x.c.ok !== false);
+    if (right) out[MAX_CHOICES - 1] = right;
+  }
+  return out;
 }
 
 /**
@@ -65,8 +97,9 @@ export function speechOfLine(id: string, lines: ReadonlyMap<string, Line>): Spee
   const l = lines.get(id);
   if (!l) return { who: 'bobr', todo: id };
   if (l.todo || (!l.pl && !l.ru)) return { who: l.who, todo: id };
-  if (!l.pl) return { who: l.who, rus: l.ru! };
-  return { who: l.who, pl: l.pl, ...(l.plRu ? { ru: l.plRu } : {}), ...(l.ru ? { rus: l.ru } : {}) };
+  const w = l.words ? { words: l.words } : {};
+  if (!l.pl) return { who: l.who, rus: l.ru!, ...w };
+  return { who: l.who, pl: l.pl, ...(l.plRu ? { ru: l.plRu } : {}), ...(l.ru ? { rus: l.ru } : {}), ...w };
 }
 
 export function runDialog(dlg: Dialogue, deps: DialogDeps): Promise<DialogOutcome> {
@@ -76,67 +109,100 @@ export function runDialog(dlg: Dialogue, deps: DialogDeps): Promise<DialogOutcom
   return playDialog(dlg, deps, layer, box).finally(() => layer.close());
 }
 
+/** Стиль окна (P-07): рассказчик без портрета, Казик (компаньон) своей рамкой, остальные — NPC. */
+function styleOf(deps: DialogDeps, who: string): LineStyle {
+  if (who === 'narrator') return 'narrator';
+  return deps.content.characters.get(who)?.kind === 'companion' ? 'kazik' : 'npc';
+}
+
 /** Окно реплик на слое: показать реплику и дождаться «дальше» или выбора варианта. */
 function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
   const cond = deps.cond ?? (() => true);
   let view: LineView | null = null;
+  let offPress: (() => void) | null = null;
   const speaker = (id: string): { id: string; name: string } => ({ id, name: deps.content.characters.get(id)?.name ?? id });
 
-  /** Индекс выбранного варианта или -1 («дальше»). Отмена — исключение Cancelled. */
-  const say = (sp: Speech, choices?: readonly DialogueChoice[]): Promise<number> => {
+  /** Индекс выбранного варианта или -1 («дальше»). Отмена — исключение Cancelled. `key` — seed перемешивания. */
+  const say = (sp: Speech, choices?: readonly DialogueChoice[], key = ''): Promise<number> => {
     const hideTodo = !!sp.todo && !todoVisible();
     // Заглушка без вариантов в игре не показывается: узел идёт дальше.
     if (hideTodo && !(choices ?? []).some((c) => !c.if || cond(c.if))) return Promise.resolve(-1);
     return new Promise<number>((resolve, reject) => {
       view?.dispose();
+      offPress?.();
+      offPress = null;
       const lv = lineBox({
         speaker: speaker(sp.who),
         ...(sp.pl ? { pl: sp.pl } : {}),
         ...(sp.ru ? { ru: sp.ru } : {}),
         ...(sp.todo && !hideTodo ? { todo: sp.todo } : {}),
         ...(sp.rus ? { rus: sp.rus } : {}),
+        ...(sp.words ? { refs: sp.words } : {}),
         audio: deps.audio,
         portraits: deps.portraits ?? null,
-        translations: deps.translations ?? 'tap',
+        translations: deps.translations ?? 'auto',
+        words: deps.words ?? null,
+        style: styleOf(deps, sp.who),
         ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
         autoplay: true,
       });
       view = lv;
-      const choiceBox = el('div', { class: 'pq-dlg-choices', role: 'group' });
-      const visible = (choices ?? []).map((c, i) => ({ c, i })).filter(({ c }) => !c.if || cond(c.if));
+      const choiceBox = el('div', { class: 'pq-dlg-choices', role: 'group', hidden: true });
+      const all = (choices ?? []).map((c, i) => ({ c, i })).filter(({ c }) => !c.if || cond(c.if));
+      const visible = screenChoices(all, `${key}${deps.seed ? `:${deps.seed}` : ''}`);
       let settled = false;
       const done = (v: number): void => {
         if (settled) return;
         settled = true;
         resolve(v);
       };
+      const always = deps.translations === 'always';
       const next = btn('▼', () => {
-        if (lv.skip()) return;
-        done(-1);
+        if (lv.advance()) return;
+        if (!visible.length) done(-1);
       }, 'icon pq-line-next', { 'aria-label': 'Дальше', 'data-primary': true, 'data-act': 'next' });
       if (visible.length) {
         for (const { c, i } of visible) {
-          choiceBox.append(
-            btn(
-              el('span', {}, el('span', { lang: 'pl' }, c.pl), c.ru && deps.translations === 'always' ? el('small', {}, c.ru) : null),
-              () => {
-                if (lv.skip()) return;
-                done(i);
-              },
-              '',
-              { 'data-nav': true, 'data-choice': String(i) },
-            ),
-          );
+          const ru = c.ru ? el('small', { class: 'ru', lang: 'ru', hidden: !always }, c.ru) : null;
+          const reveal = (): void => {
+            if (ru) ru.hidden = false;
+            // Место «?» остаётся, чтобы кнопка не прыгала под пальцем.
+            if (q) {
+              q.style.visibility = 'hidden';
+              q.disabled = true;
+            }
+          };
+          // Первый тап выбирает (P-07): раньше тап, пока реплика печаталась, только допечатывал её,
+          // и «Start» срабатывал со второго тапа. Теперь строка дописывается и вариант выбирается сразу.
+          const b = btn(el('span', { class: 'pq-choice-l' }, el('span', { class: 'pl', lang: 'pl' }, c.pl), ru), () => {
+            lv.finish();
+            done(i);
+          }, 'pq-choice', { 'data-nav': true, 'data-choice': String(i) });
+          const q = c.ru && !always ? btn('?', reveal, 'icon ghost pq-choice-q', { 'aria-label': `Перевод: ${c.pl}`, 'data-act': 'choice-ru', 'data-for': String(i) }) : null;
+          (b as HTMLElement & { pqReveal?: () => void }).pqReveal = reveal;
+          choiceBox.append(el('div', { class: 'pq-choice-row' }, q, b));
         }
-      } else lv.node.append(next);
-      // Тап по рамке без вариантов = «дальше» (или допечатать строку).
+        // Долгое нажатие на вариант — перевод, без выбора.
+        offPress = attachLongPress(choiceBox, { selector: '[data-choice]', onLongPress: (item) => (item as HTMLElement & { pqReveal?: () => void }).pqReveal?.() });
+      }
+      lv.node.append(next);
+      // Тап по коробке = «дальше» (допечатать, следующая коробка); на последней коробке с вариантами — ничего.
       lv.node.addEventListener('click', (e) => {
-        if (visible.length || (e.target as Element).closest('button')) return;
-        if (!lv.skip()) done(-1);
+        if ((e.target as Element).closest('button')) return;
+        if (lv.advance()) return;
+        if (!visible.length) done(-1);
       });
-      box.replaceChildren(...(visible.length ? [choiceBox] : []), lv.node);
+      box.replaceChildren(choiceBox, lv.node);
+      // Узел только с вариантами (реплика героя): пустую коробку не показываем, варианты — его слова.
+      if (visible.length && !sp.pl && !sp.rus && !(sp.todo && !hideTodo)) lv.node.hidden = true;
+      lv.onEnd(() => {
+        if (!visible.length) return;
+        choiceBox.hidden = false;
+        next.hidden = true;
+        if (!deps.coarse) queueMicrotask(() => (choiceBox.querySelector('[data-choice]') as HTMLElement | null)?.focus({ preventScroll: true }));
+      });
       layer.handle({
-        interact: () => lv.skip(),
+        interact: () => lv.advance(),
         cancel: () => {
           if (!settled) {
             settled = true;
@@ -145,7 +211,7 @@ function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
           return true;
         },
       });
-      if (!deps.coarse) queueMicrotask(() => (visible.length ? (choiceBox.querySelector('button') as HTMLElement | null) : next)?.focus({ preventScroll: true }));
+      if (!deps.coarse && choiceBox.hidden) queueMicrotask(() => next.focus({ preventScroll: true }));
     });
   };
 
@@ -156,6 +222,7 @@ function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
     },
     dispose(): void {
       view?.dispose();
+      offPress?.();
       layer.handle(null);
     },
   };
@@ -194,11 +261,11 @@ async function playDialog(dlg: Dialogue, deps: DialogDeps, layer: Layer, box: HT
         const sp: Speech = node.line
           ? speechOfLine(node.line, deps.content.lines)
           : node.pl
-            ? { who, pl: node.pl, ...(node.ru ? { ru: node.ru } : {}) }
+            ? { who, pl: node.pl, ...(node.ru ? { ru: node.ru } : {}), ...(node.words ? { words: node.words } : {}) }
             : node.choices && !node.todo
               ? { who }
               : { who, todo: `${dlg.id}.${id}` };
-        const pick = await ui.say(sp, node.choices);
+        const pick = await ui.say(sp, node.choices, `${dlg.id}#${id}`);
         const ch: DialogueChoice | undefined = pick >= 0 ? node.choices?.[pick] : undefined;
         if (ch) {
           const reaction = ch.ok === false ? (ch.react ?? 'confused') : ch.react;

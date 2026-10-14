@@ -41,24 +41,58 @@ const css = `
 .pq-emote { position: absolute; right: -6px; top: -10px; min-width: 26px; height: 26px; padding: 0 4px; box-sizing: border-box; border-radius: 13px;
   background: #fff; border: 2px solid #3b3643; font: 700 16px/22px -apple-system, sans-serif; text-align: center; color: #3b3643; animation: pq-pop .3s; }
 
-/* Диалог */
-.pq-dlg { width: min(100% - 16px, 720px); margin: 0 8px calc(8px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
-.pq-dlg-choices { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-.pq-dlg-choices .pq-btn { max-width: 92%; text-align: left; }
-.pq-dlg-choices .pq-btn small { display: block; font-weight: 400; font-size: 15px; color: #543c52; }
-.pq-line { display: flex; gap: 12px; padding: 20px 14px 12px; min-height: 120px; margin-top: 16px; }
-.pq-line-who { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.pq-line-name { position: absolute; left: 14px; top: -17px; white-space: nowrap; padding: 2px 10px; background: #ffcba9; border: 3px solid #91522c; border-radius: 6px;
-  font-weight: 700; font-size: 16px; color: #3b3643; box-shadow: 0 0 0 2px #3b3643; }
-.pq-line-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-.pq-line-pl { font-size: 20px; font-weight: 600; min-height: 1.4em; cursor: pointer; }
-.pq-line-pl.todo { color: #8f3e56; font-family: ui-monospace, Menlo, monospace; font-size: 17px; }
-.pq-line-ru { font-size: 17px; color: #543c52; }
-.pq-line-ru.hidden-ru { color: #695953; font-style: italic; }
-.pq-line-rus { font-size: 17px; color: #3a2c38; margin-top: 4px; }
-.pq-line-tools { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.pq-line-next { position: absolute; right: 12px; bottom: 8px; }
+/* Диалог (P-07): портрет с именем над коробкой, польская строка крупно, подпись мелко серым, высота
+   коробки постоянная (кнопка ▼ не прыгает), тап по коробке листает. */
+.pq-dlg { width: min(100% - 12px, 720px); margin: 0 6px calc(8px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; }
+.pq-dlg-choices { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.pq-dlg-choices[hidden] { display: none; }
+.pq-choice-row { display: flex; align-items: stretch; gap: 6px; justify-content: flex-end; }
+.pq-choice-row .pq-choice { flex: 1 1 auto; max-width: 520px; min-height: 56px; text-align: left; padding: 8px 16px; font-size: 19px; }
+.pq-choice-l { display: flex; flex-direction: column; gap: 2px; }
+.pq-choice-l .pl { font-weight: 700; }
+.pq-choice-l .ru { font-size: 14px; font-weight: 500; color: #543c52; }
+.pq-choice-l .ru[hidden] { display: none; }
+.pq-choice-q { align-self: center; font-size: 18px; color: #f0e5d1 !important; text-shadow: 0 1px 0 #3b3643; }
+.pq-line { position: relative; display: block; padding: 18px 10px 8px; min-height: 172px; margin-top: 50px; cursor: pointer; }
+.pq-line-who { position: absolute; left: 10px; top: -52px; display: flex; align-items: flex-end; gap: 6px; pointer-events: none; }
+.pq-line-who .pq-portrait { width: 60px; height: 60px; background-color: #b8dce5; }
+.pq-line-name { margin-bottom: 8px; white-space: nowrap; padding: 2px 10px; background: #ffcba9; border: 3px solid #91522c; border-radius: 6px;
+  font-weight: 700; font-size: 15px; color: #3b3643; box-shadow: 0 0 0 2px #3b3643; }
+/* 40 знаков польской строки в ширину телефона 375 px: 16 px полужирным ≈ 330 px. */
+.pq-line-text { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pq-line-pl { font-size: clamp(15px, 4.3vw, 20px); font-weight: 600; line-height: 1.35; min-height: 2.7em; overflow-wrap: anywhere; }
+.pq-line-pl[hidden], .pq-line-rus[hidden], .pq-line-ru[hidden] { display: none; }
+.pq-line-pl.todo { color: #8f3e56; font-family: ui-monospace, Menlo, monospace; font-size: 16px; }
+.pq-line-ru { font-size: 13px; line-height: 1.3; color: #695953; min-height: 2.6em; }
+.pq-line-rus { font-size: clamp(15px, 4.2vw, 18px); line-height: 1.35; color: #3a2c38; min-height: 2.7em; }
+.pq-line-tools { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; min-height: 44px; padding-right: 52px; }
+.pq-line-tools .pq-btn.icon { min-height: 40px; }
+.pq-line-q { font-weight: 800; font-size: 18px; color: #2d697b; }
+.pq-line-q[hidden] { display: none; }
+.pq-line-page { margin-left: auto; font-size: 13px; color: #695953; }
+.pq-line-next { position: absolute; right: 8px; bottom: 8px; }
+.pq-line-next[hidden], .pq-line[hidden] { display: none; }
 .pq-noaudio { font-size: 15px; color: #8f3e56; }
+/* Польское слово: тап — перевод. Знакомое по SRS — без подчёркивания. */
+.pq-w { cursor: pointer; border-bottom: 2px dotted #c8966b; border-radius: 2px; }
+.pq-w.known { border-bottom-color: transparent; }
+.pq-w.on { background: #ffe18d; }
+.pq-line-rus .pq-w { color: #2d697b; font-weight: 700; border-bottom-color: #79b8ce; }
+.pq-wpop { position: absolute; left: 12px; bottom: calc(100% - 12px); z-index: 5; min-width: 140px; max-width: min(240px, 80%); padding: 8px 12px;
+  display: flex; flex-direction: column; gap: 2px; font-size: 16px; cursor: default; animation: pq-pop .15s; }
+.pq-wpop[hidden] { display: none; }
+.pq-wpop .tr { color: #543c52; font-size: 14px; }
+.pq-wpop .ru { color: #3a2c38; }
+.pq-wpop .pq-btn { align-self: flex-start; min-height: 36px; }
+/* Казик: русская речь с польскими вкраплениями, рамка теплее. */
+.pq-line.kazik { background: #f6e3c4; }
+/* Рассказчик: без портрета и имени, курсивом, мелко. */
+.pq-line.narrator { margin-top: 8px; min-height: 0; background: #3b3643; border-color: #543c52; color: #f0e5d1;
+  box-shadow: 0 0 0 3px #141b1b, 0 8px 0 3px rgba(20,27,27,.45); }
+.pq-line.narrator .pq-line-rus, .pq-line.narrator .pq-line-pl { font-style: italic; font-size: 15px; font-weight: 500; color: #f0e5d1; min-height: 0; }
+.pq-line.narrator .pq-line-ru { color: #d2b37d; min-height: 0; }
+.pq-line.narrator .pq-line-next { filter: saturate(.6); }
+@media (prefers-reduced-motion: reduce) { .pq-wpop { animation: none; } }
 
 /* Урок */
 .pq-lesson { width: min(100%, 680px); height: 100%; max-height: 100%; display: flex; flex-direction: column; box-sizing: border-box; padding: 8px; }
@@ -90,6 +124,7 @@ const css = `
 .pq-ex-fb.part { background: #ffe18d; border-color: #e89b2f; }
 .pq-ex-fb.bad { background: #f6d0cf; border-color: #8f3e56; }
 .pq-ex-fb .verdict { font-weight: 700; font-size: 19px; }
+.pq-ex-fb .verdict .ru { font-size: 13px; font-weight: 500; color: #543c52; }
 .pq-ex-fb .answer { font-size: 19px; }
 .pq-ex-fb .tr { color: #543c52; font-size: 16px; }
 .pq-ex-fb .rule { color: #2d697b; font-weight: 600; }

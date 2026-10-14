@@ -10,9 +10,11 @@ import type { LogEvent } from '../systems/log';
 import { getSetting, giveItem, markChallenge, setFlag, type Progress } from '../systems/progress';
 import { newContentLock } from '../systems/queue';
 import { cardId } from '../systems/srs';
+import { buildWordIndex, isFamiliar, tokenize, type WordIndex } from '../systems/words';
 import type { BusEvents, LessonResult, WorldInteract } from '../types/bus';
 import type { Condition, Effect, Lesson, LocationMap, Step, VocabEntry } from '../types/content';
 import { runDialog, runLines, speechOfLine, type DialogDeps } from './dialog';
+import type { WordPort } from './dialog/line';
 import { el } from './dom';
 import { runLesson, type LessonStore } from './lesson';
 import { shuffled } from './exercises/options';
@@ -162,18 +164,45 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     if (next !== store.progress && store.setProgress?.(next)) bus.emit('progress:changed', { kinds: [kind] });
   };
 
-  const dialogDeps = (store: PlayStore): DialogDeps => ({
-    overlay,
-    content,
-    audio,
-    portraits,
-    translations: getSetting(store.progress, 'translations'),
-    ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
-    ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
-    cond: cond(store),
-    runLesson: (id) => lessonById(store, id),
-    effects: (e) => effect(store, e),
-  });
+  // Слова реплик (P-07): словарь строится один раз, «знакомо ли» — по карточкам на момент открытия диалога.
+  let wordIndex: WordIndex | null = null;
+  const names = new Set([...content.characters.values()].flatMap((c) => tokenize(c.name).filter((t) => t.word && /^\p{Lu}/u.test(t.text)).map((t) => t.text)));
+  const wordPort = (store: PlayStore): { port: WordPort; day: string } => {
+    const now = deps.clock?.now() ?? Date.now();
+    const d = derive(store.progress, deriveContent(content), now);
+    wordIndex ??= buildWordIndex([...content.vocab.values()].map((x) => x.value));
+    const vocab = (id: string): VocabEntry | undefined => content.vocab.get(content.renames.get(id) ?? id)?.value;
+    return {
+      day: d.today,
+      port: {
+        index: wordIndex,
+        vocab,
+        known: (id) => {
+          const v = vocab(id);
+          return !!v && isFamiliar(d.cards, v.id, v);
+        },
+        ignore: (w) => names.has(w),
+      },
+    };
+  };
+
+  const dialogDeps = (store: PlayStore): DialogDeps => {
+    const w = wordPort(store);
+    return {
+      overlay,
+      content,
+      audio,
+      portraits,
+      words: w.port,
+      seed: w.day,
+      translations: getSetting(store.progress, 'translations'),
+      ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
+      ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
+      cond: cond(store),
+      runLesson: (id) => lessonById(store, id),
+      effects: (e) => effect(store, e),
+    };
+  };
 
   /** Эффекты кроме `line` и `startLesson` (их ведёт диалог). Новые атомы — effects.ts (I-17). */
   async function effect(store: PlayStore, e: Effect): Promise<void> {
@@ -334,7 +363,7 @@ export function wordStep(v: VocabEntry, ex: string | undefined, content: Pick<Co
 }
 
 /** Табличка (§5.4): `pl` крупно, перевод по тапу, ▶. */
-function signPopup(overlay: Overlay, audio: AudioPort, pl: string, ru: string | undefined, translations: 'tap' | 'always'): Promise<void> {
+function signPopup(overlay: Overlay, audio: AudioPort, pl: string, ru: string | undefined, translations: 'auto' | 'always' | 'never'): Promise<void> {
   const layer = overlay.open('pq-sign-layer');
   return new Promise((resolve) => {
     const close = (): void => {
@@ -342,7 +371,7 @@ function signPopup(overlay: Overlay, audio: AudioPort, pl: string, ru: string | 
       resolve();
     };
     const ruLine = el('div', { class: 'pq-line-ru', lang: 'ru' }, translations === 'always' ? (ru ?? '') : '');
-    const ruBtn = ru && translations === 'tap' ? btn('перевод', () => {
+    const ruBtn = ru && translations !== 'always' ? btn('перевод', () => {
       ruLine.textContent = ru;
       ruBtn?.remove();
     }, 'icon ghost', { 'data-nav': true }) : null;

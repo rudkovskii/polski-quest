@@ -26,6 +26,7 @@
             "who": { "$ref": "common.schema.json#/$defs/charId" },
             "pl": { "type": "string" },
             "ru": { "type": "string" },
+            "words": { "$ref": "common.schema.json#/$defs/words" },
             "line": {
               "$ref": "common.schema.json#/$defs/lineId",
               "description": "Реплика из story/lines.json (говорящий — её who), вместо pl/ru"
@@ -49,6 +50,7 @@
                 "properties": {
                   "pl": { "type": "string" },
                   "ru": { "type": "string" },
+                  "words": { "$ref": "common.schema.json#/$defs/words" },
                   "ok": { "type": "boolean" },
                   "next": { "type": "string" },
                   "errorTag": { "$ref": "common.schema.json#/$defs/errorTag" },
