@@ -5,6 +5,7 @@
 //   … --prev <dir>                                     # п. 7 против другого корня контента
 //   … --base <ref>                                     # п. 7 против ревизии git
 //   … --quiet                                          # без предупреждений
+//   … --release  (или PQ_RELEASE=1)                     # todo в бите первого дня = ошибка (P-01)
 import { relative, resolve } from 'node:path';
 import { formatIssue } from './lib/content_check';
 import { validateDir } from './lib/content_io';
@@ -18,7 +19,12 @@ function arg(name: string): string | undefined {
 if (isMain(import.meta.url)) {
   const root = resolve(arg('--root') ?? 'content');
   const prefix = `${relative(ROOT, root).split('\\').join('/') || '.'}/`;
-  const { issues, files, prevFrom } = validateDir({ root, prevRoot: arg('--prev'), base: arg('--base') });
+  const { issues, files, prevFrom } = validateDir({
+    root,
+    prevRoot: arg('--prev'),
+    base: arg('--base'),
+    release: process.argv.includes('--release') || process.env.PQ_RELEASE === '1',
+  });
   const errors = issues.filter((i) => i.level === 'error');
   const warns = issues.filter((i) => i.level === 'warn');
   for (const i of errors) console.error(formatIssue(i, prefix));

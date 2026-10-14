@@ -1,8 +1,8 @@
-// `shadow` (ТЗ §3.5): слушает и повторяет вслух `repeat` раз, жмёт «Повторил». Без проверки и SRS.
+// `shadow` (ТЗ §3.5): слушает и повторяет вслух `repeat` раз, жмёт «Powtórzone / Повторено». Без проверки и SRS.
 // Каждое нажатие (кроме последнего) проигрывает фразу снова; `slow` — первый раз медленно.
 import type { StepShadow } from '../../types/content';
 import { el } from '../dom';
-import { audioButtons } from '../overlay/kit';
+import { audioButtons, setPlLabel, type PlLabel } from '../overlay/kit';
 import { runPlain } from './frame';
 import type { ExerciseModule } from './types';
 
@@ -20,13 +20,14 @@ export const shadow: ExerciseModule<StepShadow> = {
       ru,
       el('div', { class: 'pq-line-tools' }, ...(canPlay ? audioButtons(ctx.audio, step.pl) : [el('span', { class: 'pq-noaudio' }, '🔇 звука нет — прочитай вслух')])),
     );
-    const label = (): string => (times > 1 ? `Повторил (${done}/${times})` : 'Повторил');
+    // Без рода (плейтест Марины): «Повторено», не «Повторил».
+    const label = (): PlLabel => (times > 1 ? { pl: `Powtórzone (${done}/${times})`, ru: 'Повторено' } : { pl: 'Powtórzone', ru: 'Повторено' });
     const { result, next } = runPlain(ctx, [el('span', { class: 'q' }, 'Послушай и повтори вслух')], body, {
       label: label(),
       onNext: () => {
         done++;
         if (done >= times) return true;
-        next.textContent = label();
+        setPlLabel(next, label());
         if (canPlay) ctx.audio.play(step.pl);
         return false;
       },

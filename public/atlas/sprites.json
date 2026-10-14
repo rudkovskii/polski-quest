@@ -332,6 +332,20 @@
   ],
   "anims": {}
  },
+ "portrait.brzechwa": {
+  "size": [
+   32,
+   32
+  ],
+  "anchor": [
+   16,
+   31
+  ],
+  "frames": [
+   "portrait.brzechwa/0"
+  ],
+  "anims": {}
+ },
  "sign_exit": {
   "size": [
    16,

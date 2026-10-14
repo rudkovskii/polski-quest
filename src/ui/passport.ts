@@ -7,7 +7,7 @@ import type { Progress } from '../systems/progress';
 import type { Condition } from '../types/content';
 import { el } from './dom';
 import type { Overlay } from './overlay/host';
-import { btn } from './overlay/kit';
+import { BTN, plBtn } from './overlay/kit';
 
 export interface PassportPage {
   biome: string;
@@ -146,7 +146,7 @@ export function openPassport(overlay: Overlay, model: PassportModel): Promise<vo
           : el('div', { class: 'muted' }, 'Пока пусто'),
         model.canDo.length ? el('b', {}, 'Умею') : null,
         model.canDo.length ? el('ul', { 'data-role': 'cando' }, ...model.canDo.map((c) => el('li', { 'data-cando': c.id, 'data-done': String(c.done) }, c.done ? '✅ ' : '⬜ ', c.ru))) : null,
-        el('div', { class: 'pq-ex-actions' }, el('span', { class: 'grow' }), btn('Zamknij', close, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'close' })),
+        el('div', { class: 'pq-ex-actions' }, el('span', { class: 'grow' }), plBtn(BTN.close, close, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'close' })),
       ),
     );
     layer.handle({ cancel: () => (close(), true) });

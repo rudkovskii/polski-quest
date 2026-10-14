@@ -6,7 +6,9 @@
 // русская реплика Казика и склейка на działkę. Журнал: `intro` слова и `lesson` вступления (день засчитан).
 import type { Content } from '../systems/content';
 import type { LogEvent } from '../systems/log';
+import { INTRO_LINES as L } from '../systems/director';
 import { speechOfLine } from './dialog';
+import { todoVisible } from './todo';
 import { el } from './dom';
 import type { LessonStore } from './lesson';
 import type { Overlay } from './overlay/host';
@@ -273,8 +275,10 @@ export async function runIntro(deps: IntroDeps): Promise<IntroResult> {
     art.replaceChildren(canvas, ...extra);
   };
 
-  const sayNode = (id: string): HTMLElement => {
+  /** Строка карточки; заглушка `todo` в игре — null (не показывается, P-01). */
+  const sayNode = (id: string): HTMLElement | null => {
     const sp = speechOfLine(id, content.lines);
+    if (sp.todo && !todoVisible()) return null;
     // Подписи рассказчика и звуки за кадром («miau») — без портрета.
     const offscreen = sp.who === 'narrator' || sp.who === 'simba';
     if (offscreen && !sp.pl) return el('div', { class: 'cap', 'data-line': id }, sp.rus ?? '');
@@ -296,7 +300,13 @@ export async function runIntro(deps: IntroDeps): Promise<IntroResult> {
         layer.handle(null);
         resolve();
       }, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'next', 'aria-label': 'Дальше' });
-      box.replaceChildren(...lines.map(sayNode), el('div', { class: 'row' }, next));
+      const shown = lines.map(sayNode).filter((x): x is HTMLElement => x !== null);
+      // Все строки карточки — заглушки, картинки сверху нет: показывать нечего, идём дальше.
+      if (!shown.length && !o.extra?.length && !o.speak) {
+        resolve();
+        return;
+      }
+      box.replaceChildren(...shown, el('div', { class: 'row' }, next));
       layer.handle({ cancel: () => true }); // вступление не прерывается Esc: закрыть можно вкладку, F1 начнётся заново
       if (o.speak) audio.play(o.speak.text, { who: o.speak.who });
       queueMicrotask(() => next.focus({ preventScroll: true }));
@@ -305,11 +315,11 @@ export async function runIntro(deps: IntroDeps): Promise<IntroResult> {
   const t0 = clock.mono();
   try {
     const board = el('div', { class: 'board', lang: 'pl' }, 'WARSZAWA WSCHODNIA');
-    await card('train', ['intro.caption.oct'], { extra: [board] });
-    await card('platform', ['intro.kazik.kloda', 'intro.caption.bobr']);
-    const hela = content.lines.get('intro.hela.za_darmo');
-    await card('bazar', ['intro.hela.za_darmo'], hela?.pl ? { speak: { text: hela.pl, who: hela.who } } : {});
-    await card('passport', ['intro.passport.k', 'intro.caption.empty']);
+    await card('train', [L.oct], { extra: [board] });
+    await card('platform', [L.kloda, L.bobr]);
+    const hela = content.lines.get(L.hela);
+    await card('bazar', [L.hela], hela?.pl ? { speak: { text: hela.pl, who: hela.who } } : {});
+    await card('passport', [L.passportK, L.empty]);
 
     // ── Первое упражнение: «Dzień dobry?» → две плитки.
     let attempts = 0;
@@ -326,7 +336,7 @@ export async function runIntro(deps: IntroDeps): Promise<IntroResult> {
           }, '', { 'data-nav': true, 'data-tile': String(k), 'data-act': k === answer ? 'right' : 'wrong' }),
         );
         box.replaceChildren(
-          sayNode('intro.kazik.dzien_dobry'),
+          ...[sayNode(L.dzienDobry)].filter((x): x is HTMLElement => x !== null),
           el('div', { class: 'row' }, ...audioButtons(audio, phrase)),
           el('div', { class: 'tiles', role: 'group' }, ...tiles),
         );
@@ -336,7 +346,7 @@ export async function runIntro(deps: IntroDeps): Promise<IntroResult> {
       });
       if (attempts === 1) firstTry = ok;
       if (ok) break;
-      await card('bobr', ['intro.kazik.dopiero']);
+      await card('bobr', [L.dopiero]);
     }
 
     // ── Печать №1 и журнал.
@@ -353,7 +363,7 @@ export async function runIntro(deps: IntroDeps): Promise<IntroResult> {
     }
     deps.onStamp?.();
     const stamp = el('div', { class: 'stamp', 'data-stamp': '1', lang: 'pl' }, 'Warszawa', el('span', {}, 'Praga'));
-    await card('passport', ['intro.kazik.gosc_mowi'], { extra: [stamp] });
+    await card('passport', [L.goscMowi], { extra: [stamp] });
 
     // ── Повтори вслух (shadow): без проверки.
     await new Promise<void>((resolve) => {
@@ -363,7 +373,7 @@ export async function runIntro(deps: IntroDeps): Promise<IntroResult> {
         resolve();
       }, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'next', 'aria-label': 'Дальше' });
       box.replaceChildren(
-        sayNode('kazik.shadow.first'),
+        ...[sayNode(L.shadow)].filter((x): x is HTMLElement => x !== null),
         el('div', { class: 'big', lang: 'pl' }, shadowPl),
         shadowRu ? el('div', { class: 'note' }, shadowRu) : el('span'),
         el('div', { class: 'row' }, ...audioButtons(audio, shadowPl), el('span', { style: 'flex:1' }), next),
@@ -373,8 +383,8 @@ export async function runIntro(deps: IntroDeps): Promise<IntroResult> {
       queueMicrotask(() => next.focus({ preventScroll: true }));
     });
 
-    await card('bobr', ['intro.kazik.po_rusku']);
-    await card('dzialka', ['intro.simba.miau', 'intro.caption.pokazalo']);
+    await card('bobr', [L.poRusku]);
+    await card('dzialka', [L.miau, L.pokazalo]);
     return { firstTry, attempts };
   } finally {
     layer.close();

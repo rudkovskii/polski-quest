@@ -490,6 +490,10 @@ export interface MinimalPair {
 export interface ErrorTag {
   id: ErrorTagId;
   ru: string;
+  /**
+   * Правило одной строкой после неверного ответа (P-01); нет — показывается ru
+   */
+  hint?: string;
   remedy?: Id;
   cluster?: Cluster;
 }
@@ -635,6 +639,10 @@ export interface StepSay {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Правило, ≤400 знаков
@@ -654,6 +662,10 @@ export interface StepExplain {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Слушает и повторяет вслух
@@ -675,6 +687,10 @@ export interface StepShadow {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Слышит фразу, выбирает вариант
@@ -696,6 +712,10 @@ export interface StepListen {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Выбор варианта
@@ -724,6 +744,10 @@ export interface StepChoice {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Собирает фразу из плиток
@@ -752,6 +776,10 @@ export interface StepOrder {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Печатает ответ
@@ -780,6 +808,10 @@ export interface StepType {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Слышит, печатает
@@ -808,6 +840,10 @@ export interface StepDictation {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Соединяет пары pl↔ru
@@ -831,6 +867,10 @@ export interface StepMatch {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Заполняет пропуск ___
@@ -860,6 +900,10 @@ export interface StepGap {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Слышит одно из пары, выбирает
@@ -884,6 +928,10 @@ export interface StepMinimalPair {
   tags?: ErrorTagId[];
   cluster: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 /**
  * Тапает ударный слог
@@ -908,6 +956,10 @@ export interface StepStress {
   tags?: ErrorTagId[];
   cluster?: Cluster;
   hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
 }
 export interface LessonPart {
   id: string;

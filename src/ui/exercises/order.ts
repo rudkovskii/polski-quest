@@ -5,14 +5,29 @@ import { attachDrag } from '../../input/drag';
 import type { StepOrder } from '../../types/content';
 import { el } from '../dom';
 import { audioButtons } from '../overlay/kit';
-import { runGraded } from './frame';
-import { shuffled } from './options';
+import { explainOf, runGraded } from './frame';
+import { seedOf, shuffled } from './options';
 import type { ExerciseModule } from './types';
 
 interface Tile {
   id: number;
   text: string;
   node: HTMLButtonElement;
+}
+
+/**
+ * Плитки в запасе по seed (P-01). Если перемешивание случайно начинается с готового ответа
+ * (плитки ответа идут первыми по порядку), берём следующий seed: собрать «как лежит» нельзя.
+ */
+export function tileOrder(tiles: readonly string[], variants: readonly (readonly string[])[], seed: string): { id: number; text: string }[] {
+  const all = tiles.map((text, id) => ({ id, text }));
+  let out = all;
+  for (let k = 0; k < 8; k++) {
+    out = shuffled(all, k ? `${seed}:${k}` : seed);
+    const head = out.map((t) => t.text);
+    if (!variants.some((v) => v.length > 1 && v.every((w, i) => head[i] === w))) break;
+  }
+  return out;
 }
 
 export const order: ExerciseModule<StepOrder> = {
@@ -23,10 +38,7 @@ export const order: ExerciseModule<StepOrder> = {
     const box = el('div', { class: 'pq-ex-body' }, line, pool);
     const variants = [step.answer, ...(step.alt ?? [])];
 
-    const tiles: Tile[] = shuffled(
-      step.tiles.map((text, id) => ({ id, text })),
-      ctx.stepId,
-    ).map(({ id, text }) => {
+    const tiles: Tile[] = tileOrder(step.tiles, variants, seedOf(ctx)).map(({ id, text }) => {
       const node = el('button', { type: 'button', class: 'pq-btn pq-tile', 'data-nav': true, 'data-tile': id, lang: 'pl', onclick: () => toggle(id) }, text);
       return { id, text, node };
     });
@@ -93,7 +105,7 @@ export const order: ExerciseModule<StepOrder> = {
         return `Начни с «${first}».`;
       },
       focus: () => (pool.querySelector<HTMLElement>('[data-tile]') ?? line.querySelector<HTMLElement>('[data-tile]'))?.focus({ preventScroll: true }),
-      ...(step.hint ? { stepHint: step.hint } : {}),
+      ...explainOf(step),
     });
 
     // Перетаскивание: призрак под пальцем, вставка по положению в строке.

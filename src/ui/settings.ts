@@ -1,5 +1,5 @@
 // Settings (ТЗ §5.11) и Export / Import (§5.12), I-12. Настройки — LWW-ключи `progress.settings` (§3.10):
-// ответы (диакритика, переводы, новых слов в день, клавиатура), управление (d-pad, сторона), звук
+// ответы (диакритика, переводы, новых слов в день, клавиатура), управление (крестик, сторона), звук
 // (медленная озвучка, громкость эффектов и музыки, reduced motion). Синк: «Сохрани свою ссылку»
 // (экран I-06 через `ui:screen:open link`), статус. Копия: файл `pq-save` (exportImport.ts) через
 // Web Share (iOS «Сохранить в Файлы») или загрузку; импорт файла — слияние или «Заменить» с автоэкспортом.
@@ -39,26 +39,27 @@ export interface SettingsDeps {
 type Choice<K extends keyof SettingsMap> = { key: K; label: string; options: { value: SettingsMap[K]; label: string }[] };
 
 const CHOICES = {
-  diacritics: { key: 'diacritics', label: 'Без ą, ę, ł…', options: [{ value: 'ok', label: 'засчитать' }, { value: 'warn', label: 'засчитать, но показать' }, { value: 'fail', label: 'ошибка' }] },
-  translations: { key: 'translations', label: 'Перевод реплик', options: [{ value: 'tap', label: 'по тапу' }, { value: 'always', label: 'всегда' }] },
-  keyboard: { key: 'keyboard.mode', label: 'Экранная клавиатура', options: [{ value: 'auto', label: 'авто' }, { value: 'full', label: 'полная' }, { value: 'strip', label: 'полоска ąćę' }] },
-  dpad: { key: 'controls.dpad', label: 'Кнопки-стрелки (d-pad)', options: [{ value: 'auto', label: 'авто' }, { value: 'always', label: 'всегда' }, { value: 'never', label: 'никогда' }] },
-  dpadSide: { key: 'controls.dpadSide', label: 'D-pad с какой стороны', options: [{ value: 'left', label: 'слева' }, { value: 'right', label: 'справа' }] },
+  diacritics: { key: 'diacritics', label: 'Ответ без ą, ę, ł…', options: [{ value: 'ok', label: 'засчитать' }, { value: 'warn', label: 'засчитать, но показать' }, { value: 'fail', label: 'ошибка' }] },
+  translations: { key: 'translations', label: 'Перевод реплик', options: [{ value: 'tap', label: 'по нажатию' }, { value: 'always', label: 'всегда' }] },
+  keyboard: { key: 'keyboard.mode', label: 'Клавиатура на экране', options: [{ value: 'auto', label: 'сама решит' }, { value: 'full', label: 'вся' }, { value: 'strip', label: 'только ą ć ę…' }] },
+  dpad: { key: 'controls.dpad', label: 'Крестик управления на экране', options: [{ value: 'auto', label: 'на телефоне' }, { value: 'always', label: 'всегда' }, { value: 'never', label: 'никогда' }] },
+  dpadSide: { key: 'controls.dpadSide', label: 'Крестик управления: с какой стороны', options: [{ value: 'left', label: 'слева' }, { value: 'right', label: 'справа' }] },
   slow: { key: 'audioSlowDefault', label: 'Медленная озвучка сразу', options: [{ value: false, label: 'нет' }, { value: true, label: 'да' }] },
   motion: { key: 'reducedMotion', label: 'Меньше анимации', options: [{ value: false, label: 'нет' }, { value: true, label: 'да' }] },
-  debt: { key: 'showDebtNumber', label: 'Долг числом в HUD', options: [{ value: true, label: 'да' }, { value: false, label: 'словами' }] },
+  debt: { key: 'showDebtNumber', label: 'Сколько слов ждёт полива (на элементах экрана)', options: [{ value: true, label: 'числом' }, { value: false, label: 'словами' }] },
 } as const satisfies Record<string, Choice<keyof SettingsMap>>;
 
+// Статус сохранения в облаке без жаргона (P-01: «синк», «сольём» пугали).
 const SYNC_RU: Record<SyncState, string> = {
-  idle: 'не запускался',
-  no_secret: 'ссылки нет, прогресс только на устройстве',
-  pending: 'есть изменения, отправлю',
-  syncing: 'синхронизирую…',
-  ok: 'всё в облаке',
-  offline: 'облако недоступно, сольём при сети',
-  conflict: 'нужен выбор',
-  old_client: 'обнови игру',
-  error: 'ошибка синка',
+  idle: 'ещё не сохранялось',
+  no_secret: 'ссылки нет, прогресс только на этом устройстве',
+  pending: 'есть новое, скоро сохраню в облако',
+  syncing: 'сохраняю в облако…',
+  ok: 'всё сохранено в облаке',
+  offline: 'нет связи с облаком, сохраню, когда появится сеть',
+  conflict: 'в облаке другая версия, нужен выбор',
+  old_client: 'обнови игру: закрой и открой заново',
+  error: 'не получилось сохранить в облако',
 };
 
 const css = `
@@ -266,8 +267,8 @@ export function runSettings(deps: SettingsDeps): Promise<void> {
     range('musicVolume', 'Громкость музыки'),
     choice(CHOICES.motion),
     choice(CHOICES.debt),
-    el('h3', {}, 'Ссылка и синк'),
-    sync ? el('div', { class: 'set', 'data-sync': sync }, el('span', {}, 'Синк'), el('div', {}, SYNC_RU[sync])) : null,
+    el('h3', {}, 'Сохранение в облаке'),
+    sync ? el('div', { class: 'set', 'data-sync': sync }, el('span', {}, 'Облако'), el('div', {}, SYNC_RU[sync])) : null,
     deps.hasLink?.()
       ? btn('Сохрани свою ссылку', () => bus.emit('ui:screen:open', { screen: 'link' }), '', { 'data-nav': true, 'data-act': 'link' })
       : el('div', { class: 'set' }, el('span', {}, 'Приватной ссылки пока нет: прогресс живёт на этом устройстве')),

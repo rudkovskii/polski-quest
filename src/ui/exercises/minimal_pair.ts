@@ -4,8 +4,8 @@
 import type { StepMinimalPair } from '../../types/content';
 import { el } from '../dom';
 import { btn } from '../overlay/kit';
-import { runGraded } from './frame';
-import { optionList } from './options';
+import { explainOf, runGraded } from './frame';
+import { optionList, seedOf, shuffled } from './options';
 import type { ExerciseModule } from './types';
 
 export const minimal_pair: ExerciseModule<StepMinimalPair> = {
@@ -22,8 +22,10 @@ export const minimal_pair: ExerciseModule<StepMinimalPair> = {
     const play = (slow = false): void => {
       for (const w of words) ctx.audio.play(w, { slow });
     };
-    const labels = sameDiff ? ['Одинаковые', 'Разные'] : [a, b];
-    const answer = sameDiff ? (target === 0 ? 0 : 1) : target;
+    // which: слова пары в перемешанном порядке (P-01), «Одинаковые / Разные» — всегда так.
+    const order: (0 | 1)[] = sameDiff ? [0, 1] : shuffled([0, 1] as (0 | 1)[], seedOf(ctx));
+    const labels = sameDiff ? ['Одинаковые', 'Разные'] : order.map((k) => step.pair[k]);
+    const answer = sameDiff ? (target === 0 ? 0 : 1) : order.indexOf(target);
     const opts = optionList(labels, () => run.submit(), { row: true, lang: sameDiff ? undefined : 'pl' });
 
     const head: (Node | string)[] = noAudio
@@ -57,7 +59,8 @@ export const minimal_pair: ExerciseModule<StepMinimalPair> = {
         return 'Медленно. Слушай первую согласную.';
       },
       focus: () => opts.focusFirst(),
-      ...(step.hint ? { stepHint: step.hint } : {}),
+      word: step.pair[target],
+      ...explainOf(step),
     });
     if (!noAudio) play();
     return run.result;

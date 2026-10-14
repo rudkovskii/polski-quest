@@ -3,14 +3,14 @@
 import type { StepListen } from '../../types/content';
 import { el } from '../dom';
 import { audioButtons } from '../overlay/kit';
-import { runGraded } from './frame';
-import { autoOptions, optionList } from './options';
+import { explainOf, runGraded } from './frame';
+import { autoOptions, optionList, seedOf } from './options';
 import type { ExerciseModule } from './types';
 
 export const listen: ExerciseModule<StepListen> = {
   graded: true,
   mount(step, ctx) {
-    const { options, answer } = autoOptions(step, ctx.stepId, ctx.content);
+    const { options, answer } = autoOptions(step, ctx.stepId, ctx.content, 3, seedOf(ctx));
     const noAudio = !ctx.audio.has(step.say);
     const opts = optionList(options, () => run.submit(), { cls: step.show === 'sign' ? 'pq-sign' : '', lang: 'pl' });
     const head: (Node | string)[] = noAudio
@@ -44,7 +44,8 @@ export const listen: ExerciseModule<StepListen> = {
         return 'Медленно, и одним вариантом меньше.';
       },
       focus: () => opts.focusFirst(),
-      ...(step.hint ? { stepHint: step.hint } : {}),
+      word: step.say,
+      ...explainOf(step),
     });
     if (!noAudio) ctx.audio.play(step.say);
     return run.result;

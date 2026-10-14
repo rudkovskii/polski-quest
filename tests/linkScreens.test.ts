@@ -5,6 +5,7 @@ import { bus } from '../src/systems/bus';
 import { mountLink } from '../src/ui/screens/link';
 import { mountStart } from '../src/ui/screens/start';
 import { mountSyncDot, syncColor } from '../src/ui/syncDot';
+import { dpadLabelsOn, mountDpad } from '../src/ui/dpad';
 
 let root: HTMLElement;
 beforeEach(() => {
@@ -120,8 +121,38 @@ describe('точка синка', () => {
     bus.on('ui:screen:open', opened);
     bus.emit('sync:status', { state: 'ok', at: Date.UTC(2026, 9, 15, 6, 5) });
     const btn = root.querySelector<HTMLButtonElement>('.pq-sync')!;
-    expect(btn.getAttribute('aria-label')).toMatch(/^Синхронизировано \d\d:\d\d$/);
+    expect(btn.getAttribute('aria-label')).toMatch(/^Сохранено в облаке \d\d:\d\d$/);
     btn.click();
     expect(opened).toHaveBeenCalledWith({ screen: 'link' });
+  });
+
+  it('P-01: пока открыт модальный слой (урок, диалог), точки нет — крестик урока свободен', () => {
+    mountSyncDot(root);
+    const btn = root.querySelector<HTMLButtonElement>('.pq-sync')!;
+    expect(btn.hidden).toBe(false);
+    bus.emit('world:input', { enabled: false });
+    expect(btn.hidden).toBe(true);
+    bus.emit('world:input', { enabled: true });
+    expect(btn.hidden).toBe(false);
+    expect(btn.getAttribute('aria-label')).not.toMatch(/синк/i);
+  });
+});
+
+describe('P-01: подписи «A · действие», «B · назад» на d-pad', () => {
+  it('первые дни (до третьего Dobranoc) подписи есть, потом нет', () => {
+    const sleep = (ts: number) => ({ id: `d.${ts}`, ts, k: 'seg' as const, seg: 'sleep' as const });
+    expect(dpadLabelsOn([])).toBe(true);
+    expect(dpadLabelsOn([sleep(1), sleep(2)])).toBe(true);
+    expect(dpadLabelsOn([sleep(1), sleep(2), sleep(3)])).toBe(false);
+    let on = true;
+    const view = mountDpad(root, bus, { labels: () => on });
+    expect(view.a.textContent).toContain('A · действие');
+    expect(view.b.textContent).toContain('B · назад');
+    bus.emit('input:dpad', { visible: true, side: 'left' });
+    expect(view.root.hasAttribute('data-labels')).toBe(true);
+    on = false;
+    bus.emit('input:dpad', { visible: true, side: 'left' });
+    expect(view.root.hasAttribute('data-labels')).toBe(false);
+    view.dispose();
   });
 });

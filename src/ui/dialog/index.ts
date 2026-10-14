@@ -1,7 +1,8 @@
 // Диалог (ТЗ §3.6, §5.6, I-08): граф dialogues.json в окне реплики. Узел: реплика `pl/ru` →
 // варианты `choices` или «дальше» → эффекты `do` → урок `lesson` → `next`, пока не `end`.
 // Выбор с `ok: false` даёт тег ошибки и реакцию NPC (`react`), SRS не трогает. Реплики-заглушки:
-// узел без текста и эффект `line` на `todo`-строку показываются как `[todo: id]`.
+// узел без текста и эффект `line` на `todo`-строку в dev показываются как `[todo: id]`, в игре
+// пропускаются (P-01): узел идёт дальше, у узла с вариантами остаются только варианты.
 // Прерывание (Esc, «B») закрывает диалог; при возврате он начнётся с `start` (диалоги короткие).
 import type { Content } from '../../systems/content';
 import type { LessonResult } from '../../types/bus';
@@ -9,6 +10,7 @@ import type { Condition, Dialogue, DialogueChoice, DialogueNode, Effect, Line } 
 import { el } from '../dom';
 import type { Layer, Overlay } from '../overlay/host';
 import { btn, react, type AudioPort, type PortraitSource, type React } from '../overlay/kit';
+import { todoVisible } from '../todo';
 import { lineBox, type LineView } from './line';
 
 export interface DialogDeps {
@@ -81,14 +83,17 @@ function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
   const speaker = (id: string): { id: string; name: string } => ({ id, name: deps.content.characters.get(id)?.name ?? id });
 
   /** Индекс выбранного варианта или -1 («дальше»). Отмена — исключение Cancelled. */
-  const say = (sp: Speech, choices?: readonly DialogueChoice[]): Promise<number> =>
-    new Promise<number>((resolve, reject) => {
+  const say = (sp: Speech, choices?: readonly DialogueChoice[]): Promise<number> => {
+    const hideTodo = !!sp.todo && !todoVisible();
+    // Заглушка без вариантов в игре не показывается: узел идёт дальше.
+    if (hideTodo && !(choices ?? []).some((c) => !c.if || cond(c.if))) return Promise.resolve(-1);
+    return new Promise<number>((resolve, reject) => {
       view?.dispose();
       const lv = lineBox({
         speaker: speaker(sp.who),
         ...(sp.pl ? { pl: sp.pl } : {}),
         ...(sp.ru ? { ru: sp.ru } : {}),
-        ...(sp.todo ? { todo: sp.todo } : {}),
+        ...(sp.todo && !hideTodo ? { todo: sp.todo } : {}),
         ...(sp.rus ? { rus: sp.rus } : {}),
         audio: deps.audio,
         portraits: deps.portraits ?? null,
@@ -142,6 +147,7 @@ function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
       });
       if (!deps.coarse) queueMicrotask(() => (visible.length ? (choiceBox.querySelector('button') as HTMLElement | null) : next)?.focus({ preventScroll: true }));
     });
+  };
 
   return {
     say,
@@ -180,6 +186,7 @@ async function playDialog(dlg: Dialogue, deps: DialogDeps, layer: Layer, box: HT
       out.path.push(id);
       let nextId: string | undefined = node.next;
       // Узел без текста, урока и эффектов (или с `todo: true`) — заглушка `[todo: <dlg>.<узел>]`.
+      // Узел только с вариантами (реплика героя «Start») — варианты без строки, не заглушка.
       // Узел `line` — реплика из story/lines.json. Чистый `end` без who (I-11) молчит.
       const silent = !node.pl && !node.line && !node.lesson && !node.do?.length && !(node.end && node.who === undefined);
       if (node.pl || node.line || silent || node.todo || node.choices) {
@@ -188,7 +195,9 @@ async function playDialog(dlg: Dialogue, deps: DialogDeps, layer: Layer, box: HT
           ? speechOfLine(node.line, deps.content.lines)
           : node.pl
             ? { who, pl: node.pl, ...(node.ru ? { ru: node.ru } : {}) }
-            : { who, todo: `${dlg.id}.${id}` };
+            : node.choices && !node.todo
+              ? { who }
+              : { who, todo: `${dlg.id}.${id}` };
         const pick = await ui.say(sp, node.choices);
         const ch: DialogueChoice | undefined = pick >= 0 ? node.choices?.[pick] : undefined;
         if (ch) {
@@ -231,6 +240,9 @@ function pause(ms: number): Promise<void> {
 
 /** Реплики вне графа (эффект `line` триггера, `[todo]` у NPC без диалога). false — прервали. */
 export async function runLines(lines: readonly Speech[], deps: DialogDeps): Promise<boolean> {
+  // В игре заглушки не показываются; если показывать нечего, окно не открываем.
+  if (!todoVisible()) lines = lines.filter((l) => !l.todo);
+  if (!lines.length) return true;
   const layer = deps.overlay.open('pq-dialog-layer');
   const box = el('div', { class: 'pq-dlg' });
   layer.el.append(box);

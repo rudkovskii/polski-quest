@@ -2,7 +2,7 @@
 import type { StepStress } from '../../types/content';
 import { el } from '../dom';
 import { audioButtons } from '../overlay/kit';
-import { runGraded } from './frame';
+import { explainOf, runGraded } from './frame';
 import { optionList } from './options';
 import type { ExerciseModule } from './types';
 
@@ -33,7 +33,8 @@ export const stress: ExerciseModule<StepStress> = {
         return 'В польском ударение почти всегда на предпоследнем слоге.';
       },
       focus: () => opts.focusFirst(),
-      ...(step.hint ? { stepHint: step.hint } : {}),
+      word: step.word,
+      ...explainOf(step),
     });
     if (step.say === true && canPlay) ctx.audio.play(step.word);
     return run.result;

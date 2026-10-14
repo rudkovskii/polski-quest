@@ -5,7 +5,7 @@ import type { StepDictation } from '../../types/content';
 import { el } from '../dom';
 import { audioButtons } from '../overlay/kit';
 import { answerField, focusField, letterHint } from './field';
-import { runGraded } from './frame';
+import { explainOf, runGraded } from './frame';
 import type { ExerciseModule } from './types';
 
 export const dictation: ExerciseModule<StepDictation> = {
@@ -39,7 +39,7 @@ export const dictation: ExerciseModule<StepDictation> = {
         return letterHint(accept[0] ?? step.say);
       },
       focus: () => focusField(field),
-      ...(step.hint ? { stepHint: step.hint } : {}),
+      ...explainOf(step),
     });
     if (!noAudio) ctx.audio.play(step.say, { slow: step.slowFirst === true });
     return run.result;

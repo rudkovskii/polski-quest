@@ -26,6 +26,7 @@ import type {
   VocabEntry,
   World,
 } from '../../src/types/content';
+import { FIRST_DAY_LINES } from '../../src/systems/director';
 
 // ───────────────────────────── типы ─────────────────────────────
 
@@ -73,6 +74,11 @@ export interface CheckInput {
   prevVocab?: ReadonlyMap<string, string> | null;
   /** `public/audio/manifest.json` (п. 6, пишет tools/build_audio.py). Нет файла = предупреждение «не проверена». */
   audioManifest?: unknown;
+  /**
+   * Сборка для людей (`--release`, `PQ_RELEASE=1 npm run build`, P-01): реплика-заглушка (`todo`) в бите
+   * первого дня — ошибка. Без флага — одно предупреждение со списком.
+   */
+  release?: boolean;
 }
 
 export type SchemaName =
@@ -989,6 +995,14 @@ export function checkContent(input: CheckInput): Issue[] {
   if (todo.length)
     ctx.warn('todo', { file: 'story/lines.json', path: '' }, `${todo.length} реплик с todo: true (${todo.slice(0, 6).map((l) => l.value.id).join(', ')}${todo.length > 6 ? ', …' : ''})`);
 
+  // Бит первого дня (P-01): реплики вступления и переходов, диалоги диагностики и ремонтных сцен.
+  const firstDay = firstDayTodos(ctx, director);
+  if (firstDay.length) {
+    const ids = firstDay.map((x) => x.id);
+    if (input.release) for (const x of firstDay) ctx.err('todo', x.w, `первый день: ${x.why} "${x.id}" ещё todo, а сборка release`);
+    else ctx.warn('todo', { file: 'story/lines.json', path: '' }, `первый день: ${ids.length} заглушек todo (${ids.slice(0, 6).join(', ')}${ids.length > 6 ? ', …' : ''}); сборка с PQ_RELEASE=1 упадёт`);
+  }
+
   // п. 6: озвучка. Есть ли для строки запись в манифесте (любым голосом); файлы и голоса сверяет
   // `npm run audio:check`. ready без озвучки = ошибка, draft = одно предупреждение на модуль.
   const unvoiced = new Set([...ctx.characters].filter(([, c]) => c.value.voice.engine === 'none').map(([cid]) => cid));
@@ -1030,3 +1044,48 @@ export function checkContent(input: CheckInput): Issue[] {
 }
 
 export const errorsOf = (issues: Issue[]): Issue[] => issues.filter((i) => i.level === 'error');
+
+/**
+ * Заглушки бита первого дня (§5.0 F1–F6): реплики FIRST_DAY_LINES и `director.done`, а в диалогах, которые
+ * запускают диагностику (`kind: diag`) или ремонтную сцену кластера (`phonetics.clusters[].repairLesson`), —
+ * узлы `todo: true` и ссылки на todo-реплики (узел `line`, эффекты `line` узла и вариантов).
+ */
+function firstDayTodos(ctx: Ctx, director: Director | undefined): { id: string; why: string; w: Where }[] {
+  const out: { id: string; why: string; w: Where }[] = [];
+  const seen = new Set<string>();
+  const line = (id: string | undefined, w: Where): void => {
+    if (id === undefined || seen.has(id)) return;
+    const l = ctx.lines.get(id);
+    if (l && !l.value.todo) return;
+    seen.add(id);
+    out.push({ id, why: l ? 'реплика' : 'нет реплики', w: l ? { file: l.file, path: l.path } : w });
+  };
+  const dw = { file: 'director.json', path: '' };
+  for (const id of FIRST_DAY_LINES) line(id, dw);
+  line(director?.done?.line, sub(dw, 'done', 'line'));
+  line(director?.done?.more3Line, sub(dw, 'done', 'more3Line'));
+
+  const lessons = new Set<string>();
+  for (const [id, l] of ctx.lessons) if (l.value.kind === 'diag') lessons.add(id);
+  for (const [, c] of ctx.clusters) {
+    const r = (c.value as { repairLesson?: string }).repairLesson;
+    if (r) lessons.add(r);
+  }
+  const effLines = (effs: Effect[] | undefined, w: Where): void => (effs ?? []).forEach((e, i) => line(e.line, sub(w, i, 'line')));
+  const starts = (effs: Effect[] | undefined): boolean => (effs ?? []).some((e) => e.startLesson !== undefined && lessons.has(e.startLesson));
+  for (const [id, def] of ctx.dialogues) {
+    const nodes = Object.entries(def.value.nodes);
+    if (!nodes.some(([, n]) => (n.lesson !== undefined && lessons.has(n.lesson)) || starts(n.do) || (n.choices ?? []).some((c) => starts(c.do)))) continue;
+    for (const [key, n] of nodes) {
+      const nw = sub(def, 'nodes', key);
+      if (n.todo === true && !seen.has(`${id}.${key}`)) {
+        seen.add(`${id}.${key}`);
+        out.push({ id: `${id}.${key}`, why: 'узел диалога', w: nw });
+      }
+      line(n.line, sub(nw, 'line'));
+      effLines(n.do, sub(nw, 'do'));
+      (n.choices ?? []).forEach((c, i) => effLines(c.do, sub(nw, 'choices', i, 'do')));
+    }
+  }
+  return out;
+}

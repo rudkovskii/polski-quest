@@ -55,7 +55,9 @@ export function portrait(sp: Speaker, src?: PortraitSource | null, box = 58): HT
       }),
     );
   } else {
-    node.append(el('span', { class: 'initial' }, (sp.name || sp.id).replace(/^(pan|pani)\s+/i, '').charAt(0).toUpperCase()));
+    // Портрета нет (P-01): силуэт «голова и плечи», а не буква — буква выглядела как сломанная картинка.
+    node.dataset.fallback = 'silhouette';
+    node.append(el('span', { class: 'sil' }, el('i', { class: 'head' }), el('i', { class: 'body' })));
   }
   return node;
 }
@@ -75,6 +77,47 @@ export function react(node: HTMLElement | null | undefined, kind: React): void {
 }
 
 // ── Кнопки.
+
+/** Подпись кнопки: польское слово крупно, русская подпись мелко под ним (P-01, как кнопка титула). */
+export interface PlLabel {
+  pl: string;
+  ru: string;
+}
+
+/** Общие подписи кнопок (ПОЛИРОВКА §2.10): одно место, чтобы «Dalej» везде значило одно и то же. */
+export const BTN = {
+  next: { pl: 'Dalej', ru: 'Дальше' },
+  check: { pl: 'Sprawdź', ru: 'Проверить' },
+  retry: { pl: 'Jeszcze raz', ru: 'Ещё раз' },
+  hint: { pl: 'Podpowiedź', ru: 'Подсказка' },
+  skip: { pl: 'Pomiń', ru: 'Пропустить' },
+  done: { pl: 'Gotowe', ru: 'Готово' },
+  close: { pl: 'Zamknij', ru: 'Закрыть' },
+  obchod: { pl: 'Obchód', ru: 'Обход' },
+  express: { pl: 'Ekspres', ru: 'Быстро' },
+  passport: { pl: 'Paszport', ru: 'Паспорт' },
+  cellar: { pl: 'Spiżarnia', ru: 'Кладовая' },
+  dobranoc: { pl: 'Dobranoc', ru: 'Спокойной ночи' },
+  sleep: { pl: 'Spać', ru: 'Спать' },
+  round: { pl: 'Jeszcze runda', ru: 'Ещё раунд' },
+  start: { pl: 'Zaczynamy', ru: 'Начать' },
+  more: { pl: 'Dalej', ru: 'Продолжить' },
+} as const satisfies Record<string, PlLabel>;
+
+export function plLabel(l: PlLabel): DocumentFragment {
+  const f = document.createDocumentFragment();
+  f.append(el('span', { class: 'pl', lang: 'pl' }, l.pl), el('small', { class: 'ru', lang: 'ru' }, l.ru));
+  return f;
+}
+
+/** Единая кнопка «Obchód / Обход». Поменять подпись потом — setPlLabel. */
+export function plBtn(l: PlLabel, onClick: () => void, cls = '', attrs: Record<string, string | boolean | undefined> = {}): HTMLButtonElement {
+  return btn(plLabel(l), onClick, `${cls} pq-btn2`.trim(), attrs);
+}
+
+export function setPlLabel(b: HTMLElement, l: PlLabel): void {
+  b.replaceChildren(plLabel(l));
+}
 
 export function btn(label: string | Node, onClick: () => void, cls = '', attrs: Record<string, string | boolean | undefined> = {}): HTMLButtonElement {
   return el('button', { type: 'button', class: `pq-btn ${cls}`.trim(), onclick: () => onClick(), ...attrs }, label);

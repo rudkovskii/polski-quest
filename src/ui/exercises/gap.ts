@@ -5,8 +5,8 @@ import type { StepGap } from '../../types/content';
 import { el } from '../dom';
 import { audioButtons } from '../overlay/kit';
 import { answerField, focusField, letterHint } from './field';
-import { runGraded } from './frame';
-import { optionList } from './options';
+import { explainOf, runGraded } from './frame';
+import { optionList, seedOf, shuffled } from './options';
 import type { ExerciseModule } from './types';
 
 export const gap: ExerciseModule<StepGap> = {
@@ -26,11 +26,11 @@ export const gap: ExerciseModule<StepGap> = {
       correct: () => step.answer,
       ...(item?.tr ? { tr: item.tr } : {}),
       sayCorrect: full,
-      ...(step.hint ? { stepHint: step.hint } : {}),
+      ...explainOf(step),
     };
 
     if (step.options) {
-      const options = step.options;
+      const options = shuffled(step.options, seedOf(ctx));
       const opts = optionList(options, (i) => {
         slot.textContent = options[i] ?? '';
         run.submit();

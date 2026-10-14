@@ -1,6 +1,6 @@
 // DaySummary «Сон» (ТЗ §5.9), I-12: итог игрового дня из журнала (systems/session.ts → summarizeDay).
-// Показывает: полито и покрытие, что выросло и созрело, посажено, złoty (заглушка до I-18), минуты
-// вспоминания, сколько ждёт полива завтра. «Dobranoc» пишет `session {mode: 'day'}` и `seg: sleep`;
+// Показывает: полито (только обход и экспресс, включая ранний полив первого дня) и покрытие, что выросло и созрело, посажено, złoty (заглушка до I-18), минуты
+// вспоминания (уроки и диагностика целиком + ответы вне уроков), сколько ждёт полива завтра. «Dobranoc» пишет `session {mode: 'day'}` и `seg: sleep`;
 // маленькая ссылка «ещё 3 минуты повторений» → экспресс (seg `more3`, пишет обход). Пустой день →
 // «Сегодня ещё ничего, полей хоть пару грядок?» и кнопка экспресса. Крючок (реплика следующей сцены) — I-13.
 import type { Bus } from '../systems/bus';
@@ -12,7 +12,7 @@ import { retrievalSince, summarizeDay, type DaySummary } from '../systems/sessio
 import type { BusEvents } from '../types/bus';
 import { el } from './dom';
 import type { Overlay } from './overlay/host';
-import { btn } from './overlay/kit';
+import { BTN, btn, plBtn } from './overlay/kit';
 import { bobrLine } from './obchod';
 
 /** Флаг мира «Я сохранил ссылку» (тот же, что LINK_SAVED_FLAG в src/cloud.ts; ui не импортирует склейку). */
@@ -76,12 +76,14 @@ export function summaryBody(s: DaySummary, content: Pick<Content, 'vocab' | 'lin
   out.push(stat('Повторено из нужного', `${s.reviewed} из ${s.wasDue}`, 'coverage'));
   out.push(stat('Выросло', String(s.grew.length), 'grew'));
   if (s.grew.length) out.push(el('div', { class: 'list', lang: 'pl' }, s.grew.map((g) => `${pl(g.item)}: ${STAGE_RU[g.from]} → ${STAGE_RU[g.to]}`).join(', ')));
-  out.push(stat('Созрело (słoiki)', String(s.matured.length), 'matured'));
+  out.push(stat('Созрело (в банку)', String(s.matured.length), 'matured'));
   if (s.matured.length) out.push(el('div', { class: 'list', lang: 'pl' }, s.matured.map(pl).join(', ')));
   out.push(stat('Посажено', String(s.planted.length), 'planted'));
   if (s.planted.length) out.push(el('div', { class: 'list', lang: 'pl' }, s.planted.map(pl).join(', ')));
   out.push(stat('Złoty', s.zloty === null ? '—' : `${s.zloty} zł`, 'zloty'));
-  out.push(stat('Минуты вспоминания', `${Math.round(s.retrievalMs / 60_000)} мин`, 'retrieval'));
+  // Меньше полуминуты — всё равно «1 мин»: игрок работал, ноль выглядит как «ничего не сделал» (P-01).
+  const min = s.retrievalMs > 0 ? Math.max(1, Math.round(s.retrievalMs / 60_000)) : 0;
+  out.push(stat('Минуты вспоминания', `${min} мин`, 'retrieval'));
   out.push(stat('Завтра к поливу', String(s.tomorrow), 'tomorrow'));
   return out;
 }
@@ -114,9 +116,9 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
       deps.bus.emit('progress:changed', { kinds: ['cards'] });
       finish('sleep');
     };
-    const main = btn('Dobranoc', dobranoc, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'sleep' });
+    const main = plBtn(BTN.dobranoc, dobranoc, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'sleep' });
     const actions: HTMLElement[] = [];
-    if (s.empty) actions.push(btn('Экспресс', () => finish('express'), '', { 'data-nav': true, 'data-act': 'express' }));
+    if (s.empty) actions.push(plBtn(BTN.express, () => finish('express'), '', { 'data-nav': true, 'data-act': 'express' }));
     else actions.push(btn('ещё 3 минуты повторений', () => finish('more3'), 'ghost more3', { 'data-nav': true, 'data-act': 'more3' }));
     actions.push(main);
 

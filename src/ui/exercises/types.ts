@@ -40,6 +40,8 @@ export interface ExerciseContent {
   /** Все слова (для дистракторов `auto:<tag>`), в порядке файлов. */
   allVocab(): readonly VocabEntry[];
   speaker(id: string): Speaker;
+  /** Тег ошибки (errorTags.json): правило одной строкой после неверного ответа (P-01). */
+  errorTag?(id: string): { ru: string; hint?: string } | undefined;
 }
 
 export interface ExerciseCtx {
@@ -47,8 +49,10 @@ export interface ExerciseCtx {
   layer: Layer;
   /** Куда рисовать шаг. */
   root: HTMLElement;
-  /** id шага (`<lessonId>#<index>` по умолчанию): seed для перемешивания и `auto:<tag>`. */
+  /** id шага (`<lessonId>#<index>` по умолчанию): дистракторы `auto:<tag>`, seed по умолчанию. */
   stepId: string;
+  /** Seed порядка вариантов и плиток (P-01): id шага + игровой день (+ `:r` у повтора ошибки). */
+  seed?: string;
   content?: ExerciseContent;
   audio: AudioPort;
   portraits?: PortraitSource | null;

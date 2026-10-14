@@ -562,3 +562,32 @@ describe('src/systems/content.ts', () => {
     expect(c.maps.get('ch01.metro')?.value.objects.some((o) => o.type === 'word')).toBe(true);
   });
 });
+
+describe('P-01: объяснение ошибки и бит первого дня', () => {
+  it('errorTags.hint и step.why необязательны; длиннее 140 знаков — ошибка схемы', () => {
+    expect(errorsOf(run((f) => {
+      at(fx.errorTags(f), 0).hint = 'stół = стол, krzesło = стул.';
+      (at(fx.s01(f).steps!, 7) as StepChoice).why = 'ó читается как [у].';
+    }))).toEqual([]);
+    expectIssue(run((f) => ((at(fx.s01(f).steps!, 7) as StepChoice).why = 'x'.repeat(141))), 'schema', /141|длинн|140/);
+    expectIssue(run((f) => (at(fx.errorTags(f), 0).hint = '')), 'schema', /.+/);
+  });
+
+  it('без --release заглушки первого дня — одно предупреждение; с --release — ошибка на каждую', () => {
+    // В фикстуре: ремонтная сцена R3 = demo.s01, её запускает dlg.demo.marek, а там line bobr.after_kawa (todo).
+    expectIssue(run(), 'todo', /первый день: \d+ заглушек todo .*PQ_RELEASE=1/, 'story/lines.json', 'warn');
+    const rel = run(undefined, { release: true });
+    expectIssue(rel, 'todo', /первый день: реплика "bobr\.after_kawa" ещё todo, а сборка release/, 'story/lines.json');
+    expectIssue(rel, 'todo', /первый день: нет реплики "intro\.caption\.oct"/, 'director.json');
+    // Реплика написана — ошибки по ней нет.
+    const fixed = run((f) => Object.assign(fx.lines(f).find((l) => l.id === 'bobr.after_kawa')!, { todo: false, pl: 'Dobra kawa.', plRu: 'Хороший кофе.' }), { release: true });
+    expect(fixed.some((i) => i.level === 'error' && /bobr\.after_kawa/.test(i.msg))).toBe(false);
+  });
+
+  it('реальный контент: все реплики первого дня есть в story/lines.json (release ловит только todo)', () => {
+    const { issues } = validateDir({ release: true, base: 'HEAD' });
+    const first = issues.filter((i) => i.level === 'error' && /первый день/.test(i.msg));
+    expect(first.filter((i) => /нет реплики/.test(i.msg))).toEqual([]);
+    expect(first.every((i) => i.code === 'todo')).toBe(true);
+  });
+});

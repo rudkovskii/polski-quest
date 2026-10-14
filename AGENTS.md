@@ -146,6 +146,19 @@
   `?dev=play`), повторный запуск `/?dev=play&mute=1`, `&now=+1d` / `&now=+9d` (весна). В `window.__pq.flow.step` —
   шаг и `reason`. Вкладка в фоне почти не рисует кадры (rAF): мир «стоит», пока панель браузера скрыта.
 
+## Полировка плейтестов (P-01)
+- `[todo]` в сборке не виден никогда: реплика-заглушка пропускается (диалог, runLines, вступление, пузырь, bobrLine),
+  у узла с вариантами остаются варианты. Видно только в `npm run dev` с `?dev=…`/`?reset=1` (`src/ui/todo.ts`), `&todo=0` прячет.
+- Бит первого дня без `todo`: `npm run validate:release` / `npm run build:release` (`PQ_RELEASE=1`) падают на заглушке
+  в репликах `FIRST_DAY_LINES` (director.ts) и в диалогах диагностики и ремонтных сцен. Без флага — предупреждение.
+- Варианты, плитки, пары перемешиваются по `ExerciseCtx.seed` = id шага + игровой день (`options.ts`: `seedOf`,
+  `shuffleOptions`); `stress` не перемешивается. В тестах выбирай вариант по тексту, не по индексу.
+- После ошибки: ответ, строка правила (`step.why` → `errorTags[tag].hint` → `ru`), перевод с транскрипцией, потом
+  «Prawie. Jeszcze raz.» (`frame.ts`: `ruleLine`, `glossLine`).
+- Кнопки: `plBtn(BTN.next, …)` из `overlay/kit.ts` — польское слово + мелкая русская подпись; новые подписи — в `BTN`.
+  Портрета нет — силуэт. Итог дня: «полито» только обход/экспресс (+ ранний полив агрегатом `lesson obchod.*`),
+  минуты — `retrievalMsOf` (уроки целиком + ответы вне уроков).
+
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
 2. Id: модуль `[a-z0-9_]+`, урок `<module>.<name>`, слово `lx.<slug>` (глобально уникально),

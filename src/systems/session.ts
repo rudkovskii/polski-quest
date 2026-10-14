@@ -9,7 +9,7 @@
 import type { Tuning } from '../types/content';
 import { derive, isPlayedDay, type DeriveContent, type Derived } from './derive';
 import { gardenItems, plantStage, stageRank, type GardenTuning, type PlantStage } from './garden';
-import type { EventOf, LogEvent, Seg } from './log';
+import type { EventOf, LogEvent, Seg, Src } from './log';
 import type { Progress } from './progress';
 import { dueQueue, isSpring, type QueueTuning } from './queue';
 import { cardId, parseCardId } from './srs';
@@ -162,16 +162,40 @@ export function planRound(
 
 // ── Итог дня (§5.9).
 
+/** Полив грядок: ответы обхода, экспресса и «ещё 3 минуты» (src express). Сцены, вечер и слова в мире — не полив. */
+export const WATER_SRC: ReadonlySet<Src> = new Set<Src>(['obchod', 'express']);
+/**
+ * Ранний полив без SRS (первый день F2: грядка ещё не due) пишется агрегатом `lesson` с id
+ * `obchod.<item>` / `express.<card>` (ТЗ §3.11: ранние ответы — в агрегат урока, P-01).
+ */
+export const WATER_LESSON = /^(obchod|express)\./;
+/** Ответы внутри урока: их время уже в `lesson.ms` / `boss.ms`, второй раз не считаем. */
+const IN_LESSON_SRC: ReadonlySet<Src> = new Set<Src>(['scene', 'remedy', 'boss']);
+
+/**
+ * Минуты вспоминания (§5.9, P-01) за [since, until]: уроки, диагностика и босс целиком (`lesson.ms`, `boss.ms`)
+ * плюс ответы вне уроков (обход, экспресс, вечер, слова в мире — `rev.ms`).
+ */
+export function retrievalMsOf(events: readonly LogEvent[], since: Ts, until: Ts = Infinity): number {
+  let ms = 0;
+  for (const e of events) {
+    if (e.ts < since || e.ts > until) continue;
+    if (e.k === 'rev' && !IN_LESSON_SRC.has(e.src)) ms += e.ms;
+    else if (e.k === 'lesson' || e.k === 'boss') ms += e.ms;
+  }
+  return ms;
+}
+
 export interface DaySummary {
   day: Day;
-  /** Ответов по due-карточкам сегодня. */
+  /** Политых грядок сегодня: ответы обхода и экспресса (rev src obchod/express и ранний полив агрегатом). */
   answered: number;
-  /** Из них верно (grade ≥ 1): «полито». */
+  /** Из них верно (grade ≥ 1, у раннего полива — с первой попытки): «полито N из M». */
   watered: number;
   /** Разных карточек повторено / было due сегодня (повторено + ещё due) — покрытие. */
   reviewed: number;
   wasDue: number;
-  /** Минуты вспоминания: Σ rev.ms. */
+  /** Минуты вспоминания: уроки и диагностика целиком + ответы вне уроков (retrievalMsOf). */
   retrievalMs: number;
   /** Слова, сменившие стадию сегодня (росток → куст и т.п.). */
   grew: { item: string; from: PlantStage; to: PlantStage }[];
@@ -197,6 +221,8 @@ export function summarizeDay(p: Progress, dc: DeriveContent, now: Ts, tz?: strin
   const before = derive({ ...p, log: { ...p.log, events: p.log.events.filter((e) => e.ts < start) } }, dc, start - 1, tz);
   const today = p.log.events.filter((e) => e.ts >= start && e.ts <= now);
   const revs = today.filter((e): e is EventOf<'rev'> => e.k === 'rev');
+  const water = revs.filter((e) => WATER_SRC.has(e.src));
+  const early = today.filter((e): e is EventOf<'lesson'> => e.k === 'lesson' && WATER_LESSON.test(e.lesson));
   const intros = today.filter((e): e is EventOf<'intro'> => e.k === 'intro');
   const ren = dc.renames ?? {};
 
@@ -236,11 +262,11 @@ export function summarizeDay(p: Progress, dc: DeriveContent, now: Ts, tz?: strin
   const counted = isPlayedDay(s);
   return {
     day: after.today,
-    answered: revs.length,
-    watered: revs.filter((e) => e.g >= 1).length,
+    answered: water.length + early.reduce((x, e) => x + e.answers, 0),
+    watered: water.filter((e) => e.g >= 1).length + early.reduce((x, e) => x + Math.round(e.firstTry * e.answers), 0),
     reviewed: reviewedCards.size,
     wasDue: reviewedCards.size + stillDue,
-    retrievalMs: revs.reduce((x, e) => x + e.ms, 0),
+    retrievalMs: retrievalMsOf(today, start, now),
     grew,
     matured,
     planted,
@@ -248,15 +274,13 @@ export function summarizeDay(p: Progress, dc: DeriveContent, now: Ts, tz?: strin
     zloty: null,
     segs,
     counted,
-    empty: revs.length === 0 && intros.length === 0 && !counted,
+    empty: revs.length === 0 && intros.length === 0 && early.length === 0 && !counted,
   };
 }
 
-/** Σ rev.ms с момента `since` (для события `session.retrievalMs`). */
+/** Минуты вспоминания с момента `since` (для события `session.retrievalMs`): то же правило, что в итоге дня. */
 export function retrievalSince(events: readonly LogEvent[], since: Ts): number {
-  let ms = 0;
-  for (const e of events) if (e.k === 'rev' && e.ts >= since) ms += e.ms;
-  return ms;
+  return retrievalMsOf(events, since);
 }
 
 /** Игровой день момента (удобство для UI, который не тянет time.ts). */
