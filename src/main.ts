@@ -1,12 +1,14 @@
 import Phaser from 'phaser';
 import { Boot } from './scenes/Boot';
 import { Title } from './scenes/Title';
+import { startCloud } from './cloud';
 import { mountUi } from './ui';
 
 function startGame(): void {
   const overlay = document.getElementById('overlay');
   if (!overlay) throw new Error('#overlay not found');
   mountUi(overlay);
+  void startCloud({ dev: new URLSearchParams(location.search).get('dev') === '1' });
 
   // Конфигурация из ТЗ §2.4. WorldMap и Location добавятся в I-06 и I-14.
   new Phaser.Game({
