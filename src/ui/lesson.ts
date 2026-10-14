@@ -84,12 +84,18 @@ export function lessonSteps(lesson: Lesson): { steps: Step[]; part: (string | nu
   return { steps, part };
 }
 
-/** План: шаги по порядку, затем повтор проваленных с первой попытки (по порядку провала). */
-export function planOf(n: number, records: readonly StepRecord[]): PlanEntry[] {
+/**
+ * План: шаги по порядку, затем повтор проваленных с первой попытки (по порядку провала). Диагностика
+ * (`repeat: false`, P-06): ошибки не добавляют пунктов — повтор в ремонтных сценах следующих дней.
+ */
+export function planOf(n: number, records: readonly StepRecord[], repeat = true): PlanEntry[] {
   const plan: PlanEntry[] = [...Array(n).keys()].map((i) => ({ i, rep: false }));
-  for (const r of records) if (!r.rep && r.graded && r.ok === false) plan.push({ i: r.i, rep: true });
+  if (repeat) for (const r of records) if (!r.rep && r.graded && r.ok === false) plan.push({ i: r.i, rep: true });
   return plan;
 }
+
+/** Реплика диагностики после 6-го пункта (СЮЖЕТ_v2 d02.kazik.bramka.mid): один раз, не модально. */
+export const DIAG_MID_AT = 6;
 
 /** Источник `rev` по виду урока (§3.11). */
 export function srcOf(kind: Lesson['kind'] | 'world'): Src {
@@ -135,6 +141,7 @@ export function exerciseContent(c: Content): ExerciseContent {
     allVocab: () => (all ??= [...c.vocab.values()].map((v) => v.value)),
     speaker: (id) => ({ id, name: c.characters.get(id)?.name ?? id }),
     errorTag: (id) => c.errorTags.get(id),
+    pair: (id) => c.pairs.get(id),
   };
 }
 
@@ -192,7 +199,11 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
   const dots = el('div', { class: 'pq-dots', 'aria-hidden': 'true' });
   const main = el('div', { class: 'pq-lesson-main' });
   let stepHandler: IntentHandler | null = null;
-  const closeBtn = btn('✕', () => stepHandler?.cancel?.(), 'icon ghost', { 'aria-label': 'Прервать урок', 'data-act': 'close' });
+  // Диагностика (P-06, ПОЛИРОВКА §2 р. 5): кнопка «Wyjdź / Выйти» видна всегда; ответы сохраняются.
+  const diag = lesson.kind === 'diag' && !drill;
+  const closeBtn = diag
+    ? plBtn(BTN.exit, () => stepHandler?.cancel?.(), 'ghost', { 'aria-label': 'Выйти из проверки', 'data-act': 'close' })
+    : btn('✕', () => stepHandler?.cancel?.(), 'icon ghost', { 'aria-label': 'Прервать урок', 'data-act': 'close' });
   const shell = el(
     'div',
     { class: 'pq-lesson', 'data-lesson': lesson.id },
@@ -228,8 +239,12 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
     diacritics: getSetting(store.progress, 'diacritics'),
     translations: getSetting(store.progress, 'translations'),
     keyboardMode: getSetting(store.progress, 'keyboard.mode'),
+    silent: getSetting(store.progress, 'sound.mode') === 'off',
   };
   const exContent = exerciseContent(content);
+  // Реакция мира на ошибку (P-06): реплика NPC урока; без звука — её вариант `.mute`, если есть.
+  const errLine = lineSpeech(content, lesson.errLine, settings.silent);
+  const verdicts = diag ? diagVerdicts(content) : undefined;
 
   const saveResume = (stepIndex: number): void => {
     if (drill) return;
@@ -259,7 +274,8 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
     }
   };
 
-  let plan = planOf(steps.length, records);
+  let plan = planOf(steps.length, records, !diag);
+  const midNote = diag ? diagMid(content) : null;
   let cancelled = false;
   while (pos < plan.length) {
     const entry = plan[pos]!;
@@ -285,6 +301,10 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
       ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
       ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
       ...(entry.rep ? { repeat: true } : {}),
+      ...(settings.silent ? { silent: true } : {}),
+      ...(diag ? { oneShot: true } : {}),
+      ...(errLine ? { errLine } : {}),
+      ...(verdicts ? { verdicts } : {}),
     };
     const res = await mountStep(step, ctx);
     // Отмена до ответа — шаг не засчитан. Ответил и нажал Esc — шаг засчитан, пауза на следующем.
@@ -305,7 +325,8 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
     records.push(rec);
     writeRevs(step, res, rec);
     pos++;
-    plan = planOf(steps.length, records);
+    plan = planOf(steps.length, records, !diag);
+    if (midNote && pos === DIAG_MID_AT && !midNote.isConnected) dots.after(midNote);
     saveResume(pos);
     if (res.status === 'cancel') {
       cancelled = true;
@@ -318,7 +339,9 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
     else layer.handle(null);
   };
 
-  if (cancelled) {
+  // Выход из диагностики (P-06): ответы засчитаны сразу, карта звуков — по ним; остальное проверит ремонт.
+  const exited = cancelled && diag && records.some((r) => r.graded && !r.rep);
+  if (cancelled && !exited) {
     close();
     return { passed: false, cancelled: true };
   }
@@ -373,8 +396,12 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
   }
   clearResume();
 
-  const result: LessonResult = { passed, score: round3(score), firstTry: round3(firstTry), ms, planted };
-  if (!opts.noSummary && !drill) await summary(main, stepLayer, dots, { lesson, result, n, graded: graded.filter((r) => r.ok).length, content });
+  const result: LessonResult = { passed, score: round3(score), firstTry: round3(firstTry), ms, planted, ...(exited ? { exited: true } : {}) };
+  if (exited) {
+    close();
+    return result;
+  }
+  if (!opts.noSummary && !drill && !diag) await summary(main, stepLayer, dots, { lesson, result, n, graded: graded.filter((r) => r.ok).length, content });
   close();
   return result;
 }
@@ -419,4 +446,28 @@ function summary(
     });
     queueMicrotask(() => done.focus({ preventScroll: true }));
   });
+}
+
+/** Реплика из story/lines.json для окна упражнения: имя говорящего и польская строка (без звука — `.mute`). */
+export function lineSpeech(content: Pick<Content, 'lines' | 'characters'>, id: string | undefined, silent: boolean): { who: string; pl: string; plRu?: string } | undefined {
+  if (!id) return undefined;
+  // Без звука у реакции свой вариант: `<id>.mute` или `<npc-префикс>.mute` (d14.konduktor.err → d14.konduktor.mute).
+  const alt = silent ? [`${id}.mute`, `${id.replace(/\.[^.]+$/, '')}.mute`].find((x) => content.lines.has(x)) : undefined;
+  const l = content.lines.get(alt ?? id);
+  if (!l || l.todo || !l.pl) return undefined;
+  return { who: content.characters.get(l.who)?.name ?? l.who, pl: l.pl, ...(l.plRu ? { plRu: l.plRu } : {}) };
+}
+
+/** Отклики турникета (d02.bramka.ok / err): «Pip!» и «Hyk!». */
+function diagVerdicts(content: Pick<Content, 'lines'>): { ok: string; bad: string } | undefined {
+  const ok = content.lines.get('d02.bramka.ok')?.pl;
+  const bad = content.lines.get('d02.bramka.err')?.pl;
+  return ok && bad ? { ok, bad } : undefined;
+}
+
+/** Казик посреди диагностики: «Устал? Кнопка Wyjdź…» (d02.kazik.bramka.mid). */
+function diagMid(content: Pick<Content, 'lines'>): HTMLElement | null {
+  const l = content.lines.get('d02.kazik.bramka.mid');
+  if (!l?.ru || l.todo) return null;
+  return el('div', { class: 'pq-bobr pq-diag-mid', 'data-line': l.id }, el('b', {}, 'Kazik: '), el('span', {}, l.ru));
 }

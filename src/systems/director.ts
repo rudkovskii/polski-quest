@@ -254,16 +254,17 @@ export function lessonDay(l: Pick<Lesson, 'requires'>): number {
 /** Сцена главы (не практика и не лекарство): у неё есть день и квота. */
 const isScene = (l: Lesson): boolean => l.kind !== 'practice' && l.kind !== 'remedy';
 
-/** Сцен (уроков главы с итогом) сегодня: события `lesson`/`boss` с начала игрового дня. */
-export function scenesToday(i: Pick<DirectorInput, 'events' | 'derived' | 'content'>): number {
+/** Сцены (уроки главы с итогом) сегодня: события `lesson`/`boss` с начала игрового дня. */
+export function scenesTodayIds(i: Pick<DirectorInput, 'events' | 'derived' | 'content'>): Set<string> {
   const ids = new Set<string>();
   for (const e of i.events) {
     if (e.ts < i.derived.todayStart || (e.k !== 'lesson' && e.k !== 'boss')) continue;
     const l = i.content.lessons.get(e.lesson)?.value;
     if (l && isScene(l)) ids.add(e.lesson);
   }
-  return ids.size;
+  return ids;
 }
+export const scenesToday = (i: Pick<DirectorInput, 'events' | 'derived' | 'content'>): number => scenesTodayIds(i).size;
 
 /**
  * Сколько сцен можно сегодня (P-06): сцены этого дня по расписанию (кроме пропущенных зелёным кластером) и ещё
@@ -271,14 +272,16 @@ export function scenesToday(i: Pick<DirectorInput, 'events' | 'derived' | 'conte
  */
 export function sceneQuota(i: DirectorInput): { quota: number; backlog: boolean } {
   const ctx = ctxOf(i);
+  const today = scenesTodayIds(i);
   let planned = 0;
   let backlog = false;
   for (const { value: l } of i.content.lessons.values()) {
-    if (!isScene(l)) continue;
+    if (!isScene(l) || l.id === FIRST_DAY.introLesson) continue;
     const day = lessonDay(l);
     const v = lessonVariant(l, ctx);
     if (day === i.day && v !== 'skip') planned++;
-    else if (day < i.day && v !== 'skip' && v !== 'locked' && !lessonDoneFor(l, i.derived) && l.id !== FIRST_DAY.introLesson) backlog = true;
+    // Хвост с прошлых дней: ещё не сыгран или сыгран сегодня (тогда он и занял лишнее место).
+    else if (day < i.day && v !== 'skip' && v !== 'locked' && (!lessonDoneFor(l, i.derived) || today.has(l.id))) backlog = true;
   }
   return { quota: Math.max(planned, backlog ? 0 : 1) + (backlog ? 1 : 0), backlog };
 }

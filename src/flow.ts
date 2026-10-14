@@ -28,7 +28,9 @@ import {
 } from './systems/director';
 import type { LogEvent } from './systems/log';
 import type { Clock } from './systems/platform/clock';
-import { setFlag, type Progress } from './systems/progress';
+import { entryOf, lineFor, sysFlag } from './systems/pace';
+import { getSetting, setFlag, type Progress } from './systems/progress';
+import type { PaceSystem } from './types/content';
 import { appearanceOf, hasAppearance } from './systems/avatar';
 import type { GuideStepView, WorldInteract } from './types/bus';
 import type { Lesson } from './types/content';
@@ -133,7 +135,7 @@ export function startFlow(o: FlowOptions): Flow {
         text = 'весна: полей грядки';
         break;
       case 'beat':
-        text = `поговори: ${npcName(s.target.npc) || 'Kazik'}`;
+        text = s.target.object === 'skrzynka' ? 'почтовый ящик у калитки' : `поговори: ${npcName(s.target.npc) || 'Kazik'}`;
         break;
       case 'water':
         text = 'полей грядки';
@@ -148,7 +150,7 @@ export function startFlow(o: FlowOptions): Flow {
         text = `босс: ${title}`;
         break;
       case 'evening':
-        text = 'вечер: звуки у реки';
+        text = s.choose ? 'вечер: рыбалка или табличка' : 'вечер: звуки у реки';
         break;
       case 'sleep':
         text = 'альтанка: спать';
@@ -160,6 +162,9 @@ export function startFlow(o: FlowOptions): Flow {
     return there ? `${text} → ${content.maps.get(s.target.location)?.value.title.pl ?? s.target.location}` : text;
   }
 
+  /** Без звука (P-06): реплика `<id>.mute`, если есть. */
+  const say = (id: string): string => lineFor(id, !!storeNow && getSetting(storeNow.progress, 'sound.mode') === 'off', content.lines);
+
   function view(s: DirectorStep): GuideStepView {
     const here = s.target.screen === 'intro' || (s.target.location === location && s.kind !== 'done');
     return {
@@ -168,7 +173,7 @@ export function startFlow(o: FlowOptions): Flow {
       ...(s.f ? { f: s.f } : {}),
       label: label(s),
       // Бит с персонажем-целью: реплика прозвучит в окне диалога по тапу, пузырём её не дублируем.
-      ...(s.line && !(s.kind === 'beat' && (s.target.npc || s.target.object)) ? { line: s.line } : {}),
+      ...(s.line && !(s.kind === 'beat' && (s.target.npc || s.target.object)) ? { line: say(s.line) } : {}),
       here,
       ...(s.kind === 'done' && s.more3 ? { more3: true } : {}),
       // Подсказка управления (при 3 с бездействия): первая локация — działka в F2, первый вход в метро — F3 и
@@ -233,9 +238,13 @@ export function startFlow(o: FlowOptions): Flow {
       const changed = !step || stepKey(step) !== stepKey(next) || step.reason !== next.reason || hide !== nowHidden;
       nowHidden = hide;
       step = next;
-      if (changed) publish();
-      // Бит без цели-персонажа: реплика пузырём и эффекты сразу.
-      if (next.kind === 'beat' && !next.target.npc && !next.target.object) void runBeat(next);
+      if (changed) {
+        publish();
+        // Следующие коробки реплики шага (P-06): той же очередью пузыря.
+        if (!(next.kind === 'beat' && (next.target.npc || next.target.object))) for (const l of next.lines ?? []) bus.emit('guide:reveal', { element: 'say', line: say(l) });
+      }
+      // Бит без цели-персонажа: реплика пузырём и эффекты сразу (когда не открыт урок или диалог).
+      if (next.kind === 'beat' && !next.target.npc && !next.target.object && !play.busy && !day.ui.busy && !running) void runBeat(next);
       return;
     }
   }
@@ -294,6 +303,13 @@ export function startFlow(o: FlowOptions): Flow {
     if (o.hasLink?.() && !(LINK_SAVED in st.progress.world.flags)) bus.emit('ui:screen:open', { screen: 'link' });
   }
 
+  /** Система расписания показана (P-06): флаг `sys.<запись>` — с сегодняшнего дня она открыта. */
+  async function shown(sys: PaceSystem | undefined): Promise<void> {
+    const e = sys ? entryOf(content.director.schedule ?? [], sys) : undefined;
+    const st = await o.store;
+    if (e && !(sysFlag(e.system) in st.progress.world.flags)) await flag(sysFlag(e.system));
+  }
+
   async function runBeat(s: DirectorStep): Promise<void> {
     if (!s.beat) return;
     const b = content.director.beats.find((x) => x.id === s.beat);
@@ -301,10 +317,22 @@ export function startFlow(o: FlowOptions): Flow {
     const fl = `beat.${s.beat}${b?.once === false ? `.${derive(st.progress, deriveContent(content), clock.now()).today.replace(/-/g, '_')}` : ''}`;
     if (fl in st.progress.world.flags) return;
     await flag(fl); // сначала флаг: бит не повторится, даже если окно закроют
+    await shown(s.system);
     if (s.target.npc || s.target.object) {
       if (s.line) await play.lines([s.line]);
-    } else if (s.line) bus.emit('guide:reveal', { element: `beat.${s.beat}`, line: s.line });
-    if (s.do?.length) await play.effects(s.do);
+      if (s.do?.length) await play.effects(s.do);
+      return;
+    }
+    // Без цели: реплики пузырём (и реплики-эффекты тоже, по очереди), остальные эффекты — как обычно.
+    if (s.line) bus.emit('guide:reveal', { element: `beat.${s.beat}`, line: say(s.line) });
+    const rest = (s.do ?? []).filter((e) => {
+      if (e.line && Object.keys(e).length === 1) {
+        bus.emit('guide:reveal', { element: `beat.${s.beat}`, line: say(e.line) });
+        return false;
+      }
+      return true;
+    });
+    if (rest.length) await play.effects(rest);
   }
 
   async function perform(s: DirectorStep): Promise<void> {
@@ -335,6 +363,7 @@ export function startFlow(o: FlowOptions): Flow {
         return;
       }
       case 'water':
+        await shown(s.system);
         await day.ui.obchod({ mode: 'day', ...(s.target.item ? { fromItem: s.target.item } : {}) });
         return;
       case 'resume':
@@ -344,10 +373,14 @@ export function startFlow(o: FlowOptions): Flow {
       case 'remedy':
       case 'scene':
       case 'boss':
+        await shown(s.system);
         if (s.lesson) await lessonFlow(s.lesson);
         return;
       case 'evening':
-        await day.ui.obchod({ mode: 'phonetic' });
+        // Вечер — день 5, выбор вечера (рыбалка или табличка) — день 6 (P-06).
+        await shown(s.system);
+        if (s.system === 'eveningChoice') await shown('evening');
+        await day.ui.obchod({ mode: 'phonetic', ...(s.choose ? { choose: true } : {}), ...(s.limit ? { limit: s.limit } : {}), ...(s.cluster ? { cluster: s.cluster } : {}) });
         return;
       case 'sleep':
         return sleepFlow(s);

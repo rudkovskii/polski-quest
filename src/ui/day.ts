@@ -158,7 +158,7 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
   // ── HUD локаций: элементы по флагам hud.* (I-13).
   // Кнопки HUD: польское слово + русская подпись (P-01, ПОЛИРОВКА §2.10).
   const obchodBtn = plBtn(BTN.obchod, () => void ui.obchod({ mode: 'day' }), '', { 'data-hud': 'obchod' });
-  const expressBtn = plBtn(BTN.express, () => void ui.obchod({ mode: 'express' }), '', { 'data-hud': 'obchod', 'data-act': 'express' });
+  const expressBtn = plBtn(BTN.express, () => void ui.obchod({ mode: 'express' }), '', { 'data-hud': 'express', 'data-act': 'express' });
   const cellarBtn = plBtn(BTN.cellar, () => void once((s) => cellarPanel(s)), '', { 'data-hud': 'jars' });
   const passportBtn = plBtn(BTN.passport, () => bus.emit('ui:screen:open', { screen: 'passport' }), '', { 'data-hud': 'passport' });
   const hud = el(
@@ -184,7 +184,8 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
     const flags = store.progress.world.flags;
     const shown = (e: string): boolean => `hud.${e}` in flags;
     obchodBtn.hidden = !shown('obchod');
-    expressBtn.hidden = !shown('obchod');
+    // Ekspres — своя система (P-06, день 7): до неё кнопки нет.
+    expressBtn.hidden = !shown('express');
     cellarBtn.hidden = !shown('jars');
     passportBtn.hidden = !shown('passport');
     // Число на кнопке = растения с «!» (что польёт раунд сейчас). Долг (§4.2) больше на братьев,

@@ -2,36 +2,70 @@
  "v": 1,
  "default": "say:Zosia",
  "entries": {
+  "say:Zosia|normal|A teraz: „chrząszcz”!": "721a63eff6bb.m4a",
+  "say:Zosia|normal|Albo „cześć”, albo „dzień dobry”!": "e295505df895.m4a",
   "say:Zosia|normal|Albo „cześć”, albo „dzień dobry”.": "1a83c1ee654a.m4a",
   "say:Zosia|normal|Apteka": "030929d1b7b3.m4a",
+  "say:Zosia|normal|Au!": "b71f51a82f4e.m4a",
+  "say:Zosia|normal|Bilet jest? Dobrze.": "942836464c1a.m4a",
+  "say:Zosia|normal|Bilet tymczasowy. Proszę.": "ab754e9eedcd.m4a",
   "say:Zosia|normal|Bilety do kontroli!": "3f009bd78ef4.m4a",
   "say:Zosia|normal|Brawo!": "7c3362d4701c.m4a",
+  "say:Zosia|normal|Brawo! A „może”?": "ca67f6815203.m4a",
+  "say:Zosia|normal|Brawo! Bramka otwarta!": "23e441306283.m4a",
+  "say:Zosia|normal|Brawo! Czytasz Warszawę.": "dc158571912f.m4a",
+  "say:Zosia|normal|Brawo! Słyszysz Warszawę.": "51498442ad21.m4a",
+  "say:Zosia|normal|Bubr?": "5623773402d8.m4a",
+  "say:Zosia|normal|Był tu jakiś kot.": "05a6c23a6186.m4a",
+  "say:Zosia|normal|Bóbr w metrze? Warszawa...": "db92e3e0bbb5.m4a",
   "say:Zosia|normal|Bóbr. „Ó” z kreską!": "9773c829537d.m4a",
   "say:Zosia|normal|Bóbr... bóbr... Nic się nie rymuje.": "01ef37d0c286.m4a",
   "say:Zosia|normal|Centrum": "cb00e7c49358.m4a",
+  "say:Zosia|normal|Chrząszcz.": "22a20b875597.m4a",
+  "say:Zosia|normal|Ciasto! Już, już!": "12c6a75535cd.m4a",
   "say:Zosia|normal|Co to znaczy?": "c05b56c388de.m4a",
   "say:Zosia|normal|Czech": "217d579be36d.m4a",
-  "say:Zosia|normal|Cześć! Jestem Jan Brzechwa. Sprawdzimy, jak słyszysz Warszawę.": "fd1f17820d12.m4a",
+  "say:Zosia|normal|Cześć! Jestem Ola.": "74522f2bf307.m4a",
+  "say:Zosia|normal|Cześć! Jestem z Krakowa.": "3d648d0544a4.m4a",
   "say:Zosia|normal|Cześć, Dima!": "75ae8ca31629.m4a",
+  "say:Zosia|normal|Cześć, Dima! Co słychać?": "5a654d2edda9.m4a",
+  "say:Zosia|normal|Cześć, Dima! Zima!": "e1b4f9ea0067.m4a",
   "say:Zosia|normal|Dima? Rymuje się z „zima”!": "a8f1d41fd2b4.m4a",
+  "say:Zosia|normal|Do jutra! Bramka poczeka.": "3bff681e64a8.m4a",
   "say:Zosia|normal|Dworzec Centralny": "1a7a5e3a6cd8.m4a",
   "say:Zosia|normal|Dziesięć złotych.": "84a42cbc1bee.m4a",
   "say:Zosia|normal|Dzień dobry": "85c5856b17ad.m4a",
   "say:Zosia|normal|Dzień dobry!": "9b352ba165fd.m4a",
+  "say:Zosia|normal|Dziękuję! Krówkę?": "4a61393975dc.m4a",
   "say:Zosia|normal|Dziękuję. Proszę. Są.": "8bd247deeae7.m4a",
+  "say:Zosia|normal|Hej! Uwaga, drzwi!": "e117bf3f41cd.m4a",
   "say:Zosia|normal|Herbata. Chleb. Ile? Cena. Kraków.": "592909586582.m4a",
+  "say:Zosia|normal|I pieczątka: Praga.": "a16c42f398ef.m4a",
   "say:Zosia|normal|Informacja": "b4547b087c3f.m4a",
   "say:Zosia|normal|Jak to się pisze?": "51c21729b84f.m4a",
-  "say:Zosia|normal|Jestem adwokatem. Cytuj krótko.": "ccd09c916a4c.m4a",
+  "say:Zosia|normal|Jestem adwokatem. To ciekawe.": "3bd845fc8c39.m4a",
+  "say:Zosia|normal|Jutro sprawdzę.": "1da4e7c6792a.m4a",
   "say:Zosia|normal|Już, już!": "9455c8f10343.m4a",
+  "say:Zosia|normal|Ka-si-a? Nie. Ka-sia!": "ab1ad258373a.m4a",
   "say:Zosia|normal|Kasa": "de9d84130484.m4a",
   "say:Zosia|normal|Kasia": "0ed6283545a0.m4a",
   "say:Zosia|normal|Kasia je kaszę.": "9172dbe06208.m4a",
   "say:Zosia|normal|Kasza czy ciasto?": "77c8e16b71c1.m4a",
+  "say:Zosia|normal|Kasza. Smacznego!": "737b4da1f281.m4a",
   "say:Zosia|normal|Kawa czy woda?": "6ef49a4c95f2.m4a",
+  "say:Zosia|normal|Kawa, trawa, Warszawa!": "4b3ea814abf0.m4a",
+  "say:Zosia|normal|Kawa? Herbata? Już!": "0102510cee13.m4a",
+  "say:Zosia|normal|Kolano? Tak sobie.": "4994bef56b48.m4a",
+  "say:Zosia|normal|Kontrola będzie. Kiedyś.": "1580ec5873b1.m4a",
+  "say:Zosia|normal|Kot? Nie ma kota.": "4aec41d6cf2d.m4a",
   "say:Zosia|normal|Kraków": "0261d263be0e.m4a",
+  "say:Zosia|normal|Krówkę? Proszę.": "eefe74c30889.m4a",
+  "say:Zosia|normal|Mała kawa! Powtórz!": "bfa6d8566a62.m4a",
   "say:Zosia|normal|Mała kawa, proszę.": "0a108f18bfca.m4a",
+  "say:Zosia|normal|Może morze? Może!": "f2701be594ca.m4a",
   "say:Zosia|normal|Następna stacja: Świętokrzyska.": "3b70ce2bd2d7.m4a",
+  "say:Zosia|normal|Następny!": "e45184c1e4e7.m4a",
+  "say:Zosia|normal|Następny! Imię?": "ff18cde6bdc3.m4a",
   "say:Zosia|normal|Nazwisko. Proszę przeliterować.": "59e20dbc2033.m4a",
   "say:Zosia|normal|Nazwisko?": "6a7a383f5f5c.m4a",
   "say:Zosia|normal|Nazwisko? Proszę przeliterować.": "10995e8f4a0d.m4a",
@@ -39,32 +73,55 @@
   "say:Zosia|normal|Nie rozumiem.": "1b685f28e87c.m4a",
   "say:Zosia|normal|Nie rozumiem. Proszę powtórzyć.": "19ed1de883d7.m4a",
   "say:Zosia|normal|Nie szkodzi.": "52fadc2577fa.m4a",
+  "say:Zosia|normal|Nie „wada”. Wo-da!": "5158360638d9.m4a",
+  "say:Zosia|normal|Numerek, proszę.": "c8d98781624a.m4a",
   "say:Zosia|normal|Obsługujemy: 12": "71bfaf31d084.m4a",
+  "say:Zosia|normal|Ojej... Ciężkie.": "d17835e044b3.m4a",
   "say:Zosia|normal|Otwarte": "0d102aaa5380.m4a",
   "say:Zosia|normal|Pan bierze? Za darmo.": "008897b21e8a.m4a",
+  "say:Zosia|normal|Pan mieszka na działce? Ciekawe...": "a5f0b15a7962.m4a",
   "say:Zosia|normal|Pchać": "5eeadbfe3383.m4a",
-  "say:Zosia|normal|Peron": "9b0d738838f8.m4a",
   "say:Zosia|normal|Piekarnia": "8dab85996635.m4a",
-  "say:Zosia|normal|Powtórz!": "4a3ac9c5bbde.m4a",
+  "say:Zosia|normal|Po sylabach! Świę-to-krzy-ska.": "8fb58947dfc9.m4a",
+  "say:Zosia|normal|Podpis: „K.”. Autor nieznany.": "d5f5a4b8100c.m4a",
+  "say:Zosia|normal|Pokaż paszport.": "0cca7139716e.m4a",
+  "say:Zosia|normal|Poniedziałek...": "1fc8338ab5de.m4a",
+  "say:Zosia|normal|Powiesz: „chrząszcz”. Ale nie dziś.": "9b820103ed03.m4a",
+  "say:Zosia|normal|Powtórz! Ach, nic nie mówiłeś.": "bd2e14da4326.m4a",
+  "say:Zosia|normal|Prawdziwa Polska? Tam, gdzie mówią „chrząszcz”!": "b577b884cc5c.m4a",
   "say:Zosia|normal|Proszę bardzo!": "9f50271a40a9.m4a",
   "say:Zosia|normal|Proszę powtórzyć": "29c11fefff9c.m4a",
   "say:Zosia|normal|Proszę powtórzyć.": "ae89b4730335.m4a",
+  "say:Zosia|normal|Proszę powtórzyć?": "9e93ddeb9772.m4a",
+  "say:Zosia|normal|Proszę przeczytać.": "a694196d476a.m4a",
   "say:Zosia|normal|Proszę przeliterować": "e8173fdb31c1.m4a",
   "say:Zosia|normal|Proszę przeliterować.": "464729080ab7.m4a",
   "say:Zosia|normal|Proszę wolniej": "7f85667ae8c2.m4a",
   "say:Zosia|normal|Proszę wolniej.": "ec4641f8003c.m4a",
   "say:Zosia|normal|Proszę wolniej. Co to znaczy?": "82c05c5aeeb4.m4a",
+  "say:Zosia|normal|Proszę!": "e20e4814e0cf.m4a",
+  "say:Zosia|normal|Proszę? Co „proszę”?": "6cb4594861d7.m4a",
   "say:Zosia|normal|Przystanek": "14f788a21711.m4a",
+  "say:Zosia|normal|Ręka! Moja ręka!": "f2368c59290a.m4a",
+  "say:Zosia|normal|Siano? Nie mamy siana.": "de33d5558e3d.m4a",
   "say:Zosia|normal|Sklep": "782a092ef8aa.m4a",
   "say:Zosia|normal|Stół jest mały.": "484ec5748417.m4a",
   "say:Zosia|normal|Stół. Słucham.": "66d9aef0110a.m4a",
+  "say:Zosia|normal|Słuchaj Warszawy! Cześć!": "74471e402e4b.m4a",
   "say:Zosia|normal|Słuchaj Warszawy.": "183fbf1a9d39.m4a",
   "say:Zosia|normal|Słucham?": "3e7e47216ddf.m4a",
-  "say:Zosia|normal|Tam, gdzie mówią „chrząszcz”!": "c8c19b91e234.m4a",
+  "say:Zosia|normal|Ta bramka czyta.": "7b61381ee8fb.m4a",
+  "say:Zosia|normal|Ta bramka słucha.": "d45d50ee8a2a.m4a",
+  "say:Zosia|normal|Ta stara pieczątka... Takich już nie ma.": "470adb20d022.m4a",
+  "say:Zosia|normal|Ta-TA? Nie. TA-ta!": "208c15c0455b.m4a",
   "say:Zosia|normal|Tam.": "94cc7354dd05.m4a",
   "say:Zosia|normal|To moja siostra, Kasia.": "7cbe45250918.m4a",
+  "say:Zosia|normal|To nie mój kot.": "c866e576c137.m4a",
   "say:Zosia|normal|Toaleta": "49e36cb02faf.m4a",
+  "say:Zosia|normal|W porządku. Bilet miesięczny.": "bd163cea442f.m4a",
   "say:Zosia|normal|Warszawa": "3cc4a1a3c64c.m4a",
+  "say:Zosia|normal|Warszawa? Spoko. Ale Kraków...": "8c64771bc16e.m4a",
+  "say:Zosia|normal|Warszawa? Spoko. Kraków lepszy.": "21e6b4b18842.m4a",
   "say:Zosia|normal|Wejście": "be99c8632153.m4a",
   "say:Zosia|normal|Woda. Kawa. Telefon. Teatr. Warszawa.": "02655e8fd898.m4a",
   "say:Zosia|normal|Wyjście": "60c68899a2f5.m4a",
@@ -108,7 +165,6 @@
   "say:Zosia|normal|kasa": "9cf2be0d0f95.m4a",
   "say:Zosia|normal|kasza": "42a0b28431c8.m4a",
   "say:Zosia|normal|kawa": "400d2e43300e.m4a",
-  "say:Zosia|normal|kobieta": "de4dd21af3fd.m4a",
   "say:Zosia|normal|kos": "a61168a4d30d.m4a",
   "say:Zosia|normal|kosz": "9516acacb7ca.m4a",
   "say:Zosia|normal|koś": "e679d3c58e61.m4a",
@@ -208,8 +264,10 @@
   "say:Zosia|normal|żak": "a5eebfeb06b9.m4a",
   "say:Zosia|normal|żona": "0fe444aaeac0.m4a",
   "say:Zosia|normal|„Morze” — rz czy ż?": "8b7cc5021cbd.m4a",
+  "say:Zosia|normal|„Morze”: rz czy ż?": "7adc4fb47893.m4a",
   "say:Zosia|slow|Apteka": "36cf3dd2c833.m4a",
   "say:Zosia|slow|Centrum": "3e449b90e99a.m4a",
+  "say:Zosia|slow|Chrząszcz.": "e8ac173b872d.m4a",
   "say:Zosia|slow|Co to znaczy?": "33f29ce23632.m4a",
   "say:Zosia|slow|Czech": "b53173da6ebf.m4a",
   "say:Zosia|slow|Dworzec Centralny": "7f6af11b8bf3.m4a",
@@ -230,7 +288,6 @@
   "say:Zosia|slow|Nie rozumiem. Proszę powtórzyć.": "cd35f9204410.m4a",
   "say:Zosia|slow|Otwarte": "f096da93f3ad.m4a",
   "say:Zosia|slow|Pchać": "244c7ca725dc.m4a",
-  "say:Zosia|slow|Peron": "03ddba0817d7.m4a",
   "say:Zosia|slow|Piekarnia": "8a2d25c888f5.m4a",
   "say:Zosia|slow|Proszę powtórzyć": "7d120f4cce8a.m4a",
   "say:Zosia|slow|Proszę powtórzyć.": "f0b3825a4fcc.m4a",
@@ -286,7 +343,6 @@
   "say:Zosia|slow|kasa": "d13ae4f29338.m4a",
   "say:Zosia|slow|kasza": "75a64b015255.m4a",
   "say:Zosia|slow|kawa": "b84f07e9fa59.m4a",
-  "say:Zosia|slow|kobieta": "abcc712a4a8b.m4a",
   "say:Zosia|slow|kos": "0923e17496be.m4a",
   "say:Zosia|slow|kosz": "dd8784b5de27.m4a",
   "say:Zosia|slow|koś": "b64df8dc6b24.m4a",
@@ -391,6 +447,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "0102510cee13.m4a": {
+   "dur": 2.32,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "013757dfa542.m4a": {
    "dur": 0.33,
    "voice": "say:Zosia",
@@ -416,11 +477,6 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
-  "03ddba0817d7.m4a": {
-   "dur": 0.69,
-   "voice": "say:Zosia",
-   "rate": "slow"
-  },
   "043611897739.m4a": {
    "dur": 0.89,
    "voice": "say:Zosia",
@@ -435,6 +491,11 @@
    "dur": 0.66,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "05a6c23a6186.m4a": {
+   "dur": 1.52,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "06a795d51eee.m4a": {
    "dur": 0.58,
@@ -502,6 +563,11 @@
    "rate": "normal"
   },
   "0c0805736521.m4a": {
+   "dur": 1.35,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "0cca7139716e.m4a": {
    "dur": 1.35,
    "voice": "say:Zosia",
    "rate": "normal"
@@ -581,6 +647,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "12c6a75535cd.m4a": {
+   "dur": 2.23,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "134e538eb807.m4a": {
    "dur": 0.63,
    "voice": "say:Zosia",
@@ -593,6 +664,11 @@
   },
   "14f788a21711.m4a": {
    "dur": 0.95,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "1580ec5873b1.m4a": {
+   "dur": 2.18,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -651,6 +727,11 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "1da4e7c6792a.m4a": {
+   "dur": 1.21,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "1e96f4493e27.m4a": {
    "dur": 0.73,
    "voice": "say:Zosia",
@@ -671,8 +752,33 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "1fc8338ab5de.m4a": {
+   "dur": 0.93,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "208c15c0455b.m4a": {
+   "dur": 2.02,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "217d579be36d.m4a": {
    "dur": 0.53,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "21e6b4b18842.m4a": {
+   "dur": 3.15,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "22a20b875597.m4a": {
+   "dur": 0.78,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "23e441306283.m4a": {
+   "dur": 2.25,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -831,10 +937,20 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "3bd845fc8c39.m4a": {
+   "dur": 2.51,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "3bedc728bc3b.m4a": {
    "dur": 1.65,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "3bff681e64a8.m4a": {
+   "dur": 2.29,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "3c0cc608c253.m4a": {
    "dur": 2.55,
@@ -865,6 +981,11 @@
    "dur": 0.69,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "3d648d0544a4.m4a": {
+   "dur": 2.15,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "3db42a913ac4.m4a": {
    "dur": 0.63,
@@ -971,6 +1092,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "470adb20d022.m4a": {
+   "dur": 2.73,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "476645d77507.m4a": {
    "dur": 0.8,
    "voice": "say:Zosia",
@@ -991,13 +1117,28 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "4994bef56b48.m4a": {
+   "dur": 1.67,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "49e36cb02faf.m4a": {
    "dur": 0.77,
    "voice": "say:Zosia",
    "rate": "normal"
   },
-  "4a3ac9c5bbde.m4a": {
-   "dur": 0.76,
+  "4a61393975dc.m4a": {
+   "dur": 1.71,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "4aec41d6cf2d.m4a": {
+   "dur": 1.66,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "4b3ea814abf0.m4a": {
+   "dur": 2.21,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -1036,6 +1177,16 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "51498442ad21.m4a": {
+   "dur": 2.14,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "5158360638d9.m4a": {
+   "dur": 1.54,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "51c21729b84f.m4a": {
    "dur": 1.2,
    "voice": "say:Zosia",
@@ -1070,6 +1221,11 @@
    "dur": 0.87,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "5623773402d8.m4a": {
+   "dur": 0.66,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "568693d94231.m4a": {
    "dur": 0.57,
@@ -1115,6 +1271,11 @@
    "dur": 1.25,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "5a654d2edda9.m4a": {
+   "dur": 2.6,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "5ae7de2af33a.m4a": {
    "dur": 0.74,
@@ -1231,6 +1392,11 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "6cb4594861d7.m4a": {
+   "dur": 1.67,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "6ef49a4c95f2.m4a": {
    "dur": 0.96,
    "voice": "say:Zosia",
@@ -1251,6 +1417,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "721a63eff6bb.m4a": {
+   "dur": 1.77,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "72495c62df12.m4a": {
    "dur": 1.0,
    "voice": "say:Zosia",
@@ -1265,6 +1436,21 @@
    "dur": 0.49,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "737b4da1f281.m4a": {
+   "dur": 1.75,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "74471e402e4b.m4a": {
+   "dur": 2.15,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "74522f2bf307.m4a": {
+   "dur": 1.72,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "74881d1f4a72.m4a": {
    "dur": 0.73,
@@ -1341,10 +1527,20 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "7adc4fb47893.m4a": {
+   "dur": 1.92,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "7b1eb2c2fd3a.m4a": {
    "dur": 0.65,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "7b61381ee8fb.m4a": {
+   "dur": 1.17,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "7c1f89c91cbc.m4a": {
    "dur": 1.34,
@@ -1486,6 +1682,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "8c64771bc16e.m4a": {
+   "dur": 3.08,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "8c7a6a50d9ac.m4a": {
    "dur": 0.94,
    "voice": "say:Zosia",
@@ -1541,6 +1742,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "8fb58947dfc9.m4a": {
+   "dur": 2.53,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "9042fe62ee32.m4a": {
    "dur": 0.67,
    "voice": "say:Zosia",
@@ -1578,6 +1784,11 @@
   },
   "93b79d7b2092.m4a": {
    "dur": 0.81,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "942836464c1a.m4a": {
+   "dur": 1.97,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -1631,13 +1842,13 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
-  "9b0d738838f8.m4a": {
-   "dur": 0.55,
+  "9b352ba165fd.m4a": {
+   "dur": 0.87,
    "voice": "say:Zosia",
    "rate": "normal"
   },
-  "9b352ba165fd.m4a": {
-   "dur": 0.87,
+  "9b820103ed03.m4a": {
+   "dur": 2.82,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -1661,6 +1872,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "9e93ddeb9772.m4a": {
+   "dur": 1.3,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "9f50271a40a9.m4a": {
    "dur": 0.98,
    "voice": "say:Zosia",
@@ -1675,6 +1891,11 @@
    "dur": 0.92,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "a16c42f398ef.m4a": {
+   "dur": 1.77,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "a202ccab2d71.m4a": {
    "dur": 0.59,
@@ -1706,8 +1927,18 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "a5f0b15a7962.m4a": {
+   "dur": 2.49,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "a61168a4d30d.m4a": {
    "dur": 0.51,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "a694196d476a.m4a": {
+   "dur": 1.36,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -1751,6 +1982,16 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "ab1ad258373a.m4a": {
+   "dur": 2.1,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "ab754e9eedcd.m4a": {
+   "dur": 2.18,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "ab7daff2e8ad.m4a": {
    "dur": 0.73,
    "voice": "say:Zosia",
@@ -1763,11 +2004,6 @@
   },
   "abb4ce818cb5.m4a": {
    "dur": 1.22,
-   "voice": "say:Zosia",
-   "rate": "slow"
-  },
-  "abcc712a4a8b.m4a": {
-   "dur": 0.9,
    "voice": "say:Zosia",
    "rate": "slow"
   },
@@ -1826,6 +2062,11 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "b577b884cc5c.m4a": {
+   "dur": 3.75,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "b62c27bc6522.m4a": {
    "dur": 0.73,
    "voice": "say:Zosia",
@@ -1840,6 +2081,11 @@
    "dur": 1.02,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "b71f51a82f4e.m4a": {
+   "dur": 0.53,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "b740f54a7220.m4a": {
    "dur": 1.08,
@@ -1891,8 +2137,23 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "bd163cea442f.m4a": {
+   "dur": 2.56,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "bd2e14da4326.m4a": {
+   "dur": 2.89,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "be99c8632153.m4a": {
    "dur": 0.85,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "bfa6d8566a62.m4a": {
+   "dur": 1.88,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -1941,13 +2202,18 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "c866e576c137.m4a": {
+   "dur": 1.07,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "c8b35fd3b5ad.m4a": {
    "dur": 0.89,
    "voice": "say:Zosia",
    "rate": "normal"
   },
-  "c8c19b91e234.m4a": {
-   "dur": 2.2,
+  "c8d98781624a.m4a": {
+   "dur": 1.66,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -1955,6 +2221,11 @@
    "dur": 0.84,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "ca67f6815203.m4a": {
+   "dur": 1.47,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "cb00e7c49358.m4a": {
    "dur": 0.83,
@@ -1970,11 +2241,6 @@
    "dur": 0.73,
    "voice": "say:Zosia",
    "rate": "slow"
-  },
-  "ccd09c916a4c.m4a": {
-   "dur": 2.82,
-   "voice": "say:Zosia",
-   "rate": "normal"
   },
   "cd35f9204410.m4a": {
    "dur": 4.85,
@@ -2001,6 +2267,11 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "d17835e044b3.m4a": {
+   "dur": 1.46,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "d1bdaa042185.m4a": {
    "dur": 0.76,
    "voice": "say:Zosia",
@@ -2016,10 +2287,20 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "d45d50ee8a2a.m4a": {
+   "dur": 1.23,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "d4a2b129f194.m4a": {
    "dur": 0.7,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "d5f5a4b8100c.m4a": {
+   "dur": 2.67,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "d5febdc1ef49.m4a": {
    "dur": 0.81,
@@ -2051,6 +2332,16 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "db92e3e0bbb5.m4a": {
+   "dur": 2.08,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "dc158571912f.m4a": {
+   "dur": 1.98,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "dd09b14a7107.m4a": {
    "dur": 0.56,
    "voice": "say:Zosia",
@@ -2061,8 +2352,8 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
-  "de4dd21af3fd.m4a": {
-   "dur": 0.7,
+  "de33d5558e3d.m4a": {
+   "dur": 1.88,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -2091,6 +2382,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "e117bf3f41cd.m4a": {
+   "dur": 2.1,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "e171955ee6f8.m4a": {
    "dur": 0.7,
    "voice": "say:Zosia",
@@ -2101,10 +2397,30 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "e1b4f9ea0067.m4a": {
+   "dur": 2.22,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "e20e4814e0cf.m4a": {
+   "dur": 0.64,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "e28a404f00f4.m4a": {
    "dur": 0.82,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "e295505df895.m4a": {
+   "dur": 2.27,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "e45184c1e4e7.m4a": {
+   "dur": 1.03,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "e679d3c58e61.m4a": {
    "dur": 0.51,
@@ -2136,6 +2452,11 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "e8ac173b872d.m4a": {
+   "dur": 0.99,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
   "eac3b60cdd4e.m4a": {
    "dur": 0.72,
    "voice": "say:Zosia",
@@ -2158,6 +2479,11 @@
   },
   "edc1139bf33b.m4a": {
    "dur": 1.34,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "eefe74c30889.m4a": {
+   "dur": 1.56,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -2186,8 +2512,18 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "f2368c59290a.m4a": {
+   "dur": 1.85,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "f25683edb777.m4a": {
    "dur": 0.46,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "f2701be594ca.m4a": {
+   "dur": 1.63,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -2271,11 +2607,6 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
-  "fd1f17820d12.m4a": {
-   "dur": 5.12,
-   "voice": "say:Zosia",
-   "rate": "normal"
-  },
   "fd68f3ba23e0.m4a": {
    "dur": 5.05,
    "voice": "say:Zosia",
@@ -2291,6 +2622,11 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "ff18cde6bdc3.m4a": {
+   "dur": 1.76,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "ffe6558227b0.m4a": {
    "dur": 1.71,
    "voice": "say:Zosia",
@@ -2298,21 +2634,6 @@
   }
  },
  "ids": {
-  "brzechwa.adwokat": {
-   "text": "Jestem adwokatem. Cytuj krótko.",
-   "voice": "say:Zosia",
-   "slow": false
-  },
-  "brzechwa.powtorz": {
-   "text": "Powtórz!",
-   "voice": "say:Zosia",
-   "slow": false
-  },
-  "brzechwa.prawdziwa_polska": {
-   "text": "Tam, gdzie mówią „chrząszcz”!",
-   "voice": "say:Zosia",
-   "slow": false
-  },
   "brzechwa.rym_dima": {
    "text": "Dima? Rymuje się z „zima”!",
    "voice": "say:Zosia",
@@ -2448,6 +2769,11 @@
    "voice": "say:Zosia",
    "slow": true
   },
+  "ch01.chrzaszcz#0": {
+   "text": "Chrząszcz.",
+   "voice": "say:Zosia",
+   "slow": true
+  },
   "ch01.intro#1": {
    "text": "Dzień dobry!",
    "voice": "say:Zosia",
@@ -2458,53 +2784,18 @@
    "voice": "say:Zosia",
    "slow": false
   },
-  "ch01.s00#1": {
+  "ch01.s00#0": {
    "text": "telefon",
    "voice": "say:Zosia",
    "slow": true
   },
+  "ch01.s00#1": {
+   "text": "Warszawa",
+   "voice": "say:Zosia",
+   "slow": true
+  },
   "ch01.s00#10": {
-   "text": "góra",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#11": {
-   "text": "woda",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#12": {
-   "text": "cena",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#13": {
-   "text": "mleko",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#14": {
-   "text": "czy",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#15": {
-   "text": "środa",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#16": {
-   "text": "prosię",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#17": {
-   "text": "ząb",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#19": {
-   "text": "twój",
+   "text": "wszystko",
    "voice": "say:Zosia",
    "slow": true
   },
@@ -2513,83 +2804,8 @@
    "voice": "say:Zosia",
    "slow": true
   },
-  "ch01.s00#20": {
-   "text": "chleb",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#21": {
-   "text": "Warszawa",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#22": {
-   "text": "kobieta",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#23": {
-   "text": "teatr",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#24": {
-   "text": "problem",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#25": {
-   "text": "dziękuję",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#26": {
-   "text": "cześć",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#27": {
-   "text": "przepraszam",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#28": {
-   "text": "ręka",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#29": {
-   "text": "mały",
-   "voice": "say:Zosia",
-   "slow": true
-  },
   "ch01.s00#3": {
    "text": "łata",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#30": {
-   "text": "chleb",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#31": {
-   "text": "środa",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#32": {
-   "text": "wszystko",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#33": {
-   "text": "krzesło",
-   "voice": "say:Zosia",
-   "slow": true
-  },
-  "ch01.s00#34": {
-   "text": "Peron",
    "voice": "say:Zosia",
    "slow": true
   },
@@ -2599,22 +2815,22 @@
    "slow": true
   },
   "ch01.s00#5": {
-   "text": "siedem",
+   "text": "czy",
    "voice": "say:Zosia",
    "slow": true
   },
   "ch01.s00#6": {
-   "text": "Kasia",
+   "text": "siedem",
    "voice": "say:Zosia",
    "slow": true
   },
   "ch01.s00#7": {
-   "text": "ręka",
+   "text": "Kasia",
    "voice": "say:Zosia",
    "slow": true
   },
-  "ch01.s00#9": {
-   "text": "wszystko",
+  "ch01.s00#8": {
+   "text": "ręka",
    "voice": "say:Zosia",
    "slow": true
   },
@@ -3458,53 +3674,398 @@
    "voice": "say:Zosia",
    "slow": true
   },
-  "dlg.ch01.basia#gosc": {
-   "text": "Zawsze jest miejsce dla gościa.",
+  "d02.brzechwa.bramka.1": {
+   "text": "Cześć, Dima! Zima!",
    "voice": "say:Zosia",
    "slow": false
   },
-  "dlg.ch01.bobr_kreska#kreska": {
-   "text": "Bóbr. „Ó” z kreską!",
+  "d02.brzechwa.bramka.2": {
+   "text": "Ta bramka słucha.",
    "voice": "say:Zosia",
    "slow": false
   },
-  "dlg.ch01.bobr_kreska#rym": {
-   "text": "Bóbr... bóbr... Nic się nie rymuje.",
+  "d02.brzechwa.bramka.2.mute": {
+   "text": "Ta bramka czyta.",
    "voice": "say:Zosia",
    "slow": false
   },
-  "dlg.ch01.boss#bilety": {
-   "text": "Bilety do kontroli!",
+  "d02.brzechwa.bramka.exit": {
+   "text": "Do jutra! Bramka poczeka.",
    "voice": "say:Zosia",
    "slow": false
   },
-  "dlg.ch01.bramka#hello": {
-   "text": "Cześć! Jestem Jan Brzechwa. Sprawdzimy, jak słyszysz Warszawę.",
+  "d02.brzechwa.peron.1": {
+   "text": "Powiesz: „chrząszcz”. Ale nie dziś.",
    "voice": "say:Zosia",
    "slow": false
   },
-  "dlg.ch01.brzechwa#sluchaj": {
-   "text": "Słuchaj Warszawy.",
+  "d02.brzechwa.peron.2": {
+   "text": "Słuchaj Warszawy! Cześć!",
    "voice": "say:Zosia",
    "slow": false
   },
-  "dlg.ch01.marek#juz": {
+  "d02.brzechwa.result.1": {
+   "text": "Brawo! Bramka otwarta!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d03.brzechwa.kiosk.1": {
+   "text": "Kawa czy woda?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d03.brzechwa.kiosk.2": {
+   "text": "Nie „wada”. Wo-da!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d03.brzechwa.kiosk.3": {
+   "text": "Proszę!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d03.brzechwa.kiosk.err": {
+   "text": "Ta-TA? Nie. TA-ta!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d04.brzechwa.cart.1": {
+   "text": "Mała kawa! Powtórz!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d04.marek.cart.1": {
    "text": "Już, już!",
    "voice": "say:Zosia",
    "slow": false
   },
-  "dlg.ch01.pasazer#nie_szkodzi": {
+  "d04.marek.cart.2": {
+   "text": "Słucham?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d04.marek.cart.3": {
+   "text": "Dziesięć złotych.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d04.marek.cart.err": {
+   "text": "Siano? Nie mamy siana.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d04.marek.simba": {
+   "text": "Kot? Nie ma kota.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d05.pasazer.1": {
+   "text": "Au!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d05.pasazer.2": {
    "text": "Nie szkodzi.",
    "voice": "say:Zosia",
    "slow": false
   },
-  "dlg.ch01.s02#juz": {
+  "d05.pasazer.err": {
+   "text": "Proszę? Co „proszę”?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d06.brzechwa.1": {
+   "text": "Albo „cześć”, albo „dzień dobry”!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d06.marek.1": {
+   "text": "Kasza czy ciasto?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d06.marek.2": {
+   "text": "Ciasto! Już, już!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d06.marek.err": {
+   "text": "Kasza. Smacznego!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d08.basia.dzialka": {
+   "text": "Pan mieszka na działce? Ciekawe...",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d08.basia.err": {
+   "text": "Ręka! Moja ręka!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d08.basia.simba": {
+   "text": "To nie mój kot.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d08.basia.stairs.1": {
+   "text": "Ojej... Ciężkie.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d08.basia.stairs.2": {
+   "text": "Dziękuję! Krówkę?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d08.basia.stairs.3": {
+   "text": "Proszę bardzo!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d09.kasia.1": {
+   "text": "Cześć! Jestem z Krakowa.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d09.kasia.2": {
+   "text": "Warszawa? Spoko. Ale Kraków...",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d09.kasia.err": {
+   "text": "Ka-si-a? Nie. Ka-sia!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d09.ola.1": {
+   "text": "Cześć! Jestem Ola.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d09.ola.2": {
+   "text": "To moja siostra, Kasia.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d09.ola.simba": {
+   "text": "Był tu jakiś kot.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d10.brzechwa.1": {
+   "text": "Po sylabach! Świę-to-krzy-ska.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d10.brzechwa.k.1": {
+   "text": "Pokaż paszport.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d10.brzechwa.k.2": {
+   "text": "Podpis: „K.”. Autor nieznany.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d10.brzechwa.k.3": {
+   "text": "Jestem adwokatem. To ciekawe.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d11.brzechwa.1": {
+   "text": "„Morze”: rz czy ż?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d11.brzechwa.2": {
+   "text": "Brawo! A „może”?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d11.brzechwa.bobr.1": {
+   "text": "Bóbr. „Ó” z kreską!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d11.brzechwa.bobr.2": {
+   "text": "Bóbr... bóbr... Nic się nie rymuje.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d11.brzechwa.err": {
+   "text": "Może morze? Może!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d12.brzechwa.polska.1": {
+   "text": "Prawdziwa Polska? Tam, gdzie mówią „chrząszcz”!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d13.konduktor.1": {
+   "text": "Jutro sprawdzę.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d13.urzedniczka.1": {
+   "text": "Następny! Imię?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d13.urzedniczka.2": {
+   "text": "Proszę przeliterować.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d13.urzedniczka.3": {
+   "text": "Bilet tymczasowy. Proszę.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d13.urzedniczka.err": {
+   "text": "Bubr?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d14.brzechwa.1": {
+   "text": "A teraz: „chrząszcz”!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d14.brzechwa.2": {
+   "text": "Brawo! Słyszysz Warszawę.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d14.brzechwa.2.mute": {
+   "text": "Brawo! Czytasz Warszawę.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d14.konduktor.1": {
+   "text": "Bilety do kontroli!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d14.konduktor.2": {
+   "text": "W porządku. Bilet miesięczny.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d14.konduktor.3": {
+   "text": "I pieczątka: Praga.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d14.konduktor.4": {
+   "text": "Ta stara pieczątka... Takich już nie ma.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d14.konduktor.err": {
+   "text": "Proszę powtórzyć?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "d14.konduktor.mute": {
+   "text": "Proszę przeczytać.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.basia.1": {
+   "text": "Zawsze jest miejsce dla gościa.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.basia.2": {
+   "text": "Kolano? Tak sobie.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.basia.3": {
+   "text": "Krówkę? Proszę.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.brzechwa.1": {
+   "text": "Słuchaj Warszawy.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.brzechwa.2": {
+   "text": "Kawa, trawa, Warszawa!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.brzechwa.3": {
+   "text": "Powtórz! Ach, nic nie mówiłeś.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.kasia.1": {
+   "text": "Cześć! Jestem z Krakowa.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.kasia.2": {
+   "text": "Warszawa? Spoko. Kraków lepszy.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.konduktor.1": {
+   "text": "Bilet jest? Dobrze.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.konduktor.2": {
+   "text": "Kontrola będzie. Kiedyś.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.marek.1": {
    "text": "Już, już!",
    "voice": "say:Zosia",
    "slow": false
   },
-  "dlg.ch01.s06#juz": {
-   "text": "Już, już!",
+  "idle.marek.2": {
+   "text": "Kawa? Herbata? Już!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.marek.3": {
+   "text": "Poniedziałek...",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.ola.1": {
+   "text": "Hej! Uwaga, drzwi!",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.ola.2": {
+   "text": "Cześć, Dima! Co słychać?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.pasazer.1": {
+   "text": "Nie szkodzi.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.pasazer.2": {
+   "text": "Bóbr w metrze? Warszawa...",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.urzedniczka.1": {
+   "text": "Numerek, proszę.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "idle.urzedniczka.2": {
+   "text": "Następny!",
    "voice": "say:Zosia",
    "slow": false
   },

@@ -7,6 +7,7 @@ import type { Content } from '../systems/content';
 import { condCtx, evaluator, lessonOfVariant, lessonVariant } from '../systems/conditions';
 import { derive, deriveContent } from '../systems/derive';
 import type { LogEvent } from '../systems/log';
+import { lessonForToday, muteLines, paceCtxOf, stepGateOf } from '../systems/pace';
 import { getSetting, giveItem, markChallenge, setFlag, type Progress } from '../systems/progress';
 import { newContentLock } from '../systems/queue';
 import { cardId } from '../systems/srs';
@@ -20,6 +21,7 @@ import { runLesson, type LessonStore } from './lesson';
 import { shuffled } from './exercises/options';
 import { createOverlay, type Overlay } from './overlay/host';
 import { openPassport, passportModel } from './passport';
+import { openSoundMap, soundMapModel } from './soundMap';
 import { audioButtons, btn, busAudio, type AudioPort, type PortraitFrame, type PortraitSource } from './overlay/kit';
 
 export interface PlayStore extends LessonStore {
@@ -131,7 +133,11 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     const d = derive(store.progress, deriveContent(content), now);
     // requires / skipIf / short (§3.5, §4.3, I-13): закрытый и пропущенный урок не играется, жёлтый кластер — короткая версия.
     const variant = lessonVariant(l0, condCtx(content, d, store.progress.world, now));
-    const l = lessonOfVariant(l0, variant);
+    const lv = lessonOfVariant(l0, variant);
+    // P-06: шаги систем, которые сегодня рано (клавиатура с дня 3, «повтори вслух» с дня 4), и без звука —
+    // задания на слух без транскрипции не играются.
+    const silent = getSetting(store.progress, 'sound.mode') === 'off';
+    const l = lv ? lessonForToday(lv, stepGateOf(content, paceCtxOf(content, d, store.progress.world.flags), silent)) : null;
     if (!l) {
       console.info(`[ui] урок ${id}: ${variant === 'skip' ? 'пропуск (skipIf)' : 'закрыт (requires)'}`);
       return null;
@@ -139,18 +145,23 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     // Затор (§4.2): долг выше порога — сцены с новыми словами закрыты, Казик говорит «Zator.».
     const fresh = (l.introduces ?? []).filter((it) => !d.cards[cardId(it, 'rec')] && !d.cards[cardId(it, 'lis')]).length;
     if (newContentLock(d, now, content.tuning, fresh) === 'debt') {
-      await runLines([speechOfLine('kazik.debt.jam', content.lines)], dialogDeps(store));
+      await runLines([speechOfLine('sys.kazik.jam', content.lines)], dialogDeps(store));
       return null;
     }
     const wasPassed = l.kind === 'boss' && d.bossResults[id]?.passedAt !== undefined;
     const result = await runLesson(l, lessonDeps(store));
     // Отрезок дня (§3.11 seg, I-13): сцена, босс, диагностика → `scene`; лекарство → `remedy`. Пишет тот, кто
     // знает, что урок закончен (не прерван): склейка оверлея. Режиссёр читает seg за сегодня.
-    if (!result.cancelled) {
+    if (!result.cancelled && l.kind !== 'practice') {
       const r = store.append({ k: 'seg', ts: deps.clock?.now() ?? Date.now(), seg: l.kind === 'remedy' ? 'remedy' : 'scene' });
       if (r.ok) onEvent(r.event);
     }
     bus.emit('ui:lesson:end', { lessonId: id, result });
+    // Турникет (P-06): карта звуков сразу, в том числе после выхода посреди проверки.
+    if (l.kind === 'diag' && !result.cancelled) {
+      const dots = soundMapModel(content, derive(store.progress, deriveContent(content), deps.clock?.now() ?? Date.now()));
+      if (dots) await openSoundMap(overlay, linesOf(store), dots, { ...(result.exited ? { exited: true } : {}) });
+    }
     // Первая сдача босса (§5.8, I-11): reward урока и module.onComplete (билет, флаг главы → печать биома, реплики).
     if (l.kind === 'boss' && result.passed && !wasPassed) {
       const mod = content.modules.get(content.lessons.get(id)?.module ?? '')?.module;
@@ -186,11 +197,14 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     };
   };
 
+  /** Без звука (P-06, СЮЖЕТ_v2 §7): реплики с вариантом `<id>.mute` подменяются им. */
+  const linesOf = (store: PlayStore): Content => (getSetting(store.progress, 'sound.mode') === 'off' ? { ...content, lines: muteLines(content.lines) } : content);
+
   const dialogDeps = (store: PlayStore): DialogDeps => {
     const w = wordPort(store);
     return {
       overlay,
-      content,
+      content: linesOf(store),
       audio,
       portraits,
       words: w.port,
@@ -211,7 +225,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     if (e.give) applyProgress(store, (p) => giveItem(p, e.give!, now), 'world');
     if (e.challenge) applyProgress(store, (p) => markChallenge(p, e.challenge!, now), 'world');
     if (e.startDialogue) await dialogById(store, e.startDialogue);
-    if (e.line) await runLines([speechOfLine(e.line, content.lines)], dialogDeps(store));
+    if (e.line) await runLines([speechOfLine(e.line, linesOf(store).lines)], dialogDeps(store));
     if (e.startLesson) await lessonById(store, e.startLesson);
     if (e.teleport) bus.emit('world:teleport', { location: e.teleport.to, spawn: e.teleport.spawn ?? 'default' });
     if (e.open === 'obchod' || e.open === 'express') bus.emit('ui:obchod:start', { mode: e.open === 'express' ? 'express' : 'day' });
@@ -317,7 +331,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
       });
     },
     lines: async (ids) => {
-      await guard((s) => runLines(ids.map((id) => speechOfLine(id, content.lines)), dialogDeps(s)));
+      await guard((s) => runLines(ids.map((id) => speechOfLine(id, linesOf(s).lines)), dialogDeps(s)));
     },
     dialogFor,
     openLesson: (id) => guard((s) => lessonById(s, id)).then((r) => r ?? null),

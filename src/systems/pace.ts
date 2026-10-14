@@ -11,6 +11,7 @@
 // сегодня: сегодня ещё не показывали другую систему. Флаг ставит склейка (src/flow.ts), когда шаг с системой
 // выполнен. Дни в расписании разные и по возрастанию (валидатор), так что в свой день система одна.
 import type { DayLines, Lesson, Line, PaceSystem, ScheduleEntry, Step } from '../types/content';
+import type { Content } from './content';
 import { isPlayedDay, type Derived } from './derive';
 import { dayOf, type Day, type TimeOpts, type Ts } from './time';
 
@@ -39,6 +40,22 @@ export interface PaceCtx {
   flags: Readonly<Record<string, Ts>>;
   schedule: readonly ScheduleEntry[];
   opts?: TimeOpts;
+}
+
+/** Контекст расписания из контента, вывода и флагов (склейка, UI). */
+export function paceCtxOf(content: Pick<Content, 'director' | 'tuning'>, d: Pick<Derived, 'days' | 'today'>, flags: Readonly<Record<string, Ts>>, tz?: string): PaceCtx {
+  const opts: TimeOpts = { dayStartHour: content.tuning.dayStartHour, ...(tz ? { tz } : {}) };
+  return { day: storyDay(d, flags, opts), today: d.today, flags, schedule: content.director.schedule ?? [], opts };
+}
+
+/** Шлюз шагов урока на сегодня: закрытые системы, режим без звука, транскрипции и переводы пар из контента. */
+export function stepGateOf(content: Pick<Content, 'vocab' | 'pairs'>, pace: PaceCtx, silent: boolean): StepGate {
+  return {
+    closed: (s) => !isOpen(s, pace),
+    silent,
+    trOf: (item) => content.vocab.get(item)?.value.tr,
+    pairRu: (item) => !!content.pairs.get(item)?.ru,
+  };
 }
 
 /** Запись расписания, в которую входит система (сама или в `with`). */

@@ -11,7 +11,7 @@
       "n3": { "line": "d02.brzechwa.bramka.1", "next": "n4" },
       "n4": { "line": "d02.brzechwa.bramka.2", "next": "n5" },
       "n5": { "line": "d02.kazik.bramka.1", "next": "n6" },
-      "n6": { "who": "dima", "choices": [{ "pl": "Słucham!", "ru": "Слушаю!", "next": "n7" }] },
+      "n6": { "who": "dima", "choices": [{ "pl": "Słucham!", "ru": "Слушаю!", "next": "n7", "words": ["lx.slucham"] }] },
       "n7": { "who": "brzechwa", "lesson": "ch01.s00", "next": "end" },
       "end": { "end": true }
     }

@@ -32,10 +32,25 @@
     "ch01.s11",
     "ch01.s12",
     "ch01.s12r",
-    "ch01.boss"
+    "ch01.boss",
+    "ch01.tabliczka",
+    "ch01.chrzaszcz"
   ],
   "phonetics": { "clusters": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10"] },
   "renames": {},
   "boss": "ch01.boss",
-  "onComplete": [{ "give": "it.bilet_miesieczny" }, { "setFlag": "ch01.done" }, { "line": "kazik.stamp" }, { "line": "kazik.map.first" }]
+  "onComplete": [
+    { "give": "it.bilet_miesieczny" },
+    { "setFlag": "ch01.done" },
+    { "line": "d14.konduktor.2" },
+    { "line": "d14.konduktor.3" },
+    { "line": "d14.konduktor.4" },
+    { "line": "d14.kazik.stamp.1" },
+    { "line": "d14.kazik.stamp.2" },
+    { "line": "d14.brzechwa.1" },
+    { "startLesson": "ch01.chrzaszcz" },
+    { "line": "d14.brzechwa.2" },
+    { "line": "d14.kazik.map.1" },
+    { "line": "d14.kazik.map.2" }
+  ]
 }

@@ -44,6 +44,7 @@
     { "type": "plot", "id": "grzadki", "at": [2, 6], "size": [6, 3] },
     { "type": "npc", "id": "bobr", "at": [13, 4], "facing": "left" },
     { "type": "trigger", "id": "altana_sleep", "at": [2, 2], "size": [2, 2], "on": "tap", "do": [{ "open": "summary" }] },
+    { "type": "trigger", "id": "skrzynka", "at": [10, 15], "on": "tap", "do": [] },
     { "type": "trigger", "id": "ryby", "at": [13, 9], "size": [1, 2], "on": "tap", "do": [] },
     { "type": "exit", "at": [9, 15], "to": "ch01.metro", "spawn": "from_dzialka" }
   ]

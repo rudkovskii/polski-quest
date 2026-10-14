@@ -46,6 +46,8 @@ interface StartOptions {
   devStore?: Promise<GameStorage>;
   /** Опции синка (dev=play: своя база и облако выключено). */
   cloud?: CloudOptions;
+  /** P-06: `&day=N` — чистый мир сразу в игровой день N (src/dev/seedDay.ts). */
+  seedDay?: number;
 }
 
 // Склейка слоёв (ТЗ §2.1): DOM-оверлей, d-pad, ввод, Phaser. Порядок важен (I-03): сначала d-pad
@@ -59,7 +61,9 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
   else connectAudio(bus);
   mountAudioToast(overlay);
-  const store = opts.devStore ?? startCloud({ dev: dev === '1', ...opts.cloud }).then((c) => c.storage);
+  const store0 = opts.devStore ?? startCloud({ dev: dev === '1', ...opts.cloud }).then((c) => c.storage);
+  const seedDay = opts.seedDay;
+  const store = seedDay ? Promise.all([store0, import('./dev/seedDay')]).then(([s, m]) => (m.seedStoryDay(s, getContent(), seedDay, clock.now()), s)) : store0;
   // Диалоги и упражнения (I-08): world:interact → оверлей, события журнала → хранилище синка.
   const content = getContent();
   // Внешность из Fotobudka (P-03): `avatar:changed` → текстура `avatar` в мире, голова аватара в портретах.
@@ -179,7 +183,8 @@ if (dev === 'creator') {
     req.onsuccess = req.onerror = req.onblocked = () => resolve();
   }) : Promise.resolve();
   void fresh.then(() => {
-    startGame(undefined, { cloud: { storage: new GameStorage({ dbName, ls: null }), rpc: offlineRpc } });
+    const day = Number(params.get('day') ?? '0');
+    startGame(undefined, { cloud: { storage: new GameStorage({ dbName, ls: null }), rpc: offlineRpc }, ...(day >= 2 ? { seedDay: day } : {}) });
     if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
   });
 } else startGame();

@@ -43,6 +43,8 @@ export interface ExerciseContent {
   speaker(id: string): Speaker;
   /** Тег ошибки (errorTags.json): правило одной строкой после неверного ответа (P-01). */
   errorTag?(id: string): { ru: string; hint?: string } | undefined;
+  /** Минимальная пара (phonetics.pairs): без звука — «какое слово значит …» по переводу `ru` (P-06). */
+  pair?(id: string): { a: string; b: string; ru?: string[] } | undefined;
 }
 
 export interface ExerciseCtx {
@@ -74,6 +76,17 @@ export interface ExerciseCtx {
   repeat?: boolean;
   /** Мс на букву в репликах `say`; 0 — сразу (тесты, reduced motion). */
   typeMs?: number;
+  /**
+   * Режим без звука (P-06, `sound.mode: off`): задания на слух читаются — транскрипция вместо звука,
+   * карточки `lis`/`pair` не пишутся (шаг отдаёт `noAudio`), кнопок ▶ нет.
+   */
+  silent?: boolean;
+  /** Одна попытка (диагностика P-06): после ошибки — правило и «Дальше», без повтора и без «Пропустить». */
+  oneShot?: boolean;
+  /** Реакция мира на ошибку (P-06, `lesson.errLine`): реплика NPC перед правилом. */
+  errLine?: { who: string; pl: string; plRu?: string };
+  /** Свои отклики вместо «Dobrze!» / «Jeszcze raz.» (турникет: «Pip!» / «Hyk!»). */
+  verdicts?: { ok: string; bad: string };
 }
 
 export interface ExerciseModule<S extends Step = Step> {

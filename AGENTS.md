@@ -182,6 +182,27 @@
 - Экран `src/ui/creator.ts`: `openCreator({ mode: 'new' | 'mirror' })` → `ui:creator:show`. Новый мир: `flow.ts` открывает
   его перед вступлением F1. Фото — `passportModel().owner`. Dev: `/?dev=creator&mute=1[&mode=mirror][&seed=N]`.
 
+## Темп и контент дней 2–14 (P-06, P-08)
+- Игровой день главы: `storyDay` (`src/systems/pace.ts`, атом условия `gameDay: { min, max }`): день 1 — до флага
+  `beat.first_day_done`, дальше +1 за каждый засчитанный день. Пропуск календарных дней день не двигает.
+- Расписание систем — данные `director.json` → `schedule` (одна запись = одна новая система дня, `with` — её части):
+  1 ходьба · 2 обход+письмо+метро+диагностика · 3 клавиатура · 4 «повтори вслух» · 5 вечер · 6 выбор вечера ·
+  7 экспресс (+ воскресенье) · 8 «скажи в жизни» · 14 карта и босс. `systemState` = closed / new / open; показ ставит
+  флаг `sys.<запись>` (склейка `flow.ts`, шаг с `system`), в день не больше одной новой; валидатор — `scheduleIssues`.
+- Сцены по дням: `requires: { gameDay: { min: N } }` у уроков ch01; режиссёр даёт столько сцен, сколько у дня в
+  расписании, + одну с прошлых дней (`sceneQuota`, реплика `sys.kazik.extra_repair`). Биты дней — `director.json`
+  (`dNN.*`, `system` у бита), реплики шагов дня — `director.days` (полив, сцена, вечер, сон, крючок итога).
+- Шаги урока на сегодня: `lessonForToday` (play.ts) — type/dictation до клавиатуры и shadow до дня 4 не играются;
+  без звука — listen/dictation только с `tr` (шаг) или `vocab.tr`, пары — «какое слово значит …».
+- Без звука: настройка `sound.mode: 'on' | 'off'` (вопрос Казика в день 1 — P-05). `derive` выкидывает карточки
+  `lis`; упражнения получают `ctx.silent`; реплика `<id>.mute` подменяет `<id>` (`lineFor`, `muteLines`).
+- Диагностика `ch01.s00`: 12 пунктов, `ctx.oneShot` (ошибка → правило и «Hyk!», без повтора), «Wyjdź» в шапке:
+  выход после ответа пишет `diag` + `lesson` по отвеченному, непроверенные кластеры `unknown` → ремонт полной сценой.
+  Карта звуков — `src/ui/soundMap.ts` сразу после (play.ts) и страница паспорта.
+- Реакция мира на ошибку: `lesson.errLine` (реплика NPC перед правилом, `ctx.errLine`).
+- Сборка для людей: `PQ_RELEASE=1` в CI (`deploy.yml`) — `todo` в любой реплике/узле = ошибка.
+- Dev: `/?reset=1&mute=1&now=+1d` — день 2 (после сна дня 1), `&now=+2d` — день 3 и т.д.; `window.__pq.flow.step.reason`.
+
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
 2. Id: модуль `[a-z0-9_]+`, урок `<module>.<name>`, слово `lx.<slug>` (глобально уникально),

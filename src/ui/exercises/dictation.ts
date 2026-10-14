@@ -13,12 +13,19 @@ export const dictation: ExerciseModule<StepDictation> = {
   mount(step, ctx) {
     const field = answerField('Что услышал');
     const accept = step.accept ?? [step.say];
-    const noAudio = !ctx.audio.has(step.say);
+    const noAudio = ctx.silent === true || !ctx.audio.has(step.say);
     const lenient = { ...step.lenient, diacritics: step.lenient?.diacritics ?? ctx.diacritics };
     const item = step.item ? ctx.content?.vocab(step.item) : undefined;
-    const head: (Node | string)[] = noAudio
-      ? [el('span', { class: 'q' }, 'Перепиши: ', el('b', { lang: 'pl' }, step.say)), el('span', { class: 'pq-noaudio' }, '🔇 звука нет')]
-      : [el('span', { class: 'q' }, 'Напиши, что слышишь'), ...audioButtons(ctx.audio, step.say)];
+    // Без звука (P-06): ввод по транскрипции [про́шэ] → «proszę»; диктовка по буквам — сами названия букв.
+    const tr = step.tr ?? item?.tr;
+    const spelled = !!tr && tr === step.say;
+    const head: (Node | string)[] = ctx.silent && tr
+      ? spelled
+        ? [el('span', { class: 'q' }, 'Напиши слово по буквам: ', el('b', { lang: 'pl' }, tr))]
+        : [el('span', { class: 'q' }, 'Напиши по-польски: ', el('b', { class: 'tr', 'data-tr': '' }, `[${tr}]`))]
+      : noAudio
+        ? [el('span', { class: 'q' }, 'Перепиши: ', el('b', { lang: 'pl' }, step.say)), el('span', { class: 'pq-noaudio' }, '🔇 звука нет')]
+        : [el('span', { class: 'q' }, 'Напиши, что слышишь'), ...audioButtons(ctx.audio, step.say)];
     const run = runGraded<string>(ctx, {
       kind: 'dictation',
       head,
@@ -29,7 +36,7 @@ export const dictation: ExerciseModule<StepDictation> = {
       check: (v) => checkAnswer(v, accept, lenient, step.tags ?? []),
       correct: () => accept[0] ?? step.say,
       ...(item?.tr ? { tr: item.tr } : {}),
-      sayCorrect: step.say,
+      ...(noAudio ? {} : { sayCorrect: step.say }),
       reset: () => {
         field.value = '';
         if (!noAudio) ctx.audio.play(step.say);

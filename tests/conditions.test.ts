@@ -191,16 +191,33 @@ describe('из журнала: derive → condCtx на реальном конт
 
 describe('варианты уроков (§3.5, §4.3): requires / skipIf / short', () => {
   const content = getContent();
-  const withStatus = (s: Record<string, ClusterStatus>): CondCtx => ctx({ clusterStatus: s });
+  /** Игровой день `n` (P-06): первый день закрыт 20 дней назад, после него n − 2 засчитанных дня. */
+  const onDay = (n: number, d: Partial<Derived> = {}): CondCtx => {
+    const days: Derived['days'] = {};
+    for (let k = 0; k < n - 2; k++) days[`2026-09-${String(26 + k).padStart(2, '0')}`] = { segs: ['water'], revs: 1, lessons: 0 };
+    return ctx({ days, lessonsDone: new Set(['ch01.s00']), ...d }, { flags: { 'beat.first_day_done': Date.UTC(2026, 8, 24, 12) } }, { time: { tz: TZ } });
+  };
+  const withStatus = (s: Record<string, ClusterStatus>): CondCtx => onDay(14, { clusterStatus: s });
   const repairs = [...content.lessons.values()].map((x) => x.value).filter((l) => l.kind === 'repair');
 
-  it('ремонтные сцены 1.1–1.10: вариант совпадает с repairVariant статуса кластера', () => {
+  it('ремонтные сцены 1.1–1.10: вариант совпадает с repairVariant статуса кластера; непроверенный — полная сцена (P-06)', () => {
     expect(repairs.length).toBe(10);
     const cl = content.phonetics.clusters;
     for (const l of repairs) {
       const c = cl.find((x) => x.repairLesson === l.id)!.id;
-      for (const st of ['unknown', 'green', 'yellow', 'red'] as const) expect([l.id, st, lessonVariant(l, withStatus({ [c]: st }))]).toEqual([l.id, st, repairVariant(st)]);
+      for (const st of ['green', 'yellow', 'red'] as const) expect([l.id, st, lessonVariant(l, withStatus({ [c]: st }))]).toEqual([l.id, st, repairVariant(st)]);
+      // Диагностику прервали до пункта кластера: ремонт проверит его целиком.
+      expect([l.id, lessonVariant(l, withStatus({ [c]: 'unknown' }))]).toEqual([l.id, 'full']);
     }
+  });
+  it('gameDay (P-06): ремонтная сцена закрыта до своего дня и до турникета', () => {
+    const s04 = content.lessons.get('ch01.s04')!.value;
+    expect(lessonVariant(s04, onDay(4, { clusterStatus: { R4: 'red' } }))).toBe('locked');
+    expect(lessonVariant(s04, onDay(5, { clusterStatus: { R4: 'red' } }))).toBe('full');
+    expect(lessonVariant(s04, onDay(5, { clusterStatus: { R4: 'red' }, lessonsDone: new Set() }))).toBe('locked');
+    expect(evaluate({ gameDay: { min: 3, max: 3 } }, onDay(3))).toBe(true);
+    expect(evaluate({ gameDay: { min: 3, max: 3 } }, onDay(4))).toBe(false);
+    expect(evaluate({ gameDay: { max: 1 } }, ctx())).toBe(true);
   });
   it('short оставляет только short.steps и сохраняет id шагов (озвучка)', () => {
     const l = content.lessons.get('ch01.s03')!.value;
@@ -214,6 +231,7 @@ describe('варианты уроков (§3.5, §4.3): requires / skipIf / shor
   it('requires босса: закрыт, пока не сданы 1.11, 1.12, 1.12r', () => {
     const boss = content.lessons.get('ch01.boss')!.value;
     expect(lessonVariant(boss, ctx())).toBe('locked');
-    expect(lessonVariant(boss, ctx({ lessonsDone: new Set(['ch01.s11', 'ch01.s12', 'ch01.s12r']) }))).toBe('full');
+    expect(lessonVariant(boss, onDay(13, { lessonsDone: new Set(['ch01.s11', 'ch01.s12', 'ch01.s12r']) }))).toBe('locked');
+    expect(lessonVariant(boss, onDay(14, { lessonsDone: new Set(['ch01.s11', 'ch01.s12', 'ch01.s12r']) }))).toBe('full');
   });
 });

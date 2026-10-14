@@ -16,7 +16,7 @@ import type { LessonResult } from '../types/bus';
 import { el } from './dom';
 import { mountStep } from './exercises/registry';
 import type { ExerciseCtx, StepResult } from './exercises/types';
-import { cardsOfStep, exerciseContent, type LessonDeps, type RunOptions } from './lesson';
+import { cardsOfStep, exerciseContent, lineSpeech, type LessonDeps, type RunOptions } from './lesson';
 import type { IntentHandler, Layer } from './overlay/host';
 import { BTN, btn, plBtn, portrait, react, type PlLabel } from './overlay/kit';
 
@@ -205,7 +205,10 @@ export async function runBoss(lesson: Lesson, deps: LessonDeps, opts: RunOptions
     diacritics: getSetting(store.progress, 'diacritics'),
     translations: getSetting(store.progress, 'translations'),
     keyboardMode: getSetting(store.progress, 'keyboard.mode'),
+    silent: getSetting(store.progress, 'sound.mode') === 'off',
   };
+  // P-06: реакция контролёра на ошибку («Proszę powtórzyć?», без звука — «Proszę przeczytać.»).
+  const errLine = lineSpeech(content, lesson.errLine, settings.silent);
   const revDone = new Set<CardId>();
   const writeRevs = (step: Step, res: StepResult): void => {
     if (!res.first) return;
@@ -250,6 +253,8 @@ export async function runBoss(lesson: Lesson, deps: LessonDeps, opts: RunOptions
         react: (k) => react(pic, k),
         // Босс без подсказок (§5.8): тот же флаг, что у повтора ошибки в уроке.
         repeat: true,
+        ...(settings.silent ? { silent: true } : {}),
+        ...(errLine ? { errLine } : {}),
         ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
         ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
       };
