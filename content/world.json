@@ -10,13 +10,9 @@
       "mapRegion": [40, 60, 80, 70],
       "locations": ["ch01.dzialka", "ch01.metro"],
       "modules": ["ch01"],
-      "hosts": ["bobr"],
+      "hosts": ["brzechwa", "bobr"],
       "stamp": "stamp.praga",
-      "stages": {
-        "visible": { "always": true },
-        "preview": { "always": true },
-        "stamp": { "flag": "ch01.done" }
-      }
+      "stages": { "visible": { "always": true }, "preview": { "always": true }, "stamp": { "flag": "ch01.done" } }
     }
   ]
 }

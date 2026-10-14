@@ -32,7 +32,15 @@
   "spawns": { "default": [9, 11], "from_dzialka": [9, 12] },
   "objects": [
     { "type": "word", "id": "tablica_wyjscie", "at": [11, 12], "item": "lx.wyjscie", "ex": "listen", "sprite": "sign_exit" },
+    { "type": "word", "id": "tablica_wejscie", "at": [6, 8], "item": "lx.wejscie", "ex": "listen", "sprite": "sign_wejscie" },
+    { "type": "word", "id": "tablica_kasa", "at": [1, 10], "item": "lx.kasa", "ex": "listen", "sprite": "sign_kasa" },
+    { "type": "word", "id": "tablica_informacja", "at": [18, 10], "item": "lx.informacja", "ex": "listen", "sprite": "sign_informacja" },
+    { "type": "word", "id": "tablica_peron", "at": [9, 1], "item": "lx.peron", "ex": "listen", "sprite": "sign_peron" },
+    { "type": "word", "id": "tablica_dworzec", "at": [4, 1], "item": "lx.dworzec", "ex": "choice", "sprite": "sign_station" },
+    { "type": "word", "id": "tablica_toaleta", "at": [18, 4], "item": "lx.toaleta", "ex": "listen", "sprite": "sign_toaleta" },
+    { "type": "npc", "id": "brzechwa", "at": [8, 8], "facing": "down" },
     { "type": "npc", "id": "pan_marek", "at": [15, 2], "facing": "down" },
+    { "type": "npc", "id": "pasazer", "at": [7, 4], "facing": "left" },
     { "type": "exit", "at": [9, 13], "to": "ch01.dzialka", "spawn": "from_metro" }
   ]
 }

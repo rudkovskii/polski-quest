@@ -17,6 +17,7 @@
     "voice": { "engine": "none", "id": "none" },
     "sprite": "bobr",
     "portrait": "bobr",
+    "traits": "Kazik, бобр с Буга, прораб: короткие команды, «Szefie!», «Prawie. Jeszcze raz.» Всё объясняет стройкой. Не читает, грызёт. Строит мост.",
     "hearts": false
   },
   {
@@ -30,12 +31,57 @@
     "hearts": false
   },
   {
+    "id": "brzechwa",
+    "name": "Jan Brzechwa",
+    "kind": "teacher",
+    "years": "1898–1966",
+    "addressAs": "ty",
+    "voice": { "engine": "say", "id": "Zosia" },
+    "sprite": "brzechwa",
+    "portrait": "brzechwa",
+    "traits": "Поэт скороговорок, весёлый и нетерпеливый, адвокат по авторскому праву. Перебивает «Powtórz!», рифмует имена. Портрет-заглушка до I-26."
+  },
+  {
     "id": "pan_marek",
     "name": "pan Marek",
     "kind": "extra",
     "addressAs": "pan",
     "voice": { "engine": "say", "id": "Zosia" },
     "sprite": "extra_m",
-    "portrait": "extra_m"
+    "portrait": "extra_m",
+    "traits": "Бариста, кофейная тележка в переходе метро. Вечное «Już, już!»."
+  },
+  {
+    "id": "pani_hela",
+    "name": "pani Hela",
+    "kind": "extra",
+    "addressAs": "pani",
+    "voice": { "engine": "say", "id": "Zosia" },
+    "sprite": "extra_k",
+    "portrait": "extra_k",
+    "traits": "Продавщица с Bazaru Różyckiego, лоток со старьём (вступление).",
+    "hearts": false
+  },
+  {
+    "id": "konduktor",
+    "name": "Konduktor",
+    "kind": "extra",
+    "addressAs": "pan",
+    "voice": { "engine": "say", "id": "Zosia" },
+    "sprite": "extra_m",
+    "portrait": "extra_m",
+    "traits": "Старомодный контролёр в фуражке, босс главы 1: «Bilety do kontroli!».",
+    "hearts": false
+  },
+  {
+    "id": "pasazer",
+    "name": "Pasażer",
+    "kind": "extra",
+    "addressAs": "pan",
+    "voice": { "engine": "say", "id": "Zosia" },
+    "sprite": "extra_m",
+    "portrait": "extra_m",
+    "traits": "Пассажир в вагоне метро (сцена 1.4).",
+    "hearts": false
   }
 ]

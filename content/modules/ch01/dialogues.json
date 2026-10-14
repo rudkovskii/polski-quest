@@ -1,1 +1,143 @@
-[]
+[
+  {
+    "id": "dlg.ch01.bramka",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "kazik",
+    "if": { "cluster": { "id": "R1", "status": "unknown" } },
+    "nodes": {
+      "kazik": { "who": "bobr", "do": [{ "line": "kazik.diag" }], "next": "hello" },
+      "hello": {
+        "who": "brzechwa",
+        "pl": "Cześć! Jestem Jan Brzechwa. Sprawdzimy, jak słyszysz Warszawę.",
+        "ru": "Привет! Я Ян Бжехва. Проверим, как ты слышишь Варшаву.",
+        "next": "start"
+      },
+      "start": { "who": "dima", "choices": [{ "pl": "Start", "ru": "Начать", "next": "diag" }] },
+      "diag": { "who": "brzechwa", "lesson": "ch01.s00", "next": "result" },
+      "result": { "who": "bobr", "do": [{ "line": "kazik.ch01.diag_result" }], "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.s01",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "wada",
+    "if": {
+      "all": [
+        { "not": { "cluster": { "id": "R1", "status": "unknown" } } },
+        { "not": { "lessonDone": "ch01.s01" } },
+        { "not": { "cluster": { "id": "R1", "status": "green" } } }
+      ]
+    },
+    "nodes": {
+      "wada": { "who": "bobr", "do": [{ "line": "kazik.ch01.s01.wada" }], "next": "lesson" },
+      "lesson": { "who": "brzechwa", "lesson": "ch01.s01", "next": "end" },
+      "end": { "who": "dima", "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.s05",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "lesson",
+    "if": {
+      "all": [
+        { "not": { "cluster": { "id": "R5", "status": "unknown" } } },
+        { "not": { "lessonDone": "ch01.s05" } },
+        { "not": { "cluster": { "id": "R5", "status": "green" } } }
+      ]
+    },
+    "nodes": { "lesson": { "who": "brzechwa", "lesson": "ch01.s05", "next": "end" }, "end": { "who": "dima", "end": true } }
+  },
+  {
+    "id": "dlg.ch01.bobr_kreska",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "kreska",
+    "if": { "all": [{ "not": { "cluster": { "id": "R1", "status": "unknown" } } }, { "not": { "flag": "ch01.bobr_kreska" } }] },
+    "nodes": {
+      "kreska": { "who": "brzechwa", "pl": "Bóbr. „Ó” z kreską!", "ru": "Бобр. «Ó» с чёрточкой!", "next": "kazik" },
+      "kazik": { "who": "bobr", "do": [{ "line": "kazik.bobr_kreska" }], "next": "rym" },
+      "rym": {
+        "who": "brzechwa",
+        "pl": "Bóbr... bóbr... Nic się nie rymuje.",
+        "ru": "Бобр... бобр... Ничего не рифмуется.",
+        "do": [{ "setFlag": "ch01.bobr_kreska" }],
+        "end": true
+      }
+    }
+  },
+  {
+    "id": "dlg.ch01.brzechwa",
+    "npc": "brzechwa",
+    "register": "ty",
+    "start": "sluchaj",
+    "if": { "not": { "cluster": { "id": "R1", "status": "unknown" } } },
+    "nodes": { "sluchaj": { "who": "brzechwa", "pl": "Słuchaj Warszawy.", "ru": "Слушай Варшаву.", "end": true } }
+  },
+  {
+    "id": "dlg.ch01.s02",
+    "npc": "pan_marek",
+    "register": "pan",
+    "start": "juz",
+    "if": {
+      "all": [
+        { "not": { "cluster": { "id": "R2", "status": "unknown" } } },
+        { "not": { "lessonDone": "ch01.s02" } },
+        { "not": { "cluster": { "id": "R2", "status": "green" } } }
+      ]
+    },
+    "nodes": {
+      "juz": { "who": "pan_marek", "pl": "Już, już!", "ru": "Сейчас-сейчас!", "next": "lesson" },
+      "lesson": { "who": "pan_marek", "lesson": "ch01.s02", "next": "end" },
+      "end": { "who": "dima", "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.s03",
+    "npc": "pan_marek",
+    "register": "pan",
+    "start": "kazik",
+    "if": {
+      "all": [
+        { "not": { "cluster": { "id": "R3", "status": "unknown" } } },
+        { "not": { "lessonDone": "ch01.s03" } },
+        { "not": { "cluster": { "id": "R3", "status": "green" } } }
+      ]
+    },
+    "nodes": {
+      "kazik": { "who": "bobr", "do": [{ "line": "kazik.ch01.s03.slucham" }], "next": "lesson" },
+      "lesson": { "who": "pan_marek", "lesson": "ch01.s03", "next": "end" },
+      "end": { "who": "dima", "end": true }
+    }
+  },
+  {
+    "id": "dlg.ch01.marek",
+    "npc": "pan_marek",
+    "register": "pan",
+    "start": "juz",
+    "nodes": { "juz": { "who": "pan_marek", "pl": "Już, już!", "ru": "Сейчас-сейчас!", "end": true } }
+  },
+  {
+    "id": "dlg.ch01.s04",
+    "npc": "pasazer",
+    "register": "pan",
+    "start": "lesson",
+    "if": {
+      "all": [
+        { "not": { "cluster": { "id": "R4", "status": "unknown" } } },
+        { "not": { "lessonDone": "ch01.s04" } },
+        { "not": { "cluster": { "id": "R4", "status": "green" } } }
+      ]
+    },
+    "nodes": { "lesson": { "who": "pasazer", "lesson": "ch01.s04", "next": "end" }, "end": { "who": "dima", "end": true } }
+  },
+  {
+    "id": "dlg.ch01.pasazer",
+    "npc": "pasazer",
+    "register": "pan",
+    "start": "nie_szkodzi",
+    "nodes": { "nie_szkodzi": { "who": "pasazer", "pl": "Nie szkodzi.", "ru": "Ничего страшного.", "end": true } }
+  }
+]
