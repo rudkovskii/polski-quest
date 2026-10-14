@@ -35,7 +35,9 @@ const dev = params.get('dev');
  * в отдельной базе `polski-quest-play` и облако выключено (ничего не уходит в Supabase). `reset=1` стирает базу:
  * чистый профиль. Повторный запуск — `?dev=play&mute=1` (база сохранилась), `&now=+8d` — весна.
  */
-const playDev = dev === 'play' || (!dev && params.get('reset') === '1');
+// Свой профиль параллельной проверки (`?dev=p10a`): тот же прогон, отдельная база `polski-quest-p10a`.
+const playProfile = !!dev && /^p\d+[a-z]?$/.test(dev);
+const playDev = dev === 'play' || playProfile || (!dev && params.get('reset') === '1');
 // Dev-часы (I-12): `?now=<ISO>` или `?now=+1d` сдвигают время во всех deps; только вместе с `dev`.
 const clock = createClock(dev || playDev ? params.get('now') : null);
 // Без звука вслух (AGENTS.md): `?mute=1` — `audio:play` только в консоль.
@@ -182,7 +184,7 @@ if (dev === 'creator') {
   bus.on('world:marks', (m) => console.info('[world:marks]', JSON.stringify({ location: m.location, due: m.dueItems, cells: m.plots.flatMap((p) => p.cells.filter((c) => c.item).map((c) => `${c.item}:${c.stage}/${c.interval}${c.due ? '!' : ''}${c.wilted ? '~' : ''}`)) })));
   if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
 } else if (playDev) {
-  const dbName = 'polski-quest-play';
+  const dbName = playProfile ? `polski-quest-${dev}` : 'polski-quest-play';
   const reset = params.get('reset') === '1';
   if (reset) {
     // Стираем один раз: перезагрузка вкладки (в том числе HMR) продолжает тот же мир, а не чистый.

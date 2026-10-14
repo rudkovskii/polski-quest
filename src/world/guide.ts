@@ -90,17 +90,22 @@ const BACK: Record<Dir4, Dir4> = { up: 'down', down: 'up', left: 'right', right:
 const SIDES: Record<Dir4, [Dir4, Dir4]> = { up: ['left', 'right'], down: ['right', 'left'], left: ['up', 'down'], right: ['down', 'up'] };
 
 /**
- * Куда встать Казику, когда цель шага — он сам (P-10a: «поговори: Kazik»): рядом с Димой, сзади или сбоку,
+ * Куда встать Казику, когда цель шага — он сам (P-10a: «поговори: Kazik»): рядом с Димой, сбоку, потом сзади,
  * не перед лицом (не загораживает дорогу) и не на занятых клетках (`reserved`: Дима, куда он шагает, конец пути).
- * Перед лицом — только если больше некуда. Уже стоит рядом (`current`) — остаётся. null — рядом всё занято.
+ * Клетка прямо над Димой — последней: высокий спрайт Димы закрывает того, кто стоит за ним.
+ * Уже стоит сбоку (`current`) — остаётся. null — рядом всё занято.
  */
 export function besideCell(grid: Grid, player: Xy, facing: Dir4, reserved: readonly Xy[] = [], current: Xy | null = null): Xy | null {
   const free = (c: Xy): boolean => grid.passable(c[0], c[1]) && !reserved.some((r) => r[0] === c[0] && r[1] === c[1]);
   const at = (d: Dir4): Xy => [player[0] + DELTA4[d][0], player[1] + DELTA4[d][1]];
-  if (current && manhattan(current, player) === 1 && (current[0] !== at(facing)[0] || current[1] !== at(facing)[1])) return current;
-  for (const d of [BACK[facing], ...SIDES[facing], facing]) {
+  const same = (a: Xy, b: Xy | null): boolean => !!b && a[0] === b[0] && a[1] === b[1];
+  const behind = [...SIDES[facing], BACK[facing]];
+  // Сбоку и сзади, «над головой» — после них, «перед лицом» — последним.
+  const ranked: Dir4[] = [...behind.filter((d) => d !== 'up'), ...behind.filter((d) => d === 'up'), facing];
+  if (current && SIDES[facing].some((d) => d !== 'up' && same(at(d), current))) return current;
+  for (const d of ranked) {
     const c = at(d);
-    if (free(c) || (current && c[0] === current[0] && c[1] === current[1])) return c;
+    if (free(c) || same(c, current)) return c;
   }
   return null;
 }

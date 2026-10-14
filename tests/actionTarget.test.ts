@@ -153,12 +153,15 @@ describe('NPC-Казик и цель', () => {
     expect(m.moveObject(BOBR_KEY, [10, 10])).toBe(true);
   });
 
-  it('besideCell: сзади, потом сбоку, перед лицом — только если больше некуда; не на занятых клетках', () => {
+  it('besideCell: сбоку, потом сзади; над головой (за спрайтом Димы) и перед лицом — последними; не на занятых', () => {
     const grid = { w: 10, h: 10, passable: () => true };
-    expect(besideCell(grid, [5, 5], 'up')).toEqual([5, 6]);
-    expect(besideCell(grid, [5, 5], 'up', [[5, 6]])).toEqual([4, 5]);
-    expect(besideCell(grid, [5, 5], 'right', [], [5, 4])).toEqual([5, 4]); // уже рядом сбоку — остаётся
-    expect(besideCell(grid, [5, 5], 'right', [], [6, 5])).toEqual([4, 5]); // стоит перед лицом — уходит назад
+    expect(besideCell(grid, [5, 5], 'up')).toEqual([4, 5]);
+    expect(besideCell(grid, [5, 5], 'up', [[4, 5], [6, 5]])).toEqual([5, 6]);
+    // Смотрит вниз: сзади — клетка над Димой, её закрывает спрайт; сначала бока.
+    expect(besideCell(grid, [5, 5], 'down')).toEqual([6, 5]);
+    expect(besideCell(grid, [5, 5], 'down', [[6, 5], [4, 5]])).toEqual([5, 4]);
+    expect(besideCell(grid, [5, 5], 'right', [], [5, 6])).toEqual([5, 6]); // уже рядом сбоку — остаётся
+    expect(besideCell(grid, [5, 5], 'right', [], [6, 5])).toEqual([5, 6]); // стоит перед лицом — уходит вбок
     const walls = { w: 10, h: 10, passable: (x: number, y: number) => x === 5 && y === 4 };
     expect(besideCell(walls, [5, 5], 'up')).toEqual([5, 4]);
     expect(besideCell({ w: 10, h: 10, passable: () => false }, [5, 5], 'up')).toBeNull();

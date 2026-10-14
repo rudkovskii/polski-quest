@@ -105,6 +105,8 @@ export class Location extends Phaser.Scene {
   private guideLive = false;
   /** Запас сверху и снизу под HUD и d-pad, CSS-пиксели (layout). */
   private insets = { top: 0, bottom: 0 };
+  /** Камера следует за Димой (карта больше экрана): сдвиг, чтобы цель тоже была в кадре (P-10a). */
+  private follow: { x: boolean; y: boolean; base: number; off: [number, number] } | null = null;
 
   constructor() {
     super('Location');
@@ -238,9 +240,40 @@ export class Location extends Phaser.Scene {
     this.wasMoving = moving;
     this.syncActor(this.player, this.playerSid, this.model.player, time);
     if (this.companion && this.model.companion) this.syncActor(this.companion, 'bobr', this.model.companion, time);
+    this.updateFollow();
     this.drawHighlight(time);
     this.drawActionBubble(time);
     this.drawGuide(time);
+  }
+
+  /**
+   * Цель в кадре (P-10a): камера держит Диму в видимой зоне (между HUD и d-pad) и, если цель режиссёра рядом,
+   * сдвигается к ней, чтобы и цель была видна над кнопками, а не под ними. Плавно, без рывков.
+   */
+  private updateFollow(): void {
+    const f = this.follow;
+    if (!f) return;
+    const cam = this.cameras.main;
+    const z = cam.zoom;
+    const g = this.guide;
+    let sx = 0;
+    let sy = 0;
+    if (g) {
+      const [px, py] = LocationModel.pos(this.model.player);
+      const halfW = this.scale.width / z / 2 - T;
+      const halfH = (this.scale.height - this.insets.top - this.insets.bottom) / z / 2 - T;
+      const dx = (g.at[0] + g.size[0] / 2 - (px + 0.5)) * T;
+      const dy = (g.at[1] + g.size[1] / 2 - (py + 0.5)) * T;
+      const need = (d: number, half: number): number => (Math.abs(d) <= half ? 0 : Math.sign(d) * Math.min(Math.abs(d) - half, half - T));
+      if (f.x) sx = need(dx, halfW);
+      if (f.y) sy = need(dy, halfH);
+    }
+    const k = 0.12;
+    f.off[0] += (sx - f.off[0]) * k;
+    f.off[1] += (sy - f.off[1]) * k;
+    if (Math.abs(sx - f.off[0]) < 0.5) f.off[0] = sx;
+    if (Math.abs(sy - f.off[1]) < 0.5) f.off[1] = sy;
+    cam.setFollowOffset(-Math.round(f.off[0]), -Math.round(f.base + f.off[1]));
   }
 
   // ───────────── «A»-пузырёк и якорь Казика (P-02) ─────────────
@@ -344,15 +377,23 @@ export class Location extends Phaser.Scene {
     const m = this.model;
     const targetsBobr = this.targetsBobr();
     const reserved = m.reserved();
-    const free = (x: number, y: number): boolean => m.passable(x, y) && !reserved.some((r) => r[0] === x && r[1] === y);
+    // Казик не встаёт на клетку Димы и на выход (калитка, лестница): проход не перегораживает (P-10a).
+    const exits = m.objects.filter((o) => o.kind === 'exit' && !m.isHidden(o.key)).map((o) => o.at);
+    const free = (x: number, y: number): boolean =>
+      m.passable(x, y) && !reserved.some((r) => r[0] === x && r[1] === y) && !exits.some((e) => e[0] === x && e[1] === y);
     let g = resolveGuide(m, this.guideTarget, this.plots, this.hiddenKeys());
     // Бобр-указатель (§4.12): в walk-локации идёт к клетке у цели и смотрит на неё; на карте, где он NPC,
     // садится у цели. Цель — сам Казик (P-10a): подходит к Диме сзади-сбоку, компаньон просто идёт следом.
     if (m.companion) {
+      const c = m.companion;
       if (g && !targetsBobr) {
-        const cell = pointerCell({ w: m.parsed.w, h: m.parsed.h, passable: free }, g, m.player.tile, m.companion.tile);
+        const cell = pointerCell({ w: m.parsed.w, h: m.parsed.h, passable: free }, g, m.player.tile, c.tile);
         m.pointTo(cell, cell ? faceTowards(cell, g.at, g.size) : null);
-      } else m.pointTo(null);
+      } else if (targetsBobr && Math.abs(c.tile[0] - m.player.tile[0]) + Math.abs(c.tile[1] - m.player.tile[1]) > 1) {
+        // Цель — Казик, а он отстал (стоял у прошлой цели): сам подходит к Диме сбоку.
+        const cell = besideCell({ w: m.parsed.w, h: m.parsed.h, passable: free }, m.player.tile, m.player.facing, reserved);
+        m.pointTo(cell, cell ? faceTowards(cell, m.player.tile, [1, 1]) : null);
+      } else if (!targetsBobr || !m.pointing) m.pointTo(null);
     }
     const bobr = this.npcs.get(BOBR_KEY);
     const bobrObj = m.object(BOBR_KEY);
@@ -659,6 +700,7 @@ export class Location extends Phaser.Scene {
     const fitsW = mw * zoom <= width;
     const fitsH = mh * zoom <= height - bottom;
     const shift = bottom / zoom / 2;
+    this.follow = null;
     // tap-локация всегда по центру: ходьбы нет, следовать не за кем.
     if ((fitsW && fitsH) || this.model.controls === 'tap') {
       cam.removeBounds();
@@ -672,7 +714,10 @@ export class Location extends Phaser.Scene {
       const by = fitsH ? mh / 2 + shift - height / zoom / 2 : 0;
       cam.setBounds(fitsW ? (mw - width / zoom) / 2 : 0, by, fitsW ? width / zoom : mw, fitsH ? height / zoom : mh + inset);
       cam.startFollow(this.player, true);
-      cam.setFollowOffset(0, fitsH ? 0 : -shift);
+      // Центр видимой зоны между HUD и d-pad ниже центра экрана на (низ − верх) / 2.
+      const base = fitsH ? 0 : (bottom - this.insets.top) / zoom / 2;
+      this.follow = { x: !fitsW, y: !fitsH, base, off: [0, 0] };
+      cam.setFollowOffset(0, -base);
     }
   }
 
