@@ -1,0 +1,77 @@
+// Общий интерфейс шагов урока (ТЗ §3.5, §5.7, I-08): `mount(step, ctx) → Promise<StepResult>`.
+// Каждый тип шага — отдельный модуль в src/ui/exercises/, реестр в registry.ts.
+import type { DiacriticsMode, Verdict } from '../../systems/answer';
+import type { Step, VocabEntry } from '../../types/content';
+import type { KeyboardMode } from '../keyboard';
+import type { Layer } from '../overlay/host';
+import type { AudioPort, PortraitSource, React, Speaker } from '../overlay/kit';
+
+export type StepT = Step['t'];
+
+/** Проверка первой попытки: она одна идёт в SRS (ТЗ §4.7). */
+export interface FirstTry {
+  verdict: Verdict;
+  score: number;
+  tags: string[];
+  /** Время до первого «Проверить», мс. */
+  ms: number;
+  /** Ответ после подсказки → grade ≤ 1. */
+  hinted: boolean;
+}
+
+export interface StepResult {
+  status: 'done' | 'cancel';
+  /** Шаг проверяет ответ (всё, кроме say/explain/shadow). */
+  graded: boolean;
+  first?: FirstTry;
+  /** Сколько раз нажали «Проверить» (с повторами после ошибки). */
+  attempts: number;
+  /** match: результат по каждой паре с первой попытки (item из `items[i]`). */
+  parts?: { item?: string; ok: boolean }[];
+  /** Аудио-шаг прошёл текстом (звука нет): карточку `lis`/`pair` не пишем (ТЗ §5.7). */
+  noAudio?: boolean;
+  /** Время на шаге целиком, мс. */
+  ms: number;
+}
+
+/** Срез контента, нужный упражнениям: слова для «auto:<tag>», транскрипция, имена говорящих. */
+export interface ExerciseContent {
+  vocab(id: string): VocabEntry | undefined;
+  /** Все слова (для дистракторов `auto:<tag>`), в порядке файлов. */
+  allVocab(): readonly VocabEntry[];
+  speaker(id: string): Speaker;
+}
+
+export interface ExerciseCtx {
+  /** Слой оверлея: шаг ставит на него свои обработчики intents. */
+  layer: Layer;
+  /** Куда рисовать шаг. */
+  root: HTMLElement;
+  /** id шага (`<lessonId>#<index>` по умолчанию): seed для перемешивания и `auto:<tag>`. */
+  stepId: string;
+  content?: ExerciseContent;
+  audio: AudioPort;
+  portraits?: PortraitSource | null;
+  /** Настройка `diacritics` (по умолчанию warn), если у шага нет своей `lenient.diacritics`. */
+  diacritics: DiacriticsMode;
+  translations: 'tap' | 'always';
+  keyboardMode: KeyboardMode;
+  /** Для attachKeyboard в тестах; по умолчанию matchMedia. */
+  coarse?: boolean;
+  /** Монотонные часы для времени ответа, мс. */
+  now(): number;
+  /** [0, 1): для `minimal_pair` с `play: "random"`. */
+  random(): number;
+  /** Реакция NPC урока на ответ (портрет в шапке). */
+  react?(kind: React): void;
+  /** Повтор проваленного шага в конце урока: без подсказок, без SRS. */
+  repeat?: boolean;
+  /** Мс на букву в репликах `say`; 0 — сразу (тесты, reduced motion). */
+  typeMs?: number;
+}
+
+export interface ExerciseModule<S extends Step = Step> {
+  /** Шаг проверяет ответ и может писать SRS. */
+  graded: boolean;
+  mount(step: S, ctx: ExerciseCtx): Promise<StepResult>;
+}

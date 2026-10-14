@@ -92,6 +92,18 @@
   `audio:state`. Файл → Web Speech pl-PL → `'none'`. `playbackRate` для медленной речи не использовать (iOS меняет тембр).
 - Разблокировка: Title (`unlockAudio`) и первый click/touchend (`connectAudio`); после фона `audio:blocked` → тост → `audio:unlock`.
 - Dev: `/?dev=audio`. Сравнение голосов: `python3 tools/voice_compare/build.py` → `tools/voice_compare/index.html`.
+## Оверлей: диалоги и упражнения (ТЗ §5.6–5.7, I-08)
+- `src/ui/overlay/host.ts`: модальные слои. Открыт слой → `world:input {enabled:false}`, intents `to:'ui'` идут
+  верхнему слою; стрелки двигают фокус по `[data-nav]`, interact жмёт фокус или `[data-primary]`. Своих keydown нет.
+- Шаг урока = модуль `src/ui/exercises/<t>.ts` с `mount(step, ctx) → Promise<StepResult>`, общий цикл попыток в
+  `frame.ts` (первая попытка → SRS, ошибка → «Prawie. Jeszcze raz.» + ответ + обучающий повтор). Поле ввода —
+  только через рамку (`input` в спеке): она подключает `attachKeyboard`.
+- `src/ui/lesson.ts`: события только `store.append(draft, appendGate(derived, tuning))`; resume в `local.resume`.
+- Перетаскивание (pointerdown) — `src/input/drag.ts`, экраны его не слушают сами.
+- Звук: оверлей шлёт `audio:play`, сам не играет. Реплики `todo` показываются как `[todo: id]`.
+- `src/ui/play.ts`: `world:interact` → диалог/слово/табличка/триггер. Dev: `/?dev=lesson&id=demo.s01`
+  (`&dlg=dlg.demo.marek`, `&days=N` — сдвиг часов, `&reset=1` — журнал в памяти, `&sound=1` — Web Speech),
+  события журнала в консоли `[log]`.
 
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
@@ -100,8 +112,12 @@
 3. Привязать модуль к биому в `content/world.json`.
 4. `npm run validate`, затем `npm run audio` (на Mac), затем `npm run check`.
 5. `status: "draft"` → модуль не виден в игре. `ready` ставит Шэф после вычитки польского.
-Новый тип шага = файл в `src/ui/exercises/`, запись в реестре, схема в `content/schema/steps.schema.json`, тест.
+Новый тип шага = файл в `src/ui/exercises/`, запись в `registry.ts`, схема в `content/schema/steps.schema.json`, тест в `tests/exercises.test.ts`.
 
 ## Проверки перед коммитом
 `npm run check` = typecheck + validate + check:layers + check:banned + test + build.
 Если менял арт: `npm run sprites -- --check`. Если менял польский текст: `npm run audio`.
+
+## Звук при проверках
+
+Заказчик работает за этим же Mac. При браузерных прогонах звук вслух не воспроизводить: кнопки озвучки не нажимать, автозвук глушить (`?mute=1` или мок `audio:play`), озвучку проверять тестами с моками. Прослушивание голосов делает сам заказчик.

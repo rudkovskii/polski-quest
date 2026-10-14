@@ -183,7 +183,10 @@ def collect(content: Path, default_voice: str) -> Collected:
                         for j, w in enumerate(s['pair']):
                             add(w, default_voice, both, ready=ready, id_=f'{sid}.{j}', src=src)
                     elif t == 'stress':
-                        add(s.get('say') or s['word'], default_voice, both, ready=ready, id_=sid, src=src)
+                        say = s.get('say')
+                        if say is False:
+                            continue
+                        add(say if isinstance(say, str) else s['word'], default_voice, both, ready=ready, id_=sid, src=src)
 
         df = mdir / 'dialogues.json'
         for d in load_json(df) if df.exists() else []:

@@ -35,9 +35,18 @@ export type AudioVia = 'file' | 'webspeech' | 'none';
  */
 export type AudioState = 'idle' | 'playing' | 'blocked' | 'none';
 
-/** Результат урока. Уточняется в I-07. */
+/** Результат урока (I-08). Поля, кроме passed, необязательны: их нет у отменённого до начала урока. */
 export interface LessonResult {
   passed: boolean;
+  /** Урок прерван (Esc / «B» / ×): позиция лежит в `local.resume`, событие `lesson` не записано. */
+  cancelled?: boolean;
+  /** Средний score первых попыток по проверяемым шагам, 0..1. */
+  score?: number;
+  /** Доля проверяемых шагов, верных с первой попытки, 0..1. */
+  firstTry?: number;
+  ms?: number;
+  /** Слова, посаженные в конце сцены (`intro`). */
+  planted?: string[];
 }
 
 /** Действие с объектом локации: кнопка «A»/пробел, тап или вход в триггер (I-07, ТЗ §5.4). */
@@ -94,7 +103,7 @@ export interface BusEvents {
    * медленная версия. По умолчанию новая фраза прерывает текущую; `queue: true` — встать в очередь.
    * `done` вызывается, когда фраза доиграла или прервана.
    */
-  'audio:play': { id?: string; text?: string; slow?: boolean; voice?: string; queue?: boolean; done?: (via: AudioVia) => void };
+  'audio:play': { id?: string; text?: string; slow?: boolean; voice?: string; queue?: boolean; who?: string; done?: (via: AudioVia) => void };
   /** Остановить речь и очистить очередь. */
   'audio:stop': Record<string, never>;
   /** Повторная разблокировка из жеста (тост «Нажми, чтобы включить звук»). Слать синхронно из обработчика тапа. */
