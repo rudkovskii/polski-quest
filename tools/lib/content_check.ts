@@ -604,7 +604,7 @@ export function voiceTexts(lessons: Lesson[], vocab: VocabEntry[], dialogues: Di
       if (s.t === 'minimal_pair') s.pair.forEach((p) => out.add(p));
       if (s.t === 'stress') out.add(s.word);
     }
-  for (const d of dialogues) for (const n of Object.values(d.nodes)) if (n.pl && !unvoiced.has(n.who)) out.add(n.pl);
+  for (const d of dialogues) for (const n of Object.values(d.nodes)) if (n.pl && !unvoiced.has(n.who ?? '')) out.add(n.pl);
   return [...out].map((t) => t.normalize('NFC').trim());
 }
 
@@ -827,6 +827,7 @@ export function checkContent(input: CheckInput): Issue[] {
   }
 
   // dialogues.json
+  const todoNodes: { id: string; file: string }[] = [];
   for (const [id, def] of ctx.dialogues) {
     const d = def.value;
     const w = { file: def.file, path: def.path };
@@ -839,6 +840,18 @@ export function checkContent(input: CheckInput): Issue[] {
     for (const [key, n] of Object.entries(nodes)) {
       const nw = sub(w, 'nodes', key);
       ctx.ref(ctx.characters, n.who, sub(nw, 'who'), 'who', WHERE.characters);
+      // I-11: who обязателен там, где кто-то говорит; узел line берёт говорящего из реплики; чистый end — без who.
+      if (n.who === undefined && (n.pl !== undefined || n.choices !== undefined || n.todo === true))
+        ctx.err('dialogue', nw, `у узла "${key}" с pl, choices или todo нет who`);
+      if (n.line !== undefined) {
+        if (n.pl !== undefined || n.todo === true) ctx.err('dialogue', nw, `у узла "${key}" line вместе с pl или todo: оставь одно`);
+        ctx.line(n.line, sub(nw, 'line'), strict);
+      }
+      if (n.todo === true && n.pl !== undefined) ctx.err('dialogue', nw, `у узла "${key}" и pl, и todo: реплика или есть, или нет`);
+      if (n.todo === true) {
+        if (strict) ctx.err('todo', nw, `узел "${key}" ещё todo, а модуль status: ready`);
+        else todoNodes.push({ id: `${id}.${key}`, file: def.file });
+      }
       const kinds = [n.next !== undefined, n.choices !== undefined, n.end === true].filter(Boolean).length;
       if (kinds !== 1) ctx.err('dialogue', nw, `у узла "${key}" должно быть ровно одно из next / choices / end (сейчас ${kinds})`);
       if (n.lesson !== undefined) {
@@ -872,6 +885,9 @@ export function checkContent(input: CheckInput): Issue[] {
         if (!seen.has(k)) ctx.warn('orphan', sub(w, 'nodes', k), `узел "${k}" недостижим из start`);
     }
   }
+
+  if (todoNodes.length)
+    ctx.warn('todo', { file: todoNodes[0]!.file, path: '' }, `${todoNodes.length} узлов диалогов с todo: true (${todoNodes.slice(0, 6).map((x) => x.id).join(', ')}${todoNodes.length > 6 ? ', …' : ''})`);
 
   // maps
   for (const [, def] of ctx.maps) checkMapObjects(ctx, def.value, { file: def.file, path: '' }, isReady(def.module));

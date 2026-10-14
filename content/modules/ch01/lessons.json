@@ -405,7 +405,7 @@
     "minutes": 4,
     "npc": "pasazer",
     "location": "ch01.metro",
-    "introduces": ["lx.przepraszam", "lx.czas", "lx.moze", "lx.krzeslo"],
+    "introduces": ["lx.przepraszam", "lx.czas", "lx.moze", "lx.krzeslo", "lx.dworzec"],
     "requires": { "not": { "cluster": { "id": "R4", "status": "unknown" } } },
     "skipIf": { "cluster": { "id": "R4", "status": "green" } },
     "short": { "if": { "cluster": { "id": "R4", "status": "yellow" } }, "steps": [0, 1, 2, 7, 11, 12, 15] },
@@ -473,8 +473,8 @@
       },
       {
         "t": "listen",
-        "say": "Dworzec Wileński",
-        "options": ["DWORZEC WILEŃSKI", "WYJŚCIE", "KASA"],
+        "say": "Dworzec Centralny",
+        "options": ["DWORZEC CENTRALNY", "WYJŚCIE", "KASA"],
         "answer": 0,
         "show": "sign",
         "item": "lx.dworzec",
@@ -560,6 +560,1089 @@
         "show": "sign",
         "item": "lx.wyjscie",
         "hint": "Вывеска: какую табличку назвали?"
+      }
+    ]
+  },
+  {
+    "id": "ch01.s06",
+    "kind": "repair",
+    "title": { "pl": "S, sz, ś", "ru": "Три ряда рядом: s/sz/ś, c/cz/ć, z/ż/ź" },
+    "minutes": 5,
+    "npc": "pan_marek",
+    "location": "ch01.metro",
+    "requires": { "not": { "cluster": { "id": "R6", "status": "unknown" } } },
+    "skipIf": { "cluster": { "id": "R6", "status": "green" } },
+    "short": { "if": { "cluster": { "id": "R6", "status": "yellow" } }, "steps": [0, 1, 2, 3, 13, 14, 16, 17, 18] },
+    "steps": [
+      {
+        "t": "explain",
+        "md": "Три ряда шипящих — главная работа на слух. Простой: **s c z** [с ц з]. Твёрдый: **sz cz ż/rz** [ш ч ж]. Мягкий: **ś ć ź** = **si ci zi** [щ чь жь]. Русское ч мягкое — не переноси его на cz: **czy** [чы], **ci** [чьи].",
+        "table": [
+          ["простой", "твёрдый", "мягкий"],
+          ["s [с]", "sz [ш]", "ś, si [щ]"],
+          ["c [ц]", "cz [ч]", "ć, ci [чь]"],
+          ["z [з]", "ż, rz [ж]", "ź, zi [жь]"]
+        ]
+      },
+      { "t": "minimal_pair", "pair": ["kasza", "Kasia"], "play": "random", "cluster": "R6", "item": "mp.kasza_kasia" },
+      { "t": "minimal_pair", "pair": ["proszę", "prosię"], "play": "random", "cluster": "R6", "item": "mp.prosze_prosie" },
+      { "t": "minimal_pair", "pair": ["czy", "ci"], "play": "random", "cluster": "R6", "item": "mp.czy_ci" },
+      { "t": "minimal_pair", "pair": ["nosze", "nosi"], "play": "random", "cluster": "R6", "item": "mp.nosze_nosi" },
+      { "t": "minimal_pair", "pair": ["wieś", "wiesz"], "play": "random", "cluster": "R6", "item": "mp.wies_wiesz" },
+      { "t": "minimal_pair", "pair": ["płacz", "płać"], "play": "random", "cluster": "R6", "item": "mp.placz_plac" },
+      { "t": "minimal_pair", "pair": ["sok", "szok"], "play": "random", "cluster": "R6", "item": "mp.sok_szok" },
+      { "t": "minimal_pair", "pair": ["syk", "szyk"], "play": "random", "cluster": "R6", "item": "mp.syk_szyk" },
+      { "t": "minimal_pair", "pair": ["kasa", "kasza"], "play": "random", "cluster": "R6", "item": "mp.kasa_kasza" },
+      { "t": "minimal_pair", "pair": ["kosz", "koś"], "play": "random", "cluster": "R6", "item": "mp.kosz_kos" },
+      { "t": "minimal_pair", "pair": ["szal", "sal"], "play": "random", "cluster": "R6", "item": "mp.szal_sal" },
+      { "t": "minimal_pair", "pair": ["czar", "car"], "play": "random", "cluster": "R6", "item": "mp.czar_car" },
+      { "t": "shadow", "pl": "Kasia je kaszę.", "ru": "Кася ест кашу.", "repeat": 2, "slow": true },
+      {
+        "t": "listen",
+        "say": "prosię",
+        "options": ["prosię", "proszę", "prosi"],
+        "answer": 0,
+        "item": "lx.prosie",
+        "cluster": "R6",
+        "hint": "Поросёнок или «пожалуйста»?"
+      },
+      {
+        "t": "choice",
+        "q": "ci — это…",
+        "options": ["тебе", "ли", "чей"],
+        "answer": 0,
+        "item": "lx.ci",
+        "errorTagByOption": { "1": "R6" },
+        "cluster": "R6"
+      },
+      { "t": "say", "who": "pan_marek", "pl": "Kasza czy ciasto?", "ru": "Каша или пирог?" },
+      {
+        "t": "choice",
+        "q": "Казик хочет пирог. Закажи.",
+        "options": ["Ciasto, proszę.", "Kasza, proszę.", "Ciasto, prosię."],
+        "answer": 0,
+        "item": "lx.ciasto",
+        "dir": "ru-pl",
+        "errorTagByOption": { "1": "R6", "2": "R6" },
+        "cluster": "R6"
+      },
+      {
+        "t": "listen",
+        "say": "Kasa",
+        "options": ["KASA", "KASZA", "KASIA"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.kasa",
+        "cluster": "R6",
+        "hint": "Вывеска: какую табличку назвали?"
+      }
+    ]
+  },
+  {
+    "id": "ch01.s07",
+    "kind": "repair",
+    "title": { "pl": "Ą i ę", "ru": "Носовые ą, ę" },
+    "minutes": 5,
+    "npc": "pani_basia",
+    "location": "ch01.metro",
+    "introduces": ["lx.dziekuje", "lx.prosze", "lx.reka"],
+    "requires": { "not": { "cluster": { "id": "R7", "status": "unknown" } } },
+    "skipIf": { "cluster": { "id": "R7", "status": "green" } },
+    "short": { "if": { "cluster": { "id": "R7", "status": "yellow" } }, "steps": [0, 2, 3, 9, 10, 13, 14, 17] },
+    "steps": [
+      {
+        "t": "explain",
+        "md": "**ą** и **ę** читаем по соседу справа («светофор соседей»): перед t, d, c, cz — [он]/[эн], перед p, b — [ом]/[эм], перед s, sz, ż, w, ch — носовое [оў̃]/[эў̃]. **На конце слова ę = просто [э]**: proszę [про́шэ]. Конечное ą — носовое: są [соў̃].",
+        "table": [
+          ["сосед", "ą", "ę"],
+          ["t, d, c, cz", "он", "эн"],
+          ["p, b", "ом", "эм"],
+          ["k, g", "он", "эн"],
+          ["s, sz, ż, w, ch", "оў̃", "эў̃"],
+          ["конец слова", "оў̃", "э"]
+        ]
+      },
+      {
+        "t": "choice",
+        "q": "ręka читается…",
+        "options": ["[рэ́нка]", "[рэ́ка]", "[рэ́нька]"],
+        "answer": 0,
+        "tags": ["ph.nasal"],
+        "cluster": "R7"
+      },
+      {
+        "t": "listen",
+        "say": "ręka",
+        "options": ["ręka", "reka", "rąka"],
+        "answer": 0,
+        "item": "lx.reka",
+        "cluster": "R7",
+        "hint": "ę или e?"
+      },
+      {
+        "t": "gap",
+        "text": "r___ka",
+        "answer": "ę",
+        "options": ["ę", "e"],
+        "say": "ręka",
+        "item": "lx.reka",
+        "cluster": "R7",
+        "tags": ["ph.nasal"]
+      },
+      { "t": "minimal_pair", "pair": ["wąs", "was"], "play": "random", "cluster": "R7", "item": "mp.was_was" },
+      { "t": "minimal_pair", "pair": ["mąka", "męka"], "play": "random", "cluster": "R7", "item": "mp.maka_meka" },
+      { "t": "minimal_pair", "pair": ["sąd", "sad"], "play": "random", "cluster": "R7", "item": "mp.sad_sad" },
+      { "t": "minimal_pair", "pair": ["mąż", "masz"], "play": "random", "cluster": "R7", "item": "mp.maz_masz" },
+      { "t": "listen", "say": "proszę", "options": ["proszę", "proszą", "prosię"], "answer": 0, "item": "lx.prosze", "cluster": "R7" },
+      {
+        "t": "listen",
+        "say": "dziękuję",
+        "options": ["dziękuję", "dziękuje", "dzienkuje"],
+        "answer": 0,
+        "item": "lx.dziekuje",
+        "cluster": "R7"
+      },
+      {
+        "t": "choice",
+        "q": "Конечное ę в proszę звучит как…",
+        "options": ["[э]", "[эн]", "[эў̃]"],
+        "answer": 0,
+        "tags": ["ph.nasal_end"],
+        "cluster": "R7"
+      },
+      { "t": "shadow", "pl": "Dziękuję. Proszę. Są.", "ru": "Спасибо. Пожалуйста. (Они) есть.", "repeat": 2, "slow": true },
+      {
+        "t": "match",
+        "pairs": [["dziękuję", "спасибо"], ["proszę", "пожалуйста"], ["ręka", "рука"]],
+        "items": ["lx.dziekuje", "lx.prosze", "lx.reka"]
+      },
+      {
+        "t": "choice",
+        "q": "Пани Бася даёт тебе конфету. Что сказать?",
+        "options": ["Dziękuję!", "Proszę!", "Przepraszam!"],
+        "answer": 0,
+        "item": "lx.dziekuje",
+        "dir": "ru-pl"
+      },
+      { "t": "say", "who": "pani_basia", "pl": "Proszę bardzo!", "ru": "Пожалуйста!" },
+      {
+        "t": "choice",
+        "q": "proszę — это…",
+        "options": ["пожалуйста; прошу", "поросёнок", "спасибо"],
+        "answer": 0,
+        "item": "lx.prosze",
+        "errorTagByOption": { "1": "R6" }
+      },
+      {
+        "t": "choice",
+        "q": "ręka — это…",
+        "options": ["рука", "река", "речка"],
+        "answer": 0,
+        "item": "lx.reka",
+        "errorTagByOption": { "1": "R7" }
+      },
+      {
+        "t": "listen",
+        "say": "Zamknięte",
+        "options": ["ZAMKNIĘTE", "ZAMKNIETE", "ZAMKNIĄTE"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.zamkniete",
+        "cluster": "R7"
+      }
+    ]
+  },
+  {
+    "id": "ch01.s08",
+    "kind": "repair",
+    "title": { "pl": "Ie, ia, io", "ru": "i как знак мягкости" },
+    "minutes": 4,
+    "npc": "ola",
+    "location": "ch01.metro",
+    "introduces": ["lx.nie"],
+    "requires": { "not": { "cluster": { "id": "R8", "status": "unknown" } } },
+    "skipIf": { "cluster": { "id": "R8", "status": "green" } },
+    "short": { "if": { "cluster": { "id": "R8", "status": "yellow" } }, "steps": [0, 1, 2, 6, 10, 11, 12, 14] },
+    "steps": [
+      {
+        "t": "explain",
+        "md": "**i** перед гласной обычно не отдельный звук, а мягкость: **nie** — один слог [нье], **Kasia** — два (Ka·sia). Это двигает ударение: **mia**·sto, а не mi·**a**·sto. В заимствованиях i слышно как [й]: hi·**sto**·ria [хисто́рйа]."
+      },
+      { "t": "choice", "q": "Сколько слогов в слове miasto?", "options": ["2", "3"], "answer": 0, "tags": ["ph.i_soft"], "cluster": "R8" },
+      { "t": "stress", "word": "miasto", "syllables": ["mia", "sto"], "answer": 0, "say": true, "cluster": "R8", "tags": ["ph.stress"] },
+      { "t": "stress", "word": "Kasia", "syllables": ["Ka", "sia"], "answer": 0, "say": true, "cluster": "R8", "tags": ["ph.stress"] },
+      { "t": "choice", "q": "Сколько слогов в слове pies?", "options": ["1", "2"], "answer": 0, "tags": ["ph.i_soft"], "cluster": "R8" },
+      {
+        "t": "stress",
+        "word": "historia",
+        "syllables": ["hi", "sto", "ria"],
+        "answer": 1,
+        "say": true,
+        "cluster": "R8",
+        "tags": ["ph.stress"]
+      },
+      { "t": "listen", "say": "nie", "options": ["nie", "ni", "nje"], "answer": 0, "item": "lx.nie", "cluster": "R8" },
+      { "t": "listen", "say": "miasto", "options": ["miasto", "masto", "miesto"], "answer": 0, "item": "lx.miasto", "cluster": "R8" },
+      { "t": "listen", "say": "siostra", "options": ["siostra", "sostra", "szostra"], "answer": 0, "item": "lx.siostra", "cluster": "R8" },
+      { "t": "listen", "say": "pies", "options": ["pies", "pis", "pes"], "answer": 0, "item": "lx.pies", "cluster": "R8" },
+      { "t": "choice", "q": "nie — это…", "options": ["нет; не", "ни", "но"], "answer": 0, "item": "lx.nie" },
+      { "t": "say", "who": "ola", "pl": "To moja siostra, Kasia.", "ru": "Это моя сестра, Кася." },
+      {
+        "t": "choice",
+        "q": "Поздоровайся с Касей: она на «ты».",
+        "options": ["Cześć, Kasia!", "Dzień dobry, Kasia!", "Cześć, Kasza!"],
+        "answer": 0,
+        "item": "lx.czesc",
+        "dir": "ru-pl",
+        "errorTagByOption": { "1": "gr.register", "2": "R6" }
+      },
+      {
+        "t": "gap",
+        "text": "Ka___a",
+        "answer": "si",
+        "options": ["si", "ś"],
+        "say": "Kasia",
+        "cluster": "R8",
+        "tags": ["ph.soft_spelling"]
+      },
+      {
+        "t": "listen",
+        "say": "Piekarnia",
+        "options": ["PIEKARNIA", "PEKARNIA", "APTEKA"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.piekarnia",
+        "cluster": "R8",
+        "hint": "Вывеска: какую табличку назвали?"
+      }
+    ]
+  },
+  {
+    "id": "ch01.s09",
+    "kind": "repair",
+    "title": { "pl": "Przystanek", "ru": "Кластеры и оглушение" },
+    "minutes": 5,
+    "npc": "brzechwa",
+    "location": "ch01.metro",
+    "introduces": ["lx.przystanek", "lx.wszystko"],
+    "requires": { "not": { "cluster": { "id": "R9", "status": "unknown" } } },
+    "skipIf": { "cluster": { "id": "R9", "status": "green" } },
+    "short": { "if": { "cluster": { "id": "R9", "status": "yellow" } }, "steps": [0, 1, 4, 8, 9, 11, 12, 13, 15] },
+    "steps": [
+      {
+        "t": "explain",
+        "md": "Оглушение как в русском: **chleb** [хлеп], **ząb** [зомп]. **w после глухой = [ф]**: twój [тфуй], wszystko [фшы́стко]. Длинное сочетание читаем по слогам, потом целиком: przy·**sta**·nek → przystanek."
+      },
+      {
+        "t": "order",
+        "prompt": "Собери услышанное слово из слогов.",
+        "say": "przystanek",
+        "tiles": ["przy", "psy", "sta", "nek", "niek"],
+        "answer": ["przy", "sta", "nek"],
+        "item": "lx.przystanek",
+        "cluster": "R9"
+      },
+      { "t": "shadow", "pl": "Świę-to-krzy-ska.", "ru": "По слогам.", "repeat": 1, "slow": true },
+      { "t": "shadow", "pl": "Świętokrzyska.", "ru": "Целиком.", "repeat": 2 },
+      {
+        "t": "listen",
+        "say": "wszystko",
+        "options": ["wszystko", "fszystko", "wszytko"],
+        "answer": 0,
+        "item": "lx.wszystko",
+        "cluster": "R9"
+      },
+      { "t": "listen", "say": "twój", "options": ["twój", "tfuj", "dwój"], "answer": 0, "item": "lx.twoj", "cluster": "R9" },
+      {
+        "t": "choice",
+        "q": "chleb на конце звучит…",
+        "options": ["[хлеп]", "[хлеб]"],
+        "answer": 0,
+        "tags": ["ph.devoice"],
+        "cluster": "R9"
+      },
+      {
+        "t": "choice",
+        "q": "ząb читается…",
+        "options": ["[зомп]", "[зоб]", "[зомб]"],
+        "answer": 0,
+        "tags": ["ph.devoice"],
+        "cluster": "R9"
+      },
+      {
+        "t": "listen",
+        "say": "przystanek",
+        "options": ["przystanek", "pszystanek", "przestanek"],
+        "answer": 0,
+        "item": "lx.przystanek",
+        "cluster": "R9"
+      },
+      {
+        "t": "listen",
+        "say": "Następna stacja: Świętokrzyska.",
+        "options": ["ŚWIĘTOKRZYSKA", "CENTRUM", "POLITECHNIKA"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.swietokrzyska",
+        "cluster": "R9"
+      },
+      { "t": "choice", "q": "wszystko — это…", "options": ["всё", "все", "вещи"], "answer": 0, "item": "lx.wszystko" },
+      { "t": "choice", "q": "przystanek — это…", "options": ["остановка", "пристань", "переход"], "answer": 0, "item": "lx.przystanek" },
+      {
+        "t": "order",
+        "prompt": "Спроси: «Где остановка?»",
+        "tiles": ["Gdzie", "jest", "przystanek?", "pszystanek?", "Czy"],
+        "answer": ["Gdzie", "jest", "przystanek?"],
+        "item": "lx.przystanek"
+      },
+      { "t": "say", "who": "brzechwa", "pl": "Tam.", "ru": "Там." },
+      {
+        "t": "match",
+        "pairs": [["przystanek", "остановка"], ["wszystko", "всё"], ["twój", "твой"]],
+        "items": ["lx.przystanek", "lx.wszystko", "lx.twoj"]
+      },
+      {
+        "t": "listen",
+        "say": "Przystanek",
+        "options": ["PRZYSTANEK", "PRZEJŚCIE", "PERON"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.przystanek",
+        "cluster": "R9",
+        "hint": "Вывеска: какую табличку назвали?"
+      }
+    ]
+  },
+  {
+    "id": "ch01.s10",
+    "kind": "repair",
+    "title": { "pl": "Rz czy ż?", "ru": "Один звук — две буквы" },
+    "minutes": 5,
+    "npc": "brzechwa",
+    "location": "ch01.metro",
+    "introduces": ["lx.dworzec"],
+    "requires": { "not": { "cluster": { "id": "R10", "status": "unknown" } } },
+    "skipIf": { "cluster": { "id": "R10", "status": "green" } },
+    "short": { "if": { "cluster": { "id": "R10", "status": "yellow" } }, "steps": [0, 1, 2, 7, 8, 11, 12, 13, 16] },
+    "steps": [
+      {
+        "t": "explain",
+        "md": "**rz = ż** [ж], **ó = u** [у], **ch = h** [х]: звучат одинаково, пишутся по-разному. Подсказки: ó чередуется с o (stół — stoły, Kraków — Krakowa), rz — с r (morze — morski). На A1 ошибка в такой паре — «почти», а не ошибка."
+      },
+      {
+        "t": "dictation",
+        "say": "góra",
+        "accept": ["góra"],
+        "slowFirst": true,
+        "lenient": { "diacritics": "warn", "ortho": true },
+        "item": "lx.gora",
+        "cluster": "R10"
+      },
+      {
+        "t": "dictation",
+        "say": "rzeka",
+        "accept": ["rzeka"],
+        "slowFirst": true,
+        "lenient": { "diacritics": "warn", "ortho": true },
+        "item": "lx.rzeka",
+        "cluster": "R10"
+      },
+      {
+        "t": "dictation",
+        "say": "żona",
+        "accept": ["żona"],
+        "slowFirst": true,
+        "lenient": { "diacritics": "warn", "ortho": true },
+        "item": "lx.zona",
+        "cluster": "R10"
+      },
+      {
+        "t": "dictation",
+        "say": "chleb",
+        "accept": ["chleb"],
+        "slowFirst": true,
+        "lenient": { "diacritics": "warn", "ortho": true },
+        "item": "lx.chleb",
+        "cluster": "R10"
+      },
+      {
+        "t": "dictation",
+        "say": "herbata",
+        "accept": ["herbata"],
+        "slowFirst": true,
+        "lenient": { "diacritics": "warn", "ortho": true },
+        "item": "lx.herbata",
+        "cluster": "R10"
+      },
+      {
+        "t": "dictation",
+        "say": "mój",
+        "accept": ["mój"],
+        "slowFirst": true,
+        "lenient": { "diacritics": "warn", "ortho": true },
+        "item": "lx.moj",
+        "cluster": "R10"
+      },
+      {
+        "t": "gap",
+        "text": "st___ł",
+        "answer": "ó",
+        "options": ["ó", "u"],
+        "say": "stół",
+        "item": "lx.stol",
+        "cluster": "R10",
+        "tags": ["orth.o_u"],
+        "hint": "stół — stoły"
+      },
+      {
+        "t": "gap",
+        "text": "mo___e",
+        "answer": "rz",
+        "options": ["rz", "ż"],
+        "say": "morze",
+        "cluster": "R10",
+        "tags": ["orth.rz_z"],
+        "hint": "morze — morski"
+      },
+      { "t": "gap", "text": "___leb", "answer": "ch", "options": ["ch", "h"], "say": "chleb", "cluster": "R10", "tags": ["orth.ch_h"] },
+      {
+        "t": "gap",
+        "text": "dwo___ec",
+        "answer": "rz",
+        "options": ["rz", "ż"],
+        "say": "dworzec",
+        "item": "lx.dworzec",
+        "cluster": "R10",
+        "tags": ["orth.rz_z"]
+      },
+      { "t": "say", "who": "brzechwa", "pl": "„Morze” — rz czy ż?", "ru": "«Morze» — rz или ż?" },
+      {
+        "t": "choice",
+        "q": "Ответь Бжехве.",
+        "options": ["Rz.", "Ż."],
+        "answer": 0,
+        "errorTagByOption": { "1": "orth.rz_z" },
+        "cluster": "R10"
+      },
+      { "t": "say", "who": "brzechwa", "pl": "Brawo!", "ru": "Браво!" },
+      {
+        "t": "choice",
+        "q": "dworzec — это…",
+        "options": ["вокзал", "дворец"],
+        "answer": 0,
+        "item": "lx.dworzec",
+        "tags": ["ff.dworzec"],
+        "errorTagByOption": { "1": "ff.dworzec" }
+      },
+      { "t": "listen", "say": "dworzec", "options": ["dworzec", "dworzek", "dworec"], "answer": 0, "item": "lx.dworzec", "cluster": "R10" },
+      {
+        "t": "listen",
+        "say": "Dworzec Centralny",
+        "options": ["DWORZEC CENTRALNY", "DWORZEC GDAŃSKI", "CENTRUM"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.dworzec",
+        "cluster": "R4"
+      }
+    ]
+  },
+  {
+    "id": "ch01.s11",
+    "kind": "signs",
+    "title": { "pl": "Czytamy Warszawę", "ru": "Читаем Варшаву: вывески" },
+    "minutes": 5,
+    "npc": "brzechwa",
+    "location": "ch01.metro",
+    "introduces": ["lx.wyjscie", "lx.wejscie", "lx.otwarte", "lx.zamkniete", "lx.sklep"],
+    "requires": { "not": { "cluster": { "id": "R1", "status": "unknown" } } },
+    "steps": [
+      {
+        "t": "explain",
+        "md": "Вывески читаем по тем же правилам. Пары, которые путают: **wyjście / wejście** (выход / вход), **otwarte / zamknięte** (открыто / закрыто), на двери **pchać / ciągnąć** (от себя / к себе). Ложные друзья: **sklep** — магазин, **dworzec** — вокзал."
+      },
+      {
+        "t": "listen",
+        "say": "Wyjście",
+        "options": ["WYJŚCIE", "WEJŚCIE", "KASA"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.wyjscie",
+        "cluster": "R5",
+        "hint": "Вывеска: какую табличку назвали?"
+      },
+      {
+        "t": "listen",
+        "say": "Wejście",
+        "options": ["WEJŚCIE", "WYJŚCIE", "TOALETA"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.wejscie",
+        "cluster": "R5",
+        "hint": "Вывеска: какую табличку назвали?"
+      },
+      {
+        "t": "listen",
+        "say": "Otwarte",
+        "options": ["OTWARTE", "ZAMKNIĘTE", "APTEKA"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.otwarte",
+        "cluster": "R9",
+        "hint": "Вывеска: какую табличку назвали?"
+      },
+      {
+        "t": "listen",
+        "say": "Zamknięte",
+        "options": ["ZAMKNIĘTE", "OTWARTE", "SKLEP"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.zamkniete",
+        "cluster": "R7",
+        "hint": "Вывеска: какую табличку назвали?"
+      },
+      {
+        "t": "listen",
+        "say": "Sklep",
+        "options": ["SKLEP", "SKŁAD", "PLAC"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.sklep",
+        "cluster": "R3",
+        "hint": "Вывеска: какую табличку назвали?"
+      },
+      {
+        "t": "choice",
+        "q": "На двери написано PCHAĆ. Что делать?",
+        "options": ["толкать от себя", "тянуть к себе"],
+        "answer": 0,
+        "item": "lx.pchac"
+      },
+      { "t": "choice", "q": "CIĄGNĄĆ — это…", "options": ["тянуть к себе", "толкать от себя"], "answer": 0, "item": "lx.ciagnac" },
+      {
+        "t": "choice",
+        "q": "sklep — это…",
+        "options": ["магазин", "склеп"],
+        "answer": 0,
+        "item": "lx.sklep",
+        "tags": ["ff.sklep"],
+        "errorTagByOption": { "1": "ff.sklep" }
+      },
+      { "t": "choice", "q": "otwarte — это…", "options": ["открыто", "закрыто", "отвёртка"], "answer": 0, "item": "lx.otwarte" },
+      { "t": "choice", "q": "zamknięte — это…", "options": ["закрыто", "открыто", "занято"], "answer": 0, "item": "lx.zamkniete" },
+      {
+        "t": "match",
+        "pairs": [["wyjście", "выход"], ["wejście", "вход"], ["otwarte", "открыто"], ["zamknięte", "закрыто"]],
+        "items": ["lx.wyjscie", "lx.wejscie", "lx.otwarte", "lx.zamkniete"]
+      },
+      {
+        "t": "match",
+        "pairs": [["apteka", "аптека"], ["ulica", "улица"], ["plac", "площадь"], ["rondo", "кольцо"]],
+        "items": ["lx.apteka", "lx.ulica", "lx.plac", "lx.rondo"]
+      },
+      { "t": "say", "who": "brzechwa", "pl": "Wyjście jest tam.", "ru": "Выход там." },
+      {
+        "t": "order",
+        "prompt": "Ответь: «Спасибо. А магазин?»",
+        "tiles": ["Dziękuję.", "A", "sklep?", "Proszę.", "dworzec?"],
+        "answer": ["Dziękuję.", "A", "sklep?"],
+        "item": "lx.sklep"
+      },
+      { "t": "say", "who": "brzechwa", "pl": "Żabka jest obok.", "ru": "Żabka рядом." },
+      {
+        "t": "listen",
+        "say": "Apteka",
+        "options": ["APTEKA", "PIEKARNIA", "SKLEP"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.apteka",
+        "cluster": "R1",
+        "hint": "Вывеска: какую табличку назвали?"
+      }
+    ]
+  },
+  {
+    "id": "ch01.s12",
+    "kind": "scene",
+    "title": { "pl": "Po literze", "ru": "По буквам" },
+    "minutes": 5,
+    "npc": "urzedniczka",
+    "location": "ch01.metro",
+    "introduces": ["lx.imie", "lx.nazwisko", "lx.jak_to_sie_pisze", "lx.prosze_przeliterowac"],
+    "requires": { "not": { "cluster": { "id": "R1", "status": "unknown" } } },
+    "steps": [
+      {
+        "t": "explain",
+        "md": "В urzędzie и по телефону фамилию диктуют по буквам. Ловушки: **w = wu**, **y = igrek**, **j = jot**, **h = ha**, **c = ce** [цэ], **ł = eł**, **ó = o z kreską** (или «u zamknięte»).",
+        "table": [
+          ["a", "a", "b", "be", "c", "ce"],
+          ["ć", "cie", "d", "de", "e", "e"],
+          ["f", "ef", "g", "gie", "h", "ha"],
+          ["i", "i", "j", "jot", "k", "ka"],
+          ["l", "el", "ł", "eł", "m", "em"],
+          ["n", "en", "ń", "eń", "o", "o"],
+          ["ó", "o z kreską", "p", "pe", "r", "er"],
+          ["s", "es", "ś", "eś", "t", "te"],
+          ["u", "u", "w", "wu", "y", "igrek"],
+          ["z", "zet", "ź", "ziet", "ż", "żet"]
+        ]
+      },
+      { "t": "choice", "q": "Как называется буква W?", "options": ["wu", "we", "dablju"], "answer": 0 },
+      { "t": "choice", "q": "Как называется буква Y?", "options": ["igrek", "i", "uj"], "answer": 0 },
+      { "t": "choice", "q": "Как называется буква J?", "options": ["jot", "je", "dżej"], "answer": 0 },
+      { "t": "listen", "say": "ce", "options": ["C", "S", "K"], "answer": 0, "cluster": "R2", "hint": "Какую букву назвали?" },
+      { "t": "listen", "say": "eł", "options": ["Ł", "L", "W"], "answer": 0, "cluster": "R3", "hint": "Какую букву назвали?" },
+      { "t": "dictation", "say": "en, o, wu, a, ka", "accept": ["Nowak"], "slowFirst": false, "hint": "Фамилия по буквам" },
+      { "t": "dictation", "say": "ka, o, wu, a, el, es, ka, a", "accept": ["Kowalska"], "slowFirst": false, "hint": "Фамилия по буквам" },
+      {
+        "t": "listen",
+        "say": "Jak to się pisze?",
+        "options": ["Jak to się pisze?", "Jak się masz?", "Co to jest?"],
+        "answer": 0,
+        "item": "lx.jak_to_sie_pisze"
+      },
+      {
+        "t": "listen",
+        "say": "Proszę przeliterować.",
+        "options": ["Proszę przeliterować.", "Proszę powtórzyć.", "Proszę wolniej."],
+        "answer": 0,
+        "item": "lx.prosze_przeliterowac"
+      },
+      { "t": "listen", "say": "imię", "options": ["imię", "imienia", "imieniny"], "answer": 0, "item": "lx.imie", "cluster": "R7" },
+      { "t": "listen", "say": "nazwisko", "options": ["nazwisko", "naswisko", "nazwiska"], "answer": 0, "item": "lx.nazwisko" },
+      {
+        "t": "match",
+        "pairs": [
+          ["imię", "имя"],
+          ["nazwisko", "фамилия"],
+          ["Jak to się pisze?", "Как это пишется?"],
+          ["Proszę przeliterować", "Продиктуйте по буквам"]
+        ],
+        "items": ["lx.imie", "lx.nazwisko", "lx.jak_to_sie_pisze", "lx.prosze_przeliterowac"]
+      },
+      { "t": "say", "who": "urzedniczka", "pl": "Nazwisko?", "ru": "Фамилия?" },
+      {
+        "t": "choice",
+        "q": "Ты не расслышал. Что сказать?",
+        "options": ["Przepraszam, proszę powtórzyć.", "Przepraszam, proszę przeliterować.", "Dziękuję, nazwisko."],
+        "answer": 0,
+        "item": "lx.prosze_powtorzyc",
+        "dir": "ru-pl"
+      },
+      { "t": "say", "who": "urzedniczka", "pl": "Nazwisko. Proszę przeliterować.", "ru": "Фамилия. Продиктуйте по буквам." },
+      {
+        "t": "order",
+        "prompt": "Продиктуй по буквам: DIMA",
+        "tiles": ["de", "i", "em", "a", "en", "igrek"],
+        "answer": ["de", "i", "em", "a"]
+      },
+      {
+        "t": "order",
+        "prompt": "Продиктуй по буквам улицу: TARGOWA",
+        "tiles": ["te", "a", "er", "gie", "o", "wu", "a", "we", "ge"],
+        "answer": ["te", "a", "er", "gie", "o", "wu", "a"]
+      },
+      { "t": "choice", "q": "nazwisko — это…", "options": ["фамилия", "название", "прозвище"], "answer": 0, "item": "lx.nazwisko" },
+      { "t": "choice", "q": "imię — это…", "options": ["имя", "имение", "мне"], "answer": 0, "item": "lx.imie" }
+    ]
+  },
+  {
+    "id": "ch01.s12r",
+    "kind": "scene",
+    "title": { "pl": "Proszę powtórzyć", "ru": "Спасательные фразы" },
+    "minutes": 4,
+    "npc": "urzedniczka",
+    "location": "ch01.metro",
+    "introduces": ["lx.nie_rozumiem", "lx.prosze_powtorzyc", "lx.prosze_wolniej", "lx.co_to_znaczy"],
+    "requires": { "lessonDone": "ch01.s12" },
+    "steps": [
+      {
+        "t": "explain",
+        "md": "Четыре фразы-спасателя: **Nie rozumiem.** — не понимаю. **Proszę powtórzyć.** — повторите. **Proszę wolniej.** — помедленнее. **Co to znaczy?** — что это значит? С ними можно выжить в urzędzie, у врача и по телефону."
+      },
+      { "t": "shadow", "pl": "Nie rozumiem. Proszę powtórzyć.", "ru": "Не понимаю. Повторите, пожалуйста.", "repeat": 2 },
+      { "t": "shadow", "pl": "Proszę wolniej. Co to znaczy?", "ru": "Помедленнее, пожалуйста. Что это значит?", "repeat": 2 },
+      {
+        "t": "listen",
+        "say": "Nie rozumiem.",
+        "options": ["Nie rozumiem.", "Nie wiem.", "Rozumiem."],
+        "answer": 0,
+        "item": "lx.nie_rozumiem"
+      },
+      {
+        "t": "listen",
+        "say": "Proszę powtórzyć.",
+        "options": ["Proszę powtórzyć.", "Proszę przeliterować.", "Proszę wolniej."],
+        "answer": 0,
+        "item": "lx.prosze_powtorzyc"
+      },
+      {
+        "t": "listen",
+        "say": "Proszę wolniej.",
+        "options": ["Proszę wolniej.", "Proszę bardzo.", "Proszę powtórzyć."],
+        "answer": 0,
+        "item": "lx.prosze_wolniej"
+      },
+      {
+        "t": "listen",
+        "say": "Co to znaczy?",
+        "options": ["Co to znaczy?", "Co to jest?", "Jak to się pisze?"],
+        "answer": 0,
+        "item": "lx.co_to_znaczy"
+      },
+      {
+        "t": "match",
+        "pairs": [
+          ["Nie rozumiem", "Не понимаю"],
+          ["Proszę powtórzyć", "Повторите, пожалуйста"],
+          ["Proszę wolniej", "Помедленнее, пожалуйста"],
+          ["Co to znaczy?", "Что это значит?"]
+        ],
+        "items": ["lx.nie_rozumiem", "lx.prosze_powtorzyc", "lx.prosze_wolniej", "lx.co_to_znaczy"]
+      },
+      {
+        "t": "choice",
+        "q": "Urzędniczka говорит очень быстро. Что сказать?",
+        "options": ["Proszę wolniej.", "Proszę bardzo.", "Co to znaczy?"],
+        "answer": 0,
+        "item": "lx.prosze_wolniej",
+        "dir": "ru-pl"
+      },
+      {
+        "t": "choice",
+        "q": "Ты услышал незнакомое слово «PESEL». Спроси, что это значит.",
+        "options": ["Co to znaczy?", "Jak to się pisze?", "Proszę bardzo."],
+        "answer": 0,
+        "item": "lx.co_to_znaczy",
+        "dir": "ru-pl"
+      },
+      {
+        "t": "choice",
+        "q": "Ты совсем ничего не понял. Что сказать?",
+        "options": ["Nie rozumiem.", "Proszę bardzo.", "Dziękuję."],
+        "answer": 0,
+        "item": "lx.nie_rozumiem",
+        "dir": "ru-pl"
+      },
+      {
+        "t": "order",
+        "prompt": "Повторите, пожалуйста.",
+        "tiles": ["Proszę", "powtórzyć.", "wolniej.", "Prosię"],
+        "answer": ["Proszę", "powtórzyć."],
+        "item": "lx.prosze_powtorzyc"
+      },
+      {
+        "t": "choice",
+        "q": "Co to znaczy? — это…",
+        "options": ["Что это значит?", "Как это пишется?", "Кто это?"],
+        "answer": 0,
+        "item": "lx.co_to_znaczy"
+      },
+      {
+        "t": "choice",
+        "q": "Proszę wolniej. — это…",
+        "options": ["Помедленнее, пожалуйста.", "Повторите, пожалуйста.", "Пожалуйста, входите."],
+        "answer": 0,
+        "item": "lx.prosze_wolniej"
+      },
+      {
+        "t": "choice",
+        "q": "Nie rozumiem. — это…",
+        "options": ["Не понимаю.", "Не помню.", "Не знаю."],
+        "answer": 0,
+        "item": "lx.nie_rozumiem"
+      },
+      {
+        "t": "choice",
+        "q": "Proszę powtórzyć. — это…",
+        "options": ["Повторите, пожалуйста.", "Продиктуйте по буквам.", "Проходите, пожалуйста."],
+        "answer": 0,
+        "item": "lx.prosze_powtorzyc"
+      }
+    ]
+  },
+  {
+    "id": "ch01.boss",
+    "kind": "boss",
+    "title": { "pl": "Konduktor", "ru": "Контролёр: босс главы" },
+    "minutes": 8,
+    "npc": "konduktor",
+    "location": "ch01.metro",
+    "requires": { "all": [{ "lessonDone": "ch01.s11" }, { "lessonDone": "ch01.s12" }, { "lessonDone": "ch01.s12r" }] },
+    "pass": { "score": 0.8, "redClusterMin": 0.6 },
+    "parts": [
+      {
+        "id": "signs",
+        "title": "Объявления и вывески",
+        "weight": 0.3,
+        "steps": [
+          { "t": "say", "who": "konduktor", "pl": "Bilety do kontroli!", "ru": "Билеты к проверке!" },
+          {
+            "t": "listen",
+            "say": "Wyjście",
+            "options": ["WYJŚCIE", "WEJŚCIE", "WYJAZD"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.wyjscie",
+            "cluster": "R5"
+          },
+          {
+            "t": "listen",
+            "say": "Wejście",
+            "options": ["WEJŚCIE", "WYJŚCIE", "PERON"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.wejscie",
+            "cluster": "R5"
+          },
+          {
+            "t": "listen",
+            "say": "Otwarte",
+            "options": ["OTWARTE", "ZAMKNIĘTE", "APTEKA"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.otwarte",
+            "cluster": "R9"
+          },
+          {
+            "t": "listen",
+            "say": "Zamknięte",
+            "options": ["ZAMKNIĘTE", "OTWARTE", "TOALETA"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.zamkniete",
+            "cluster": "R7"
+          },
+          {
+            "t": "listen",
+            "say": "Kasa",
+            "options": ["KASA", "KASZA", "KASIA"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.kasa",
+            "cluster": "R6"
+          },
+          {
+            "t": "listen",
+            "say": "Apteka",
+            "options": ["APTEKA", "PIEKARNIA", "TOALETA"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.apteka",
+            "cluster": "R1"
+          },
+          {
+            "t": "listen",
+            "say": "Piekarnia",
+            "options": ["PIEKARNIA", "APTEKA", "KASA"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.piekarnia",
+            "cluster": "R8"
+          },
+          {
+            "t": "listen",
+            "say": "Sklep",
+            "options": ["SKLEP", "SKŁAD", "PLAC"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.sklep",
+            "cluster": "R3"
+          },
+          {
+            "t": "listen",
+            "say": "Pchać",
+            "options": ["PCHAĆ", "CIĄGNĄĆ", "WYJŚCIE"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.pchac",
+            "cluster": "R2"
+          },
+          {
+            "t": "listen",
+            "say": "Dworzec Centralny",
+            "options": ["DWORZEC CENTRALNY", "DWORZEC GDAŃSKI", "CENTRUM"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.dworzec",
+            "cluster": "R4"
+          },
+          {
+            "t": "listen",
+            "say": "Następna stacja: Świętokrzyska.",
+            "options": ["ŚWIĘTOKRZYSKA", "CENTRUM", "POLITECHNIKA"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.swietokrzyska",
+            "cluster": "R9"
+          },
+          {
+            "t": "listen",
+            "say": "Przystanek",
+            "options": ["PRZYSTANEK", "PRZEJŚCIE", "PERON"],
+            "answer": 0,
+            "show": "sign",
+            "item": "lx.przystanek",
+            "cluster": "R4"
+          }
+        ]
+      },
+      {
+        "id": "dictation",
+        "title": "Диктант",
+        "weight": 0.3,
+        "steps": [
+          {
+            "t": "dictation",
+            "say": "herbata",
+            "accept": ["herbata"],
+            "slowFirst": false,
+            "lenient": { "diacritics": "warn", "ortho": true },
+            "item": "lx.herbata",
+            "cluster": "R2"
+          },
+          {
+            "t": "dictation",
+            "say": "słucham",
+            "accept": ["słucham"],
+            "slowFirst": false,
+            "lenient": { "diacritics": "warn", "ortho": true },
+            "item": "lx.slucham",
+            "cluster": "R3"
+          },
+          {
+            "t": "dictation",
+            "say": "czas",
+            "accept": ["czas"],
+            "slowFirst": false,
+            "lenient": { "diacritics": "warn", "ortho": true },
+            "item": "lx.czas",
+            "cluster": "R4"
+          },
+          {
+            "t": "dictation",
+            "say": "dzień",
+            "accept": ["dzień"],
+            "slowFirst": false,
+            "lenient": { "diacritics": "warn", "ortho": true },
+            "item": "lx.dzien",
+            "cluster": "R5"
+          },
+          {
+            "t": "dictation",
+            "say": "kasza",
+            "accept": ["kasza"],
+            "slowFirst": false,
+            "lenient": { "diacritics": "warn", "ortho": true },
+            "item": "lx.kasza",
+            "cluster": "R6"
+          },
+          {
+            "t": "dictation",
+            "say": "dziękuję",
+            "accept": ["dziękuję"],
+            "slowFirst": false,
+            "lenient": { "diacritics": "warn", "ortho": true },
+            "item": "lx.dziekuje",
+            "cluster": "R7"
+          },
+          {
+            "t": "dictation",
+            "say": "miasto",
+            "accept": ["miasto"],
+            "slowFirst": false,
+            "lenient": { "diacritics": "warn", "ortho": true },
+            "item": "lx.miasto",
+            "cluster": "R8"
+          },
+          {
+            "t": "dictation",
+            "say": "przystanek",
+            "accept": ["przystanek"],
+            "slowFirst": false,
+            "lenient": { "diacritics": "warn", "ortho": true },
+            "item": "lx.przystanek",
+            "cluster": "R9"
+          }
+        ]
+      },
+      {
+        "id": "spelling",
+        "title": "Имя и улица по буквам",
+        "weight": 0.2,
+        "steps": [
+          { "t": "say", "who": "konduktor", "pl": "Nazwisko? Proszę przeliterować.", "ru": "Фамилия? Продиктуйте по буквам." },
+          { "t": "dictation", "say": "zet, o, ef, i, a", "accept": ["Zofia"], "slowFirst": false },
+          { "t": "dictation", "say": "en, o, wu, i, ce, ka, a", "accept": ["Nowicka"], "slowFirst": false },
+          { "t": "dictation", "say": "te, a, er, gie, o, wu, a", "accept": ["Targowa"], "slowFirst": false },
+          { "t": "dictation", "say": "be, er, zet, e, es, ka, a", "accept": ["Brzeska"], "slowFirst": false }
+        ]
+      },
+      {
+        "id": "traps",
+        "title": "Ловушки и спасательные фразы",
+        "weight": 0.2,
+        "steps": [
+          {
+            "t": "choice",
+            "q": "sklep — это…",
+            "options": ["магазин", "склеп"],
+            "answer": 0,
+            "item": "lx.sklep",
+            "tags": ["ff.sklep"],
+            "errorTagByOption": { "1": "ff.sklep" }
+          },
+          {
+            "t": "choice",
+            "q": "dworzec — это…",
+            "options": ["вокзал", "дворец"],
+            "answer": 0,
+            "item": "lx.dworzec",
+            "tags": ["ff.dworzec"],
+            "errorTagByOption": { "1": "ff.dworzec" }
+          },
+          {
+            "t": "choice",
+            "q": "stół — это…",
+            "options": ["стол", "стул"],
+            "answer": 0,
+            "item": "lx.stol",
+            "tags": ["ff.stol"],
+            "errorTagByOption": { "1": "ff.stol" }
+          },
+          {
+            "t": "choice",
+            "q": "czas — это…",
+            "options": ["время", "час"],
+            "answer": 0,
+            "item": "lx.czas",
+            "tags": ["ff.czas"],
+            "errorTagByOption": { "1": "ff.czas" }
+          },
+          {
+            "t": "choice",
+            "q": "Контролёр говорит слишком быстро. Что сказать?",
+            "options": ["Proszę wolniej.", "Proszę powtórzyć.", "Dziękuję."],
+            "answer": 0,
+            "item": "lx.prosze_wolniej",
+            "dir": "ru-pl"
+          },
+          {
+            "t": "choice",
+            "q": "Ты не расслышал вопрос. Попроси повторить.",
+            "options": ["Proszę powtórzyć.", "Proszę wolniej.", "Przepraszam."],
+            "answer": 0,
+            "item": "lx.prosze_powtorzyc",
+            "dir": "ru-pl"
+          },
+          {
+            "t": "choice",
+            "q": "Контролёр сказал «bilet ulgowy». Спроси, что это значит.",
+            "options": ["Co to znaczy?", "Jak to się pisze?", "Nie rozumiem."],
+            "answer": 0,
+            "item": "lx.co_to_znaczy",
+            "dir": "ru-pl"
+          }
+        ]
       }
     ]
   }

@@ -3,138 +3,185 @@
     "id": "kazik.move.first",
     "who": "bobr",
     "ru": "Стрелки или кружок слева внизу. Подходи к вещам и жми A. Тут каждая табличка что-то говорит.",
-    "pl": "Idziemy!"
+    "pl": "Idziemy!",
+    "plRu": "Идём!"
   },
   {
     "id": "kazik.water.first",
     "who": "bobr",
     "ru": "Это не огурец, это слово. Подвяло - значит, пора вспомнить. Полей вот это одно.",
-    "pl": "Szefie, podlewamy."
+    "pl": "Szefie, podlewamy.",
+    "plRu": "Шеф, поливаем."
   },
-  { "id": "kazik.water.due", "who": "bobr", "ru": "Где зарубка, там слово просится. Обойдём и пойдём гулять.", "pl": "Zrobiłem znak." },
+  {
+    "id": "kazik.water.due",
+    "who": "bobr",
+    "ru": "Где зарубка, там слово просится. Обойдём и пойдём гулять.",
+    "pl": "Zrobiłem znak.",
+    "plRu": "Я сделал зарубку."
+  },
   {
     "id": "kazik.pierogi.first",
     "who": "bobr",
     "ru": "Новые слова как пироги: три в день. Съешь больше, ночью приснятся падежи.",
-    "pl": "Trzy pierogi dziennie. Więcej nie zjesz."
+    "pl": "Trzy pierogi dziennie. Więcej nie zjesz.",
+    "plRu": "Три пирога в день. Больше не съешь."
   },
   {
     "id": "kazik.jar.first",
     "who": "bobr",
     "ru": "Это слово ты помнишь уже месяц. Закатываем. Варшава приезжих зовёт słoiki, так что мы с тобой оба банки.",
-    "pl": "Dojrzało. Do słoika!"
+    "pl": "Dojrzało. Do słoika!",
+    "plRu": "Созрело. В банку!"
   },
   {
     "id": "kazik.order.first",
     "who": "bobr",
     "ru": "Банки не для полки. Бася просит три слова. Донеси и собери из них фразу прямо у неё. Zamówienie - заказ. Zakaz - запрет. Перепутаешь, будет запрет на пироги.",
-    "pl": "Pani Basia ma zamówienie."
+    "pl": "Pani Basia ma zamówienie.",
+    "plRu": "У пани Баси заказ."
   },
   {
     "id": "kazik.kitchen.first",
     "who": "bobr",
     "ru": "Хочешь ещё новое слово сегодня? Три старых в кастрюлю. Слова не пропадут, банки вернутся, когда вспомнишь. Раз в день, я не повар.",
-    "pl": "Trzy słoiki, jeden pieróg."
+    "pl": "Trzy słoiki, jeden pieróg.",
+    "plRu": "Три банки - один пирог."
   },
   {
     "id": "kazik.hearts.cool",
     "who": "bobr",
     "ru": "Давно не повторял её слова, она тебя будто не узнаёт. Отнеси заказ, оттает.",
-    "pl": "Pani Basia patrzy dziwnie."
+    "pl": "Pani Basia patrzy dziwnie.",
+    "plRu": "Пани Бася странно смотрит."
   },
   {
     "id": "kazik.map.first",
     "who": "bobr",
     "ru": "Туман не запрет. Это мы пока не понимаем, что там говорят. Половина слов, и туман поредеет.",
-    "pl": "Tam jest mgła. Jeszcze nie rozumiemy."
+    "pl": "Tam jest mgła. Jeszcze nie rozumiemy.",
+    "plRu": "Там туман. Пока не понимаем."
   },
   {
     "id": "kazik.stamp",
     "who": "bobr",
     "ru": "Регион говорит: с тобой можно разговаривать. Печать не отнимут, даже если что-то забудешь.",
-    "pl": "Pieczątka!"
+    "pl": "Pieczątka!",
+    "plRu": "Печать!"
   },
-  { "id": "kazik.bridge.span", "who": "bobr", "ru": "Ещё пролёт. Я дерево, ты слова.", "pl": "No to budujemy." },
+  { "id": "kazik.bridge.span", "who": "bobr", "ru": "Ещё пролёт. Я дерево, ты слова.", "pl": "No to budujemy.", "plRu": "Ну, строим." },
   {
     "id": "kazik.debt.jam",
     "who": "bobr",
     "ru": "Брёвна сбились. Новые сцены подождут, сначала разберём. Никто не виноват, река такая. По пятнадцать за раз.",
-    "pl": "Zator."
+    "pl": "Zator.",
+    "plRu": "Затор."
   },
   {
     "id": "kazik.return.spring",
     "who": "bobr",
     "ru": "Пока тебя не было, всё заросло. Не страшно. Мы в Праге, мост на третьем пролёте, Бася ждёт банку. Пять лёгких для разминки.",
-    "pl": "Wróciłeś! Wiosna."
+    "pl": "Wróciłeś! Wiosna.",
+    "plRu": "Вернулся! Весна."
   },
-  { "id": "kazik.resume", "who": "bobr", "ru": "Ушёл посреди фразы. Ничего, бревно лежит, где лежало.", "pl": "Gdzie byliśmy?" },
+  {
+    "id": "kazik.resume",
+    "who": "bobr",
+    "ru": "Ушёл посреди фразы. Ничего, бревно лежит, где лежало.",
+    "pl": "Gdzie byliśmy?",
+    "plRu": "Где мы были?"
+  },
   {
     "id": "kazik.express",
     "who": "bobr",
     "ru": "Нет времени - обойдём только то, что горит. Три минуты, и свободен.",
-    "pl": "Szybko? Trzy minuty."
+    "pl": "Szybko? Trzy minuty.",
+    "plRu": "Быстро? Три минуты."
   },
   {
     "id": "kazik.keyboard.first",
     "who": "bobr",
     "ru": "У тебя нет польских букв, у меня нет пальцев. Тыкай в полоску сверху. ą и ę с хвостиками, хвостик по-польски ogonek. Без хвостика засчитаю, но поморщусь.",
-    "pl": "Ogonek. Jak u mnie."
+    "pl": "Ogonek. Jak u mnie.",
+    "plRu": "Хвостик. Как у меня."
   },
   {
     "id": "kazik.shadow.first",
     "who": "bobr",
     "ru": "Проверять не буду, я не слышу. Скажи вслух, никто не смотрит. Ну, кроме меня.",
-    "pl": "Powtórz na głos."
+    "pl": "Powtórz na głos.",
+    "plRu": "Повтори вслух."
   },
   {
     "id": "kazik.diag",
     "who": "bobr",
     "ru": "Этот турникет пускает тех, кто слышит город. Не экзамен. Посмотрим, какие сваи шатаются.",
-    "pl": "Bramka słucha."
+    "pl": "Bramka słucha.",
+    "plRu": "Турникет слушает."
   },
   {
     "id": "kazik.repair",
     "who": "bobr",
     "ru": "Три раза споткнулся на одном. Две минуты, подобьём сваю.",
-    "pl": "Ten kawałek się chwieje."
+    "pl": "Ten kawałek się chwieje.",
+    "plRu": "Этот кусок шатается."
   },
   {
     "id": "kazik.reallife",
     "who": "bobr",
     "ru": "Задание со звёздочкой: скажи это сегодня по-настоящему. Сказал - ставь галочку. Я поверю.",
-    "pl": "Powiedz to w Żabce."
+    "pl": "Powiedz to w Żabce.",
+    "plRu": "Скажи это в Жабке."
   },
-  { "id": "kazik.sleep", "who": "bobr", "ru": "На сегодня хватит. Ночью слова пускают корни.", "pl": "Idziemy spać. Jutro też jest dzień." },
+  {
+    "id": "kazik.sleep",
+    "who": "bobr",
+    "ru": "На сегодня хватит. Ночью слова пускают корни.",
+    "pl": "Idziemy spać. Jutro też jest dzień.",
+    "plRu": "Идём спать. Завтра тоже день."
+  },
   {
     "id": "kazik.sunday",
     "who": "bobr",
     "ru": "Сегодня только полив. Żabka, правда, открыта, но мы отдыхаем.",
-    "pl": "Niedziela. Sklepy zamknięte."
+    "pl": "Niedziela. Sklepy zamknięte.",
+    "plRu": "Воскресенье. Магазины закрыты."
   },
-  { "id": "kazik.prawie", "who": "bobr", "ru": "Почти. Ещё раз.", "pl": "Prawie. Jeszcze raz." },
-  { "id": "kazik.name.odwrotnie", "who": "bobr", "ru": "А я наоборот.", "pl": "Ja robię odwrotnie." },
+  { "id": "kazik.prawie", "who": "bobr", "pl": "Prawie. Jeszcze raz.", "plRu": "Почти. Ещё раз." },
+  { "id": "kazik.name.odwrotnie", "who": "bobr", "pl": "Ja robię odwrotnie.", "plRu": "А я наоборот." },
   {
     "id": "kazik.dream.most",
     "who": "bobr",
-    "ru": "Все бобры строят плотины. Я строю мост.",
-    "pl": "Wszystkie bobry budują tamy. Ja buduję most."
+    "pl": "Wszystkie bobry budują tamy. Ja buduję most.",
+    "plRu": "Все бобры строят плотины. Я строю мост."
   },
-  { "id": "kazik.dream.gryze", "who": "bobr", "ru": "Я не читаю. Я грызу.", "pl": "Ja nie czytam. Ja gryzę." },
-  { "id": "intro.kazik.kloda", "who": "bobr", "ru": "Хорошее бревно!", "pl": "Dobra kłoda!" },
-  { "id": "intro.hela.za_darmo", "who": "pani_hela", "ru": "Берёте? Даром.", "pl": "Pan bierze? Za darmo." },
-  { "id": "intro.kazik.gosc_mowi", "who": "bobr", "ru": "Ну надо же. Гость говорит!", "pl": "No proszę. Gość mówi!" },
-  { "id": "intro.kazik.dopiero", "who": "bobr", "ru": "До свидания? Ты только пришёл.", "pl": "Do widzenia? Dopiero przyszedłeś." },
+  { "id": "kazik.dream.gryze", "who": "bobr", "pl": "Ja nie czytam. Ja gryzę.", "plRu": "Я не читаю. Я грызу." },
+  { "id": "intro.kazik.kloda", "who": "bobr", "pl": "Dobra kłoda!", "plRu": "Хорошее бревно!" },
+  { "id": "intro.hela.za_darmo", "who": "pani_hela", "pl": "Pan bierze? Za darmo.", "plRu": "Берёте? Даром." },
+  { "id": "intro.kazik.gosc_mowi", "who": "bobr", "pl": "No proszę. Gość mówi!", "plRu": "Ну надо же. Гость говорит!" },
+  { "id": "intro.kazik.dopiero", "who": "bobr", "pl": "Do widzenia? Dopiero przyszedłeś.", "plRu": "До свидания? Ты только пришёл." },
   {
     "id": "intro.kazik.po_rusku",
     "who": "bobr",
     "ru": "О, ты по-русски? Я с Буга, у нас граница течёт через всё. Kazimierz, для своих Казик. Пошли, покажу участок. Ничей. Теперь наш."
   },
-  { "id": "brzechwa.powtorz", "who": "brzechwa", "ru": "Повтори!", "pl": "Powtórz!" },
-  { "id": "brzechwa.rym_dima", "who": "brzechwa", "ru": "Дима? Рифмуется с «зима»!", "pl": "Dima? Rymuje się z „zima”!" },
-  { "id": "brzechwa.adwokat", "who": "brzechwa", "ru": "Я адвокат. Цитируй коротко.", "pl": "Jestem adwokatem. Cytuj krótko." },
-  { "id": "brzechwa.prawdziwa_polska", "who": "brzechwa", "ru": "Там, где говорят «chrząszcz»!", "pl": "Tam, gdzie mówią „chrząszcz”!" },
+  { "id": "brzechwa.powtorz", "who": "brzechwa", "pl": "Powtórz!", "plRu": "Повтори!" },
+  { "id": "brzechwa.rym_dima", "who": "brzechwa", "pl": "Dima? Rymuje się z „zima”!", "plRu": "Дима? Рифмуется с «зима»!" },
+  { "id": "brzechwa.adwokat", "who": "brzechwa", "pl": "Jestem adwokatem. Cytuj krótko.", "plRu": "Я адвокат. Цитируй коротко." },
+  { "id": "brzechwa.prawdziwa_polska", "who": "brzechwa", "pl": "Tam, gdzie mówią „chrząszcz”!", "plRu": "Там, где говорят «chrząszcz»!" },
   { "id": "kazik.bobr_kreska", "who": "bobr", "ru": "Я знаю, как я пишусь." },
   { "id": "kazik.ch01.s03.slucham", "who": "bobr", "ru": "Słucham - это не «слушаю тебя», а «что желаете»." },
   { "id": "kazik.ch01.diag_result", "who": "bobr", "todo": true },
-  { "id": "kazik.ch01.s01.wada", "who": "bobr", "todo": true }
+  { "id": "kazik.ch01.s01.wada", "who": "bobr", "todo": true },
+  { "id": "kazik.ch01.s09.wysiadam", "who": "bobr", "pl": "Ja wysiadam.", "plRu": "Я выхожу." },
+  { "id": "kazik.ch01.s10.rzeka", "who": "bobr", "pl": "Rz. Jak rzeka. Ja tam mieszkam.", "plRu": "Rz. Как река. Я там живу." },
+  {
+    "id": "kazik.simba.okno",
+    "who": "bobr",
+    "pl": "Kot. Jakiś kot. Nie interesuje mnie.",
+    "plRu": "Кот. Какой-то кот. Меня не интересует."
+  },
+  { "id": "kazik.ch01.s12.most", "who": "bobr", "ru": "Успеем построить ещё один мост." },
+  { "id": "kazik.ch01.s06.ciasto", "who": "bobr", "todo": true },
+  { "id": "kazik.ch01.s06.kasza", "who": "bobr", "todo": true }
 ]

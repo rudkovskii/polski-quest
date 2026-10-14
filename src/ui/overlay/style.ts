@@ -49,6 +49,7 @@ const css = `
 .pq-line-pl.todo { color: #8f3e56; font-family: ui-monospace, Menlo, monospace; font-size: 17px; }
 .pq-line-ru { font-size: 17px; color: #543c52; }
 .pq-line-ru.hidden-ru { color: #695953; font-style: italic; }
+.pq-line-rus { font-size: 17px; color: #3a2c38; margin-top: 4px; }
 .pq-line-tools { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .pq-line-next { position: absolute; right: 12px; bottom: 8px; }
 .pq-noaudio { font-size: 15px; color: #8f3e56; }

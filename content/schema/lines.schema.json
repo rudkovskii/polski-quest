@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "lines.schema.json",
   "title": "Lines",
-  "description": "content/story/lines.json: реплики бобра, сюжета, кота (ТЗ §3.8). Текст переносится из ../СЮЖЕТ.md, не сочиняется. todo: true = реплики ещё нет (ru можно не указывать).",
+  "description": "content/story/lines.json: реплики бобра, сюжета, кота (ТЗ §3.8). Текст переносится из ../СЮЖЕТ.md, не сочиняется. todo: true = реплики ещё нет (ru можно не указывать). Без todo нужен ru или pl; plRu — перевод pl.",
   "type": "array",
   "items": {
     "title": "Line",
@@ -14,9 +14,10 @@
       "who": { "$ref": "common.schema.json#/$defs/charId" },
       "ru": { "type": "string", "minLength": 1 },
       "pl": { "type": "string", "minLength": 1 },
+      "plRu": { "type": "string", "minLength": 1, "description": "Перевод pl (скобки в СЮЖЕТ.md); ru — отдельная русская реплика" },
       "todo": { "type": "boolean" }
     },
     "if": { "not": { "required": ["todo"], "properties": { "todo": { "const": true } } } },
-    "then": { "required": ["ru"] }
+    "then": { "anyOf": [{ "required": ["ru"] }, { "required": ["pl"] }] }
   }
 }

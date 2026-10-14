@@ -2,11 +2,14 @@
 // `local.resume` после каждого шага, события журнала через append + appendGate:
 //   rev    — первая попытка по due-карточке (ранние ответы отсекает appendGate и уходят в агрегат);
 //   intro  — в конце сцены для слов из `introduces`, которых ещё нет (ok = типы, верные с первого раза);
-//   lesson — итог сцены (score, firstTry, ms, passed, tags, answers); у босса — `boss` по частям.
+//   lesson — итог сцены (score, firstTry, ms, passed, tags, answers);
+//   diag   — у диагностики (kind: diag) ещё точность по кластерам R1–R10 (§4.3, I-11).
+// Урок с частями (`parts`, босс) ведёт src/ui/boss.ts (§5.8, I-11).
 // Проваленный с первой попытки шаг повторяется ещё раз в конце урока (без SRS, без подсказки):
 // так ошибка не «застревает», а порядок шагов урока не ломается.
 import type { Check } from '../systems/answer';
 import type { Content } from '../systems/content';
+import { stepCluster, tallyOf } from '../systems/clusters';
 import { appendGate, derive, deriveContent, type Derived } from '../systems/derive';
 import { gradeFromAnswer, type StepKind } from '../systems/grade';
 import type { EventDraft, LogEvent, Src } from '../systems/log';
@@ -14,6 +17,7 @@ import { getSetting, type AppendOpts, type AppendResult, type CardId, type CardT
 import { cardId } from '../systems/srs';
 import type { Lesson, Step } from '../types/content';
 import type { LessonResult } from '../types/bus';
+import { runBoss } from './boss';
 import { el } from './dom';
 import { mountStep } from './exercises/registry';
 import type { ExerciseContent, ExerciseCtx, StepResult } from './exercises/types';
@@ -68,7 +72,6 @@ interface PlanEntry {
 }
 
 const DEFAULT_FIRST_TRY = 0.7;
-const DEFAULT_BOSS_SCORE = 0.8;
 
 export function lessonSteps(lesson: Lesson): { steps: Step[]; part: (string | null)[] } {
   if (lesson.steps) return { steps: [...lesson.steps], part: lesson.steps.map(() => null) };
@@ -148,10 +151,11 @@ export interface RunOptions {
  * `tuning.resumeHours` продолжает с неё.
  */
 export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptions = {}): Promise<LessonResult> {
+  if (lesson.parts && !opts.drill) return runBoss(lesson, deps, opts);
   const clock = deps.clock ?? { now: () => Date.now(), mono: () => performance.now() };
   const { content, store } = deps;
   const tuning = content.tuning;
-  const { steps, part } = lessonSteps(lesson);
+  const { steps } = lessonSteps(lesson);
   const startNow = clock.now();
   const drill = opts.drill === true;
   const src = srcOf(drill ? 'world' : lesson.kind);
@@ -325,24 +329,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
   const planted: string[] = [];
   let passed = true;
   if (!drill) {
-    const isBoss = lesson.kind === 'boss' || !!lesson.parts;
-    if (isBoss) {
-      const parts: Record<string, number> = {};
-      let total = 0;
-      let wsum = 0;
-      for (const p of lesson.parts ?? []) {
-        const rs = graded.filter((r) => part[r.i] === p.id);
-        const ps = rs.length ? rs.reduce((s, r) => s + (r.score ?? 0), 0) / rs.length : 1;
-        parts[p.id] = round3(ps);
-        const w = p.weight ?? 1;
-        total += w * ps;
-        wsum += w;
-      }
-      const bossScore = wsum ? total / wsum : score;
-      passed = bossScore >= (lesson.pass?.score ?? DEFAULT_BOSS_SCORE);
-      record({ k: 'boss', ts: clock.now(), lesson: lesson.id, score: round3(bossScore), parts, passed, ms });
-    } else {
-      // intro: слова урока, которых ещё нет; ok — типы (rec/lis), верные с первой попытки.
+    // intro: слова урока, которых ещё нет; ok — типы (rec/lis), верные с первой попытки.
       for (const item of lesson.introduces ?? []) {
         if (Object.keys(derived.cards).some((c) => c.startsWith(`${item}#`))) continue;
         const ok = new Set<CardType>();
@@ -360,6 +347,12 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
       const minFirst = lesson.pass?.firstTry ?? DEFAULT_FIRST_TRY;
       const minScore = lesson.pass?.score ?? 0;
       passed = firstTry >= minFirst && score >= minScore;
+      if (lesson.kind === 'diag') {
+        // Диагностика (§4.3): точность первых попыток по кластерам шагов → статус кластеров в derive.
+        const clustersOf = (item: string): readonly string[] => content.vocab.get(item)?.value.clusters ?? (content.pairs.get(item) ? [content.pairs.get(item)!.cluster] : []);
+        const results = tallyOf(graded.map((r) => ({ cluster: stepCluster(steps[r.i]!, clustersOf), score: r.score ?? 0 })));
+        if (Object.keys(results).length) record({ k: 'diag', ts: clock.now(), results });
+      }
       record({
         k: 'lesson',
         ts: clock.now(),
@@ -371,7 +364,6 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
         ...(Object.keys(tags).length ? { tags } : {}),
         answers: n,
       });
-    }
   }
   clearResume();
 

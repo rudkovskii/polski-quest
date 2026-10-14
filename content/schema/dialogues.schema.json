@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "dialogues.schema.json",
   "title": "Dialogues",
-  "description": "content/modules/<id>/dialogues.json (ТЗ §3.6). У узла ровно одно из next / choices / end (проверяет валидатор).",
+  "description": "content/modules/<id>/dialogues.json (ТЗ §3.6). У узла ровно одно из next / choices / end (проверяет валидатор). who обязателен у узла с pl, choices или todo; узел line берёт говорящего из story/lines.json; чистый end — без who (I-11).",
   "type": "array",
   "items": {
     "title": "Dialogue",
@@ -21,12 +21,19 @@
         "additionalProperties": {
           "title": "DialogueNode",
           "type": "object",
-          "required": ["who"],
           "additionalProperties": false,
           "properties": {
             "who": { "$ref": "common.schema.json#/$defs/charId" },
             "pl": { "type": "string" },
             "ru": { "type": "string" },
+            "line": {
+              "$ref": "common.schema.json#/$defs/lineId",
+              "description": "Реплика из story/lines.json (говорящий — её who), вместо pl/ru"
+            },
+            "todo": {
+              "const": true,
+              "description": "Реплики ещё нет в СЮЖЕТ.md: в игре [todo: <dlg>.<узел>]"
+            },
             "next": { "type": "string" },
             "end": { "const": true },
             "lesson": { "$ref": "common.schema.json#/$defs/id" },

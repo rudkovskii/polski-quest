@@ -23,7 +23,7 @@ export type DlgId = string;
  */
 export type Effects = Effect[];
 /**
- * content/story/lines.json: реплики бобра, сюжета, кота (ТЗ §3.8). Текст переносится из ../СЮЖЕТ.md, не сочиняется. todo: true = реплики ещё нет (ru можно не указывать).
+ * content/story/lines.json: реплики бобра, сюжета, кота (ТЗ §3.8). Текст переносится из ../СЮЖЕТ.md, не сочиняется. todo: true = реплики ещё нет (ru можно не указывать). Без todo нужен ru или pl; plRu — перевод pl.
  */
 export type Lines = Line[];
 /**
@@ -77,7 +77,11 @@ export type Step =
  */
 export type Lessons = Lesson[];
 /**
- * content/modules/<id>/dialogues.json (ТЗ §3.6). У узла ровно одно из next / choices / end (проверяет валидатор).
+ * Реплика из story/lines.json (говорящий — её who), вместо pl/ru
+ */
+export type LineId1 = string;
+/**
+ * content/modules/<id>/dialogues.json (ТЗ §3.6). У узла ровно одно из next / choices / end (проверяет валидатор). who обязателен у узла с pl, choices или todo; узел line берёт говорящего из story/lines.json; чистый end — без who (I-11).
  */
 export type Dialogues = Dialogue[];
 export type MapObject = MapNpc | MapExit | MapTrigger | MapPlot | MapSign | MapBoard | MapWord | MapSecret;
@@ -395,6 +399,10 @@ export interface Line {
   who: CharId;
   ru?: string;
   pl?: string;
+  /**
+   * Перевод pl (скобки в СЮЖЕТ.md); ru — отдельная русская реплика
+   */
+  plRu?: string;
   todo?: boolean;
 }
 export interface Secret {
@@ -921,9 +929,14 @@ export interface Dialogue {
   };
 }
 export interface DialogueNode {
-  who: CharId;
+  who?: CharId;
   pl?: string;
   ru?: string;
+  line?: LineId1;
+  /**
+   * Реплики ещё нет в СЮЖЕТ.md: в игре [todo: <dlg>.<узел>]
+   */
+  todo?: true;
   next?: string;
   end?: true;
   lesson?: Id;
