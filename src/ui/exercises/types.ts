@@ -45,6 +45,8 @@ export interface ExerciseContent {
   errorTag?(id: string): { ru: string; hint?: string } | undefined;
   /** Минимальная пара (phonetics.pairs): без звука — «какое слово значит …» по переводу `ru` (P-06). */
   pair?(id: string): { a: string; b: string; ru?: string[] } | undefined;
+  /** Слово уже выучено (есть карточка): в задании на слух два знакомых слова похожей длины не ставятся рядом (P-11). */
+  known?(id: string): boolean;
 }
 
 export interface ExerciseCtx {

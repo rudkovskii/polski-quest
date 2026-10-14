@@ -252,6 +252,12 @@ export interface Condition {
   daysSinceLast?: number;
   stepDone?: 'water' | 'scene' | 'evening' | 'sleep';
   /**
+   * P-11: сколько растений на грядке ещё ждут полива («!»). «Wszystko podlane» — только при max 0.
+   */
+  dueLeft?: {
+    max: number;
+  };
+  /**
    * Номер игрового дня главы (P-06): день 1 длится до флага beat.first_day_done, дальше +1 за каждый засчитанный день. min/max включительно.
    */
   gameDay?: {
@@ -608,6 +614,10 @@ export interface Module {
   canDo?: {
     id: string;
     ru: string;
+    /**
+     * P-11: формулировка в режиме без звука («по чтению» вместо «на слух»).
+     */
+    ruMute?: string;
     when?: Condition1;
   }[];
   unlock: {
@@ -700,6 +710,12 @@ export interface Condition1 {
   hud?: HudElement;
   daysSinceLast?: number;
   stepDone?: 'water' | 'scene' | 'evening' | 'sleep';
+  /**
+   * P-11: сколько растений на грядке ещё ждут полива («!»). «Wszystko podlane» — только при max 0.
+   */
+  dueLeft?: {
+    max: number;
+  };
   /**
    * Номер игрового дня главы (P-06): день 1 длится до флага beat.first_day_done, дальше +1 за каждый засчитанный день. min/max включительно.
    */

@@ -196,7 +196,7 @@ describe('правило 1: день 1 по битам d01.* (P-05, СЮЖЕТ_v
 });
 
 describe('игровой день и расписание систем (P-06)', () => {
-  it('storyDay: день 1 до флага конца первого дня, дальше +1 за засчитанный день', () => {
+  it('storyDay: день 1 до флага конца первого дня, дальше +1 за день, закрытый сном (P-11)', () => {
     const w = new World();
     const d = (now: number): number => directorInput(w.p, content, now, { tz: TZ }).day;
     expect(d(at(0))).toBe(1);
@@ -205,7 +205,10 @@ describe('игровой день и расписание систем (P-06)', 
     expect(d(at(1))).toBe(2);
     expect(d(at(5))).toBe(2); // пропуск календарных дней не двигает день главы
     w.add(seg('water', at(5, 10.5)));
-    expect(d(at(6))).toBe(3);
+    // P-11: день не закрыт сном — следующий календарный день продолжает тот же игровой день.
+    expect(d(at(6))).toBe(2);
+    w.add(seg('sleep', at(6, 20)));
+    expect(d(at(7))).toBe(3);
     expect(storyDay({ days: {}, today: '2026-10-20' }, {})).toBe(1);
   });
   it('расписание из director.json: дни растут, система не повторяется, день 2 — обход с письмом, метро и диагностикой', () => {
@@ -284,6 +287,9 @@ describe('день 2 «Bramka słucha» (P-06): обход, письмо, мет
   });
   it('после обхода: «Wszystko podlane», письмо в ящике у калитки, потом турникет', () => {
     const w = afterDay1().flag('beat.d02.title').flagAt(at(0, 10.1), sysFlag('obchod')).add(seg('water', at(0, 10.2)));
+    // P-11: росток с «!» остался (ошибка в обходе) — «Wszystko podlane» не говорим, сразу письмо.
+    expect(w.step(at(0, 10.3))).toMatchObject({ kind: 'beat', beat: 'd02.letter' });
+    for (const t of ['rec', 'lis']) w.add({ k: 'rev', ts: at(0, 10.25), card: `lx.dzien_dobry#${t}`, g: 2, ms: 1000, src: 'obchod' } as EventDraft);
     expect(w.step(at(0, 10.3))).toMatchObject({ kind: 'beat', beat: 'd02.podlane', line: 'd02.kazik.obchod.3' });
     w.flag('beat.d02.podlane');
     expect(w.step(at(0, 10.3))).toMatchObject({ kind: 'beat', beat: 'd02.letter', system: 'letter', target: { location: 'ch01.dzialka', object: 'skrzynka' }, do: [{ startDialogue: 'dlg.ch01.list' }] });

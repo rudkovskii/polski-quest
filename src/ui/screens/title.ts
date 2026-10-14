@@ -16,6 +16,7 @@ const css = `
 export function mountTitle(root: HTMLElement): void {
   root.append(el('style', {}, css));
   bus.on('ui:title:show', ({ build }) => {
+    let off: (() => void) | null = null;
     const screen = el(
       'div',
       { class: 'pq-title' },
@@ -25,6 +26,8 @@ export function mountTitle(root: HTMLElement): void {
         {
           type: 'button',
           onclick: async () => {
+            off?.();
+            off = null;
             const unlocked = await unlockAudio();
             console.log(unlocked ? 'audio unlocked' : 'audio unlock failed');
             screen.remove();
@@ -37,5 +40,9 @@ export function mountTitle(root: HTMLElement): void {
       el('div', { class: 'build' }, `v${build}`),
     );
     root.append(screen);
+    // Mac (P-11): Enter, пробел и E на титуле — как тап по кнопке (intent `interact` из src/input).
+    off = bus.on('input:intent', (i) => {
+      if (i.type === 'interact' && screen.isConnected) screen.querySelector('button')?.click();
+    });
   });
 }

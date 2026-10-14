@@ -164,6 +164,10 @@ export interface BusEvents {
   'guide:step': { step: GuideStepView | null };
   /** HUD раскрыт (флаг hud.<element> только что поставлен): анимация появления и реплика. */
   'guide:reveal': { element: string; line?: string };
+  /** Короткая заметка пузырём (P-11: «Posadzone: dziękuję» после посадки): польский и перевод, `key` — один раз. */
+  'guide:note': { pl: string; ru: string; key: string };
+  /** Подпись растения под «A» (P-11): слово над ростком, экранная точка; null — убрать. */
+  'world:label': { text: string; at: { x: number; y: number } } | null;
   /** Тап по строке «Сейчас», цель шага в этой локации: сделать шаг (как тап по цели). */
   'guide:act': { key: string };
   /** «ещё 3 минуты повторений» из строки «Сейчас» (шаг done). */

@@ -134,9 +134,10 @@ function introTypeOf(step: Step): CardType | null {
   return null;
 }
 
-export function exerciseContent(c: Content): ExerciseContent {
+export function exerciseContent(c: Content, known?: (id: string) => boolean): ExerciseContent {
   let all: ReturnType<ExerciseContent['allVocab']> | null = null;
   return {
+    ...(known ? { known } : {}),
     vocab: (id) => c.vocab.get(id)?.value,
     allVocab: () => (all ??= [...c.vocab.values()].map((v) => v.value)),
     speaker: (id) => ({ id, name: c.characters.get(id)?.name ?? id }),
@@ -241,7 +242,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
     keyboardMode: getSetting(store.progress, 'keyboard.mode'),
     silent: getSetting(store.progress, 'sound.mode') === 'off',
   };
-  const exContent = exerciseContent(content);
+  const exContent = exerciseContent(content, (id) => Object.keys(derived.cards).some((c) => c.startsWith(`${id}#`)));
   // Реакция мира на ошибку (P-06): реплика NPC урока; без звука — её вариант `.mute`, если есть.
   const errLine = lineSpeech(content, lesson.errLine, settings.silent);
   // «Pip!» / «Hyk!» — звуки турникета; без звука (P-10b) отклик текстом: «Dobrze!» и правило с ответом.

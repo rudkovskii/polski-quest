@@ -18,6 +18,7 @@ export const TURN_MS = 90;
 export const DELTA: Record<Dir, Xy> = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 const OPPOSITE: Record<Dir, Dir> = { up: 'down', down: 'up', left: 'right', right: 'left' };
 const DIR_ORDER: readonly Dir[] = ['up', 'right', 'down', 'left'];
+const DIAG: readonly Xy[] = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
 
 export type ObjKind = MapObject['type'];
 
@@ -63,7 +64,13 @@ export interface StepEvent {
   from: Xy;
   to: Xy;
 }
-export type WorldEvent = InteractEvent | ExitEvent | BumpEvent | StepEvent;
+/** NPC-Казик уступил дорогу Диме (P-11): сцена переносит спрайт. */
+export interface YieldEvent {
+  type: 'yield';
+  key: string;
+  to: Xy;
+}
+export type WorldEvent = InteractEvent | ExitEvent | BumpEvent | StepEvent | YieldEvent;
 
 export interface Actor {
   tile: Xy;
@@ -183,8 +190,9 @@ export class LocationModel {
   private rebuildSolid(): void {
     const { w, h } = this.parsed;
     this.solidObj = Array.from({ length: h }, () => Array<boolean>(w).fill(false));
+    // NPC-Казик не стена (P-11): Дима идёт к цели сквозь его клетку, Казик уступает дорогу (`yieldBobr`).
     for (const o of this.objects)
-      if (o.solid && !this.hidden.has(o.key))
+      if (o.solid && o.key !== BOBR_KEY && !this.hidden.has(o.key))
         for (let y = o.at[1]; y < o.at[1] + o.size[1]; y++)
           for (let x = o.at[0]; x < o.at[0] + o.size[0]; x++) if (y < h && x < w) this.solidObj[y]![x] = true;
   }
@@ -220,7 +228,7 @@ export class LocationModel {
     const o = this.objects.find((x) => x.key === key);
     if (!o || (o.at[0] === at[0] && o.at[1] === at[1])) return false;
     // На клетку Димы (и куда он шагает) NPC не встаёт (P-10a: Казик на клетке игрока).
-    if (o.solid && this.isReserved(at)) return false;
+    if ((o.solid || o.key === BOBR_KEY) && this.isReserved(at)) return false;
     o.at = [at[0], at[1]];
     this.rebuildSolid();
     return true;
@@ -326,6 +334,26 @@ export class LocationModel {
     return !this.parsed.solid[y]![x] && !this.solidObj[y]![x];
   }
 
+  /**
+   * Проходимость для пути Димы к цели (P-11): выходы закрыты, кроме `allow` (сам выход — цель) и клетки, где Дима
+   * стоит. Иначе тап по ящику у калитки вёл через калитку в метро.
+   */
+  walkGrid(allow: Xy | null = null): Grid {
+    const exits = this.objects.filter((o) => o.kind === 'exit' && !this.hidden.has(o.key));
+    const here = this.player.step ? this.player.step.to : this.player.tile;
+    return {
+      w: this.parsed.w,
+      h: this.parsed.h,
+      passable: (x, y) =>
+        this.passable(x, y) && (!exits.some((e) => covers(e, [x, y])) || (!!allow && allow[0] === x && allow[1] === y) || (here[0] === x && here[1] === y)),
+    };
+  }
+
+  /** Клетка — видимый выход. */
+  isExit(c: Xy): boolean {
+    return this.objects.some((o) => o.kind === 'exit' && !this.hidden.has(o.key) && covers(o, c));
+  }
+
   object(key: string): WorldObject | undefined {
     return this.objects.find((o) => o.key === key) ?? (key === BOBR_KEY ? this.companionObject() : undefined);
   }
@@ -358,8 +386,18 @@ export class LocationModel {
 
   /** Что под пальцем: ключ объекта (`key` или `key@x,y` для многоклеточных) или null. */
   targetAt(tile: Xy): string | null {
-    const o = this.objects.find((ob) => covers(ob, tile) && this.cellActionable(ob, tile)) ?? this.companionAt(tile);
+    let o = this.objects.find((ob) => covers(ob, tile) && this.cellActionable(ob, tile)) ?? this.companionAt(tile);
     if (!o) return null;
+    // Палец попал в Казика прямо под подсвеченной целью (P-11, табличка BAZAR): цель важнее — Казик не цель.
+    const g = this.goal;
+    if (o.key === BOBR_KEY && g && g.key !== BOBR_KEY && !g.viaExit) {
+      const above: Xy = [tile[0], tile[1] - 1];
+      const go = this.objects.find((x) => x.key === g.key);
+      if (go && !this.hidden.has(go.key) && covers(go, above) && this.cellActionable(go, above)) {
+        o = go;
+        tile = above;
+      }
+    }
     return o.size[0] * o.size[1] > 1 ? `${o.key}@${tile[0]},${tile[1]}` : o.key;
   }
 
@@ -435,7 +473,7 @@ export class LocationModel {
         this.queuedDir = null;
         this.turnWait = 0;
         this.pending = null;
-        this.path = findPath(this.grid, this.from(), i.tile).path;
+        this.path = findPath(this.walkGrid(i.tile), this.from(), i.tile).path;
         return;
       case 'interact':
         if (i.target) this.interactTarget(i.target);
@@ -518,10 +556,36 @@ export class LocationModel {
     const d = dirBetween(from, to);
     const side: Dir[] = d === 'up' || d === 'down' ? ['left', 'right'] : ['up', 'down'];
     const options: Xy[] = [...side.map((s): Xy => [to[0] + DELTA[s][0], to[1] + DELTA[s][1]]), from];
-    const cell = options.find((x) => this.passable(x[0], x[1]) && !eq(x, to)) ?? from;
+    const cell = options.find((x) => this.passable(x[0], x[1]) && !eq(x, to) && !this.isExit(x) && !this.isApproach(x)) ?? options.find((x) => this.passable(x[0], x[1]) && !eq(x, to)) ?? from;
     c.facing = dirBetween(c.tile, cell);
     c.step = { from: c.tile, to: cell, t: 0 };
     this.companionPath = [];
+  }
+
+  /** Клетка подхода к цели режиссёра (соседняя с её контуром): Казик на ней не задерживается (P-11). */
+  private isApproach(c: Xy): boolean {
+    const g = this.goal;
+    if (!g || g.key === BOBR_KEY) return false;
+    const inG = (x: number, y: number): boolean => x >= g.at[0] && y >= g.at[1] && x < g.at[0] + g.size[0] && y < g.at[1] + g.size[1];
+    return !inG(c[0], c[1]) && DIR_ORDER.some((d) => inG(c[0] + DELTA[d][0], c[1] + DELTA[d][1]));
+  }
+
+  /**
+   * NPC-Казик стоит там, куда шагает Дима (P-11): отходит в сторону — не на клетку Димы, не на выход, не на путь
+   * и не на подход к цели; некуда — меняется с Димой местами. Спрайт переносит сцена (событие `yield`).
+   */
+  private yieldBobr(to: Xy, from: Xy): void {
+    const o = this.objects.find((x) => x.key === BOBR_KEY);
+    if (!o || this.hidden.has(o.key) || !eq(o.at, to)) return;
+    const onPath = (c: Xy): boolean => this.path.some((p) => eq(p, c));
+    const ok = (c: Xy, strict: boolean): boolean =>
+      this.passable(c[0], c[1]) && !eq(c, to) && !eq(c, from) && !this.isExit(c) && (!strict || (!onPath(c) && !this.isApproach(c)));
+    const d = dirBetween(from, to);
+    const side: Dir[] = d === 'up' || d === 'down' ? ['left', 'right'] : ['up', 'down'];
+    const options: Xy[] = [...side, d].map((s): Xy => [to[0] + DELTA[s][0], to[1] + DELTA[s][1]]);
+    const cell = options.find((c) => ok(c, true)) ?? options.find((c) => ok(c, false)) ?? from;
+    o.at = [cell[0], cell[1]];
+    this.out.push({ type: 'yield', key: o.key, to: [cell[0], cell[1]] });
   }
 
   private tryStep(dir: Dir): boolean {
@@ -542,6 +606,7 @@ export class LocationModel {
     this.player.facing = dirBetween(from, to);
     this.player.step = { from, to, t: 0 };
     this.out.push({ type: 'step', from, to });
+    this.yieldBobr(to, from);
     const c = this.companion;
     if (c && this.pointGoal && !c.step && eq(c.tile, to)) this.yieldCompanion(to, from);
     else if (c && !this.pointGoal && !eq(c.tile, from)) {
@@ -596,7 +661,8 @@ export class LocationModel {
         this.path = [];
         this.pending = null;
         if (p && o) {
-          const res = o.kind === 'plot' && p.tile ? pathToAdjacent(this.grid, this.player.tile, p.tile) : pathToAdjacent(this.grid, this.player.tile, o.at, o.size);
+          const walk = this.walkGrid();
+          const res = o.kind === 'plot' && p.tile ? pathToAdjacent(walk, this.player.tile, p.tile) : pathToAdjacent(walk, this.player.tile, o.at, o.size);
           if (res.exact && (res.path.length === 0 || this.passable(res.path[0]![0], res.path[0]![1]))) {
             this.path = res.path;
             this.pending = p;
@@ -697,6 +763,12 @@ export class LocationModel {
       if (ok(c)) return { key: o.key, tile: c };
     }
     if (o.kind !== 'exit' && o.kind !== 'plot' && ok([x, y])) return { key: o.key, tile: [x, y] };
+    // По диагонали (P-11, как в Stardew): A берёт подсвеченную цель и сама делает шаг к клетке подхода.
+    if (o.kind !== 'exit')
+      for (const [dx, dy] of DIAG) {
+        const c: Xy = [x + dx, y + dy];
+        if (ok(c)) return { key: o.key, tile: c };
+      }
     return null;
   }
 
@@ -709,6 +781,16 @@ export class LocationModel {
       // Подсвеченный выход рядом: A — шаг в него (выход срабатывает, когда Дима на клетке).
       if (eq(t.tile, this.player.tile)) return;
       this.path = [t.tile];
+      return;
+    }
+    if (!this.near(o) || (o.kind === 'plot' && !adjacent(t.tile, this.player.tile) && !eq(t.tile, this.player.tile))) {
+      // Цель по диагонали: шаг к клетке подхода, потом действие (как тап по цели).
+      const walk = this.walkGrid();
+      const res = o.kind === 'plot' ? pathToAdjacent(walk, this.player.tile, t.tile) : pathToAdjacent(walk, this.player.tile, o.at, o.size);
+      if (!res.exact) return;
+      this.path = res.path;
+      this.pending = { key: o.key, tile: o.kind === 'plot' ? t.tile : null };
+      if (!this.path.length) this.next();
       return;
     }
     this.faceTo(o, t.tile);
@@ -739,7 +821,8 @@ export class LocationModel {
       this.fire(o.key, tile, 'tap');
       return;
     }
-    const res = plotCell ? pathToAdjacent(this.grid, this.from(), plotCell) : pathToAdjacent(this.grid, this.from(), o.at, o.size);
+    const walk = this.walkGrid();
+    const res = plotCell ? pathToAdjacent(walk, this.from(), plotCell) : pathToAdjacent(walk, this.from(), o.at, o.size);
     this.path = res.path;
     this.pending = res.exact ? { key: o.key, tile } : null;
   }

@@ -25,6 +25,7 @@
         "properties": {
           "id": { "type": "string" },
           "ru": { "type": "string" },
+          "ruMute": { "type": "string", "description": "P-11: формулировка в режиме без звука («по чтению» вместо «на слух»)." },
           "when": {
             "$ref": "common.schema.json#/$defs/cond",
             "description": "P-10b: когда пункт «Умею» засчитан (сцены главы). Нет — когда сдан босс главы."

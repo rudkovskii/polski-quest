@@ -34,8 +34,9 @@ export interface DialogDeps {
   /** Пауза на реакцию NPC после неверного выбора, мс (тесты: 0). */
   reactMs?: number;
   coarse?: boolean;
-  /** Режим без звука (P-10b): реплики без ▶ и автозвука. */
-  silent?: boolean;
+  /** Режим без звука (P-10b): реплики без ▶ и автозвука. Функция — проверка на каждой реплике (P-11: выбор
+   * «Bez dźwięku» посреди диалога гасит ▶ уже на следующей реплике). */
+  silent?: boolean | (() => boolean);
   /** Игровой день главы (P-10b): до дня 7 у вариантов с проверкой русская подпись видна сразу. */
   day?: number;
   /** Условие `if` у варианта (ТЗ §3.9). Без вычислителя (до I-17) — всё истинно. */
@@ -170,7 +171,7 @@ function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
         words: deps.words ?? null,
         style: styleOf(deps, sp.who),
         ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
-        ...(deps.silent ? { silent: true } : {}),
+        ...((typeof deps.silent === 'function' ? deps.silent() : deps.silent) ? { silent: true } : {}),
         autoplay: true,
       });
       view = lv;

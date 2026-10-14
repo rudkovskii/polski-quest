@@ -80,7 +80,7 @@
     {
       "id": "d02.podlane",
       "slot": "afterWater",
-      "if": { "all": [{ "gameDay": { "min": 2, "max": 2 } }, { "stepDone": "water" }] },
+      "if": { "all": [{ "gameDay": { "min": 2, "max": 2 } }, { "stepDone": "water" }, { "dueLeft": { "max": 0 } }] },
       "target": { "location": "ch01.dzialka" },
       "line": "d02.kazik.obchod.3"
     },

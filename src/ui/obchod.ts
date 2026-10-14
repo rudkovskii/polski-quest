@@ -83,7 +83,6 @@ export function stageLabel(g: Pick<GardenItem, 'stage' | 'jar'>): string {
   return g.stage === 'jar' && g.jar ? `${STAGE_RU.jar} · ${JAR_PL[g.jar]}` : STAGE_RU[g.stage];
 }
 
-const ruDate = (ts: number): string => new Date(ts).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 const plural = (n: number, one: string, few: string, many: string): string => {
   const m10 = n % 10;
   const m100 = n % 100;
@@ -117,6 +116,8 @@ const css = `
 .pq-obchod .row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
 .pq-bobr { padding: 8px 10px; border-radius: 6px; background: #fff7ec; border: 2px solid #c8966b; font-size: 17px; }
 .pq-bobr .ru { font-size: 16px; color: #543c52; }
+.pq-obchod .say { font-size: 19px; font-weight: 700; display: flex; flex-direction: column; gap: 2px; }
+.pq-obchod .say .ru { font-size: 15px; font-weight: 400; color: #543c52; }
 .pq-bobr .todo { color: #8f3e56; font-family: ui-monospace, Menlo, monospace; }
 `;
 
@@ -152,21 +153,20 @@ const WIECZOR: PlLabel = { pl: 'Wieczór', ru: 'вечер, звуки у рек
 
 const stat = (label: string, value: string): HTMLElement => el('div', { class: 'stat' }, el('span', {}, label), el('b', {}, value));
 
-/** Тап по растению без полива: что это за слово и когда его поливать. */
-async function plantInfo(layer: Layer, content: Content, g: GardenItem | undefined, now: number): Promise<void> {
+/** Тап по растению без полива (P-11): слово и одна короткая строка — «Rośnie. Jutro podlej.», без цифр интервала. */
+async function plantInfo(layer: Layer, content: Content, g: GardenItem | undefined, now: number, todayStart: number): Promise<void> {
   if (!g) {
     await panel(layer, 'Пустая грядка', [el('div', { class: 'line2' }, 'Новые слова сажаются в сценах. Здесь вырастет следующее.')], [{ act: 'ok', label: 'OK', primary: true }], 'ok');
     return;
   }
   const v = content.vocab.get(g.item)?.value;
+  // Полить завтра (или уже пора): «Jutro podlej.»; позже — «Jeszcze nie pora.»
+  const tomorrow = g.nextDue < todayStart + 2 * 86_400_000 || g.nextDue <= now;
+  const l = content.lines.get(tomorrow ? 'sys.rosnie' : 'sys.rosnie.later') ?? (tomorrow ? { pl: 'Rośnie. Jutro podlej.', plRu: 'Растёт. Завтра полей.' } : { pl: 'Rośnie. Jeszcze nie pora.', plRu: 'Растёт. Поливать пока рано.' });
   const body = [
-    el('div', { class: 'word', lang: 'pl' }, v?.pl ?? g.item),
-    v?.ru ? el('div', { class: 'ru' }, v.ru) : null,
-    stat('Стадия', stageLabel(g)),
-    stat('Интервал', g.interval ? days(g.interval) : '—'),
-    stat('Полив', g.nextDue <= now ? 'завтра' : ruDate(g.nextDue)),
+    el('div', { class: 'say', 'data-line': tomorrow ? 'sys.rosnie' : 'sys.rosnie.later' }, el('span', { lang: 'pl' }, l?.pl ?? ''), l?.plRu ? el('span', { class: 'ru' }, l.plRu) : null),
   ];
-  await panel(layer, 'Полито', body, [{ act: 'ok', label: 'OK', primary: true }], 'ok');
+  await panel(layer, { pl: v?.pl ?? g.item, ru: v?.ru ?? '' }, body, [{ act: 'ok', label: 'OK', primary: true }], 'ok');
 }
 
 /**
@@ -214,7 +214,7 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
     if (o.fromItem && !express && !evening) {
       const g = gardenItems(d0, now0, t).find((x) => x.item === o.fromItem);
       if (!g?.dueCard) {
-        await plantInfo(layer, content, g, now0);
+        await plantInfo(layer, content, g, now0, d0.todayStart);
         return { answered: 0, correct: 0, empty: true, left: gardenItems(d0, now0, t).filter((x) => x.dueCard).length };
       }
     }

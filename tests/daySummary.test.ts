@@ -223,7 +223,10 @@ describe('обход и экспресс в оверлее', () => {
     const done = runObchod(d, { mode: 'day', fromItem: 'lx.kawa' });
     await flush(1);
     expect(panelText()).toContain('kawa');
-    expect(panelText()).toContain('росток');
+    // P-11: не «Полито… Интервал», а одна строка «Rośnie. Jutro podlej.»
+    expect(panelText()).toContain('Rośnie');
+    expect(panelText()).not.toContain('Интервал');
+    expect(panelText()).not.toContain('Полито');
     act(host, 'ok').click();
     expect(await done).toMatchObject({ answered: 0, empty: true });
     expect(events).toEqual([]);

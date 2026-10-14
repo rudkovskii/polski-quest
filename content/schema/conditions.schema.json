@@ -83,6 +83,13 @@
     "hud": { "$ref": "common.schema.json#/$defs/hud" },
     "daysSinceLast": { "type": "integer", "minimum": 0 },
     "stepDone": { "enum": ["water", "scene", "evening", "sleep"] },
+    "dueLeft": {
+      "type": "object",
+      "description": "P-11: сколько растений на грядке ещё ждут полива («!»). «Wszystko podlane» — только при max 0.",
+      "required": ["max"],
+      "additionalProperties": false,
+      "properties": { "max": { "type": "integer", "minimum": 0 } }
+    },
     "gameDay": {
       "type": "object",
       "description": "Номер игрового дня главы (P-06): день 1 длится до флага beat.first_day_done, дальше +1 за каждый засчитанный день. min/max включительно.",

@@ -75,8 +75,12 @@ export function openSoundMap(overlay: Overlay, content: Pick<Content, 'lines' | 
   layer.el.style.justifyContent = 'center';
   const line = (id: string): HTMLElement | null => sayLine(content, o.lineFor ? o.lineFor(id) : id);
   const allGreen = dots.every((d) => d.status === 'green');
+  // Слой урока и кнопка «Słucham!» диалога под картой не торчат (P-11): нижние слои спрятаны, пока карта открыта.
+  const below = [...(layer.el.parentElement?.querySelectorAll<HTMLElement>(':scope > .pq-layer') ?? [])].filter((n) => n !== layer.el && n.style.visibility !== 'hidden');
+  for (const n of below) n.style.visibility = 'hidden';
   return new Promise((resolve) => {
     const close = (): void => {
+      for (const n of below) n.style.visibility = '';
       layer.close();
       resolve();
     };

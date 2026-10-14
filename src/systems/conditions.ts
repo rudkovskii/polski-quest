@@ -7,6 +7,7 @@ import type { Content } from './content';
 import { variantSteps, type RepairVariant } from './clusters';
 import type { Derived } from './derive';
 import type { WorldState } from './progress';
+import { gardenItems } from './garden';
 import { storyDay } from './pace';
 import { cardId, parseCardId } from './srs';
 import { isoWeekday, type TimeOpts, type Ts } from './time';
@@ -36,6 +37,8 @@ export interface CondCtx {
   jarFrom?: number;
   /** Граница игрового дня для атома `gameDay` (tuning.dayStartHour, пояс устройства). */
   time?: TimeOpts;
+  /** Растений с «!» на грядке сейчас (атом `dueLeft`, P-11); нет — 0. */
+  dueCount?: () => number;
   /** Неизвестный атом (контент новее движка): по умолчанию молча false. */
   onUnknown?: (c: Condition) => void;
 }
@@ -52,6 +55,7 @@ export function condCtx(content: Pick<Content, 'modules' | 'vocab' | 'tuning'>, 
     itemModule: (item) => content.vocab.get(item)?.module,
     jarFrom: content.tuning.jars.thresholds[0] ?? DEFAULT_JAR_FROM,
     time: { dayStartHour: content.tuning.dayStartHour },
+    ...('todayStart' in derived ? { dueCount: () => gardenItems(derived as Pick<Derived, 'cards' | 'todayStart'>, now, content.tuning).filter((g) => g.dueCard).length } : {}),
   };
 }
 
@@ -124,6 +128,7 @@ export function evaluate(c: Condition, ctx: CondCtx): boolean {
     const n = storyDay(d, ctx.world.flags, ctx.time);
     return (c.gameDay.min === undefined || n >= c.gameDay.min) && (c.gameDay.max === undefined || n <= c.gameDay.max);
   }
+  if (c.dueLeft !== undefined) return (ctx.dueCount?.() ?? 0) <= c.dueLeft.max;
   if (c.stepDone !== undefined) {
     const segs = d.days[d.today]?.segs ?? [];
     return STEP_SEGS[c.stepDone].some((s) => segs.includes(s as never));

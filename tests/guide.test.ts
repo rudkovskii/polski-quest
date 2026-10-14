@@ -57,14 +57,14 @@ describe('путь, бобр-указатель, стрелка', () => {
     expect(p).toHaveLength(3);
     expect(p[0]).toEqual([9, 11]);
   });
-  it('бобр встаёт рядом с целью, но не туда, куда придёт Дима', () => {
+  it('бобр встаёт у цели по диагонали: не на клетку подхода (P-11) и не на путь Димы', () => {
     const m = new LocationModel(metro, [9, 12]);
     const g = resolveGuide(m, { location: 'ch01.metro', npc: 'brzechwa' })!;
     const cell = pointerCell(m.grid, g, [9, 12], [9, 11])!;
-    const dist = Math.abs(cell[0] - 8) + Math.abs(cell[1] - 8);
-    expect(dist).toBe(1);
-    expect(cell).not.toEqual([8, 9]); // сюда придёт Дима (ближайшая к нему соседняя клетка)
-    expect(faceTowards(cell, g.at, g.size)).toBe(cell[0] > 8 ? 'left' : cell[0] < 8 ? 'right' : cell[1] > 8 ? 'up' : 'down');
+    expect(Math.max(Math.abs(cell[0] - 8), Math.abs(cell[1] - 8))).toBe(1); // рядом по диагонали
+    expect(Math.abs(cell[0] - 8) + Math.abs(cell[1] - 8)).toBe(2); // не соседняя по стороне
+    expect(cell).not.toEqual([9, 11]); // путь Димы снизу
+    expect(['left', 'right', 'up', 'down']).toContain(faceTowards(cell, g.at, g.size));
   });
   it('стрелка у края: цель в кадре — нет, за кадром — точка на краю в её сторону', () => {
     const view = { x: 0, y: 0, width: 100, height: 100 };

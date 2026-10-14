@@ -4,7 +4,7 @@
 import { appearanceOf, hasAppearance, type Appearance } from '../systems/avatar';
 import type { Content } from '../systems/content';
 import type { Derived } from '../systems/derive';
-import type { Progress } from '../systems/progress';
+import { getSetting, type Progress } from '../systems/progress';
 import type { Condition } from '../types/content';
 import { el } from './dom';
 import type { Overlay } from './overlay/host';
@@ -93,13 +93,15 @@ export function passportModel(
       return { id, title: it?.title.pl ?? id, titleRu: it?.title.ru ?? '' };
     });
   // can-do главы (§5.10, P-10b): пункт засчитан по своим сценам (`when` в module.json), без `when` — когда сдан босс.
+  const silent = getSetting(p, 'sound.mode') === 'off';
   const canDo = [...content.modules.values()]
     .map((b) => b.module)
     .filter((m) => m.kind === 'chapter' && m.canDo?.length)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .flatMap((m) => {
       const boss = m.boss ? d.bossResults[m.boss]?.passedAt !== undefined : false;
-      return (m.canDo ?? []).map((x) => ({ id: x.id, ru: x.ru, done: x.when ? cond(x.when) : boss }));
+      // Без звука (P-11): цели «на слух» звучат «по чтению».
+      return (m.canDo ?? []).map((x) => ({ id: x.id, ru: silent && x.ruMute ? x.ruMute : x.ru, done: x.when ? cond(x.when) : boss }));
     });
   const appearance = appearanceOf(p);
   const sounds = d.clusterStatus ? soundMapModel(content, { clusterStatus: d.clusterStatus }) : null;

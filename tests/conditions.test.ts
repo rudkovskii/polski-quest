@@ -191,10 +191,10 @@ describe('из журнала: derive → condCtx на реальном конт
 
 describe('варианты уроков (§3.5, §4.3): requires / skipIf / short', () => {
   const content = getContent();
-  /** Игровой день `n` (P-06): первый день закрыт 20 дней назад, после него n − 2 засчитанных дня. */
+  /** Игровой день `n` (P-06): первый день закрыт 20 дней назад, после него n − 2 засчитанных дня (закрытых сном, P-11). */
   const onDay = (n: number, d: Partial<Derived> = {}): CondCtx => {
     const days: Derived['days'] = {};
-    for (let k = 0; k < n - 2; k++) days[`2026-09-${String(26 + k).padStart(2, '0')}`] = { segs: ['water'], revs: 1, lessons: 0 };
+    for (let k = 0; k < n - 2; k++) days[`2026-09-${String(26 + k).padStart(2, '0')}`] = { segs: ['water', 'sleep'], revs: 1, lessons: 0 };
     return ctx({ days, lessonsDone: new Set(['ch01.s00']), ...d }, { flags: { 'beat.first_day_done': Date.UTC(2026, 8, 24, 12) } }, { time: { tz: TZ } });
   };
   const withStatus = (s: Record<string, ClusterStatus>): CondCtx => onDay(14, { clusterStatus: s });

@@ -8,7 +8,8 @@ import { condCtx, evaluator, lessonOfVariant, lessonVariant } from '../systems/c
 import { derive, deriveContent } from '../systems/derive';
 import type { LogEvent } from '../systems/log';
 import { lessonForToday, muteLines, paceCtxOf, stepGateOf } from '../systems/pace';
-import { getSetting, giveItem, markChallenge, setFlag, type Progress } from '../systems/progress';
+import { getSetting, giveItem, markChallenge, setFlag, setSetting, type Progress } from '../systems/progress';
+import { SOUND_FLAGS } from '../systems/director';
 import { newContentLock } from '../systems/queue';
 import { cardId } from '../systems/srs';
 import { buildWordIndex, isFamiliar, tokenize, type WordIndex } from '../systems/words';
@@ -219,7 +220,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
       seed: w.day,
       day: w.gameDay,
       translations: getSetting(store.progress, 'translations'),
-      ...(getSetting(store.progress, 'sound.mode') === 'off' ? { silent: true } : {}),
+      silent: () => getSetting(store.progress, 'sound.mode') === 'off',
       ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
       ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
       cond: cond(store),
@@ -232,6 +233,11 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
   async function effect(store: PlayStore, e: Effect): Promise<void> {
     const now = deps.clock?.now() ?? Date.now();
     if (e.setFlag) applyProgress(store, (p) => setFlag(p, e.setFlag!, now), 'world');
+    // Выбор звука на перроне (P-11): настройка сразу, а не после диалога — следующая реплика уже без ▶.
+    if (e.setFlag === SOUND_FLAGS.mute || e.setFlag === SOUND_FLAGS.on) {
+      const mode = e.setFlag === SOUND_FLAGS.mute ? 'off' : 'on';
+      if (getSetting(store.progress, 'sound.mode') !== mode && store.setProgress?.(setSetting(store.progress, 'sound.mode', mode, now))) bus.emit('progress:changed', { kinds: ['settings'] });
+    }
     if (e.give) applyProgress(store, (p) => giveItem(p, e.give!, now), 'world');
     if (e.challenge) applyProgress(store, (p) => markChallenge(p, e.challenge!, now), 'world');
     if (e.startDialogue) await dialogById(store, e.startDialogue);

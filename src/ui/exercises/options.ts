@@ -103,9 +103,13 @@ export function autoOptions(step: StepListen, stepId: string, content: ExerciseC
   const item = step.item ? content?.vocab(step.item) : undefined;
   const all = content?.allVocab() ?? [];
   const norm = (s: string): string => s.trim().toLowerCase();
+  // P-11: на слух два знакомых слова похожей длины (proszę / dziękuję) — лотерея, когда звук не слышен. Знакомый
+  // дистрактор берём, только если он заметно короче или длиннее верного ответа (больше чем на 2 буквы).
+  const correctKnown = !!item && !!content?.known?.(item.id);
+  const confusable = (v: VocabEntry): boolean => correctKnown && !!content?.known?.(v.id) && Math.abs(v.pl.length - correct.length) <= 2;
   const pool = (pred: (v: VocabEntry) => boolean): string[] =>
     shuffled(
-      all.filter((v) => pred(v) && norm(v.pl) !== norm(correct)).map((v) => v.pl),
+      all.filter((v) => pred(v) && norm(v.pl) !== norm(correct) && !confusable(v)).map((v) => v.pl),
       `${stepId}:${tag}`,
     );
   const picked: string[] = [];

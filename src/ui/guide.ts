@@ -101,6 +101,9 @@ const css = `
 .pq-bubble { position: absolute; top: calc(56px + env(safe-area-inset-top)); left: calc(8px + env(safe-area-inset-left)); max-width: min(440px, calc(100% - 150px));
   display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; z-index: 4; cursor: pointer; animation: pq-bubble-in .25s ease-out; }
 .pq-bubble[hidden] { display: none; }
+.pq-plantlabel { position: fixed; left: 0; top: 0; z-index: 3; pointer-events: none; padding: 1px 6px; border-radius: 6px; background: rgba(244,244,244,.92);
+  color: #141b1b; border: 2px solid #141b1b; font: 700 13px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
+.pq-plantlabel[hidden] { display: none; }
 .pq-bubble .txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .pq-bubble .pl { font-size: 18px; font-weight: 700; }
 .pq-bubble .plru { font-size: 15px; color: #543c52; }
@@ -169,7 +172,7 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
   let location = '';
   let controls: 'walk' | 'tap' = 'tap';
   const shownLines = new Set<string>();
-  const queue: { id: string; key: string }[] = [];
+  const queue: { id: string; key: string; note?: { pl: string; ru: string } }[] = [];
 
   // ── Бездействие: строка «Сейчас» (10 с, когда спрятана) и подсказка управления (3 с).
   let nowIdle = false;
@@ -237,7 +240,8 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
     if (!bubble.hidden || !inWorld || !worldOn) return;
     const q = queue.shift();
     if (!q) return;
-    showLine(q.id);
+    if (q.note) showNote(q.note);
+    else showLine(q.id);
     bubble.dataset.key = q.key;
   }
 
@@ -306,6 +310,22 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
     shownAt = Date.now();
     paintPage();
   }
+
+  /** Заметка Казика без id реплики (P-11: «Posadzone: dziękuję»): польская строка с подписью. */
+  function showNote(n: { pl: string; ru: string }): void {
+    who = 'bobr';
+    pages = bubblePages({ pl: n.pl, ru: n.ru });
+    page = 0;
+    bubble.dataset.line = 'note';
+    bubble.dataset.who = who;
+    bubble.hidden = false;
+    shownAt = Date.now();
+    paintPage();
+  }
+
+  // ── Подпись растения под «A» (P-11): слово над ростком, DOM (польский текст в canvas не рисуем).
+  const label = el('div', { class: 'pq-plantlabel', hidden: true, lang: 'pl', 'data-plant-label': '' });
+  root.append(label);
 
   function say(id: string, key: string): void {
     if (!deps.dev && (content.lines.get(id)?.todo ?? !content.lines.has(id))) return;
@@ -416,6 +436,28 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
       armHint();
       nextBubble();
     }),
+    // Окно ссылки (P-11): пузырь Казика не ложится поверх «Скопировать».
+    bus.on('ui:link:show', () => {
+      if (!bubble.hidden) {
+        bubble.hidden = true;
+        if (bubbleTimer) clearTimeout(bubbleTimer);
+        bubbleTimer = null;
+      }
+      queue.length = 0;
+    }),
+    bus.on('guide:note', ({ pl, ru, key }) => {
+      const k = `note#${key}`;
+      if (shownLines.has(k)) return;
+      shownLines.add(k);
+      queue.push({ id: 'note', key: `reveal.${key}`, note: { pl, ru } });
+      nextBubble();
+    }),
+    bus.on('world:label', (v) => {
+      label.hidden = !v || !worldOn;
+      if (!v) return;
+      label.textContent = v.text;
+      label.style.transform = `translate(calc(${Math.round(v.at.x)}px - 50%), ${Math.round(v.at.y) - 54}px)`;
+    }),
     bus.on('world:anchor', ({ id, at }) => {
       if (id !== 'bobr') return;
       const was = inWorldBubble();
@@ -426,6 +468,7 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
     }),
     bus.on('world:input', ({ enabled }) => {
       worldOn = enabled;
+      if (!enabled) label.hidden = true;
       nowIdle = false;
       paintBar();
       armNowIdle();
@@ -452,8 +495,11 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
       }
       armNowIdle();
       if (i.to !== 'world') return;
-      const acts = (i.type === 'move' && i.held) || i.type === 'goto' || i.type === 'interact';
+      // Снимает подсказку только ходьба (P-11): E у фотобудки ещё не значит, что игрок знает, как ходить, — после
+      // окна подсказка дождётся бездействия на той же карте.
+      const acts = (i.type === 'move' && i.held) || i.type === 'goto';
       if (acts && (hintArmed || hint)) disarmHint();
+      else if (i.type === 'interact' && hintArmed) restartHintIdle();
       // Дима пошёл: пузырь Казика в мире гаснет (не раньше, чем его начали читать).
       if ((i.type === 'move' && i.held) || i.type === 'goto') {
         if (!bubble.hidden && inWorldBubble() && Date.now() - shownAt >= bubbleMinMs) hideBubble();
@@ -469,6 +515,7 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
       for (const off of offs) off();
       now.remove();
       bubble.remove();
+      label.remove();
       hideHint();
       for (const t of [bubbleTimer, nowTimer, hintIdleTimer]) if (t) clearTimeout(t);
     },

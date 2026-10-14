@@ -6,7 +6,7 @@ import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap } from '../types/content';
 import type { BusEvents, GuideTarget, PlotCellView, PlotView } from '../types/bus';
 import { cellAt } from '../world/dzialka';
-import { besideCell, edgeArrow, faceTowards, guidePath, pointerCell, resolveGuide, type ResolvedGuide } from '../world/guide';
+import { bobrSpot, besideCell, edgeArrow, faceTowards, guidePath, pointerCell, resolveGuide, type ResolvedGuide } from '../world/guide';
 import { tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
 import { playerTextureKey } from '../world/avatar';
 import { pickZoom } from '../world/camera';
@@ -17,6 +17,8 @@ import { BOBR_KEY, DELTA, LocationModel, type Actor, type WorldEvent } from '../
 // intents через bus (`input:intent`, to = world); тап по карте разбирает PointerSource через tileAt().
 
 const T = 16;
+/** Шаг Казика в сторону, мс (как шаг Димы). */
+const STEP_MS_SCENE = 220;
 const ATLAS = 'custom';
 const TILESET = 'ninja16';
 
@@ -101,6 +103,8 @@ export class Location extends Phaser.Scene {
   private inputOn = true;
   /** Последняя отправленная экранная точка Казика (`world:anchor`). */
   private anchorKey = '';
+  /** Последняя подпись растения (`world:label`). */
+  private labelKey = '';
   /** Цель шага — бобр-компаньон: контур и стрелка идут за ним каждый кадр (P-10a). */
   private guideLive = false;
   /** Запас сверху и снизу под HUD и d-pad, CSS-пиксели (layout). */
@@ -129,6 +133,7 @@ export class Location extends Phaser.Scene {
     this.aKey = '';
     this.aHiddenMark = null;
     this.anchorKey = '';
+    this.labelKey = '';
     this.guideLive = false;
   }
 
@@ -194,6 +199,7 @@ export class Location extends Phaser.Scene {
       this.events.off(Phaser.Scenes.Events.RENDER, this.emitAnchor, this);
       this.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
       bus.emit('world:anchor', { id: 'bobr', at: null });
+      bus.emit('world:label', null);
     });
     this.cameras.main.fadeIn(150, 26, 28, 44);
     bus.emit('world:location', { id: this.mapDef.id, controls: this.mapDef.controls });
@@ -350,9 +356,33 @@ export class Location extends Phaser.Scene {
       };
     }
     const key = at ? `${at.x},${at.y}` : '-';
+    this.emitPlantLabel();
     if (key === this.anchorKey) return;
     this.anchorKey = key;
     bus.emit('world:anchor', { id: 'bobr', at });
+  }
+
+  /** Подпись растения под «A» (P-11): какое слово растёт на клетке, с которой сработает A. Текст рисует DOM. */
+  private emitPlantLabel(): void {
+    const t = this.inputOn ? this.model.actionHint() : null;
+    const cell = t ? this.plants.get(`${t.tile[0]},${t.tile[1]}`)?.cell : undefined;
+    const text = cell?.item ? getContent().vocab.get(cell.item)?.value.pl : undefined;
+    let v: { text: string; at: { x: number; y: number } } | null = null;
+    if (t && text) {
+      const cam = this.cameras.main;
+      const r = this.game.canvas.getBoundingClientRect();
+      v = {
+        text,
+        at: {
+          x: Math.round(((t.tile[0] + 0.5) * T - cam.worldView.x) * cam.zoom + cam.x + r.left),
+          y: Math.round((t.tile[1] * T - cam.worldView.y) * cam.zoom + cam.y + r.top),
+        },
+      };
+    }
+    const key = v ? `${v.text}@${v.at.x},${v.at.y}` : '-';
+    if (key === this.labelKey) return;
+    this.labelKey = key;
+    bus.emit('world:label', v);
   }
 
   // ───────────── цель режиссёра (I-13) ─────────────
@@ -387,7 +417,8 @@ export class Location extends Phaser.Scene {
     if (m.companion) {
       const c = m.companion;
       if (g && !targetsBobr) {
-        const cell = pointerCell({ w: m.parsed.w, h: m.parsed.h, passable: free }, g, m.player.tile, c.tile);
+        // P-11: не на подход к цели, не на путь Димы и не перед его лицом; места нет — просто идёт следом.
+        const cell = pointerCell({ w: m.parsed.w, h: m.parsed.h, passable: free }, g, m.player.tile, c.tile, { walk: m.walkGrid(g.viaExit ? g.at : null), facing: m.player.facing });
         m.pointTo(cell, cell ? faceTowards(cell, g.at, g.size) : null);
       } else if (targetsBobr && Math.abs(c.tile[0] - m.player.tile[0]) + Math.abs(c.tile[1] - m.player.tile[1]) > 1) {
         // Цель — Казик, а он отстал (стоял у прошлой цели): сам подходит к Диме сбоку.
@@ -405,9 +436,11 @@ export class Location extends Phaser.Scene {
       if (targetsBobr) {
         cell = besideCell(grid, m.player.tile, m.player.facing, reserved, now) ?? now;
         face = faceTowards(cell, m.player.tile, [1, 1]);
-      } else if (g && !g.viaExit && g.key !== BOBR_KEY) {
-        cell = pointerCell(grid, g, m.player.tile, now) ?? this.bobrHome;
-        face = faceTowards(cell, g.at, g.size);
+      } else if (g && g.key !== BOBR_KEY) {
+        // P-11: указывает на цель, но никогда не с клетки подхода и не с пути Димы (блокер дня 2 у ящика).
+        const spot = bobrSpot(grid, g, { player: m.player.tile, facing: m.player.facing, bobr: now, home: this.bobrHome, walk: m.walkGrid(g.viaExit ? g.at : null) });
+        cell = spot.cell;
+        face = spot.face;
       }
       if (!m.moveObject(BOBR_KEY, cell)) cell = m.object(BOBR_KEY)!.at;
       const sid = this.spriteFor(getContent().characters.get('bobr')?.sprite, 'bobr');
@@ -452,7 +485,7 @@ export class Location extends Phaser.Scene {
     gr.lineStyle(1, pulse % 2 ? 0xffffff : 0x73eff7, 1).strokeRect(x0, y0, w, h);
     // Путь пунктиром на 3 клетки (walk-локации, §4.12).
     if (this.model.controls === 'walk' && !this.model.moving) {
-      for (const [cx, cy] of guidePath(this.model.grid, this.model.player.tile, g, 3)) {
+      for (const [cx, cy] of guidePath(this.model.walkGrid(g.viaExit ? g.at : null), this.model.player.tile, g, 3)) {
         gr.fillStyle(0x141b1b, 1).fillRect(cx * T + T / 2 - 2, cy * T + T / 2 - 2, 4, 4);
         gr.fillStyle(0x73eff7, 1).fillRect(cx * T + T / 2 - 1, cy * T + T / 2 - 1, 2, 2);
       }
@@ -752,6 +785,15 @@ export class Location extends Phaser.Scene {
         break;
       case 'step':
         break;
+      case 'yield': {
+        // NPC-Казик уступил дорогу (P-11): спрайт отходит на новую клетку.
+        const s = this.npcs.get(ev.key);
+        if (!s) break;
+        const x = ev.to[0] * T + T / 2;
+        const y = ev.to[1] * T + T;
+        this.tweens.add({ targets: s, x, y, duration: STEP_MS_SCENE, ease: 'Sine.easeInOut', onUpdate: () => s.setDepth(10 + s.y) });
+        break;
+      }
     }
   }
 

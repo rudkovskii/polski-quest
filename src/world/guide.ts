@@ -30,6 +30,9 @@ export interface ResolvedGuide {
 
 type ModelLike = Pick<LocationModel, 'objects' | 'map'>;
 
+const DELTA4 = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] } as const;
+type Dir4 = keyof typeof DELTA4;
+
 function rectOf(o: WorldObject): Pick<ResolvedGuide, 'at' | 'size'> {
   return { at: [o.at[0], o.at[1]], size: [o.size[0], o.size[1]] };
 }
@@ -65,27 +68,62 @@ export function resolveGuide(m: ModelLike, t: GuideTarget | null, plots: readonl
 
 /** Первые `n` клеток пути от Димы к клетке рядом с целью (на выход — на саму клетку выхода). */
 export function guidePath(grid: Grid, from: Xy, g: ResolvedGuide, n = 3): Xy[] {
-  const res = g.viaExit ? findPath(grid, from, g.at) : pathToAdjacent(grid, from, g.at, g.size);
-  return res.path.slice(0, n);
+  return playerRoute(grid, from, g).slice(0, n);
 }
 
 const manhattan = (a: Xy, b: Xy): number => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
-/**
- * Клетка бобра-указателя: проходимая соседняя с целью; та, куда встанет Дима (конец его пути), —
- * только если другой нет. Из подходящих — ближайшая к бобру. На выход бобр встаёт рядом с ним.
- */
-export function pointerCell(grid: Grid, g: ResolvedGuide, player: Xy, companion: Xy): Xy | null {
-  const cells = around(g.at, g.size).filter(([x, y]) => grid.passable(x, y));
-  if (!cells.length) return null;
-  const approach = g.viaExit ? null : pathToAdjacent(grid, player, g.at, g.size).end;
-  const free = cells.filter((c) => !(approach && c[0] === approach[0] && c[1] === approach[1]) && !(c[0] === player[0] && c[1] === player[1]));
-  const pool = free.length ? free : cells;
-  return [...pool].sort((a, b) => manhattan(a, companion) - manhattan(b, companion) || a[1] - b[1] || a[0] - b[0])[0]!;
+/** Клетки подхода к цели: соседние с прямоугольником цели (4-соседство). С них Дима берёт цель кнопкой A. */
+export function approachCells(g: Pick<ResolvedGuide, 'at' | 'size'>): Xy[] {
+  return around(g.at, g.size);
 }
 
-const DELTA4 = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] } as const;
-type Dir4 = keyof typeof DELTA4;
+/** Путь Димы к цели (P-11): к клетке подхода; к выходу — на сам выход. `walk` — проходимость для Димы (без чужих выходов). */
+export function playerRoute(walk: Grid, player: Xy, g: ResolvedGuide): Xy[] {
+  return (g.viaExit ? findPath(walk, player, g.at) : pathToAdjacent(walk, player, g.at, g.size)).path;
+}
+
+export interface PointerOptions {
+  /** Проходимость для Димы (P-11: выходы закрыты для путей к другой цели). Нет — та же сетка. */
+  walk?: Grid;
+  /** Куда смотрит Дима: клетка перед лицом не занимается. */
+  facing?: Dir4;
+}
+
+/**
+ * Клетка бобра-указателя у цели (P-11, блокер дня 2: Казик стоял на единственном подходе к ящику).
+ * Бобр никогда не встаёт:
+ *   • на клетку подхода к цели (ни на одну: подход всегда свободен);
+ *   • на путь Димы к цели, на клетку Димы и на клетку перед его лицом;
+ *   • на непроходимые для бобра клетки `grid` (склейка убирает оттуда выходы и занятые Димой клетки).
+ * Из остальных — ближе к цели (по диагонали, потом через клетку), потом ближе к самому бобру. Нет такой — null.
+ */
+export function pointerCell(grid: Grid, g: ResolvedGuide, player: Xy, companion: Xy, o: PointerOptions = {}): Xy | null {
+  const key = (c: Xy): string => `${c[0]},${c[1]}`;
+  const banned = new Set(approachCells(g).map(key));
+  for (const c of playerRoute(o.walk ?? grid, player, g)) banned.add(key(c));
+  banned.add(key(player));
+  if (o.facing) banned.add(key([player[0] + DELTA4[o.facing][0], player[1] + DELTA4[o.facing][1]]));
+  const [x0, y0] = g.at;
+  const [w, h] = g.size;
+  const inRect = (x: number, y: number): boolean => x >= x0 && y >= y0 && x < x0 + w && y < y0 + h;
+  // Расстояние до прямоугольника цели по Чебышёву: диагональ = 1, «через клетку» = 2.
+  const cheb = (x: number, y: number): number => Math.max(Math.max(x0 - x, 0, x - (x0 + w - 1)), Math.max(y0 - y, 0, y - (y0 + h - 1)));
+  let best: Xy | null = null;
+  let bestScore = Infinity;
+  for (let r = 1; r <= 4 && !best; r++)
+    for (let y = y0 - r; y < y0 + h + r; y++)
+      for (let x = x0 - r; x < x0 + w + r; x++) {
+        if (x < 0 || y < 0 || x >= grid.w || y >= grid.h || inRect(x, y) || cheb(x, y) !== r || !grid.passable(x, y) || banned.has(key([x, y]))) continue;
+        const score = manhattan([x, y], companion) * 1000 + y * 50 + x;
+        if (score < bestScore) {
+          bestScore = score;
+          best = [x, y];
+        }
+      }
+  return best;
+}
+
 const BACK: Record<Dir4, Dir4> = { up: 'down', down: 'up', left: 'right', right: 'left' };
 const SIDES: Record<Dir4, [Dir4, Dir4]> = { up: ['left', 'right'], down: ['right', 'left'], left: ['up', 'down'], right: ['down', 'up'] };
 
@@ -108,6 +146,49 @@ export function besideCell(grid: Grid, player: Xy, facing: Dir4, reserved: reado
     if (free(c) || same(c, current)) return c;
   }
   return null;
+}
+
+export interface BobrSpotInput {
+  player: Xy;
+  facing: Dir4;
+  /** Где Казик-NPC стоит сейчас. */
+  bobr: Xy;
+  /** Его место на карте, когда цели нет. */
+  home: Xy;
+  walk?: Grid;
+}
+
+/**
+ * Куда сесть NPC-Казику при цели шага (P-11). Клетка у цели по `pointerCell`; к выходу — остаётся дома, если дом не
+ * мешает. Нет места — дом или текущая клетка, но только если они не на подходе к цели и не на пути Димы; иначе
+ * ближайшая свободная клетка дальше. Подход к цели Казик не занимает никогда.
+ */
+export function bobrSpot(grid: Grid, g: ResolvedGuide, i: BobrSpotInput): { cell: Xy; face: Dir4 } {
+  const key = (c: Xy): string => `${c[0]},${c[1]}`;
+  const banned = new Set(approachCells(g).map(key));
+  for (const c of playerRoute(i.walk ?? grid, i.player, g)) banned.add(key(c));
+  banned.add(key(i.player));
+  banned.add(key([i.player[0] + DELTA4[i.facing][0], i.player[1] + DELTA4[i.facing][1]]));
+  const okCell = (c: Xy): boolean => grid.passable(c[0], c[1]) && !banned.has(key(c));
+  const toward = (c: Xy): Dir4 => faceTowards(c, g.at, g.size);
+  if (g.viaExit && okCell(i.home)) return { cell: i.home, face: 'left' };
+  const near = pointerCell(grid, g, i.player, i.bobr, { ...(i.walk ? { walk: i.walk } : {}), facing: i.facing });
+  if (near) return { cell: near, face: toward(near) };
+  if (okCell(i.home)) return { cell: i.home, face: 'left' };
+  if (okCell(i.bobr)) return { cell: i.bobr, face: toward(i.bobr) };
+  // Отойти от Димы подальше: ближайшая свободная клетка вне подхода и пути.
+  let best: Xy | null = null;
+  let bestD = Infinity;
+  for (let y = 0; y < grid.h; y++)
+    for (let x = 0; x < grid.w; x++) {
+      if (!okCell([x, y])) continue;
+      const d = manhattan([x, y], i.bobr);
+      if (d < bestD) {
+        bestD = d;
+        best = [x, y];
+      }
+    }
+  return best ? { cell: best, face: toward(best) } : { cell: i.home, face: 'left' };
 }
 
 /** Куда смотреть с клетки `from` на прямоугольник цели. */

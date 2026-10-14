@@ -42,7 +42,10 @@ export function mountStart(root: HTMLElement): void {
       'aria-label': 'Ссылка',
     });
     const connectBtn = el('button', { type: 'submit' }, 'Подключить');
-    const close = (): void => screen.remove();
+    const close = (): void => {
+      offKeys();
+      screen.remove();
+    };
     const startNew = (): void => {
       close();
       create();
@@ -92,5 +95,9 @@ export function mountStart(root: HTMLElement): void {
       form,
     );
     root.append(screen);
+    // Mac (P-11): Enter / пробел / E — «Начать» (пока поле ссылки не открыто: в поле клавиатура принадлежит ему).
+    const offKeys = bus.on('input:intent', (i) => {
+      if (i.type === 'interact' && screen.isConnected && !form.classList.contains('open')) startNew();
+    });
   });
 }

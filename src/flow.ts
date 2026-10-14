@@ -46,6 +46,11 @@ import { STAMP_FIRST } from './ui/passport';
 import type { Play } from './ui/play';
 import { gardenItems, plantOnCell, seedFlag } from './world/dzialka';
 
+/** Реплика посадки (P-11): «Posadzone:» + слово. */
+export const PLANTED_LINE = 'sys.posadzone';
+/** Постель днём, когда ещё ничего не сыграно (P-11). */
+export const BED_EARLY = 'sys.kazik.sleep.early';
+
 /** Сколько первых игровых дней строка «Сейчас» спрятана: ведёт Казик (ПОЛИРОВКА §2 р. 11). */
 export const NOW_HIDDEN_DAYS = 3;
 
@@ -62,6 +67,8 @@ export const isAutoBeat = (s: DirectorStep): boolean => s.kind === 'intro' && !s
 
 /** Флаг «Я сохранил ссылку» (тот же, что LINK_SAVED_FLAG в cloud.ts). */
 const LINK_SAVED = 'link.saved';
+/** Экран ссылки уже показан сам (после дня 1). */
+export const LINK_OFFERED = 'link.offered';
 
 export interface FlowStore extends DayStore {
   setProgress(p: Progress): boolean;
@@ -243,6 +250,12 @@ export function startFlow(o: FlowOptions): Flow {
           continue;
         }
       }
+      // Урок ещё открыт (P-11): его позиция в `local.resume` — не «прерванный урок». Реплику «Ушёл посреди фразы»
+      // не публикуем, пересчёт — когда окно закроется.
+      if (next.kind === 'resume' && (play.busy || day.ui.busy)) {
+        setTimeout(schedule, 400);
+        return;
+      }
       const hide = gameDayNo(input.derived) <= NOW_HIDDEN_DAYS;
       const changed = !step || stepKey(step) !== stepKey(next) || step.reason !== next.reason || hide !== nowHidden;
       nowHidden = hide;
@@ -266,7 +279,8 @@ export function startFlow(o: FlowOptions): Flow {
     const t = step.target;
     // Бит «поговори: Kazik» без цели-объекта (P-10a): подсвечен сам Казик — он подходит, A и тап говорят с ним.
     const npc = t.npc ?? (talksToKazik(step) ? 'bobr' : undefined);
-    bus.emit('guide:target', { target: t.screen || !isMap(t.location) ? null : { location: t.location, ...(npc ? { npc } : {}), ...(t.object ? { object: t.object } : {}), ...(t.plot ? { plot: t.plot } : {}), ...(t.item ? { item: t.item } : {}) } });
+    // После сна (P-11): «до завтра» — ничего не подсвечено, пунктир к двери не зовёт уйти.
+    bus.emit('guide:target', { target: t.screen || !isMap(t.location) || step.kind === 'done' ? null : { location: t.location, ...(npc ? { npc } : {}), ...(t.object ? { object: t.object } : {}), ...(t.plot ? { plot: t.plot } : {}), ...(t.item ? { item: t.item } : {}) } });
   }
 
   /** Бит дней 2+ без цели-персонажа: в строке «Сейчас» «поговори: Kazik», играется сам или по Казику. */
@@ -309,7 +323,11 @@ export function startFlow(o: FlowOptions): Flow {
     if (first) await flag(firstFlag(s.f ?? 'd01.sen'), FIRST_DAY_DONE);
     await runNight({ ...introDeps(st), atlas: withAvatarAtlas(loadIntroAtlas(), appearanceOf(st.progress)), dark: first ? [D01.miau, D01.notMe] : [D01.miau] });
     // F6: мир создан на этом устройстве и ссылка ещё не сохранена → экран «Сохрани свою ссылку» (§5.2).
-    if (first && o.hasLink?.() && !(LINK_SAVED in st.progress.world.flags)) bus.emit('ui:screen:open', { screen: 'link' });
+    // Сам экран — один раз (P-11): флаг `link.offered`; дальше ссылка — кнопкой в итоге дня и в настройках.
+    if (first && o.hasLink?.() && !(LINK_SAVED in st.progress.world.flags) && !(LINK_OFFERED in st.progress.world.flags)) {
+      await flag(LINK_OFFERED);
+      bus.emit('ui:screen:open', { screen: 'link' });
+    }
   }
 
   /** Система расписания показана (P-06): флаг `sys.<запись>` — с сегодняшнего дня она открыта. */
@@ -409,7 +427,33 @@ export function startFlow(o: FlowOptions): Flow {
     const now = clock.now();
     const d = derive(st.progress, deriveContent(content), now);
     const f = plantOnCell(st.progress.world.flags, gardenItems(d, now, content.tuning).map((g) => g.item), p.tile);
-    if (f) await flag(f);
+    if (!f) return;
+    await flag(f);
+    // Посадка говорит (P-11): «Posadzone: dziękuję» с переводом — какое слово где выросло.
+    const item = f.split('.').slice(2).join('.');
+    const v = content.vocab.get(item)?.value;
+    const l = content.lines.get(PLANTED_LINE);
+    if (v) bus.emit('guide:note', { pl: `${l?.pl ?? 'Posadzone:'} ${v.pl}`, ru: `${l?.plRu ?? 'Посажено:'} ${v.ru}`, key: `plant.${item}` });
+  }
+
+  /**
+   * Постель в хатке (P-11): со дня 2 отвечает всегда. Сегодня уже что-то сыграно — итог и ночь (день закрыт, даже
+   * если сюжет дня не пройден: его продолжит следующий игровой день); ещё ничего — Казик говорит, что рано.
+   */
+  async function bed(): Promise<void> {
+    const st = await o.store;
+    const d = derive(st.progress, deriveContent(content), clock.now());
+    if (!isPlayedDay(d.days[d.today])) {
+      await play.lines([BED_EARLY]);
+      return;
+    }
+    running = true;
+    try {
+      await sleepFlow({ kind: 'sleep', target: { location: FIRST_DAY.chatka, object: FIRST_DAY.sleepObject }, reason: 'P-11: постель' } as DirectorStep);
+    } finally {
+      running = false;
+      await compute();
+    }
   }
 
   /** Тап по объекту мира: если это цель шага — шаг делает режиссёр. */
@@ -419,6 +463,10 @@ export function startFlow(o: FlowOptions): Flow {
       return true;
     }
     const s = step;
+    if (s && !running && s.kind !== 'intro' && s.kind !== 'sleep' && s.kind !== 'done' && p.location === FIRST_DAY.chatka && p.id === FIRST_DAY.sleepObject) {
+      void bed();
+      return true;
+    }
     if (!s || running || p.location !== s.target.location) return false;
     const t = s.target;
     let hit = false;

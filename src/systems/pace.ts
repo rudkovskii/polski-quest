@@ -22,14 +22,26 @@ export const sysFlag = (system: PaceSystem): string => `sys.${system}`;
 
 export type SystemState = 'closed' | 'new' | 'open';
 
-/** Номер игрового дня главы (атом `gameDay`). */
+/** Номер игрового дня главы (атом `gameDay`): день 1 до сна дня 1, дальше +1 за каждый день, закрытый сном. */
 export function storyDay(d: Pick<Derived, 'days' | 'today'>, flags: Readonly<Record<string, Ts>>, opts: TimeOpts = {}): number {
   const at = flags[FIRST_DAY_DONE_FLAG];
   if (at === undefined) return 1;
   const x = dayOf(at, opts);
   if (d.today <= x) return 1;
   let n = 2;
-  for (const [day, s] of Object.entries(d.days)) if (day > x && day < d.today && isPlayedDay(s)) n++;
+  // P-11: игровой день закрывает только сон. Не лёг спать — следующий календарный день продолжает тот же игровой
+  // день (заголовок и сюжет не обгоняют игрока, прогресс дня не теряется).
+  // Сон закрывает день, если в нём (или в незакрытых днях до него) что-то сыграно.
+  let open = false;
+  for (const day of Object.keys(d.days).sort()) {
+    if (day <= x || day >= d.today) continue;
+    const s = d.days[day]!;
+    open ||= isPlayedDay(s);
+    if (open && s.segs.includes('sleep')) {
+      n++;
+      open = false;
+    }
+  }
   return n;
 }
 
