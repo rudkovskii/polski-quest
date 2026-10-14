@@ -190,6 +190,7 @@ describe('dev-часы ?now=', () => {
   it('ISO и сдвиги +1d / -2h / +90m', () => {
     expect(parseNowParam('2026-10-14T10:00:00Z', real)).toBe(Date.UTC(2026, 9, 14, 10));
     expect(parseNowParam('+1d', real)).toBe(real + DAY);
+    expect(parseNowParam(' 8d', real)).toBe(real + 8 * DAY); // «+» из адресной строки после URLSearchParams
     expect(parseNowParam('-2h', real)).toBe(real - 2 * 3_600_000);
     expect(parseNowParam('+90m', real)).toBe(real + 90 * MIN);
     expect(parseNowParam('', real)).toBeNull();

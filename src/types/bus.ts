@@ -86,6 +86,38 @@ export interface PlotView {
   cells: PlotCellView[];
 }
 
+/** Цель режиссёра в мире (src/systems/director.ts Target, без экранов). */
+export interface GuideTarget {
+  location: string;
+  npc?: string;
+  object?: string;
+  plot?: string;
+  item?: string;
+}
+
+/** Что показывает HUD про текущий шаг режиссёра. */
+export interface GuideStepView {
+  /** Ключ шага (меняется при смене шага). */
+  key: string;
+  kind: string;
+  /** Шаг первого дня f1…f6. */
+  f?: string;
+  /** «Сейчас: …» — UI-подпись, не реплика. */
+  label: string;
+  /** Реплика бобра (story/lines.json), показывается один раз за шаг. */
+  line?: string;
+  /** Цель в этой локации: тап по строке «Сейчас» = действие цели. */
+  here: boolean;
+  /** done: «ещё 3 минуты повторений». */
+  more3?: boolean;
+  /** Показать подсказку управления (F3, первый вход в walk-локацию). */
+  moveHint?: boolean;
+  /** Почему (dev). */
+  reason: string;
+  /** Весна: долг словами, а не числом (§4.2). */
+  spring?: boolean;
+}
+
 export interface BusEvents {
   'ui:dialog:open': { dialogueId: string; npcId: string };
   'ui:lesson:start': { lessonId: string; src: LessonSrc };
@@ -103,12 +135,29 @@ export interface BusEvents {
   'world:exit': { from: string; to: string; spawn?: string };
   /** Локация загружена: склейка переключает режим ввода `walk | tap` (I-07). */
   'world:location': { id: string; controls: MapControls };
-  'world:teleport': { location: string; spawn: string };
+  /** Перейти в локацию (эффект teleport, запуск режиссёра I-13): спавн по имени или клетка. */
+  'world:teleport': { location: string; spawn: string | [number, number] };
   /**
    * Пометки мира из прогресса (I-12): грядки `plot` (стадии, «!», подвявшие) и «!» над объектами `word`
    * с due-словами. Шлёт склейка (src/day.ts) на `world:location` и после изменений прогресса.
    */
-  'world:marks': { location: string; plots: PlotView[]; dueItems: string[] };
+  'world:marks': { location: string; plots: PlotView[]; dueItems: string[]; hidden?: string[] };
+  /**
+   * Цель режиссёра (I-13, ТЗ §4.12): сцена подсвечивает объект (контур, путь, стрелка у края),
+   * бобр идёт к цели. Цель в другой локации — подсвечен выход туда. null — цели нет.
+   */
+  'guide:target': { target: GuideTarget | null };
+  /**
+   * Шаг режиссёра для HUD (I-13): строка «Сейчас: …», реплика бобра пузырём (один раз за шаг),
+   * подсказка управления, «ещё 3 минуты». Шлёт склейка src/flow.ts, рисует src/ui/guide.ts.
+   */
+  'guide:step': { step: GuideStepView | null };
+  /** HUD раскрыт (флаг hud.<element> только что поставлен): анимация появления и реплика. */
+  'guide:reveal': { element: string; line?: string };
+  /** Тап по строке «Сейчас», цель шага в этой локации: сделать шаг (как тап по цели). */
+  'guide:act': { key: string };
+  /** «ещё 3 минуты повторений» из строки «Сейчас» (шаг done). */
+  'guide:more3': Record<string, never>;
   /** Дима остановился (ТЗ §5.4): склейка пишет позицию в `local.position` (I-12). */
   'world:position': { location: string; x: number; y: number };
   'progress:changed': { kinds: ProgressKind[] };

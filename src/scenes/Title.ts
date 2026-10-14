@@ -18,10 +18,21 @@ export class Title extends Phaser.Scene {
     });
 
     const offStart = bus.once('title:start', () => {
-      // Дальше: LinkSetup / Location (I-05, I-06). Пока остаёмся на фоне.
+      // Дальше LinkSetup (cloud.ts) и шаг режиссёра (src/flow.ts, I-13): он шлёт world:teleport.
       this.cameras.main.flash(200, 26, 28, 44);
     });
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, offStart);
+    // Запуск сразу в шаг (§5.2, I-13): режиссёр выбрал локацию — уходим в неё, меню нет.
+    let going = false;
+    const offTeleport = bus.on('world:teleport', ({ location, spawn }) => {
+      if (going) return;
+      going = true;
+      this.cameras.main.fadeOut(150, 26, 28, 44);
+      this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.start('Location', { location, spawn }));
+    });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      offStart();
+      offTeleport();
+    });
 
     bus.emit('ui:title:show', { build: __BUILD_ID__ });
   }

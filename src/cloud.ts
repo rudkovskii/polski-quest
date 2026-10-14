@@ -6,7 +6,7 @@ import { isPristine } from './systems/merge';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './systems/platform/config';
 import { adoptSecret, buildLink, captureSecretFromUrl, generateSecret, parseSecretInput, storedSecret } from './systems/platform/secret';
 import { GameStorage } from './systems/platform/storage';
-import { SupabaseRpc, SyncClient } from './systems/platform/sync';
+import { SupabaseRpc, SyncClient, type RpcApi } from './systems/platform/sync';
 import { setFlag } from './systems/progress';
 import type { ConnectResult, LinkMode } from './types/bus';
 
@@ -21,11 +21,21 @@ export interface Cloud {
 export interface CloudOptions {
   /** `?dev=1`: в облаке устройство помечается `test-<deviceId>` (потом `delete … where updated_by like 'test-%'`). */
   dev?: boolean;
+  /** Своё хранилище (dev-прогон `?dev=play`: отдельная база, I-13). */
+  storage?: GameStorage;
+  /** Свой RPC (dev-прогон: облако «недоступно», ничего не уходит в Supabase). */
+  rpc?: RpcApi;
 }
 
+/** RPC без сети: облако всегда «недоступно» (dev-прогон первого дня без записи в Supabase). */
+export const offlineRpc: RpcApi = {
+  load: async () => ({ kind: 'offline', detail: 'dev: облако выключено' }),
+  save: async () => ({ kind: 'offline', detail: 'dev: облако выключено' }),
+};
+
 export function startCloud(opts: CloudOptions = {}): Promise<Cloud> {
-  const storage = new GameStorage();
-  const rpc = new SupabaseRpc(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+  const storage = opts.storage ?? new GameStorage();
+  const rpc = opts.rpc ?? new SupabaseRpc(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
   const sync = new SyncClient({
     store: storage,
     rpc,

@@ -19,14 +19,22 @@ export interface PassportPage {
 }
 
 export interface PassportModel {
+  /**
+   * Первая страница (СЮЖЕТ §2, I-13): выцветшая запись «Dla następnego gościa. - K.» и печать №1
+   * «Warszawa. Praga» за первое «Dzień dobry» (флаг STAMP_FIRST). null — паспорт ещё не найден.
+   */
+  first: { stamped: boolean; note: string | null } | null;
   pages: PassportPage[];
   items: { id: string; title: string; titleRu: string }[];
   canDo: { id: string; ru: string; done: boolean }[];
 }
 
+/** Флаг печати №1 (вступление, I-13). */
+export const STAMP_FIRST = 'stamp.first';
+
 /**
- * Условие печати по прогрессу (§3.9, подмножество до conditions.ts I-17): always/all/any/not, flag, item,
- * bossPassed, lessonDone. Остальные атомы ложны.
+ * Условие печати по прогрессу (§3.9, подмножество): always/all/any/not, flag, item, bossPassed, lessonDone.
+ * Остальные атомы ложны. Игра передаёт в passportModel полный вычислитель (systems/conditions.ts, I-13).
  */
 export function passportCond(p: Progress, d: Pick<Derived, 'bossResults' | 'lessonsDone'>): (c: Condition) => boolean {
   const ev = (c: Condition): boolean => {
@@ -58,8 +66,15 @@ export function condWords(c: Condition, content: Pick<Content, 'lessons' | 'modu
   return 'Пока закрыто';
 }
 
-export function passportModel(content: Content, p: Progress, d: Pick<Derived, 'bossResults' | 'lessonsDone'>): PassportModel {
-  const cond = passportCond(p, d);
+export function passportModel(
+  content: Content,
+  p: Progress,
+  d: Pick<Derived, 'bossResults' | 'lessonsDone'>,
+  condition?: (c: Condition) => boolean,
+): PassportModel {
+  const cond = condition ?? passportCond(p, d);
+  const k = content.lines.get('intro.passport.k');
+  const first = STAMP_FIRST in p.world.flags || 'beat.first.f1' in p.world.flags ? { stamped: STAMP_FIRST in p.world.flags, note: k?.pl ?? null } : null;
   const pages = content.world.biomes
     .filter((b) => b.stamp && cond(b.stages.visible))
     .map((b) => ({ biome: b.id, title: b.title.pl, titleRu: b.title.ru, stamped: cond(b.stages.stamp), how: condWords(b.stages.stamp, content) }));
@@ -78,7 +93,7 @@ export function passportModel(content: Content, p: Progress, d: Pick<Derived, 'b
       const done = m.boss ? d.bossResults[m.boss]?.passedAt !== undefined : false;
       return (m.canDo ?? []).map((x) => ({ id: x.id, ru: x.ru, done }));
     });
-  return { pages, items, canDo };
+  return { first, pages, items, canDo };
 }
 
 const css = `
@@ -108,7 +123,15 @@ export function openPassport(overlay: Overlay, model: PassportModel): Promise<vo
       el(
         'div',
         { class: 'pq-wood pq-passport', 'data-screen': 'passport' },
-        el('h2', { lang: 'pl' }, 'PASZPORT'),
+        el('h2', { lang: 'pl' }, 'PASZPORT GOŚCIA'),
+        model.first
+          ? el(
+              'div',
+              { class: 'page', 'data-page': 'first', 'data-stamped': String(model.first.stamped) },
+              el('div', { class: `seal ${model.first.stamped ? 'on' : 'off'}`, lang: 'pl' }, model.first.stamped ? 'Praga' : '?'),
+              el('div', {}, model.first.note ? el('i', { lang: 'pl' }, model.first.note) : null, el('div', { class: 'muted', lang: 'pl' }, 'Warszawa. Praga · №1')),
+            )
+          : null,
         ...model.pages.map((pg) =>
           el(
             'div',

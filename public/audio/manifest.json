@@ -16,6 +16,8 @@
   "say:Zosia|normal|Dima? Rymuje się z „zima”!": "a8f1d41fd2b4.m4a",
   "say:Zosia|normal|Dworzec Centralny": "1a7a5e3a6cd8.m4a",
   "say:Zosia|normal|Dziesięć złotych.": "84a42cbc1bee.m4a",
+  "say:Zosia|normal|Dzień dobry": "85c5856b17ad.m4a",
+  "say:Zosia|normal|Dzień dobry!": "9b352ba165fd.m4a",
   "say:Zosia|normal|Dziękuję. Proszę. Są.": "8bd247deeae7.m4a",
   "say:Zosia|normal|Herbata. Chleb. Ile? Cena. Kraków.": "592909586582.m4a",
   "say:Zosia|normal|Informacja": "b4547b087c3f.m4a",
@@ -211,6 +213,8 @@
   "say:Zosia|slow|Co to znaczy?": "33f29ce23632.m4a",
   "say:Zosia|slow|Czech": "b53173da6ebf.m4a",
   "say:Zosia|slow|Dworzec Centralny": "7f6af11b8bf3.m4a",
+  "say:Zosia|slow|Dzień dobry": "0e3b67aea9f5.m4a",
+  "say:Zosia|slow|Dzień dobry!": "75d4ba8d4f03.m4a",
   "say:Zosia|slow|Dziękuję. Proszę. Są.": "6317b5372a78.m4a",
   "say:Zosia|slow|Herbata. Chleb. Ile? Cena. Kraków.": "ab8f07875354.m4a",
   "say:Zosia|slow|Informacja": "8a056823b278.m4a",
@@ -511,6 +515,11 @@
    "dur": 0.77,
    "voice": "say:Zosia",
    "rate": "normal"
+  },
+  "0e3b67aea9f5.m4a": {
+   "dur": 1.87,
+   "voice": "say:Zosia",
+   "rate": "slow"
   },
   "0eab9682d0e6.m4a": {
    "dur": 0.77,
@@ -1272,6 +1281,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "75d4ba8d4f03.m4a": {
+   "dur": 1.87,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
   "76060157550e.m4a": {
    "dur": 0.64,
    "voice": "say:Zosia",
@@ -1424,6 +1438,11 @@
   },
   "85460748b0a7.m4a": {
    "dur": 1.06,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "85c5856b17ad.m4a": {
+   "dur": 0.87,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -1614,6 +1633,11 @@
   },
   "9b0d738838f8.m4a": {
    "dur": 0.55,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "9b352ba165fd.m4a": {
+   "dur": 0.87,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -2421,6 +2445,11 @@
   },
   "ch01.boss#spelling.4": {
    "text": "be, er, zet, e, es, ka, a",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "ch01.intro#1": {
+   "text": "Dzień dobry!",
    "voice": "say:Zosia",
    "slow": true
   },
@@ -3551,6 +3580,11 @@
   },
   "lx.dzien": {
    "text": "dzień",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "lx.dzien_dobry": {
+   "text": "Dzień dobry",
    "voice": "say:Zosia",
    "slow": true
   },

@@ -4,9 +4,12 @@
 // журнала — `progress:changed` (его слушает синк).
 import { bus as globalBus, type Bus } from '../systems/bus';
 import type { Content } from '../systems/content';
+import { condCtx, evaluator, lessonOfVariant, lessonVariant } from '../systems/conditions';
 import { derive, deriveContent } from '../systems/derive';
 import type { LogEvent } from '../systems/log';
 import { getSetting, giveItem, markChallenge, setFlag, type Progress } from '../systems/progress';
+import { newContentLock } from '../systems/queue';
+import { cardId } from '../systems/srs';
 import type { BusEvents, LessonResult, WorldInteract } from '../types/bus';
 import type { Condition, Effect, Lesson, LocationMap, Step, VocabEntry } from '../types/content';
 import { runDialog, runLines, speechOfLine, type DialogDeps } from './dialog';
@@ -34,6 +37,11 @@ export interface PlayDeps {
   typeMs?: number;
   /** Каждое записанное событие журнала (dev: консоль). */
   onEvent?(e: LogEvent): void;
+  /**
+   * Режиссёр забирает действие с объектом (I-13): цель шага, бит, грядка первого дня. true — склейка
+   * (src/flow.ts) сама ведёт шаг, обработчик по умолчанию не нужен.
+   */
+  claim?(p: WorldInteract): boolean;
 }
 
 export interface Play {
@@ -43,6 +51,12 @@ export interface Play {
   /** Паспорт (§5.10, I-11); то же по `ui:screen:open { screen: 'passport' }`. */
   openPassport(): Promise<void>;
   interact(p: WorldInteract): Promise<void>;
+  /** Эффекты контента (биты режиссёра, I-13). */
+  effects(list: readonly Effect[]): Promise<void>;
+  /** Реплики из story/lines.json модальным окном (бит с целью, I-13). */
+  lines(ids: readonly string[]): Promise<void>;
+  /** Диалог NPC, который ведёт к уроку `lessonId` (условия `if` истинны); нет — null. */
+  dialogFor(npc: string, lessonId: string): string | null;
   /** Идёт диалог или урок. */
   readonly busy: boolean;
   dispose(): void;
@@ -70,24 +84,16 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     bus.emit('progress:changed', { kinds: ['cards'] });
   };
 
-  /** Условие `if` (§3.9) до conditions.ts (I-17): флаги, предметы, сданные уроки и боссы; прочие атомы ложны. */
-  const condLite = (store: PlayStore): ((c: Condition) => boolean) => {
-    let done: ReadonlySet<string> | null = null;
-    const ev = (c: Condition): boolean => {
-      if (c.always) return true;
-      if (c.all) return c.all.every(ev);
-      if (c.any) return c.any.some(ev);
-      if (c.not) return !ev(c.not);
-      if (c.flag !== undefined) return c.flag in store.progress.world.flags;
-      if (c.item !== undefined) return c.item in store.progress.world.items;
-      if (c.lessonDone !== undefined) {
-        done ??= derive(store.progress, deriveContent(content), deps.clock?.now() ?? Date.now()).lessonsDone;
-        return done.has(c.lessonDone);
+  /** Условие `if` (§3.9): все атомы через systems/conditions.ts (I-13); состояние выводится один раз на вызов. */
+  const cond = (store: PlayStore): ((c: Condition) => boolean) => {
+    let ev: ((c: Condition) => boolean) | null = null;
+    return (c) => {
+      if (!ev) {
+        const now = deps.clock?.now() ?? Date.now();
+        ev = evaluator(condCtx(content, derive(store.progress, deriveContent(content), now), store.progress.world, now));
       }
-      if (c.bossPassed !== undefined) return derive(store.progress, deriveContent(content), Date.now()).bossResults[c.bossPassed]?.passedAt !== undefined;
-      return false;
+      return ev(c);
     };
-    return ev;
   };
 
   const guard = async <T>(fn: (store: PlayStore) => Promise<T>): Promise<T | null> => {
@@ -114,14 +120,34 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
   });
 
   const lessonById = async (store: PlayStore, id: string): Promise<LessonResult | null> => {
-    const l = content.lessons.get(id)?.value;
-    if (!l) {
+    const l0 = content.lessons.get(id)?.value;
+    if (!l0) {
       console.warn(`[ui] урока ${id} нет в контенте`);
       return null;
     }
     const now = deps.clock?.now() ?? Date.now();
-    const wasPassed = l.kind === 'boss' && derive(store.progress, deriveContent(content), now).bossResults[id]?.passedAt !== undefined;
+    const d = derive(store.progress, deriveContent(content), now);
+    // requires / skipIf / short (§3.5, §4.3, I-13): закрытый и пропущенный урок не играется, жёлтый кластер — короткая версия.
+    const variant = lessonVariant(l0, condCtx(content, d, store.progress.world, now));
+    const l = lessonOfVariant(l0, variant);
+    if (!l) {
+      console.info(`[ui] урок ${id}: ${variant === 'skip' ? 'пропуск (skipIf)' : 'закрыт (requires)'}`);
+      return null;
+    }
+    // Затор (§4.2): долг выше порога — сцены с новыми словами закрыты, Казик говорит «Zator.».
+    const fresh = (l.introduces ?? []).filter((it) => !d.cards[cardId(it, 'rec')] && !d.cards[cardId(it, 'lis')]).length;
+    if (newContentLock(d, now, content.tuning, fresh) === 'debt') {
+      await runLines([speechOfLine('kazik.debt.jam', content.lines)], dialogDeps(store));
+      return null;
+    }
+    const wasPassed = l.kind === 'boss' && d.bossResults[id]?.passedAt !== undefined;
     const result = await runLesson(l, lessonDeps(store));
+    // Отрезок дня (§3.11 seg, I-13): сцена, босс, диагностика → `scene`; лекарство → `remedy`. Пишет тот, кто
+    // знает, что урок закончен (не прерван): склейка оверлея. Режиссёр читает seg за сегодня.
+    if (!result.cancelled) {
+      const r = store.append({ k: 'seg', ts: deps.clock?.now() ?? Date.now(), seg: l.kind === 'remedy' ? 'remedy' : 'scene' });
+      if (r.ok) onEvent(r.event);
+    }
     bus.emit('ui:lesson:end', { lessonId: id, result });
     // Первая сдача босса (§5.8, I-11): reward урока и module.onComplete (билет, флаг главы → печать биома, реплики).
     if (l.kind === 'boss' && result.passed && !wasPassed) {
@@ -144,7 +170,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     translations: getSetting(store.progress, 'translations'),
     ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
     ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
-    cond: condLite(store),
+    cond: cond(store),
     runLesson: (id) => lessonById(store, id),
     effects: (e) => effect(store, e),
   });
@@ -162,7 +188,13 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     if (e.open === 'obchod' || e.open === 'express') bus.emit('ui:obchod:start', { mode: e.open === 'express' ? 'express' : 'day' });
     else if (e.open) bus.emit('ui:screen:open', { screen: e.open });
     if (e.toast) toast(root, e.toast.ru);
-    if (e.reveal) console.info('[ui] reveal (I-13):', e.reveal);
+    if (e.reveal) {
+      // Раскрыть элемент HUD навсегда (§4.12): флаг hud.<element> + анимация появления.
+      const el2 = e.reveal;
+      const before = store.progress;
+      applyProgress(store, (p) => setFlag(p, `hud.${el2}`, now), 'world');
+      if (store.progress !== before) bus.emit('guide:reveal', { element: el2 });
+    }
   }
 
   async function dialogById(store: PlayStore, id: string): Promise<void> {
@@ -176,6 +208,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
   }
 
   async function interact(p: WorldInteract): Promise<void> {
+    if (!busy && deps.claim?.(p)) return;
     // Грядка (I-12): полив ведёт оверлей петли дня (src/ui/day.ts); клетку → слово уже разобрала сцена.
     if (p.kind === 'plot') {
       bus.emit('ui:obchod:start', { mode: 'day', ...(p.item ? { fromItem: p.item } : {}) });
@@ -184,8 +217,8 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     await guard(async (store) => {
       switch (p.kind) {
         case 'npc': {
-          const cond = condLite(store);
-          const d = [...content.dialogues.values()].map((x) => x.value).find((x) => x.npc === p.id && (!x.if || cond(x.if)));
+          const ok = cond(store);
+          const d = [...content.dialogues.values()].map((x) => x.value).find((x) => x.npc === p.id && (!x.if || ok(x.if)));
           if (d) await dialogById(store, d.id);
           else await runLines([{ who: p.id, todo: `npc.${p.id}` }], dialogDeps(store));
           return;
@@ -208,7 +241,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
           const map: LocationMap | undefined = content.maps.get(p.location)?.value;
           const trig = map?.objects.find((o) => o.type === 'trigger' && o.id === p.id);
           if (!trig || trig.type !== 'trigger') return;
-          if (trig.if && !condLite(store)(trig.if)) return;
+          if (trig.if && !cond(store)(trig.if)) return;
           for (const e of trig.do) await effect(store, e);
           return;
         }
@@ -229,12 +262,35 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
   ];
 
   function passport(store: PlayStore): Promise<void> {
-    const d = derive(store.progress, deriveContent(content), deps.clock?.now() ?? Date.now());
-    return openPassport(overlay, passportModel(content, store.progress, d));
+    const now = deps.clock?.now() ?? Date.now();
+    const d = derive(store.progress, deriveContent(content), now);
+    return openPassport(overlay, passportModel(content, store.progress, d, cond(store)));
   }
+
+  /** Диалог NPC, в графе которого есть узел-урок `lessonId`, и его `if` истинно сейчас. */
+  let storeNow: PlayStore | null = null;
+  void storeP.then((s) => (storeNow = s));
+  const dialogFor = (npc: string, lessonId: string): string | null => {
+    if (!storeNow) return null;
+    const ok = cond(storeNow);
+    for (const { value: d } of content.dialogues.values()) {
+      if (d.npc !== npc || (d.if && !ok(d.if))) continue;
+      if (Object.values(d.nodes).some((n) => (n as { lesson?: string }).lesson === lessonId)) return d.id;
+    }
+    return null;
+  };
 
   return {
     overlay,
+    effects: async (list) => {
+      await guard(async (s) => {
+        for (const e of list) await effect(s, e);
+      });
+    },
+    lines: async (ids) => {
+      await guard((s) => runLines(ids.map((id) => speechOfLine(id, content.lines)), dialogDeps(s)));
+    },
+    dialogFor,
     openLesson: (id) => guard((s) => lessonById(s, id)).then((r) => r ?? null),
     openDialog: async (id) => {
       await guard((s) => dialogById(s, id));

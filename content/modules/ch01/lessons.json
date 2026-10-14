@@ -1,5 +1,18 @@
 [
   {
+    "id": "ch01.intro",
+    "kind": "scene",
+    "title": { "pl": "Dzień dobry", "ru": "Вступление: первое «Dzień dobry»" },
+    "minutes": 1,
+    "npc": "bobr",
+    "location": "ch01.dzialka",
+    "introduces": ["lx.dzien_dobry"],
+    "steps": [
+      { "t": "choice", "q": "Dzień dobry?", "options": ["Dzień dobry", "Do widzenia"], "answer": 0, "item": "lx.dzien_dobry" },
+      { "t": "shadow", "pl": "Dzień dobry!", "ru": "Здравствуйте!", "repeat": 1, "item": "lx.dzien_dobry" }
+    ]
+  },
+  {
     "id": "ch01.s00",
     "kind": "diag",
     "title": { "pl": "Bramka metra", "ru": "Турникет метро: диагностика" },

@@ -1,6 +1,8 @@
 // Петля дня в оверлее (I-12): обработчики `ui:obchod:start` (обход, экспресс, полив по тапу грядки),
-// `ui:screen:open` (summary → DaySummary, settings/export → Settings) и мини-HUD działki: «Obchód (N)»,
-// «Ekspres», подвал (список банок), шестерёнка. Полный HUD с раскрытием по флагам `hud.*` — I-13.
+// `ui:screen:open` (summary → DaySummary, settings/export → Settings) и HUD локаций: «Obchód (N)»,
+// «Ekspres», подвал (список банок), паспорт, шестерёнка. I-13: HUD во всех локациях, каждый элемент
+// появляется только после флага `hud.<element>` (§4.12): obchod → Obchód и Ekspres, jars → Spiżarnia,
+// passport → Paszport; шестерёнка видна всегда. В весну долг словами («грядки подсохли», §4.2).
 // Один поток за раз: пока идёт обход или открыт экран, новые запросы игнорируются.
 import type { Bus } from '../systems/bus';
 import type { Content } from '../systems/content';
@@ -15,6 +17,7 @@ import { runObchod, stageLabel, type ObchodOptions } from './obchod';
 import type { Overlay } from './overlay/host';
 import { btn, type AudioPort } from './overlay/kit';
 import { runSettings, type SettingsStore } from './settings';
+import { dayState } from '../systems/session';
 
 export type DayStore = LessonStore & SettingsStore;
 
@@ -48,9 +51,10 @@ export interface DayUi {
 }
 
 const css = `
-.pq-dhud { position: absolute; right: calc(8px + env(safe-area-inset-right)); bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; z-index: 5; pointer-events: auto; }
+.pq-dhud { position: absolute; right: calc(8px + env(safe-area-inset-right)); top: calc(52px + env(safe-area-inset-top)); display: flex; flex-direction: column; align-items: flex-end; gap: 6px; z-index: 5; pointer-events: none; }
 .pq-dhud[hidden] { display: none; }
-.pq-dhud .pq-btn { font-size: 16px; }
+.pq-dhud .pq-btn { font-size: 15px; padding: 6px 10px; pointer-events: auto; }
+.pq-dhud .pq-btn[hidden] { display: none; }
 .pq-cellar { width: min(100% - 16px, 520px); max-height: calc(100% - 24px); overflow-y: auto; margin: auto; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
 .pq-cellar h2 { margin: 0; font-size: 22px; color: #543c52; }
 .pq-cellar .jar { display: flex; justify-content: space-between; gap: 10px; font-size: 18px; border-bottom: 2px dotted #c8966b; padding: 4px 0; }
@@ -151,14 +155,18 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
     },
   };
 
-  // ── Мини-HUD działki (tap-карты с грядками).
+  // ── HUD локаций: элементы по флагам hud.* (I-13).
   const obchodBtn = btn('Obchód', () => void ui.obchod({ mode: 'day' }), '', { 'data-hud': 'obchod' });
+  const expressBtn = btn('Ekspres', () => void ui.obchod({ mode: 'express' }), '', { 'data-hud': 'obchod', 'data-act': 'express' });
+  const cellarBtn = btn('Spiżarnia', () => void once((s) => cellarPanel(s)), '', { 'data-hud': 'jars' });
+  const passportBtn = btn('Paszport', () => bus.emit('ui:screen:open', { screen: 'passport' }), '', { 'data-hud': 'passport' });
   const hud = el(
     'div',
-    { class: 'pq-dhud', hidden: true, 'data-hud': 'dzialka' },
+    { class: 'pq-dhud', hidden: true, 'data-hud-bar': 'location' },
     obchodBtn,
-    btn('Ekspres', () => void ui.obchod({ mode: 'express' }), '', { 'data-hud': 'express' }),
-    btn('Spiżarnia', () => void once((s) => cellarPanel(s)), '', { 'data-hud': 'cellar' }),
+    expressBtn,
+    cellarBtn,
+    passportBtn,
     btn('⚙', () => void ui.settings(), 'icon', { 'data-hud': 'settings', 'aria-label': 'Настройки' }),
   );
   root.prepend(hud);
@@ -172,9 +180,16 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
     const store = await storeP;
     const now = clock.now();
     const d = derive(store.progress, deriveContent(content), now, deps.tz);
+    const flags = store.progress.world.flags;
+    const shown = (e: string): boolean => `hud.${e}` in flags;
+    obchodBtn.hidden = !shown('obchod');
+    expressBtn.hidden = !shown('obchod');
+    cellarBtn.hidden = !shown('jars');
+    passportBtn.hidden = !shown('passport');
     // Число на кнопке = растения с «!» (что польёт раунд сейчас). Долг (§4.2) больше на братьев,
-    // придержанных до завтра; с ним «Obchód (3)» вёл бы в «Всё полито».
-    obchodBtn.textContent = `Obchód (${gardenItems(d, now, content.tuning).filter((g) => g.dueCard).length})`;
+    // придержанных до завтра; с ним «Obchód (3)» вёл бы в «Всё полито». Весна: словами, без числа.
+    const n = gardenItems(d, now, content.tuning).filter((g) => g.dueCard).length;
+    obchodBtn.textContent = dayState(d, content.tuning).spring && n > 0 ? 'Obchód · грядки подсохли' : `Obchód (${n})`;
   }
 
   async function cellarPanel(store: DayStore): Promise<void> {
@@ -208,15 +223,14 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
     });
   }
 
-  const hasPlot = (id: string): boolean => !!content.maps.get(id)?.value.objects.some((o) => o.type === 'plot');
   const offs = [
     bus.on('ui:obchod:start', ({ mode, fromItem }) => void ui.obchod({ mode, ...(fromItem ? { fromItem } : {}) })),
     bus.on('ui:screen:open', ({ screen }) => {
       if (screen === 'summary') void ui.summary();
       else if (screen === 'settings' || screen === 'export') void ui.settings();
     }),
-    bus.on('world:location', ({ id }) => {
-      hudOn = hasPlot(id);
+    bus.on('world:location', () => {
+      hudOn = true;
       void refreshHud();
     }),
     bus.on('world:input', ({ enabled }) => {

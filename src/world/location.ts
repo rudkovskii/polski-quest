@@ -132,6 +132,12 @@ export class LocationModel {
   private out: WorldEvent[] = [];
   private solidObj: boolean[][];
   readonly grid: Grid;
+  /** Объекты с ложным `if` (§3.7, I-13): не видны, не цель, не препятствие. */
+  private hidden = new Set<string>();
+  /** Бобр-указатель (§4.12, I-13): клетка у цели режиссёра; null — идёт следом за Димой. */
+  private pointGoal: Xy | null = null;
+  private pointFace: Dir | null = null;
+  private companionPath: Xy[] = [];
 
   constructor(map: LocationMap, spawn: Xy, opts: LocationOptions = {}) {
     this.map = map;
@@ -139,15 +145,95 @@ export class LocationModel {
     this.controls = map.controls;
     this.objects = buildObjects(map);
     const { w, h } = this.parsed;
-    this.solidObj = Array.from({ length: h }, () => Array<boolean>(w).fill(false));
-    for (const o of this.objects)
-      if (o.solid)
-        for (let y = o.at[1]; y < o.at[1] + o.size[1]; y++)
-          for (let x = o.at[0]; x < o.at[0] + o.size[0]; x++) if (y < h && x < w) this.solidObj[y]![x] = true;
+    this.solidObj = [];
+    this.rebuildSolid();
     this.grid = { w, h, passable: (x, y) => this.passable(x, y) };
     this.player = { tile: [spawn[0], spawn[1]], facing: opts.facing ?? 'down', step: null };
     const wantCompanion = opts.companion ?? (map.controls === 'walk' && !this.objects.some((o) => o.key === 'npc:bobr'));
     this.companion = wantCompanion ? { tile: this.companionSpawn(), facing: this.player.facing, step: null } : null;
+  }
+
+  private rebuildSolid(): void {
+    const { w, h } = this.parsed;
+    this.solidObj = Array.from({ length: h }, () => Array<boolean>(w).fill(false));
+    for (const o of this.objects)
+      if (o.solid && !this.hidden.has(o.key))
+        for (let y = o.at[1]; y < o.at[1] + o.size[1]; y++)
+          for (let x = o.at[0]; x < o.at[0] + o.size[0]; x++) if (y < h && x < w) this.solidObj[y]![x] = true;
+  }
+
+  // ───────────── режиссёр (I-13) ─────────────
+
+  /** Скрыть объекты с ложным `if` (ключи). Возвращает true, если набор изменился. */
+  setHidden(keys: Iterable<string>): boolean {
+    const next = new Set(keys);
+    if (next.size === this.hidden.size && [...next].every((k) => this.hidden.has(k))) return false;
+    this.hidden = next;
+    if (this.selected && next.has(this.selected)) this.selected = null;
+    this.rebuildSolid();
+    return true;
+  }
+
+  isHidden(key: string): boolean {
+    return this.hidden.has(key);
+  }
+
+  /** Переставить объект (бобр на działce садится у нужной грядки). */
+  moveObject(key: string, at: Xy): void {
+    const o = this.object(key);
+    if (!o || (o.at[0] === at[0] && o.at[1] === at[1])) return;
+    o.at = [at[0], at[1]];
+    this.rebuildSolid();
+  }
+
+  /** Бобр идёт к клетке `goal` и смотрит в сторону `face`; null — снова следом за Димой. */
+  pointTo(goal: Xy | null, face: Dir | null = null): void {
+    const c = this.companion;
+    if (!c) return;
+    const same = goal && this.pointGoal && goal[0] === this.pointGoal[0] && goal[1] === this.pointGoal[1];
+    this.pointFace = face;
+    if (same) return;
+    this.pointGoal = goal ? [goal[0], goal[1]] : null;
+    this.companionPath = goal ? findPath({ w: this.parsed.w, h: this.parsed.h, passable: (x, y) => this.passable(x, y) }, c.step ? c.step.to : c.tile, goal).path : [];
+  }
+
+  get pointing(): Xy | null {
+    return this.pointGoal;
+  }
+
+  private updateCompanion(dt: number): void {
+    const c = this.companion;
+    if (!c || !this.pointGoal) return;
+    let budget = dt;
+    for (let guard = 0; guard < 8; guard++) {
+      if (c.step) {
+        const need = STEP_MS - c.step.t;
+        if (budget < need) {
+          c.step.t += budget;
+          return;
+        }
+        budget -= need;
+        c.tile = c.step.to;
+        c.step = null;
+        continue;
+      }
+      let nxt = this.companionPath.shift();
+      if (!nxt && !eq(c.tile, this.pointGoal) && guard === 0) {
+        // Путь кончился не у цели (упёрся в Диму или в NPC): пересчитать один раз за кадр.
+        this.companionPath = findPath(this.grid, c.tile, this.pointGoal).path;
+        nxt = this.companionPath.shift();
+      }
+      if (!nxt) {
+        if (this.pointFace) c.facing = this.pointFace;
+        return;
+      }
+      if (!this.passable(nxt[0], nxt[1])) {
+        this.companionPath = [];
+        return;
+      }
+      c.facing = dirBetween(c.tile, nxt);
+      c.step = { from: c.tile, to: nxt, t: 0 };
+    }
   }
 
   // ───────────── запросы ─────────────
@@ -164,6 +250,7 @@ export class LocationModel {
 
   /** Объекты, с которыми можно что-то сделать кнопкой или тапом. Выход — только в tap-режиме. */
   actionable(o: WorldObject): boolean {
+    if (this.hidden.has(o.key)) return false;
     switch (o.kind) {
       case 'npc':
       case 'word':
@@ -265,6 +352,7 @@ export class LocationModel {
   // ───────────── время ─────────────
 
   update(dt: number): WorldEvent[] {
+    this.updateCompanion(dt);
     let budget = dt;
     for (let guard = 0; guard < 16 && !this.exited; guard++) {
       const st = this.player.step;
@@ -272,7 +360,7 @@ export class LocationModel {
         const need = STEP_MS - st.t;
         if (budget < need) {
           st.t += budget;
-          if (this.companion?.step) this.companion.step.t = st.t;
+          if (this.companion?.step && !this.pointGoal) this.companion.step.t = st.t;
           break;
         }
         budget -= need;
@@ -317,7 +405,7 @@ export class LocationModel {
     this.player.step = { from, to, t: 0 };
     this.out.push({ type: 'step', from, to });
     const c = this.companion;
-    if (c && !eq(c.tile, from)) {
+    if (c && !this.pointGoal && !eq(c.tile, from)) {
       const adjacent = Math.abs(c.tile[0] - from[0]) + Math.abs(c.tile[1] - from[1]) === 1;
       if (adjacent) {
         c.facing = dirBetween(c.tile, from);
@@ -331,13 +419,13 @@ export class LocationModel {
     this.player.tile = st.to;
     this.player.step = null;
     const c = this.companion;
-    if (c?.step) {
+    if (c?.step && !this.pointGoal) {
       c.tile = c.step.to;
       c.step = null;
     }
     const here = this.player.tile;
     for (const o of this.objects) {
-      if (!covers(o, here)) continue;
+      if (!covers(o, here) || this.hidden.has(o.key)) continue;
       if (o.kind === 'exit') {
         const ex = o.src as Extract<MapObject, { type: 'exit' }>;
         this.out.push({ type: 'exit', to: ex.to, ...(ex.spawn ? { spawn: ex.spawn } : {}), tile: here });
@@ -433,7 +521,7 @@ export class LocationModel {
   private interactTarget(target: string): void {
     const [key, cell] = target.split('@') as [string, string | undefined];
     const o = this.object(key);
-    if (!o) return;
+    if (!o || this.hidden.has(o.key)) return;
     const tile: Xy | null = cell ? (cell.split(',').map(Number) as unknown as Xy) : null;
     if (this.controls === 'tap') {
       this.selected = o.key;

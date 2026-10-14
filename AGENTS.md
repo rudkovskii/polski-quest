@@ -126,6 +126,26 @@
 - Dev: `/?dev=world&map=ch01.dzialka&now=2026-10-14T10:00&mute=1[&plant=lx.woda,lx.kawa][&reset=1]` — `now` ISO или `+1d/-2h/+90m`
   (часы во всех deps, только с `dev`), `plant` — dev-событие `intro`, прогресс в базе `polski-quest-dev` без облака.
 
+## Режиссёр и первый день (ТЗ §3.9, §4.12, §5.0, §5.2, I-13)
+- Условия: только `src/systems/conditions.ts` (`evaluate`, `condCtx`, все атомы §3.9); варианты уроков —
+  `lessonVariant` (requires → locked, skipIf → skip, short.if → short) + `lessonOfVariant` (шаги short с исходными id).
+  `play.ts` применяет их в `lessonById`; объекты карты с ложным `if` уходят в `world:marks.hidden` (src/day.ts).
+- Режиссёр: чистая `nextStep(directorInput(progress, content, now, {local, activeMin}))` в `src/systems/director.ts`
+  (правила 1–10, слоты битов, `reveals`). Ничего не пишет: флаги `beat.first.f1…f6`, `beat.first_day_done`,
+  `beat.<id>`, `hud.<el>`, `spring.<день>`, `stamp.first` ставит склейка `src/flow.ts`. После сна в тот же день — только `done`.
+- Склейка `src/flow.ts`: `link:ready` → запуск сразу в шаг (F1 → `ui/intro.ts`, иначе `world:teleport`, resume —
+  урок сразу); `guide:step` / `guide:target` после каждого `progress:changed`; действие шага — тап по цели
+  (`play.claim`) или по строке «Сейчас» (`guide:act`). Рисуют: `src/ui/guide.ts` (строка «Сейчас», пузырь Казика,
+  подсказка управления, анимация раскрытия), `src/world/guide.ts` + `Location` (контур, путь на 3 клетки, стрелка
+  у края, бобр-указатель). HUD (`ui/day.ts`) показывает кнопку только при флаге `hud.<element>`.
+- `seg`: water/express/more3/evening — обход (`ui/obchod.ts`, вечер = `mode: 'phonetic'`), scene/remedy — конец
+  урока в `play.ts`, sleep — «Dobranoc».
+- Реплики шагов — константы `LINES` в director.ts и `director.json` (биты, reveals, spring, done); нет в СЮЖЕТ.md →
+  `todo` в lines.json: в игре такой пузырь не показывается, в dev — `[todo: id]`.
+- Dev-прогон всей игры без облака: `/?reset=1&mute=1` (стирает базу `polski-quest-play`, адрес становится
+  `?dev=play`), повторный запуск `/?dev=play&mute=1`, `&now=+1d` / `&now=+9d` (весна). В `window.__pq.flow.step` —
+  шаг и `reason`. Вкладка в фоне почти не рисует кадры (rAF): мир «стоит», пока панель браузера скрыта.
+
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
 2. Id: модуль `[a-z0-9_]+`, урок `<module>.<name>`, слово `lx.<slug>` (глобально уникально),

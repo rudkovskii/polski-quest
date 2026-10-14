@@ -1,5 +1,56 @@
 {
   "schema": 1,
-  "beats": [],
-  "reveals": []
+  "beats": [
+    {
+      "id": "kazik_most",
+      "slot": "start",
+      "if": { "all": [{ "flag": "beat.first_day_done" }, { "not": { "stepDone": "sleep" } }] },
+      "target": { "location": "ch01.dzialka", "npc": "bobr" },
+      "line": "kazik.dream.most",
+      "do": [{ "line": "kazik.dream.gryze" }]
+    },
+    {
+      "id": "brzechwa_rym",
+      "slot": "afterScene",
+      "if": { "all": [{ "flag": "beat.first_day_done" }, { "stepDone": "scene" }] },
+      "target": { "location": "ch01.metro", "npc": "brzechwa" },
+      "line": "brzechwa.rym_dima"
+    },
+    {
+      "id": "bridge_piles",
+      "slot": "start",
+      "if": { "all": [{ "flag": "beat.kazik_most" }, { "daysPlayed": 3 }, { "not": { "stepDone": "sleep" } }] },
+      "target": { "location": "ch01.dzialka", "npc": "bobr" },
+      "line": "kazik.bridge.piles"
+    },
+    {
+      "id": "brzechwa_adwokat",
+      "slot": "afterScene",
+      "if": { "all": [{ "flag": "beat.brzechwa_rym" }, { "daysPlayed": 3 }, { "stepDone": "scene" }] },
+      "target": { "location": "ch01.metro", "npc": "brzechwa" },
+      "line": "brzechwa.adwokat"
+    },
+    {
+      "id": "brzechwa_polska",
+      "slot": "afterScene",
+      "if": { "all": [{ "lessonDone": "ch01.s11" }, { "stepDone": "scene" }] },
+      "target": { "location": "ch01.metro", "npc": "brzechwa" },
+      "line": "brzechwa.prawdziwa_polska"
+    },
+    {
+      "id": "bridge_span_1",
+      "slot": "start",
+      "if": { "flag": "ch01.done" },
+      "target": { "location": "ch01.dzialka", "npc": "bobr" },
+      "line": "kazik.bridge.span"
+    }
+  ],
+  "reveals": [
+    { "element": "passport", "if": { "flag": "beat.first.f1" } },
+    { "element": "obchod", "if": { "flag": "beat.first.f2" } },
+    { "element": "jars", "if": { "jars": { "min": 1 } }, "line": "kazik.jar.first" },
+    { "element": "map", "if": { "bossPassed": "ch01.boss" } }
+  ],
+  "spring": { "line": "kazik.return.spring" },
+  "done": { "line": "kazik.done", "more3Line": "kazik.express" }
 }
