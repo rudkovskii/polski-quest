@@ -66,6 +66,16 @@
 - Фикстура для тестов: `tests/fixtures/content-mini/` (модуль `demo`, все типы шагов, бобр и Симба,
   реплики — `todo`-заглушки). Новое правило валидатора = поломка фикстуры в тесте.
 
+## Арт и мир (ТЗ §8, I-07)
+- `art/palette.json` (≤ 64 цвета, у каждого имя) собирает `npm run palette` из `art/vendor/ninja-adventure`.
+- Спрайты: `art/sprites/*.sprite.json` (sprite-as-data, ключи = имена цветов, hex запрещён), кадры из листов
+  паков: `art/imports.json`, тайлсет локаций: `art/tilesets/ninja16.json` (имя тайла = `legend[*].tile` в картах).
+- `npm run sprites` → `public/atlas/*` (руками не править), `npm run sprites:check` в `npm run check`:
+  палитра, альфа 0/255, кратность 16, атлас не устарел.
+- Мир: `src/world/ascii.ts` (карта → слои и коллизии), `pathfind.ts` (BFS), `location.ts` (модель без Phaser,
+  тесты в `tests/location.test.ts`), сцена `src/scenes/Location.ts` только рисует и шлёт `world:*` в bus.
+- Dev: `/?dev=world&map=ch01.metro[&spawn=<имя>]`, события мира в консоли.
+
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
 2. Id: модуль `[a-z0-9_]+`, урок `<module>.<name>`, слово `lx.<slug>` (глобально уникально),

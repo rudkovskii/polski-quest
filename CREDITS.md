@@ -4,3 +4,7 @@
 
 | Что | Автор / источник | Лицензия | Где используется |
 |---|---|---|---|
+| Ninja Adventure - Asset Pack: тайлы (Floor, Nature, Water, Element, InteriorFloor), палитра, статисты OldMan и Inspector | Pixel-boy и AAA, https://pixel-boy.itch.io/ninja-adventure-asset-pack | CC0 1.0 | `art/vendor/ninja-adventure/` → `public/atlas/ninja16.png`, `custom.png`; список файлов и sha256 архива в `art/vendor/ninja-adventure/SOURCE.txt` |
+| Палитра игры (`art/palette.json`) | цвета Ninja Adventure + польские акценты (ТЗ §8.1) | CC0 1.0 | все атласы |
+| Дима, бобр Kazik, турникет, табличка «выход», забор, альтанка (черновики sprite-as-data, `art/sprites/*.sprite.json`) | нарисовано для проекта (I-07) | CC0 1.0 | `public/atlas/custom.png`, `ninja16.png` |
+| Pillow | Python Imaging Library | MIT-CMU | инструмент сборки (`tools/sprites_build.py`, `tools/palette_extract.py`), в бандл не попадает |

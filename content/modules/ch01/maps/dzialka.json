@@ -10,30 +10,28 @@
     ",": { "tile": "grass_flowers" },
     "#": { "tile": "fence", "solid": true, "auto": true },
     "=": { "tile": "path", "auto": true },
-    "s": { "tile": "soil" },
-    "H": { "tile": "altana", "solid": true },
+    "s": { "tile": "soil", "auto": true },
+    "H": { "tile": "altana", "solid": true, "auto": true },
     "T": { "tile": "tree", "solid": true, "layer": "deco" },
     "~": { "tile": "water", "solid": true, "auto": true }
   },
-  "layers": {
-    "ground": [
-      "############",
-      "#....,.....#",
-      "#.ssssss.HH#",
-      "#.ssssss.HH#",
-      "#.ssssss...#",
-      "#....==....#",
-      "#T...==..~~#",
-      "#....==..~~#",
-      "#....==....#",
-      "#####==#####"
-    ]
-  },
+  "layers": { "ground": [
+    "############",
+    "#....,.....#",
+    "#.ssssss.HH#",
+    "#.ssssss.HH#",
+    "#.ssssss...#",
+    "#....==....#",
+    "#T...==..~~#",
+    "#....==..~~#",
+    "#....==....#",
+    "#####==#####"
+  ] },
   "spawns": { "default": [5, 8], "from_metro": [5, 9] },
   "objects": [
     { "type": "plot", "id": "grzadki", "at": [2, 2], "size": [6, 3] },
     { "type": "npc", "id": "bobr", "at": [8, 5], "facing": "left" },
-    { "type": "trigger", "id": "altana_sleep", "at": [9, 4], "on": "tap", "do": [{ "open": "summary" }] },
+    { "type": "trigger", "id": "altana_sleep", "at": [9, 2], "size": [2, 2], "on": "tap", "do": [{ "open": "summary" }] },
     { "type": "exit", "at": [5, 9], "to": "ch01.metro", "spawn": "from_dzialka" }
   ]
 }

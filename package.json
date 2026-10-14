@@ -16,7 +16,10 @@
     "check:layers": "tsx tools/check_layers.ts",
     "check:banned": "tsx tools/check_banned.ts",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run validate && npm run check:layers && npm run check:banned && npm run test && npm run build"
+    "sprites": "python3 tools/sprites_build.py",
+    "sprites:check": "python3 tools/sprites_build.py --check",
+    "palette": "python3 tools/palette_extract.py",
+    "check": "npm run typecheck && npm run validate && npm run check:layers && npm run check:banned && npm run test && npm run sprites:check && npm run build"
   },
   "dependencies": {
     "idb-keyval": "6.3.0",

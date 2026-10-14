@@ -1,0 +1,98 @@
+{
+ "id": "tile.altana",
+ "note": "Альтанка на działce (ТЗ §5.5), блок 2×2: кадры NW, NE, SW, SE. Прозрачное закрывает трава (under в art/tilesets/ninja16.json).",
+ "size": [
+  16,
+  16
+ ],
+ "anchor": [
+  0,
+  0
+ ],
+ "keys": {
+  ".": null,
+  "o": "ink",
+  "r": "accent_brick",
+  "R": "orange_0",
+  "q": "red_1",
+  "w": "brown_3",
+  "W": "brown_0",
+  "l": "brown_5",
+  "d": "plum_0",
+  "b": "sand_3"
+ },
+ "frames": [
+  [
+   "................",
+   "...........ooooo",
+   ".........ooqqqqq",
+   ".......ooqqrrrrr",
+   ".....ooqqrrrrrrr",
+   "....oqqrrrrrrrrr",
+   "...oqrrrrrrrrrrr",
+   "..oqrrRrrrrRrrrr",
+   "..oqrrRrrrrRrrrr",
+   ".oqrrRrrrrRrrrrR",
+   ".oqrrRrrrrRrrrrR",
+   "oqqrRrrrrRrrrrRr",
+   "oRRRRRRRRRRRRRRR",
+   "oooooooooooooooo",
+   ".owwwwwwwwwwwwww",
+   ".oWWWWWWWWWWWWWW"
+  ],
+  [
+   "................",
+   "ooooo...........",
+   "qqqqqoo.........",
+   "rrrrrRRoo.......",
+   "rrrrrrrRRoo.....",
+   "rrrrrrrrrRRo....",
+   "rrrrrrrrrrrRo...",
+   "RrrrrRrrrrRRRo..",
+   "RrrrrRrrrrRRRo..",
+   "rrrrRrrrrRrrRRo.",
+   "rrrrRrrrrRrrRRo.",
+   "rrrRrrrrRrrrRRRo",
+   "RRRRRRRRRRRRRRRo",
+   "oooooooooooooooo",
+   "wwwwwwwwwwwwwwo.",
+   "WWWWWWWWWWWWWWo."
+  ],
+  [
+   ".oloo...........",
+   ".olwo...........",
+   ".olwo...........",
+   ".olwo....ddddddd",
+   ".olwo....ddddddd",
+   ".olwo....ddddddd",
+   ".olwo..ooooooooo",
+   ".olwo..olbbbbbbb",
+   ".olwo..oWWWWWWWW",
+   ".olwo..owo......",
+   ".olwo..owo......",
+   ".olwo..ooo......",
+   ".olwo...........",
+   ".oWWo...........",
+   ".oooo...........",
+   "................"
+  ],
+  [
+   "..........oolo..",
+   "..........owlo..",
+   "..........owlo..",
+   "dddddd....owlo..",
+   "dddddd....owlo..",
+   "dddddd....owlo..",
+   "ooooooo...owlo..",
+   "bbbbbbo...owlo..",
+   "WWWWWWo...owlo..",
+   "....owo...owlo..",
+   "....owo...owlo..",
+   "....ooo...owlo..",
+   "..........owlo..",
+   "..........oWWo..",
+   "..........oooo..",
+   "................"
+  ]
+ ]
+}

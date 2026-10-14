@@ -11,8 +11,11 @@ https://rudkovskii.github.io/polski-quest/
 nvm use        # Node 24 (.nvmrc)
 npm ci
 npm run dev    # http://localhost:5173/polski-quest/
-npm run check  # typecheck + validate + check:layers + check:banned + test + build
+npm run check  # typecheck + validate + check:layers + check:banned + test + sprites:check + build
+npm run sprites   # art/ → public/atlas (Python 3 + Pillow 12.2.0)
 ```
+
+Dev-страницы: `/?dev=input` (ввод), `/?dev=world&map=ch01.metro` (локация, события мира в консоли).
 
 Деплой: пуш в `main` → GitHub Actions (`.github/workflows/deploy.yml`) → Pages.
 

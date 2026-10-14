@@ -1,0 +1,164 @@
+{
+ "id": "ninja16",
+ "note": "Тайлсет локаций (ТЗ §3.7, §8). Имя тайла = legend[*].tile в maps/*.json. Источники: vendor/<pack>/<лист> + [колонка, строка] в клетках 16×16; sprite = кадр из art/sprites. auto16 = 16 вариантов по соседям N=1 E=2 S=4 W=8; блок NA (3×3 + полоски + одиночный) задаётся левым верхним углом. under = тайл под прозрачными пикселями.",
+ "sources": {
+  "floor": "vendor/ninja-adventure/Backgrounds/Tilesets/TilesetFloor.png",
+  "nature": "vendor/ninja-adventure/Backgrounds/Tilesets/TilesetNature.png",
+  "water": "vendor/ninja-adventure/Backgrounds/Tilesets/TilesetWater.png",
+  "element": "vendor/ninja-adventure/Backgrounds/Tilesets/TilesetElement.png",
+  "interior": "vendor/ninja-adventure/Backgrounds/Tilesets/Interior/TilesetInteriorFloor.png"
+ },
+ "tiles": {
+  "grass": {
+   "variants": [
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "floor",
+     1,
+     12
+    ],
+    [
+     "floor",
+     2,
+     12
+    ],
+    [
+     "floor",
+     3,
+     12
+    ]
+   ]
+  },
+  "grass_flowers": {
+   "stack": [
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "nature",
+     0,
+     11
+    ]
+   ]
+  },
+  "path": {
+   "auto16": [
+    "floor",
+    0,
+    7
+   ]
+  },
+  "soil": {
+   "auto16": [
+    "floor",
+    11,
+    7
+   ]
+  },
+  "water": {
+   "auto16": [
+    "water",
+    0,
+    6
+   ]
+  },
+  "tree": {
+   "tile": [
+    "nature",
+    10,
+    9
+   ]
+  },
+  "fence": {
+   "sprite": "tile.fence",
+   "mask": "auto16",
+   "under": [
+    "floor",
+    0,
+    12
+   ]
+  },
+  "altana": {
+   "sprite": "tile.altana",
+   "mask": "corners",
+   "under": [
+    "floor",
+    0,
+    12
+   ]
+  },
+  "floor": {
+   "variants": [
+    [
+     "interior",
+     11,
+     10
+    ],
+    [
+     "interior",
+     11,
+     10
+    ],
+    [
+     "interior",
+     11,
+     10
+    ],
+    [
+     "interior",
+     11,
+     10
+    ],
+    [
+     "interior",
+     11,
+     10
+    ],
+    [
+     "interior",
+     14,
+     11
+    ]
+   ]
+  },
+  "wall": {
+   "tile": [
+    "interior",
+    16,
+    14
+   ]
+  },
+  "gate": {
+   "sprite": "bramka",
+   "frame": 0,
+   "under": [
+    "interior",
+    11,
+    10
+   ]
+  },
+  "stairs": {
+   "tile": [
+    "element",
+    6,
+    12
+   ]
+  }
+ }
+}
