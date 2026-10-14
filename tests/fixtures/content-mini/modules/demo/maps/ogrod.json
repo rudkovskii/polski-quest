@@ -1,0 +1,27 @@
+{
+  "id": "demo.ogrod",
+  "title": { "pl": "Ogród", "ru": "Сад" },
+  "tileset": "ninja16",
+  "controls": "tap",
+  "size": [8, 6],
+  "defaultGround": ".",
+  "legend": {
+    ".": { "tile": "grass" },
+    "#": { "tile": "fence", "solid": true, "auto": true },
+    "s": { "tile": "soil" },
+    "H": { "tile": "altana", "solid": true },
+    "=": { "tile": "path", "auto": true }
+  },
+  "layers": {
+    "ground": ["########", "#ssss..#", "#ssss..#", "#....H.#", "#......#", "###=####"]
+  },
+  "spawns": { "default": [3, 4], "from_kawiarnia": [3, 4] },
+  "objects": [
+    { "type": "plot", "id": "grzadki", "at": [1, 1], "size": [4, 2] },
+    { "type": "npc", "id": "bobr", "at": [5, 2], "facing": "left" },
+    { "type": "secret", "id": "spot_okno", "at": [6, 3], "spot": "ogrod_okno" },
+    { "type": "trigger", "id": "altana_sleep", "at": [5, 3], "on": "tap", "do": [{ "open": "summary" }] },
+    { "type": "trigger", "id": "furtka", "at": [3, 4], "on": "enter", "once": true, "if": { "not": { "found": "simba" } }, "do": [{ "teleport": { "to": "demo.kawiarnia", "spawn": "from_ogrod" } }, { "toast": { "pl": "Kawiarnia", "ru": "Кафе" } }] },
+    { "type": "exit", "at": [3, 5], "to": "demo.kawiarnia", "spawn": "from_ogrod" }
+  ]
+}

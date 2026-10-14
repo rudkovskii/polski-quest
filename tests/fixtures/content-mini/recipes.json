@@ -1,0 +1,8 @@
+[
+  {
+    "id": "rec.demo",
+    "title": { "pl": "Pierogi", "ru": "Вареники" },
+    "needs": [{ "count": 2, "pos": ["noun"] }, { "count": 1, "pos": ["adj"] }],
+    "gives": { "pierog": 1 }
+  }
+]

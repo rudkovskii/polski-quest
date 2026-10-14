@@ -1,0 +1,29 @@
+[
+  {
+    "id": "ch01.s03",
+    "kind": "repair",
+    "title": { "pl": "Ł i L", "ru": "ł и l" },
+    "minutes": 4,
+    "npc": "pan_marek",
+    "location": "ch01.metro",
+    "introduces": ["lx.maly", "lx.slucham", "lx.stol"],
+    "skipIf": { "cluster": { "id": "R3", "status": "green" } },
+    "short": { "if": { "cluster": { "id": "R3", "status": "yellow" } }, "steps": [0, 2, 3, 6] },
+    "steps": [
+      { "t": "explain", "md": "**ł** = [ў], как английское w. **l** среднее, не мягкое." },
+      { "t": "minimal_pair", "pair": ["łata", "lata"], "play": "random", "cluster": "R3", "item": "mp.lata_lata" },
+      { "t": "minimal_pair", "pair": ["ława", "lawa"], "play": "random", "cluster": "R3" },
+      { "t": "listen", "say": "mała kawa", "options": ["mała kawa", "mala kawa", "mała kava"], "answer": 0, "item": "lx.maly" },
+      { "t": "shadow", "pl": "Mała kawa, proszę.", "repeat": 2 },
+      { "t": "say", "who": "pan_marek", "pl": "Słucham?", "ru": "Слушаю?" },
+      {
+        "t": "order",
+        "prompt": "Маленький кофе, пожалуйста.",
+        "tiles": ["Mała", "kawa", "proszę", "Mały", "kawę"],
+        "answer": ["Mała", "kawa", "proszę"],
+        "item": "lx.maly"
+      },
+      { "t": "choice", "q": "stół это…", "options": ["стол", "стул"], "answer": 0, "item": "lx.stol", "tags": ["ff.stol"] }
+    ]
+  }
+]

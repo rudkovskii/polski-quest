@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dialogues.schema.json",
+  "title": "Dialogues",
+  "description": "content/modules/<id>/dialogues.json (ТЗ §3.6). У узла ровно одно из next / choices / end (проверяет валидатор).",
+  "type": "array",
+  "items": {
+    "title": "Dialogue",
+    "type": "object",
+    "required": ["id", "npc", "start", "nodes"],
+    "additionalProperties": false,
+    "properties": {
+      "id": { "$ref": "common.schema.json#/$defs/dlgId" },
+      "npc": { "$ref": "common.schema.json#/$defs/charId" },
+      "register": { "enum": ["ty", "pan", "pani", "panstwo"] },
+      "start": { "type": "string" },
+      "if": { "$ref": "common.schema.json#/$defs/cond" },
+      "nodes": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": {
+          "title": "DialogueNode",
+          "type": "object",
+          "required": ["who"],
+          "additionalProperties": false,
+          "properties": {
+            "who": { "$ref": "common.schema.json#/$defs/charId" },
+            "pl": { "type": "string" },
+            "ru": { "type": "string" },
+            "next": { "type": "string" },
+            "end": { "const": true },
+            "lesson": { "$ref": "common.schema.json#/$defs/id" },
+            "do": { "$ref": "common.schema.json#/$defs/effects" },
+            "choices": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "title": "DialogueChoice",
+                "type": "object",
+                "required": ["pl", "next"],
+                "additionalProperties": false,
+                "properties": {
+                  "pl": { "type": "string" },
+                  "ru": { "type": "string" },
+                  "ok": { "type": "boolean" },
+                  "next": { "type": "string" },
+                  "errorTag": { "$ref": "common.schema.json#/$defs/errorTag" },
+                  "react": { "enum": ["confused", "happy", "laugh", "cold"] },
+                  "if": { "$ref": "common.schema.json#/$defs/cond" },
+                  "do": { "$ref": "common.schema.json#/$defs/effects" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

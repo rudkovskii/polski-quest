@@ -1,0 +1,41 @@
+[
+  {
+    "id": "dima",
+    "name": "Dima",
+    "kind": "player",
+    "addressAs": "none",
+    "voice": { "engine": "none", "id": "none" },
+    "sprite": "dima",
+    "portrait": "dima",
+    "hearts": false
+  },
+  {
+    "id": "bobr",
+    "name": "Kazimierz Bóbr",
+    "kind": "companion",
+    "addressAs": "ty",
+    "voice": { "engine": "none", "id": "none" },
+    "sprite": "bobr",
+    "portrait": "bobr",
+    "hearts": false
+  },
+  {
+    "id": "simba",
+    "name": "Simba",
+    "kind": "secret",
+    "addressAs": "none",
+    "voice": { "engine": "none", "id": "none" },
+    "sprite": "simba",
+    "portrait": "simba",
+    "hearts": false
+  },
+  {
+    "id": "pan_marek",
+    "name": "pan Marek",
+    "kind": "extra",
+    "addressAs": "pan",
+    "voice": { "engine": "say", "id": "Zosia" },
+    "sprite": "extra_m",
+    "portrait": "extra_m"
+  }
+]

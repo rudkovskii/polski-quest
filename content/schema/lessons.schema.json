@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lessons.schema.json",
+  "title": "Lessons",
+  "description": "content/modules/<id>/lessons.json (ТЗ §3.5). Ровно одно из steps / parts (проверяет валидатор).",
+  "type": "array",
+  "items": {
+    "title": "Lesson",
+    "type": "object",
+    "required": ["id", "kind", "title", "minutes"],
+    "additionalProperties": false,
+    "properties": {
+      "id": { "$ref": "common.schema.json#/$defs/id" },
+      "kind": { "enum": ["scene", "repair", "signs", "diag", "boss", "remedy", "practice"] },
+      "title": {
+        "type": "object",
+        "required": ["ru"],
+        "additionalProperties": false,
+        "properties": {
+          "pl": { "type": "string" },
+          "ru": { "type": "string" }
+        }
+      },
+      "minutes": { "type": "number", "minimum": 1, "maximum": 15 },
+      "npc": { "$ref": "common.schema.json#/$defs/charId" },
+      "location": { "$ref": "common.schema.json#/$defs/id" },
+      "introduces": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lxId" }, "maxItems": 8 },
+      "warmup": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fromModules": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/moduleId" } },
+          "count": { "type": "integer", "minimum": 0, "maximum": 3 }
+        }
+      },
+      "requires": { "$ref": "common.schema.json#/$defs/cond" },
+      "skipIf": { "$ref": "common.schema.json#/$defs/cond" },
+      "short": {
+        "type": "object",
+        "required": ["if", "steps"],
+        "additionalProperties": false,
+        "properties": {
+          "if": { "$ref": "common.schema.json#/$defs/cond" },
+          "steps": { "type": "array", "items": { "type": "integer", "minimum": 0 } }
+        }
+      },
+      "steps": { "type": "array", "minItems": 1, "items": { "$ref": "steps.schema.json" } },
+      "parts": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "title": "LessonPart",
+          "type": "object",
+          "required": ["id", "steps"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "type": "string" },
+            "title": { "type": "string" },
+            "weight": { "type": "number" },
+            "steps": { "type": "array", "minItems": 1, "items": { "$ref": "steps.schema.json" } }
+          }
+        }
+      },
+      "pass": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "score": { "type": "number", "minimum": 0, "maximum": 1 },
+          "firstTry": { "type": "number", "minimum": 0, "maximum": 1 },
+          "redClusterMin": { "type": "number" },
+          "maxErrorsByTag": { "type": "object", "additionalProperties": { "type": "integer" } }
+        }
+      },
+      "reviewShare": { "type": "number", "minimum": 0, "maximum": 0.5 },
+      "reward": { "$ref": "common.schema.json#/$defs/effects" }
+    }
+  }
+}

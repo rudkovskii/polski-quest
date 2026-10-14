@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "clusters": [{ "id": "R3", "title": "ł и l", "repairLesson": "demo.s01" }],
+  "pairs": [
+    { "id": "mp.lata_lata", "a": "łata", "b": "lata", "cluster": "R3" },
+    { "id": "mp.lawa_lawa", "a": "ława", "b": "lawa", "cluster": "R3" }
+  ]
+}

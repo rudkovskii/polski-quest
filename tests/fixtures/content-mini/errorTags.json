@@ -1,0 +1,4 @@
+[
+  { "id": "ff.stol", "ru": "stół = стол, а не стул", "remedy": "demo.s01" },
+  { "id": "R3", "ru": "ł и l", "cluster": "R3", "remedy": "demo.s01" }
+]

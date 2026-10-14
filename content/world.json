@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "start": { "location": "ch01.dzialka", "spawn": "default" },
+  "maps": { "poland": "worldmap/poland.png", "warszawa": "worldmap/warszawa.png" },
+  "biomes": [
+    {
+      "id": "praga",
+      "layer": "warszawa",
+      "title": { "pl": "Praga", "ru": "Прага" },
+      "mapRegion": [40, 60, 80, 70],
+      "locations": ["ch01.dzialka", "ch01.metro"],
+      "modules": ["ch01"],
+      "hosts": ["bobr"],
+      "stamp": "stamp.praga",
+      "stages": {
+        "visible": { "always": true },
+        "preview": { "always": true },
+        "stamp": { "flag": "ch01.done" }
+      }
+    }
+  ]
+}
