@@ -159,6 +159,90 @@
     6,
     12
    ]
+  },
+  "lodge_nw": {
+   "stack": [
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "nature",
+     13,
+     8
+    ]
+   ]
+  },
+  "lodge_ne": {
+   "stack": [
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "nature",
+     14,
+     8
+    ]
+   ]
+  },
+  "lodge_sw": {
+   "stack": [
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "nature",
+     13,
+     9
+    ]
+   ]
+  },
+  "lodge_se": {
+   "stack": [
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "nature",
+     14,
+     9
+    ]
+   ]
+  },
+  "stump": {
+   "stack": [
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "nature",
+     4,
+     8
+    ]
+   ]
+  },
+  "bush": {
+   "stack": [
+    [
+     "floor",
+     0,
+     12
+    ],
+    [
+     "nature",
+     1,
+     10
+    ]
+   ]
   }
  }
 }

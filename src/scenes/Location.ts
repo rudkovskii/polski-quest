@@ -58,8 +58,17 @@ export class Location extends Phaser.Scene {
   private guide: ResolvedGuide | null = null;
   private guideG!: Phaser.GameObjects.Graphics;
   private guideKey = '';
-  /** Дом бобра на tap-карте (NPC bobr): сюда он возвращается, когда цели нет. */
+  /** Дом бобра на карте, где он NPC (działka): сюда он возвращается, когда цели нет. */
   private bobrHome: Xy | null = null;
+  /** «A»-пузырёк над тем, с чем сработает кнопка действия (P-02). */
+  private aBubble!: Phaser.GameObjects.Graphics;
+  private aKey = '';
+  /** «!» растения-цели спрятан, пока над ним «A». */
+  private aHiddenMark: Phaser.GameObjects.Sprite | null = null;
+  /** Мир принимает ввод (оверлей закрыт). */
+  private inputOn = true;
+  /** Последняя отправленная экранная точка Казика (`world:anchor`). */
+  private anchorKey = '';
 
   constructor() {
     super('Location');
@@ -79,6 +88,9 @@ export class Location extends Phaser.Scene {
     this.guide = null;
     this.guideKey = '';
     this.bobrHome = null;
+    this.aKey = '';
+    this.aHiddenMark = null;
+    this.anchorKey = '';
   }
 
   preload(): void {
@@ -107,14 +119,21 @@ export class Location extends Phaser.Scene {
     this.marker = this.add.graphics().setDepth(10_000);
     this.markerKey = '';
     this.guideG = this.add.graphics().setDepth(9_500);
+    this.aBubble = this.add.graphics().setDepth(10_500);
     this.bobrHome = this.model.object('npc:bobr')?.at ?? null;
 
     this.layout();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.layout, this);
     const offIntent = bus.on('input:intent', (i) => this.onIntent(i));
     const offInput = bus.on('world:input', ({ enabled }) => {
+      this.inputOn = enabled;
       if (!enabled) this.model.halt();
     });
+    // Вкладка свернулась (P-02, исследование §6в п. 10): Phaser сам ставит цикл на паузу, здесь — стоп ходьбы,
+    // чтобы после возврата Дима стоял на той же клетке, а не «доходил» зажатую кнопку.
+    const onHidden = (): void => this.model.halt();
+    this.game.events.on(Phaser.Core.Events.HIDDEN, onHidden);
+    this.events.on(Phaser.Scenes.Events.RENDER, this.emitAnchor, this);
     const offTeleport = bus.on('world:teleport', ({ location, spawn }) => this.go(location, spawn));
     const offMarks = bus.on('world:marks', (m) => {
       if (m.location === this.mapDef.id && !this.leaving) this.applyMarks(m);
@@ -129,7 +148,10 @@ export class Location extends Phaser.Scene {
       offTeleport();
       offMarks();
       offGuide();
+      this.game.events.off(Phaser.Core.Events.HIDDEN, onHidden);
+      this.events.off(Phaser.Scenes.Events.RENDER, this.emitAnchor, this);
       this.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
+      bus.emit('world:anchor', { id: 'bobr', at: null });
     });
     this.cameras.main.fadeIn(150, 26, 28, 44);
     bus.emit('world:location', { id: this.mapDef.id, controls: this.mapDef.controls });
@@ -147,8 +169,9 @@ export class Location extends Phaser.Scene {
   }
 
   /** Состояние для dev-проверок и тестов в браузере. */
-  get state(): { location: string; controls: string; tile: Xy; facing: Dir; moving: boolean; highlight: string | null; companion: Xy | null } {
+  get state(): { location: string; controls: string; tile: Xy; facing: Dir; moving: boolean; highlight: string | null; aBubble: string | null; companion: Xy | null; zoom: number } {
     const m = this.model;
+    const a = this.inputOn ? m.actionHint() : null;
     return {
       location: this.mapDef.id,
       controls: m.controls,
@@ -156,7 +179,9 @@ export class Location extends Phaser.Scene {
       facing: m.player.facing,
       moving: m.moving,
       highlight: m.highlight()?.key ?? null,
+      aBubble: a ? `${a.key}@${a.tile[0]},${a.tile[1]}` : null,
       companion: m.companion?.tile ?? null,
+      zoom: this.cameras.main.zoom,
     };
   }
 
@@ -172,7 +197,87 @@ export class Location extends Phaser.Scene {
     this.syncActor(this.player, 'dima', this.model.player, time);
     if (this.companion && this.model.companion) this.syncActor(this.companion, 'bobr', this.model.companion, time);
     this.drawHighlight(time);
+    this.drawActionBubble(time);
     this.drawGuide(time);
+  }
+
+  // ───────────── «A»-пузырёк и якорь Казика (P-02) ─────────────
+
+  /** Пиксельная «A» 5×6 (не текст: canvas рисует только цифры HUD). */
+  private static readonly GLYPH_A = ['.XXX.', 'X...X', 'X...X', 'XXXXX', 'X...X', 'X...X'];
+
+  /**
+   * «A»-пузырёк (исследование §3.2, §6в п. 4): белый пузырёк с «A» над объектом, с которым сработает кнопка
+   * действия с этой клетки. Пока Дима идёт или открыт оверлей, пузырька нет.
+   */
+  private drawActionBubble(time: number): void {
+    const t = this.inputOn && !this.leaving ? this.model.actionHint() : null;
+    const bob = Math.floor(time / 450) % 2;
+    const key = t ? `${t.key}@${t.tile[0]},${t.tile[1]}:${bob}` : '';
+    if (key === this.aKey) return;
+    this.aKey = key;
+    const g = this.aBubble.clear();
+    const mark = t ? (this.plants.get(`${t.tile[0]},${t.tile[1]}`)?.mark ?? null) : null;
+    if (this.aHiddenMark && this.aHiddenMark !== mark) this.aHiddenMark.setVisible(true);
+    this.aHiddenMark = mark;
+    mark?.setVisible(false);
+    if (!t) return;
+    const o = this.model.object(t.key);
+    if (!o) return;
+    const w = 11;
+    const h = 10;
+    const ink = 0x141b1b;
+    const paper = 0xf4f4f4;
+    // Дима стоит прямо над целью (смотрит вниз): над целью его голова. Пузырёк — справа от Димы, на его клетке
+    // по высоте (не на соседней грядке), хвостиком вниз-влево к цели.
+    const side = this.model.player.facing === 'down' && this.model.player.tile[0] === t.tile[0];
+    let x0: number;
+    let y0: number;
+    if (side) {
+      x0 = (t.tile[0] + 1) * T + 1;
+      y0 = (t.tile[1] - 1) * T + 2 - bob;
+      g.fillStyle(ink, 1).fillTriangle(x0 - 1, y0 + h - 4, x0 + 4, y0 + h, x0 - 4, t.tile[1] * T + 3 - bob);
+    } else {
+      const cx = t.tile[0] * T + T / 2;
+      const top = (o.kind === 'plot' ? t.tile[1] : o.at[1]) * T;
+      const tip = top - 1 - bob;
+      x0 = Math.round(cx - w / 2);
+      y0 = tip - 3 - h;
+      g.fillStyle(ink, 1).fillTriangle(cx - 3, y0 + h, cx + 3, y0 + h, cx, tip + 1);
+    }
+    g.fillStyle(ink, 1).fillRect(x0 - 1, y0, w + 2, h).fillRect(x0, y0 - 1, w, h + 2);
+    g.fillStyle(paper, 1).fillRect(x0, y0, w, h);
+    g.fillStyle(0xb13e53, 1);
+    Location.GLYPH_A.forEach((row, ry) => {
+      for (let rx = 0; rx < row.length; rx++) if (row[rx] === 'X') g.fillRect(x0 + 3 + rx, y0 + 2 + ry, 1, 1);
+    });
+  }
+
+  /**
+   * Экранная точка над головой Казика (`world:anchor`): пузырь его реплики живёт в мире над спрайтом (P-02).
+   * После отрисовки кадра: камера уже сдвинута, точка совпадает с картинкой.
+   */
+  private emitAnchor(): void {
+    if (!this.model || this.leaving) return;
+    const npc = this.npcs.get('npc:bobr');
+    const s = npc && !this.model.isHidden('npc:bobr') ? npc : this.companion;
+    let at: { x: number; y: number } | null = null;
+    const view = this.cameras.main.worldView;
+    // За кадром Казика не видно: пузырь над пустым краем экрана путает — оверлей покажет его с портретом.
+    const seen = s?.visible && s.x >= view.x + 4 && s.x <= view.right - 4 && s.y - 8 >= view.y && s.y - 8 <= view.bottom;
+    if (s && seen) {
+      const cam = this.cameras.main;
+      const r = this.game.canvas.getBoundingClientRect();
+      const top = s.y - s.displayHeight * s.originY;
+      at = {
+        x: Math.round((s.x - cam.worldView.x) * cam.zoom + cam.x + r.left),
+        y: Math.round((top - cam.worldView.y) * cam.zoom + cam.y + r.top),
+      };
+    }
+    const key = at ? `${at.x},${at.y}` : '-';
+    if (key === this.anchorKey) return;
+    this.anchorKey = key;
+    bus.emit('world:anchor', { id: 'bobr', at });
   }
 
   // ───────────── цель режиссёра (I-13) ─────────────
@@ -264,15 +369,18 @@ export class Location extends Phaser.Scene {
     const hl = this.model.highlight();
     const o = hl ? this.model.object(hl.key) : undefined;
     const inset = Math.floor(time / 333) % 2;
-    const key = o ? `${o.key}:${inset}` : '';
+    // Грядка: уголки вокруг одной клетки, на которую сработает A, а не вокруг всей грядки.
+    const at: Xy | undefined = o?.kind === 'plot' && hl ? hl.tile : o?.at;
+    const size: Xy = o?.kind === 'plot' ? [1, 1] : (o?.size ?? [1, 1]);
+    const key = o && at ? `${o.key}:${at[0]},${at[1]}:${inset}` : '';
     if (key === this.markerKey) return;
     this.markerKey = key;
     const g = this.marker.clear();
-    if (!o) return;
-    const x0 = o.at[0] * T + inset - 1;
-    const y0 = o.at[1] * T + inset - 1;
-    const x1 = (o.at[0] + o.size[0]) * T - inset + 1;
-    const y1 = (o.at[1] + o.size[1]) * T - inset + 1;
+    if (!o || !at) return;
+    const x0 = at[0] * T + inset - 1;
+    const y0 = at[1] * T + inset - 1;
+    const x1 = (at[0] + size[0]) * T - inset + 1;
+    const y1 = (at[1] + size[1]) * T - inset + 1;
     const L = 5;
     const corner = (cx: number, cy: number, sx: number, sy: number, color: number, d: number): void => {
       g.fillStyle(color, 1);
@@ -370,6 +478,8 @@ export class Location extends Phaser.Scene {
 
   private applyMarks(m: BusEvents['world:marks']): void {
     this.plots = m.plots;
+    this.model.setGarden(m.plots.flatMap((p) => p.cells), m.seeds?.length ?? 0);
+    this.aKey = ''; // цель «A» могла измениться: на пустой клетке выросло семя
     if (m.hidden && this.model.setHidden(m.hidden)) {
       for (const [key, s] of this.npcs) s.setVisible(!this.model.isHidden(key));
       for (const [key, s] of this.wordSprites) s.setVisible(!this.model.isHidden(key));
@@ -472,7 +582,7 @@ export class Location extends Phaser.Scene {
     cam.stopFollow();
     const fitsW = mw * zoom <= width;
     const fitsH = mh * zoom <= height;
-    // tap-локация (działka) всегда по центру: ходьбы нет, следовать не за кем.
+    // tap-локация всегда по центру: ходьбы нет, следовать не за кем.
     if ((fitsW && fitsH) || this.model.controls === 'tap') {
       cam.removeBounds();
       cam.centerOn(mw / 2, mh / 2);

@@ -6,6 +6,11 @@
 // пока слов не больше клеток, растение не прыгает по грядке, когда его полили.
 // Банка (слово созрело): на грядке банка, пока у слова есть полив или оно созрело за последние
 // JAR_SHOW_DAYS; дальше слово живёт в подвале (список), клетка достаётся другому слову (§4.10).
+//
+// Посадка руками (P-02, исследование §6а день 1): слово с флагом `seed.<item>` — семя в кармане, на грядке его
+// нет, пока Дима не посадит: A (или тап) по пустой клетке ставит флаг `plant.<x>_<y>.<item>`, и слово растёт
+// именно на этой клетке. Слова без флага `seed.*` (всё, что посажено до P-02, и сцены, которые сажают сами)
+// раскладываются по свободным клеткам, как раньше. Флаги сливаются объединением (merge.ts) — синк не ломается.
 import { gardenItems, type GardenItem, type GardenTuning } from '../systems/garden';
 import type { Derived } from '../systems/derive';
 import type { LocationMap } from '../types/content';
@@ -63,32 +68,105 @@ function cellOf(g: GardenItem | undefined, at: [number, number]): PlotCellView {
   return { at, item: g.item, stage: g.stage, interval: g.interval, due: g.dueCard !== null, wilted: g.wilted };
 }
 
-/** Грядки карты: клетки построчно слева направо, сверху вниз; несколько plot заполняются по очереди. */
-export function layoutPlots(plots: readonly PlotRect[], items: readonly GardenItem[], now: number): PlotView[] {
+/** Флаг «семя в кармане»: слово уже выучено в сцене, но ещё не посажено руками. */
+export const seedFlag = (item: string): string => `seed.${item}`;
+/** Флаг «посажено на клетку x,y». */
+export const plantFlag = (item: string, at: readonly [number, number]): string => `plant.${at[0]}_${at[1]}.${item}`;
+const PLANT_RE = /^plant\.(\d+)_(\d+)\.(.+)$/;
+
+export interface PlantedPins {
+  /** Слово → клетка, куда его посадили руками (при споре двух устройств — раньше посаженное). */
+  pins: Map<string, [number, number]>;
+  /** Семена в кармане по порядку получения. */
+  seeds: string[];
+}
+
+/** Карман и посаженное руками из флагов мира (только слова, которые есть на грядке: `items`). */
+export function plantedPins(flags: Readonly<Record<string, number>>, items: readonly string[]): PlantedPins {
+  const known = new Set(items);
+  const pins = new Map<string, [number, number]>();
+  const pinTs = new Map<string, number>();
+  const taken = new Map<string, number>();
+  const all = Object.entries(flags)
+    .map(([name, ts]) => ({ m: PLANT_RE.exec(name), ts }))
+    .filter((x): x is { m: RegExpExecArray; ts: number } => !!x.m && known.has(x.m[3]!))
+    .sort((a, b) => a.ts - b.ts || (a.m[0] < b.m[0] ? -1 : 1));
+  for (const { m, ts } of all) {
+    const item = m[3]!;
+    const cell = `${m[1]},${m[2]}`;
+    if (pins.has(item) || taken.has(cell)) continue; // одно слово — одна клетка, одна клетка — одно слово
+    pins.set(item, [Number(m[1]), Number(m[2])]);
+    pinTs.set(item, ts);
+    taken.set(cell, ts);
+  }
+  const seeds = Object.entries(flags)
+    .filter(([name]) => name.startsWith('seed.') && known.has(name.slice(5)) && !pins.has(name.slice(5)))
+    .sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : 1))
+    .map(([name]) => name.slice(5));
+  return { pins, seeds };
+}
+
+/**
+ * Посадка руками: какой флаг поставить, если Дима сажает на клетку `at` (A или тап по пустой клетке).
+ * Первое семя из кармана; клетка занята посаженным руками словом или семян нет — null.
+ */
+export function plantOnCell(flags: Readonly<Record<string, number>>, items: readonly string[], at: readonly [number, number]): string | null {
+  const { pins, seeds } = plantedPins(flags, items);
+  if (!seeds[0]) return null;
+  for (const c of pins.values()) if (c[0] === at[0] && c[1] === at[1]) return null;
+  return plantFlag(seeds[0], at);
+}
+
+/**
+ * Грядки карты: клетки построчно слева направо, сверху вниз; несколько plot заполняются по очереди.
+ * Слова из `pins` стоят на своих клетках (посажены руками), остальные занимают свободные клетки по порядку.
+ */
+export function layoutPlots(plots: readonly PlotRect[], items: readonly GardenItem[], now: number, pins: ReadonlyMap<string, readonly [number, number]> = new Map()): PlotView[] {
   const capacity = plots.reduce((s, p) => s + p.size[0] * p.size[1], 0);
   const chosen = pickPlants(items, capacity, now);
+  const inPlots = (c: readonly [number, number]): boolean =>
+    plots.some((p) => c[0] >= p.at[0] && c[1] >= p.at[1] && c[0] < p.at[0] + p.size[0] && c[1] < p.at[1] + p.size[1]);
+  const byCell = new Map<string, GardenItem>();
+  const free: GardenItem[] = [];
+  for (const g of chosen) {
+    const pin = pins.get(g.item);
+    const k = pin ? `${pin[0]},${pin[1]}` : '';
+    if (pin && inPlots(pin) && !byCell.has(k)) byCell.set(k, g);
+    else free.push(g);
+  }
   let k = 0;
   return plots.map((p) => {
     const cells: PlotCellView[] = [];
     for (let y = 0; y < p.size[1]; y++)
-      for (let x = 0; x < p.size[0]; x++) cells.push(cellOf(chosen[k++], [p.at[0] + x, p.at[1] + y]));
+      for (let x = 0; x < p.size[0]; x++) {
+        const at: [number, number] = [p.at[0] + x, p.at[1] + y];
+        cells.push(cellOf(byCell.get(`${at[0]},${at[1]}`) ?? free[k++], at));
+      }
     return { plot: p.id, cells };
   });
 }
 
-/** Всё для `world:marks` одной карты: грядки и «!» над словами-объектами. */
+/**
+ * Всё для `world:marks` одной карты: грядки, «!» над словами-объектами и семена в кармане (P-02).
+ * `flags` — флаги мира (`seed.*`, `plant.*`); без них посадки руками нет, всё раскладывается само.
+ */
 export function worldMarks(
   map: Pick<LocationMap, 'id' | 'objects'>,
   state: Pick<Derived, 'cards' | 'todayStart'>,
   now: number,
   t?: GardenTuning,
-): { location: string; plots: PlotView[]; dueItems: string[] } {
-  const items = gardenItems(state, now, t);
+  flags: Readonly<Record<string, number>> = {},
+): { location: string; plots: PlotView[]; dueItems: string[]; seeds: string[] } {
+  const all = gardenItems(state, now, t);
+  const { pins, seeds } = plantedPins(flags, all.map((g) => g.item));
+  const pocket = new Set(seeds);
+  const items = all.filter((g) => !pocket.has(g.item));
   const plots = plotsOf(map);
   return {
     location: map.id,
-    plots: plots.length ? layoutPlots(plots, items, now) : [],
+    plots: plots.length ? layoutPlots(plots, items, now, pins) : [],
     dueItems: items.filter((g) => g.dueCard).map((g) => g.item),
+    seeds: plots.length ? seeds : [],
   };
 }
 

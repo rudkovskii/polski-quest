@@ -112,6 +112,8 @@ export interface GuideStepView {
   more3?: boolean;
   /** Показать подсказку управления (F3, первый вход в walk-локацию). */
   moveHint?: boolean;
+  /** Строку «Сейчас» не показывать (первые 3 игровых дня ведёт Казик, P-02); она появится при 10 с бездействия. */
+  nowHidden?: boolean;
   /** Почему (dev). */
   reason: string;
   /** Весна: долг словами, а не числом (§4.2). */
@@ -141,7 +143,12 @@ export interface BusEvents {
    * Пометки мира из прогресса (I-12): грядки `plot` (стадии, «!», подвявшие) и «!» над объектами `word`
    * с due-словами. Шлёт склейка (src/day.ts) на `world:location` и после изменений прогресса.
    */
-  'world:marks': { location: string; plots: PlotView[]; dueItems: string[]; hidden?: string[] };
+  'world:marks': { location: string; plots: PlotView[]; dueItems: string[]; hidden?: string[]; seeds?: string[] };
+  /**
+   * Где на экране персонаж (P-02): CSS-пиксели окна над головой спрайта. Сцена шлёт при движении камеры или
+   * персонажа; оверлей ставит над ним пузырь реплики. `at: null` — персонажа на карте нет или он скрыт.
+   */
+  'world:anchor': { id: string; at: { x: number; y: number } | null };
   /**
    * Цель режиссёра (I-13, ТЗ §4.12): сцена подсвечивает объект (контур, путь, стрелка у края),
    * бобр идёт к цели. Цель в другой локации — подсвечен выход туда. null — цели нет.

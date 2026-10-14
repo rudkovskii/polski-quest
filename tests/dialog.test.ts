@@ -398,3 +398,38 @@ describe('P-01: заглушки todo в игре не видны', () => {
     expect(bobrLine(content, 'bobr.after_kawa')?.textContent).toContain('[todo: bobr.after_kawa]');
   });
 });
+
+describe('B/Esc закрывает любое окно (P-02)', () => {
+  it('слой без своего обработчика закрывается кнопкой «✕» по B/Esc; тап мимо окна — нет', () => {
+    const bus = testBus();
+    const overlay = createOverlay(host, { bus });
+    const layer = overlay.open('pq-test-layer');
+    let closed = 0;
+    const x = document.createElement('button');
+    x.dataset.act = 'close';
+    x.addEventListener('click', () => {
+      closed++;
+      layer.close();
+    });
+    layer.el.append(x);
+    bus.emit('input:intent', { type: 'cancel', to: 'ui', source: 'pointer' });
+    expect(closed).toBe(0);
+    bus.emit('input:intent', { type: 'cancel', to: 'ui', source: 'dpad' });
+    expect(closed).toBe(1);
+    expect(overlay.depth).toBe(0);
+  });
+  it('свой обработчик cancel (true) — кнопка не жмётся второй раз', () => {
+    const bus = testBus();
+    const overlay = createOverlay(host, { bus });
+    const layer = overlay.open();
+    let clicks = 0;
+    let handled = 0;
+    const x = document.createElement('button');
+    x.dataset.act = 'close';
+    x.addEventListener('click', () => clicks++);
+    layer.el.append(x);
+    layer.handle({ cancel: () => (handled++, true) });
+    bus.emit('input:intent', { type: 'cancel', to: 'ui', source: 'keyboard' });
+    expect([handled, clicks]).toEqual([1, 0]);
+  });
+});

@@ -6,7 +6,7 @@ import type { EventDraft } from '../src/systems/log';
 import { append, newProgress, type CardState, type Progress } from '../src/systems/progress';
 import { cellar } from '../src/systems/garden';
 import { DEFAULT_TUNING } from '../src/systems/tuning';
-import { cellAt, gardenItems, jarStage, JAR_SHOW_DAYS, layoutPlots, pickPlants, plantStage, plotsOf, worldMarks, type GardenItem } from '../src/world/dzialka';
+import { cellAt, gardenItems, jarStage, JAR_SHOW_DAYS, layoutPlots, pickPlants, plantedPins, plantFlag, plantOnCell, plantStage, plotsOf, seedFlag, worldMarks, type GardenItem } from '../src/world/dzialka';
 
 const DAY = 86_400_000;
 const TZ = 'Europe/Warsaw';
@@ -183,5 +183,58 @@ describe('раскладка по грядкам', () => {
     expect(m.dueItems.sort()).toEqual(['lx.kawa', 'lx.stol']);
     expect(cellAt(m.plots, [2, 1])?.item).toBe('lx.stol');
     expect(cellAt(m.plots, [9, 9])).toBeUndefined();
+  });
+});
+
+describe('посадка руками (P-02): семена в кармане, слово растёт на выбранной клетке', () => {
+  const map = { id: 'demo.ogrod', objects: [{ type: 'plot' as const, id: 'grzadki', at: [1, 1] as [number, number], size: [3, 2] as [number, number] }] };
+  const p = log([intro('lx.kawa'), intro('lx.stol', T0 + 1000), intro('lx.woda', T0 + 2000)]);
+  const d = derive(p, dc, dz(0, 20), TZ);
+
+  it('без флагов seed.* всё раскладывается само, как раньше; карман пуст', () => {
+    const m = worldMarks(map, d, dz(0, 20), DEFAULT_TUNING, {});
+    expect(m.seeds).toEqual([]);
+    expect(m.plots[0]!.cells.map((c) => c.item ?? '-')).toEqual(['lx.kawa', 'lx.stol', 'lx.woda', '-', '-', '-']);
+  });
+  it('семя в кармане не на грядке; посадили на клетку 3,2 — растёт там, остальные не сдвинулись', () => {
+    const flags: Record<string, number> = { [seedFlag('lx.stol')]: T0 + 1000, [seedFlag('lx.woda')]: T0 + 2000 };
+    const m1 = worldMarks(map, d, dz(0, 20), DEFAULT_TUNING, flags);
+    expect(m1.seeds).toEqual(['lx.stol', 'lx.woda']);
+    expect(m1.plots[0]!.cells.map((c) => c.item ?? '-')).toEqual(['lx.kawa', '-', '-', '-', '-', '-']);
+    flags[plantFlag('lx.stol', [3, 2])] = T0 + 5000;
+    const m2 = worldMarks(map, d, dz(0, 20), DEFAULT_TUNING, flags);
+    expect(m2.seeds).toEqual(['lx.woda']);
+    expect(cellAt(m2.plots, [3, 2])?.item).toBe('lx.stol');
+    expect(cellAt(m2.plots, [1, 1])?.item).toBe('lx.kawa');
+    expect(m2.plots[0]!.cells.filter((c) => c.item)).toHaveLength(2);
+  });
+  it('спор двух устройств: одна клетка — одно слово (раньше посаженное), второе ищет свободную', () => {
+    const flags = {
+      [seedFlag('lx.stol')]: 1,
+      [seedFlag('lx.woda')]: 2,
+      [plantFlag('lx.woda', [2, 1])]: 10,
+      [plantFlag('lx.stol', [2, 1])]: 20,
+    };
+    const { pins, seeds } = plantedPins(flags, ['lx.kawa', 'lx.stol', 'lx.woda']);
+    expect(pins.get('lx.woda')).toEqual([2, 1]);
+    expect(pins.has('lx.stol')).toBe(false);
+    expect(seeds).toEqual(['lx.stol']); // осталось в кармане: посадить ещё раз
+  });
+  it('plantOnCell: первое семя из кармана на выбранную клетку; занятая клетка или пустой карман — ничего', () => {
+    const items = ['lx.kawa', 'lx.stol', 'lx.woda'];
+    const flags: Record<string, number> = { [seedFlag('lx.woda')]: 2, [seedFlag('lx.stol')]: 1 };
+    expect(plantOnCell(flags, items, [2, 2])).toBe('plant.2_2.lx.stol');
+    flags['plant.2_2.lx.stol'] = 5;
+    expect(plantOnCell(flags, items, [2, 2])).toBeNull();
+    expect(plantOnCell(flags, items, [3, 1])).toBe('plant.3_1.lx.woda');
+    flags['plant.3_1.lx.woda'] = 6;
+    expect(plantOnCell(flags, items, [1, 2])).toBeNull();
+  });
+  it('флаг семени у слова без карточек (ещё не выучено) не делает семя', () => {
+    expect(plantedPins({ [seedFlag('lx.nic')]: 1 }, ['lx.kawa']).seeds).toEqual([]);
+  });
+  it('на карте без грядок карман не показывается', () => {
+    const m = worldMarks({ id: 'x', objects: [] }, d, dz(0, 20), DEFAULT_TUNING, { [seedFlag('lx.stol')]: 1 });
+    expect(m.seeds).toEqual([]);
   });
 });

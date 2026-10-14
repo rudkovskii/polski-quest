@@ -11,7 +11,7 @@
 // sleep — «Dobranoc» (ui/daySummary.ts).
 import { bus } from './systems/bus';
 import type { Content } from './systems/content';
-import { derive, deriveContent } from './systems/derive';
+import { derive, deriveContent, isPlayedDay, type Derived } from './systems/derive';
 import {
   diagDone,
   directorInput,
@@ -37,6 +37,15 @@ import { loadIntroAtlas, runIntro } from './ui/intro';
 import type { AudioPort, PortraitSource } from './ui/overlay/kit';
 import { STAMP_FIRST } from './ui/passport';
 import type { Play } from './ui/play';
+import { gardenItems, plantOnCell } from './world/dzialka';
+
+/** Сколько первых игровых дней строка «Сейчас» спрятана: ведёт Казик (ПОЛИРОВКА §2 р. 11). */
+export const NOW_HIDDEN_DAYS = 3;
+
+/** Номер игрового дня: засчитанные дни до сегодня + 1 (сегодняшний день — текущий, даже если ещё не засчитан). */
+export function gameDayNo(d: Pick<Derived, 'days' | 'today'>): number {
+  return Object.entries(d.days).filter(([day, st]) => day < d.today && isPlayedDay(st)).length + 1;
+}
 
 /** Флаг «Я сохранил ссылку» (тот же, что LINK_SAVED_FLAG в cloud.ts). */
 const LINK_SAVED = 'link.saved';
@@ -76,6 +85,7 @@ export function startFlow(o: FlowOptions): Flow {
   let running = false;
   let launched = false;
   let pendingResume: string | null = null;
+  let nowHidden = false;
   let storeNow: FlowStore | null = null;
   void o.store.then((s) => (storeNow = s));
 
@@ -158,8 +168,10 @@ export function startFlow(o: FlowOptions): Flow {
       ...(s.line && !(s.kind === 'beat' && (s.target.npc || s.target.object)) ? { line: s.line } : {}),
       here,
       ...(s.kind === 'done' && s.more3 ? { more3: true } : {}),
-      // Подсказка управления: первый день до турникета (F3 и диагностика F4 — первый вход в метро).
-      ...(s.f === 'f3' || (s.f === 'f4' && content.lessons.get(s.lesson ?? '')?.value.kind === 'diag') ? { moveHint: true } : {}),
+      // Подсказка управления (при 3 с бездействия): первая локация — działka в F2, первый вход в метро — F3 и
+      // диагностика F4.
+      ...(s.f === 'f2' || s.f === 'f3' || (s.f === 'f4' && content.lessons.get(s.lesson ?? '')?.value.kind === 'diag') ? { moveHint: true } : {}),
+      ...(nowHidden ? { nowHidden: true } : {}),
       ...(s.kind === 'spring' ? { spring: true } : {}),
       reason: s.reason,
     };
@@ -192,7 +204,8 @@ export function startFlow(o: FlowOptions): Flow {
     // Каждый круг либо ставит флаг (раскрытие HUD, F3), либо публикует шаг: флаги только растут, круг конечен.
     for (let guard = 0; guard < 8; guard++) {
       const now = clock.now();
-      const next = nextStep(directorInput(s.progress, content, now, { local: s.local, activeMin: activeMin() }));
+      const input = directorInput(s.progress, content, now, { local: s.local, activeMin: activeMin() });
+      const next = nextStep(input);
       // Раскрытие HUD (§4.12): флаг + анимация + реплика бобра.
       if (next.reveal?.length) {
         let p = s.progress;
@@ -213,7 +226,9 @@ export function startFlow(o: FlowOptions): Flow {
           continue;
         }
       }
-      const changed = !step || stepKey(step) !== stepKey(next) || step.reason !== next.reason;
+      const hide = gameDayNo(input.derived) <= NOW_HIDDEN_DAYS;
+      const changed = !step || stepKey(step) !== stepKey(next) || step.reason !== next.reason || hide !== nowHidden;
+      nowHidden = hide;
       step = next;
       if (changed) publish();
       // Бит без цели-персонажа: реплика пузырём и эффекты сразу.
@@ -353,8 +368,24 @@ export function startFlow(o: FlowOptions): Flow {
     }
   }
 
+  /**
+   * Посадка руками (P-02): A или тап по пустой клетке грядки — первое семя из кармана растёт на этой клетке.
+   * Семян нет — ничего (сцена такую клетку целью не делает).
+   */
+  async function plant(p: WorldInteract): Promise<void> {
+    const st = await o.store;
+    const now = clock.now();
+    const d = derive(st.progress, deriveContent(content), now);
+    const f = plantOnCell(st.progress.world.flags, gardenItems(d, now, content.tuning).map((g) => g.item), p.tile);
+    if (f) await flag(f);
+  }
+
   /** Тап по объекту мира: если это цель шага — шаг делает режиссёр. */
   function claim(p: WorldInteract): boolean {
+    if (p.kind === 'plot' && !p.item) {
+      if (!running) void plant(p);
+      return true;
+    }
     const s = step;
     if (!s || running || p.location !== s.target.location) return false;
     const t = s.target;
