@@ -3,7 +3,7 @@
 // подсказка (grade ≤ 1 через hinted), отмена (Esc/«B»). Плюс навигация intents и реестр.
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Step } from '../src/types/content';
-import { RIGHT_LINE, WRONG_LINE } from '../src/ui/exercises/frame';
+import { isNear, NEAR_LINE, RIGHT_LINE, WRONG_LINE } from '../src/ui/exercises/frame';
 import { autoOptions, shuffled, shuffleOptions } from '../src/ui/exercises/options';
 import { tileOrder } from '../src/ui/exercises/order';
 import { getContent } from '../src/systems/content';
@@ -33,7 +33,7 @@ function setup(step: Step, o: { audio?: boolean; random?: number; repeat?: boole
     content: exerciseContent(fixture()),
     audio,
     diacritics: 'warn',
-    translations: 'tap',
+    translations: 'auto',
     keyboardMode: 'auto',
     coarse: true,
     now: () => t,
@@ -502,13 +502,12 @@ describe('match', () => {
 });
 
 describe('say, explain, shadow (без проверки)', () => {
-  it('say: имя, польская строка, перевод по тапу (это и есть «подсказка»), «Дальше»', async () => {
+  it('say: имя, польская строка, подпись-перевод под ней (P-07: по ситуации — видна), «Дальше»', async () => {
     const s = setup({ t: 'say', who: 'pan_marek', pl: 'Słucham?', ru: 'Слушаю?' });
     expect(s.root.textContent).toContain('pan Marek');
     expect(s.root.querySelector('[data-role="pl"]')?.textContent).toBe('Słucham?');
-    expect(s.root.querySelector('[data-role="ru"]')?.textContent).toBe('');
-    act(s.root, 'ru').click();
     expect(s.root.querySelector('[data-role="ru"]')?.textContent).toBe('Слушаю?');
+    expect(s.root.querySelector<HTMLElement>('[data-act="ru"]')?.hidden).toBe(true);
     expect(s.audio.played[0]?.text).toBe('Słucham?');
     const r = await done(s);
     expect(r).toMatchObject({ status: 'done', graded: false });
@@ -640,7 +639,7 @@ describe('P-01: ошибка объясняет', () => {
     expect(fb.querySelector('[data-fb="gloss"]')?.textContent).toBe('stół — стол [стуў]');
     expect(order(fb, '.rule')).toBeLessThan(order(fb, '.verdict'));
     expect(order(fb, '.gloss')).toBeLessThan(order(fb, '.verdict'));
-    expect(fb.lastElementChild?.textContent).toBe(WRONG_LINE);
+    expect(fb.lastElementChild?.textContent).toBe(`${WRONG_LINE} Ещё раз.`);
   });
 
   it('`why` шага главнее тега; кластер шага — когда тега нет', () => {
@@ -676,5 +675,39 @@ describe('P-01: кнопки — польское слово и русская �
     type(s.input(), 'kawa');
     check.click();
     expect(act(s.root, 'next').textContent).toBe('DalejДальше');
+  });
+});
+
+describe('P-07: «Prawie» только для почти верного', () => {
+  it('диакритика в режиме «ошибка» (почти верно) → «Prawie. Jeszcze raz.»; неверно → «Jeszcze raz.» без «Prawie»', () => {
+    const near = setup({ t: 'type', prompt: 'маленький', accept: ['mały'], lenient: { diacritics: 'fail' } } as Step);
+    type(near.input(), 'maly');
+    act(near.root, 'check').click();
+    const v1 = near.fb().querySelector('.verdict')!;
+    expect(v1.textContent).toBe(`${NEAR_LINE} Почти. Ещё раз.`);
+    expect(act(near.root, 'retry')).toBeTruthy();
+    near.cancel();
+
+    const wrong = setup({ t: 'type', prompt: 'маленький', accept: ['mały'] } as Step);
+    type(wrong.input(), 'kot');
+    act(wrong.root, 'check').click();
+    const v2 = wrong.fb().querySelector('.verdict')!;
+    expect(v2.textContent).toBe(`${WRONG_LINE} Ещё раз.`);
+    expect(wrong.fb().textContent).not.toContain('Prawie');
+    // Правило и перевод P-01 остались.
+    expect(wrong.fb().querySelector('[data-fb="gloss"]')?.textContent).toContain('маленький');
+    wrong.cancel();
+  });
+
+  it('выбор варианта мимо → «Jeszcze raz.»; isNear по вердикту', () => {
+    const s = setup(choice);
+    s.opt('стул').click();
+    expect(s.fb().querySelector('.verdict')?.textContent?.startsWith(WRONG_LINE)).toBe(true);
+    expect(s.fb().textContent).not.toContain('Prawie');
+    expect(isNear({ verdict: 'diacritics' })).toBe(true);
+    expect(isNear({ verdict: 'ortho' })).toBe(true);
+    expect(isNear({ verdict: 'typo' })).toBe(true);
+    expect(isNear({ verdict: 'wrong' })).toBe(false);
+    s.cancel();
   });
 });

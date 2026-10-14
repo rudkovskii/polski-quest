@@ -27,6 +27,7 @@ import type {
   World,
 } from '../../src/types/content';
 import { FIRST_DAY_LINES } from '../../src/systems/director';
+import { buildWordIndex, matchWords, refIds, type WordIndex } from '../../src/systems/words';
 
 // ───────────────────────────── типы ─────────────────────────────
 
@@ -53,7 +54,8 @@ export type IssueCode =
   | 'dialogue' // граф диалога (§3.6)
   | 'orphan' // сиротский узел / урок вне module.lessons (предупреждение)
   | 'tr' // транскрипция
-  | 'long-lesson'; // урок длиннее minutes × 1.5 (предупреждение)
+  | 'long-lesson' // урок длиннее minutes × 1.5 (предупреждение)
+  | 'words'; // разметка words реплики (P-07): id слова есть в vocab, слово стоит в строке
 
 export interface Issue {
   level: Level;
@@ -982,6 +984,8 @@ export function checkContent(input: CheckInput): Issue[] {
     ctx.line(r.line, sub(def, 'line'));
   }
 
+  checkWords(ctx);
+
   // Реплики (п. 8) и todo.
   for (const r of ctx.lineRefs) {
     const l = ctx.lines.get(r.id);
@@ -1050,6 +1054,44 @@ export const errorsOf = (issues: Issue[]): Issue[] => issues.filter((i) => i.lev
  * запускают диагностику (`kind: diag`) или ремонтную сцену кластера (`phonetics.clusters[].repairLesson`), —
  * узлы `todo: true` и ссылки на todo-реплики (узел `line`, эффекты `line` узла и вариантов).
  */
+/** Слова варианта и реплики (P-07): `words` ссылается на vocab, форма стоит в строке; ≤ 2 варианта; NPC без русской речи. */
+function checkWords(ctx: Ctx): void {
+  let index: WordIndex | null = null;
+  const idx = (): WordIndex => (index ??= buildWordIndex([...ctx.vocab.values()].map((d) => d.value)));
+  const words = (refs: Line['words'], texts: (string | undefined)[], w: Where): void => {
+    if (!refs) return;
+    const text = texts.filter(Boolean).join(' \n ');
+    refs.forEach((r, i) => {
+      const lx = refIds([r])[0]!;
+      const rw = sub(w, 'words', i);
+      if (!ctx.ref(ctx.vocab, lx, typeof r === 'string' ? rw : sub(rw, 'lx'), 'words', WHERE.vocab)) return;
+      const hit = matchWords(text, idx(), { refs: [r] }).some((s) => s.lx === lx && s.marked);
+      if (!hit) ctx.warn('words', rw, `слово ${typeof r === 'string' ? lx : `«${r.pl}»`} не найдено в строке «${text.replace(/ \n /g, ' / ')}»${typeof r === 'string' ? ' (форма не из pl/forms: запиши {"pl": "<как в строке>", "lx": "' + lx + '"})' : ''}`);
+    });
+  };
+  for (const [, def] of ctx.dialogues) {
+    const w = { file: def.file, path: def.path };
+    for (const [key, n] of Object.entries(def.value.nodes)) {
+      const nw = sub(w, 'nodes', key);
+      words(n.words, [n.pl], nw);
+      n.choices?.forEach((c, i) => words(c.words, [c.pl], sub(nw, 'choices', i)));
+      if ((n.choices?.length ?? 0) > 2)
+        ctx.warn('dialogue', sub(nw, 'choices'), `у узла "${key}" ${n.choices!.length} варианта: на экране только 2 (research/05 §6б п. 8), остальные не покажутся`);
+      // Польские NPC по-русски не говорят (ПОЛИРОВКА §2.7): ru узла — перевод pl, без pl это русская речь.
+      const kind = n.who ? ctx.characters.get(n.who)?.value.kind : undefined;
+      if (n.ru && !n.pl && n.who && n.who !== 'narrator' && kind !== 'companion')
+        ctx.warn('dialogue', sub(nw, 'ru'), `${n.who} говорит по-русски без pl: польские NPC говорят только по-польски с подписью`);
+    }
+  }
+  for (const [, def] of ctx.lines) {
+    const l = def.value;
+    words(l.words, [l.pl, l.ru], def);
+    const kind = ctx.characters.get(l.who)?.value.kind;
+    if (l.ru && l.who !== 'narrator' && kind !== 'companion' && kind !== 'player')
+      ctx.warn('line', sub(def, 'ru'), `${l.who} говорит по-русски (ru): польские NPC говорят только по-польски, перевод — в plRu`);
+  }
+}
+
 function firstDayTodos(ctx: Ctx, director: Director | undefined): { id: string; why: string; w: Where }[] {
   const out: { id: string; why: string; w: Where }[] = [];
   const seen = new Set<string>();

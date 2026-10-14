@@ -40,7 +40,7 @@ type Choice<K extends keyof SettingsMap> = { key: K; label: string; options: { v
 
 const CHOICES = {
   diacritics: { key: 'diacritics', label: 'Ответ без ą, ę, ł…', options: [{ value: 'ok', label: 'засчитать' }, { value: 'warn', label: 'засчитать, но показать' }, { value: 'fail', label: 'ошибка' }] },
-  translations: { key: 'translations', label: 'Перевод реплик', options: [{ value: 'tap', label: 'по нажатию' }, { value: 'always', label: 'всегда' }] },
+  translations: { key: 'translations', label: 'Перевод реплик', options: [{ value: 'always', label: 'всегда' }, { value: 'auto', label: 'по ситуации' }, { value: 'never', label: 'никогда' }] },
   keyboard: { key: 'keyboard.mode', label: 'Клавиатура на экране', options: [{ value: 'auto', label: 'сама решит' }, { value: 'full', label: 'вся' }, { value: 'strip', label: 'только ą ć ę…' }] },
   dpad: { key: 'controls.dpad', label: 'Крестик управления на экране', options: [{ value: 'auto', label: 'на телефоне' }, { value: 'always', label: 'всегда' }, { value: 'never', label: 'никогда' }] },
   dpadSide: { key: 'controls.dpadSide', label: 'Крестик управления: с какой стороны', options: [{ value: 'left', label: 'слева' }, { value: 'right', label: 'справа' }] },

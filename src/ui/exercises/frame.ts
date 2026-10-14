@@ -1,8 +1,9 @@
 // Рамка шага (ТЗ §5.7): задание, тело, «Подсказка», «Проверить»/«Дальше», панель обратной связи.
 // Цикл попыток общий для всех типов: первая попытка идёт в SRS, после ошибки — правильный ответ,
 // строка правила и перевод (P-01: `why` шага → `errorTags[tag].hint`/`ru` → перевод с транскрипцией),
-// потом «Prawie. Jeszcze raz.» (СЮЖЕТ §1 правило 3) и обучающий повтор. Модули типов дают только тело,
-// чтение ответа и проверку.
+// потом «Prawie. Jeszcze raz.» для почти верного (диакритика, орфография, одна буква) или «Jeszcze raz.»
+// для неверного (P-07, СЮЖЕТ_v2 §4 sys.*: «Prawie» только когда правда почти) и обучающий повтор.
+// Модули типов дают только тело, чтение ответа и проверку.
 import type { Check } from '../../systems/answer';
 import type { StepKind } from '../../systems/grade';
 import { el } from '../dom';
@@ -11,9 +12,13 @@ import { BTN as L, btn, plBtn, type PlLabel } from '../overlay/kit';
 import { navItems } from '../overlay/nav';
 import type { ExerciseCtx, FirstTry, StepResult } from './types';
 
-/** Реплика при ошибке: никто не говорит «неправильно» (СЮЖЕТ §1, правило 3). */
-export const WRONG_LINE = 'Prawie. Jeszcze raz.';
+/** Реплика при неверном ответе (`sys.jeszcze`): никто не говорит «неправильно» (СЮЖЕТ §1, правило 3). */
+export const WRONG_LINE = 'Jeszcze raz.';
+/** Реплика при почти верном незачтённом ответе (`sys.kazik.prawie`, P-07). */
+export const NEAR_LINE = 'Prawie. Jeszcze raz.';
 export const RIGHT_LINE = 'Dobrze!';
+/** Русские подписи реплик отклика (ПОЛИРОВКА §2.10: польское слово + мелкая подпись). */
+const VERDICT_RU: Record<string, string> = { [WRONG_LINE]: 'Ещё раз.', [NEAR_LINE]: 'Почти. Ещё раз.', 'Prawie.': 'Почти.', [RIGHT_LINE]: 'Хорошо!' };
 /** После стольких неверных попыток появляется «Пропустить», чтобы шаг не держал вечно. */
 export const SKIP_AFTER = 2;
 
@@ -107,8 +112,13 @@ function isRight(c: CheckLike): boolean {
   return c.verdict !== 'wrong' && c.score > 0;
 }
 
+/** Почти верно (P-07): диакритика, орфография (rz/ż, ó/u), одна буква. «Prawie» — только тогда. */
+export function isNear(c: Pick<CheckLike, 'verdict'>): boolean {
+  return c.verdict === 'diacritics' || c.verdict === 'ortho' || c.verdict === 'typo';
+}
+
 export function verdictText(c: CheckLike): { cls: 'ok' | 'part' | 'bad'; text: string } {
-  if (!isRight(c)) return { cls: 'bad', text: WRONG_LINE };
+  if (!isRight(c)) return { cls: 'bad', text: isNear(c) ? NEAR_LINE : WRONG_LINE };
   if (c.verdict === 'exact' || c.score >= 1) return { cls: 'ok', text: RIGHT_LINE };
   if (c.verdict === 'diacritics') return { cls: 'part', text: 'Засчитано, но смотри на диакритику:' };
   if (c.verdict === 'ortho') return { cls: 'part', text: 'Почти: звучит так же, пишется иначе:' };
@@ -212,8 +222,9 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
     spec.mark?.(a, c, isFirst);
     const v = verdictText(c);
     const right = isRight(c);
-    // Ошибки уже исправлены по ходу (match): «ещё раз» не нужен.
-    if (!right && spec.noRetry) v.text = 'Prawie.';
+    // Ошибки уже исправлены по ходу (match): «ещё раз» не нужен; «Prawie.» — если половина пар верна.
+    if (!right && spec.noRetry) v.text = c.score > 0 || isNear(c) ? 'Prawie.' : '';
+    const verdictEl = v.text ? el('span', { class: 'verdict', lang: 'pl' }, v.text, VERDICT_RU[v.text] ? el('small', { class: 'ru', lang: 'ru' }, ` ${VERDICT_RU[v.text]}`) : null) : null;
     const showAnswer = !right || v.cls === 'part';
     const ans = spec.correct();
     const answerParts = [
@@ -221,7 +232,7 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
       showAnswer && spec.tr ? el('span', { class: 'tr' }, `[${spec.tr}]`) : null,
       showAnswer && spec.sayCorrect ? btn('▶', () => ctx.audio.play(spec.sayCorrect!), 'icon', { 'aria-label': 'Послушать ответ', 'data-nav': true }) : null,
     ];
-    if (right) feedback(v.cls, [el('span', { class: 'verdict' }, v.text), ...answerParts]);
+    if (right) feedback(v.cls, [verdictEl, ...answerParts]);
     else {
       // Ошибка объясняет (P-01): ответ, правило одной строкой, перевод — и только потом «Prawie. Jeszcze raz.».
       const rule = ruleLine(ctx, spec, c.tags);
@@ -230,7 +241,7 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
         ...answerParts,
         rule ? el('span', { class: 'rule', 'data-fb': 'rule' }, '💡 ', rule) : null,
         gloss ? el('span', { class: 'gloss', 'data-fb': 'gloss', lang: 'ru' }, gloss) : null,
-        el('span', { class: 'verdict' }, v.text),
+        verdictEl,
       ]);
     }
     if (hintBtn) hintBtn.hidden = true;

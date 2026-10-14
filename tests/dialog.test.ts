@@ -149,13 +149,15 @@ describe('runDialog: граф dlg.demo.marek', () => {
 });
 
 describe('окно реплики', () => {
-  it('перевод скрыт до тапа (translations: tap) и виден сразу при always; ▶ и «медленно» шлют озвучку', () => {
+  it('подпись: never — скрыта, «?» показывает; always и auto без словаря — видна; ▶ и «медленно» шлют озвучку', () => {
     const audio = fakeAudio();
-    const v = lineBox({ speaker: { id: 'pan_marek', name: 'pan Marek' }, pl: 'Słucham?', ru: 'Слушаю?', audio, translations: 'tap', typeMs: 0 });
+    const v = lineBox({ speaker: { id: 'pan_marek', name: 'pan Marek' }, pl: 'Słucham?', ru: 'Слушаю?', audio, translations: 'never', typeMs: 0 });
     host.append(v.node);
     expect(v.node.querySelector('[data-role="ru"]')?.textContent).toBe('');
     act(v.node, 'ru').click();
     expect(v.node.querySelector('[data-role="ru"]')?.textContent).toBe('Слушаю?');
+    const a = lineBox({ speaker: { id: 'x', name: 'X' }, pl: 'a', ru: 'б', audio, translations: 'auto', typeMs: 0 });
+    expect(a.node.querySelector('[data-role="ru"]')?.textContent).toBe('б');
     v.node.querySelector<HTMLButtonElement>('[data-audio="slow"]')!.click();
     expect(audio.played).toEqual([{ text: 'Słucham?', slow: true }]);
     const w = lineBox({ speaker: { id: 'x', name: 'X' }, pl: 'a', ru: 'б', audio, translations: 'always', typeMs: 0 });
@@ -219,6 +221,9 @@ describe('окно реплики', () => {
     await flush();
     expect(host.querySelector('.pq-line-name')?.textContent).toBe('Kazimierz Bóbr');
     expect(pl()).toBe('Zator.');
+    expect(host.querySelector('[data-role="ru"]')?.textContent).toBe('Затор.');
+    // P-07: польская коробка, потом русская речь Казика своей коробкой.
+    await next();
     expect(host.querySelector('[data-role="rus"]')?.textContent).toBe('Брёвна сбились.');
     await next();
     expect(pl()).toBe(todoText('dlg.demo.i11.b'));
