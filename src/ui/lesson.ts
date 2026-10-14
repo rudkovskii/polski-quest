@@ -23,6 +23,7 @@ import { mountStep } from './exercises/registry';
 import type { ExerciseContent, ExerciseCtx, StepResult } from './exercises/types';
 import type { IntentHandler, Layer, Overlay } from './overlay/host';
 import { BTN, btn, plBtn, portrait, react, type AudioPort, type PortraitSource } from './overlay/kit';
+import { isSilent, setSoundUnavailable } from '../systems/sound';
 
 /** Хранилище прогресса: GameStorage подходит как есть, в тестах — память. */
 export interface LessonStore {
@@ -63,6 +64,8 @@ export interface StepRecord {
   ms: number;
   hinted?: 1;
   noAudio?: 1;
+  /** Шаг сыгран без звука (P-12: настройка или звука нет на деле): его ошибка не идёт в карту звуков. */
+  silent?: 1;
   parts?: { item?: string; ok: boolean }[];
 }
 
@@ -240,7 +243,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
     diacritics: getSetting(store.progress, 'diacritics'),
     translations: getSetting(store.progress, 'translations'),
     keyboardMode: getSetting(store.progress, 'keyboard.mode'),
-    silent: getSetting(store.progress, 'sound.mode') === 'off',
+    silent: isSilent(store.progress),
   };
   const exContent = exerciseContent(content, (id) => Object.keys(derived.cards).some((c) => c.startsWith(`${id}#`)));
   // Реакция мира на ошибку (P-06): реплика NPC урока; без звука — её вариант `.mute`, если есть.
@@ -303,7 +306,10 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
       ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
       ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
       ...(entry.rep ? { repeat: true } : {}),
-      ...(settings.silent ? { silent: true } : {}),
+      // Без звука — по каждому шагу (P-12): «Не слышу» или `audio:state none` посреди урока переводят следующие
+      // задания на слух в чтение.
+      ...(settings.silent || isSilent(store.progress) ? { silent: true } : {}),
+      cantHear: () => setSoundUnavailable(true),
       ...(diag ? { oneShot: true } : {}),
       ...(errLine ? { errLine } : {}),
       ...(verdicts ? { verdicts } : {}),
@@ -323,6 +329,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
       if (res.first.hinted) rec.hinted = 1;
     }
     if (res.noAudio) rec.noAudio = 1;
+    if (ctx.silent) rec.silent = 1;
     if (res.parts) rec.parts = res.parts;
     records.push(rec);
     writeRevs(step, res, rec);
@@ -381,7 +388,10 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
       if (lesson.kind === 'diag') {
         // Диагностика (§4.3): точность первых попыток по кластерам шагов → статус кластеров в derive.
         const clustersOf = (item: string): readonly string[] => content.vocab.get(item)?.value.clusters ?? (content.pairs.get(item) ? [content.pairs.get(item)!.cluster] : []);
-        const results = tallyOf(graded.map((r) => ({ cluster: stepCluster(steps[r.i]!, clustersOf), score: r.score ?? 0 })));
+        // P-12: ошибка в задании, сыгранном без звука (чтение транскрипции, «Не слышу»), в карту звуков не идёт —
+        // красный кластер значит «не слышит», а не «не угадал без звука». Верный ответ засчитывается.
+        const heard = graded.filter((r) => r.ok || !(r.silent || r.noAudio));
+        const results = tallyOf(heard.map((r) => ({ cluster: stepCluster(steps[r.i]!, clustersOf), score: r.score ?? 0 })));
         if (Object.keys(results).length) record({ k: 'diag', ts: clock.now(), results });
       }
       record({

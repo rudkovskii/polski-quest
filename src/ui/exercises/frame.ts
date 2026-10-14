@@ -105,6 +105,8 @@ export interface GradedRun {
   submit(): void;
   /** Ответ изменился: пересчитать доступность «Проверить». */
   changed(): void;
+  /** «Не слышу» (P-12): шаг закрыт без оценки, как задание без звука — не идёт ни в счёт урока, ни в карту звуков. */
+  skipNoAudio(): void;
   readonly phase: 'answer' | 'feedback' | 'done';
 }
 
@@ -164,7 +166,9 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
   const nextBtn = plBtn(L.next, () => finish(), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'next', hidden: true });
   const retryBtn = plBtn(L.retry, () => retry(), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'retry', hidden: true });
   const skipBtn = plBtn(L.skip, () => finish(), 'ghost', { 'data-nav': true, 'data-act': 'skip', hidden: true });
-  actions.append(...[hintBtn, el('span', { class: 'grow' }), skipBtn, spec.instant ? null : checkBtn, retryBtn, nextBtn].filter((x): x is HTMLElement => !!x));
+  // P-12: после ошибки с правильным ответом и правилом «Dalej» видна всегда. У ввода текстом рядом с «Ещё раз».
+  const laterBtn = plBtn(L.next, () => finish(), 'ghost', { 'data-nav': true, 'data-act': 'later', hidden: true });
+  actions.append(...[hintBtn, el('span', { class: 'grow' }), skipBtn, laterBtn, spec.instant ? null : checkBtn, retryBtn, nextBtn].filter((x): x is HTMLElement => !!x));
 
   if (spec.input) {
     kb = attachKeyboard(spec.input, {
@@ -212,6 +216,11 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
   }
 
   function submit(): void {
+    // Выбор после ошибки (P-12): тап по подсвеченному верному варианту — то же, что «Dalej».
+    if (phase === 'feedback' && spec.instant && !nextBtn.hidden) {
+      finish();
+      return;
+    }
     if (phase !== 'answer') return;
     const a = spec.read();
     if (a === null) return;
@@ -262,17 +271,18 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
     } else {
       wrongs++;
       ctx.react?.('confused');
+      phase = 'feedback';
+      checkBtn.hidden = true;
       if (spec.instant) {
-        // Выбор: остаёмся в ответе, неверный вариант погашен, верный подсвечен — выбери его.
-        show(skipBtn, wrongs >= SKIP_AFTER);
-        changed();
-        if (!ctx.coarse) (spec.focus ? spec.focus() : navItems(root)[0]?.focus({ preventScroll: true }));
-        return;
+        // Выбор (P-12): неверный погашен, верный подсвечен, ниже правило — и «Dalej». Раньше кнопки не было и игрок
+        // ждал, пока догадается тапнуть зелёный вариант. Повтор шага — в конце урока (planOf).
+        show(nextBtn, true);
+        show(skipBtn, false);
       } else {
-        phase = 'feedback';
+        // Ввод: «Ещё раз» (обучающий повтор) и рядом «Dalej».
         show(retryBtn, true);
-        show(skipBtn, wrongs >= SKIP_AFTER);
-        checkBtn.hidden = true;
+        show(laterBtn, true);
+        show(skipBtn, false);
       }
     }
     changed();
@@ -283,6 +293,8 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
     if (phase !== 'feedback' || retryBtn.hidden) return;
     phase = 'answer';
     show(retryBtn, false);
+    show(laterBtn, false);
+    show(skipBtn, wrongs >= SKIP_AFTER);
     checkBtn.hidden = false;
     spec.reset?.();
     if (hintBtn) {
@@ -341,10 +353,18 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
     else navItems(root)[0]?.focus({ preventScroll: true });
   });
 
+  function skipNoAudio(): void {
+    if (phase === 'done') return;
+    phase = 'done';
+    cleanup();
+    resolve({ status: 'done', graded: false, attempts, noAudio: true, ms: Math.round(ctx.now() - t0) });
+  }
+
   return {
     result,
     submit,
     changed,
+    skipNoAudio,
     get phase() {
       return phase;
     },

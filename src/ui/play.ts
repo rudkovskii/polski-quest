@@ -24,6 +24,7 @@ import { createOverlay, type Overlay } from './overlay/host';
 import { openPassport, passportModel } from './passport';
 import { openSoundMap, soundMapModel } from './soundMap';
 import { audioButtons, btn, busAudio, type AudioPort, type PortraitFrame, type PortraitSource } from './overlay/kit';
+import { isSilent } from '../systems/sound';
 
 export interface PlayStore extends LessonStore {
   /** Флаги, предметы, челленджи из эффектов. false — запись запрещена (только чтение). */
@@ -141,7 +142,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
     const lv = lessonOfVariant(l0, variant);
     // P-06: шаги систем, которые сегодня рано (клавиатура с дня 3, «повтори вслух» с дня 4), и без звука —
     // задания на слух без транскрипции не играются.
-    const silent = getSetting(store.progress, 'sound.mode') === 'off';
+    const silent = isSilent(store.progress);
     const l = lv ? lessonForToday(lv, stepGateOf(content, paceCtxOf(content, d, store.progress.world.flags), silent)) : null;
     if (!l) {
       console.info(`[ui] урок ${id}: ${variant === 'skip' ? 'пропуск (skipIf)' : 'закрыт (requires)'}`);
@@ -207,7 +208,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
   };
 
   /** Без звука (P-06, СЮЖЕТ_v2 §7): реплики с вариантом `<id>.mute` подменяются им. */
-  const linesOf = (store: PlayStore): Content => (getSetting(store.progress, 'sound.mode') === 'off' ? { ...content, lines: muteLines(content.lines) } : content);
+  const linesOf = (store: PlayStore): Content => (isSilent(store.progress) ? { ...content, lines: muteLines(content.lines) } : content);
 
   const dialogDeps = (store: PlayStore): DialogDeps => {
     const w = wordPort(store);
@@ -220,7 +221,7 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
       seed: w.day,
       day: w.gameDay,
       translations: getSetting(store.progress, 'translations'),
-      silent: () => getSetting(store.progress, 'sound.mode') === 'off',
+      silent: () => isSilent(store.progress),
       ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
       ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
       cond: cond(store),

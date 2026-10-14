@@ -334,7 +334,8 @@ export function diagDone(d: Pick<Derived, 'clusterStatus'>): boolean {
 
 /** Урок «закрыт» для режиссёра: диагностика — по событию diag, вступление — по попытке, босс — сдан, прочие — сданы. */
 export function lessonDoneFor(lesson: Lesson, d: Derived): boolean {
-  if (lesson.kind === 'diag') return diagDone(d);
+  // P-12: без звука ошибки в карту звуков не идут — проверка может не дать ни одного статуса, но она пройдена.
+  if (lesson.kind === 'diag') return diagDone(d) || d.lessons[lesson.id] !== undefined;
   if (lesson.kind === 'boss') return d.bossResults[lesson.id]?.passedAt !== undefined;
   if (lesson.id === FIRST_DAY.introLesson || lesson.id === FIRST_DAY.plotLesson) return d.lessons[lesson.id] !== undefined;
   return d.lessonsDone.has(lesson.id);

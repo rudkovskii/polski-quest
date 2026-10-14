@@ -102,9 +102,11 @@ describe('choice', () => {
     expect(s.opt('стул').disabled).toBe(true);
     expect(s.opt('стол').classList.contains('show')).toBe(true);
     expect(s.fb().textContent).not.toMatch(/неправильно/i);
+    // P-12: после ошибки сразу «Dalej»; тап по подсвеченному верному — то же самое.
+    expect(act(s.root, 'next').hidden).toBe(false);
     s.opt('стол').click();
     const r = await done(s);
-    expect(r.attempts).toBe(2);
+    expect(r.attempts).toBe(1);
     expect(r.first).toMatchObject({ verdict: 'wrong', score: 0, tags: ['ff.stol'] });
   });
 
@@ -150,14 +152,15 @@ describe('choice', () => {
     expect(s.result?.status).toBe('done');
   });
 
-  it('после двух ошибок можно пропустить', async () => {
+  it('после ошибки — «Dalej» сразу (P-12), без «Пропустить» и без второй попытки', async () => {
     const s = setup({ ...choice, options: ['стол', 'стул', 'стал'] });
     s.opt('стул').click();
     expect(s.root.querySelector<HTMLElement>('[data-act="skip"]')!.hidden).toBe(true);
+    // Другой неверный уже не засчитывается второй попыткой: шаг ждёт «Dalej».
     s.opt('стал').click();
-    act(s.root, 'skip').click();
+    act(s.root, 'next').click();
     await s.p;
-    expect(s.result).toMatchObject({ status: 'done', attempts: 2, first: { verdict: 'wrong' } });
+    expect(s.result).toMatchObject({ status: 'done', attempts: 1, first: { verdict: 'wrong' } });
   });
 
   it('повтор в конце урока — без подсказки', () => {
@@ -183,7 +186,7 @@ describe('listen', () => {
     expect(s.fb().textContent).toContain('[ма́ўы]');
     expect(s.audio.played.length).toBe(2);
     s.opt('mała kawa').click();
-    expect((await done(s)).attempts).toBe(2);
+    expect((await done(s)).attempts).toBe(1);
   });
 
   it('переслушать ▶ не штрафует; подсказка — медленно и минус вариант', async () => {
@@ -397,7 +400,7 @@ describe('gap', () => {
     s.opt('kava').click();
     expect(s.fb().textContent).toContain(WRONG_LINE);
     s.opt('kawa').click();
-    expect((await done(s)).attempts).toBe(2);
+    expect((await done(s)).attempts).toBe(1);
 
     s = setup(withOpts);
     act(s.root, 'hint').click();

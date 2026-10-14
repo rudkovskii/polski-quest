@@ -11,6 +11,7 @@ import type { Overlay } from './overlay/host';
 import { avatarPhotoEl } from './avatar';
 import { BTN, btn, plBtn } from './overlay/kit';
 import { ensureSoundStyle, soundGrid, soundMapModel, type SoundDot } from './soundMap';
+import { isSilent } from '../systems/sound';
 
 export interface PassportPage {
   biome: string;
@@ -93,7 +94,7 @@ export function passportModel(
       return { id, title: it?.title.pl ?? id, titleRu: it?.title.ru ?? '' };
     });
   // can-do главы (§5.10, P-10b): пункт засчитан по своим сценам (`when` в module.json), без `when` — когда сдан босс.
-  const silent = getSetting(p, 'sound.mode') === 'off';
+  const silent = isSilent(p);
   const canDo = [...content.modules.values()]
     .map((b) => b.module)
     .filter((m) => m.kind === 'chapter' && m.canDo?.length)

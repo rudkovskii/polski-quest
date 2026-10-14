@@ -393,14 +393,17 @@ describe('склейка: после сна ничего не подсвечен
 });
 
 describe('Андрей: задания на слух и клавиатура', () => {
-  it('на слух: знакомые слова похожей длины (proszę / dziękuję) не стоят вместе', () => {
+  it('на слух: дистракторы знакомого слова — знакомые слова (P-12 заменил правило P-11)', () => {
+    // P-11 убирал знакомые слова похожей длины — вышло «выбери единственное знакомое». P-12: наоборот, знакомые
+    // первыми; лотерею без звука убирает режим чтения (systems/sound.ts).
     const content = getContent();
     const known = new Set(['lx.dziekuje', 'lx.prosze', 'lx.czesc', 'lx.dzien_dobry']);
     const ex = exerciseContent(content, (id) => known.has(id));
     for (let k = 0; k < 20; k++) {
       const r = autoOptions({ t: 'listen', say: 'dziękuję', options: 'auto:greeting', answer: 0, item: 'lx.dziekuje' }, `obchod#${k}`, ex);
       expect(r.options).toContain('dziękuję');
-      expect(r.options).not.toContain('proszę');
+      const kn = new Set(['proszę', 'cześć', 'Dzień dobry']);
+      expect(r.options.filter((o) => o !== 'dziękuję').every((o) => kn.has(o))).toBe(true);
     }
     // Без сведений о знакомых словах — как раньше.
     const plain = exerciseContent(content);
@@ -426,7 +429,8 @@ describe('Андрей: задания на слух и клавиатура', (
 describe('слой оверлея не съедает тапы по миру', () => {
   it('#overlay > * — нулевая специфичность: pointer-events: none у HUD, «Сейчас» и подписи растения работает', () => {
     const html = readFileSync('index.html', 'utf8');
-    expect(html).toContain('#overlay > :where(*) { pointer-events: auto; }');
+    // P-12: `#overlay > :where(*)` всё равно (1,0,0) из-за id — весь селектор в :where.
+    expect(html).toContain(':where(#overlay > *) { pointer-events: auto; }');
     expect(html).not.toMatch(/#overlay > \* \{ pointer-events: auto; \}/);
   });
 });

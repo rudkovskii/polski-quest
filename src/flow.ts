@@ -45,6 +45,7 @@ import type { AudioPort, PortraitSource } from './ui/overlay/kit';
 import { STAMP_FIRST } from './ui/passport';
 import type { Play } from './ui/play';
 import { gardenItems, plantOnCell, seedFlag } from './world/dzialka';
+import { isSilent } from './systems/sound';
 
 /** Реплика посадки (P-11): «Posadzone:» + слово. */
 export const PLANTED_LINE = 'sys.posadzone';
@@ -187,7 +188,7 @@ export function startFlow(o: FlowOptions): Flow {
     }
   }
   /** Без звука (P-06): реплика `<id>.mute`, если есть. */
-  const say = (id: string): string => lineFor(id, !!storeNow && getSetting(storeNow.progress, 'sound.mode') === 'off', content.lines);
+  const say = (id: string): string => lineFor(id, !!storeNow && isSilent(storeNow.progress), content.lines);
 
   function view(s: DirectorStep): GuideStepView {
     const here = s.target.screen === 'intro' || (s.target.location === location && s.kind !== 'done');
@@ -551,7 +552,7 @@ export function startFlow(o: FlowOptions): Flow {
   }
 
   function introDeps(st: FlowStore): Parameters<typeof runCaption>[0] {
-    return { overlay: play.overlay, content, audio: o.audio, portraits: portraitsNow, clock, ...(getSetting(st.progress, 'sound.mode') === 'off' ? { silent: true } : {}) };
+    return { overlay: play.overlay, content, audio: o.audio, portraits: portraitsNow, clock, ...(isSilent(st.progress) ? { silent: true } : {}) };
   }
   let portraitsNow: PortraitSource | null = null;
   void Promise.resolve(o.portraits ?? null).then((p) => (portraitsNow = p));

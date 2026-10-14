@@ -103,22 +103,32 @@ export function autoOptions(step: StepListen, stepId: string, content: ExerciseC
   const item = step.item ? content?.vocab(step.item) : undefined;
   const all = content?.allVocab() ?? [];
   const norm = (s: string): string => s.trim().toLowerCase();
-  // P-11: на слух два знакомых слова похожей длины (proszę / dziękuję) — лотерея, когда звук не слышен. Знакомый
-  // дистрактор берём, только если он заметно короче или длиннее верного ответа (больше чем на 2 буквы).
+  // P-12 (вместо P-11): «выбери единственное знакомое среди незнакомых» решается без слуха и без чтения. Если
+  // верное слово знакомо — дистракторы тоже из знакомых: того же типа и похожей длины (±2 буквы), потом любые
+  // знакомые, и только потом незнакомые по тегу. Без звука такие задания читаются транскрипцией (P-10b, P-12), так
+  // что пара proszę / dziękuję — честное чтение, а не лотерея.
+  const known = (v: VocabEntry): boolean => !!content?.known?.(v.id);
   const correctKnown = !!item && !!content?.known?.(item.id);
-  const confusable = (v: VocabEntry): boolean => correctKnown && !!content?.known?.(v.id) && Math.abs(v.pl.length - correct.length) <= 2;
+  const near = (v: VocabEntry): boolean => Math.abs(v.pl.length - correct.length) <= 2;
+  const samePos = (v: VocabEntry): boolean => !item || v.pos === item.pos;
   const pool = (pred: (v: VocabEntry) => boolean): string[] =>
     shuffled(
-      all.filter((v) => pred(v) && norm(v.pl) !== norm(correct) && !confusable(v)).map((v) => v.pl),
+      all.filter((v) => pred(v) && norm(v.pl) !== norm(correct)).map((v) => v.pl),
       `${stepId}:${tag}`,
     );
   const picked: string[] = [];
   const add = (xs: string[]): void => {
     for (const x of xs) if (picked.length < n - 1 && !picked.some((p) => norm(p) === norm(x))) picked.push(x);
   };
-  add(pool((v) => (v.tags ?? []).includes(tag) && (!item || v.pos === item.pos)));
+  if (correctKnown) {
+    add(pool((v) => known(v) && samePos(v) && near(v)));
+    add(pool((v) => known(v) && near(v)));
+    add(pool((v) => known(v) && samePos(v)));
+    add(pool((v) => known(v)));
+  }
+  add(pool((v) => (v.tags ?? []).includes(tag) && samePos(v)));
   add(pool((v) => (v.tags ?? []).includes(tag)));
-  add(pool((v) => !item || v.pos === item.pos));
+  add(pool((v) => samePos(v)));
   add(pool(() => true));
   // Дистракторы стабильны по id шага, порядок показа — по seed (день).
   const options = shuffled([correct, ...picked], `${seed}:opts`);

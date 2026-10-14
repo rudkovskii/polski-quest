@@ -19,6 +19,7 @@ import type { ExerciseCtx, StepResult } from './exercises/types';
 import { cardsOfStep, exerciseContent, lineSpeech, type LessonDeps, type RunOptions } from './lesson';
 import type { IntentHandler, Layer } from './overlay/host';
 import { BTN, btn, plBtn, portrait, react, type PlLabel } from './overlay/kit';
+import { isSilent } from '../systems/sound';
 
 /** Сколько дней живут результаты частей (resume и прошлая несданная попытка), §5.8. */
 export const BOSS_KEEP_DAYS = 7;
@@ -205,7 +206,7 @@ export async function runBoss(lesson: Lesson, deps: LessonDeps, opts: RunOptions
     diacritics: getSetting(store.progress, 'diacritics'),
     translations: getSetting(store.progress, 'translations'),
     keyboardMode: getSetting(store.progress, 'keyboard.mode'),
-    silent: getSetting(store.progress, 'sound.mode') === 'off',
+    silent: isSilent(store.progress),
   };
   // P-06: реакция контролёра на ошибку («Proszę powtórzyć?», без звука — «Proszę przeczytać.»).
   const errLine = lineSpeech(content, lesson.errLine, settings.silent);

@@ -204,6 +204,8 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
   let shownAt = 0;
   let who = '';
   let anchor: { x: number; y: number } | null = null;
+  /** Колонка кнопок HUD (P-12, `ui:hud:rect`): пузырь Казика её обходит. */
+  let hudRect: { left: number; top: number; right: number; bottom: number } | null = null;
 
   root.append(now, bubble);
 
@@ -259,15 +261,34 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
       return;
     }
     const vw = win?.innerWidth ?? 800;
-    const r = bubble.getBoundingClientRect();
-    const w = r.width || 200;
-    const h = r.height || 48;
+    bubble.style.removeProperty('max-width');
+    let r = bubble.getBoundingClientRect();
+    let w = r.width || 200;
+    let h = r.height || 48;
     const margin = 8;
-    const x = Math.min(Math.max(anchor.x - w / 2, margin), Math.max(margin, vw - w - margin));
+    let x = Math.min(Math.max(anchor.x - w / 2, margin), Math.max(margin, vw - w - margin));
     // Над головой; не влезает под строку «Сейчас» — под ногами.
     let y = anchor.y - h - 12;
-    const below = y < 56;
+    let below = y < 56;
     if (below) y = anchor.y + 44;
+    // Колонка кнопок справа (P-12): пузырь не заходит под «Obchód / Paszport / ⚙» — уже, левее, иначе ниже колонки.
+    const hud = hudRect;
+    const hits = (): boolean => !!hud && x < hud.right + margin && x + w > hud.left - margin && y < hud.bottom + margin && y + h > hud.top - margin;
+    if (hud && hits()) {
+      const room = hud.left - 2 * margin;
+      if (w > room && room >= 140) {
+        bubble.style.maxWidth = `${Math.floor(room)}px`;
+        r = bubble.getBoundingClientRect();
+        w = r.width || room;
+        h = r.height || h;
+        y = below ? anchor.y + 44 : anchor.y - h - 12;
+      }
+      x = Math.max(margin, Math.min(x, hud.left - margin - w));
+      if (hits()) {
+        y = hud.bottom + margin;
+        below = y > anchor.y;
+      }
+    }
     bubble.classList.toggle('below', below);
     bubble.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
     bubble.style.setProperty('--tail', `${Math.round(Math.min(Math.max(anchor.x - x, 12), w - 12))}px`);
@@ -457,6 +478,10 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
       if (!v) return;
       label.textContent = v.text;
       label.style.transform = `translate(calc(${Math.round(v.at.x)}px - 50%), ${Math.round(v.at.y) - 54}px)`;
+    }),
+    bus.on('ui:hud:rect', (r) => {
+      hudRect = r;
+      place();
     }),
     bus.on('world:anchor', ({ id, at }) => {
       if (id !== 'bobr') return;

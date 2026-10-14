@@ -2,7 +2,7 @@
 // Можно переслушать без штрафа. Нет звука → текстовый аналог: фраза показана, `lis` не пишется (§5.7).
 import type { StepListen } from '../../types/content';
 import { el } from '../dom';
-import { audioButtons } from '../overlay/kit';
+import { audioButtons, cantHearButton } from '../overlay/kit';
 import { explainOf, runGraded } from './frame';
 import { autoOptions, optionList, seedOf } from './options';
 import type { ExerciseModule } from './types';
@@ -20,7 +20,7 @@ export const listen: ExerciseModule<StepListen> = {
       ? [el('span', { class: 'q' }, 'Как это пишется? ', el('b', { class: 'tr', 'data-tr': '' }, `[${tr}]`))]
       : noAudio
         ? [el('span', { class: 'q' }, 'Что здесь написано? ', el('b', { lang: 'pl' }, step.say)), el('span', { class: 'pq-noaudio' }, '🔇 звука нет')]
-        : [el('span', { class: 'q' }, 'Что ты слышишь?'), ...audioButtons(ctx.audio, step.say)];
+        : [el('span', { class: 'q' }, 'Что ты слышишь?'), ...audioButtons(ctx.audio, step.say), cantHearButton(ctx, () => run.skipNoAudio())];
     // Без звука с транскрипцией (P-10b) — это чтение звука: ответ засчитывается в карточку `lis`, она не пропадает.
     const reading = ctx.silent === true && !!tr;
     const run = runGraded<number>(ctx, {

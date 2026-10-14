@@ -9,7 +9,7 @@ import { cellAt } from '../world/dzialka';
 import { bobrSpot, besideCell, edgeArrow, faceTowards, guidePath, pointerCell, resolveGuide, type ResolvedGuide } from '../world/guide';
 import { tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
 import { playerTextureKey } from '../world/avatar';
-import { pickZoom } from '../world/camera';
+import { hudDodge, pickZoom, type ScreenRect } from '../world/camera';
 import { BOBR_KEY, DELTA, LocationModel, type Actor, type WorldEvent } from '../world/location';
 
 // Location (ТЗ §5.4–5.5): ASCII-карта, Дима, NPC, слова, выходы, бобр-компаньон. Логика в
@@ -66,6 +66,11 @@ bus.on('input:dpad', ({ visible }) => {
   for (const fn of dpadWatchers) fn();
 });
 const dpadWatchers = new Set<() => void>();
+/** Колонка кнопок HUD справа (P-12, `ui:hud:rect`): цель не прячется под ней, камера сдвигает картинку. */
+let hudRect: ScreenRect | null = null;
+bus.on('ui:hud:rect', (r) => {
+  hudRect = r;
+});
 
 export class Location extends Phaser.Scene {
   private model!: LocationModel;
@@ -109,8 +114,13 @@ export class Location extends Phaser.Scene {
   private guideLive = false;
   /** Запас сверху и снизу под HUD и d-pad, CSS-пиксели (layout). */
   private insets = { top: 0, bottom: 0 };
-  /** Камера следует за Димой (карта больше экрана): сдвиг, чтобы цель тоже была в кадре (P-10a). */
-  private follow: { x: boolean; y: boolean; base: number; off: [number, number] } | null = null;
+  /**
+   * Камера (P-10a, P-12): по оси, где карта не влезает, следует за Димой (центр видимой зоны между HUD и d-pad) и
+   * сдвигается к цели рядом; где влезает — карта по центру зоны над d-pad. `dodge` — сдвиг, чтобы цель не стояла
+   * под колонкой кнопок справа. Центр ставится вручную каждый кадр (`placeCamera`), без startFollow и границ Phaser.
+   */
+  private cam0: { zoom: number; mw: number; mh: number; fitsW: boolean; fitsH: boolean; centered: boolean; bottom: number; base: number; inset: number } | null = null;
+  private follow: { off: [number, number]; dodge: [number, number] } = { off: [0, 0], dodge: [0, 0] };
 
   constructor() {
     super('Location');
@@ -213,7 +223,10 @@ export class Location extends Phaser.Scene {
     const ty = Math.floor(p.y / T);
     if (tx < 0 || ty < 0 || tx >= this.model.parsed.w || ty >= this.model.parsed.h) return null;
     const target = this.model.targetAt([tx, ty]);
-    return target ? { tile: [tx, ty], target } : { tile: [tx, ty] };
+    if (target) return { tile: [tx, ty], target };
+    // Палец на крыше или стене дома, дверь которого подсвечена (P-12): идём в дверь.
+    const door = this.model.doorFor([tx, ty]);
+    return { tile: door ? [door[0], door[1]] : [tx, ty] };
   }
 
   /** Состояние для dev-проверок и тестов в браузере. */
@@ -255,31 +268,67 @@ export class Location extends Phaser.Scene {
   /**
    * Цель в кадре (P-10a): камера держит Диму в видимой зоне (между HUD и d-pad) и, если цель режиссёра рядом,
    * сдвигается к ней, чтобы и цель была видна над кнопками, а не под ними. Плавно, без рывков.
+   * P-12: цель (и дверь с домом над ней) не встаёт под колонку кнопок справа — картинка уезжает вниз или влево.
    */
-  private updateFollow(): void {
-    const f = this.follow;
-    if (!f) return;
+  private updateFollow(snap = false): void {
+    const c0 = this.cam0;
+    if (!c0) return;
     const cam = this.cameras.main;
-    const z = cam.zoom;
+    const z = c0.zoom;
     const g = this.guide;
+    const f = this.follow;
+    const W = this.scale.width / z;
+    const H = this.scale.height / z;
     let sx = 0;
     let sy = 0;
-    if (g) {
+    if (g && !c0.centered) {
       const [px, py] = LocationModel.pos(this.model.player);
       const halfW = this.scale.width / z / 2 - T;
       const halfH = (this.scale.height - this.insets.top - this.insets.bottom) / z / 2 - T;
       const dx = (g.at[0] + g.size[0] / 2 - (px + 0.5)) * T;
       const dy = (g.at[1] + g.size[1] / 2 - (py + 0.5)) * T;
       const need = (d: number, half: number): number => (Math.abs(d) <= half ? 0 : Math.sign(d) * Math.min(Math.abs(d) - half, half - T));
-      if (f.x) sx = need(dx, halfW);
-      if (f.y) sy = need(dy, halfH);
+      if (!c0.fitsW) sx = need(dx, halfW);
+      if (!c0.fitsH) sy = need(dy, halfH);
     }
-    const k = 0.12;
-    f.off[0] += (sx - f.off[0]) * k;
-    f.off[1] += (sy - f.off[1]) * k;
-    if (Math.abs(sx - f.off[0]) < 0.5) f.off[0] = sx;
-    if (Math.abs(sy - f.off[1]) < 0.5) f.off[1] = sy;
-    cam.setFollowOffset(-Math.round(f.off[0]), -Math.round(f.base + f.off[1]));
+    const k = snap ? 1 : 0.12;
+    const ease = (v: [number, number], tx: number, ty: number): void => {
+      v[0] += (tx - v[0]) * k;
+      v[1] += (ty - v[1]) * k;
+      if (Math.abs(tx - v[0]) < 0.5) v[0] = tx;
+      if (Math.abs(ty - v[1]) < 0.5) v[1] = ty;
+    };
+    ease(f.off, sx, sy);
+    // Центр камеры без учёта колонки HUD.
+    let cx: number;
+    let cy: number;
+    if (c0.centered) {
+      cx = c0.mw / 2;
+      cy = c0.mh / 2 + (c0.fitsH ? this.insets.bottom / z / 2 : 0);
+    } else {
+      const p = this.player;
+      cx = c0.fitsW ? c0.mw / 2 : Math.round(p.x + f.off[0]);
+      cy = c0.fitsH ? c0.mh / 2 + this.insets.bottom / z / 2 : Math.round(p.y + c0.base + f.off[1]);
+      if (!c0.fitsW) cx = Math.min(Math.max(cx, W / 2), c0.mw - W / 2);
+      if (!c0.fitsH) cy = Math.min(Math.max(cy, H / 2), c0.mh + c0.inset - H / 2);
+    }
+    // Колонка HUD: цель под ней — сдвиг картинки.
+    let tx = 0;
+    let ty = 0;
+    if (g && this.model.controls === 'walk') {
+      const r = this.game.canvas.getBoundingClientRect();
+      // Дверь вместе с домом над ней: выход — клетка, а тапают по крыше.
+      const exit = this.model.object(g.key)?.kind === 'exit';
+      const top = exit ? g.at[1] - 1 : g.at[1];
+      const toScreen = (wx: number, wy: number): [number, number] => [(wx - (cx - W / 2)) * z + r.left, (wy - (cy - H / 2)) * z + r.top];
+      const [l, t] = toScreen(g.at[0] * T, top * T);
+      const [rr, b] = toScreen((g.at[0] + g.size[0]) * T, (g.at[1] + g.size[1]) * T);
+      const [dx, dy] = hudDodge({ left: l, top: t, right: rr, bottom: b }, hudRect, { width: r.left + this.scale.width, height: r.top + this.scale.height, bottom: this.insets.bottom });
+      tx = -dx / z;
+      ty = -dy / z;
+    }
+    ease(f.dodge, tx, ty);
+    cam.centerOn(Math.round((cx + f.dodge[0]) * z) / z, Math.round((cy + f.dodge[1]) * z) / z);
   }
 
   // ───────────── «A»-пузырёк и якорь Казика (P-02) ─────────────
@@ -448,6 +497,8 @@ export class Location extends Phaser.Scene {
       const y = cell[1] * T + T;
       if (bobr.x !== x || bobr.y !== y) {
         const dist = Math.abs(bobr.x - x) + Math.abs(bobr.y - y);
+        // Старый твин к прежней клетке не доигрывает поверх нового (P-12: Казик «на» Диме, A уходила в росток).
+        this.tweens.killTweensOf(bobr);
         this.tweens.add({ targets: bobr, x, y, duration: Math.min(900, 260 + dist * 4), ease: 'Sine.easeInOut', onUpdate: () => bobr.setDepth(10 + bobr.y) });
       }
       bobr.play(`${sid}:idle_${face}`);
@@ -726,32 +777,24 @@ export class Location extends Phaser.Scene {
     const zoom = pickZoom(width, height, mw, mh);
     cam.setZoom(zoom);
     cam.stopFollow();
+    cam.removeBounds();
     const safe = safeArea();
     // Видимая зона карты (P-10a): между строкой «Сейчас» сверху и d-pad снизу (вместе с safe-area iPhone).
     const bottom = dpadVisible ? DPAD_INSET + safe.bottom : 0;
     this.insets = { top: HUD_TOP_INSET + safe.top, bottom };
     const fitsW = mw * zoom <= width;
     const fitsH = mh * zoom <= height - bottom;
-    const shift = bottom / zoom / 2;
-    this.follow = null;
-    // tap-локация всегда по центру: ходьбы нет, следовать не за кем.
-    if ((fitsW && fitsH) || this.model.controls === 'tap') {
-      cam.removeBounds();
-      // Центр карты — в центре видимой зоны над d-pad, а не всего экрана: нет пустой полосы сверху (P-10a).
-      cam.centerOn(mw / 2, mh / 2 + (fitsH ? shift : 0));
-    } else {
-      // Карта больше экрана: камера следует за Димой в границах карты (по оси, где не влезает).
-      // Крест на экране: снизу запас на его высоту, чтобы низ карты (выход, калитка) поднимался над d-pad,
-      // а Дима стоял в центре видимой зоны над крестом (followOffset), а не всего экрана.
-      const inset = !fitsH ? bottom / zoom : 0;
-      const by = fitsH ? mh / 2 + shift - height / zoom / 2 : 0;
-      cam.setBounds(fitsW ? (mw - width / zoom) / 2 : 0, by, fitsW ? width / zoom : mw, fitsH ? height / zoom : mh + inset);
-      cam.startFollow(this.player, true);
-      // Центр видимой зоны между HUD и d-pad ниже центра экрана на (низ − верх) / 2.
-      const base = fitsH ? 0 : (bottom - this.insets.top) / zoom / 2;
-      this.follow = { x: !fitsW, y: !fitsH, base, off: [0, 0] };
-      cam.setFollowOffset(0, -base);
-    }
+    // tap-локация всегда по центру: ходьбы нет, следовать не за кем. Карта целиком влезает — центр видимой зоны
+    // над d-pad, а не всего экрана: нет пустой полосы сверху (P-10a).
+    const centered = (fitsW && fitsH) || this.model.controls === 'tap';
+    // Крест на экране: снизу запас на его высоту, чтобы низ карты (выход, калитка) поднимался над d-pad,
+    // а Дима стоял в центре видимой зоны над крестом, а не всего экрана.
+    const inset = !fitsH ? bottom / zoom : 0;
+    // Центр видимой зоны между HUD и d-pad ниже центра экрана на (низ − верх) / 2.
+    const base = fitsH ? 0 : (bottom - this.insets.top) / zoom / 2;
+    this.cam0 = { zoom, mw, mh, fitsW, fitsH, centered, bottom, base, inset };
+    this.follow = { off: [0, 0], dodge: this.follow.dodge };
+    this.updateFollow(true);
   }
 
   // ───────────── ввод и события ─────────────
@@ -791,6 +834,7 @@ export class Location extends Phaser.Scene {
         if (!s) break;
         const x = ev.to[0] * T + T / 2;
         const y = ev.to[1] * T + T;
+        this.tweens.killTweensOf(s);
         this.tweens.add({ targets: s, x, y, duration: STEP_MS_SCENE, ease: 'Sine.easeInOut', onUpdate: () => s.setDepth(10 + s.y) });
         break;
       }
@@ -817,7 +861,8 @@ export class Location extends Phaser.Scene {
       oy = DELTA[this.bump.dir][1];
     }
     s.setPosition(Math.round((fx * T + T / 2) + ox), Math.round(fy * T + T + oy));
-    s.setDepth(10 + Math.round(fy * T + T));
+    // Одна строка с Казиком (P-12): Дима поверх, Казик не рисуется на нём.
+    s.setDepth(10 + Math.round(fy * T + T) + (s === this.player ? 0.5 : 0));
     const key = `${sid}:${a.step ? 'walk' : 'idle'}_${a.facing}`;
     if (s.anims.currentAnim?.key !== key) s.play(key);
   }

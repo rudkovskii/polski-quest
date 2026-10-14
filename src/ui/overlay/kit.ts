@@ -135,6 +135,18 @@ export function audioButtons(audio: AudioPort, text: string, who?: string): HTML
   ];
 }
 
+/**
+ * «Не слышу» в задании на слух (P-12, Андрей: «Не могу слушать»): звука в этом запуске нет — шаг закрывается без
+ * оценки, следующие задания на слух читаются транскрипцией. Нет `cantHear` (dev-страницы) — кнопки нет.
+ */
+export function cantHearButton(ctx: { cantHear?(): void }, skip: () => void): HTMLElement | string {
+  if (!ctx.cantHear) return '';
+  return btn('Не слышу', () => {
+    ctx.cantHear?.();
+    skip();
+  }, 'icon ghost', { 'data-nav': true, 'data-act': 'cant-hear', 'aria-label': 'Не слышу: дальше задания на слух — чтением' });
+}
+
 /** Мини-markdown для `explain` (≤ 400 знаков): **жирный**, *курсив*, `код`, переносы строк. */
 export function mdInline(md: string): DocumentFragment {
   const frag = document.createDocumentFragment();

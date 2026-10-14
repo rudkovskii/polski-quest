@@ -20,3 +20,30 @@ export function pickZoom(viewW: number, viewH: number, mapW: number, mapH: numbe
   const fit = Math.floor(Math.min(viewW / mapW, viewH / mapH) * FIT_SLACK);
   return Math.max(base, Math.min(fit, MAX_ZOOM));
 }
+
+/** Прямоугольник на экране, CSS-пиксели канваса. */
+export interface ScreenRect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
+/**
+ * Цель под колонкой кнопок HUD справа (P-12, хатка Казика под «Obchód / Paszport / ⚙»): на сколько сдвинуть
+ * картинку, чтобы цель вышла из-под колонки. Колонка — край видимой зоны, как d-pad снизу (P-10a).
+ * Возвращает сдвиг содержимого в CSS-пикселях: `dx < 0` — влево, `dy > 0` — вниз; [0, 0] — цель не под колонкой.
+ * Из двух вариантов (вниз под колонку или влево от неё) — тот, что короче и не уводит цель за край или под d-pad.
+ */
+export function hudDodge(goal: ScreenRect, hud: ScreenRect | null, view: { width: number; height: number; bottom: number }, margin = 6): [number, number] {
+  if (!hud) return [0, 0];
+  const hit = goal.right > hud.left - margin && goal.left < hud.right + margin && goal.bottom > hud.top - margin && goal.top < hud.bottom + margin;
+  if (!hit) return [0, 0];
+  const down = hud.bottom + margin - goal.top;
+  const left = goal.right - (hud.left - margin);
+  const downOk = goal.bottom + down <= view.height - view.bottom;
+  const leftOk = goal.left - left >= 0;
+  if (downOk && (!leftOk || down <= left)) return [0, down];
+  if (leftOk) return [-left, 0];
+  return [0, Math.max(0, Math.min(down, view.height - view.bottom - goal.bottom))];
+}

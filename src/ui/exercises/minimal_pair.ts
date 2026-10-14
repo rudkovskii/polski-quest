@@ -3,7 +3,7 @@
 // Переслушать можно без штрафа. Нет звука → слово показано текстом, карточка `pair` не пишется.
 import type { StepMinimalPair } from '../../types/content';
 import { el } from '../dom';
-import { btn } from '../overlay/kit';
+import { btn, cantHearButton } from '../overlay/kit';
 import { explainOf, runGraded } from './frame';
 import { optionList, seedOf, shuffled } from './options';
 import type { ExerciseModule } from './types';
@@ -41,6 +41,7 @@ export const minimal_pair: ExerciseModule<StepMinimalPair> = {
           el('span', { class: 'q' }, sameDiff ? 'Это одно и то же слово?' : 'Какое слово звучит?'),
           btn('▶', () => play(), 'icon', { 'aria-label': 'Послушать ещё раз', 'data-nav': true, 'data-audio': 'play' }),
           btn('медленно', () => play(true), 'icon ghost', { 'data-nav': true, 'data-audio': 'slow' }),
+          cantHearButton(ctx, () => run.skipNoAudio()),
         ];
     // Без звука по переводу или транскрипции (P-10b) — чтение пары: карточка `pair` пишется и не пропадает.
     const reading = !sameDiff && ctx.silent === true && (!!meaning || !!step.tr);

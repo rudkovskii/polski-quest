@@ -242,8 +242,7 @@ describe('без звука в уроке', () => {
     byText(main(), 'сено').click();
     await flush(1);
     expect(main().querySelector('[data-fb=react]')?.textContent).toContain('Siano? Nie mamy siana.');
-    byText(main(), 'цена').click();
-    await flush(1);
+    // P-12: после ошибки «Dalej» (тап по подсвеченному верному — то же самое).
     act(main(), 'next').click();
     // Повтор ошибки в конце урока: реакция мира только на первую ошибку шага.
     await flush(2);

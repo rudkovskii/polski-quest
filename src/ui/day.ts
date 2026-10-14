@@ -151,6 +151,7 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
       ),
     dispose() {
       for (const off of offs) off();
+      root.ownerDocument.defaultView?.removeEventListener('resize', onResize);
       hud.remove();
     },
   };
@@ -192,7 +193,34 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
     // придержанных до завтра; с ним «Obchód (3)» вёл бы в «Всё полито». Весна: словами, без числа.
     const n = gardenItems(d, now, content.tuning).filter((g) => g.dueCard).length;
     setPlLabel(obchodBtn, dayState(d, content.tuning).spring && n > 0 ? { pl: 'Obchód', ru: 'грядки подсохли' } : { pl: `Obchód (${n})`, ru: BTN.obchod.ru });
+    sendRect();
   }
+
+  /**
+   * Где колонка на экране (P-12): камера не ставит цель под неё, пузырь Казика её обходит. Берём объединение видимых
+   * кнопок, а не контейнер: контейнер шириной с самую широкую кнопку, а тапы он и так пропускает.
+   */
+  let rectKey = '';
+  function sendRect(): void {
+    if (!worldOn && hudOn) return; // под модальным слоем колонка спрятана, но вернётся на то же место
+    let r: BusEvents['ui:hud:rect'] = null;
+    if (hudOn && !hud.hidden) {
+      const boxes = [...hud.children].filter((c) => !(c as HTMLElement).hidden).map((c) => c.getBoundingClientRect()).filter((b) => b.width > 0 && b.height > 0);
+      if (boxes.length)
+        r = {
+          left: Math.min(...boxes.map((b) => b.left)),
+          top: Math.min(...boxes.map((b) => b.top)),
+          right: Math.max(...boxes.map((b) => b.right)),
+          bottom: Math.max(...boxes.map((b) => b.bottom)),
+        };
+    }
+    const key = r ? `${Math.round(r.left)},${Math.round(r.top)},${Math.round(r.right)},${Math.round(r.bottom)}` : '-';
+    if (key === rectKey) return;
+    rectKey = key;
+    bus.emit('ui:hud:rect', r);
+  }
+  const onResize = (): void => sendRect();
+  root.ownerDocument.defaultView?.addEventListener('resize', onResize);
 
   async function cellarPanel(store: DayStore): Promise<void> {
     const now = clock.now();
@@ -238,6 +266,7 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
     bus.on('world:input', ({ enabled }) => {
       worldOn = enabled;
       hud.hidden = !hudOn || !worldOn;
+      if (enabled) sendRect();
     }),
     bus.on('progress:changed', () => void refreshHud()),
     bus.on('progress:merged', () => void refreshHud()),

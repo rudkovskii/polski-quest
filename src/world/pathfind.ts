@@ -70,14 +70,20 @@ const manhattan = (a: Xy, b: Xy): number => Math.abs(a[0] - b[0]) + Math.abs(a[1
  * ближайшей к цели по Манхэттену (при равенстве — более короткий путь). Стартовая клетка
  * считается проходимой, даже если на ней стоит препятствие.
  */
-export function findPathToAny(grid: Grid, from: Xy, goals: readonly Xy[], target: Xy = goals[0] ?? from): PathResult {
+export function findPathToAny(grid: Grid, from: Xy, goals: readonly Xy[], target: Xy = goals[0] ?? from, cost?: (c: Xy) => number): PathResult {
   const f = flood(grid, from);
   let best = -1;
+  let bestCost = Infinity;
   for (const [gx, gy] of goals) {
     if (gx < 0 || gy < 0 || gx >= grid.w || gy >= grid.h) continue;
     const gi = gy * grid.w + gx;
     if (f.dist[gi] === -1) continue;
-    if (best === -1 || f.dist[gi]! < f.dist[best]!) best = gi;
+    // Цена клетки (P-12): к человеку — сбоку, а не снизу (высокий спрайт Димы закрывает собеседника).
+    const c = f.dist[gi]! + (cost ? cost([gx, gy]) : 0);
+    if (c < bestCost) {
+      bestCost = c;
+      best = gi;
+    }
   }
   if (best !== -1) {
     const end: Xy = [best % grid.w, Math.floor(best / grid.w)];
@@ -112,7 +118,15 @@ export function around(at: Xy, size: Xy = [1, 1]): Xy[] {
 }
 
 /** Путь к клетке рядом с объектом (тап по NPC или слову вдали: подойти, потом действие). */
-export function pathToAdjacent(grid: Grid, from: Xy, at: Xy, size: Xy = [1, 1]): PathResult {
+export function pathToAdjacent(grid: Grid, from: Xy, at: Xy, size: Xy = [1, 1], cost?: (c: Xy) => number): PathResult {
   const goals = around(at, size).filter(([x, y]) => grid.passable(x, y) || (x === from[0] && y === from[1]));
-  return findPathToAny(grid, from, goals, at);
+  return findPathToAny(grid, from, goals, at, cost);
+}
+
+/**
+ * Лишние шаги за клетку подхода к человеку (P-12): Дима 16×32, стоя прямо под NPC он закрывает его спрайт. Сбоку — 0,
+ * сверху — 1, снизу — 3: подходит сбоку, если обход не дальше трёх клеток.
+ */
+export function npcApproachCost(at: Xy): (c: Xy) => number {
+  return (c) => (c[1] > at[1] ? 3 : c[1] < at[1] ? 1 : 0);
 }

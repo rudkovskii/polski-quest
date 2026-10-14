@@ -17,6 +17,7 @@ import { el } from './dom';
 import type { Overlay } from './overlay/host';
 import { BTN, btn, plBtn } from './overlay/kit';
 import { bobrLine } from './obchod';
+import { isSilent } from '../systems/sound';
 
 /** Флаг мира «Я сохранил ссылку» (тот же, что LINK_SAVED_FLAG в src/cloud.ts; ui не импортирует склейку). */
 export const LINK_SAVED = 'link.saved';
@@ -146,7 +147,7 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
   const s = summarizeDay(store.progress, deriveContent(content), now, deps.tz);
   const pace = paceCtxOf(content, derive(store.progress, deriveContent(content), now, deps.tz), store.progress.world.flags, deps.tz);
   const dl = dayLines(content.director.days, pace.day);
-  const silent = getSetting(store.progress, 'sound.mode') === 'off';
+  const silent = isSilent(store.progress);
   const lines: SummaryLines = {
     ...(dl?.sleep ? { sleep: dl.sleep.map((id) => lineFor(id, silent, content.lines)) } : {}),
     ...(dl?.umiem ? { umiem: dl.umiem } : {}),

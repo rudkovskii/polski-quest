@@ -218,4 +218,9 @@ export interface BusEvents {
   'app:update': Record<string, never>;
   /** Игрок нажал «Обновить» в тосте: дописать прогресс и перезагрузиться (main.ts). */
   'app:reload': Record<string, never>;
+  /**
+   * Колонка кнопок HUD справа (P-12): прямоугольник в CSS-пикселях окна; null — колонки нет. Камера не ставит цель
+   * под неё (scenes/Location.ts), пузырь Казика её обходит (ui/guide.ts).
+   */
+  'ui:hud:rect': { left: number; top: number; right: number; bottom: number } | null;
 }

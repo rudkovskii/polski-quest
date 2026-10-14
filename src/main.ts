@@ -11,6 +11,7 @@ import { mountCreator } from './ui/creator';
 import { mountGuide } from './ui/guide';
 import { bus } from './systems/bus';
 import { connectAudio } from './systems/platform/audio';
+import { setSoundUnavailable } from './systems/sound';
 import { getContent } from './systems/content';
 import { mountUi } from './ui';
 import { mountAudioToast } from './ui/audioToast';
@@ -65,6 +66,14 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   // Озвучка (I-09): `audio:play` из UI, разблокировка на Title и первом жесте, тост после фона.
   if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
   else connectAudio(bus);
+  // P-12: звука нет на деле — задания на слух читаются, как при «Bez dźwięku» (systems/sound.ts). `?mute=1` — сразу;
+  // фразу нечем озвучить (`none`) — до первой прозвучавшей.
+  if (mute) setSoundUnavailable(true);
+  bus.on('audio:state', ({ state }) => {
+    if (mute) return;
+    if (state === 'none') setSoundUnavailable(true);
+    else if (state === 'playing') setSoundUnavailable(false);
+  });
   mountAudioToast(overlay);
   mountUpdateToast(overlay);
   const store0 = opts.devStore ?? startCloud({ dev: dev === '1', ...opts.cloud }).then((c) => c.storage);
