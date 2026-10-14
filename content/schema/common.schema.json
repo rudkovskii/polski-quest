@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common.schema.json",
+  "title": "Common",
+  "description": "Общие определения (ТЗ §3.0). Ссылки: common.schema.json#/$defs/<имя>.",
+  "$defs": {
+    "id": { "title": "Id", "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$" },
+    "moduleId": { "title": "ModuleId", "type": "string", "pattern": "^[a-z0-9_]+$" },
+    "lxId": { "title": "LxId", "type": "string", "pattern": "^lx\\.[a-z0-9_]+$" },
+    "mpId": { "title": "MpId", "type": "string", "pattern": "^mp\\.[a-z0-9_]+$" },
+    "itemId": { "title": "ItemId", "type": "string", "pattern": "^it\\.[a-z0-9_]+$" },
+    "charId": { "title": "CharId", "type": "string", "pattern": "^[a-z_]+$" },
+    "lineId": { "title": "LineId", "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$" },
+    "dlgId": { "title": "DlgId", "type": "string", "pattern": "^dlg\\.[a-z0-9_]+\\.[a-z0-9_]+$" },
+    "errorTag": { "title": "ErrorTagId", "type": "string", "pattern": "^(R[1-9]|R10|(orth|gr|ff|ph)\\.[a-z0-9_.]+)$" },
+    "cluster": { "title": "Cluster", "enum": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10"] },
+    "pos": {
+      "title": "Pos",
+      "enum": ["noun", "verb", "adj", "adv", "num", "pron", "prep", "conj", "part", "phrase", "name", "sign", "letter"]
+    },
+    "hud": {
+      "title": "HudElement",
+      "enum": ["obchod", "pierogi", "zloty", "passport", "map", "jars", "orders", "kitchen", "diary"]
+    },
+    "text2": {
+      "title": "Text2",
+      "type": "object",
+      "required": ["pl", "ru"],
+      "additionalProperties": false,
+      "properties": {
+        "pl": { "type": "string", "minLength": 1 },
+        "ru": { "type": "string", "minLength": 1 }
+      }
+    },
+    "xy": {
+      "title": "Xy",
+      "type": "array",
+      "items": { "type": "integer", "minimum": 0 },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "target": {
+      "title": "Target",
+      "description": "Куда ведёт режиссёр (ТЗ §4.12).",
+      "type": "object",
+      "required": ["location"],
+      "additionalProperties": false,
+      "properties": {
+        "location": { "$ref": "#/$defs/id" },
+        "object": { "type": "string" },
+        "npc": { "$ref": "#/$defs/charId" },
+        "plot": { "type": "string" },
+        "screen": { "type": "string" }
+      }
+    },
+    "cond": { "$ref": "conditions.schema.json" },
+    "effects": { "$ref": "effects.schema.json" }
+  }
+}

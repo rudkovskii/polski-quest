@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lines.schema.json",
+  "title": "Lines",
+  "description": "content/story/lines.json: реплики бобра, сюжета, кота (ТЗ §3.8). Текст переносится из ../СЮЖЕТ.md, не сочиняется. todo: true = реплики ещё нет (ru можно не указывать).",
+  "type": "array",
+  "items": {
+    "title": "Line",
+    "type": "object",
+    "required": ["id", "who"],
+    "additionalProperties": false,
+    "properties": {
+      "id": { "$ref": "common.schema.json#/$defs/lineId" },
+      "who": { "$ref": "common.schema.json#/$defs/charId" },
+      "ru": { "type": "string", "minLength": 1 },
+      "pl": { "type": "string", "minLength": 1 },
+      "todo": { "type": "boolean" }
+    },
+    "if": { "not": { "required": ["todo"], "properties": { "todo": { "const": true } } } },
+    "then": { "required": ["ru"] }
+  }
+}

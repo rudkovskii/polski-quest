@@ -1,8 +1,10 @@
 # AGENTS.md: polski-quest
 
-Ты пишешь код игры по польскому для Димы («Шэф»). ТЗ и план лежат в воркспейсе:
-`~/Documents/GitHub/Изучение польского/Игра/ТЗ.md` и `ПЛАН.md`. Читай раздел ТЗ своей итерации до кода.
-Код игры живёт в `~/Documents/GitHub/Изучение польского/Игра/app/` (этот репозиторий, `rudkovskii/polski-quest`).
+Ты пишешь код игры по польскому для Димы («Шэф»). Репозиторий = папка `Игра/app/`
+(`~/Documents/GitHub/Изучение польского/Игра/app/`, `rudkovskii/polski-quest`).
+ТЗ, план и сюжет лежат уровнем выше: `../ТЗ.md`, `../ПЛАН.md`, `../СЮЖЕТ.md`, `../КОНЦЕПТ.md`.
+Читай раздел ТЗ своей итерации до кода. Реплики персонажей не придумывай: бери из `../СЮЖЕТ.md`
+в `content/story/lines.json`; если реплики нет, ставь id и `"todo": true`.
 `CLAUDE.md` — копия этого файла (не симлинк): меняешь AGENTS.md → скопируй в CLAUDE.md.
 
 ## Итерация
@@ -36,6 +38,11 @@
 - Эффекты контента, которые выдают złoty, сердца или карточки напрямую.
 - Секрет приватной ссылки в коде, коммитах, логах, README, тестах.
 - Удаление или переименование id в `vocab.json`. Переименование только через `module.renames`.
+  (Ловит `npm run validate`, ТЗ §3.13 п. 7.)
+- Слушать `keydown`/`pointerdown` в сценах и экранах напрямую. Ввод только через `src/input` (intents).
+- Меню выбора режима и экран «как играть». Следующий шаг выбирает `director`.
+- Медведь Wojtek: компаньон бобр (`bobr`).
+  (Три последних пункта пока ловит ревью, не `check_banned.ts`.)
 
 ## Слои (ловит tools/check_layers.ts)
 - `src/systems/**` без `platform/`: не импортирует `phaser`, `platform/`, `scenes|world`, `ui`, `main.ts`;
@@ -43,6 +50,19 @@
 - `src/systems/platform/**`: адаптеры браузера, без `phaser`, `scenes|world`, `ui`.
 - `src/scenes|world/**` ⇄ `src/ui/**`: друг друга не импортируют. `ui` не импортирует `phaser`.
 - Склейка слоёв только в `src/main.ts`.
+
+## Контент (ТЗ §3, I-02)
+- Схемы: `content/schema/*.schema.json` (draft 2020-12, `additionalProperties: false`). Поменял схему →
+  `npm run gen:types` (перезаписывает `src/types/content.d.ts`, руками не править; тест сверяет файл со схемами).
+- `npm run validate` = схемы + дубли id + висячие ссылки + ASCII-карты + introduces + реплики + секреты +
+  рецепты + удалённые слова (против `origin/main`, в CI против `HEAD~1`). Вывод `файл:путь: сообщение`.
+  Другой корень: `npx tsx tools/validate_content.ts --root <dir> [--prev <dir>]`.
+- В `npm run dev` тот же валидатор гоняется на каждую правку `content/**`, ошибки видны оверлеем Vite.
+- Игра читает контент через `getContent()` из `src/systems/content.ts` (типы из `src/types/content.d.ts`).
+- Новый атом условия или эффекта: схема `conditions`/`effects`, проверка ссылок в `tools/lib/content_check.ts`,
+  тест в `tests/content.test.ts`, вычислитель в `src/systems/conditions.ts`/`effects.ts`.
+- Фикстура для тестов: `tests/fixtures/content-mini/` (модуль `demo`, все типы шагов, бобр и Симба,
+  реплики — `todo`-заглушки). Новое правило валидатора = поломка фикстуры в тесте.
 
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.

@@ -1,0 +1,28 @@
+{
+  "id": "demo.kawiarnia",
+  "title": { "pl": "Kawiarnia", "ru": "Кафе" },
+  "tileset": "ninja16",
+  "controls": "walk",
+  "size": [8, 6],
+  "defaultGround": ".",
+  "legend": {
+    ".": { "tile": "floor" },
+    "#": { "tile": "wall", "solid": true, "auto": true },
+    "c": { "tile": "counter", "solid": true },
+    "T": { "tile": "table", "solid": true, "layer": "deco" },
+    "=": { "tile": "door" }
+  },
+  "layers": {
+    "ground": ["########", "#..c...#", "#......#", "#..TT..#", "#......#", "###=####"],
+    "deco": ["        ", "        ", "        ", "        ", "        ", "        "]
+  },
+  "spawns": { "default": [3, 4], "from_ogrod": [3, 4] },
+  "objects": [
+    { "type": "npc", "id": "pan_marek", "at": [3, 2], "facing": "down" },
+    { "type": "word", "id": "tablica_wyjscie", "at": [6, 1], "item": "lx.wyjscie", "ex": "listen", "sprite": "sign_exit" },
+    { "type": "sign", "at": [4, 5], "pl": "Wyjście", "ru": "Выход", "item": "lx.wyjscie" },
+    { "type": "board", "at": [5, 1], "board": "orders" },
+    { "type": "trigger", "id": "lada", "at": [3, 1], "on": "tap", "do": [{ "startDialogue": "dlg.demo.marek" }] },
+    { "type": "exit", "at": [3, 5], "to": "demo.ogrod", "spawn": "from_kawiarnia" }
+  ]
+}

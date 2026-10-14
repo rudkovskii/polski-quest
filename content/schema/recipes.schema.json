@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "recipes.schema.json",
+  "title": "Recipes",
+  "description": "content/recipes.json: рецепты кухни из банок (этап 3, ТЗ §4.13). Сумма needs[].count = tuning.kitchen.jarsPerRecipe.",
+  "type": "array",
+  "items": {
+    "title": "Recipe",
+    "type": "object",
+    "required": ["id", "title", "needs", "gives"],
+    "additionalProperties": false,
+    "properties": {
+      "id": { "type": "string", "pattern": "^rec\\.[a-z0-9_]+$" },
+      "title": { "$ref": "common.schema.json#/$defs/text2" },
+      "needs": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["count"],
+          "additionalProperties": false,
+          "properties": {
+            "count": { "type": "integer", "minimum": 1 },
+            "tags": { "type": "array", "items": { "type": "string" } },
+            "pos": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/pos" } }
+          }
+        }
+      },
+      "gives": {
+        "type": "object",
+        "required": ["pierog"],
+        "additionalProperties": false,
+        "properties": {
+          "pierog": { "const": 1 }
+        }
+      },
+      "line": { "$ref": "common.schema.json#/$defs/lineId" }
+    }
+  }
+}

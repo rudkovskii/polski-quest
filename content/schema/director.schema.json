@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "director.schema.json",
+  "title": "Director",
+  "description": "content/director.json: сюжетные биты и раскрытие HUD для режиссёра (ТЗ §4.12). Реплики (line) ссылаются на story/lines.json.",
+  "type": "object",
+  "required": ["schema", "beats", "reveals"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": 1 },
+    "beats": {
+      "type": "array",
+      "items": {
+        "title": "Beat",
+        "type": "object",
+        "required": ["id", "slot", "if", "target"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_]+$", "description": "Флаг показа: beat.<id>" },
+          "slot": { "enum": ["start", "afterWater", "afterScene", "beforeSleep"] },
+          "once": { "type": "boolean" },
+          "if": { "$ref": "common.schema.json#/$defs/cond" },
+          "target": { "$ref": "common.schema.json#/$defs/target" },
+          "line": { "$ref": "common.schema.json#/$defs/lineId" },
+          "do": { "$ref": "common.schema.json#/$defs/effects" }
+        }
+      }
+    },
+    "reveals": {
+      "type": "array",
+      "items": {
+        "title": "Reveal",
+        "type": "object",
+        "required": ["element", "if"],
+        "additionalProperties": false,
+        "properties": {
+          "element": { "$ref": "common.schema.json#/$defs/hud" },
+          "if": { "$ref": "common.schema.json#/$defs/cond" },
+          "line": { "$ref": "common.schema.json#/$defs/lineId" }
+        }
+      }
+    },
+    "spring": {
+      "type": "object",
+      "required": ["line"],
+      "additionalProperties": false,
+      "properties": {
+        "line": { "$ref": "common.schema.json#/$defs/lineId" }
+      }
+    },
+    "done": {
+      "type": "object",
+      "required": ["line"],
+      "additionalProperties": false,
+      "properties": {
+        "line": { "$ref": "common.schema.json#/$defs/lineId" },
+        "more3Line": { "$ref": "common.schema.json#/$defs/lineId" }
+      }
+    }
+  }
+}

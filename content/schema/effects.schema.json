@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "effects.schema.json",
+  "title": "Effects",
+  "description": "Список эффектов (ТЗ §3.9). Эффектов «дать złoty / сердце / карточку» нет и не будет.",
+  "type": "array",
+  "items": {
+    "title": "Effect",
+    "type": "object",
+    "minProperties": 1,
+    "maxProperties": 1,
+    "additionalProperties": false,
+    "properties": {
+      "setFlag": { "$ref": "common.schema.json#/$defs/id" },
+      "give": { "$ref": "common.schema.json#/$defs/itemId" },
+      "startLesson": { "$ref": "common.schema.json#/$defs/id" },
+      "startDialogue": { "$ref": "common.schema.json#/$defs/dlgId" },
+      "teleport": {
+        "type": "object",
+        "required": ["to"],
+        "additionalProperties": false,
+        "properties": {
+          "to": { "$ref": "common.schema.json#/$defs/id" },
+          "spawn": { "type": "string" }
+        }
+      },
+      "open": { "enum": ["summary", "passport", "obchod", "express", "settings"] },
+      "challenge": { "$ref": "common.schema.json#/$defs/id" },
+      "toast": { "$ref": "common.schema.json#/$defs/text2" },
+      "line": { "$ref": "common.schema.json#/$defs/lineId" },
+      "reveal": { "$ref": "common.schema.json#/$defs/hud" }
+    }
+  }
+}

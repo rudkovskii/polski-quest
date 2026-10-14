@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "beats": [
+    {
+      "id": "bobr_meets",
+      "slot": "start",
+      "once": true,
+      "if": { "all": [{ "flag": "beat.intro" }, { "not": { "flag": "beat.bobr_meets" } }] },
+      "target": { "location": "demo.ogrod", "npc": "bobr" },
+      "line": "bobr.meets",
+      "do": [{ "reveal": "obchod" }]
+    },
+    {
+      "id": "simba_hint",
+      "slot": "afterScene",
+      "once": true,
+      "if": { "daysPlayed": 5 },
+      "target": { "location": "demo.ogrod", "object": "spot_okno" },
+      "line": "bobr.simba_hint"
+    }
+  ],
+  "reveals": [
+    { "element": "zloty", "if": { "lessonDone": "demo.s01" }, "line": "bobr.reveal_zloty" },
+    { "element": "map", "if": { "bossPassed": "demo.boss" }, "line": "bobr.reveal_map" },
+    { "element": "jars", "if": { "jars": { "min": 1 } } }
+  ],
+  "spring": { "line": "bobr.spring" },
+  "done": { "line": "bobr.see_you", "more3Line": "bobr.more3" }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "start": { "location": "demo.ogrod", "spawn": "default" },
+  "maps": { "poland": "worldmap/poland.png", "warszawa": "worldmap/warszawa.png" },
+  "biomes": [
+    {
+      "id": "praga",
+      "layer": "warszawa",
+      "title": { "pl": "Praga", "ru": "Прага" },
+      "mapRegion": [40, 60, 80, 70],
+      "locations": ["demo.ogrod", "demo.kawiarnia"],
+      "border": "demo.ogrod",
+      "modules": ["demo"],
+      "hosts": ["bobr", "pan_marek"],
+      "stamp": "stamp.praga",
+      "stages": {
+        "visible": { "always": true },
+        "preview": { "any": [{ "lessonDone": "demo.s01" }, { "daysPlayed": 2 }] },
+        "stamp": { "bossPassed": "demo.boss" }
+      }
+    }
+  ]
+}

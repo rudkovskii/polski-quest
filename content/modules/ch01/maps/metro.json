@@ -1,0 +1,31 @@
+{
+  "id": "ch01.metro",
+  "title": { "pl": "Metro Dworzec Wileński", "ru": "Метро «Дворец Виленьски»" },
+  "tileset": "ninja16",
+  "controls": "walk",
+  "size": [10, 7],
+  "defaultGround": ".",
+  "legend": {
+    ".": { "tile": "floor" },
+    "#": { "tile": "wall", "solid": true, "auto": true },
+    "|": { "tile": "gate", "solid": true },
+    "=": { "tile": "stairs" }
+  },
+  "layers": {
+    "ground": [
+      "##########",
+      "#........#",
+      "#........#",
+      "#.||.||..#",
+      "#........#",
+      "#........#",
+      "####=#####"
+    ]
+  },
+  "spawns": { "default": [4, 5], "from_dzialka": [4, 5] },
+  "objects": [
+    { "type": "word", "id": "tablica_wyjscie", "at": [3, 1], "item": "lx.wyjscie", "ex": "listen", "sprite": "sign_exit" },
+    { "type": "npc", "id": "pan_marek", "at": [7, 1], "facing": "down" },
+    { "type": "exit", "at": [4, 6], "to": "ch01.dzialka", "spawn": "from_metro" }
+  ]
+}

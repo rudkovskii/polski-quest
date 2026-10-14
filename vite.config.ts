@@ -1,6 +1,7 @@
-import { execSync } from 'node:child_process';
+import { execFile, execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { defineConfig } from 'vite';
+import { fileURLToPath } from 'node:url';
+import { defineConfig, type Plugin, type ViteDevServer } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const BASE = '/polski-quest/';
@@ -18,6 +19,53 @@ function buildId(): string {
   return `${pkg.version}+${sha}`;
 }
 
+const ROOT_DIR = fileURLToPath(new URL('./', import.meta.url));
+const CONTENT_DIR = fileURLToPath(new URL('./content/', import.meta.url));
+const TSX = fileURLToPath(new URL('./node_modules/.bin/tsx', import.meta.url));
+
+/**
+ * Dev: валидатор контента (ТЗ §3.13, tools/validate_content.ts) при старте и при каждой правке content/**.
+ * Ошибки показываются оверлеем Vite поверх игры; после исправления страница перезагружается.
+ */
+function contentValidator(): Plugin {
+  let last = '';
+  const send = (server: ViteDevServer): void => {
+    if (!last) return;
+    server.ws.send({
+      type: 'error',
+      err: { message: `Контент не прошёл валидацию (npm run validate):\n${last}`, stack: '', plugin: 'pq-content' },
+    });
+  };
+  const run = async (server: ViteDevServer): Promise<void> => {
+    const had = last;
+    // Отдельный процесс: конфиг Vite не тянет за собой ajv и tools/, ошибки те же, что у `npm run validate`.
+    last = await new Promise<string>((done) => {
+      execFile(TSX, ['tools/validate_content.ts', '--quiet'], { cwd: ROOT_DIR }, (err, _out, stderr) => {
+        done(err ? stderr.trim() || err.message : '');
+      });
+    });
+    if (last) {
+      server.config.logger.error(`[content] ошибки валидации:\n${last}`);
+      send(server);
+    } else if (had) {
+      server.config.logger.info('[content] валидация ок');
+      server.ws.send({ type: 'full-reload' });
+    }
+  };
+  return {
+    name: 'pq-content-validator',
+    apply: 'serve',
+    configureServer(server) {
+      void run(server);
+      server.ws.on('connection', () => send(server));
+      const onFs = (file: string): void => {
+        if (file.startsWith(CONTENT_DIR) && file.endsWith('.json')) void run(server);
+      };
+      server.watcher.on('change', onFs).on('add', onFs).on('unlink', onFs);
+    },
+  };
+}
+
 export default defineConfig({
   base: BASE,
   define: {
@@ -28,6 +76,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 2000,
   },
   plugins: [
+    contentValidator(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icons/apple-touch-icon.png'],

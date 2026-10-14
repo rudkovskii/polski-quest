@@ -1,0 +1,42 @@
+[
+  {
+    "id": "lx.maly",
+    "pl": "mały",
+    "ru": "маленький",
+    "tr": "ма́ўы",
+    "pos": "adj",
+    "srs": true,
+    "clusters": ["R3"]
+  },
+  {
+    "id": "lx.slucham",
+    "pl": "słucham",
+    "ru": "слушаю (алло; «что желаете?»)",
+    "tr": "сўу́хам",
+    "pos": "phrase",
+    "srs": true,
+    "clusters": ["R3"]
+  },
+  {
+    "id": "lx.stol",
+    "pl": "stół",
+    "ru": "стол",
+    "tr": "стуў",
+    "pos": "noun",
+    "gender": "m",
+    "srs": true,
+    "ff": { "ru": "стул", "means": "krzesło" },
+    "clusters": ["R3", "R10"],
+    "tags": ["dom", "ff"],
+    "ex": { "pl": "Stół jest mały.", "ru": "Стол маленький." }
+  },
+  {
+    "id": "lx.wyjscie",
+    "pl": "wyjście",
+    "ru": "выход",
+    "tr": "вы́йщче",
+    "pos": "sign",
+    "srs": true,
+    "tags": ["sign"]
+  }
+]
