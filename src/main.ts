@@ -5,7 +5,9 @@ import { Location, type LocationData } from './scenes/Location';
 import { Title } from './scenes/Title';
 import { startCloud } from './cloud';
 import { bus } from './systems/bus';
+import { connectAudio } from './systems/platform/audio';
 import { mountUi } from './ui';
+import { mountAudioToast } from './ui/audioToast';
 import { mountDpad } from './ui/dpad';
 
 // Склейка слоёв (ТЗ §2.1): DOM-оверлей, d-pad, ввод, Phaser. Порядок важен (I-03): сначала d-pad
@@ -15,6 +17,9 @@ function startGame(start?: BootStart): Phaser.Game {
   const parent = document.getElementById('game');
   if (!overlay || !parent) throw new Error('#overlay или #game не найден');
   mountUi(overlay);
+  // Озвучка (I-09): `audio:play` из UI, разблокировка на Title и первом жесте, тост после фона.
+  connectAudio(bus);
+  mountAudioToast(overlay);
   void startCloud({ dev: new URLSearchParams(window.location.search).get('dev') === '1' });
 
   // Конфигурация из ТЗ §2.4. WorldMap добавится в I-11.
@@ -48,7 +53,10 @@ function startGame(start?: BootStart): Phaser.Game {
 
 const params = new URLSearchParams(location.search);
 const dev = params.get('dev');
-if (dev === 'input') {
+if (dev === 'audio') {
+  // Dev-страница озвучки без Phaser (I-09).
+  void import('./dev/audio').then((m) => m.mountAudioDev(document.body));
+} else if (dev === 'input') {
   // Dev-страница без Phaser (I-03).
   void import('./dev/input').then((m) => m.mountInputDev(document.body));
 } else if (dev === 'world') {

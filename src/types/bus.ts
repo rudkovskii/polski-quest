@@ -27,6 +27,14 @@ export type SyncState =
 export type ConnectResult = 'ok' | 'offline' | 'not_found' | 'invalid';
 export type LinkMode = 'stored' | 'url' | 'new' | 'joined';
 
+/** Чем прозвучала фраза (ТЗ §7.2): файл из манифеста, Web Speech pl-PL или никак (показать текст). */
+export type AudioVia = 'file' | 'webspeech' | 'none';
+/**
+ * Состояние озвучки (I-09): playing — звучит (`via`); idle — очередь пуста; blocked — iOS отклонил play()
+ * после фона, ждём тап (`audio:blocked`); none — фразу озвучить нечем, показать значок «звука нет».
+ */
+export type AudioState = 'idle' | 'playing' | 'blocked' | 'none';
+
 /** Результат урока. Уточняется в I-07. */
 export interface LessonResult {
   passed: boolean;
@@ -80,6 +88,19 @@ export interface BusEvents {
   /** Секрет есть, мир выбран: дальше шаг режиссёра (I-13). `mode` — откуда взялся мир. */
   'link:ready': { mode: LinkMode };
   'audio:blocked': Record<string, never>;
+  /**
+   * Озвучить польскую строку (I-09, ТЗ §7). `id` — слово, шаг или реплика из манифеста (`lx.maly`,
+   * `ch01.s03#4`, `dlg.ch01.x#n1`), `text` — сам текст (запасной, если id нет в манифесте). `slow` —
+   * медленная версия. По умолчанию новая фраза прерывает текущую; `queue: true` — встать в очередь.
+   * `done` вызывается, когда фраза доиграла или прервана.
+   */
+  'audio:play': { id?: string; text?: string; slow?: boolean; voice?: string; queue?: boolean; done?: (via: AudioVia) => void };
+  /** Остановить речь и очистить очередь. */
+  'audio:stop': Record<string, never>;
+  /** Повторная разблокировка из жеста (тост «Нажми, чтобы включить звук»). Слать синхронно из обработчика тапа. */
+  'audio:unlock': Record<string, never>;
+  /** Что сейчас с озвучкой (I-09): для значков «звучит» и «звука нет». */
+  'audio:state': { state: AudioState; via?: AudioVia; text?: string; id?: string };
   /** Intent после роутера (ТЗ §2.7): `to` = мир или оверлей по фокусу (I-03). */
   'input:intent': RoutedIntent;
   /** Сменился последний источник ввода (I-03). */

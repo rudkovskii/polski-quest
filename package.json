@@ -19,7 +19,9 @@
     "sprites": "python3 tools/sprites_build.py",
     "sprites:check": "python3 tools/sprites_build.py --check",
     "palette": "python3 tools/palette_extract.py",
-    "check": "npm run typecheck && npm run validate && npm run check:layers && npm run check:banned && npm run test && npm run sprites:check && npm run build",
+    "audio": "python3 tools/build_audio.py",
+    "audio:check": "python3 tools/build_audio.py --check",
+    "check": "npm run typecheck && npm run validate && npm run audio:check && npm run check:layers && npm run check:banned && npm run test && npm run sprites:check && npm run build",
     "sync:smoke": "tsx tools/sync_smoke.ts"
   },
   "dependencies": {

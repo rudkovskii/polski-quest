@@ -27,7 +27,7 @@ import type {
   World,
 } from '../src/types/content';
 import { generate, TYPES_FILE } from '../tools/gen_types';
-import { checkContent, errorsOf, formatIssue, type CheckInput, type Issue, type IssueCode } from '../tools/lib/content_check';
+import { checkContent, errorsOf, formatIssue, voiceTexts, type CheckInput, type Issue, type IssueCode } from '../tools/lib/content_check';
 import { readContentDir, readSchemas, validateDir, vocabIds } from '../tools/lib/content_io';
 import { ROOT } from '../tools/lib/files';
 
@@ -279,14 +279,46 @@ describe('п. 5: introduces', () => {
 
 // ───────────────────────── п. 6: озвучка ─────────────────────────
 
-describe('п. 6: озвучка (до I-09 предупреждение)', () => {
+describe('п. 6: озвучка', () => {
+  const full = (): { v: 1; entries: Record<string, string> } => {
+    const f: Files = new Map([...base].map(([k, v]) => [k, structuredClone(v)]));
+    const lessons = (f.get(`modules/demo/lessons.json`) ?? []) as Lesson[];
+    const vocab = (f.get(`modules/demo/vocab.json`) ?? []) as VocabEntry[];
+    const dialogues = (f.get(`modules/demo/dialogues.json`) ?? []) as Dialogue[];
+    const unvoiced = new Set(['dima', 'bobr', 'simba']);
+    const entries = Object.fromEntries(voiceTexts(lessons, vocab, dialogues, unvoiced).map((t, i) => [`say:Zosia|normal|${t}`, `${i}.m4a`]));
+    return { v: 1, entries };
+  };
   it('нет манифеста: предупреждение для ready и draft, не ошибка', () => {
     const issues = run((f) => (fx.module(f).status = 'ready'));
     expectIssue(issues, 'audio', /озвучка не проверена.*модуль ready/, `${D}module.json`, 'warn');
     expect(errorsOf(issues).filter((i) => i.code === 'audio')).toEqual([]);
   });
-  it('с манифестом предупреждения нет', () => {
-    expect(run(undefined, { audioManifest: {} }).filter((i) => i.code === 'audio')).toEqual([]);
+  it('всё озвучено: ни ошибок, ни предупреждений', () => {
+    const m = full();
+    expect(Object.keys(m.entries).length).toBeGreaterThan(5);
+    expect(run((f) => (fx.module(f).status = 'ready'), { audioManifest: m }).filter((i) => i.code === 'audio')).toEqual([]);
+  });
+  it('пустой манифест: draft = предупреждение со списком строк', () => {
+    const issues = run(undefined, { audioManifest: { v: 1, entries: {} } });
+    expectIssue(issues, 'audio', /не озвучено \d+ из \d+ строк \("/, `${D}module.json`, 'warn');
+    expect(errorsOf(issues).filter((i) => i.code === 'audio')).toEqual([]);
+  });
+  it('ready без одной строки = ошибка', () => {
+    const m = full();
+    const [drop] = Object.keys(m.entries);
+    delete m.entries[drop!];
+    const issues = run((f) => (fx.module(f).status = 'ready'), { audioManifest: m });
+    expectIssue(issues, 'audio', /модуль ready: не озвучено 1 из/, `${D}module.json`);
+  });
+  it('реплики персонажей без голоса (voice.engine none) не требуют озвучки', () => {
+    const texts = voiceTexts(
+      [{ id: 'demo.x', steps: [{ t: 'say', who: 'dima', pl: 'Cześć!' }, { t: 'say', who: 'pan_marek', pl: 'Dzień dobry.' }, { t: 'say', who: 'pan_marek', pl: 'Hm.', audio: false }] } as unknown as Lesson],
+      [],
+      [],
+      new Set(['dima']),
+    );
+    expect(texts).toEqual(['Dzień dobry.']);
   });
 });
 
