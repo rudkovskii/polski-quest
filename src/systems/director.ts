@@ -125,6 +125,39 @@ export const LINES = {
   more3: 'kazik.express',
 } as const;
 
+/** Реплики вступления F1 (src/ui/intro.ts), по порядку карточек. */
+export const INTRO_LINES = {
+  oct: 'intro.caption.oct',
+  kloda: 'intro.kazik.kloda',
+  bobr: 'intro.caption.bobr',
+  hela: 'intro.hela.za_darmo',
+  passportK: 'intro.passport.k',
+  empty: 'intro.caption.empty',
+  dzienDobry: 'intro.kazik.dzien_dobry',
+  dopiero: 'intro.kazik.dopiero',
+  goscMowi: 'intro.kazik.gosc_mowi',
+  shadow: 'kazik.shadow.first',
+  poRusku: 'intro.kazik.po_rusku',
+  miau: 'intro.simba.miau',
+  pokazalo: 'intro.caption.pokazalo',
+} as const;
+
+/**
+ * Реплики бита первого дня (§5.0 F1–F6, P-01): вступление, переходы режиссёра первого дня, итог и «done».
+ * Диалоги первого дня (турникет-диагностика и ремонтные сцены кластеров) валидатор собирает сам по контенту.
+ * `PQ_RELEASE=1 npm run build` (и `validate --release`) падает, если среди них есть `todo`.
+ */
+export const FIRST_DAY_LINES: readonly string[] = [
+  ...Object.values(INTRO_LINES),
+  LINES.waterFirst,
+  LINES.move,
+  LINES.resume,
+  LINES.evening,
+  LINES.sleep,
+  LINES.done,
+  LINES.more3,
+];
+
 // ── Вход из прогресса (для склейки и тестов).
 
 export interface InputOptions {

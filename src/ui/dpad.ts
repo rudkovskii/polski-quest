@@ -1,6 +1,8 @@
 // Вёрстка d-pad (ТЗ §2.7): крест 120 px слева внизу, «A» справа внизу, «B» мелкая рядом с «A».
 // Отступ = safe-area + 16 px; сторона креста — `controls.dpadSide`. Видимость решает роутер
 // (событие `input:dpad`). Нажатия обрабатывает src/input/dpad.ts: здесь слушателей ввода нет.
+// P-01: первые дни под «A» и над «B» мелкие подписи «A · действие», «B · назад» (флаг `labels`).
+import type { LogEvent } from '../systems/log';
 import { bus as globalBus, type Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import { el } from './dom';
@@ -27,6 +29,10 @@ const css = `
 .pq-dpad-a { width: 72px; height: 72px; right: calc(env(safe-area-inset-right) + 16px); bottom: calc(env(safe-area-inset-bottom) + 40px); background: #b13e53; border: 3px solid #ef7d57; box-shadow: 0 4px 0 #5d275d; }
 .pq-dpad-b { width: 46px; height: 46px; font-size: 16px; right: calc(env(safe-area-inset-right) + 100px); bottom: calc(env(safe-area-inset-bottom) + 16px); background: #29366f; border: 3px solid #566c86; box-shadow: 0 3px 0 #1a1c2c; }
 .pq-dpad-btn[data-pressed] { transform: translateY(3px); box-shadow: none; filter: brightness(1.2); }
+.pq-dpad-cap { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; pointer-events: none; font: 600 12px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; color: #f4f4f4; text-shadow: 0 1px 0 #1a1c2c, 0 0 3px #1a1c2c; }
+.pq-dpad-a .pq-dpad-cap { top: calc(100% + 6px); }
+.pq-dpad-b .pq-dpad-cap { bottom: calc(100% + 6px); }
+.pq-dpad:not([data-labels]) .pq-dpad-cap { display: none; }
 .pq-dpad[data-side=right] .pq-dpad-cross { left: auto; right: calc(env(safe-area-inset-right) + 16px); }
 .pq-dpad[data-side=right] .pq-dpad-a { right: auto; left: calc(env(safe-area-inset-left) + 16px); }
 .pq-dpad[data-side=right] .pq-dpad-b { right: auto; left: calc(env(safe-area-inset-left) + 100px); }
@@ -40,16 +46,36 @@ export interface DpadView {
   dispose(): void;
 }
 
-export function mountDpad(parent: HTMLElement, bus: Bus<BusEvents> = globalBus): DpadView {
+/** Подписи «A · действие», «B · назад» нужны первые дни: до третьего «Dobranoc» (P-01). */
+export const DPAD_LABEL_SLEEPS = 3;
+
+export function dpadLabelsOn(events: readonly LogEvent[]): boolean {
+  let sleeps = 0;
+  for (const e of events) if (e.k === 'seg' && e.seg === 'sleep' && ++sleeps >= DPAD_LABEL_SLEEPS) return false;
+  return true;
+}
+
+export interface DpadOptions {
+  /** Показывать подписи под кнопками (проверяется при каждом показе d-pad). По умолчанию да. */
+  labels?: () => boolean;
+}
+
+export function mountDpad(parent: HTMLElement, bus: Bus<BusEvents> = globalBus, opts: DpadOptions = {}): DpadView {
   const arms = (['up', 'down', 'left', 'right'] as const).map((d) => el('div', { class: `arm ${d}` }));
-  const cross = el('div', { class: 'pq-dpad-cross', role: 'group', 'aria-label': 'Крестовина' }, el('div', { class: 'hub' }), ...arms);
-  const a = el('div', { class: 'pq-dpad-btn pq-dpad-a', role: 'button', 'aria-label': 'Действие' }, 'A');
-  const b = el('div', { class: 'pq-dpad-btn pq-dpad-b', role: 'button', 'aria-label': 'Назад' }, 'B');
-  const root = el('div', { class: 'pq-dpad', hidden: true, 'data-side': 'left' }, el('style', {}, css), cross, a, b);
+  const cross = el('div', { class: 'pq-dpad-cross', role: 'group', 'aria-label': 'Крестик управления' }, el('div', { class: 'hub' }), ...arms);
+  const a = el('div', { class: 'pq-dpad-btn pq-dpad-a', role: 'button', 'aria-label': 'A: действие' }, 'A', el('span', { class: 'pq-dpad-cap', 'aria-hidden': 'true' }, 'A · действие'));
+  const b = el('div', { class: 'pq-dpad-btn pq-dpad-b', role: 'button', 'aria-label': 'B: назад' }, 'B', el('span', { class: 'pq-dpad-cap', 'aria-hidden': 'true' }, 'B · назад'));
+  const root = el('div', { class: 'pq-dpad', hidden: true, 'data-side': 'left', 'data-labels': '' }, el('style', {}, css), cross, a, b);
   parent.append(root);
+  // Флаг спрашиваем при показе, не при монтировании: прогресс к этому моменту ещё грузится.
+  const labels = (): void => {
+    if (opts.labels?.() ?? true) root.dataset.labels = '';
+    else delete root.dataset.labels;
+  };
   const off = bus.on('input:dpad', ({ visible, side }) => {
     root.hidden = !visible;
     root.dataset.side = side;
+    if (visible) labels();
   });
   return {
     root,

@@ -1,8 +1,11 @@
 // Варианты ответа (choice, listen, gap, minimal_pair, stress) и детерминированное перемешивание.
+// P-01: варианты всех упражнений показываются перемешанными по seed = id шага + игровой день
+// (`ExerciseCtx.seed`): на двух устройствах в один день одинаково, назавтра иначе, повтор ошибки в
+// конце урока — в другом порядке. Порядок слогов в `stress` не трогаем: это слово.
 import { fnv1a } from '../../systems/hash';
 import type { StepListen, VocabEntry } from '../../types/content';
 import { el } from '../dom';
-import type { ExerciseContent } from './types';
+import type { ExerciseContent, ExerciseCtx } from './types';
 
 /** Перемешивание по seed (id шага): на двух устройствах и в тестах одинаково. */
 export function shuffled<T>(list: readonly T[], seed: string): T[] {
@@ -14,6 +17,20 @@ export function shuffled<T>(list: readonly T[], seed: string): T[] {
     [out[i], out[j]] = [out[j]!, out[i]!];
   }
   return out;
+}
+
+/** Seed перемешивания вариантов шага: `ctx.seed` (id шага + день), без него — id шага. */
+export function seedOf(ctx: Pick<ExerciseCtx, 'stepId' | 'seed'>): string {
+  return ctx.seed ?? ctx.stepId;
+}
+
+/**
+ * Перемешать варианты с известным верным (`answer` — индекс в исходном списке). `orig[i]` — исходный
+ * индекс i-го показанного варианта (для `errorTagByOption`).
+ */
+export function shuffleOptions<T>(list: readonly T[], answer: number, seed: string): { options: T[]; answer: number; orig: number[] } {
+  const orig = shuffled([...list.keys()], seed);
+  return { options: orig.map((i) => list[i]!), answer: orig.indexOf(answer), orig };
 }
 
 export interface OptionList {
@@ -76,9 +93,12 @@ export function optionList(labels: readonly string[], onPick: (i: number) => voi
  * с этим тегом и тем же `pos`, затем с тегом, затем любые; детерминированно по id шага. Возвращает
  * варианты и индекс верного.
  */
-export function autoOptions(step: StepListen, stepId: string, content: ExerciseContent | undefined, n = 3): { options: string[]; answer: number } {
+export function autoOptions(step: StepListen, stepId: string, content: ExerciseContent | undefined, n = 3, seed = stepId): { options: string[]; answer: number } {
   const correct = step.say;
-  if (typeof step.options !== 'string') return { options: [...step.options], answer: step.answer };
+  if (typeof step.options !== 'string') {
+    const s = shuffleOptions(step.options, step.answer, seed);
+    return { options: s.options, answer: s.answer };
+  }
   const tag = step.options.replace(/^auto:/, '');
   const item = step.item ? content?.vocab(step.item) : undefined;
   const all = content?.allVocab() ?? [];
@@ -96,6 +116,7 @@ export function autoOptions(step: StepListen, stepId: string, content: ExerciseC
   add(pool((v) => (v.tags ?? []).includes(tag)));
   add(pool((v) => !item || v.pos === item.pos));
   add(pool(() => true));
-  const options = shuffled([correct, ...picked], `${stepId}:opts`);
+  // Дистракторы стабильны по id шага, порядок показа — по seed (день).
+  const options = shuffled([correct, ...picked], `${seed}:opts`);
   return { options, answer: options.indexOf(correct) };
 }

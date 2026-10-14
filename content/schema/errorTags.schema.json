@@ -12,6 +12,7 @@
     "properties": {
       "id": { "$ref": "common.schema.json#/$defs/errorTag" },
       "ru": { "type": "string", "minLength": 1 },
+      "hint": { "type": "string", "minLength": 1, "maxLength": 140, "description": "Правило одной строкой после неверного ответа (P-01); нет — показывается ru" },
       "remedy": { "$ref": "common.schema.json#/$defs/id" },
       "cluster": { "$ref": "common.schema.json#/$defs/cluster" }
     }

@@ -5,7 +5,7 @@ import type { StepType } from '../../types/content';
 import { el } from '../dom';
 import { audioButtons } from '../overlay/kit';
 import { answerField, focusField, letterHint } from './field';
-import { runGraded } from './frame';
+import { explainOf, runGraded } from './frame';
 import type { ExerciseModule } from './types';
 
 export const type: ExerciseModule<StepType> = {
@@ -31,7 +31,7 @@ export const type: ExerciseModule<StepType> = {
       },
       hint: () => letterHint(step.accept[0]),
       focus: () => focusField(field),
-      ...(step.hint ? { stepHint: step.hint } : {}),
+      ...explainOf(step),
     });
     return run.result;
   },

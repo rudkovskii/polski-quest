@@ -15,7 +15,7 @@ import { el } from './dom';
 import type { LessonStore } from './lesson';
 import { runObchod, stageLabel, type ObchodOptions } from './obchod';
 import type { Overlay } from './overlay/host';
-import { btn, type AudioPort } from './overlay/kit';
+import { BTN, btn, plBtn, setPlLabel, type AudioPort } from './overlay/kit';
 import { runSettings, type SettingsStore } from './settings';
 import { dayState } from '../systems/session';
 
@@ -156,10 +156,11 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
   };
 
   // ── HUD локаций: элементы по флагам hud.* (I-13).
-  const obchodBtn = btn('Obchód', () => void ui.obchod({ mode: 'day' }), '', { 'data-hud': 'obchod' });
-  const expressBtn = btn('Ekspres', () => void ui.obchod({ mode: 'express' }), '', { 'data-hud': 'obchod', 'data-act': 'express' });
-  const cellarBtn = btn('Spiżarnia', () => void once((s) => cellarPanel(s)), '', { 'data-hud': 'jars' });
-  const passportBtn = btn('Paszport', () => bus.emit('ui:screen:open', { screen: 'passport' }), '', { 'data-hud': 'passport' });
+  // Кнопки HUD: польское слово + русская подпись (P-01, ПОЛИРОВКА §2.10).
+  const obchodBtn = plBtn(BTN.obchod, () => void ui.obchod({ mode: 'day' }), '', { 'data-hud': 'obchod' });
+  const expressBtn = plBtn(BTN.express, () => void ui.obchod({ mode: 'express' }), '', { 'data-hud': 'obchod', 'data-act': 'express' });
+  const cellarBtn = plBtn(BTN.cellar, () => void once((s) => cellarPanel(s)), '', { 'data-hud': 'jars' });
+  const passportBtn = plBtn(BTN.passport, () => bus.emit('ui:screen:open', { screen: 'passport' }), '', { 'data-hud': 'passport' });
   const hud = el(
     'div',
     { class: 'pq-dhud', hidden: true, 'data-hud-bar': 'location' },
@@ -189,7 +190,7 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
     // Число на кнопке = растения с «!» (что польёт раунд сейчас). Долг (§4.2) больше на братьев,
     // придержанных до завтра; с ним «Obchód (3)» вёл бы в «Всё полито». Весна: словами, без числа.
     const n = gardenItems(d, now, content.tuning).filter((g) => g.dueCard).length;
-    obchodBtn.textContent = dayState(d, content.tuning).spring && n > 0 ? 'Obchód · грядки подсохли' : `Obchód (${n})`;
+    setPlLabel(obchodBtn, dayState(d, content.tuning).spring && n > 0 ? { pl: 'Obchód', ru: 'грядки подсохли' } : { pl: `Obchód (${n})`, ru: BTN.obchod.ru });
   }
 
   async function cellarPanel(store: DayStore): Promise<void> {
@@ -208,7 +209,7 @@ export function mountDay(root: HTMLElement, deps: DayDeps): DayUi {
         el(
           'div',
           { class: 'pq-wood pq-cellar', 'data-screen': 'cellar' },
-          el('h2', {}, 'Spiżarnia'),
+          el('h2', {}, el('span', { lang: 'pl' }, BTN.cellar.pl), ' ', el('small', {}, BTN.cellar.ru)),
           ...(jars.length
             ? jars.map((g) => {
                 const v = content.vocab.get(g.item)?.value;

@@ -22,7 +22,7 @@ import { el } from './dom';
 import { mountStep } from './exercises/registry';
 import type { ExerciseContent, ExerciseCtx, StepResult } from './exercises/types';
 import type { IntentHandler, Layer, Overlay } from './overlay/host';
-import { btn, portrait, react, type AudioPort, type PortraitSource } from './overlay/kit';
+import { BTN, btn, plBtn, portrait, react, type AudioPort, type PortraitSource } from './overlay/kit';
 
 /** Хранилище прогресса: GameStorage подходит как есть, в тестах — память. */
 export interface LessonStore {
@@ -134,6 +134,7 @@ export function exerciseContent(c: Content): ExerciseContent {
     vocab: (id) => c.vocab.get(id)?.value,
     allVocab: () => (all ??= [...c.vocab.values()].map((v) => v.value)),
     speaker: (id) => ({ id, name: c.characters.get(id)?.name ?? id }),
+    errorTag: (id) => c.errorTags.get(id),
   };
 }
 
@@ -265,10 +266,13 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
     const step = steps[entry.i]!;
     paintDots(plan, pos);
     main.scrollTop = 0;
+    const stepId = step.id ?? `${lesson.id}#${entry.i}`;
     const ctx: ExerciseCtx = {
       layer: stepLayer,
       root: main,
-      stepId: step.id ?? `${lesson.id}#${entry.i}`,
+      stepId,
+      // Порядок вариантов (P-01): по шагу и игровому дню; повтор ошибки в конце урока — в другом порядке.
+      seed: `${stepId}@${derived.today}${entry.rep ? ':r' : ''}`,
       content: exContent,
       audio: deps.audio,
       portraits: deps.portraits ?? null,
@@ -391,7 +395,7 @@ function summary(
   const min = Math.max(1, Math.round((result.ms ?? 0) / 60_000));
   dots.replaceChildren();
   return new Promise((resolve) => {
-    const done = btn('Dalej', () => {
+    const done = plBtn(BTN.next, () => {
       layer.handle(null);
       resolve();
     }, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'next' });
@@ -399,7 +403,7 @@ function summary(
       el(
         'div',
         { class: 'pq-summary', 'data-summary': o.lesson.id },
-        el('div', { class: 'pq-big' }, result.passed ? 'Gotowe!' : 'Prawie.'),
+        el('div', { class: 'pq-big' }, result.passed ? 'Gotowe!' : 'Prawie.', el('small', { class: 'pq-big-ru' }, result.passed ? ' Готово!' : ' Почти.')),
         o.n ? el('div', { class: 'stat' }, el('span', {}, 'С первого раза'), el('b', {}, `${o.graded} из ${o.n}`)) : null,
         o.n ? el('div', { class: 'stat' }, el('span', {}, 'Точность'), el('b', {}, `${Math.round((result.score ?? 0) * 100)} %`)) : null,
         el('div', { class: 'stat' }, el('span', {}, 'Время'), el('b', {}, `${min} мин`)),

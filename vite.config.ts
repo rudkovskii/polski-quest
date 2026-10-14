@@ -1,4 +1,4 @@
-import { execFile, execSync } from 'node:child_process';
+import { execFile, execFileSync, execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin, type ViteDevServer } from 'vite';
@@ -66,6 +66,26 @@ function contentValidator(): Plugin {
   };
 }
 
+/**
+ * Сборка для людей (P-01): `PQ_RELEASE=1 npm run build` (или `npm run build:release`) сначала гоняет
+ * валидатор с `--release` и падает, если в бит первого дня попала реплика-заглушка `todo`.
+ */
+function releaseGate(): Plugin {
+  return {
+    name: 'pq-release-gate',
+    apply: 'build',
+    buildStart() {
+      if (process.env.PQ_RELEASE !== '1') return;
+      try {
+        execFileSync(TSX, ['tools/validate_content.ts', '--release', '--quiet'], { cwd: ROOT_DIR, stdio: ['ignore', 'pipe', 'pipe'] });
+      } catch (e) {
+        const err = e as { stderr?: Buffer; message: string };
+        this.error(`PQ_RELEASE=1: контент не готов к сборке для людей:\n${err.stderr?.toString().trim() || err.message}`);
+      }
+    },
+  };
+}
+
 export default defineConfig({
   base: BASE,
   define: {
@@ -77,6 +97,7 @@ export default defineConfig({
   },
   plugins: [
     contentValidator(),
+    releaseGate(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icons/apple-touch-icon.png'],

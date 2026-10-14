@@ -4,16 +4,19 @@
 // Карточка `rec` для каждого `items[i]` получает свою оценку (parts).
 import type { StepMatch } from '../../types/content';
 import { el } from '../dom';
-import { runGraded } from './frame';
-import { shuffled } from './options';
+import { explainOf, runGraded } from './frame';
+import { seedOf, shuffled } from './options';
 import type { ExerciseModule } from './types';
 
 export const match: ExerciseModule<StepMatch> = {
   graded: true,
   mount(step, ctx) {
     const n = step.pairs.length;
-    const leftOrder = shuffled([...Array(n).keys()], `${ctx.stepId}:l`);
-    const rightOrder = shuffled([...Array(n).keys()], `${ctx.stepId}:r`);
+    const seed = seedOf(ctx);
+    const leftOrder = shuffled([...Array(n).keys()], `${seed}:l`);
+    // Правый столбец не повторяет левый построчно: иначе пары читаются «по горизонтали».
+    let rightOrder = shuffled([...Array(n).keys()], `${seed}:r`);
+    for (let k = 1; k < 8 && n > 1 && rightOrder.every((x, i) => x === leftOrder[i]); k++) rightOrder = shuffled([...Array(n).keys()], `${seed}:r${k}`);
     const done = new Set<number>();
     const missed = new Set<number>();
     let sel: { side: 'l' | 'r'; i: number } | null = null;
@@ -88,7 +91,7 @@ export const match: ExerciseModule<StepMatch> = {
       },
       parts: () => step.pairs.map((_, i) => ({ ...(step.items?.[i] ? { item: step.items[i] } : {}), ok: !missed.has(i) })),
       focus: () => left.find((b) => !b.disabled)?.focus({ preventScroll: true }),
-      ...(step.hint ? { stepHint: step.hint } : {}),
+      ...explainOf(step),
     });
     return run.result;
   },

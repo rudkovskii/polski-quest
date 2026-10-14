@@ -1,0 +1,66 @@
+{
+ "id": "portrait.brzechwa",
+ "note": "Портрет-заглушка Яна Бжехвы (СЮЖЕТ.md §6, P-01): шляпа с лентой, круглые очки, седые виски, усы, бабочка, пиджак. 32×32, черновик до I-26.",
+ "size": [
+  32,
+  32
+ ],
+ "anchor": [
+  16,
+  31
+ ],
+ "keys": {
+  ".": null,
+  "o": "ink",
+  "h": "plum_0",
+  "H": "plum_1",
+  "r": "accent_brick",
+  "s": "brown_7",
+  "S": "brown_6",
+  "a": "grey_5",
+  "w": "white",
+  "l": "blue_6",
+  "e": "ink",
+  "m": "grey_4",
+  "b": "red_0",
+  "B": "orange_0",
+  "c": "blue_0",
+  "C": "plum_0"
+ },
+ "frames": [
+  [
+   "..........oooooooooooo..........",
+   ".........ohhhhhhhhhhhho.........",
+   "........ohhHHHHHHHHHHhho........",
+   "........ohhHHHHHHHHHHhho........",
+   "........ohhhhhhhhhhhhhho........",
+   "........ohhhhhhhhhhhhhho........",
+   "........ohhhhhhhhhhhhhho........",
+   "........orrrrrrrrrrrrrro........",
+   ".....oooorrrrrrrrrrrrrroooo.....",
+   "....ohhhhhhhhhhhhhhhhhhhhhho....",
+   "....ohhhhhhhhhhhhhhhhhhhhhho....",
+   ".....oooaassssssssssssaaooo.....",
+   ".......oaasooossssooosaao.......",
+   ".......oaoowlloooowllooao.......",
+   ".......oSSolelossoleloSSo.......",
+   ".......oSSolllossollloSSo.......",
+   ".......oSSsooossssooosSSo.......",
+   ".......oSSsssssSSsssssSSo.......",
+   "........osssssssSsssssso........",
+   ".........osssmmmmmmssso.........",
+   "..........osmssBBssmso..........",
+   "...........osssssssso...........",
+   "............osssssso............",
+   "...........oobbSSbboo...........",
+   "........ooocbbbBBbbbcooo........",
+   "......oocCccbbbBBbbbccCcoo......",
+   "....ooccccCccbbwwbbccCccccoo....",
+   "...occcccccCccwwwwccCccccccco...",
+   "..occcccccccCcwwwwcCccccccccco..",
+   ".occcccccccccCcwwcCccccccccccco.",
+   ".occccccccccccCwwCcccccccccccco.",
+   "occccccccccccccCCcccccccccccccco"
+  ]
+ ]
+}

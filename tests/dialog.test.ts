@@ -5,6 +5,8 @@ import type { Dialogue } from '../src/types/content';
 import { runDialog, runLines, speechOfLine, type DialogDeps } from '../src/ui/dialog';
 import { lineBox, todoText } from '../src/ui/dialog/line';
 import { createOverlay } from '../src/ui/overlay/host';
+import { setTodoVisible } from '../src/ui/todo';
+import { bobrLine } from '../src/ui/obchod';
 import { mountPlay, portraitSourceFrom, wordStep } from '../src/ui/play';
 import { act, byText, fakeAudio, fixture, flush, memStore, testBus } from './overlayKit';
 
@@ -15,8 +17,12 @@ let host: HTMLElement;
 beforeEach(() => {
   host = document.createElement('div');
   document.body.append(host);
+  setTodoVisible(true); // dev: заглушки видны; игра (по умолчанию) — отдельный describe ниже
 });
-afterEach(() => host.remove());
+afterEach(() => {
+  host.remove();
+  setTodoVisible(false);
+});
 
 function setup(extra: Partial<DialogDeps> = {}) {
   const bus = testBus();
@@ -168,7 +174,7 @@ describe('окно реплики', () => {
     vi.useRealTimers();
   });
 
-  it('портрет: кадр атласа с целым масштабом; без портрета — голова спрайта; без атласа — буква', () => {
+  it('портрет: кадр атласа с целым масштабом; без портрета — голова спрайта; без атласа — силуэт (P-01)', () => {
     const atlas = { frames: { 'extra_m/0': { frame: { x: 10, y: 20, w: 16, h: 16 } }, 'dima/1': { frame: { x: 19, y: 1, w: 16, h: 32 } } }, meta: { size: { w: 256, h: 128 }, image: 'custom.png' } };
     const sprites = { extra_m: { size: [16, 16] as [number, number], frames: ['extra_m/0'], anims: { idle_down: ['extra_m/0'] } }, dima: { size: [16, 32] as [number, number], frames: ['dima/0'], anims: { idle_down: ['dima/1'] } } };
     const src = portraitSourceFrom(atlas, sprites, '/base/', content);
@@ -178,7 +184,9 @@ describe('окно реплики', () => {
     const v = lineBox({ speaker: { id: 'pan_marek', name: 'pan Marek' }, pl: 'x', audio: fakeAudio(), translations: 'tap', typeMs: 0, portraits: src });
     expect(v.portrait.querySelector<HTMLElement>('.pix')!.style.width).toBe('48px'); // 16 × 3
     const u = lineBox({ speaker: { id: 'pan_marek', name: 'pan Marek' }, pl: 'x', audio: fakeAudio(), translations: 'tap', typeMs: 0 });
-    expect(u.portrait.textContent).toBe('M');
+    expect(u.portrait.textContent).toBe('');
+    expect(u.portrait.dataset.fallback).toBe('silhouette');
+    expect(u.portrait.querySelector('.sil .head')).not.toBeNull();
   });
 
   it('speechOfLine: todo-строка и неизвестный id → заглушка', () => {
@@ -324,5 +332,69 @@ describe('склейка world:interact → оверлей (ui/play)', () => {
     expect('demo.flag' in store.progress.world.flags).toBe(true);
     (content.dialogues as Map<string, unknown>).delete('dlg.demo.flag');
     p.dispose();
+  });
+});
+
+describe('P-01: заглушки todo в игре не видны', () => {
+  beforeEach(() => setTodoVisible(false));
+
+  it('узел todo и эффект line на todo-реплику пропускаются, диалог идёт дальше', async () => {
+    const { d, lessons } = setup();
+    const dlg: Dialogue = {
+      id: 'dlg.demo.p01',
+      npc: 'pan_marek',
+      start: 'a',
+      nodes: {
+        a: { who: 'pan_marek', todo: true, next: 'b' },
+        b: { who: 'pan_marek', pl: 'Słucham?', ru: 'Слушаю?', next: 'c' },
+        c: { who: 'bobr', do: [{ line: 'bobr.after_kawa' }, { startLesson: 'demo.boss' }], end: true },
+      },
+    };
+    const p = runDialog(dlg, d);
+    await flush();
+    expect(pl()).toBe('Słucham?'); // узел a молча пропущен
+    expect(host.textContent).not.toContain('[todo');
+    await next();
+    expect(await p).toMatchObject({ ended: true, path: ['a', 'b', 'c'] });
+    expect(lessons).toEqual(['demo.boss']); // line(todo) пропущен, урок запустился
+  });
+
+  it('узел только с вариантами (реплика героя «Start») — варианты без заглушки', async () => {
+    const { d } = setup();
+    const dlg: Dialogue = {
+      id: 'dlg.demo.start',
+      npc: 'pan_marek',
+      start: 's',
+      nodes: { s: { who: 'dima', choices: [{ pl: 'Start', ru: 'Начать', next: 'e' }] }, e: { end: true } },
+    };
+    const p = runDialog(dlg, d);
+    await flush();
+    expect(host.textContent).not.toContain('[todo');
+    host.querySelector<HTMLButtonElement>('[data-choice="0"]')!.click();
+    await flush();
+    expect(await p).toMatchObject({ ended: true });
+    setTodoVisible(true);
+    const q = runDialog(dlg, d);
+    await flush();
+    expect(host.textContent).not.toContain('[todo'); // и в dev это не заглушка
+    host.querySelector<HTMLButtonElement>('[data-choice="0"]')!.click();
+    await q;
+  });
+
+  it('runLines: заглушки пропускаются; только заглушки — окно не открывается', async () => {
+    const { d, input } = setup();
+    expect(await runLines([{ who: 'bobr', todo: 'bobr.meets' }], d)).toBe(true);
+    expect(input).toEqual([]);
+    const p = runLines([{ who: 'bobr', todo: 'bobr.meets' }, { who: 'pan_marek', pl: 'Słucham?' }], d);
+    await flush();
+    expect(pl()).toBe('Słucham?');
+    await next();
+    expect(await p).toBe(true);
+  });
+
+  it('реплика бобра в панелях (bobrLine): todo → null, в dev — [todo: id]', () => {
+    expect(bobrLine(content, 'bobr.after_kawa')).toBeNull();
+    setTodoVisible(true);
+    expect(bobrLine(content, 'bobr.after_kawa')?.textContent).toContain('[todo: bobr.after_kawa]');
   });
 });

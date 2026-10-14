@@ -1,12 +1,13 @@
 // Рамка шага (ТЗ §5.7): задание, тело, «Подсказка», «Проверить»/«Дальше», панель обратной связи.
 // Цикл попыток общий для всех типов: первая попытка идёт в SRS, после ошибки — правильный ответ,
-// «Prawie. Jeszcze raz.» (СЮЖЕТ §1 правило 3) и обучающий повтор. Модули типов дают только тело,
+// строка правила и перевод (P-01: `why` шага → `errorTags[tag].hint`/`ru` → перевод с транскрипцией),
+// потом «Prawie. Jeszcze raz.» (СЮЖЕТ §1 правило 3) и обучающий повтор. Модули типов дают только тело,
 // чтение ответа и проверку.
 import type { Check } from '../../systems/answer';
 import type { StepKind } from '../../systems/grade';
 import { el } from '../dom';
 import { attachKeyboard, type AttachedKeyboard } from '../keyboard';
-import { btn } from '../overlay/kit';
+import { BTN as L, btn, plBtn, type PlLabel } from '../overlay/kit';
 import { navItems } from '../overlay/nav';
 import type { ExerciseCtx, FirstTry, StepResult } from './types';
 
@@ -50,6 +51,47 @@ export interface GradedSpec<A> {
   noAudio?: boolean;
   /** Подсказка из контента (`step.hint`). */
   stepHint?: string;
+  /** Объяснение ошибки одной строкой из контента (`step.why`, P-01). */
+  why?: string;
+  /** Слово шага (`step.item`): перевод и транскрипция под ответом после ошибки. */
+  item?: string;
+  /** Кластер шага: его правило из errorTags, если у ошибки нет своего тега. */
+  cluster?: string;
+  /** Польское слово, перевод которого показать после ошибки (по умолчанию — правильный ответ). */
+  word?: string;
+}
+
+/** Поля шага для объяснения ошибки (P-01). */
+export function explainOf(step: { why?: string; item?: string; cluster?: string; hint?: string }): Pick<GradedSpec<unknown>, 'why' | 'item' | 'cluster' | 'stepHint'> {
+  return {
+    ...(step.why ? { why: step.why } : {}),
+    ...(step.item ? { item: step.item } : {}),
+    ...(step.cluster ? { cluster: step.cluster } : {}),
+    ...(step.hint ? { stepHint: step.hint } : {}),
+  };
+}
+
+const norm = (s: string): string => s.trim().toLowerCase().replace(/[.!?,…]/g, '');
+
+/** Строка правила после ошибки: `why` шага, иначе правило тега ошибки или кластера (`hint`, иначе `ru`). */
+export function ruleLine(ctx: Pick<ExerciseCtx, 'content'>, spec: Pick<GradedSpec<unknown>, 'why' | 'cluster'>, tags: readonly string[]): string | null {
+  if (spec.why) return spec.why;
+  for (const t of [...tags, ...(spec.cluster ? [spec.cluster] : [])]) {
+    const e = ctx.content?.errorTag?.(t);
+    if (e) return e.hint ?? e.ru;
+  }
+  return null;
+}
+
+/** Перевод правильного ответа: «ząb — зуб [зомп]» (слово шага или слово словаря с тем же написанием). */
+export function glossLine(ctx: Pick<ExerciseCtx, 'content'>, spec: Pick<GradedSpec<unknown>, 'item' | 'word' | 'tr'>, correct: string): string | null {
+  const c = ctx.content;
+  if (!c) return null;
+  const word = spec.word ?? correct;
+  let v = spec.item ? c.vocab(spec.item) : undefined;
+  if (!v || (norm(v.pl) !== norm(word) && norm(v.ru) !== norm(word))) v = c.allVocab().find((x) => norm(x.pl) === norm(word)) ?? v;
+  if (!v?.ru) return null;
+  return `${v.pl} — ${v.ru}${v.tr && !spec.tr ? ` [${v.tr}]` : ''}`;
 }
 
 export interface GradedRun {
@@ -107,11 +149,11 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
 
   const hintText = (): string | null => spec.stepHint ?? spec.hint?.() ?? null;
   const canHint = !ctx.repeat && (spec.stepHint !== undefined || spec.hint !== undefined);
-  const hintBtn = canHint ? btn('Подсказка', () => showHint(), 'ghost', { 'data-nav': true, 'data-act': 'hint' }) : null;
-  const checkBtn = btn('Проверить', () => submit(), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'check' });
-  const nextBtn = btn('Дальше', () => finish(), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'next', hidden: true });
-  const retryBtn = btn('Ещё раз', () => retry(), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'retry', hidden: true });
-  const skipBtn = btn('Пропустить', () => finish(), 'ghost', { 'data-nav': true, 'data-act': 'skip', hidden: true });
+  const hintBtn = canHint ? plBtn(L.hint, () => showHint(), 'ghost', { 'data-nav': true, 'data-act': 'hint' }) : null;
+  const checkBtn = plBtn(L.check, () => submit(), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'check' });
+  const nextBtn = plBtn(L.next, () => finish(), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'next', hidden: true });
+  const retryBtn = plBtn(L.retry, () => retry(), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'retry', hidden: true });
+  const skipBtn = plBtn(L.skip, () => finish(), 'ghost', { 'data-nav': true, 'data-act': 'skip', hidden: true });
   actions.append(...[hintBtn, el('span', { class: 'grow' }), skipBtn, spec.instant ? null : checkBtn, retryBtn, nextBtn].filter((x): x is HTMLElement => !!x));
 
   if (spec.input) {
@@ -174,12 +216,23 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
     if (!right && spec.noRetry) v.text = 'Prawie.';
     const showAnswer = !right || v.cls === 'part';
     const ans = spec.correct();
-    feedback(v.cls, [
-      el('span', { class: 'verdict' }, v.text),
+    const answerParts = [
       showAnswer && ans ? el('span', { class: 'answer' }, right ? '' : 'Правильно: ', el('b', {}, ans)) : null,
       showAnswer && spec.tr ? el('span', { class: 'tr' }, `[${spec.tr}]`) : null,
       showAnswer && spec.sayCorrect ? btn('▶', () => ctx.audio.play(spec.sayCorrect!), 'icon', { 'aria-label': 'Послушать ответ', 'data-nav': true }) : null,
-    ]);
+    ];
+    if (right) feedback(v.cls, [el('span', { class: 'verdict' }, v.text), ...answerParts]);
+    else {
+      // Ошибка объясняет (P-01): ответ, правило одной строкой, перевод — и только потом «Prawie. Jeszcze raz.».
+      const rule = ruleLine(ctx, spec, c.tags);
+      const gloss = ans ? glossLine(ctx, spec, ans) : null;
+      feedback(v.cls, [
+        ...answerParts,
+        rule ? el('span', { class: 'rule', 'data-fb': 'rule' }, '💡 ', rule) : null,
+        gloss ? el('span', { class: 'gloss', 'data-fb': 'gloss', lang: 'ru' }, gloss) : null,
+        el('span', { class: 'verdict' }, v.text),
+      ]);
+    }
     if (hintBtn) hintBtn.hidden = true;
     if (right || spec.noRetry) {
       phase = 'feedback';
@@ -285,7 +338,7 @@ export function runPlain(
   ctx: ExerciseCtx,
   head: (Node | string)[],
   body: HTMLElement,
-  opts: { label?: string; onNext?: () => boolean } = {},
+  opts: { label?: PlLabel; onNext?: () => boolean } = {},
 ): { result: Promise<StepResult>; next: HTMLButtonElement } {
   const t0 = ctx.now();
   const { actions } = frame(ctx, head, body);
@@ -298,7 +351,7 @@ export function runPlain(
     ctx.layer.handle(null);
     resolve({ status, graded: false, attempts: 0, ms: Math.round(ctx.now() - t0) });
   };
-  const next = btn(opts.label ?? 'Дальше', () => {
+  const next = plBtn(opts.label ?? L.next, () => {
     if (opts.onNext && !opts.onNext()) return;
     end('done');
   }, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'next' });

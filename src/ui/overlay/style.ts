@@ -18,6 +18,10 @@ const css = `
 .pq-btn.primary { background: #74a334; color: #141b1b; border-color: #56864c; box-shadow: 0 3px 0 #345a52; }
 .pq-btn.ghost { background: transparent; border-color: transparent; box-shadow: none; color: #695953; font-weight: 500; }
 .pq-btn.icon { padding: 6px 10px; min-width: 44px; }
+.pq-btn2 { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; padding-top: 5px; padding-bottom: 5px; }
+.pq-btn2[hidden] { display: none; }
+.pq-btn2 .pl { font-weight: 700; }
+.pq-btn2 .ru { font-size: 12px; font-weight: 500; opacity: .8; margin-top: 2px; }
 .pq-btn.ok { background: #a8d672; border-color: #56864c; }
 .pq-btn.bad { background: #ef9597; border-color: #8f3e56; animation: pq-shake .35s; }
 .pq-btn.show { background: #a8d672; border-color: #56864c; box-shadow: 0 0 0 3px #f2eaf1, 0 3px 0 #345a52; }
@@ -30,7 +34,9 @@ const css = `
 .pq-portrait { position: relative; flex: none; width: 64px; height: 64px; box-sizing: border-box; border: 3px solid #91522c; border-radius: 6px;
   background: #b8dce5; overflow: hidden; display: flex; align-items: center; justify-content: center; image-rendering: pixelated; }
 .pq-portrait .pix { image-rendering: pixelated; background-repeat: no-repeat; }
-.pq-portrait .initial { font: 700 30px/1 -apple-system, BlinkMacSystemFont, sans-serif; color: #543c52; }
+.pq-portrait .sil { position: relative; width: 70%; height: 80%; align-self: flex-end; }
+.pq-portrait .sil .head { position: absolute; left: 30%; top: 8%; width: 40%; height: 40%; border-radius: 50%; background: #4a5270; }
+.pq-portrait .sil .body { position: absolute; left: 6%; bottom: 0; width: 88%; height: 40%; border-radius: 45% 45% 0 0; background: #4a5270; }
 .pq-react { animation: pq-wobble .45s 2; }
 .pq-emote { position: absolute; right: -6px; top: -10px; min-width: 26px; height: 26px; padding: 0 4px; box-sizing: border-box; border-radius: 13px;
   background: #fff; border: 2px solid #3b3643; font: 700 16px/22px -apple-system, sans-serif; text-align: center; color: #3b3643; animation: pq-pop .3s; }
@@ -86,6 +92,8 @@ const css = `
 .pq-ex-fb .verdict { font-weight: 700; font-size: 19px; }
 .pq-ex-fb .answer { font-size: 19px; }
 .pq-ex-fb .tr { color: #543c52; font-size: 16px; }
+.pq-ex-fb .rule { color: #2d697b; font-weight: 600; }
+.pq-ex-fb .gloss { color: #3a2c38; }
 .pq-ex-fb .pq-btn { align-self: flex-start; }
 .pq-ex-actions { position: sticky; bottom: 0; display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding-top: 6px;
   background: linear-gradient(rgba(240,229,209,0), #f0e5d1 30%); }
@@ -97,6 +105,7 @@ const css = `
 .pq-md table { border-collapse: collapse; margin-top: 8px; }
 .pq-md td { border: 2px solid #d2b37d; padding: 4px 10px; }
 .pq-big { font-size: 24px; font-weight: 700; }
+.pq-big-ru { font-size: 16px; font-weight: 500; color: #543c52; }
 .pq-gap { font-size: 22px; }
 .pq-gap .slot { display: inline-block; min-width: 3.5em; padding: 0 6px; border-bottom: 3px solid #91522c; text-align: center; color: #2d697b; font-weight: 700; }
 .pq-order-line, .pq-order-pool { display: flex; flex-wrap: wrap; gap: 8px; min-height: 56px; padding: 8px; border-radius: 6px; box-sizing: border-box; }

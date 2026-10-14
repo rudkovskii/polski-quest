@@ -15,8 +15,9 @@ import type { Lesson, Step } from '../types/content';
 import { el } from './dom';
 import { runLesson, type LessonDeps } from './lesson';
 import type { Layer } from './overlay/host';
-import { btn } from './overlay/kit';
+import { BTN, btn, plBtn, type PlLabel } from './overlay/kit';
 import { wordStep } from './play';
+import { todoVisible } from './todo';
 
 export interface ObchodDeps extends LessonDeps {
   bus: Bus<BusEvents>;
@@ -89,10 +90,10 @@ const plural = (n: number, one: string, few: string, many: string): string => {
 };
 export const days = (n: number): string => `${n} ${plural(n, 'день', 'дня', 'дней')}`;
 
-/** Реплика бобра из story/lines.json: pl крупно, ru ниже (`todo` → id). */
+/** Реплика бобра из story/lines.json: pl крупно, ru ниже (`todo` → id в dev, в игре — null). */
 export function bobrLine(content: Pick<Content, 'lines'>, id: string): HTMLElement | null {
   const l = content.lines.get(id);
-  if (!l) return null;
+  if (!l || (l.todo && !todoVisible())) return null;
   return el(
     'div',
     { class: 'pq-bobr', 'data-line': id },
@@ -105,6 +106,7 @@ export function bobrLine(content: Pick<Content, 'lines'>, id: string): HTMLEleme
 const css = `
 .pq-obchod { width: min(100% - 16px, 520px); margin: auto; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
 .pq-obchod h2 { margin: 0; font-size: 22px; color: #543c52; }
+.pq-obchod h2 .sub { display: block; font-size: 15px; font-weight: 500; }
 .pq-obchod .stat { display: flex; justify-content: space-between; gap: 12px; font-size: 18px; border-bottom: 2px dotted #c8966b; padding: 4px 0; }
 .pq-obchod .line2 { font-size: 18px; }
 .pq-obchod .word { font-size: 26px; font-weight: 700; }
@@ -123,20 +125,27 @@ function ensureStyle(doc: Document): void {
   doc.head.append(s);
 }
 
-/** Панель в слое: заголовок, строки, кнопки. Возвращает выбранное действие. */
-function panel<A extends string>(layer: Layer, title: string, body: (HTMLElement | null)[], actions: { act: A; label: string; primary?: boolean }[], cancel: A): Promise<A> {
+/** Панель в слое: заголовок (польский с русской подписью), строки, кнопки. Возвращает выбранное действие. */
+function panel<A extends string>(layer: Layer, title: string | PlLabel, body: (HTMLElement | null)[], actions: { act: A; label: string | PlLabel; primary?: boolean }[], cancel: A): Promise<A> {
   return new Promise((resolve) => {
     const done = (a: A): void => {
       layer.handle(null);
       resolve(a);
     };
-    const buttons = actions.map((a) => btn(a.label, () => done(a.act), a.primary ? 'primary' : '', { 'data-nav': true, 'data-act': a.act, ...(a.primary ? { 'data-primary': true } : {}) }));
-    layer.el.replaceChildren(el('div', { class: 'pq-wood pq-obchod', 'data-panel': title }, el('h2', {}, title), ...body, el('div', { class: 'row' }, ...buttons)));
+    const buttons = actions.map((a) => {
+      const attrs = { 'data-nav': true, 'data-act': a.act, ...(a.primary ? { 'data-primary': true } : {}) };
+      return typeof a.label === 'string' ? btn(a.label, () => done(a.act), a.primary ? 'primary' : '', attrs) : plBtn(a.label, () => done(a.act), a.primary ? 'primary' : '', attrs);
+    });
+    const h2 = typeof title === 'string' ? el('h2', {}, title) : el('h2', {}, el('span', { lang: 'pl' }, title.pl), el('small', { class: 'sub' }, title.ru));
+    const key = typeof title === 'string' ? title : title.pl;
+    layer.el.replaceChildren(el('div', { class: 'pq-wood pq-obchod', 'data-panel': key }, h2, ...body, el('div', { class: 'row' }, ...buttons)));
     layer.el.style.justifyContent = 'center';
     layer.handle({ cancel: () => (done(cancel), true) });
     queueMicrotask(() => (buttons.find((b) => b.hasAttribute('data-primary')) ?? buttons[0])?.focus({ preventScroll: true }));
   });
 }
+
+const WIECZOR: PlLabel = { pl: 'Wieczór', ru: 'вечер, звуки у реки' };
 
 const stat = (label: string, value: string): HTMLElement => el('div', { class: 'stat' }, el('span', {}, label), el('b', {}, value));
 
@@ -196,7 +205,7 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
       }
     }
     if (!plan.cards.length && evening) {
-      await panel(layer, 'Wieczór', [el('div', { class: 'line2' }, 'Сегодня звуки в порядке.')], [{ act: 'ok', label: 'OK', primary: true }], 'ok');
+      await panel(layer, WIECZOR, [el('div', { class: 'line2' }, 'Сегодня звуки в порядке.')], [{ act: 'ok', label: 'OK', primary: true }], 'ok');
       return { answered: 0, correct: 0, empty: true, left: 0 };
     }
     if (!plan.cards.length) {
@@ -222,7 +231,7 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
       const lesson: Lesson = {
         id: `${express ? 'express' : evening ? 'wieczor' : 'obchod'}.${card}`,
         kind: 'practice',
-        title: { pl: express ? 'Ekspres' : evening ? 'Wieczór' : 'Obchód', ru: `${i + 1} из ${plan.cards.length}` },
+        title: { pl: express ? 'Ekspres' : evening ? 'Wieczór' : 'Obchód', ru: `${express ? 'быстрый полив' : evening ? 'вечер, звуки' : 'полив'} · ${i + 1} из ${plan.cards.length}` },
         minutes: 1,
         steps: [step],
       };
@@ -247,29 +256,29 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
 
     const minutes = Math.max(1, Math.round((clock.mono() - startMono) / 60_000));
     if (evening) {
-      await panel(layer, 'Wieczór', [stat('Услышано верно', `${correct} из ${answered}`)], [{ act: 'ok', label: 'Gotowe', primary: true }], 'ok');
+      await panel(layer, WIECZOR, [stat('Услышано верно', `${correct} из ${answered}`)], [{ act: 'ok', label: BTN.done, primary: true }], 'ok');
       return { answered, correct, empty: false, left };
     }
     if (express) {
       // Мини-итог (§4.5): две строки.
       await panel(
         layer,
-        o.more3 ? 'Ещё 3 минуты' : 'Ekspres',
+        o.more3 ? 'Ещё 3 минуты' : { pl: 'Ekspres', ru: 'быстрый полив' },
         [el('div', { class: 'line2' }, `Полито ${correct} из ${answered} за ${minutes} мин.`), el('div', { class: 'line2' }, left ? `Ещё ждут полива: ${left}.` : 'Всё полито.')],
-        [{ act: 'ok', label: 'Gotowe', primary: true }],
+        [{ act: 'ok', label: BTN.done, primary: true }],
         'ok',
       );
       return { answered, correct, empty: false, left };
     }
     const ds = dayState(d1, t);
     const sleepy = stoppedForSleep || (deps.activeMs ? budget(deps.activeMs(), t).softCap : false);
-    const actions: { act: 'more' | 'ok' | 'sleep'; label: string; primary?: boolean }[] = [];
-    if (sleepy) actions.push({ act: 'sleep', label: 'Спать', primary: true });
-    if (left > 0) actions.push({ act: 'more', label: 'Ещё раунд', primary: !sleepy });
-    actions.push({ act: 'ok', label: 'Готово', primary: !sleepy && left === 0 });
+    const actions: { act: 'more' | 'ok' | 'sleep'; label: PlLabel; primary?: boolean }[] = [];
+    if (sleepy) actions.push({ act: 'sleep', label: BTN.sleep, primary: true });
+    if (left > 0) actions.push({ act: 'more', label: BTN.round, primary: !sleepy });
+    actions.push({ act: 'ok', label: BTN.done, primary: !sleepy && left === 0 });
     const act = await panel(
       layer,
-      'Obchód',
+      { pl: 'Obchód', ru: 'обход грядок' },
       [
         ds.locked ? bobrLine(content, 'kazik.debt.jam') : null,
         stat('Полито', `${correct} из ${answered}`),
@@ -289,11 +298,16 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
 async function practiceOne(deps: ObchodDeps, layer: Layer, item: string): Promise<ObchodResult> {
   const v = deps.content.vocab.get(item)?.value;
   if (!v) return { answered: 0, correct: 0, empty: true, left: 0 };
-  const lesson: Lesson = { id: `obchod.${item}`, kind: 'practice', title: { pl: 'Obchód', ru: '1 из 1' }, minutes: 1, steps: [wordStep(v, undefined, deps.content)] };
+  const lesson: Lesson = { id: `obchod.${item}`, kind: 'practice', title: { pl: 'Obchód', ru: 'полив · 1 из 1' }, minutes: 1, steps: [wordStep(v, undefined, deps.content)] };
+  const before = deps.store.progress.log.events.length;
   const r = await runLesson(lesson, deps, { drill: true, noSummary: true, layer, src: 'obchod' });
-  deps.bus.emit('progress:changed', { kinds: ['cards'] });
   if (r.cancelled) return { answered: 0, correct: 0, empty: true, left: 0 };
-  return { answered: 1, correct: (r.firstTry ?? 0) >= 1 ? 1 : 0, empty: false, left: 0 };
+  // Карточка не due, appendGate `rev` не пишет: полив идёт агрегатом урока (§3.11), его видит итог дня (P-01).
+  const revWritten = deps.store.progress.log.events.slice(before).some((e) => e.k === 'rev');
+  const ok = (r.firstTry ?? 0) >= 1;
+  if (!revWritten) write(deps, { k: 'lesson', ts: deps.clock?.now() ?? Date.now(), lesson: lesson.id, score: r.score ?? (ok ? 1 : 0), firstTry: ok ? 1 : 0, ms: r.ms ?? 0, passed: true, answers: 1 });
+  deps.bus.emit('progress:changed', { kinds: ['cards'] });
+  return { answered: 1, correct: ok ? 1 : 0, empty: false, left: 0 };
 }
 
 function write(deps: ObchodDeps, draft: EventDraft): void {

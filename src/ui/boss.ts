@@ -18,7 +18,7 @@ import { mountStep } from './exercises/registry';
 import type { ExerciseCtx, StepResult } from './exercises/types';
 import { cardsOfStep, exerciseContent, type LessonDeps, type RunOptions } from './lesson';
 import type { IntentHandler, Layer } from './overlay/host';
-import { btn, portrait, react } from './overlay/kit';
+import { BTN, btn, plBtn, portrait, react, type PlLabel } from './overlay/kit';
 
 /** Сколько дней живут результаты частей (resume и прошлая несданная попытка), §5.8. */
 export const BOSS_KEEP_DAYS = 7;
@@ -233,10 +233,12 @@ export async function runBoss(lesson: Lesson, deps: LessonDeps, opts: RunOptions
       const step = p.steps[i]!;
       dots.replaceChildren(...p.steps.map((_, k) => el('span', { class: `pq-dot ${k === i ? 'cur' : (marks[k] ?? '')}`.trim() })));
       main.scrollTop = 0;
+      const stepId = step.id ?? `${lesson.id}#${p.id}.${i}`;
       const ctx: ExerciseCtx = {
         layer: stepLayer,
         root: main,
-        stepId: step.id ?? `${lesson.id}#${p.id}.${i}`,
+        stepId,
+        seed: `${stepId}@${derived.today}`,
         content: exContent,
         audio: deps.audio,
         portraits: deps.portraits ?? null,
@@ -272,7 +274,7 @@ export async function runBoss(lesson: Lesson, deps: LessonDeps, opts: RunOptions
     head: plan.retry ? 'Попробуй снова только части:' : `Частей: ${parts.length}. Без подсказок. Сдача — от ${pct(passScore)}.`,
     rows: parts.map((p) => [p.title ?? p.id, done[p.id] ? `✓ ${pct(done[p.id]!.score)}` : plan.retry ? '↻' : `${pct((p.weight ?? 1) / parts.reduce((s, x) => s + (x.weight ?? 1), 0))}`]),
     note: plan.retry ? plan.todo.map(titleOf).join(', ') : null,
-    action: plan.retry || Object.keys(done).length ? 'Продолжить' : 'Начать',
+    action: plan.retry || Object.keys(done).length ? BTN.more : BTN.start,
     act: 'start',
     cancellable: true,
   });
@@ -339,7 +341,7 @@ export async function runBoss(lesson: Lesson, deps: LessonDeps, opts: RunOptions
             .join(' '),
       stamp: rewards.stamp,
       items: rewards.items,
-      action: 'Dalej',
+      action: BTN.next,
       act: 'next',
       cancellable: false,
     });
@@ -356,7 +358,7 @@ interface ScreenOpts {
   note: string | null;
   stamp?: string | null;
   items?: string[];
-  action: string;
+  action: PlLabel;
   act: string;
   /** Esc/× = отказ (false); иначе Esc = кнопка. */
   cancellable: boolean;
@@ -373,7 +375,7 @@ function screen(main: HTMLElement, layer: Layer, dots: HTMLElement, o: ScreenOpt
       layer.handle(null);
       resolve(v);
     };
-    const go = btn(o.action, () => finish(true), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': o.act });
+    const go = plBtn(o.action, () => finish(true), 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': o.act });
     main.replaceChildren(
       el(
         'div',

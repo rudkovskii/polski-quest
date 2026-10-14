@@ -103,6 +103,8 @@ export interface ValidateOptions {
   prevRoot?: string;
   /** Git-ревизия для п. 7 (по умолчанию defaultBaseRef()). Только для content/ репозитория. */
   base?: string;
+  /** Сборка release (P-01): todo в бите первого дня = ошибка. */
+  release?: boolean;
 }
 
 export interface ValidateResult {
@@ -127,7 +129,7 @@ export function validateDir(opts: ValidateOptions = {}): ValidateResult {
   }
   const audioManifest = existsSync(AUDIO_MANIFEST) ? (JSON.parse(readFileSync(AUDIO_MANIFEST, 'utf8')) as unknown) : undefined;
   if (issues.length) return { issues, files: files.size + issues.length, prevFrom };
-  const all = checkContent({ files, schemas: readSchemas(), prevVocab, audioManifest });
+  const all = checkContent({ files, schemas: readSchemas(), prevVocab, audioManifest, ...(opts.release ? { release: true } : {}) });
   if (!prevVocab && root === CONTENT_DIR)
     all.push({ level: 'warn', code: 'vocab-removed', file: '*', path: '', msg: 'нет базовой ревизии git: удаление id слов (п. 7) не проверено' });
   return { issues: all, files: files.size, prevFrom };

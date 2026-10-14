@@ -11,6 +11,8 @@ import { createOverlay } from '../src/ui/overlay/host';
 import { runSettings } from '../src/ui/settings';
 import { parseFile } from '../src/systems/exportImport';
 import { getSetting } from '../src/systems/progress';
+import { deriveContent } from '../src/systems/derive';
+import { retrievalMsOf, summarizeDay } from '../src/systems/session';
 import { act, buttons, fakeAudio, fixture, flush, memStore, testBus } from './overlayKit';
 
 const DAY = 86_400_000;
@@ -355,5 +357,68 @@ describe('Settings и копия', () => {
     expect(host.querySelector('[data-msg]')?.textContent).toContain('тренажёра');
     act(host, 'close').click();
     await done;
+  });
+});
+
+describe('P-01: итог дня по сценарию плейтеста Андрея', () => {
+  // Андрей: вступление → полил «Dzień dobry» по просьбе Казика (карточка ещё не due) → 9 минут диагностики →
+  // начал урок шипящих (ответ по паре на слух записан из сцены) → итог дня. Было: «Полито 0 из 1», «0 мин».
+  it('ранний полив засчитан («Полито 1 из 1»), минуты = вступление + полив + диагностика, ответы сцены не полив', async () => {
+    const day = T0 + DAY; // 10:00 следующего дня от T0
+    const p = progress([
+      { k: 'lesson', ts: day, lesson: 'ch01.intro', score: 1, firstTry: 1, ms: 60_000, passed: true, answers: 1 },
+      intro('lx.kawa', day),
+    ]);
+    const bus = testBus();
+    const events: LogEvent[] = [];
+    const store = storeOf(p);
+    let mono = 0;
+    const clock = { now: () => day + 120_000, mono: () => mono };
+    const obchodDeps: ObchodDeps = { overlay: createOverlay(host, { bus }), content, store, audio: fakeAudio(), bus, clock, tz: TZ, random: () => 0.2, coarse: true, typeMs: 0, onEvent: (e) => events.push(e) };
+    // F2: одна грядка практикой.
+    const run = runObchod(obchodDeps, { mode: 'day', fromItem: 'lx.kawa', practice: true });
+    await flush(1);
+    mono = 20_000;
+    buttons(host.querySelector('.pq-lesson-main')!).find((b) => b.textContent === 'кофе')!.click();
+    await flush(1);
+    act(host, 'next').click();
+    expect(await run).toMatchObject({ answered: 1, correct: 1 });
+    expect(events.filter((e) => e.k === 'rev')).toEqual([]); // SRS не тронут: карточка не due
+    expect(events.at(-1)).toMatchObject({ k: 'lesson', lesson: 'obchod.lx.kawa', firstTry: 1, answers: 1, ms: 20_000 });
+    // Диагностика 9 минут и ответ по паре в сцене (src scene: время уже внутри урока).
+    store.append({ k: 'lesson', ts: day + 15 * 60_000, lesson: 'demo.s01', score: 0.55, firstTry: 0.55, ms: 9 * 60_000, passed: false, answers: 34 });
+    store.append({ k: 'rev', ts: day + 16 * 60_000, card: 'mp.lata_lata#pair', g: 0, ms: 4_000, src: 'scene' });
+
+    const sum = runDaySummary({ overlay: createOverlay(host, { bus }), content, store, bus, clock: { now: () => day + 20 * 60_000, mono: () => 0 }, tz: TZ });
+    await flush(1);
+    expect(stat('watered')).toBe('1 из 1');
+    expect(stat('retrieval')).toBe('10 мин'); // 1 + 0,3 + 9
+    expect(stat('planted')).toBe('1');
+    act(host, 'sleep').click();
+    await sum;
+    expect(store.progress.log.events.find((e) => e.k === 'session')).toMatchObject({ retrievalMs: 60_000 + 20_000 + 9 * 60_000 });
+  });
+
+  it('полив = только обход и экспресс: вечер и сцены в «полито» не входят (плейтест Марины: «Всё полито» и «5 из 15»)', () => {
+    const now = T0 + DAY + 3_600_000;
+    const p = progress([
+      intro('lx.kawa', T0),
+      { k: 'rev', ts: T0 + DAY, card: 'lx.kawa#rec', g: 2, ms: 5_000, src: 'obchod' },
+      { k: 'rev', ts: T0 + DAY + 1, card: 'lx.kawa#lis', g: 0, ms: 5_000, src: 'scene' },
+      { k: 'rev', ts: T0 + DAY + 2, card: 'mp.lata_lata#pair', g: 0, ms: 5_000, src: 'phonetic' },
+    ]);
+    const s = summarizeDay(p, deriveContent(content), now, TZ);
+    expect(s).toMatchObject({ answered: 1, watered: 1 });
+    // Минуты: обход 5 с + вечер 5 с; ответ сцены без события lesson (урок прерван) не считается.
+    expect(s.retrievalMs).toBe(10_000);
+    expect(retrievalMsOf(p.log.events, T0 + DAY, now)).toBe(10_000);
+  });
+
+  it('меньше полуминуты вспоминания — «1 мин», а не «0 мин»', async () => {
+    const p = progress([intro('lx.kawa', T0), { k: 'rev', ts: T0 + DAY, card: 'lx.kawa#rec', g: 2, ms: 8_000, src: 'obchod' }]);
+    const bus = testBus();
+    void runDaySummary({ overlay: createOverlay(host, { bus }), content, store: storeOf(p), bus, clock: { now: () => T0 + DAY + 1000, mono: () => 0 }, tz: TZ });
+    await flush(1);
+    expect(stat('retrieval')).toBe('1 мин');
   });
 });

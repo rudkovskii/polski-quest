@@ -12,7 +12,8 @@ import { getContent } from './systems/content';
 import { mountUi } from './ui';
 import { mountAudioToast } from './ui/audioToast';
 import { loadPortraits, mountPlay, type PlayDeps } from './ui/play';
-import { mountDpad } from './ui/dpad';
+import { dpadLabelsOn, mountDpad } from './ui/dpad';
+import { setTodoVisible } from './ui/todo';
 import { startDay } from './day';
 import { createClock } from './systems/platform/clock';
 import { storedSecret } from './systems/platform/secret';
@@ -31,6 +32,9 @@ const playDev = dev === 'play' || (!dev && params.get('reset') === '1');
 const clock = createClock(dev || playDev ? params.get('now') : null);
 // Без звука вслух (AGENTS.md): `?mute=1` — `audio:play` только в консоль.
 const mute = params.get('mute') === '1';
+// Реплики-заглушки `[todo: id]` (P-01): только dev-сервер с dev-режимом; в сборке никогда, `&todo=0` прячет.
+const showTodo = import.meta.env.DEV && (!!dev || playDev) && params.get('todo') !== '0';
+setTodoVisible(showTodo);
 
 interface StartOptions {
   /** Хранилище без облака (dev=world): отдельная база, синк не запускается. */
@@ -74,7 +78,8 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
     const s = game.scene.getScene('Location') as Location | null;
     return s && game.scene.isActive('Location') ? s : null;
   };
-  const dpad = mountDpad(document.body);
+  // Подписи «A · действие», «B · назад» первые дни (P-01).
+  const dpad = mountDpad(document.body, bus, { labels: () => !storeNow || dpadLabelsOn(storeNow.progress.log.events) });
   const input = startInput({
     dpad,
     // До первой локации (Title, экраны) d-pad не нужен: режим как у tap-локации, его сменит `world:location`.
@@ -98,7 +103,7 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
     build: __BUILD_ID__,
   });
   // Режиссёр (I-13): строка «Сейчас», пузырь Казика, подсветка цели, запуск сразу в шаг, первый день.
-  const guide = mountGuide(overlay, { bus, content, portraits, coarse: () => matchMedia('(pointer: coarse)').matches, dev: !!dev || playDev });
+  const guide = mountGuide(overlay, { bus, content, portraits, coarse: () => matchMedia('(pointer: coarse)').matches, dev: showTodo });
   const flow = startFlow({
     content,
     store,

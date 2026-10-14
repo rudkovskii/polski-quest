@@ -4,7 +4,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Step } from '../src/types/content';
 import { RIGHT_LINE, WRONG_LINE } from '../src/ui/exercises/frame';
-import { autoOptions, shuffled } from '../src/ui/exercises/options';
+import { autoOptions, shuffled, shuffleOptions } from '../src/ui/exercises/options';
+import { tileOrder } from '../src/ui/exercises/order';
+import { getContent } from '../src/systems/content';
 import { EXERCISES, mountStep } from '../src/ui/exercises/registry';
 import type { ExerciseCtx, StepResult } from '../src/ui/exercises/types';
 import { exerciseContent } from '../src/ui/lesson';
@@ -18,7 +20,7 @@ beforeEach(() => {
 });
 afterEach(() => host.remove());
 
-function setup(step: Step, o: { audio?: boolean; random?: number; repeat?: boolean } = {}) {
+function setup(step: Step, o: { audio?: boolean; random?: number; repeat?: boolean; seed?: string } = {}) {
   const bus = testBus();
   const overlay = createOverlay(host, { bus });
   const layer = overlay.open();
@@ -38,6 +40,7 @@ function setup(step: Step, o: { audio?: boolean; random?: number; repeat?: boole
     random: () => o.random ?? 0.2,
     typeMs: 0,
     ...(o.repeat ? { repeat: true } : {}),
+    ...(o.seed ? { seed: o.seed } : {}),
   };
   let result: StepResult | null = null;
   const p = mountStep(step, ctx).then((r) => (result = r));
@@ -131,14 +134,17 @@ describe('choice', () => {
   it('клавиатура: стрелка двигает выбор, interact (Enter/«A») выбирает, второй interact = «Дальше»', async () => {
     const s = setup(choice);
     await flush();
+    // Порядок вариантов перемешан (P-01): идём по кнопкам до верной.
+    const shown = [...s.root.querySelectorAll('[data-opt]')].map((b) => b.textContent);
     s.intent({ type: 'move', dir: 'down', held: true });
-    expect(document.activeElement?.textContent).toBe('стол');
+    expect(document.activeElement?.textContent).toBe(shown[0]);
     s.intent({ type: 'move', dir: 'down', held: true });
-    expect(document.activeElement?.textContent).toBe('стул');
-    s.intent({ type: 'move', dir: 'up', held: true });
+    expect(document.activeElement?.textContent).toBe(shown[1]);
+    if (shown[1] !== 'стол') s.intent({ type: 'move', dir: 'up', held: true });
     s.intent({ type: 'interact' });
     expect(s.fb().textContent).toContain(RIGHT_LINE);
-    expect(document.activeElement?.textContent).toBe('Дальше');
+    expect(document.activeElement?.querySelector('.ru')?.textContent).toBe('Дальше');
+    expect(document.activeElement?.querySelector('.pl')?.textContent).toBe('Dalej');
     s.intent({ type: 'interact' });
     await s.p;
     expect(s.result?.status).toBe('done');
@@ -526,12 +532,12 @@ describe('say, explain, shadow (без проверки)', () => {
     expect(s.result?.status).toBe('cancel');
   });
 
-  it('shadow: «Повторил» нужно нажать repeat раз, каждый раз фраза звучит снова; отмена', async () => {
+  it('shadow: «Powtórzone / Повторено» нужно нажать repeat раз, каждый раз фраза звучит снова; отмена', async () => {
     let s = setup({ t: 'shadow', pl: 'Mała kawa, proszę.', repeat: 2, slow: true });
     expect(s.audio.played).toEqual([{ text: 'Mała kawa, proszę.', slow: true }]);
     act(s.root, 'next').click();
     expect(s.result).toBeNull();
-    expect(act(s.root, 'next').textContent).toBe('Повторил (1/2)');
+    expect(act(s.root, 'next').textContent).toBe('Powtórzone (1/2)Повторено');
     expect(s.audio.played.length).toBe(2);
     act(s.root, 'next').click();
     await s.p;
@@ -540,5 +546,135 @@ describe('say, explain, shadow (без проверки)', () => {
     s.cancel();
     await s.p;
     expect(s.result?.status).toBe('cancel');
+  });
+});
+
+// ───────────────────────── P-01: перемешивание и объяснение ошибки ─────────────────────────
+
+describe('P-01: варианты перемешаны детерминированно (seed = шаг + день)', () => {
+  const shownOf = (root: HTMLElement): string[] => [...root.querySelectorAll('[data-opt]')].map((b) => b.textContent ?? '');
+
+  it('один seed — один порядок; другой день — другой порядок хотя бы у части шагов', () => {
+    const list = ['a', 'b', 'c', 'd'];
+    expect(shuffleOptions(list, 0, 'x@2026-10-14').options).toEqual(shuffleOptions(list, 0, 'x@2026-10-14').options);
+    const days = ['2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17'];
+    const orders = new Set(days.map((d) => shuffleOptions(list, 0, `ch01.s00#2@${d}`).options.join()));
+    expect(orders.size).toBeGreaterThan(1);
+    const sh = shuffleOptions(list, 2, 'seed');
+    expect(sh.options[sh.answer]).toBe('c');
+    expect(sh.orig.map((i) => list[i])).toEqual(sh.options);
+  });
+
+  it('по всему контенту главы 1 верный вариант не стоит всегда первым (плейтест: «жала первый»)', () => {
+    const c = getContent();
+    let n = 0;
+    let first = 0;
+    for (const { value: l } of c.lessons.values())
+      for (const [i, st] of (l.steps ?? []).entries()) {
+        const id = st.id ?? `${l.id}#${i}`;
+        if (st.t === 'choice' || (st.t === 'listen' && typeof st.options !== 'string')) {
+          const opts = st.options as string[];
+          const sh = shuffleOptions(opts, st.answer, `${id}@2026-10-15`);
+          n++;
+          if (sh.answer === 0) first++;
+        }
+      }
+    expect(n).toBeGreaterThan(50);
+    // В контенте answer: 0 почти везде; после перемешивания первым верный стоит примерно в 1/k случаев.
+    expect(first / n).toBeLessThan(0.55);
+  });
+
+  it('choice: порядок из seed, тег ошибки по исходному индексу (errorTagByOption)', async () => {
+    const three: Step = { ...choice, options: ['стол', 'стул', 'стал'], errorTagByOption: { '1': 'ff.stol' } };
+    const seeds = ['a', 'b', 'c', 'd', 'e', 'f'].map((x) => `demo.t#0@${x}`);
+    const orders = new Set<string>();
+    for (const seed of seeds) {
+      const s = setup(three, { seed });
+      orders.add(shownOf(s.root).join());
+      s.cancel();
+      await s.p;
+    }
+    expect(orders.size).toBeGreaterThan(1);
+    const s = setup(three, { seed: seeds[0] });
+    expect(shownOf(s.root).sort()).toEqual(['стал', 'стол', 'стул']);
+    s.opt('стул').click();
+    s.opt('стол').click();
+    expect((await done(s)).first?.tags).toEqual(['ff.stol']);
+  });
+
+  it('listen с явными вариантами, gap и minimal_pair (which) тоже перемешаны; stress — нет (это слово)', async () => {
+    const seeds = Array.from({ length: 8 }, (_, i) => `t@${i}`);
+    const seen = (step: Step): Set<string> => {
+      const out = new Set<string>();
+      for (const seed of seeds) {
+        const s = setup(step, { seed });
+        out.add(shownOf(s.root).join());
+        s.cancel();
+      }
+      return out;
+    };
+    expect(seen({ t: 'listen', say: 'mała kawa', options: ['mała kawa', 'mala kawa', 'mała kava'], answer: 0, item: 'lx.maly' }).size).toBeGreaterThan(1);
+    expect(seen({ t: 'gap', text: 'Mała ___, proszę.', answer: 'kawa', options: ['kawa', 'kava'] }).size).toBe(2);
+    expect(seen({ t: 'minimal_pair', pair: ['łata', 'lata'], play: 0, cluster: 'R3', mode: 'which' } as Step).size).toBe(2);
+    expect(seen({ t: 'stress', word: 'telefon', syllables: ['te', 'le', 'fon'], answer: 1 }).size).toBe(1);
+  });
+
+  it('order: плитки никогда не лежат готовым ответом', () => {
+    const answer = ['Mała', 'kawa', 'proszę'];
+    for (let k = 0; k < 300; k++) {
+      const head = tileOrder(answer, [answer], `o#${k}`).map((t) => t.text);
+      expect(head).not.toEqual(answer);
+      expect([...head].sort()).toEqual([...answer].sort());
+    }
+  });
+});
+
+describe('P-01: ошибка объясняет', () => {
+  const order = (fb: HTMLElement, sel: string): number => [...fb.children].findIndex((n) => n.matches(sel));
+
+  it('choice: правило тега ошибки, перевод с транскрипцией, потом «Prawie. Jeszcze raz.»', () => {
+    const s = setup(choice);
+    s.opt('стул').click();
+    const fb = s.fb();
+    expect(fb.querySelector('[data-fb="rule"]')?.textContent).toContain('stół = стол, а не стул');
+    expect(fb.querySelector('[data-fb="gloss"]')?.textContent).toBe('stół — стол [стуў]');
+    expect(order(fb, '.rule')).toBeLessThan(order(fb, '.verdict'));
+    expect(order(fb, '.gloss')).toBeLessThan(order(fb, '.verdict'));
+    expect(fb.lastElementChild?.textContent).toBe(WRONG_LINE);
+  });
+
+  it('`why` шага главнее тега; кластер шага — когда тега нет', () => {
+    const s = setup({ ...choice, why: 'ó читается как [у]: stół = [стуў].' });
+    s.opt('стул').click();
+    expect(s.fb().querySelector('.rule')?.textContent).toContain('ó читается как [у]');
+    const l = setup({ t: 'listen', say: 'mała kawa', options: ['mała kawa', 'mala kawa'], answer: 0, cluster: 'R3' } as Step);
+    l.opt('mala kawa').click();
+    expect(l.fb().querySelector('.rule')?.textContent).toContain('ł и l');
+  });
+
+  it('правила нет — только перевод и транскрипция правильного ответа', () => {
+    const s = setup({ t: 'listen', say: 'kawa', options: ['kawa', 'kava'], answer: 0 } as Step);
+    s.opt('kava').click();
+    expect(s.fb().querySelector('.rule')).toBeNull();
+    expect(s.fb().querySelector('.gloss')?.textContent).toBe('kawa — кофе [ка́ва]');
+  });
+
+  it('верный ответ — без правила и перевода', () => {
+    const s = setup(choice);
+    s.opt('стол').click();
+    expect(s.fb().querySelector('.rule, .gloss')).toBeNull();
+  });
+});
+
+describe('P-01: кнопки — польское слово и русская подпись', () => {
+  it('«Sprawdź / Проверить», «Dalej / Дальше» в рамке шага', async () => {
+    const s = setup({ t: 'type', prompt: 'кофе', accept: ['kawa'] } as Step);
+    const check = act(s.root, 'check');
+    expect(check.querySelector('.pl')?.textContent).toBe('Sprawdź');
+    expect(check.querySelector('.ru')?.textContent).toBe('Проверить');
+    expect(check.querySelector('.pl')?.getAttribute('lang')).toBe('pl');
+    type(s.input(), 'kawa');
+    check.click();
+    expect(act(s.root, 'next').textContent).toBe('DalejДальше');
   });
 });
