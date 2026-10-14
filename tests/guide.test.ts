@@ -229,7 +229,7 @@ describe('ui/guide: строка «Сейчас», пузырь, раскрыт�
       vi.advanceTimersByTime(3100);
       expect(dpad.classList.contains('pq-dpad-pulse')).toBe(true);
       expect(root2.querySelector<HTMLElement>('[data-hint=move]')!.dataset.mode).toBe('touch');
-      expect(root2.textContent).toContain('Крестовина');
+      expect(root2.textContent).toContain('Крестик слева: идти');
       root2.remove();
       dpad.remove();
     } finally {

@@ -158,7 +158,10 @@
     "id": "d01.fotobudka.1",
     "who": "fotobudka",
     "pl": "Bez uśmiechu, proszę.",
-    "plRu": "Без улыбки, пожалуйста."
+    "plRu": "Без улыбки, пожалуйста.",
+    "words": [
+      "lx.prosze"
+    ]
   },
   {
     "id": "d01.narr.fotobudka.1",
@@ -264,7 +267,10 @@
   {
     "id": "d01.kazik.bazar.1",
     "who": "bobr",
-    "ru": "Вон ящик. Скажи ей «Dzień dobry»: здравствуйте."
+    "ru": "Вон ящик. Скажи ей «Dzień dobry»: здравствуйте.",
+    "words": [
+      "lx.dzien_dobry"
+    ]
   },
   {
     "id": "d01.hela.bazar.1",
@@ -276,7 +282,10 @@
     "id": "d01.hela.bazar.2",
     "who": "pani_hela",
     "pl": "Dzień dobry!",
-    "plRu": "Здравствуйте!"
+    "plRu": "Здравствуйте!",
+    "words": [
+      "lx.dzien_dobry"
+    ]
   },
   {
     "id": "d01.kazik.bazar.2",
@@ -299,7 +308,10 @@
   {
     "id": "d01.rule.dzien_dobry",
     "who": "narrator",
-    "ru": "Dzień dobry: при встрече. Do widzenia: на прощание."
+    "ru": "Dzień dobry: при встрече. Do widzenia: на прощание.",
+    "words": [
+      "lx.dzien_dobry"
+    ]
   },
   {
     "id": "d01.rule.dzien_dobry.tr",
@@ -363,16 +375,28 @@
     "ru": "А что там за «K.»? Не я. Я не пишу. Я грызу."
   },
   {
+    "id": "idle.kazik.1",
+    "who": "bobr",
+    "pl": "Kłoda!",
+    "plRu": "Бревно!"
+  },
+  {
     "id": "idle.hela.1",
     "who": "pani_hela",
     "pl": "Pan znowu? Dzień dobry!",
-    "plRu": "Вы опять? Здравствуйте!"
+    "plRu": "Вы опять? Здравствуйте!",
+    "words": [
+      "lx.dzien_dobry"
+    ]
   },
   {
     "id": "idle.hela.2",
     "who": "pani_hela",
     "pl": "Za darmo nie ma nic. Prawie nic.",
-    "plRu": "Даром ничего нет. Почти ничего."
+    "plRu": "Даром ничего нет. Почти ничего.",
+    "words": [
+      "lx.nic"
+    ]
   },
   {
     "id": "idle.hela.3",
@@ -415,7 +439,10 @@
   {
     "id": "d01.kazik.dzialka.2",
     "who": "bobr",
-    "ru": "Твоё «Dzień dobry» я посадил. Сказанное слово растёт."
+    "ru": "Твоё «Dzień dobry» я посадил. Сказанное слово растёт.",
+    "words": [
+      "lx.dzien_dobry"
+    ]
   },
   {
     "id": "d01.kazik.dzialka.3",
@@ -444,12 +471,18 @@
     "id": "d01.brzechwa.plot.2",
     "who": "brzechwa",
     "pl": "Dziękuję!",
-    "plRu": "Спасибо!"
+    "plRu": "Спасибо!",
+    "words": [
+      "lx.dziekuje"
+    ]
   },
   {
     "id": "d01.kazik.plot.1",
     "who": "bobr",
-    "ru": "На «спасибо» тут говорят «proszę»: пожалуйста."
+    "ru": "На «спасибо» тут говорят «proszę»: пожалуйста.",
+    "words": [
+      "lx.prosze"
+    ]
   },
   {
     "id": "d01.brzechwa.plot.3",
@@ -467,7 +500,10 @@
     "id": "d01.brzechwa.plot.5",
     "who": "brzechwa",
     "pl": "Cześć, Dima! Do jutra!",
-    "plRu": "Пока, Дима! До завтра!"
+    "plRu": "Пока, Дима! До завтра!",
+    "words": [
+      "lx.czesc"
+    ]
   },
   {
     "id": "d01.kazik.plot.2",

@@ -212,14 +212,13 @@
       "id": "wejscie_bazar",
       "at": [
         8,
-        10
+        9
       ],
       "size": [
         6,
         1
       ],
       "on": "enter",
-      "once": true,
       "do": []
     },
     {

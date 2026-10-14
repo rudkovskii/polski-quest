@@ -2,14 +2,13 @@
   {
     "id": "ch01.intro",
     "kind": "scene",
-    "title": { "pl": "Dzień dobry", "ru": "Вступление: первое «Dzień dobry»" },
+    "title": { "pl": "Dzień dobry", "ru": "Базар: первое «Dzień dobry»" },
     "minutes": 1,
-    "npc": "bobr",
-    "location": "ch01.dzialka",
+    "npc": "pani_hela",
+    "location": "ch01.bazar",
     "introduces": ["lx.dzien_dobry"],
     "steps": [
-      { "t": "choice", "q": "Dzień dobry?", "options": ["Dzień dobry", "Do widzenia"], "answer": 0, "item": "lx.dzien_dobry" },
-      { "t": "shadow", "pl": "Dzień dobry!", "ru": "Здравствуйте!", "repeat": 1, "item": "lx.dzien_dobry" }
+      { "t": "choice", "q": "Dzień dobry?", "options": ["Dzień dobry", "Do widzenia"], "answer": 0, "item": "lx.dzien_dobry" }
     ]
   },
   {
@@ -1657,6 +1656,24 @@
           }
         ]
       }
+    ]
+  },
+  {
+    "id": "ch01.d01.brzechwa",
+    "kind": "scene",
+    "title": { "pl": "Dziękuję, proszę, cześć", "ru": "Шляпа Брзехвы: три слова" },
+    "minutes": 3,
+    "npc": "brzechwa",
+    "location": "ch01.dzialka",
+    "introduces": ["lx.dziekuje", "lx.prosze", "lx.czesc"],
+    "steps": [
+      { "t": "choice", "q": "Brzechwa: «Dziękuję!» Что он сказал?", "options": ["Спасибо", "Привет"], "answer": 0, "item": "lx.dziekuje", "why": "Так благодарят, когда что-то дали." },
+      { "t": "say", "who": "brzechwa", "pl": "Dziękuję!", "ru": "[джэнку́е] Спасибо!", "item": "lx.dziekuje" },
+      { "t": "choice", "q": "Как сказать «спасибо»?", "options": ["Dziękuję", "Dzień dobry"], "answer": 0, "item": "lx.dziekuje", "why": "Dziękuję [джэнку́е]: спасибо. Dzień dobry: здравствуйте." },
+      { "t": "say", "who": "brzechwa", "pl": "Proszę.", "ru": "[про́шэ] Пожалуйста. Так отвечают на «dziękuję».", "item": "lx.prosze" },
+      { "t": "choice", "q": "Brzechwa: «Dziękuję!» Что ответить?", "options": ["Proszę", "Dziękuję"], "answer": 0, "item": "lx.prosze", "why": "На «dziękuję» отвечают «proszę»." },
+      { "t": "choice", "q": "«Cześć» здесь это…", "options": ["Пока", "Спасибо"], "answer": 0, "item": "lx.czesc", "why": "Cześć: и «привет», и «пока». Так говорят на «ты»." },
+      { "t": "say", "who": "brzechwa", "pl": "Cześć!", "ru": "[чещчь] Пока! И «привет» тоже.", "item": "lx.czesc" }
     ]
   }
 ]

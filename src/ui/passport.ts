@@ -77,8 +77,8 @@ export function passportModel(
   condition?: (c: Condition) => boolean,
 ): PassportModel {
   const cond = condition ?? passportCond(p, d);
-  const k = content.lines.get('intro.passport.k');
-  const first = STAMP_FIRST in p.world.flags || 'beat.first.f1' in p.world.flags ? { stamped: STAMP_FIRST in p.world.flags, note: k?.pl ?? null } : null;
+  const k = content.lines.get('d01.passport.note');
+  const first = STAMP_FIRST in p.world.flags || 'beat.d01.bazar' in p.world.flags ? { stamped: STAMP_FIRST in p.world.flags, note: k?.pl ?? null } : null;
   const pages = content.world.biomes
     .filter((b) => b.stamp && cond(b.stages.visible))
     .map((b) => ({ biome: b.id, title: b.title.pl, titleRu: b.title.ru, stamped: cond(b.stages.stamp), how: condWords(b.stages.stamp, content) }));

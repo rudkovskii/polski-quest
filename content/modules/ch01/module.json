@@ -18,6 +18,7 @@
   "unlock": { "hard": { "always": true } },
   "lessons": [
     "ch01.intro",
+    "ch01.d01.brzechwa",
     "ch01.s00",
     "ch01.s01",
     "ch01.s02",

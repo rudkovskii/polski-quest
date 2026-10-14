@@ -139,7 +139,7 @@ export interface BusEvents {
   /** Локация загружена: склейка переключает режим ввода `walk | tap` (I-07). */
   'world:location': { id: string; controls: MapControls };
   /** Перейти в локацию (эффект teleport, запуск режиссёра I-13): спавн по имени или клетка. */
-  'world:teleport': { location: string; spawn: string | [number, number] };
+  'world:teleport': { location: string; spawn: string | [number, number]; /** Куда смотрит Дима после входа (P-05: лицом к цели шага). */ facing?: 'up' | 'down' | 'left' | 'right' };
   /**
    * Пометки мира из прогресса (I-12): грядки `plot` (стадии, «!», подвявшие) и «!» над объектами `word`
    * с due-словами. Шлёт склейка (src/day.ts) на `world:location` и после изменений прогресса.

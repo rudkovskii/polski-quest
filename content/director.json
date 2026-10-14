@@ -2,31 +2,16 @@
   "schema": 1,
   "beats": [
     {
-      "id": "kazik_most",
-      "slot": "start",
-      "if": { "all": [{ "flag": "beat.first_day_done" }, { "not": { "stepDone": "sleep" } }] },
-      "target": { "location": "ch01.dzialka", "npc": "bobr" },
-      "line": "kazik.dream.most",
-      "do": [{ "line": "kazik.dream.gryze" }]
-    },
-    {
-      "id": "brzechwa_rym",
-      "slot": "afterScene",
-      "if": { "all": [{ "flag": "beat.first_day_done" }, { "stepDone": "scene" }] },
-      "target": { "location": "ch01.metro", "npc": "brzechwa" },
-      "line": "brzechwa.rym_dima"
-    },
-    {
       "id": "bridge_piles",
       "slot": "start",
-      "if": { "all": [{ "flag": "beat.kazik_most" }, { "daysPlayed": 3 }, { "not": { "stepDone": "sleep" } }] },
+      "if": { "all": [{ "flag": "beat.first_day_done" }, { "daysPlayed": 3 }, { "not": { "stepDone": "sleep" } }] },
       "target": { "location": "ch01.dzialka", "npc": "bobr" },
       "line": "kazik.bridge.piles"
     },
     {
       "id": "brzechwa_adwokat",
       "slot": "afterScene",
-      "if": { "all": [{ "flag": "beat.brzechwa_rym" }, { "daysPlayed": 3 }, { "stepDone": "scene" }] },
+      "if": { "all": [{ "flag": "beat.d01.brzechwa" }, { "daysPlayed": 3 }, { "stepDone": "scene" }] },
       "target": { "location": "ch01.metro", "npc": "brzechwa" },
       "line": "brzechwa.adwokat"
     },
@@ -43,14 +28,31 @@
       "if": { "flag": "ch01.done" },
       "target": { "location": "ch01.dzialka", "npc": "bobr" },
       "line": "kazik.bridge.span"
-    }
+    },
+    { "id": "d01.dworzec", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.dworzec", "screen": "intro" }, "act": "card" },
+    { "id": "d01.fotobudka", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.dworzec", "object": "fotobudka" }, "act": "fotobudka" },
+    { "id": "d01.peron", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.peron" }, "do": [{ "line": "d01.kazik.platform.1" }, { "line": "d01.narr.platform.1" }] },
+    { "id": "d01.walizka", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.peron", "npc": "walizka" }, "act": "sound", "do": [{ "startDialogue": "dlg.ch01.d01_peron" }] },
+    { "id": "d01.ulica", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.bazar" }, "do": [{ "line": "d01.kazik.street.1" }, { "line": "d01.kazik.street.2" }] },
+    { "id": "d01.tablica", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.bazar", "object": "tablica_bazar" }, "do": [{ "line": "d01.sign.bazar" }, { "line": "d01.kazik.street.3" }] },
+    { "id": "d01.wejscie", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.bazar", "object": "wejscie_bazar" }, "do": [{ "line": "d01.kazik.bazar.1" }] },
+    { "id": "d01.bazar", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.bazar", "npc": "pani_hela" }, "act": "bazar" },
+    { "id": "d01.wisla", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.wisla", "npc": "bobr" }, "do": [{ "startDialogue": "dlg.ch01.d01_wisla" }] },
+    { "id": "d01.dzialka", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.dzialka" }, "do": [{ "line": "d01.kazik.dzialka.1" }, { "line": "d01.kazik.dzialka.2" }, { "line": "d01.kazik.dzialka.3" }, { "line": "d01.kazik.dzialka.4" }] },
+    { "id": "d01.podlewanie", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.dzialka", "plot": "grzadki", "npc": "bobr" }, "act": "water" },
+    { "id": "d01.wiatr", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.dzialka" }, "do": [{ "line": "d01.brzechwa.plot.1" }] },
+    { "id": "d01.kapelusz", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.dzialka", "npc": "kapelusz" } },
+    { "id": "d01.brzechwa", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.dzialka", "npc": "brzechwa" }, "act": "brzechwa" },
+    { "id": "d01.sadzenie", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.dzialka", "plot": "grzadki" }, "act": "plant" },
+    { "id": "d01.wieczor", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.dzialka" }, "do": [{ "line": "d01.kazik.hut.1" }, { "line": "d01.kazik.hut.2" }] },
+    { "id": "d01.sen", "slot": "day1", "if": { "always": true }, "target": { "location": "ch01.chatka", "object": "poslanie" }, "act": "sleep" }
   ],
   "reveals": [
-    { "element": "passport", "if": { "flag": "beat.first.f1" } },
-    { "element": "obchod", "if": { "flag": "beat.first.f2" } },
+    { "element": "passport", "if": { "flag": "beat.d01.bazar" } },
+    { "element": "obchod", "if": { "flag": "beat.first_day_done" } },
     { "element": "jars", "if": { "jars": { "min": 1 } }, "line": "kazik.jar.first" },
     { "element": "map", "if": { "bossPassed": "ch01.boss" } }
   ],
   "spring": { "line": "kazik.return.spring" },
-  "done": { "line": "kazik.done", "more3Line": "kazik.express" }
+  "done": { "line": "sys.kazik.done", "more3Line": "kazik.express" }
 }

@@ -363,7 +363,7 @@ export function mountGuide(root: HTMLElement, deps: GuideDeps): GuideUi {
     if (deps.coarse?.() ?? false) {
       // Телефон: пульсируют крестовина и «A»; подпись — тем же языком, что на экране.
       doc.querySelector<HTMLElement>('.pq-dpad')?.classList.add('pq-dpad-pulse');
-      hint = el('div', { class: 'pq-movehint touch', 'data-hint': 'move', 'data-mode': 'touch' }, el('div', { class: 'cap' }, 'Крестовина — идти · A — действие · или нажми, куда идти'));
+      hint = el('div', { class: 'pq-movehint touch', 'data-hint': 'move', 'data-mode': 'touch' }, el('div', { class: 'cap' }, 'Крестик слева: идти. A справа: взять, поговорить. Можно просто тапнуть, куда идти.'));
     } else {
       hint = el(
         'div',

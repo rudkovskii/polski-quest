@@ -2,7 +2,7 @@
 // детерминированная `nextStep(input)`: правила 1–10 по приоритету, слоты сюжетных битов из director.json,
 // раскрытие элементов HUD (`reveals`). Ничего не пишет: флаги `beat.*`, `hud.*`, `spring.*` ставит склейка
 // (src/flow.ts), когда шаг показан или выполнен. Меню режимов нет: что делать, решает только этот модуль.
-import type { Effect, HudElement, Lesson, Tuning } from '../types/content';
+import type { Beat, Effect, HudElement, Lesson, Tuning } from '../types/content';
 import type { Content } from './content';
 import { condCtx, evaluate, lessonVariant, type CondCtx } from './conditions';
 import { derive, deriveContent, isPlayedDay, type Derived } from './derive';
@@ -14,8 +14,10 @@ import { cardId } from './srs';
 import { daysBetween, isoWeekday, type Day, type Ts } from './time';
 
 export type StepKind = 'intro' | 'resume' | 'spring' | 'beat' | 'water' | 'remedy' | 'scene' | 'boss' | 'evening' | 'sleep' | 'done';
-/** Шаги первого дня (§5.0); флаги `beat.first.f1…f6`, финал — `beat.first_day_done`. */
-export type FirstStep = 'f1' | 'f2' | 'f3' | 'f4' | 'f5' | 'f6';
+/** Шаг первого дня (P-05): id бита `d01.*` из director.json (слот `day1`); флаг `beat.<id>`, финал — `beat.first_day_done`. */
+export type FirstStep = string;
+/** Действие склейки у бита дня 1 (director.json `act`). */
+export type FirstAct = NonNullable<Beat['act']>;
 export type BeatSlot = 'start' | 'afterWater' | 'afterScene' | 'beforeSleep';
 
 /** Куда вести игрока (§4.12). `item` — растение на грядке `plot` (полив одной грядки в F2). */
@@ -61,8 +63,10 @@ export interface DirectorInput {
 export interface DirectorStep {
   kind: StepKind;
   target: Target;
-  /** Шаг первого дня (kind intro). */
+  /** Шаг первого дня (kind intro): id бита `d01.*`. */
   f?: FirstStep;
+  /** Действие склейки у бита дня 1 (`card`, `fotobudka`, `bazar`, `water`, …); нет — только эффекты `do`. */
+  act?: FirstAct;
   /** scene / boss / remedy / resume / intro F4. */
   lesson?: string;
   /** Как поливать: day — обход, practice — одна грядка без SRS (F2), phonetic — вечер на звуки. */
@@ -88,10 +92,16 @@ export interface DirectorStep {
 export const FIRST_DAY = {
   dzialka: 'ch01.dzialka',
   metro: 'ch01.metro',
+  /** Первая карта дня 1 (P-05): зал Warszawa Wschodnia, спавн у фотобудки. */
+  start: 'ch01.dworzec',
+  startSpawn: 'start',
   plot: 'grzadki',
-  /** Сцена вступления (F1): две плитки «Dzień dobry» / «Do widzenia», `intro` слова, печать №1. */
+  /** Плитки у лотка пани Хели (d01.s4): «Dzień dobry» / «Do widzenia», `intro` слова, печать №1. */
   introLesson: 'ch01.intro',
   introItem: 'lx.dzien_dobry',
+  /** Урок у забора (d01.s7): три чанка «угадай → услышь → выбери», каждое слово — семя в карман. */
+  plotLesson: 'ch01.d01.brzechwa',
+  plotDialogue: 'dlg.ch01.d01_imie',
   /** Объекты działki: альтанка (сон), берег Вислы (вечер на звуки). */
   sleepObject: 'altana_sleep',
   eveningObject: 'ryby',
@@ -100,10 +110,10 @@ export const FIRST_DAY = {
 } as const;
 
 /** Флаг шага первого дня. */
-export const firstFlag = (f: FirstStep): string => `beat.first.${f}`;
+export const firstFlag = (f: FirstStep): string => `beat.${f}`;
 export const FIRST_DAY_DONE = 'beat.first_day_done';
-/** Решение после диагностики (склейка): активных минут меньше порога → сначала ремонтная сцена (§5.0 F4). */
-export const FIRST_REPAIR_FLAG = 'beat.first.f4r';
+/** Флаги выбора звука в первом разговоре с Казиком (d01.s2): склейка переносит их в настройку `sound.mode`. */
+export const SOUND_FLAGS = { on: 'd01.sound.on', mute: 'd01.sound.mute' } as const;
 export const springFlag = (lastPlayed: Day): string => `spring.${lastPlayed}`;
 export const hudFlag = (e: HudElement): string => `hud.${e}`;
 /** Флаг показа бита: `once` (по умолчанию) — навсегда, иначе — на игровой день. */
@@ -111,52 +121,64 @@ export const beatFlag = (id: string, once: boolean, today: Day): string => (once
 
 /** Реплики переходов (СЮЖЕТ §3, story/lines.json). `todo` там, где реплики пока нет. */
 export const LINES = {
-  waterFirst: 'kazik.water.first',
   waterDue: 'kazik.water.due',
   debtJam: 'kazik.debt.jam',
   sunday: 'kazik.sunday',
-  move: 'kazik.move.first',
   repair: 'kazik.repair',
   resume: 'kazik.resume',
   sleep: 'kazik.sleep',
   spring: 'kazik.return.spring',
   evening: 'kazik.evening',
-  done: 'kazik.done',
+  done: 'sys.kazik.done',
   more3: 'kazik.express',
 } as const;
 
-/** Реплики вступления F1 (src/ui/intro.ts), по порядку карточек. */
-export const INTRO_LINES = {
-  oct: 'intro.caption.oct',
-  kloda: 'intro.kazik.kloda',
-  bobr: 'intro.caption.bobr',
-  hela: 'intro.hela.za_darmo',
-  passportK: 'intro.passport.k',
-  empty: 'intro.caption.empty',
-  dzienDobry: 'intro.kazik.dzien_dobry',
-  dopiero: 'intro.kazik.dopiero',
-  goscMowi: 'intro.kazik.gosc_mowi',
-  shadow: 'kazik.shadow.first',
-  poRusku: 'intro.kazik.po_rusku',
-  miau: 'intro.simba.miau',
-  pokazalo: 'intro.caption.pokazalo',
+/**
+ * Реплики дня 1, которые показывает код (src/flow.ts, src/ui/intro.ts), а не эффекты битов (СЮЖЕТ_v2 §4 d01).
+ * Остальные реплики дня 1 — в `do` битов `day1` и в их диалогах: валидатор собирает их сам.
+ */
+export const D01 = {
+  card: 'd01.narr.card.1',
+  fotobudka: 'd01.fotobudka.1',
+  fotoNarr: 'd01.narr.fotobudka.1',
+  soundOn: 'd01.kazik.platform.6a',
+  helaTak: 'd01.hela.bazar.1',
+  helaErr: 'd01.hela.bazar.err.1',
+  rule: 'd01.rule.dzien_dobry',
+  ruleTr: 'd01.rule.dzien_dobry.tr',
+  helaHello: 'd01.hela.bazar.2',
+  goscMowi: 'd01.kazik.bazar.2',
+  umiem: 'd01.ui.umiem.1',
+  zaDarmo: 'd01.hela.bazar.3',
+  teZaDarmo: 'd01.hela.bazar.4',
+  prawieKloda: 'd01.kazik.bazar.3',
+  passportNote: 'd01.passport.note',
+  passportNarr: 'd01.narr.passport.1',
+  stamp: 'd01.hela.bazar.5',
+  stampKazik: 'd01.kazik.bazar.4',
+  passportWho: 'd01.kazik.bazar.5',
+  praga: 'd01.kazik.bazar.6',
+  notK: 'd01.kazik.bazar.7',
+  watered: 'd01.kazik.dzialka.5',
+  dziekuje: 'd01.brzechwa.plot.2',
+  proszeHint: 'd01.kazik.plot.1',
+  seeds: 'd01.kazik.plot.2',
+  pierogi: 'd01.kazik.plot.3',
+  pierogi2: 'd01.kazik.plot.4',
+  summary: 'd01.ui.summary',
+  summaryUmiem: 'd01.ui.summary.umiem',
+  hook: 'd01.ui.hook',
+  miau: 'd01.simba.night',
+  notMe: 'd01.kazik.hut.3',
+  dobranoc: 'd01.ui.dobranoc',
+  idleKazik: 'idle.kazik.1',
 } as const;
 
 /**
- * Реплики бита первого дня (§5.0 F1–F6, P-01): вступление, переходы режиссёра первого дня, итог и «done».
- * Диалоги первого дня (турникет-диагностика и ремонтные сцены кластеров) валидатор собирает сам по контенту.
- * `PQ_RELEASE=1 npm run build` (и `validate --release`) падает, если среди них есть `todo`.
+ * Реплики бита первого дня, которые знает код (P-01, P-05): D01 и «done» закрытого дня.
+ * `PQ_RELEASE=1 npm run build` (и `validate --release`) падает, если среди них или в битах `day1` есть `todo`.
  */
-export const FIRST_DAY_LINES: readonly string[] = [
-  ...Object.values(INTRO_LINES),
-  LINES.waterFirst,
-  LINES.move,
-  LINES.resume,
-  LINES.evening,
-  LINES.sleep,
-  LINES.done,
-  LINES.more3,
-];
+export const FIRST_DAY_LINES: readonly string[] = [...Object.values(D01), LINES.done, LINES.more3];
 
 // ── Вход из прогресса (для склейки и тестов).
 
@@ -218,7 +240,7 @@ export function diagDone(d: Pick<Derived, 'clusterStatus'>): boolean {
 export function lessonDoneFor(lesson: Lesson, d: Derived): boolean {
   if (lesson.kind === 'diag') return diagDone(d);
   if (lesson.kind === 'boss') return d.bossResults[lesson.id]?.passedAt !== undefined;
-  if (lesson.id === FIRST_DAY.introLesson) return d.lessons[lesson.id] !== undefined;
+  if (lesson.id === FIRST_DAY.introLesson || lesson.id === FIRST_DAY.plotLesson) return d.lessons[lesson.id] !== undefined;
   return d.lessonsDone.has(lesson.id);
 }
 
@@ -226,8 +248,8 @@ function ctxOf(i: DirectorInput): CondCtx {
   return condCtx(i.content, i.derived, i.world, i.now);
 }
 
-/** Ремонтный урок кластера (phonetics.clusters[].repairLesson). */
-function repairOf(i: DirectorInput, cluster: string | null): Lesson | null {
+/** Ремонтный урок кластера (phonetics.clusters[].repairLesson); для дня 2+ (P-06). */
+export function repairOf(i: DirectorInput, cluster: string | null): Lesson | null {
   if (!cluster) return null;
   const id = i.content.phonetics.clusters.find((c) => c.id === cluster)?.repairLesson;
   return id ? (i.content.lessons.get(id)?.value ?? null) : null;
@@ -275,47 +297,57 @@ export function nextLesson(i: DirectorInput): Lesson | null {
 
 // ── Правила.
 
+/** Семена в кармане (P-02): флаг `seed.<item>` без `plant.<x>_<y>.<item>`. Без world/: тот же разбор, что `plantedPins`. */
+export function pocketSeeds(flags: Readonly<Record<string, number>>): string[] {
+  const planted = new Set<string>();
+  for (const name of Object.keys(flags)) {
+    const m = /^plant\.\d+_\d+\.(.+)$/.exec(name);
+    if (m) planted.add(m[1]!);
+  }
+  return Object.keys(flags)
+    .filter((n) => n.startsWith('seed.') && !planted.has(n.slice(5)))
+    .map((n) => n.slice(5));
+}
+
+/** Биты дня 1 по порядку (director.json, слот `day1`). */
+export function day1Beats(content: Pick<Content, 'director'>): Beat[] {
+  return (content.director.beats ?? []).filter((b) => b.slot === 'day1');
+}
+
+/** Бит дня 1 сделан: флаг `beat.<id>`; посадка — когда карман пуст (сажают руками, флага нет). */
+export function day1Done(b: Beat, flags: Readonly<Record<string, number>>): boolean {
+  if (firstFlag(b.id) in flags) return true;
+  return b.act === 'plant' && pocketSeeds(flags).length === 0;
+}
+
+/**
+ * Правило 1 (P-05, СЮЖЕТ_v2 §4 d01): день 1 — сцены на картах по порядку битов `day1`: вокзал и фотобудка, перрон,
+ * улица, базар и паспорт, Висла, działka и полив, шляпа Брзехвы и три семечка, посадка, хатка и сон.
+ * Первый несделанный бит с истинным `if` — шаг `intro`; после сна склейка ставит `beat.first_day_done`.
+ */
 function firstDay(i: DirectorInput): DirectorStep | null {
   const flags = i.world.flags;
   if (FIRST_DAY_DONE in flags) return null;
-  const has = (f: FirstStep): boolean => firstFlag(f) in flags;
-  const d = i.derived;
-  const F = FIRST_DAY;
   const reveal = reveals(i);
-  const step = (s: Omit<DirectorStep, 'kind' | 'reason'> & { f: FirstStep }, why: string): DirectorStep => ({
-    kind: 'intro',
-    ...s,
-    ...(reveal.length ? { reveal } : {}),
-    reason: `1: первый день ${s.f.toUpperCase()} (${why})`,
-  });
-
-  if (!has('f1')) return step({ f: 'f1', target: { location: F.dzialka, screen: 'intro' } }, 'вступление');
-  if (!has('f2')) return step({ f: 'f2', target: { location: F.dzialka, plot: F.plot, item: F.introItem, npc: 'bobr' }, mode: 'practice', line: LINES.waterFirst }, 'одна грядка по просьбе Казика');
-
-  const diag = [...i.content.lessons.values()].map((x) => x.value).find((l) => l.kind === 'diag') ?? null;
-  const isDiag = diagDone(d);
-  if (!has('f3') && !isDiag) return step({ f: 'f3', target: { location: diag?.location ?? F.metro, ...(diag?.npc ? { npc: diag.npc } : {}) }, line: LINES.move }, 'путь к метро');
-
-  const red = reddestCluster(d);
-  const repair = repairOf(i, red);
-  const repairTried = !!repair && d.lessons[repair.id] !== undefined;
-  const f4done = has('f4') || (isDiag && (!(FIRST_REPAIR_FLAG in flags) || !repair || repairTried));
-  if (!f4done) {
-    if (!isDiag && diag) return step({ f: 'f4', target: lessonTarget(diag, i), lesson: diag.id }, 'турникет = диагностика');
-    if (repair) {
-      const v = lessonVariant(repair, ctxOf(i));
-      if (v !== 'skip' && v !== 'locked') return step({ f: 'f4', target: lessonTarget(repair, i), lesson: repair.id }, `ремонт самого красного ${red}`);
-    }
+  const ctx = ctxOf(i);
+  for (const b of day1Beats(i.content)) {
+    if (day1Done(b, flags) || !evaluate(b.if, ctx)) continue;
+    const water = b.act === 'water';
+    return {
+      kind: 'intro',
+      f: b.id,
+      beat: b.id,
+      ...(b.act ? { act: b.act } : {}),
+      target: { ...b.target, ...(water ? { item: FIRST_DAY.introItem } : {}) },
+      ...(water ? { mode: 'practice' as const } : {}),
+      ...(b.act === 'brzechwa' ? { lesson: FIRST_DAY.plotLesson } : b.act === 'bazar' ? { lesson: FIRST_DAY.introLesson } : {}),
+      ...(b.line ? { line: b.line } : {}),
+      ...(b.do?.length ? { do: b.do } : {}),
+      ...(reveal.length ? { reveal } : {}),
+      reason: `1: день 1, ${b.id}${b.act ? ` (${b.act})` : ''}`,
+    };
   }
-
-  // F5: пары из очереди; если ремонтная сцена их уже прогнала сегодня — те же пары кластера практикой (без SRS).
-  const pairs = phoneticDue(i) + (red ? i.content.phonetics.pairs.filter((p) => p.cluster === red).length : 0);
-  if (!has('f5') && !i.todayDone.evening && pairs > 0)
-    return step(
-      { f: 'f5', target: { location: F.dzialka, object: F.eveningObject }, mode: 'phonetic', limit: F.firstEveningPairs, ...(red ? { cluster: red } : {}), line: LINES.evening },
-      'вечер: пары самого красного кластера',
-    );
-  return step({ f: 'f6', target: { location: F.dzialka, object: F.sleepObject }, line: LINES.sleep }, 'альтанка → итог дня');
+  return null;
 }
 
 /** Раскрытия HUD (§4.12): правила `reveals`, условие истинно, флага `hud.<el>` ещё нет. */

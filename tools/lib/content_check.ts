@@ -26,7 +26,7 @@ import type {
   VocabEntry,
   World,
 } from '../../src/types/content';
-import { FIRST_DAY_LINES } from '../../src/systems/director';
+import { FIRST_DAY, FIRST_DAY_LINES } from '../../src/systems/director';
 import { buildWordIndex, matchWords, refIds, type WordIndex } from '../../src/systems/words';
 
 // ───────────────────────────── типы ─────────────────────────────
@@ -1049,11 +1049,6 @@ export function checkContent(input: CheckInput): Issue[] {
 
 export const errorsOf = (issues: Issue[]): Issue[] => issues.filter((i) => i.level === 'error');
 
-/**
- * Заглушки бита первого дня (§5.0 F1–F6): реплики FIRST_DAY_LINES и `director.done`, а в диалогах, которые
- * запускают диагностику (`kind: diag`) или ремонтную сцену кластера (`phonetics.clusters[].repairLesson`), —
- * узлы `todo: true` и ссылки на todo-реплики (узел `line`, эффекты `line` узла и вариантов).
- */
 /** Слова варианта и реплики (P-07): `words` ссылается на vocab, форма стоит в строке; ≤ 2 варианта; NPC без русской речи. */
 function checkWords(ctx: Ctx): void {
   let index: WordIndex | null = null;
@@ -1092,6 +1087,11 @@ function checkWords(ctx: Ctx): void {
   }
 }
 
+/**
+ * Заглушки дня 1 (P-01, P-05): реплики FIRST_DAY_LINES (их показывает код), `director.done`, а у битов слота `day1` —
+ * `line`, эффекты `line` и диалоги из `startDialogue` (узлы `todo`, узлы `line`, эффекты `line` узлов и вариантов),
+ * плюс диалог у забора (FIRST_DAY.plotDialogue), который запускает склейка.
+ */
 function firstDayTodos(ctx: Ctx, director: Director | undefined): { id: string; why: string; w: Where }[] {
   const out: { id: string; why: string; w: Where }[] = [];
   const seen = new Set<string>();
@@ -1107,18 +1107,22 @@ function firstDayTodos(ctx: Ctx, director: Director | undefined): { id: string; 
   line(director?.done?.line, sub(dw, 'done', 'line'));
   line(director?.done?.more3Line, sub(dw, 'done', 'more3Line'));
 
-  const lessons = new Set<string>();
-  for (const [id, l] of ctx.lessons) if (l.value.kind === 'diag') lessons.add(id);
-  for (const [, c] of ctx.clusters) {
-    const r = (c.value as { repairLesson?: string }).repairLesson;
-    if (r) lessons.add(r);
-  }
-  const effLines = (effs: Effect[] | undefined, w: Where): void => (effs ?? []).forEach((e, i) => line(e.line, sub(w, i, 'line')));
-  const starts = (effs: Effect[] | undefined): boolean => (effs ?? []).some((e) => e.startLesson !== undefined && lessons.has(e.startLesson));
-  for (const [id, def] of ctx.dialogues) {
-    const nodes = Object.entries(def.value.nodes);
-    if (!nodes.some(([, n]) => (n.lesson !== undefined && lessons.has(n.lesson)) || starts(n.do) || (n.choices ?? []).some((c) => starts(c.do)))) continue;
-    for (const [key, n] of nodes) {
+  const dialogues = new Set<string>([FIRST_DAY.plotDialogue]);
+  const effLines = (effs: Effect[] | undefined, w: Where): void =>
+    (effs ?? []).forEach((e, i) => {
+      line(e.line, sub(w, i, 'line'));
+      if (e.startDialogue) dialogues.add(e.startDialogue);
+    });
+  (director?.beats ?? []).forEach((b, i) => {
+    if (b.slot !== 'day1') return;
+    const bw = sub(dw, 'beats', i);
+    line(b.line, sub(bw, 'line'));
+    effLines(b.do, sub(bw, 'do'));
+  });
+  for (const id of dialogues) {
+    const def = ctx.dialogues.get(id);
+    if (!def) continue;
+    for (const [key, n] of Object.entries(def.value.nodes)) {
       const nw = sub(def, 'nodes', key);
       if (n.todo === true && !seen.has(`${id}.${key}`)) {
         seen.add(`${id}.${key}`);
@@ -1126,7 +1130,7 @@ function firstDayTodos(ctx: Ctx, director: Director | undefined): { id: string; 
       }
       line(n.line, sub(nw, 'line'));
       effLines(n.do, sub(nw, 'do'));
-      (n.choices ?? []).forEach((c, i) => effLines(c.do, sub(nw, 'choices', i, 'do')));
+      (n.choices ?? []).forEach((c, j) => effLines(c.do, sub(nw, 'choices', j, 'do')));
     }
   }
   return out;
