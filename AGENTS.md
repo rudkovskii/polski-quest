@@ -190,7 +190,7 @@
 - Бит без `npc/object/plot/screen` и без `act` играется сам, как только Дима на его карте (`isAutoBeat`, flow.ts); у бита с `act`
   своё действие в `src/flow.ts` (`day1`): `card`, `fotobudka` (openCreator), `sound` (флаги `d01.sound.on|mute` → настройка
   `sound.mode`), `bazar` (плитки, паспорт, печать — `ui/intro.ts`), `water`, `brzechwa` (урок `ch01.d01.brzechwa` по чанку на
-  слово: `play.openLesson(id, { item })`, семя `seed.<item>` до чанка), `plant` (руками), `sleep` (итог карточкой `SummaryView`, ночь).
+  слово: `play.openLesson(id, { item })`, семя `seed.<item>` до чанка), `plant` (руками), `sleep` (общий итог дня, ночь — P-10b).
 - Реплики, которые показывает код, — константа `D01` (director.ts); они и всё, что в `do` битов `day1` и их диалогах, входят в
   проверку `validate:release` / `build:release` (`todo` в дне 1 = ошибка). Заглушки дней 2+ сюда не входят.
 - Карты дня 1: `ch01.dworzec`, `ch01.peron`, `ch01.bazar` (улица + базар), `ch01.wisla`, `ch01.chatka` (хатка) + `ch01.dzialka`.
@@ -214,8 +214,8 @@
 - Шаги урока на сегодня: `lessonForToday` (play.ts) — type/dictation до клавиатуры и shadow до дня 4 не играются;
   без звука — listen/dictation только с `tr` (шаг) или `vocab.tr`, пары — «какое слово значит …».
 - Без звука: настройка `sound.mode: 'on' | 'off'` — один ключ: выбор на перроне в день 1 (P-05, флаги `d01.sound.on|mute` →
-  `applySound` в flow.ts) и переключатель в настройках; старые значения `sound`/`mute` читаются как `on`/`off` (`getSetting`). `derive` выкидывает карточки
-  `lis`; упражнения получают `ctx.silent`; реплика `<id>.mute` подменяет `<id>` (`lineFor`, `muteLines`).
+  `applySound` в flow.ts) и переключатель в настройках; старые значения `sound`/`mute` читаются как `on`/`off` (`getSetting`). Карточки `lis`
+  остаются (P-10b: чтение транскрипции засчитывается в них); упражнения получают `ctx.silent`; реплика `<id>.mute` подменяет `<id>` (`lineFor`, `muteLines`).
 - Диагностика `ch01.s00`: 12 пунктов, `ctx.oneShot` (ошибка → правило и «Hyk!», без повтора), «Wyjdź» в шапке:
   выход после ответа пишет `diag` + `lesson` по отвеченному, непроверенные кластеры `unknown` → ремонт полной сценой.
   Карта звуков — `src/ui/soundMap.ts` сразу после (play.ts) и страница паспорта.
@@ -228,8 +228,8 @@
 - День 1 целиком P-05: `firstDay()` идёт по битам слота `day1`, пока нет `beat.first_day_done`; расписание P-06 в нём не
   участвует (`systemState` для записей дня 1 — `open`, системы дней 2+ — `closed`, т.к. `storyDay` = 1). Флаг ставит сон
   дня 1 (`sleepFlow`), со следующего календарного дня `storyDay` = 2 и шаги ведут правила 2–10 с расписанием P-06.
-- Итог дня 1 — своя карточка (`SummaryView`, flow.ts: `d01.ui.summary`, `.umiem`, крючок из `director.days[day 1].hook`),
-  только «Dobranoc». Дни 2+ — `summaryBody` с репликами `director.days[N].sleep` и крючком `.hook`; «ещё 3 минуты» с дня 7.
+- Итог дня — один для всех дней (P-10b): `summaryBody` с репликами `director.days[N].sleep` (`[]` — без Казика), `.umiem`
+  и крючком `.hook`; «ещё 3 минуты» с дня 7.
 - Схема `director`: биты со слотами `start/afterWater/afterScene/beforeSleep` (дни 2+, поле `system`) и `day1` (поле `act`);
   `schedule`, `days` (включая день 1), атом условия `gameDay`.
 
@@ -277,3 +277,19 @@
 - Dev: `/?dev=lesson&dlg=dlg.ch01.bramka&mute=1` (с `dlg` без `id` теперь берётся `content/`, а не фикстура),
   демо всех коробок `dlg=dlg.dev.p07` (`src/dev/p07.ts`), `&learn=dlg` (или `lx.a,lx.b`) — слова диалога «выучены»
   (intro + rev, интервал 3 дня), `&days=10` — подпись знакомых строк скрыта.
+
+## Один конец дня, правдивый итог, без звука (P-10b)
+- Сон только в хатке Казика (`ch01.chatka`, постель `poslanie`): день 1 — бит `d01.sen`, дни 2+ — правило 9 режиссёра
+  (`FIRST_DAY.chatka/sleepObject`). Альтанка на działce — декор, `open: summary` в картах не ставить; `ui:screen:open summary`
+  ничего не открывает, обход сон не предлагает. `flow.sleepFlow`: итог → `runNight({ dark })` каждый день (день 1 — «miau» и
+  Казик, дни 2+ — «miau»), день 1 ещё ставит `beat.first_day_done` и экран ссылки.
+- Итог (`daySummary.ts`): полито = растения (`DaySummary.plants`, как «Obchód (N)»), выросло — по виду на грядке
+  (`garden.plantLook`: маленький/крепкий росток, куст, банка), посажено, «Umiem» дня, «Минуты в заданиях» (`retrievalMs`, ТЗ),
+  «Всего в игре» (сессии дня + таймер), завтра к поливу — растения. «Повторено из нужного» и złoty убраны.
+- Паспорт: печать №1 — «Bazar» (Bazar Różyckiego), «Умею» по `canDo[].when` из module.json (нет `when` — по боссу).
+- Новые слова: день 2 — урок `ch01.d02.znaki` (wejście, wyjście, peron) узлом в `dlg.ch01.peron`; день 3 — киоск `ch01.s01`
+  (woda, kawa, herbata) без `skipIf`: зелёный R1 → разминка `short`. Сцена — не больше 3 новых слов.
+- Без звука: `lis` и `pair` в обходе/вечере — чтением (транскрипция / перевод пары), ответ пишется в карточку; ▶ нигде нет
+  (`ctx.silent`, `DialogDeps.silent`, `IntroDeps.silent`), «Pip!/Hyk!» турникета заменяет обычный текстовый отклик.
+- Варианты в диалогах: русская подпись видна сразу (`choiceRuShown`): служебные ответы всегда, с проверкой — до дня 7 и пока
+  слова не знакомы, потом по P-07 за «?».
