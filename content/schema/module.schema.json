@@ -24,7 +24,11 @@
         "additionalProperties": false,
         "properties": {
           "id": { "type": "string" },
-          "ru": { "type": "string" }
+          "ru": { "type": "string" },
+          "when": {
+            "$ref": "common.schema.json#/$defs/cond",
+            "description": "P-10b: когда пункт «Умею» засчитан (сцены главы). Нет — когда сдан босс главы."
+          }
         }
       }
     },

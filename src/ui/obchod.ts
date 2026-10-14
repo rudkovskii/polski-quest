@@ -7,7 +7,7 @@ import type { Bus } from '../systems/bus';
 import { derive, deriveContent, type Derived } from '../systems/derive';
 import { gardenItems, type GardenItem, type PlantStage } from '../systems/garden';
 import type { EventDraft, Seg } from '../systems/log';
-import { budget, dayState, planRound, retrievalSince } from '../systems/session';
+import { dayState, planRound, retrievalSince } from '../systems/session';
 import { parseCardId } from '../systems/srs';
 import type { BusEvents } from '../types/bus';
 import type { Content } from '../systems/content';
@@ -57,8 +57,6 @@ export interface ObchodResult {
   empty: boolean;
   /** Сколько растений ещё ждут полива сегодня (с «!»). */
   left: number;
-  /** Игрок попросил сон (мягкий потолок сессии). */
-  sleep?: boolean;
   /** Ещё раунд: следующий вызов сделает склейка. */
   again?: boolean;
 }
@@ -234,13 +232,8 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
     const startTs = clock.now();
     let answered = 0;
     let correct = 0;
-    let stoppedForSleep = false;
     for (let i = 0; i < plan.cards.length; i++) {
       if (express && clock.mono() - startMono >= plan.maxMs) break;
-      if (!express && i > 0 && deps.activeMs && budget(deps.activeMs(), t).softCap) {
-        stoppedForSleep = true;
-        break;
-      }
       const card = plan.cards[i]!;
       const step = cardStep(card, content);
       if (!step) continue;
@@ -287,11 +280,10 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
       return { answered, correct, empty: false, left };
     }
     const ds = dayState(d1, t);
-    const sleepy = stoppedForSleep || (deps.activeMs ? budget(deps.activeMs(), t).softCap : false);
-    const actions: { act: 'more' | 'ok' | 'sleep'; label: PlLabel; primary?: boolean }[] = [];
-    if (sleepy) actions.push({ act: 'sleep', label: BTN.sleep, primary: true });
-    if (left > 0) actions.push({ act: 'more', label: BTN.round, primary: !sleepy });
-    actions.push({ act: 'ok', label: BTN.done, primary: !sleepy && left === 0 });
+    // P-10b: спать — только в хатке (один конец дня), обход сон не предлагает.
+    const actions: { act: 'more' | 'ok'; label: PlLabel; primary?: boolean }[] = [];
+    if (left > 0) actions.push({ act: 'more', label: BTN.round, primary: true });
+    actions.push({ act: 'ok', label: BTN.done, primary: left === 0 });
     const act = await panel(
       layer,
       { pl: 'Obchód', ru: 'обход грядок' },
@@ -301,12 +293,11 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
         stat('Ещё ждут полива', String(left)),
         // Ошибка на обходе (СЮЖЕТ_v2 d02.kazik.obchod.err): Казик делает вторую зарубку.
         correct < answered ? bobrLine(content, 'd02.kazik.obchod.err') : null,
-        sleepy ? bobrLine(content, 'sys.kazik.sleep') : null,
       ],
       actions,
       'ok',
     );
-    return { answered, correct, empty: false, left, ...(act === 'more' ? { again: true } : {}), ...(act === 'sleep' ? { sleep: true } : {}) };
+    return { answered, correct, empty: false, left, ...(act === 'more' ? { again: true } : {}) };
   } finally {
     layer.close();
   }

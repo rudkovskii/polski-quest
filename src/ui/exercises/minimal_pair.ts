@@ -42,12 +42,14 @@ export const minimal_pair: ExerciseModule<StepMinimalPair> = {
           btn('▶', () => play(), 'icon', { 'aria-label': 'Послушать ещё раз', 'data-nav': true, 'data-audio': 'play' }),
           btn('медленно', () => play(true), 'icon ghost', { 'data-nav': true, 'data-audio': 'slow' }),
         ];
+    // Без звука по переводу или транскрипции (P-10b) — чтение пары: карточка `pair` пишется и не пропадает.
+    const reading = !sameDiff && ctx.silent === true && (!!meaning || !!step.tr);
     const run = runGraded<number>(ctx, {
       kind: 'minimal_pair',
       head,
       body: opts.box,
       instant: true,
-      noAudio,
+      noAudio: noAudio && !reading,
       read: () => opts.picked,
       check: (i) => (i === answer ? { verdict: 'exact', score: 1, tags: [] } : { verdict: 'wrong', score: 0, tags: [...(step.tags ?? [step.cluster])] }),
       correct: () => (sameDiff ? `${labels[answer]}: ${words.join(' … ')}` : (step.pair[target] ?? '')),

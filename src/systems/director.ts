@@ -111,8 +111,13 @@ export const FIRST_DAY = {
   /** Урок у забора (d01.s7): три чанка «угадай → услышь → выбери», каждое слово — семя в карман. */
   plotLesson: 'ch01.d01.brzechwa',
   plotDialogue: 'dlg.ch01.d01_imie',
-  /** Объекты działki: альтанка (сон), берег Вислы (вечер на звуки). */
-  sleepObject: 'altana_sleep',
+  /**
+   * Сон (P-10b): один конец дня — постель в хатке Казика, каждый день (день 1 — бит `d01.sen`, дни 2+ — правило 9).
+   * Альтанка на działce больше не кладёт спать.
+   */
+  chatka: 'ch01.chatka',
+  sleepObject: 'poslanie',
+  /** Берег Вислы на działce (вечер на звуки). */
   eveningObject: 'ryby',
   /** Пары на первый вечер (§5.0 F5). */
   firstEveningPairs: 3,
@@ -193,9 +198,6 @@ export const D01 = {
   dziekuje: 'd01.brzechwa.plot.2',
   proszeHint: 'd01.kazik.plot.1',
   seeds: 'd01.kazik.plot.2',
-  pierogi: 'd01.kazik.plot.3',
-  pierogi2: 'd01.kazik.plot.4',
-  summary: 'd01.ui.summary',
   summaryUmiem: 'd01.ui.summary.umiem',
   hook: 'd01.ui.hook',
   miau: 'd01.simba.night',
@@ -583,7 +585,7 @@ export function nextStep(i: DirectorInput): DirectorStep {
   if (b3) return withReveal(b3);
 
   // 9. Сон.
-  if (!i.todayDone.sleep) return withReveal({ kind: 'sleep', target: { location: FIRST_DAY.dzialka, object: FIRST_DAY.sleepObject }, ...withLines(today?.sleep, LINES.sleep), reason: '9: альтанка' });
+  if (!i.todayDone.sleep) return withReveal({ kind: 'sleep', target: { location: FIRST_DAY.chatka, object: FIRST_DAY.sleepObject }, ...withLines(today?.sleep, LINES.sleep), reason: '9: хатка' });
 
   // 10. До завтра + «ещё 3 минуты».
   return withReveal(doneStep(i));

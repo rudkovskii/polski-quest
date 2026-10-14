@@ -205,7 +205,9 @@ describe('варианты уроков (§3.5, §4.3): requires / skipIf / shor
     const cl = content.phonetics.clusters;
     for (const l of repairs) {
       const c = cl.find((x) => x.repairLesson === l.id)!.id;
-      for (const st of ['green', 'yellow', 'red'] as const) expect([l.id, st, lessonVariant(l, withStatus({ [c]: st }))]).toEqual([l.id, st, repairVariant(st)]);
+      // P-10b: s01 (киоск дня 3, новые слова woda/kawa/herbata) при зелёном R1 — разминка short, а не пропуск.
+      const want = (st: 'green' | 'yellow' | 'red'): string => (l.id === 'ch01.s01' && st === 'green' ? 'short' : repairVariant(st));
+      for (const st of ['green', 'yellow', 'red'] as const) expect([l.id, st, lessonVariant(l, withStatus({ [c]: st }))]).toEqual([l.id, st, want(st)]);
       // Диагностику прервали до пункта кластера: ремонт проверит его целиком.
       expect([l.id, lessonVariant(l, withStatus({ [c]: 'unknown' }))]).toEqual([l.id, 'full']);
     }

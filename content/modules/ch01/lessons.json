@@ -43,10 +43,12 @@
     "npc": "brzechwa",
     "location": "ch01.metro",
     "errLine": "d03.brzechwa.kiosk.err",
-    "introduces": ["lx.woda", "lx.kawa"],
+    "introduces": ["lx.woda", "lx.kawa", "lx.herbata"],
     "requires": { "all": [{ "lessonDone": "ch01.s00" }, { "gameDay": { "min": 3 } }] },
-    "skipIf": { "cluster": { "id": "R1", "status": "green" } },
-    "short": { "if": { "cluster": { "id": "R1", "status": "yellow" } }, "steps": [0, 4, 7, 11, 12, 15] },
+    "short": {
+      "if": { "any": [{ "cluster": { "id": "R1", "status": "yellow" } }, { "cluster": { "id": "R1", "status": "green" } }] },
+      "steps": [0, 5, 7, 8, 11, 12, 13, 14, 15]
+    },
     "steps": [
       {
         "t": "explain",
@@ -112,6 +114,16 @@
         "errorTagByOption": { "1": "ph.vowel_o", "2": "R6" }
       },
       { "t": "choice", "q": "kawa — это…", "options": ["кофе", "какао", "квас"], "answer": 0, "item": "lx.kawa", "dir": "pl-ru" },
+      { "t": "say", "who": "brzechwa", "pl": "Herbata?", "ru": "[хэрба́та] Чай?", "item": "lx.herbata" },
+      {
+        "t": "choice",
+        "q": "herbata — это…",
+        "options": ["чай", "кофе", "вода"],
+        "answer": 0,
+        "item": "lx.herbata",
+        "dir": "pl-ru",
+        "why": "Herbata [хэрба́та]: чай. Kawa: кофе. Woda: вода."
+      },
       {
         "t": "stress",
         "word": "informacja",
@@ -1552,6 +1564,32 @@
       { "t": "choice", "q": "Brzechwa: «Dziękuję!» Что ответить?", "options": ["Proszę", "Dziękuję"], "answer": 0, "item": "lx.prosze", "why": "На «dziękuję» отвечают «proszę»." },
       { "t": "choice", "q": "«Cześć» здесь это…", "options": ["Пока", "Спасибо"], "answer": 0, "item": "lx.czesc", "why": "Cześć: и «привет», и «пока». Так говорят на «ты»." },
       { "t": "say", "who": "brzechwa", "pl": "Cześć!", "ru": "[чещчь] Пока! И «привет» тоже.", "item": "lx.czesc" }
+    ]
+  },
+  {
+    "id": "ch01.d02.znaki",
+    "kind": "practice",
+    "title": { "pl": "Wejście, wyjście, peron", "ru": "Вывески метро: три слова" },
+    "minutes": 2,
+    "npc": "brzechwa",
+    "location": "ch01.metro",
+    "introduces": ["lx.wejscie", "lx.wyjscie", "lx.peron"],
+    "steps": [
+      { "t": "say", "who": "brzechwa", "pl": "Wejście.", "ru": "[вэ́йщче] Вход.", "item": "lx.wejscie" },
+      { "t": "choice", "q": "WEJŚCIE — это…", "options": ["Вход", "Выход"], "answer": 0, "item": "lx.wejscie", "why": "Wejście [вэ́йщче]: вход. Входят тут." },
+      { "t": "say", "who": "brzechwa", "pl": "Wyjście.", "ru": "[вы́йщче] Выход.", "item": "lx.wyjscie" },
+      {
+        "t": "listen",
+        "say": "Wyjście",
+        "options": ["WYJŚCIE", "WEJŚCIE"],
+        "answer": 0,
+        "show": "sign",
+        "item": "lx.wyjscie",
+        "hint": "Вывеска: какую табличку назвали?",
+        "why": "Wy- [вы]: выход. We- [вэ]: вход."
+      },
+      { "t": "say", "who": "brzechwa", "pl": "Peron.", "ru": "[пэ́рон] Платформа.", "item": "lx.peron" },
+      { "t": "choice", "q": "PERON — это…", "options": ["Платформа", "Касса"], "answer": 0, "item": "lx.peron", "why": "Peron [пэ́рон]: платформа, перрон. Касса: kasa." }
     ]
   },
   {

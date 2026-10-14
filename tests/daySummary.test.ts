@@ -84,12 +84,15 @@ describe('DaySummary', () => {
     const { d, events, store, sessions } = deps(p, now);
     const done = runDaySummary(d);
     await flush(1);
-    expect(stat('watered')).toBe('1 из 2');
-    expect(stat('coverage')).toBe('2 из 4'); // + kawa#lis и stol#rec ещё due
-    expect(stat('grew')).toBe('0'); // kawa: росток 1 → росток 3, стадия та же
+    // P-10b: «Полито» = растений (kawa и stół), как на кнопке Obchód; «Повторено из нужного» и złoty убраны.
+    expect(stat('watered')).toBe('2');
+    expect(host.querySelector('[data-stat="coverage"]')).toBeNull();
+    expect(host.querySelector('[data-stat="zloty"]')).toBeNull();
+    expect(stat('grew')).toBe('1'); // kawa: маленький росток (1 день) → крепкий (3 дня) — на грядке видно
+    expect(panelText()).toContain('kawa: росток → крепкий росток');
     expect(stat('planted')).toBe('1');
-    expect(stat('zloty')).toBe('—');
     expect(stat('retrieval')).toBe('2 мин');
+    expect(stat('active')).toBe('7 мин');
     expect(panelText()).toContain('mały');
     act(host, 'sleep').click();
     expect(await done).toBe('sleep');
@@ -271,15 +274,18 @@ describe('обход и экспресс в оверлее', () => {
     expect(events.find((e) => e.k === 'seg')).toMatchObject({ seg: 'more3' });
   });
 
-  it('мягкий потолок сессии: после 15 активных минут раунд останавливается и предлагает сон', async () => {
+  it('P-10b: обход сон не предлагает (спать — только в хатке), даже после 15 активных минут раунд идёт до конца', async () => {
     const p = progress([intro('lx.kawa', T0), intro('lx.stol', T0 + 1)]);
     const { d } = deps(p, () => T0 + DAY);
     const run = runObchod({ ...d, activeMs: () => 16 * 60_000 }, { mode: 'day' });
     await answerRight();
+    await answerRight();
     await flush(1);
-    expect(host.querySelector('[data-act="sleep"]')).not.toBeNull();
-    act(host, 'sleep').click();
-    expect(await run).toMatchObject({ answered: 1, sleep: true });
+    expect(host.querySelector('[data-act="sleep"]')).toBeNull();
+    act(host, 'ok').click();
+    const r = await run;
+    expect(r).toMatchObject({ answered: 2 });
+    expect(r).not.toHaveProperty('sleep');
   });
 });
 
@@ -391,7 +397,7 @@ describe('P-01: итог дня по сценарию плейтеста Анд�
 
     const sum = runDaySummary({ overlay: createOverlay(host, { bus }), content, store, bus, clock: { now: () => day + 20 * 60_000, mono: () => 0 }, tz: TZ });
     await flush(1);
-    expect(stat('watered')).toBe('1 из 1');
+    expect(stat('watered')).toBe('1'); // P-10b: одно растение (ранний полив «kawa»)
     expect(stat('retrieval')).toBe('10 мин'); // 1 + 0,3 + 9
     expect(stat('planted')).toBe('1');
     act(host, 'sleep').click();

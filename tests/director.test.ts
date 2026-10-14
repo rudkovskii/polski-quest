@@ -20,6 +20,7 @@ import {
   type LocalResume,
   LINES,
   LINES_MORE,
+  waterable,
 } from '../src/systems/director';
 import type { EventDraft } from '../src/systems/log';
 import { append, newProgress, setFlag, setSetting, type Progress } from '../src/systems/progress';
@@ -89,7 +90,10 @@ describe('константы режиссёра ссылаются на суще
   it('карты, объекты, урок вступления, слово', () => {
     const dz = content.maps.get(FIRST_DAY.dzialka)!.value;
     expect(content.maps.get(FIRST_DAY.metro)).toBeTruthy();
-    for (const id of [FIRST_DAY.sleepObject, FIRST_DAY.eveningObject, FIRST_DAY.plot, 'skrzynka']) expect(dz.objects.some((o) => 'id' in o && o.id === id)).toBe(true);
+    for (const id of [FIRST_DAY.eveningObject, FIRST_DAY.plot, 'skrzynka']) expect(dz.objects.some((o) => 'id' in o && o.id === id)).toBe(true);
+    // P-10b: спать только в хатке Казика — постель там, альтанка на działce не кладёт спать.
+    expect(content.maps.get(FIRST_DAY.chatka)!.value.objects.some((o) => 'id' in o && o.id === FIRST_DAY.sleepObject)).toBe(true);
+    expect(dz.objects.some((o) => 'id' in o && o.id === 'altana_sleep')).toBe(false);
     expect(content.lessons.get(FIRST_DAY.introLesson)?.value.introduces).toEqual([FIRST_DAY.introItem]);
     expect(content.vocab.get(FIRST_DAY.introItem)?.value.pl).toBe('Dzień dobry');
   });
@@ -486,7 +490,7 @@ describe('правила 5–10 обычного дня', () => {
   });
   it('8 → 9 → 10: альтанка, до завтра', () => {
     const w = day2().add(seg('water', at(0, 10.2)), seg('scene', at(0, 10.4)));
-    expect(w.step(at(0, 10.7))).toMatchObject({ kind: 'sleep', line: 'd02.kazik.hut.1', target: { object: 'altana_sleep' } });
+    expect(w.step(at(0, 10.7))).toMatchObject({ kind: 'sleep', line: 'd02.kazik.hut.1', target: { location: 'ch01.chatka', object: 'poslanie' } });
     w.add(seg('sleep', at(0, 10.8)));
     const done = w.step(at(0, 10.9));
     expect(done).toMatchObject({ kind: 'done', line: 'sys.kazik.done' });
@@ -518,12 +522,19 @@ describe('раскрытие HUD и детерминизм', () => {
   });
 });
 
-describe('режим без звука (P-06): карточки на слух не просрочиваются', () => {
-  it('sound.mode off → lis-карточек нет в выводе, полив их не зовёт', () => {
+describe('режим без звука (P-10b): карточки на слух не пропадают', () => {
+  it('sound.mode off → lis-карточки на месте, растения с «!» те же; туда и обратно ничего не теряется', () => {
     const w = afterDay1();
-    const lis = (p: Progress): number => Object.keys(directorInput(p, content, at(0), { tz: TZ }).derived.cards).filter((c) => c.endsWith('#lis')).length;
-    expect(lis(w.p)).toBeGreaterThan(0);
-    w.p = setSetting(w.p, 'sound.mode', 'off', at(-1));
-    expect(lis(w.p)).toBe(0);
+    const input = (p: Progress) => directorInput(p, content, at(0, 10), { tz: TZ });
+    const lis = (p: Progress): number => Object.keys(input(p).derived.cards).filter((c) => c.endsWith('#lis')).length;
+    const n = lis(w.p);
+    const due = waterable(input(w.p));
+    expect(n).toBeGreaterThan(0);
+    const off = setSetting(w.p, 'sound.mode', 'off', at(-1));
+    expect(lis(off)).toBe(n);
+    expect(waterable(input(off))).toBe(due);
+    const on = setSetting(off, 'sound.mode', 'on', at(-1, 1));
+    expect(lis(on)).toBe(n);
+    expect(waterable(input(on))).toBe(due);
   });
 });

@@ -44,6 +44,20 @@ export function stageRank(s: PlantStage): number {
   return STAGE_RANK[s];
 }
 
+/**
+ * Как растение выглядит на грядке (P-10b): стадия, где росток делится на маленький и большой (interval ≥
+ * SPROUT_BIG_FROM, кадр сцены Location). «Выросло» в итоге дня считается по виду: что игрок видел, то и выросло.
+ */
+export type PlantLook = PlantStage | 'sprout_big';
+export function plantLook(rec: Pick<CardState, 'reps' | 'interval' | 'maxInterval'> | undefined, t?: GardenTuning): PlantLook {
+  const s = plantStage(rec, t);
+  return s === 'sprout' && rec && rec.interval >= SPROUT_BIG_FROM ? 'sprout_big' : s;
+}
+const LOOK_RANK: Record<PlantLook, number> = { seed: 0, sprout: 1, sprout_big: 2, bush: 3, jar: 4 };
+export function lookRank(s: PlantLook): number {
+  return LOOK_RANK[s];
+}
+
 /** Стадия банки по maxInterval (§4.10): 35 młody, 90 dojrzały, 180 stary; ниже порога банки нет. */
 export function jarStage(maxInterval: number, t?: GardenTuning): JarStage | null {
   const [a = 35, b = 90, c = 180] = t?.jars.thresholds ?? [];

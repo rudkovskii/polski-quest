@@ -1,8 +1,9 @@
 // DaySummary «Сон» (ТЗ §5.9), I-12: итог игрового дня из журнала (systems/session.ts → summarizeDay).
-// Показывает: полито (только обход и экспресс, включая ранний полив первого дня) и покрытие, что выросло и созрело, посажено, złoty (заглушка до I-18), минуты
-// вспоминания (уроки и диагностика целиком + ответы вне уроков), сколько ждёт полива завтра. «Dobranoc» пишет `session {mode: 'day'}` и `seg: sleep`;
-// маленькая ссылка «ещё 3 минуты повторений» → экспресс (seg `more3`, пишет обход). Пустой день →
-// «Сегодня ещё ничего, полей хоть пару грядок?» и кнопка экспресса. Крючок (реплика следующей сцены) — I-13.
+// P-10b: один итог на день, одни цифры, каждый день (включая день 1) — в хатке Казика перед ночью. Строки:
+// полито (растений, как на кнопке Obchód), выросло (вид на грядке), посажено, «Умею» дня, минуты в заданиях
+// (уроки и диагностика целиком + ответы вне уроков), всего в игре (активное время сессий), завтра к поливу
+// (растений). «Повторено из нужного» и złoty убраны: первое спорило с кнопкой Obchód, второе — заглушка.
+// «Dobranoc» пишет `session {mode: 'day'}` и `seg: sleep`; «ещё 3 минуты» → экспресс (день 7+).
 import type { Bus } from '../systems/bus';
 import type { Content } from '../systems/content';
 import { derive, deriveContent } from '../systems/derive';
@@ -36,20 +37,11 @@ export interface DaySummaryDeps {
   /** У мира есть приватная ссылка (секрет): тогда напоминаем сохранить её, пока чекбокс не отмечен. */
   hasLink?: () => boolean;
   onEvent?(e: LogEvent): void;
-  /** Своя карточка итога (P-05, день 1): строки вместо счётчиков, крючок на завтра, только «Dobranoc». */
-  view?: SummaryView;
-}
-
-/** Итог дня карточкой из реплик (СЮЖЕТ_v2 d01.s8): `lines` — строки итога, `hook` — «Jutro: …», `bobr` — реплика сверху (null — без неё). */
-export interface SummaryView {
-  bobr?: string | null;
-  lines: string[];
-  hook?: string;
 }
 
 export type SummaryOutcome = 'sleep' | 'more3' | 'express' | 'close';
 
-const STAGE_RU = { seed: 'семя', sprout: 'росток', bush: 'куст', jar: 'банка' } as const;
+const STAGE_RU = { seed: 'семя', sprout: 'росток', sprout_big: 'крепкий росток', bush: 'куст', jar: 'банка' } as const;
 
 const css = `
 .pq-sleep { width: min(100% - 16px, 520px); max-height: calc(100% - 24px); overflow-y: auto; margin: auto; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
@@ -59,7 +51,7 @@ const css = `
 .pq-sleep .empty { font-size: 19px; }
 .pq-sleep .row { display: flex; gap: 8px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
 .pq-sleep .more3 { font-size: 16px; text-decoration: underline; min-height: 44px; }
-.pq-sleep .remind { font-size: 16px; color: #8f3e56; }
+.pq-sleep .remind { font-size: 16px; color: #543c52; }
 .pq-sleep .card-line { display: flex; flex-direction: column; gap: 2px; font-size: 20px; font-weight: 700; color: #3a2c38; }
 .pq-sleep .card-line small { font-size: 15px; font-weight: 400; color: #543c52; }
 .pq-sleep .card-line.hook { margin-top: 6px; color: #8f3e56; }
@@ -78,61 +70,71 @@ function ensureStyle(doc: Document): void {
 const stat = (label: string, value: string, key: string): HTMLElement =>
   el('div', { class: 'stat', 'data-stat': key }, el('span', {}, label), el('b', {}, value));
 
-/** Реплики итога по игровому дню (P-06): сон дня (`director.days[].sleep`, иначе sys.kazik.sleep) и крючок на завтра. */
+/** Реплики итога по игровому дню (P-06): сон дня (`director.days[].sleep`, иначе sys.kazik.sleep; `[]` — без реплики), «Умею» дня и крючок на завтра. */
 export interface SummaryLines {
   sleep?: readonly string[];
+  /** «Umiem: …» дня (P-10b: день 1 — здороваться, день 3 — написать «proszę»). */
+  umiem?: readonly string[];
   hook?: string;
 }
 
-/** Тело итога (без кнопок): удобно проверять в тестах. */
-export function summaryBody(s: DaySummary, content: Pick<Content, 'vocab' | 'lines'>, lines: SummaryLines = {}): HTMLElement[] {
+/** Минуты для итога: меньше полуминуты — всё равно «1 мин», если что-то было (ноль выглядит как «ничего не сделал», P-01). */
+export const summaryMin = (ms: number): number => (ms > 0 ? Math.max(1, Math.round(ms / 60_000)) : 0);
+
+/** Строка реплики итога: польская строка и русская подпись под ней. */
+function cardLine(content: Pick<Content, 'lines'>, id: string, cls: string): HTMLElement | null {
+  const l = content.lines.get(id);
+  if (!l || l.todo || (!l.pl && !l.ru)) return null;
+  return el('div', { class: `card-line ${cls}`.trim(), 'data-line': id }, el('span', { lang: 'pl' }, l.pl ?? l.ru ?? ''), l.pl && l.plRu ? el('small', {}, l.plRu) : null);
+}
+
+/**
+ * Тело итога (без кнопок): удобно проверять в тестах. `activeMs` — всё активное время игрового дня (сессии дня +
+ * текущий таймер); нет — строки «Всего в игре» нет.
+ */
+export function summaryBody(s: DaySummary, content: Pick<Content, 'vocab' | 'lines'>, lines: SummaryLines = {}, activeMs?: number): HTMLElement[] {
   const pl = (id: string): string => content.vocab.get(id)?.value.pl ?? id;
   const out: HTMLElement[] = [];
-  for (const id of lines.sleep?.length ? lines.sleep : ['sys.kazik.sleep']) {
+  for (const id of lines.sleep ?? ['sys.kazik.sleep']) {
     const line = bobrLine(content, id);
     if (line) out.push(line);
   }
-  // Крючок на завтра (ПОЛИРОВКА §2 р. 8): «Jutro: list.» и т.п.
-  const hook = lines.hook ? content.lines.get(lines.hook) : undefined;
-  if (hook?.pl && !hook.todo)
-    out.push(el('div', { class: 'hook', 'data-hook': hook.id }, el('b', { lang: 'pl' }, hook.pl), hook.plRu ? el('span', { class: 'ru' }, ` ${hook.plRu}`) : null));
   if (s.empty) {
     out.push(el('div', { class: 'empty', 'data-empty': true }, 'Сегодня ещё ничего, полей хоть пару грядок?'));
-    return out;
+  } else {
+    out.push(stat('Полито', String(s.plants), 'watered'));
+    out.push(stat('Выросло', String(s.grew.length), 'grew'));
+    if (s.grew.length) out.push(el('div', { class: 'list', lang: 'pl' }, s.grew.map((g) => `${pl(g.item)}: ${STAGE_RU[g.from]} → ${STAGE_RU[g.to]}`).join(', ')));
+    if (s.matured.length) {
+      out.push(stat('Созрело (в банку)', String(s.matured.length), 'matured'));
+      out.push(el('div', { class: 'list', lang: 'pl' }, s.matured.map(pl).join(', ')));
+    }
+    out.push(stat('Посажено', String(s.planted.length), 'planted'));
+    if (s.planted.length) out.push(el('div', { class: 'list', lang: 'pl' }, s.planted.map(pl).join(', ')));
+    for (const id of lines.umiem ?? []) {
+      const r = cardLine(content, id, 'umiem');
+      if (r) out.push(r);
+    }
+    // Время в заданиях — то, что считает ТЗ («минуты вспоминания»: уроки, диагностика, обход, вечер); рядом всё время
+    // в игре, чтобы 3 минуты заданий не выглядели враньём при 12 минутах вечера (P-10b).
+    out.push(stat('Минуты в заданиях', `${summaryMin(s.retrievalMs)} мин`, 'retrieval'));
+    if (activeMs !== undefined) out.push(stat('Всего в игре', `${summaryMin(Math.max(activeMs, s.retrievalMs))} мин`, 'active'));
+    out.push(stat('Завтра к поливу', String(s.tomorrowPlants), 'tomorrow'));
   }
-  out.push(stat('Полито', `${s.watered} из ${s.answered}`, 'watered'));
-  out.push(stat('Повторено из нужного', `${s.reviewed} из ${s.wasDue}`, 'coverage'));
-  out.push(stat('Выросло', String(s.grew.length), 'grew'));
-  if (s.grew.length) out.push(el('div', { class: 'list', lang: 'pl' }, s.grew.map((g) => `${pl(g.item)}: ${STAGE_RU[g.from]} → ${STAGE_RU[g.to]}`).join(', ')));
-  out.push(stat('Созрело (в банку)', String(s.matured.length), 'matured'));
-  if (s.matured.length) out.push(el('div', { class: 'list', lang: 'pl' }, s.matured.map(pl).join(', ')));
-  out.push(stat('Посажено', String(s.planted.length), 'planted'));
-  if (s.planted.length) out.push(el('div', { class: 'list', lang: 'pl' }, s.planted.map(pl).join(', ')));
-  out.push(stat('Złoty', s.zloty === null ? '—' : `${s.zloty} zł`, 'zloty'));
-  // Меньше полуминуты — всё равно «1 мин»: игрок работал, ноль выглядит как «ничего не сделал» (P-01).
-  const min = s.retrievalMs > 0 ? Math.max(1, Math.round(s.retrievalMs / 60_000)) : 0;
-  out.push(stat('Минуты вспоминания', `${min} мин`, 'retrieval'));
-  out.push(stat('Завтра к поливу', String(s.tomorrow), 'tomorrow'));
+  // Крючок на завтра (ПОЛИРОВКА §2 р. 8): «Jutro: list.» и т.п. — последней строкой, перед сном.
+  const hook = lines.hook ? cardLine(content, lines.hook, 'hook') : null;
+  if (hook) {
+    hook.dataset['hook'] = lines.hook!;
+    out.push(hook);
+  }
   return out;
 }
 
-/** Тело карточки итога из реплик (день 1). */
-export function summaryCard(v: SummaryView, content: Pick<Content, 'vocab' | 'lines'>): HTMLElement[] {
-  const out: HTMLElement[] = [];
-  const line = v.bobr === null ? null : bobrLine(content, v.bobr ?? 'sys.kazik.sleep');
-  if (line) out.push(line);
-  const row = (id: string, cls: string): HTMLElement | null => {
-    const l = content.lines.get(id);
-    if (!l || l.todo) return null;
-    return el('div', { class: `card-line ${cls}`.trim(), 'data-line': id }, el('span', { lang: 'pl' }, l.pl ?? l.ru ?? ''), l.pl && l.plRu ? el('small', {}, l.plRu) : null);
-  };
-  for (const id of v.lines) {
-    const r = row(id, '');
-    if (r) out.push(r);
-  }
-  const hook = v.hook ? row(v.hook, 'hook') : null;
-  if (hook) out.push(hook);
-  return out;
+/** Активное время игрового дня: сессии `day` с начала дня + текущий таймер склейки. */
+export function activeToday(events: readonly LogEvent[], since: number, current: number): number {
+  let ms = current;
+  for (const e of events) if (e.k === 'session' && e.mode === 'day' && e.ts >= since) ms += e.ms;
+  return ms;
 }
 
 /** Открыть итог дня. Возвращает, чем закончился: сон, «ещё 3 минуты», экспресс (пустой день) или закрыт. */
@@ -145,7 +147,13 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
   const pace = paceCtxOf(content, derive(store.progress, deriveContent(content), now, deps.tz), store.progress.world.flags, deps.tz);
   const dl = dayLines(content.director.days, pace.day);
   const silent = getSetting(store.progress, 'sound.mode') === 'off';
-  const lines: SummaryLines = { ...(dl?.sleep ? { sleep: dl.sleep.map((id) => lineFor(id, silent, content.lines)) } : {}), ...(dl?.hook ? { hook: dl.hook } : {}) };
+  const lines: SummaryLines = {
+    ...(dl?.sleep ? { sleep: dl.sleep.map((id) => lineFor(id, silent, content.lines)) } : {}),
+    ...(dl?.umiem ? { umiem: dl.umiem } : {}),
+    ...(dl?.hook ? { hook: dl.hook } : {}),
+  };
+  const d = derive(store.progress, deriveContent(content), now, deps.tz);
+  const active = deps.activeMs ? activeToday(store.progress.log.events, d.todayStart, deps.activeMs()) : undefined;
   // «Ещё 3 минуты» — экспресс, система дня 7 (P-06): раньше в итоге только сон.
   const express = isOpen('express', pace);
   const layer = deps.overlay.open('pq-sleep-layer');
@@ -171,8 +179,8 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
     };
     const main = plBtn(BTN.dobranoc, dobranoc, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'sleep' });
     const actions: HTMLElement[] = [];
-    if (deps.view || !express) {
-      // день 1 своей карточкой (P-05) — только «Dobranoc»; до дня 7 экспресса нет (P-06)
+    if (!express) {
+      // до дня 7 экспресса нет (P-06): только «Dobranoc»
     } else if (s.empty) actions.push(plBtn(BTN.express, () => finish('express'), '', { 'data-nav': true, 'data-act': 'express' }));
     else actions.push(btn('ещё 3 минуты повторений', () => finish('more3'), 'ghost more3', { 'data-nav': true, 'data-act': 'more3' }));
     actions.push(main);
@@ -191,7 +199,7 @@ export function runDaySummary(deps: DaySummaryDeps): Promise<SummaryOutcome> {
         : null;
 
     layer.el.replaceChildren(
-      el('div', { class: 'pq-wood pq-sleep', 'data-summary': s.day }, el('h2', {}, 'Итог дня'), ...(deps.view ? summaryCard(deps.view, content) : summaryBody(s, content, lines)), remind, el('div', { class: 'row' }, ...actions)),
+      el('div', { class: 'pq-wood pq-sleep', 'data-summary': s.day }, el('h2', {}, 'Итог дня'), ...summaryBody(s, content, lines, active), remind, el('div', { class: 'row' }, ...actions)),
     );
     layer.handle({ cancel: () => (finish('close'), true) });
     queueMicrotask(() => main.focus({ preventScroll: true }));

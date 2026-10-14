@@ -152,13 +152,19 @@ describe('итог дня (§5.9)', () => {
     ]);
     const s = summarizeDay(p, dc, dz(0, 13), TZ);
     expect(s).toMatchObject({ day: '2026-10-05', answered: 3, watered: 2, reviewed: 3, planted: ['lx.chleb'], zloty: null, counted: true, empty: false });
-    expect(s.grew).toEqual([{ item: 'lx.stol', from: 'sprout', to: 'bush' }]);
+    // P-10b: «выросло» — по виду на грядке: kawa маленький росток → крепкий (1 → 3 дня), stół крепкий росток → куст.
+    expect(s.grew).toEqual([
+      { item: 'lx.kawa', from: 'sprout', to: 'sprout_big' },
+      { item: 'lx.stol', from: 'sprout_big', to: 'bush' },
+    ]);
+    expect(s.plants).toBe(3); // полито растений: kawa, stół, mały (как на кнопке Obchód)
     expect(s.matured).toEqual([]);
     expect(s.wasDue).toBe(5); // + ещё due: lx.kawa#lis и lx.maly#pro (открылась при импорте reps 4)
     expect(s.retrievalMs).toBe(12_000);
     // Завтра: kawa#lis и maly#pro (долг), maly#rec (g 0 → due сейчас), lx.chleb rec+lis,
     // stol#pro (открылась сегодня при reps 3, due завтра).
     expect(s.tomorrow).toBe(6);
+    expect(s.tomorrowPlants).toBe(4); // kawa, mały, chleb, stół
   });
 
   it('созрело: куст 16 → банка при верном ответе', () => {

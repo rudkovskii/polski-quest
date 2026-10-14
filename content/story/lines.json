@@ -310,6 +310,7 @@
   { "id": "d03.kazik.keyboard.3", "who": "bobr", "ru": "В конце ę с хвостиком. Хвостик зовут ogonek." },
   { "id": "d03.kazik.evening.3", "who": "bobr", "pl": "Proszę! Dobra tabliczka.", "plRu": "Прошу! Хорошая табличка." },
   { "id": "d03.kazik.hut.1", "who": "bobr", "ru": "Первая свая с табличкой. Мосту три дня, а уже вежливый." },
+  { "id": "d03.ui.summary.umiem", "who": "narrator", "pl": "Umiem: napisać „proszę”", "plRu": "Умею: написать «proszę»", "words": ["lx.prosze"] },
   { "id": "d03.ui.hook", "who": "narrator", "pl": "Jutro: powtórz!", "plRu": "Завтра: повтори!" },
   {
     "id": "idle.kazik.1",

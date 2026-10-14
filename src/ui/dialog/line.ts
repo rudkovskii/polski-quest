@@ -39,6 +39,8 @@ export interface LineOpts {
   typeMs?: number;
   /** Озвучить сразу при показе. */
   autoplay?: boolean;
+  /** Режим без звука (P-10b): ни ▶, ни «🔇», ни автозвука. */
+  silent?: boolean;
   style?: LineStyle;
   words?: WordPort | null;
   /** Разметка `words` строки (P-07). */
@@ -109,14 +111,14 @@ export function lineBox(o: LineOpts): LineView {
   const rusEl = el('div', { class: 'pq-line-rus', lang: 'ru', 'data-role': 'rus' });
   const pageEl = el('span', { class: 'pq-line-page', 'aria-hidden': 'true' });
   const ruBtn = hasRu ? btn('?', () => showRu(), 'icon ghost pq-line-q', { 'data-nav': true, 'data-act': 'ru', 'aria-label': 'Перевод', hidden: true }) : null;
-  const canPlay = !!o.pl && !o.todo && o.audio.has(o.pl);
+  const canPlay = !o.silent && !!o.pl && !o.todo && o.audio.has(o.pl);
   const plAudio = canPlay ? audioButtons(o.audio, o.pl!, o.speaker.id) : [];
   const tools = el(
     'div',
     { class: 'pq-line-tools' },
     ...plAudio,
     ruBtn,
-    !canPlay && o.pl && !o.todo ? el('span', { class: 'pq-noaudio' }, '🔇') : null,
+    !canPlay && !o.silent && o.pl && !o.todo ? el('span', { class: 'pq-noaudio' }, '🔇') : null,
     pageEl,
   );
   const pop = el('div', { class: 'pq-wpop pq-wood', role: 'status', hidden: true });
@@ -248,7 +250,7 @@ export function lineBox(o: LineOpts): LineView {
       ? [el('b', { lang: 'pl' }, v.pl), v.tr ? el('span', { class: 'tr' }, `[${v.tr}]`) : null, el('span', { class: 'ru', lang: 'ru' }, v.ru)]
       : [el('b', { lang: 'pl' }, w.dataset.word ?? w.textContent ?? ''), el('span', { class: 'ru', lang: 'ru' }, whole ? `Вся фраза: ${whole}` : 'Этого слова ещё нет в словаре')];
     pop.replaceChildren(...rows.filter((x): x is Node | string => x !== null));
-    if (v && o.audio.has(v.pl)) pop.append(btn('▶', () => o.audio.play(v.pl, { who: o.speaker.id }), 'icon', { 'aria-label': 'Послушать слово', 'data-audio': 'word' }));
+    if (v && !o.silent && o.audio.has(v.pl)) pop.append(btn('▶', () => o.audio.play(v.pl, { who: o.speaker.id }), 'icon', { 'aria-label': 'Послушать слово', 'data-audio': 'word' }));
     pop.hidden = false;
     w.classList.add('on');
     // Над словом, в пределах коробки (в тестах раскладки нет — остаётся по CSS).

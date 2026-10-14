@@ -47,6 +47,7 @@
   "say:Zosia|normal|Dziękuję. Proszę. Są.": "8bd247deeae7.m4a",
   "say:Zosia|normal|Hej! Uwaga, drzwi!": "e117bf3f41cd.m4a",
   "say:Zosia|normal|Herbata. Chleb. Ile? Cena. Kraków.": "592909586582.m4a",
+  "say:Zosia|normal|Herbata?": "53be3da66a5b.m4a",
   "say:Zosia|normal|I pieczątka. Gratis.": "74933a96f2b2.m4a",
   "say:Zosia|normal|I pieczątka: Praga.": "a16c42f398ef.m4a",
   "say:Zosia|normal|Informacja": "b4547b087c3f.m4a",
@@ -94,6 +95,7 @@
   "say:Zosia|normal|Pan mieszka na działce? Ciekawe...": "a5f0b15a7962.m4a",
   "say:Zosia|normal|Pan znowu? Dzień dobry!": "e4b824733e7f.m4a",
   "say:Zosia|normal|Pchać": "5eeadbfe3383.m4a",
+  "say:Zosia|normal|Peron.": "9fd7bae5d371.m4a",
   "say:Zosia|normal|Piekarnia": "8dab85996635.m4a",
   "say:Zosia|normal|Po sylabach! Świę-to-krzy-ska.": "8fb58947dfc9.m4a",
   "say:Zosia|normal|Podpis: „K.”. Autor nieznany.": "d5f5a4b8100c.m4a",
@@ -141,9 +143,11 @@
   "say:Zosia|normal|Warszawa? Spoko. Ale Kraków...": "8c64771bc16e.m4a",
   "say:Zosia|normal|Warszawa? Spoko. Kraków lepszy.": "21e6b4b18842.m4a",
   "say:Zosia|normal|Wejście": "be99c8632153.m4a",
+  "say:Zosia|normal|Wejście.": "2df96010bf52.m4a",
   "say:Zosia|normal|Woda. Kawa. Telefon. Teatr. Warszawa.": "02655e8fd898.m4a",
   "say:Zosia|normal|Wyjście": "60c68899a2f5.m4a",
   "say:Zosia|normal|Wyjście jest tam.": "0c0805736521.m4a",
+  "say:Zosia|normal|Wyjście.": "be0857b42cbf.m4a",
   "say:Zosia|normal|ZARAZ WRACAM": "a7c3165e92f5.m4a",
   "say:Zosia|normal|Za darmo nie ma nic. Prawie nic.": "3473b1d5193e.m4a",
   "say:Zosia|normal|Zamknięte": "b40470f195dc.m4a",
@@ -886,6 +890,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "2df96010bf52.m4a": {
+   "dur": 0.85,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "2ea77465478c.m4a": {
    "dur": 2.79,
    "voice": "say:Zosia",
@@ -1248,6 +1257,11 @@
   },
   "536a2da9dc3a.m4a": {
    "dur": 0.58,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "53be3da66a5b.m4a": {
+   "dur": 0.82,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -1966,6 +1980,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "9fd7bae5d371.m4a": {
+   "dur": 0.55,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
   "a090e5210e0c.m4a": {
    "dur": 1.01,
    "voice": "say:Zosia",
@@ -2238,6 +2257,11 @@
   },
   "bd2e14da4326.m4a": {
    "dur": 2.89,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "be0857b42cbf.m4a": {
+   "dur": 0.84,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -2898,6 +2922,26 @@
    "voice": "say:Zosia",
    "slow": false
   },
+  "ch01.d02.znaki#0": {
+   "text": "Wejście.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "ch01.d02.znaki#2": {
+   "text": "Wyjście.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "ch01.d02.znaki#3": {
+   "text": "Wyjście",
+   "voice": "say:Zosia",
+   "slow": true
+  },
+  "ch01.d02.znaki#4": {
+   "text": "Peron.",
+   "voice": "say:Zosia",
+   "slow": false
+  },
   "ch01.dworzec#sign.16_12": {
    "text": "BILETY",
    "voice": "say:Zosia",
@@ -2994,11 +3038,16 @@
    "slow": false
   },
   "ch01.s01#14": {
+   "text": "Herbata?",
+   "voice": "say:Zosia",
+   "slow": false
+  },
+  "ch01.s01#16": {
    "text": "informacja",
    "voice": "say:Zosia",
    "slow": true
   },
-  "ch01.s01#15": {
+  "ch01.s01#17": {
    "text": "Informacja",
    "voice": "say:Zosia",
    "slow": true

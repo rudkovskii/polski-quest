@@ -26,7 +26,7 @@ export interface PassportModel {
   owner: { appearance: Appearance; name: string; fromBooth: boolean };
   /**
    * Первая страница (СЮЖЕТ §2, I-13): выцветшая запись «Dla następnego gościa. - K.» и печать №1
-   * «Warszawa. Praga» за первое «Dzień dobry» (флаг STAMP_FIRST). null — паспорт ещё не найден.
+   * «Bazar Różyckiego» за первое «Dzień dobry» (флаг STAMP_FIRST, P-10b). null — паспорт ещё не найден.
    */
   first: { stamped: boolean; note: string | null } | null;
   pages: PassportPage[];
@@ -43,7 +43,7 @@ export const STAMP_FIRST = 'stamp.first';
  * Условие печати по прогрессу (§3.9, подмножество): always/all/any/not, flag, item, bossPassed, lessonDone.
  * Остальные атомы ложны. Игра передаёт в passportModel полный вычислитель (systems/conditions.ts, I-13).
  */
-export function passportCond(p: Progress, d: Pick<Derived, 'bossResults' | 'lessonsDone'>): (c: Condition) => boolean {
+export function passportCond(p: Progress, d: Pick<Derived, 'bossResults' | 'lessonsDone'> & Partial<Pick<Derived, 'clusterStatus'>>): (c: Condition) => boolean {
   const ev = (c: Condition): boolean => {
     if (c.always) return true;
     if (c.all) return c.all.every(ev);
@@ -53,6 +53,7 @@ export function passportCond(p: Progress, d: Pick<Derived, 'bossResults' | 'less
     if (c.item !== undefined) return c.item in p.world.items;
     if (c.bossPassed !== undefined) return d.bossResults[c.bossPassed]?.passedAt !== undefined;
     if (c.lessonDone !== undefined) return d.lessonsDone.has(c.lessonDone);
+    if (c.cluster !== undefined) return (d.clusterStatus?.[c.cluster.id] ?? 'unknown') === c.cluster.status;
     return false;
   };
   return ev;
@@ -91,14 +92,14 @@ export function passportModel(
       const it = content.items.get(id);
       return { id, title: it?.title.pl ?? id, titleRu: it?.title.ru ?? '' };
     });
-  // can-do главы закрыты, когда сдан её босс (§5.10: «по сданным сценам» — точнее, когда привяжем can-do к сценам).
+  // can-do главы (§5.10, P-10b): пункт засчитан по своим сценам (`when` в module.json), без `when` — когда сдан босс.
   const canDo = [...content.modules.values()]
     .map((b) => b.module)
     .filter((m) => m.kind === 'chapter' && m.canDo?.length)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .flatMap((m) => {
-      const done = m.boss ? d.bossResults[m.boss]?.passedAt !== undefined : false;
-      return (m.canDo ?? []).map((x) => ({ id: x.id, ru: x.ru, done }));
+      const boss = m.boss ? d.bossResults[m.boss]?.passedAt !== undefined : false;
+      return (m.canDo ?? []).map((x) => ({ id: x.id, ru: x.ru, done: x.when ? cond(x.when) : boss }));
     });
   const appearance = appearanceOf(p);
   const sounds = d.clusterStatus ? soundMapModel(content, { clusterStatus: d.clusterStatus }) : null;
@@ -147,8 +148,9 @@ export function openPassport(overlay: Overlay, model: PassportModel): Promise<vo
           ? el(
               'div',
               { class: 'page', 'data-page': 'first', 'data-stamped': String(model.first.stamped) },
-              el('div', { class: `seal ${model.first.stamped ? 'on' : 'off'}`, lang: 'pl' }, model.first.stamped ? 'Praga' : '?'),
-              el('div', {}, model.first.note ? el('i', { lang: 'pl' }, model.first.note) : null, el('div', { class: 'muted', lang: 'pl' }, 'Warszawa. Praga · №1')),
+              // Печать №1 — та, что поставила пани Хеля на базаре (P-10b): «Bazar Różyckiego», а не Praga (её ещё надо заслужить).
+              el('div', { class: `seal ${model.first.stamped ? 'on' : 'off'}`, lang: 'pl', 'data-seal': 'bazar' }, model.first.stamped ? 'Bazar' : '?'),
+              el('div', {}, model.first.note ? el('i', { lang: 'pl' }, model.first.note) : null, el('div', { class: 'muted', lang: 'pl' }, 'Bazar Różyckiego · №1')),
             )
           : null,
         model.sounds ? el('b', { lang: 'pl' }, 'Mapa dźwięków', el('small', { class: 'muted' }, ' · карта звуков')) : null,
@@ -165,7 +167,7 @@ export function openPassport(overlay: Overlay, model: PassportModel): Promise<vo
         model.items.length
           ? el('ul', { 'data-role': 'items' }, ...model.items.map((it) => el('li', { 'data-item': it.id }, '🎫 ', el('b', { lang: 'pl' }, it.title), it.titleRu ? ` — ${it.titleRu}` : '')))
           : el('div', { class: 'muted' }, 'Пока пусто'),
-        model.canDo.length ? el('b', {}, 'Умею') : null,
+        model.canDo.length ? el('b', { 'data-role': 'cando-title' }, `Умею · ${model.canDo.filter((c) => c.done).length} из ${model.canDo.length}`) : null,
         model.canDo.length ? el('ul', { 'data-role': 'cando' }, ...model.canDo.map((c) => el('li', { 'data-cando': c.id, 'data-done': String(c.done) }, c.done ? '✅ ' : '⬜ ', c.ru))) : null,
         el('div', { class: 'pq-ex-actions' }, el('span', { class: 'grow' }), plBtn(BTN.close, close, 'primary', { 'data-primary': true, 'data-nav': true, 'data-act': 'close' })),
       ),

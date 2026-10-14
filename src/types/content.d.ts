@@ -474,6 +474,10 @@ export interface DayLines {
   evening?: LineId[];
   scene?: LineId[];
   sleep?: LineId[];
+  /**
+   * P-10b: строки «Umiem: …» в итоге дня (что игрок сегодня научился делать).
+   */
+  umiem?: LineId[];
   hook?: LineId;
 }
 export interface Line {
@@ -604,6 +608,7 @@ export interface Module {
   canDo?: {
     id: string;
     ru: string;
+    when?: Condition1;
   }[];
   unlock: {
     hard: Condition;
@@ -641,6 +646,67 @@ export interface Module {
     [k: string]: LxId;
   };
   onComplete?: Effects;
+}
+/**
+ * Условие = объект ровно с одним ключом-атомом (ТЗ §3.9).
+ */
+export interface Condition1 {
+  always?: true;
+  /**
+   * @minItems 1
+   */
+  all?: [Condition, ...Condition[]];
+  /**
+   * @minItems 1
+   */
+  any?: [Condition, ...Condition[]];
+  not?: Condition;
+  flag?: Id;
+  item?: ItemId;
+  lessonDone?: Id;
+  bossPassed?: Id;
+  mastery?: {
+    module: ModuleId;
+    level: 'seen' | 'mastered';
+    min: number;
+  };
+  cards?: {
+    minInterval: number;
+    min: number;
+  };
+  cluster?: {
+    id: Cluster;
+    status: 'green' | 'yellow' | 'red' | 'unknown';
+  };
+  daysPlayed?: number;
+  dateWindow?: {
+    from: string;
+    to: string;
+  };
+  /**
+   * @minItems 1
+   */
+  weekday?: [number, ...number[]];
+  stage?: {
+    biome: Id;
+    min: number;
+  };
+  found?: CharId;
+  jars?: {
+    min: number;
+    module?: ModuleId;
+    full?: boolean;
+  };
+  hud?: HudElement;
+  daysSinceLast?: number;
+  stepDone?: 'water' | 'scene' | 'evening' | 'sleep';
+  /**
+   * Номер игрового дня главы (P-06): день 1 длится до флага beat.first_day_done, дальше +1 за каждый засчитанный день. min/max включительно.
+   */
+  gameDay?: {
+    min?: number;
+    max?: number;
+  };
 }
 export interface VocabEntry {
   id: LxId;

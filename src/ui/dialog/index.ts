@@ -9,7 +9,7 @@
 // строка ещё печатается; перевод варианта — по «?» или долгому нажатию.
 import { attachLongPress } from '../../input/press';
 import type { Content } from '../../systems/content';
-import type { CaptionMode } from '../../systems/words';
+import { captionHidden, captionMode, matchWords, type CaptionMode } from '../../systems/words';
 import type { LessonResult } from '../../types/bus';
 import type { Condition, Dialogue, DialogueChoice, DialogueNode, Effect, Line, LineWord } from '../../types/content';
 import { el } from '../dom';
@@ -34,6 +34,10 @@ export interface DialogDeps {
   /** Пауза на реакцию NPC после неверного выбора, мс (тесты: 0). */
   reactMs?: number;
   coarse?: boolean;
+  /** Режим без звука (P-10b): реплики без ▶ и автозвука. */
+  silent?: boolean;
+  /** Игровой день главы (P-10b): до дня 7 у вариантов с проверкой русская подпись видна сразу. */
+  day?: number;
   /** Условие `if` у варианта (ТЗ §3.9). Без вычислителя (до I-17) — всё истинно. */
   cond?(c: Condition): boolean;
   /** Запуск урока узла `lesson` и эффекта `startLesson`. */
@@ -72,6 +76,28 @@ interface Speech {
 
 /** На экране не больше стольких вариантов (research/05 §6б п. 8). */
 export const MAX_CHOICES = 2;
+
+/** До этого игрового дня у вариантов с проверкой русская подпись видна сразу (P-10b), дальше гаснет по P-07. */
+export const CHOICE_RU_UNTIL_DAY = 7;
+
+/**
+ * Подпись варианта видна сразу (P-10b, ПОЛИРОВКА §5 п. 9). Служебный ответ (узел без проверки: «Tak.», «Słucham!»,
+ * «Bez dźwięku») — всегда. Вариант с проверкой — до дня 7 и пока его слова не знакомы по SRS; потом как подпись
+ * реплики (P-07): гаснет, когда все значимые слова знакомы, остаётся «?». Настройка «никогда» — только «?».
+ */
+export function choiceRuShown(
+  c: Pick<DialogueChoice, 'pl' | 'ru' | 'words'>,
+  o: { test: boolean; translations?: CaptionMode | 'tap'; day?: number; words?: WordPort | null },
+): boolean {
+  if (!c.ru) return false;
+  const mode = captionMode(o.translations);
+  if (mode === 'always') return true;
+  if (mode === 'never') return false;
+  if (!o.test || (o.day ?? 1) < CHOICE_RU_UNTIL_DAY || !o.words) return true;
+  const w = o.words;
+  const spans = matchWords(c.pl, w.index, c.words ? { refs: c.words } : {});
+  return !captionHidden('auto', spans, (lx) => w.known(lx), { ...(c.words ? { refs: c.words } : {}), ...(w.ignore ? { ignore: w.ignore } : {}) });
+}
 
 /**
  * Варианты на экран (P-07): выбор с проверкой (есть `ok: false`) перемешан по seed, вкусовой — по порядку
@@ -144,6 +170,7 @@ function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
         words: deps.words ?? null,
         style: styleOf(deps, sp.who),
         ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
+        ...(deps.silent ? { silent: true } : {}),
         autoplay: true,
       });
       view = lv;
@@ -156,14 +183,15 @@ function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
         settled = true;
         resolve(v);
       };
-      const always = deps.translations === 'always';
+      const test = all.some(({ c }) => c.ok === false);
       const next = btn('▼', () => {
         if (lv.advance()) return;
         if (!visible.length) done(-1);
       }, 'icon pq-line-next', { 'aria-label': 'Дальше', 'data-primary': true, 'data-act': 'next' });
       if (visible.length) {
         for (const { c, i } of visible) {
-          const ru = c.ru ? el('small', { class: 'ru', lang: 'ru', hidden: !always }, c.ru) : null;
+          const shown = choiceRuShown(c, { test, ...(deps.translations ? { translations: deps.translations } : {}), ...(deps.day !== undefined ? { day: deps.day } : {}), words: deps.words ?? null });
+          const ru = c.ru ? el('small', { class: 'ru', lang: 'ru', hidden: !shown, 'data-role': 'choice-ru' }, c.ru) : null;
           const reveal = (): void => {
             if (ru) ru.hidden = false;
             // Место «?» остаётся, чтобы кнопка не прыгала под пальцем.
@@ -178,7 +206,7 @@ function speechUi(deps: DialogDeps, layer: Layer, box: HTMLElement) {
             lv.finish();
             done(i);
           }, 'pq-choice', { 'data-nav': true, 'data-choice': String(i) });
-          const q = c.ru && !always ? btn('?', reveal, 'icon ghost pq-choice-q', { 'aria-label': `Перевод: ${c.pl}`, 'data-act': 'choice-ru', 'data-for': String(i) }) : null;
+          const q = c.ru && !shown ? btn('?', reveal, 'icon ghost pq-choice-q', { 'aria-label': `Перевод: ${c.pl}`, 'data-act': 'choice-ru', 'data-for': String(i) }) : null;
           (b as HTMLElement & { pqReveal?: () => void }).pqReveal = reveal;
           choiceBox.append(el('div', { class: 'pq-choice-row' }, q, b));
         }

@@ -182,13 +182,14 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
   // Слова реплик (P-07): словарь строится один раз, «знакомо ли» — по карточкам на момент открытия диалога.
   let wordIndex: WordIndex | null = null;
   const names = new Set([...content.characters.values()].flatMap((c) => tokenize(c.name).filter((t) => t.word && /^\p{Lu}/u.test(t.text)).map((t) => t.text)));
-  const wordPort = (store: PlayStore): { port: WordPort; day: string } => {
+  const wordPort = (store: PlayStore): { port: WordPort; day: string; gameDay: number } => {
     const now = deps.clock?.now() ?? Date.now();
     const d = derive(store.progress, deriveContent(content), now);
     wordIndex ??= buildWordIndex([...content.vocab.values()].map((x) => x.value));
     const vocab = (id: string): VocabEntry | undefined => content.vocab.get(content.renames.get(id) ?? id)?.value;
     return {
       day: d.today,
+      gameDay: paceCtxOf(content, d, store.progress.world.flags).day,
       port: {
         index: wordIndex,
         vocab,
@@ -213,7 +214,9 @@ export function mountPlay(root: HTMLElement, deps: PlayDeps): Play {
       portraits,
       words: w.port,
       seed: w.day,
+      day: w.gameDay,
       translations: getSetting(store.progress, 'translations'),
+      ...(getSetting(store.progress, 'sound.mode') === 'off' ? { silent: true } : {}),
       ...(deps.typeMs !== undefined ? { typeMs: deps.typeMs } : {}),
       ...(deps.coarse !== undefined ? { coarse: deps.coarse } : {}),
       cond: cond(store),

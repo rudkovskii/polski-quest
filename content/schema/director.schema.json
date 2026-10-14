@@ -75,6 +75,11 @@
           "evening": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
           "scene": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
           "sleep": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lineId" } },
+          "umiem": {
+            "type": "array",
+            "description": "P-10b: строки «Umiem: …» в итоге дня (что игрок сегодня научился делать).",
+            "items": { "$ref": "common.schema.json#/$defs/lineId" }
+          },
           "hook": { "$ref": "common.schema.json#/$defs/lineId" }
         }
       }
