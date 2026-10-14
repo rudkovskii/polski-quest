@@ -16,7 +16,8 @@
     "check:layers": "tsx tools/check_layers.ts",
     "check:banned": "tsx tools/check_banned.ts",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run validate && npm run check:layers && npm run check:banned && npm run test && npm run build"
+    "check": "npm run typecheck && npm run validate && npm run check:layers && npm run check:banned && npm run test && npm run build",
+    "sync:smoke": "tsx tools/sync_smoke.ts"
   },
   "dependencies": {
     "idb-keyval": "6.3.0",

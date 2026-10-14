@@ -51,7 +51,7 @@
 - `src/scenes|world/**` ⇄ `src/ui/**`: друг друга не импортируют. `ui` не импортирует `phaser`.
 - `src/input/**`: без `phaser`, `platform/`, `scenes|world`, `ui`; шлёт intents в `bus`. Прямой `keydown`/`pointerdown`
   только в `src/input/` и `src/ui/keyboard/` (сцены, мир, экраны ловит check:banned).
-- Склейка слоёв только в `src/main.ts`.
+- Склейка слоёв только в `src/main.ts` (синк и экраны ссылки вынесены в `src/cloud.ts`, I-06).
 
 ## Контент (ТЗ §3, I-02)
 - Схемы: `content/schema/*.schema.json` (draft 2020-12, `additionalProperties: false`). Поменял схему →
@@ -65,6 +65,12 @@
   тест в `tests/content.test.ts`, вычислитель в `src/systems/conditions.ts`/`effects.ts`.
 - Фикстура для тестов: `tests/fixtures/content-mini/` (модуль `demo`, все типы шагов, бобр и Симба,
   реплики — `todo`-заглушки). Новое правило валидатора = поломка фикстуры в тесте.
+
+## Синк (ТЗ §6, I-06)
+- SQL `supabase/001_game_saves.sql` применяет только Шэф по `supabase/README.md`; живая проверка — `npm run sync:smoke`.
+- Слияние только через `merge()` (`src/systems/merge.ts`, чистый). Новое поле в `Progress` = правило слияния
+  в `merge.ts` + поле в генераторе `tests/merge.test.ts` (коммутативность, ассоциативность, идемпотентность).
+- `?dev=1`: устройство пишет в облако с `updated_by = 'test-<deviceId>'`, чистится SQL из README.
 
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.

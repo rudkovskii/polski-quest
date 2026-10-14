@@ -124,6 +124,11 @@ export interface LocalState {
   /** Последний выданный seq событий этого устройства. */
   seq: number;
   secret?: string;
+  /**
+   * Секрет подключён через «У меня есть ссылка» (I-06): при первой встрече с облаком локальный мир
+   * вливается в облачный (worldId облака), а если сейва нет, новый мир под этим секретом не создаётся.
+   */
+  join?: boolean;
   sync: { rev: number; lastSyncAt: Ts | null; lastError: string | null; dirty: boolean };
   position?: { location: string; x: number; y: number };
   resume?: { lessonId: string; stepIndex: number; startedAt: Ts; answers: unknown[] };
