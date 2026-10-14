@@ -316,6 +316,9 @@ export function startFlow(o: FlowOptions): Flow {
     const st = await o.store;
     const fl = `beat.${s.beat}${b?.once === false ? `.${derive(st.progress, deriveContent(content), clock.now()).today.replace(/-/g, '_')}` : ''}`;
     if (fl in st.progress.world.flags) return;
+    // Бит без цели: пузырь раньше флага — иначе реплика следующего шага (полив) встанет в очередь первой.
+    // Повторный вызов до записи флага пузырь не дублирует (guide: одна реплика на ключ).
+    if (!s.target.npc && !s.target.object && s.line) bus.emit('guide:reveal', { element: `beat.${s.beat}`, line: say(s.line) });
     await flag(fl); // сначала флаг: бит не повторится, даже если окно закроют
     await shown(s.system);
     if (s.target.npc || s.target.object) {
@@ -323,8 +326,7 @@ export function startFlow(o: FlowOptions): Flow {
       if (s.do?.length) await play.effects(s.do);
       return;
     }
-    // Без цели: реплики пузырём (и реплики-эффекты тоже, по очереди), остальные эффекты — как обычно.
-    if (s.line) bus.emit('guide:reveal', { element: `beat.${s.beat}`, line: say(s.line) });
+    // Без цели: реплики-эффекты тоже пузырём, по очереди; остальные эффекты — как обычно.
     const rest = (s.do ?? []).filter((e) => {
       if (e.line && Object.keys(e).length === 1) {
         bus.emit('guide:reveal', { element: `beat.${s.beat}`, line: say(e.line) });

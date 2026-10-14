@@ -86,8 +86,8 @@ export function openSoundMap(overlay: Overlay, content: Pick<Content, 'lines' | 
         'div',
         { class: 'pq-wood pq-soundmap', 'data-screen': 'soundmap', ...(o.exited ? { 'data-exited': true } : {}) },
         el('h2', { lang: 'pl' }, 'Mapa dźwięków', el('small', { lang: 'ru' }, 'Карта звуков: зелёное держит, жёлтое шатается, красное подлатаем')),
-        o.exited ? line('d02.brzechwa.bramka.exit') : null,
-        line('d02.brzechwa.result.1'),
+        // Вышли посреди — «Do jutra! Bramka poczeka.» вместо «Brawo! Bramka otwarta!».
+        o.exited ? line('d02.brzechwa.bramka.exit') : line('d02.brzechwa.result.1'),
         soundGrid(dots),
         ...(allGreen ? [line('d02.kazik.result.allgreen')] : [line('d02.kazik.result.1'), line('d02.kazik.result.2')]),
         el('div', { class: 'pq-ex-actions' }, el('span', { class: 'grow' }), ok),
