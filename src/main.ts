@@ -5,6 +5,9 @@ import { Location, type LocationData } from './scenes/Location';
 import { Title } from './scenes/Title';
 import { offlineRpc, startCloud, type CloudOptions } from './cloud';
 import { startFlow } from './flow';
+import { startAvatar } from './avatarGlue';
+import { withAvatarPortraits } from './ui/avatar';
+import { mountCreator } from './ui/creator';
 import { mountGuide } from './ui/guide';
 import { bus } from './systems/bus';
 import { connectAudio } from './systems/platform/audio';
@@ -53,9 +56,12 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
   const store = opts.devStore ?? startCloud({ dev: dev === '1', ...opts.cloud }).then((c) => c.storage);
   // Диалоги и упражнения (I-08): world:interact → оверлей, события журнала → хранилище синка.
   const content = getContent();
-  const portraits = loadPortraits(content);
+  // Внешность из Fotobudka (P-03): `avatar:changed` → текстура `avatar` в мире, голова аватара в портретах.
+  const avatar = startAvatar(store);
+  const portraits = loadPortraits(content).then((src) => withAvatarPortraits(src, avatar.current));
   const playDeps: PlayDeps = { content, store, portraits, clock };
   const play = mountPlay(overlay, playDeps);
+  const creator = mountCreator({ overlay: play.overlay, store, clock });
 
   // Конфигурация из ТЗ §2.4. WorldMap добавится в I-11.
   const game = new Phaser.Game({
@@ -110,11 +116,14 @@ function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
     hasLink: () => !!storeNow && !!storedSecret(storeNow),
   });
   playDeps.claim = (p) => flow.claim(p);
-  if (dev || playDev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game, play, day, store, clock, content, flow, guide };
+  if (dev || playDev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game, play, day, store, clock, content, flow, guide, creator, avatar };
   return game;
 }
 
-if (dev === 'audio') {
+if (dev === 'creator') {
+  // `/?dev=creator&mute=1` (P-03): Fotobudka без мира, прогресс в памяти; после «Gotowe» — паспорт и галерея.
+  void import('./dev/creator').then((m) => m.mountCreatorDev(params));
+} else if (dev === 'audio') {
   // Dev-страница озвучки без Phaser (I-09).
   void import('./dev/audio').then((m) => m.mountAudioDev(document.body));
 } else if (dev === 'input') {

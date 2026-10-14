@@ -146,6 +146,18 @@
   `?dev=play`), повторный запуск `/?dev=play&mute=1`, `&now=+1d` / `&now=+9d` (весна). В `window.__pq.flow.step` —
   шаг и `reason`. Вкладка в фоне почти не рисует кадры (rAF): мир «стоит», пока панель браузера скрыта.
 
+## Аватар и Fotobudka (P-03)
+- Слои `art/avatar/*.sprite.json` (тело, причёски, бороды, очки, верх; 12 кадров и якорь как у `dima`, кадр может быть
+  ссылкой `i` или `{"flip": i}`) + `art/avatar/avatar.json` (варианты, подписи pl/ru, подстановки палитры `base` → `ramp`,
+  пресет `default` = Дима). В атлас не идут: `npm run sprites:check` только проверяет палитру и кадры, лист собирает игра.
+- Чистое: `src/systems/avatar.ts` (`Appearance`, `avatarKey`, `cycle`, `randomAppearance(seed)`, `composeAvatar`),
+  данные — `avatarArt.ts`. Пресет совпадает с `dima` пиксель в пиксель (тест).
+- Хранение: `settings.avatar` (LWW целиком по `at`, merge.ts не менялся). Нет ключа = Fotobudka не пройдена.
+- Склейка `src/avatarGlue.ts` → `avatar:changed`; мир: `playerTextureKey()` (`src/world/avatar.ts`, CanvasTexture `avatar`,
+  фолбэк `dima`); DOM: `src/ui/avatar.ts` (кадр, фото, портрет игрока, атлас вступления).
+- Экран `src/ui/creator.ts`: `openCreator({ mode: 'new' | 'mirror' })` → `ui:creator:show`. Новый мир: `flow.ts` открывает
+  его перед вступлением F1. Фото — `passportModel().owner`. Dev: `/?dev=creator&mute=1[&mode=mirror][&seed=N]`.
+
 ## Как добавить модуль
 1. `content/modules/<id>/`: `module.json`, `vocab.json`, `lessons.json`, `dialogues.json`, `maps/*.json`.
 2. Id: модуль `[a-z0-9_]+`, урок `<module>.<name>`, слово `lx.<slug>` (глобально уникально),

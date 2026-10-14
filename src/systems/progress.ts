@@ -13,6 +13,7 @@ import {
   type RevVerdict,
 } from './log';
 import type { Day, TimeOpts, Ts } from './time';
+import type { Appearance } from './avatar';
 
 export type { Day, Ts } from './time';
 
@@ -91,6 +92,8 @@ export interface SettingsMap {
   'controls.dpad': 'auto' | 'always' | 'never';
   'controls.dpadSide': 'left' | 'right';
   'keyboard.mode': 'auto' | 'full' | 'strip';
+  /** Внешность из Fotobudka (P-03, src/systems/avatar.ts): LWW целиком; null — ещё не выбрана. */
+  avatar: Appearance | null;
 }
 
 export const SETTINGS_DEFAULTS: SettingsMap = {
@@ -105,6 +108,7 @@ export const SETTINGS_DEFAULTS: SettingsMap = {
   'controls.dpad': 'auto',
   'controls.dpadSide': 'left',
   'keyboard.mode': 'auto',
+  avatar: null,
 };
 
 export function getSetting<K extends keyof SettingsMap>(p: Progress, key: K): SettingsMap[K] {

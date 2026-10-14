@@ -1,5 +1,6 @@
 // Полный список событий шины (ТЗ §2.2). Новые события добавлять сюда же.
 import type { DpadSide, MapControls, RoutedIntent, Source } from './input';
+import type { Appearance } from '../systems/avatar';
 
 export type LessonSrc = 'npc' | 'trigger' | 'remedy' | 'map';
 export type ScreenId = 'passport' | 'settings' | 'summary' | 'export' | 'diary' | 'link';
@@ -192,4 +193,12 @@ export interface BusEvents {
   'input:source': { source: Source };
   /** Показать или спрятать d-pad; решает роутер по источнику, устройству и настройке (I-03). */
   'input:dpad': { visible: boolean; side: DpadSide };
+  /**
+   * Fotobudka (P-03): экран создания персонажа. `new` — новый мир перед вступлением, `mirror` — смена
+   * внешности позже (зеркало). `done` — выбор сохранён (null — закрыли без выбора). `opened` экран
+   * вызывает сразу: без экрана (тесты) вызывающий не ждёт. Открывать через `openCreator` (ui/creator.ts).
+   */
+  'ui:creator:show': { mode: 'new' | 'mirror'; done: (a: Appearance | null) => void; opened?: () => void };
+  /** Внешность игрока известна или сменилась (склейка src/avatarGlue.ts): мир пересобирает текстуру `avatar`. */
+  'avatar:changed': { appearance: Appearance; key: string };
 }

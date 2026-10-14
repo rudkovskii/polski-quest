@@ -29,10 +29,13 @@ import {
 import type { LogEvent } from './systems/log';
 import type { Clock } from './systems/platform/clock';
 import { setFlag, type Progress } from './systems/progress';
+import { appearanceOf, hasAppearance } from './systems/avatar';
 import type { GuideStepView, WorldInteract } from './types/bus';
 import type { Lesson } from './types/content';
 import type { DayGlue } from './day';
 import type { DayStore } from './ui/day';
+import { withAvatarAtlas } from './ui/avatar';
+import { openCreator } from './ui/creator';
 import { loadIntroAtlas, runIntro } from './ui/intro';
 import type { AudioPort, PortraitSource } from './ui/overlay/kit';
 import { STAMP_FIRST } from './ui/passport';
@@ -374,6 +377,8 @@ export function startFlow(o: FlowOptions): Flow {
 
   async function introFlow(): Promise<void> {
     const st = await o.store;
+    // P-03: новый мир → Fotobudka до вступления (`ui:creator:show`; бит дня 1 встроит режиссёр P-06).
+    if (!hasAppearance(st.progress)) await openCreator({ mode: 'new' });
     await runIntro({
       overlay: play.overlay,
       content,
@@ -381,7 +386,7 @@ export function startFlow(o: FlowOptions): Flow {
       audio: o.audio,
       portraits: await Promise.resolve(o.portraits ?? null),
       clock,
-      atlas: loadIntroAtlas(),
+      atlas: withAvatarAtlas(loadIntroAtlas(), appearanceOf(st.progress)),
       onStamp: () => void flag(STAMP_FIRST),
       ...(o.onEvent ? { onEvent: o.onEvent } : {}),
     });

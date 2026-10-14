@@ -1,0 +1,58 @@
+{
+ "note": "Аватар (P-03): слои sprite-as-data из art/avatar и подстановки палитры. Цвет слоя меняется заменой имён из base на имена из ramp того же индекса; отдельных файлов на цвет нет. Порядок слоёв: body, top, beard, hair, glasses. default — пресет «Дима» (черновик, уточнить у Шэфа).",
+ "base": {
+  "skin": ["brown_7", "brown_6", "brown_4"],
+  "hair": ["plum_0", "grey_1"],
+  "beard": ["plum_1"],
+  "top": ["blue_1", "moss_0", "blue_2"]
+ },
+ "skin": [
+  { "id": "light", "pl": "jasna", "ru": "светлая", "ramp": ["brown_7", "brown_6", "brown_4"] },
+  { "id": "pale", "pl": "bardzo jasna", "ru": "очень светлая", "ramp": ["sand_8", "brown_7", "brown_4"] },
+  { "id": "medium", "pl": "średnia", "ru": "средняя", "ramp": ["brown_6", "brown_4", "brown_3"] },
+  { "id": "tan", "pl": "śniada", "ru": "смуглая", "ramp": ["brown_3", "brown_1", "x_orange_1"] },
+  { "id": "dark", "pl": "ciemna", "ru": "тёмная", "ramp": ["grey_3", "grey_2", "plum_1"] }
+ ],
+ "hair": [
+  { "id": "short", "pl": "krótkie", "ru": "короткие", "layer": "avatar_hair_short" },
+  { "id": "buzz", "pl": "na zero", "ru": "под ноль", "layer": "avatar_hair_buzz" },
+  { "id": "fringe", "pl": "z grzywką", "ru": "с чёлкой", "layer": "avatar_hair_fringe" },
+  { "id": "curly", "pl": "kręcone", "ru": "кудрявые", "layer": "avatar_hair_curly" },
+  { "id": "long", "pl": "długie", "ru": "длинные", "layer": "avatar_hair_long" },
+  { "id": "bald", "pl": "łysy", "ru": "лысый", "layer": null }
+ ],
+ "hairColor": [
+  { "id": "dark", "pl": "ciemne", "ru": "тёмные", "ramp": ["plum_0", "grey_1"], "beard": "plum_1" },
+  { "id": "brown", "pl": "brązowe", "ru": "каштановые", "ramp": ["x_orange_1", "x_orange_3"], "beard": "brown_0" },
+  { "id": "blond", "pl": "jasne", "ru": "светлые", "ramp": ["sand_3", "sand_6"], "beard": "grey_6" },
+  { "id": "ginger", "pl": "rude", "ru": "рыжие", "ramp": ["orange_0", "orange_2"], "beard": "brown_3" },
+  { "id": "grey", "pl": "siwe", "ru": "седые", "ramp": ["moss_2", "moss_3"], "beard": "moss_2" }
+ ],
+ "beard": [
+  { "id": "none", "pl": "bez brody", "ru": "без бороды", "layer": null },
+  { "id": "stubble", "pl": "zarost", "ru": "щетина", "layer": "avatar_beard_stubble" },
+  { "id": "short", "pl": "krótka", "ru": "короткая", "layer": "avatar_beard_short" },
+  { "id": "full", "pl": "pełna", "ru": "полная", "layer": "avatar_beard_full" }
+ ],
+ "glasses": [
+  { "id": "none", "pl": "bez okularów", "ru": "без очков", "layer": null },
+  { "id": "round", "pl": "okrągłe", "ru": "круглые", "layer": "avatar_glasses_round" },
+  { "id": "square", "pl": "prostokątne", "ru": "прямоугольные", "layer": "avatar_glasses_square" }
+ ],
+ "top": [
+  { "id": "hoodie", "pl": "bluza", "ru": "худи", "layer": "avatar_top_hoodie" },
+  { "id": "sweater", "pl": "sweter", "ru": "свитер", "layer": "avatar_top_sweater" },
+  { "id": "shirt", "pl": "koszula", "ru": "рубашка", "layer": "avatar_top_shirt" },
+  { "id": "jacket", "pl": "kurtka", "ru": "куртка", "layer": "avatar_top_jacket" },
+  { "id": "tee", "pl": "koszulka", "ru": "футболка", "layer": "avatar_top_tee" }
+ ],
+ "topColor": [
+  { "id": "teal", "pl": "morski", "ru": "морской", "ramp": ["blue_1", "moss_0", "blue_2"] },
+  { "id": "red", "pl": "czerwony", "ru": "красный", "ramp": ["orange_0", "accent_brick", "orange_1"] },
+  { "id": "green", "pl": "zielony", "ru": "зелёный", "ramp": ["green_0", "moss_0", "green_1"] },
+  { "id": "mustard", "pl": "musztardowy", "ru": "горчичный", "ramp": ["accent_amber", "sand_0", "sand_4"] },
+  { "id": "plum", "pl": "śliwkowy", "ru": "сливовый", "ramp": ["plum_2", "plum_1", "plum_3"] },
+  { "id": "grey", "pl": "szary", "ru": "серый", "ramp": ["grey_2", "grey_1", "grey_5"] }
+ ],
+ "default": { "skin": "light", "hair": "short", "hairColor": "dark", "beard": "full", "glasses": "none", "top": "hoodie", "topColor": "teal" }
+}
