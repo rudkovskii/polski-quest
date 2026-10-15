@@ -89,10 +89,12 @@ export function mountHub(root: HTMLElement, deps: HubDeps): HubUi {
   };
   paint();
   let worldOn = true;
+  // Название района — только пока Дима не пошёл (W-04: на Mac 800×600 оно наезжало на подпись «Mój dom»).
+  let walked = false;
   const show = (): void => {
     layer.hidden = !worldOn;
     hud.hidden = !worldOn;
-    title.hidden = !worldOn;
+    title.hidden = !worldOn || walked;
     if (jumps) jumps.hidden = !worldOn;
   };
   const offs = [
@@ -115,6 +117,11 @@ export function mountHub(root: HTMLElement, deps: HubDeps): HubUi {
     }),
     deps.bus.on('world:input', ({ enabled }) => {
       worldOn = enabled;
+      show();
+    }),
+    deps.bus.on('input:intent', (i) => {
+      if (walked || i.to !== 'world' || (i.type !== 'move' && i.type !== 'goto')) return;
+      walked = true;
       show();
     }),
     deps.bus.on('progress:changed', paint),

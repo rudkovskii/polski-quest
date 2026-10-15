@@ -11,7 +11,9 @@ interface Swap {
   end?: boolean;
 }
 
-// Порядок = приоритет: сначала классические ловушки польской орфографии.
+// Порядок = приоритет. Сначала омофоны — пары, которые звучат одинаково и в транскрипции не различаются (rz/ż, ó/u,
+// ch/h, носовые на конце, мягкие ś/si, оглушение в конце): их транскрипция не выдаёт. Потом — пары, которые
+// транскрипция различает (sz/ś, cz/ć, ł/l, i/y): это запас для слов без омофонных ловушек.
 const SWAPS: readonly Swap[] = [
   { from: 'rz', to: 'ż' },
   { from: 'ż', to: 'rz' },
@@ -25,26 +27,28 @@ const SWAPS: readonly Swap[] = [
   { from: 'ą', to: 'on' },
   { from: 'em', to: 'ę', end: true },
   { from: 'e', to: 'ę', end: true },
-  { from: 'sz', to: 'ś' },
-  { from: 'ś', to: 'sz' },
-  { from: 'cz', to: 'ć' },
-  { from: 'ć', to: 'cz' },
   { from: 'ci', to: 'ć' },
   { from: 'si', to: 'ś' },
   { from: 'ś', to: 'si' },
-  { from: 'ź', to: 'ż' },
+  { from: 'ź', to: 'zi' },
   { from: 'zi', to: 'ź' },
   { from: 'ni', to: 'ń' },
   { from: 'ń', to: 'ni' },
-  { from: 'ł', to: 'l' },
-  { from: 'l', to: 'ł' },
-  { from: 'y', to: 'i' },
-  { from: 'i', to: 'y' },
   { from: 'w', to: 'f', end: true },
   { from: 'd', to: 't', end: true },
   { from: 'g', to: 'k', end: true },
   { from: 'b', to: 'p', end: true },
   { from: 'z', to: 's', end: true },
+  { from: 'ż', to: 'sz', end: true },
+  { from: 'sz', to: 'ś' },
+  { from: 'ś', to: 'sz' },
+  { from: 'cz', to: 'ć' },
+  { from: 'ć', to: 'cz' },
+  { from: 'ź', to: 'ż' },
+  { from: 'ł', to: 'l' },
+  { from: 'l', to: 'ł' },
+  { from: 'y', to: 'i' },
+  { from: 'i', to: 'y' },
   { from: 'k', to: 'g', end: true },
 ];
 
@@ -62,7 +66,8 @@ export function spellingCandidates(word: string): string[] {
       // «В конце» — в конце слова фразы (перед пробелом, знаком или концом строки).
       const atEnd = after === lower.length || /[\s,.!?…]/u.test(lower[after]!);
       // «ci»/«si»/«zi»/«ni» перед гласной — это мягкость, а не «ć» (ciasto ≠ ćasto): только перед согласной/концом.
-      const softBeforeVowel = /^(ci|si|zi|ni)$/.test(s.from) && after < lower.length && /[aeiouyąęó]/.test(lower[after]!);
+      // «i» перед гласной — тоже знак мягкости (dzień, gdzie): «gdzye» никто не напишет.
+      const softBeforeVowel = /^(ci|si|zi|ni|i)$/.test(s.from) && after < lower.length && /[aeiouyąęó]/.test(lower[after]!);
       if ((!s.end || atEnd) && !softBeforeVowel) {
         let to = s.to;
         if (isUpper(word[i]!)) to = to[0]!.toLocaleUpperCase('pl') + to.slice(1);
@@ -87,7 +92,7 @@ export function spellingCandidates(word: string): string[] {
 export function spellingTraps(word: string, n: number, seed: string, isWord: (s: string) => boolean = () => false): string[] {
   const ok = (v: string): boolean => !isWord(v) && v.toLocaleLowerCase('pl') !== word.toLocaleLowerCase('pl');
   const one = spellingCandidates(word).filter(ok);
-  // Первые кандидаты — самые типичные ловушки; среди них порядок по сиду, чтобы не было одной и той же пары каждый раз.
+  // Первые кандидаты — омофонные ловушки; среди них порядок по сиду, чтобы не было одной и той же пары каждый раз.
   const head = one.slice(0, Math.max(n + 1, 3));
   const rest = one.slice(head.length);
   let h = fnv1a(`${seed}:${word}`) || 1;

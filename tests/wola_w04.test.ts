@@ -333,6 +333,8 @@ describe('W-04 п. 5: дистракторы', () => {
     expect(spellingCandidates('Dzień dobry')).toContain('Dzień dobri');
     // ci/si перед гласной — мягкость, не «ć»: ciasto ≠ ćasto.
     expect(spellingCandidates('ciasto')).not.toContain('ćasto');
+    expect(spellingCandidates('Dzień dobry')).not.toContain('Dzyeń dobry');
+    expect(spellingCandidates('gdzie')).not.toContain('gdzye');
     const words = new Set(['morze']);
     const t = spellingTraps('może', 2, 's', (s) => words.has(s));
     expect(t).toHaveLength(2);

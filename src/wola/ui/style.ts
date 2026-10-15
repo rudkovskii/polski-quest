@@ -168,6 +168,7 @@ const css = `
 .wl-plan small { font-weight: 400; color: #543c52; }
 .wl-plan-top { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 2; margin: 0; max-width: calc(100% - 16px); box-sizing: border-box; text-align: center; }
 .wl-screen .head small.plan { color: #ffd966; margin-top: 2px; }
+.wl-laptop-layer:has(> .wl-laptop-bar) { background: rgba(26, 28, 44, .9); }
 .wl-laptop-layer > .wl-laptop-bar { flex: none; align-self: stretch; }
 .wl-laptop-layer > .wl-laptop { flex: 0 1 auto; min-height: 0; }
 .wl-screen > .head { position: sticky; top: -12px; z-index: 2; margin: -12px -14px 10px; padding: 12px 14px 8px; background: #1a1c2c; }
