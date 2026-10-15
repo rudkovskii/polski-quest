@@ -346,7 +346,7 @@ describe('экраны Wola', () => {
     // В огороде — 5 семян.
     const g = wolaGarden(d(store.progress, T0 + 1000), T0 + 1000, content.tuning, store.progress.world.flags);
     expect(g.plants.map((x) => x.stage)).toEqual(['seed', 'seed', 'seed', 'seed', 'seed']);
-  });
+  }, 20_000); // анимация печати ноутбука: под нагрузкой полного прогона 5 с не хватает
 
   it('проверка: варианты — переводы слов порции и темы, верный среди них', () => {
     const words = book.home.slice(0, 5);
