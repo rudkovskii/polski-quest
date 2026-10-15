@@ -578,6 +578,44 @@
   ],
   "anims": {}
  },
+ "tile.wola": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   0,
+   0
+  ],
+  "frames": [
+   "tile.wola/0",
+   "tile.wola/1",
+   "tile.wola/2",
+   "tile.wola/3",
+   "tile.wola/4",
+   "tile.wola/5",
+   "tile.wola/6",
+   "tile.wola/7",
+   "tile.wola/8",
+   "tile.wola/9",
+   "tile.wola/10",
+   "tile.wola/11",
+   "tile.wola/12",
+   "tile.wola/13",
+   "tile.wola/14",
+   "tile.wola/15",
+   "tile.wola/16",
+   "tile.wola/17",
+   "tile.wola/18",
+   "tile.wola/19",
+   "tile.wola/20",
+   "tile.wola/21",
+   "tile.wola/22",
+   "tile.wola/23",
+   "tile.wola/24"
+  ],
+  "anims": {}
+ },
  "walizka": {
   "size": [
    16,

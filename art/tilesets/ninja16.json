@@ -1044,6 +1044,176 @@
   "peron_edge_r": {
    "sprite": "tile.peron",
    "frame": 3
+  },
+  "w_biuro_dach": {
+   "sprite": "tile.wola",
+   "frame": 0,
+   "under": [
+    "interior",
+    1,
+    13
+   ]
+  },
+  "w_biuro": {
+   "sprite": "tile.wola",
+   "frame": 1
+  },
+  "w_biuro_okna": {
+   "sprite": "tile.wola",
+   "frame": 2
+  },
+  "w_biuro_wejscie": {
+   "sprite": "tile.wola",
+   "frame": 3
+  },
+  "w_tram_l": {
+   "sprite": "tile.wola",
+   "frame": 4,
+   "under": [
+    "interior",
+    12,
+    13
+   ]
+  },
+  "w_tram_m": {
+   "sprite": "tile.wola",
+   "frame": 5,
+   "under": [
+    "interior",
+    12,
+    13
+   ]
+  },
+  "w_tram_d": {
+   "sprite": "tile.wola",
+   "frame": 6,
+   "under": [
+    "interior",
+    12,
+    13
+   ]
+  },
+  "w_tram_r": {
+   "sprite": "tile.wola",
+   "frame": 7,
+   "under": [
+    "interior",
+    12,
+    13
+   ]
+  },
+  "w_salad": {
+   "sprite": "tile.wola",
+   "frame": 8
+  },
+  "w_salad_szyld": {
+   "sprite": "tile.wola",
+   "frame": 9
+  },
+  "w_markiza_l": {
+   "sprite": "tile.wola",
+   "frame": 10
+  },
+  "w_markiza_m": {
+   "sprite": "tile.wola",
+   "frame": 11
+  },
+  "w_markiza_r": {
+   "sprite": "tile.wola",
+   "frame": 12
+  },
+  "w_salad_okno": {
+   "sprite": "tile.wola",
+   "frame": 13
+  },
+  "w_salad_drzwi": {
+   "sprite": "tile.wola",
+   "frame": 14
+  },
+  "w_biurko_l": {
+   "sprite": "tile.wola",
+   "frame": 15,
+   "under": [
+    "water",
+    5,
+    13
+   ]
+  },
+  "w_biurko_r": {
+   "sprite": "tile.wola",
+   "frame": 16,
+   "under": [
+    "water",
+    5,
+    13
+   ]
+  },
+  "w_regal_g": {
+   "sprite": "tile.wola",
+   "frame": 17,
+   "under": [
+    "interior",
+    16,
+    14
+   ]
+  },
+  "w_regal_d": {
+   "sprite": "tile.wola",
+   "frame": 18,
+   "under": [
+    "water",
+    5,
+    13
+   ]
+  },
+  "w_polka": {
+   "sprite": "tile.wola",
+   "frame": 19,
+   "under": [
+    "interior",
+    16,
+    14
+   ]
+  },
+  "w_okno": {
+   "sprite": "tile.wola",
+   "frame": 20,
+   "under": [
+    "interior",
+    16,
+    14
+   ]
+  },
+  "w_dywan": {
+   "sprite": "tile.wola",
+   "frame": 21
+  },
+  "w_furtka": {
+   "sprite": "tile.wola",
+   "frame": 22,
+   "under": [
+    "floor",
+    0,
+    12
+   ]
+  },
+  "w_lozko_l": {
+   "sprite": "tile.wola",
+   "frame": 23,
+   "under": [
+    "water",
+    5,
+    13
+   ]
+  },
+  "w_lozko_r": {
+   "sprite": "tile.wola",
+   "frame": 24,
+   "under": [
+    "water",
+    5,
+    13
+   ]
   }
  }
 }

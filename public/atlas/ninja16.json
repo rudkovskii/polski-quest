@@ -5,7 +5,7 @@
  "margin": 1,
  "spacing": 2,
  "columns": 16,
- "count": 176,
+ "count": 201,
  "tiles": {
   "altana": {
    "kind": "auto16",
@@ -639,6 +639,156 @@
    "kind": "single",
    "frames": [
     53
+   ]
+  },
+  "w_biurko_l": {
+   "kind": "single",
+   "frames": [
+    191
+   ]
+  },
+  "w_biurko_r": {
+   "kind": "single",
+   "frames": [
+    192
+   ]
+  },
+  "w_biuro": {
+   "kind": "single",
+   "frames": [
+    177
+   ]
+  },
+  "w_biuro_dach": {
+   "kind": "single",
+   "frames": [
+    176
+   ]
+  },
+  "w_biuro_okna": {
+   "kind": "single",
+   "frames": [
+    178
+   ]
+  },
+  "w_biuro_wejscie": {
+   "kind": "single",
+   "frames": [
+    179
+   ]
+  },
+  "w_dywan": {
+   "kind": "single",
+   "frames": [
+    197
+   ]
+  },
+  "w_furtka": {
+   "kind": "single",
+   "frames": [
+    198
+   ]
+  },
+  "w_lozko_l": {
+   "kind": "single",
+   "frames": [
+    199
+   ]
+  },
+  "w_lozko_r": {
+   "kind": "single",
+   "frames": [
+    200
+   ]
+  },
+  "w_markiza_l": {
+   "kind": "single",
+   "frames": [
+    186
+   ]
+  },
+  "w_markiza_m": {
+   "kind": "single",
+   "frames": [
+    187
+   ]
+  },
+  "w_markiza_r": {
+   "kind": "single",
+   "frames": [
+    188
+   ]
+  },
+  "w_okno": {
+   "kind": "single",
+   "frames": [
+    196
+   ]
+  },
+  "w_polka": {
+   "kind": "single",
+   "frames": [
+    195
+   ]
+  },
+  "w_regal_d": {
+   "kind": "single",
+   "frames": [
+    194
+   ]
+  },
+  "w_regal_g": {
+   "kind": "single",
+   "frames": [
+    193
+   ]
+  },
+  "w_salad": {
+   "kind": "single",
+   "frames": [
+    184
+   ]
+  },
+  "w_salad_drzwi": {
+   "kind": "single",
+   "frames": [
+    190
+   ]
+  },
+  "w_salad_okno": {
+   "kind": "single",
+   "frames": [
+    189
+   ]
+  },
+  "w_salad_szyld": {
+   "kind": "single",
+   "frames": [
+    185
+   ]
+  },
+  "w_tram_d": {
+   "kind": "single",
+   "frames": [
+    182
+   ]
+  },
+  "w_tram_l": {
+   "kind": "single",
+   "frames": [
+    180
+   ]
+  },
+  "w_tram_m": {
+   "kind": "single",
+   "frames": [
+    181
+   ]
+  },
+  "w_tram_r": {
+   "kind": "single",
+   "frames": [
+    183
    ]
   },
   "wall": {
