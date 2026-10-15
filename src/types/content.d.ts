@@ -151,6 +151,7 @@ export interface ContentFiles {
   lessons: Lessons;
   dialogues: Dialogues;
   map: LocationMap;
+  wola: WolaVocab;
   step: Step;
   condition: Condition;
   effects: Effects;
@@ -1294,4 +1295,25 @@ export interface MapSecret {
    * Имя точки для secrets.json; по умолчанию = id
    */
   spot?: string;
+}
+/**
+ * content/wola/vocab.json: словарь короткой версии «Wola» (W-01). Собирает tools/build_wola_vocab.ts. Порядок vocab = порядок дневных порций; tags[0] = id темы.
+ */
+export interface WolaVocab {
+  schema: 1;
+  note?: string;
+  /**
+   * @minItems 1
+   */
+  themes: [WolaTheme, ...WolaTheme[]];
+  vocab: Vocab;
+}
+export interface WolaTheme {
+  id: string;
+  pl: string;
+  ru: string;
+  /**
+   * Тема живёт не дома, а в месте (salad = Salad Story, W-02): не в порциях и не на полке.
+   */
+  place?: 'salad';
 }

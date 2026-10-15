@@ -27,6 +27,7 @@ const ROOTS: Record<string, string> = {
   lessons: 'lessons',
   dialogues: 'dialogues',
   map: 'map',
+  wola: 'wola',
   step: 'steps',
   condition: 'conditions',
   effects: 'effects',

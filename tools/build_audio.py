@@ -2,7 +2,7 @@
 """Предгенерация озвучки в билд (ТЗ §7.1, I-09).
 
 Собирает польские строки из content/ (слова, примеры, шаги уроков, реплики NPC в диалогах,
-таблички, минимальные пары, реплики story/lines.json без todo), озвучивает их и пишет
+таблички, минимальные пары, реплики story/lines.json без todo, слова и примеры Wola — content/wola/vocab.json), озвучивает их и пишет
 public/audio/<sha1[:12]>.m4a + public/audio/manifest.json.
 
     npm run audio                         # = python3 tools/build_audio.py (только Mac: say + afconvert)
@@ -206,6 +206,16 @@ def collect(content: Path, default_voice: str) -> Collected:
                 if o.get('type') == 'sign' and o.get('pl'):
                     x, y = o['at']
                     add(o['pl'], default_voice, one, ready=ready, id_=f"{m['id']}#sign.{x}_{y}", src=rel(mf))
+
+    # Короткая версия «Wola» (W-01): слова и примеры content/wola/vocab.json, обязательны как у ready-модуля.
+    wf = content / 'wola' / 'vocab.json'
+    if wf.exists():
+        rel = str(wf.relative_to(content))
+        for v in load_json(wf).get('vocab', []):
+            voice = voice_str(v.get('voice'), default_voice)
+            add(v['pl'], voice, both, ready=True, id_=v['id'], src=rel)
+            if v.get('ex'):
+                add(v['ex'].get('pl'), voice, one, ready=True, id_=f"{v['id']}#ex", src=rel)
 
     # Глобальные строки: в --check только предупреждения.
     lines = content / 'story' / 'lines.json'

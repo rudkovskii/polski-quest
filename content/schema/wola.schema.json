@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wola.schema.json",
+  "title": "WolaVocab",
+  "description": "content/wola/vocab.json: словарь короткой версии «Wola» (W-01). Собирает tools/build_wola_vocab.ts. Порядок vocab = порядок дневных порций; tags[0] = id темы.",
+  "type": "object",
+  "required": ["schema", "themes", "vocab"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": 1 },
+    "note": { "type": "string" },
+    "themes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "title": "WolaTheme",
+        "type": "object",
+        "required": ["id", "pl", "ru"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "pl": { "type": "string", "minLength": 1 },
+          "ru": { "type": "string", "minLength": 1 },
+          "place": { "enum": ["salad"], "description": "Тема живёт не дома, а в месте (salad = Salad Story, W-02): не в порциях и не на полке." }
+        }
+      }
+    },
+    "vocab": { "$ref": "vocab.schema.json" }
+  }
+}

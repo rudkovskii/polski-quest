@@ -30,6 +30,8 @@ import { FIRST_DAY, FIRST_DAY_LINES } from '../../src/systems/director';
 import { scheduleIssues } from '../../src/systems/pace';
 import { buildWordIndex, matchWords, refIds, type WordIndex } from '../../src/systems/words';
 import { ANY_NAME_SUFFIX, defaultNamed, NAME_FIELDS, NAME_TOKEN } from '../../src/systems/playerName';
+import { PLACE_PREFIX, PLACE_SPAWN, PLACES, placeOf } from '../../src/wola/systems/places';
+import type { WolaVocab } from '../../src/types/content';
 
 // ───────────────────────────── типы ─────────────────────────────
 
@@ -79,6 +81,8 @@ export interface CheckInput {
   prevVocab?: ReadonlyMap<string, string> | null;
   /** `public/audio/manifest.json` (п. 6, пишет tools/build_audio.py). Нет файла = предупреждение «не проверена». */
   audioManifest?: unknown;
+  /** Id слов прошлой версии content/wola/vocab.json (п. 7 для Wola). `null` = сравнивать не с чем. */
+  prevWolaVocab?: ReadonlySet<string> | null;
   /**
    * Сборка для людей (`--release`, `PQ_RELEASE=1 npm run build`, P-01): реплика-заглушка (`todo`) в бите
    * первого дня — ошибка. Без флага — одно предупреждение со списком.
@@ -102,7 +106,8 @@ export type SchemaName =
   | 'vocab'
   | 'lessons'
   | 'dialogues'
-  | 'map';
+  | 'map'
+  | 'wola';
 
 /** Глобальные файлы контента → схема (ТЗ §2.3, §3.8). */
 export const GLOBAL_FILES: Readonly<Record<string, SchemaName>> = {
@@ -540,7 +545,8 @@ function checkMapObjects(ctx: Ctx, info: MapInfo, w: Where, strictLines: boolean
         break;
       }
       case 'exit': {
-        if (o.to === 'worldmap') break;
+        // `place:<id>` — вход в место без карты (Wola, W-01): места проверяет checkWola.
+        if (o.to === 'worldmap' || o.to.startsWith(PLACE_PREFIX)) break;
         if (ctx.ref(ctx.maps, o.to, sub(ow, 'to'), 'exit.to', `${WHERE.maps} (или "worldmap")`) && o.spawn !== undefined) {
           const target = ctx.maps.get(o.to)?.value.map;
           if (target && !(o.spawn in target.spawns))
@@ -623,6 +629,14 @@ export function voiceTexts(lessons: Lesson[], vocab: VocabEntry[], dialogues: Di
 }
 
 export function checkContent(input: CheckInput): Issue[] {
+  const wola = new Map([...input.files].filter(([f]) => f.startsWith('wola/')));
+  const main = wola.size ? new Map([...input.files].filter(([f]) => !f.startsWith('wola/'))) : input.files;
+  const issues = checkMain({ ...input, files: main });
+  if (wola.size) issues.push(...checkWola(wola, input.schemas, input.prevWolaVocab ?? null));
+  return issues;
+}
+
+function checkMain(input: CheckInput): Issue[] {
   const ctx = new Ctx();
   const { files, schemas } = input;
 
@@ -1076,6 +1090,83 @@ export function checkContent(input: CheckInput): Issue[] {
     }
   }
 
+  return ctx.issues;
+}
+
+// ───────────────────────────── Wola (W-01) ─────────────────────────────
+
+const WOLA_VOCAB = 'wola/vocab.json';
+
+/**
+ * Контент короткой версии «Wola» (content/wola/): словарь (схема, дубли id, темы, tr кириллицей, удалённые id)
+ * и карты `wola/maps/<name>.json` (схема карты, ASCII, спавны, выходы `place:<id>` на известные места и спавн
+ * возврата у двери). Отдельное пространство id: слова Wola могут совпадать с id главы 1 (то же слово).
+ */
+export function checkWola(files: ReadonlyMap<string, unknown>, schemas: ReadonlyMap<string, object>, prev: ReadonlySet<string> | null): Issue[] {
+  const ctx = new Ctx();
+  const maps: { file: string; name: string; data: LocationMap }[] = [];
+  let vocabFile: WolaVocab | null = null;
+  for (const [file, data] of files) {
+    const w = { file, path: '' };
+    const mp = /^wola\/maps\/([^/]+)\.json$/.exec(file);
+    const schema: SchemaName | null = file === WOLA_VOCAB ? 'wola' : mp ? 'map' : null;
+    if (!schema) {
+      ctx.err('file', w, 'неизвестный файл Wola (ожидаются wola/vocab.json и wola/maps/*.json)');
+      continue;
+    }
+    const v = validatorFor(schemas, schema);
+    if (!v(data)) {
+      ctx.issues.push(...schemaIssues(file, v.errors ?? [], data));
+      continue;
+    }
+    walkNfc(ctx, data, w);
+    if (schema === 'wola') vocabFile = data as WolaVocab;
+    else maps.push({ file, name: mp![1]!, data: data as LocationMap });
+  }
+  if (!files.has(WOLA_VOCAB)) ctx.err('file', { file: WOLA_VOCAB, path: '' }, 'словарь Wola отсутствует (npx tsx tools/build_wola_vocab.ts)');
+  if (!files.has('wola/maps/hub.json')) ctx.err('file', { file: 'wola/maps/hub.json', path: '' }, 'карта хаба Wola отсутствует');
+  if (ctx.issues.some((i) => i.level === 'error')) return ctx.issues;
+
+  if (vocabFile) {
+    const themes = new Map<string, number>();
+    vocabFile.themes.forEach((t, i) => {
+      if (themes.has(t.id)) ctx.err('dup', { file: WOLA_VOCAB, path: `/themes/${i}/id` }, `дубль темы "${t.id}"`);
+      themes.set(t.id, 0);
+    });
+    vocabFile.vocab.forEach((v, i) => {
+      const w = { file: WOLA_VOCAB, path: `/vocab/${i}` };
+      ctx.define(ctx.vocab, 'lx', v.id, { ...w, value: v });
+      const theme = v.tags?.[0];
+      if (!theme || !themes.has(theme)) ctx.err('ref', sub(w, 'tags', 0), `тема "${theme ?? ''}" слова ${v.id} не из themes`);
+      else themes.set(theme, themes.get(theme)! + 1);
+      if (!v.srs) ctx.err('lesson', sub(w, 'srs'), `слово Wola ${v.id} без srs: в огород не попадёт`);
+      if (v.tr === undefined || v.tr.trim() === '') ctx.err('tr', sub(w, 'tr'), `у слова ${v.id} нет транскрипции`);
+      else if (/[a-z]/i.test(v.tr)) ctx.err('tr', sub(w, 'tr'), `транскрипция ${v.id} "${v.tr}" не кириллицей`);
+    });
+    for (const [t, n] of themes) if (!n) ctx.warn('ref', { file: WOLA_VOCAB, path: '/themes' }, `в теме "${t}" нет слов`);
+    if (prev) for (const id of prev) if (!ctx.vocab.has(id)) ctx.err('vocab-removed', { file: WOLA_VOCAB, path: '' }, `слово ${id} удалено из словаря Wola: id удалять нельзя (огород игрока его помнит)`);
+  }
+
+  for (const { file, name, data } of maps) {
+    const w = { file, path: '' };
+    if (data.id !== `wola.${name}`) ctx.err('id', sub(w, 'id'), `id карты "${data.id}" должен быть "wola.${name}"`);
+    ctx.define(ctx.maps, 'location', data.id, { file, path: '', value: { map: data, module: 'wola', file, passable: analyzeMap(ctx, data, w), objectIds: new Set(), plots: new Set(), spots: new Set() } });
+  }
+  for (const [, def] of ctx.maps) {
+    const info = def.value;
+    const w = { file: info.file, path: '' };
+    checkMapObjects(ctx, info, w, false);
+    const seen = new Set<string>();
+    info.map.objects.forEach((o, i) => {
+      if (o.type !== 'exit' || !o.to.startsWith(PLACE_PREFIX)) return;
+      const place = placeOf(o.to);
+      const ow = sub(w, 'objects', i);
+      if (!place) return ctx.err('ref', sub(ow, 'to'), `неизвестное место "${o.to}" (есть: ${PLACES.map((p) => PLACE_PREFIX + p).join(', ')})`);
+      seen.add(place);
+      if (!(PLACE_SPAWN[place] in info.map.spawns)) ctx.err('ref', sub(w, 'spawns'), `нет спавна возврата "${PLACE_SPAWN[place]}" у двери ${o.to}`);
+    });
+    if (info.map.id === 'wola.hub') for (const p of PLACES) if (!seen.has(p)) ctx.err('ref', sub(w, 'objects'), `на хабе нет входа в место ${PLACE_PREFIX}${p}`);
+  }
   return ctx.issues;
 }
 

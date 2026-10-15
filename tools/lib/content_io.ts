@@ -59,6 +59,24 @@ export function vocabIds(files: ReadonlyMap<string, unknown>): Map<string, strin
   return out;
 }
 
+/** Id слов словаря Wola (content/wola/vocab.json) из набора файлов контента. */
+export function wolaVocabIds(files: ReadonlyMap<string, unknown>): Set<string> | null {
+  const data = files.get('wola/vocab.json') as { vocab?: { id?: unknown }[] } | undefined;
+  if (!data || !Array.isArray(data.vocab)) return null;
+  return new Set(data.vocab.map((v) => v?.id).filter((x): x is string => typeof x === 'string'));
+}
+
+/** Id слов Wola в ревизии `ref` (нет файла — null). */
+export function wolaVocabIdsFromGit(ref: string, contentRel = 'content'): Set<string> | null {
+  const text = git(['show', `${ref}:${contentRel}/wola/vocab.json`]);
+  if (text === null) return null;
+  try {
+    return wolaVocabIds(new Map([['wola/vocab.json', JSON.parse(text) as unknown]]));
+  } catch {
+    return null;
+  }
+}
+
 function git(args: string[]): string | null {
   try {
     return execFileSync('git', args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'], encoding: 'utf8', maxBuffer: 64 << 20 });
@@ -118,18 +136,22 @@ export function validateDir(opts: ValidateOptions = {}): ValidateResult {
   const root = resolve(opts.root ?? CONTENT_DIR);
   const { files, issues } = readContentDir(root);
   let prevVocab: Map<string, string> | null = null;
+  let prevWolaVocab: Set<string> | null = null;
   let prevFrom: string | null = null;
   if (opts.prevRoot) {
-    prevVocab = vocabIds(readContentDir(resolve(opts.prevRoot)).files);
+    const prevFiles = readContentDir(resolve(opts.prevRoot)).files;
+    prevVocab = vocabIds(prevFiles);
+    prevWolaVocab = wolaVocabIds(prevFiles);
     prevFrom = toPosix(relative(ROOT, resolve(opts.prevRoot)));
   } else if (root === CONTENT_DIR) {
     const ref = opts.base ?? defaultBaseRef();
     prevVocab = ref ? vocabIdsFromGit(ref) : null;
+    prevWolaVocab = ref ? wolaVocabIdsFromGit(ref) : null;
     prevFrom = prevVocab ? ref : null;
   }
   const audioManifest = existsSync(AUDIO_MANIFEST) ? (JSON.parse(readFileSync(AUDIO_MANIFEST, 'utf8')) as unknown) : undefined;
   if (issues.length) return { issues, files: files.size + issues.length, prevFrom };
-  const all = checkContent({ files, schemas: readSchemas(), prevVocab, audioManifest, ...(opts.release ? { release: true } : {}) });
+  const all = checkContent({ files, schemas: readSchemas(), prevVocab, prevWolaVocab, audioManifest, ...(opts.release ? { release: true } : {}) });
   if (!prevVocab && root === CONTENT_DIR)
     all.push({ level: 'warn', code: 'vocab-removed', file: '*', path: '', msg: 'нет базовой ревизии git: удаление id слов (п. 7) не проверено' });
   return { issues: all, files: files.size, prevFrom };
