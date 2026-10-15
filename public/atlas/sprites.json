@@ -612,7 +612,16 @@
    "tile.wola/21",
    "tile.wola/22",
    "tile.wola/23",
-   "tile.wola/24"
+   "tile.wola/24",
+   "tile.wola/25",
+   "tile.wola/26",
+   "tile.wola/27",
+   "tile.wola/28",
+   "tile.wola/29",
+   "tile.wola/30",
+   "tile.wola/31",
+   "tile.wola/32",
+   "tile.wola/33"
   ],
   "anims": {}
  },
@@ -642,5 +651,117 @@
     "walizka/0"
    ]
   }
+ },
+ "wola.gag": {
+  "size": [
+   32,
+   32
+  ],
+  "anchor": [
+   16,
+   31
+  ],
+  "frames": [
+   "wola.gag/0",
+   "wola.gag/1",
+   "wola.gag/2",
+   "wola.gag/3"
+  ],
+  "anims": {}
+ },
+ "wola.kasjer": {
+  "size": [
+   32,
+   32
+  ],
+  "anchor": [
+   16,
+   31
+  ],
+  "frames": [
+   "wola.kasjer/0",
+   "wola.kasjer/1",
+   "wola.kasjer/2",
+   "wola.kasjer/3"
+  ],
+  "anims": {}
+ },
+ "wola.salatka": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "wola.salatka/0",
+   "wola.salatka/1",
+   "wola.salatka/2",
+   "wola.salatka/3",
+   "wola.salatka/4",
+   "wola.salatka/5",
+   "wola.salatka/6",
+   "wola.salatka/7",
+   "wola.salatka/8",
+   "wola.salatka/9",
+   "wola.salatka/10",
+   "wola.salatka/11",
+   "wola.salatka/12",
+   "wola.salatka/13",
+   "wola.salatka/14",
+   "wola.salatka/15",
+   "wola.salatka/16",
+   "wola.salatka/17",
+   "wola.salatka/18"
+  ],
+  "anims": {}
+ },
+ "wola.skladnik": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "wola.skladnik/0",
+   "wola.skladnik/1",
+   "wola.skladnik/2",
+   "wola.skladnik/3",
+   "wola.skladnik/4",
+   "wola.skladnik/5",
+   "wola.skladnik/6",
+   "wola.skladnik/7",
+   "wola.skladnik/8",
+   "wola.skladnik/9",
+   "wola.skladnik/10",
+   "wola.skladnik/11",
+   "wola.skladnik/12",
+   "wola.skladnik/13",
+   "wola.skladnik/14",
+   "wola.skladnik/15",
+   "wola.skladnik/16",
+   "wola.skladnik/17",
+   "wola.skladnik/18"
+  ],
+  "anims": {}
+ },
+ "wola.taca": {
+  "size": [
+   48,
+   16
+  ],
+  "anchor": [
+   24,
+   15
+  ],
+  "frames": [
+   "wola.taca/0"
+  ],
+  "anims": {}
  }
 }

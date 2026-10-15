@@ -140,16 +140,29 @@ export interface StepGate {
   trOf?: (item: string) => string | undefined;
   /** Пара есть и у неё есть перевод (без звука минимальная пара = «какое слово значит …»). */
   pairRu?: (item: string) => boolean;
+  /**
+   * Мир Wola (W-02): расписания систем по дням нет — клавиатура (`type`, `dictation`) и «повтори вслух» открыты всегда;
+   * без звука `listen` с `show: "text"` (варианты — переводы реплики) читается написанием и не выпадает.
+   */
+  world?: 'wola';
+}
+
+/** Гейт шагов для Wola: ничего не закрыто по дням, без звука — по настройке. */
+export function wolaStepGate(silent: boolean, trOf?: (item: string) => string | undefined): StepGate {
+  return { world: 'wola', closed: () => false, silent, ...(trOf ? { trOf } : {}) };
 }
 
 /** Шаг играется сегодня: система открыта; без звука — есть чем заменить звук. */
 export function stepPlayable(s: Step, g: StepGate): boolean {
-  if (KEYBOARD_STEPS.has(s.t) && g.closed('keyboard')) return false;
-  if (s.t === 'shadow' && g.closed('shadow')) return false;
+  const wola = g.world === 'wola';
+  if (KEYBOARD_STEPS.has(s.t) && !wola && g.closed('keyboard')) return false;
+  if (s.t === 'shadow' && !wola && g.closed('shadow')) return false;
   if (!g.silent) return true;
   switch (s.t) {
     case 'listen':
       // Без звука: «как пишется [транскрипция]?». Нет транскрипции — показ написания сделал бы шаг пустым.
+      // Wola: вопрос кассира с переводами-вариантами читается написанием («что здесь написано?»).
+      if (wola && s.show === 'text') return true;
       return !!(s.tr ?? (s.item ? g.trOf?.(s.item) : undefined));
     case 'dictation':
       return !!(s.tr ?? (s.item ? g.trOf?.(s.item) : undefined));

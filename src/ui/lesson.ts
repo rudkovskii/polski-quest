@@ -48,6 +48,8 @@ export interface LessonDeps {
   tz?: string;
   /** Каждое записанное событие (dev: в консоль, склейка: progress:changed). */
   onEvent?(e: LogEvent): void;
+  /** Картинки кадров атласа для шага `pick` (Wola, W-02). */
+  picture?(frame: string, scale: number): HTMLElement | null;
 }
 
 /** Запись о пройденном шаге в `local.resume.answers` (сериализуемая). */
@@ -117,6 +119,8 @@ export function cardsOfStep(step: Step, r: Pick<StepRecord, 'noAudio' | 'parts'>
       return it && !r.noAudio ? [{ card: cardId(it, 'lis') }] : [];
     case 'choice':
       return it ? [{ card: cardId(it, step.dir === 'ru-pl' ? 'pro' : 'rec') }] : [];
+    case 'pick':
+      return it ? [{ card: cardId(it, 'rec') }] : [];
     case 'order':
     case 'type':
     case 'gap':
@@ -133,7 +137,7 @@ export function cardsOfStep(step: Step, r: Pick<StepRecord, 'noAudio' | 'parts'>
 /** Типы карточек, которые `intro` может отметить верными (rec, lis) по шагу. */
 function introTypeOf(step: Step): CardType | null {
   if (step.t === 'listen' || step.t === 'dictation') return 'lis';
-  if ((step.t === 'choice' && step.dir !== 'ru-pl') || step.t === 'match') return 'rec';
+  if ((step.t === 'choice' && step.dir !== 'ru-pl') || step.t === 'match' || step.t === 'pick') return 'rec';
   return null;
 }
 
@@ -158,6 +162,12 @@ export interface RunOptions {
   drill?: boolean;
   /** Источник `rev` вместо вычисленного по виду урока: полив на działce — 'obchod', экспресс — 'express' (I-12). */
   src?: Src;
+  /** Реакция мира по тегам ошибки вместо `lesson.errLines` (Salad Story: переспрос кассира, W-02). */
+  errLineFor?: ExerciseCtx['errLineFor'];
+  /** Гэг ошибки по тегам (Salad Story, W-02): картинка в разборе первой ошибки. */
+  gagFor?: ExerciseCtx['gagFor'];
+  /** Перед показом шага (Salad Story: пузырь кассира в сцене над шагом, W-02). */
+  onStep?(step: Step, id: string): void;
 }
 
 /**
@@ -248,7 +258,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
   const exContent = exerciseContent(content, (id) => Object.keys(derived.cards).some((c) => c.startsWith(`${id}#`)));
   // Реакция мира на ошибку (P-06): реплика NPC урока; без звука — её вариант `.mute`, если есть.
   const errLine = lineSpeech(content, lesson.errLine, settings.silent);
-  const errLineFor = errLinesOf(content, lesson, settings.silent);
+  const errLineFor = opts.errLineFor ?? errLinesOf(content, lesson, settings.silent);
   // «Pip!» / «Hyk!» — звуки турникета; без звука (P-10b) отклик текстом: «Dobrze!» и правило с ответом.
   const verdicts = diag && !settings.silent ? diagVerdicts(content) : undefined;
 
@@ -315,7 +325,10 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
       ...(errLine ? { errLine } : {}),
       ...(errLineFor ? { errLineFor } : {}),
       ...(verdicts ? { verdicts } : {}),
+      ...(deps.picture ? { picture: deps.picture } : {}),
+      ...(opts.gagFor ? { gagFor: opts.gagFor } : {}),
     };
+    opts.onStep?.(step, stepId);
     const res = await mountStep(step, ctx);
     // Отмена до ответа — шаг не засчитан. Ответил и нажал Esc — шаг засчитан, пауза на следующем.
     if (res.status === 'cancel' && !(res.first && res.graded)) {

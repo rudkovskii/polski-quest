@@ -9,6 +9,7 @@ import { listen } from './listen';
 import { match } from './match';
 import { minimal_pair } from './minimal_pair';
 import { order } from './order';
+import { pick } from './pick';
 import { say } from './say';
 import { shadow } from './shadow';
 import { stress } from './stress';
@@ -17,7 +18,7 @@ import type { ExerciseCtx, ExerciseModule, StepResult, StepT } from './types';
 
 type ByT = { [K in StepT]: ExerciseModule<Extract<Step, { t: K }>> };
 
-export const EXERCISES: ByT = { say, explain, shadow, listen, choice, order, type, dictation, match, gap, minimal_pair, stress };
+export const EXERCISES: ByT = { say, explain, shadow, listen, choice, pick, order, type, dictation, match, gap, minimal_pair, stress };
 
 export function exerciseFor<S extends Step>(step: S): ExerciseModule<S> {
   const m = (EXERCISES as Record<string, ExerciseModule<Step>>)[step.t];

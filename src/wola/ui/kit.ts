@@ -10,6 +10,7 @@ import type { LessonStore } from '../../ui/lesson';
 import type { Layer, Overlay } from '../../ui/overlay/host';
 import { btn, plBtn, type AudioPort, type PlLabel } from '../../ui/overlay/kit';
 import type { SettingsStore } from '../../ui/settings';
+import type { SaladData } from '../systems/saladVisit';
 import type { WolaBook } from '../systems/wola';
 import type { PixAtlas } from './pix';
 import { ensureWolaStyle } from './style';
@@ -24,6 +25,8 @@ export interface WolaDeps {
   bus: Bus<BusEvents>;
   audio: AudioPort;
   atlas: PixAtlas | null;
+  /** Salad Story (W-02): меню, кассиры, уровни, гэги. */
+  salad?: SaladData;
   clock: { now(): number; mono(): number };
   tz?: string;
   coarse?: boolean;

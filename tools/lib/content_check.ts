@@ -31,7 +31,8 @@ import { scheduleIssues } from '../../src/systems/pace';
 import { buildWordIndex, matchWords, refIds, type WordIndex } from '../../src/systems/words';
 import { ANY_NAME_SUFFIX, defaultNamed, NAME_FIELDS, NAME_TOKEN } from '../../src/systems/playerName';
 import { PLACE_PREFIX, PLACE_SPAWN, PLACES, placeOf } from '../../src/wola/systems/places';
-import type { WolaVocab } from '../../src/types/content';
+import type { SaladCashiers, SaladEvents, SaladLevels, SaladMenu, WolaVocab } from '../../src/types/content';
+import { SALAD_ANSWER_KEYS, SALAD_LINE_KEYS, SALAD_VARS } from '../../src/wola/systems/saladVisit';
 
 // ───────────────────────────── типы ─────────────────────────────
 
@@ -107,7 +108,11 @@ export type SchemaName =
   | 'lessons'
   | 'dialogues'
   | 'map'
-  | 'wola';
+  | 'wola'
+  | 'salad_menu'
+  | 'salad_cashiers'
+  | 'salad_levels'
+  | 'salad_events';
 
 /** Глобальные файлы контента → схема (ТЗ §2.3, §3.8). */
 export const GLOBAL_FILES: Readonly<Record<string, SchemaName>> = {
@@ -632,7 +637,7 @@ export function checkContent(input: CheckInput): Issue[] {
   const wola = new Map([...input.files].filter(([f]) => f.startsWith('wola/')));
   const main = wola.size ? new Map([...input.files].filter(([f]) => !f.startsWith('wola/'))) : input.files;
   const issues = checkMain({ ...input, files: main });
-  if (wola.size) issues.push(...checkWola(wola, input.schemas, input.prevWolaVocab ?? null));
+  if (wola.size) issues.push(...checkWola(wola, input.schemas, input.prevWolaVocab ?? null, input.files.get('errorTags.json')));
   return issues;
 }
 
@@ -1102,16 +1107,18 @@ const WOLA_VOCAB = 'wola/vocab.json';
  * и карты `wola/maps/<name>.json` (схема карты, ASCII, спавны, выходы `place:<id>` на известные места и спавн
  * возврата у двери). Отдельное пространство id: слова Wola могут совпадать с id главы 1 (то же слово).
  */
-export function checkWola(files: ReadonlyMap<string, unknown>, schemas: ReadonlyMap<string, object>, prev: ReadonlySet<string> | null): Issue[] {
+export function checkWola(files: ReadonlyMap<string, unknown>, schemas: ReadonlyMap<string, object>, prev: ReadonlySet<string> | null, errorTags?: unknown): Issue[] {
   const ctx = new Ctx();
   const maps: { file: string; name: string; data: LocationMap }[] = [];
   let vocabFile: WolaVocab | null = null;
+  const salad: Partial<Record<'menu' | 'cashiers' | 'levels' | 'events', unknown>> = {};
   for (const [file, data] of files) {
     const w = { file, path: '' };
     const mp = /^wola\/maps\/([^/]+)\.json$/.exec(file);
-    const schema: SchemaName | null = file === WOLA_VOCAB ? 'wola' : mp ? 'map' : null;
+    const sp = /^wola\/salad\/(menu|cashiers|levels|events)\.json$/.exec(file);
+    const schema: SchemaName | null = file === WOLA_VOCAB ? 'wola' : mp ? 'map' : sp ? (`salad_${sp[1]}` as SchemaName) : null;
     if (!schema) {
-      ctx.err('file', w, 'неизвестный файл Wola (ожидаются wola/vocab.json и wola/maps/*.json)');
+      ctx.err('file', w, 'неизвестный файл Wola (ожидаются wola/vocab.json, wola/maps/*.json, wola/salad/{menu,cashiers,levels,events}.json)');
       continue;
     }
     const v = validatorFor(schemas, schema);
@@ -1121,8 +1128,11 @@ export function checkWola(files: ReadonlyMap<string, unknown>, schemas: Readonly
     }
     walkNfc(ctx, data, w);
     if (schema === 'wola') vocabFile = data as WolaVocab;
+    else if (sp) salad[sp[1] as keyof typeof salad] = data;
     else maps.push({ file, name: mp![1]!, data: data as LocationMap });
   }
+  for (const k of ['menu', 'cashiers', 'levels', 'events'] as const)
+    if (!files.has(`wola/salad/${k}.json`)) ctx.err('file', { file: `wola/salad/${k}.json`, path: '' }, 'нет файла Salad Story (W-02)');
   if (!files.has(WOLA_VOCAB)) ctx.err('file', { file: WOLA_VOCAB, path: '' }, 'словарь Wola отсутствует (npx tsx tools/build_wola_vocab.ts)');
   if (!files.has('wola/maps/hub.json')) ctx.err('file', { file: 'wola/maps/hub.json', path: '' }, 'карта хаба Wola отсутствует');
   if (ctx.issues.some((i) => i.level === 'error')) return ctx.issues;
@@ -1147,6 +1157,11 @@ export function checkWola(files: ReadonlyMap<string, unknown>, schemas: Readonly
     if (prev) for (const id of prev) if (!ctx.vocab.has(id)) ctx.err('vocab-removed', { file: WOLA_VOCAB, path: '' }, `слово ${id} удалено из словаря Wola: id удалять нельзя (огород игрока его помнит)`);
   }
 
+  if (vocabFile && salad.menu && salad.cashiers && salad.levels && salad.events) {
+    const tags = new Set(Array.isArray(errorTags) ? (errorTags as { id?: string }[]).map((t) => t.id ?? '') : []);
+    checkSalad(ctx, { menu: salad.menu as SaladMenu, cashiers: salad.cashiers as SaladCashiers, levels: salad.levels as SaladLevels, events: salad.events as SaladEvents }, tags);
+  }
+
   for (const { file, name, data } of maps) {
     const w = { file, path: '' };
     if (data.id !== `wola.${name}`) ctx.err('id', sub(w, 'id'), `id карты "${data.id}" должен быть "wola.${name}"`);
@@ -1168,6 +1183,99 @@ export function checkWola(files: ReadonlyMap<string, unknown>, schemas: Readonly
     if (info.map.id === 'wola.hub') for (const p of PLACES) if (!seen.has(p)) ctx.err('ref', sub(w, 'objects'), `на хабе нет входа в место ${PLACE_PREFIX}${p}`);
   }
   return ctx.issues;
+}
+
+/**
+ * Salad Story (W-02): ссылки меню, кассиров, уровней и гэгов на словарь Wola, теги ошибок, друг на друга; реплики и ответы,
+ * которые зовёт генератор (src/wola/systems/saladVisit.ts), есть; подстановки известные; уровни 1…N по порядку.
+ */
+function checkSalad(ctx: Ctx, d: { menu: SaladMenu; cashiers: SaladCashiers; levels: SaladLevels; events: SaladEvents }, tags: ReadonlySet<string>): void {
+  const M = { file: 'wola/salad/menu.json', path: '' };
+  const C = { file: 'wola/salad/cashiers.json', path: '' };
+  const L = { file: 'wola/salad/levels.json', path: '' };
+  const E = { file: 'wola/salad/events.json', path: '' };
+  const lx = (id: string | undefined, w: Where, field: string): void => {
+    if (id !== undefined) ctx.ref(ctx.vocab, id, w, field, 'словаре Wola (content/wola/vocab.json)');
+  };
+  const vars = (text: string, w: Where): void => {
+    for (const m of text.matchAll(/\{([A-Za-z]+)\}/g)) if (!SALAD_VARS.has(m[1]!)) ctx.err('ref', w, `неизвестная подстановка {${m[1]}} (есть: ${[...SALAD_VARS].join(', ')})`);
+  };
+  const uniq = (ids: string[], w: Where, what: string): void => {
+    const seen = new Set<string>();
+    ids.forEach((id, i) => {
+      if (seen.has(id)) ctx.err('dup', sub(w, i), `дубль ${what} "${id}"`);
+      seen.add(id);
+    });
+  };
+  // Меню.
+  const dressings = new Set(d.menu.dressings.map((x) => x.id));
+  const salads = new Set(d.menu.salads.map((x) => x.id));
+  uniq(d.menu.salads.map((x) => x.id), sub(M, 'salads'), 'салата');
+  uniq(d.menu.dressings.map((x) => x.id), sub(M, 'dressings'), 'dressingu');
+  uniq([...d.menu.breads, ...d.menu.drinks].map((x) => x.id), sub(M, 'breads'), 'позиции');
+  uniq(d.menu.ingredients.map((x) => x.lx), sub(M, 'ingredients'), 'ингредиента');
+  if (d.menu.salads[0]!.from !== 1) ctx.err('ref', sub(M, 'salads', 0, 'from'), 'первый салат меню — «мой салат» по умолчанию, должен быть открыт с уровня 1');
+  d.menu.sizes.forEach((x, i) => lx(x.lx, sub(M, 'sizes', i, 'lx'), 'lx'));
+  d.menu.salads.forEach((x, i) => {
+    x.has.forEach((h, j) => lx(h, sub(M, 'salads', i, 'has', j), 'has'));
+    if (!dressings.has(x.dressing)) ctx.err('ref', sub(M, 'salads', i, 'dressing'), `висячая ссылка dressing "${x.dressing}"`);
+  });
+  d.menu.dressings.forEach((x, i) => lx(x.lx, sub(M, 'dressings', i, 'lx'), 'lx'));
+  d.menu.breads.forEach((x, i) => lx(x.lx, sub(M, 'breads', i, 'lx'), 'lx'));
+  d.menu.drinks.forEach((x, i) => lx(x.lx, sub(M, 'drinks', i, 'lx'), 'lx'));
+  d.menu.ingredients.forEach((x, i) => lx(x.lx, sub(M, 'ingredients', i, 'lx'), 'lx'));
+  d.menu.compose.slots.forEach((x, i) => x.options.forEach((o, j) => lx(o, sub(M, 'compose', 'slots', i, 'options', j), 'options')));
+  if (!salads.has(d.menu.season.salad)) ctx.err('ref', sub(M, 'season', 'salad'), `висячая ссылка season.salad "${d.menu.season.salad}"`);
+  // Кассиры: каждая реплика, которую зовёт генератор, есть в common с вариантом без minLevel.
+  const needLines = [...SALAD_LINE_KEYS, ...Object.keys(d.levels.questions), ...d.menu.compose.slots.map((x) => x.ask)];
+  for (const k of needLines)
+    if (!d.cashiers.common[k]?.some((l) => (l.minLevel ?? 1) <= 1)) ctx.err('ref', sub(C, 'common'), `нет реплики "${k}" для уровня 1 (её зовёт генератор визита)`);
+  uniq(d.cashiers.cashiers.map((x) => x.id), sub(C, 'cashiers'), 'кассира');
+  const lineSets: [Where, Record<string, { pl: string; ru: string }[]>][] = [[sub(C, 'common'), d.cashiers.common], ...d.cashiers.cashiers.map((c, i): [Where, Record<string, { pl: string; ru: string }[]>] => [sub(C, 'cashiers', i, 'ask'), c.ask])];
+  for (const [w, set] of lineSets)
+    for (const [k, ls] of Object.entries(set)) {
+      if (!needLines.includes(k)) ctx.warn('ref', sub(w, k), `реплику "${k}" генератор не зовёт`);
+      ls.forEach((l, i) => {
+        vars(l.pl, sub(w, k, i, 'pl'));
+        vars(l.ru, sub(w, k, i, 'ru'));
+      });
+    }
+  // Уровни.
+  d.levels.levels.forEach((lv, i) => {
+    const w = sub(L, 'levels', i);
+    if (lv.n !== i + 1) ctx.err('ref', sub(w, 'n'), `уровень ${lv.n} на месте ${i + 1}: уровни идут 1, 2, 3… по порядку`);
+    if (lv.id !== `salad.l${String(lv.n).padStart(2, '0')}`) ctx.err('id', sub(w, 'id'), `id уровня ${lv.n} должен быть salad.l${String(lv.n).padStart(2, '0')}`);
+    lv.words.forEach((x, j) => lx(x, sub(w, 'words', j), 'words'));
+    lv.slots.forEach((s, j) => {
+      const sw = sub(w, 'slots', j);
+      if (s.slot === 'listen') lx(s.item, sub(sw, 'item'), 'item');
+      if (s.slot === 'questions')
+        s.pool.forEach((q, k) => {
+          if (!d.levels.questions[q]) ctx.err('ref', sub(sw, 'pool', k), `висячая ссылка вопроса "${q}" (нет в levels.questions)`);
+        });
+      if (s.slot === 'pick' && s.count > lv.words.length) ctx.warn('ref', sub(sw, 'count'), 'картинок-целей больше, чем слов уровня');
+    });
+    if (lv.realTask) {
+      vars(lv.realTask.pl, sub(w, 'realTask', 'pl'));
+      vars(lv.realTask.ru, sub(w, 'realTask', 'ru'));
+    }
+    if (lv.status === 'ready' && i > 0 && d.levels.levels[i - 1]!.status !== 'ready') ctx.warn('ref', sub(w, 'status'), 'уровень ready после locked не играется: лестница стоит на последнем ready подряд');
+  });
+  for (const [q, def] of Object.entries(d.levels.questions)) lx(def.lx, sub(L, 'questions', q, 'lx'), 'lx');
+  for (const k of SALAD_ANSWER_KEYS) if (!d.levels.answers[k]) ctx.err('ref', sub(L, 'answers'), `нет ответа "${k}" (его зовёт генератор визита)`);
+  for (const [k, a] of Object.entries(d.levels.answers)) {
+    vars(a.pl, sub(L, 'answers', k, 'pl'));
+    vars(a.ru, sub(L, 'answers', k, 'ru'));
+    lx(a.lx, sub(L, 'answers', k, 'lx'), 'lx');
+    if (a.tag && tags.size && !tags.has(a.tag)) ctx.err('ref', sub(L, 'answers', k, 'tag'), `тега ошибки "${a.tag}" нет в errorTags.json`);
+  }
+  // Гэги: тег ошибки из errorTags.json, один гэг на тег.
+  uniq(d.events.gags.map((g) => g.onTag), sub(E, 'gags'), 'гэга на тег');
+  d.events.gags.forEach((g, i) => {
+    if (tags.size && !tags.has(g.onTag)) ctx.err('ref', sub(E, 'gags', i, 'onTag'), `тега ошибки "${g.onTag}" нет в errorTags.json`);
+    vars(g.line.pl, sub(E, 'gags', i, 'line', 'pl'));
+  });
+  uniq(d.events.events.map((e) => e.id), sub(E, 'events'), 'события');
 }
 
 export const errorsOf = (issues: Issue[]): Issue[] => issues.filter((i) => i.level === 'error');

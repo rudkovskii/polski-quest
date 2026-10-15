@@ -210,11 +210,12 @@ async function lozko(deps: WolaDeps, leave: () => void): Promise<void> {
   const pl = (id: string): string => deps.content.vocab.get(id)?.value.pl ?? id;
   const active = deps.activeMs ? activeToday(deps.store.progress.log.events, d.todayStart, deps.activeMs()) : undefined;
   const body = s.empty
-    ? [el('div', { class: 'list', 'data-empty': true }, 'Сегодня ещё ничего: добавь пару слов на ноутбуке или удобри огород.')]
+    ? [el('div', { class: 'list', 'data-empty': true }, 'Сегодня ещё ничего: добавь пару слов на ноутбуке, удобри огород или закажи обед в Salad Story.')]
     : [
         stat('Добавлено слов', String(s.added.length), 'added'),
         s.added.length ? el('div', { class: 'list', lang: 'pl' }, s.added.map(pl).join(', ')) : null,
         stat('Удобрено растений', String(s.fertilized), 'fertilized'),
+        s.saladVisits ? stat('Salad Story: визитов', String(s.saladVisits), 'salad') : null,
         stat('Выросло', String(s.grewWola.length), 'grew'),
         stat('Собрано в банки', String(s.harvestedToday.length), 'harvested'),
         s.harvestedToday.length ? el('div', { class: 'list', lang: 'pl' }, s.harvestedToday.map(pl).join(', ')) : null,

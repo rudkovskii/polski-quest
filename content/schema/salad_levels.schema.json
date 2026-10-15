@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "salad_levels.schema.json",
+  "title": "SaladLevels",
+  "description": "content/wola/salad/levels.json: лестница уровней Salad Story (W-02). Слоты визита раскрывает генератор src/wola/systems/saladVisit.ts в обычные шаги уроков.",
+  "type": "object",
+  "required": ["schema", "visit", "pass", "questions", "answers", "levels"],
+  "additionalProperties": false,
+  "$defs": {
+    "text": {
+      "title": "SaladText",
+      "type": "object",
+      "required": ["pl", "ru"],
+      "additionalProperties": false,
+      "properties": {
+        "pl": { "type": "string", "minLength": 1 },
+        "ru": { "type": "string", "minLength": 1 },
+        "lx": { "$ref": "common.schema.json#/$defs/lxId" },
+        "tag": { "$ref": "common.schema.json#/$defs/errorTag" }
+      }
+    },
+    "qId": { "title": "SaladQuestionId", "type": "string", "pattern": "^q\\.[a-z_]+$" },
+    "slot": {
+      "title": "SaladSlot",
+      "type": "object",
+      "required": ["slot"],
+      "discriminator": { "propertyName": "slot" },
+      "oneOf": [
+        { "title": "SlotGreet", "type": "object", "required": ["slot"], "additionalProperties": false, "properties": { "slot": { "const": "greet" } } },
+        { "title": "SlotWarmup", "type": "object", "required": ["slot"], "additionalProperties": false, "properties": { "slot": { "const": "warmup" } } },
+        {
+          "title": "SlotPick", "description": "Витрина: голос называет ингредиент, тап по картинке", "type": "object", "required": ["slot", "count", "options"], "additionalProperties": false,
+          "properties": { "slot": { "const": "pick" }, "count": { "type": "integer", "minimum": 1, "maximum": 4 }, "options": { "type": "array", "items": { "type": "integer", "minimum": 2, "maximum": 6 }, "minItems": 2, "maxItems": 2, "description": "Картинок: первый визит уровня, дальше" } }
+        },
+        { "title": "SlotPickSalad", "type": "object", "required": ["slot"], "additionalProperties": false, "properties": { "slot": { "const": "pick_salad" } } },
+        {
+          "title": "SlotListen", "type": "object", "required": ["slot", "say", "options", "item"], "additionalProperties": false,
+          "properties": { "slot": { "const": "listen" }, "say": { "type": "string", "minLength": 1 }, "options": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 2, "maxItems": 4 }, "item": { "$ref": "common.schema.json#/$defs/lxId" } }
+        },
+        {
+          "title": "SlotExplain", "type": "object", "required": ["slot", "md"], "additionalProperties": false,
+          "properties": { "slot": { "const": "explain" }, "md": { "type": "string", "minLength": 1, "maxLength": 400 }, "table": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } }, "once": { "type": "boolean", "description": "Только в первом визите уровня" } }
+        },
+        {
+          "title": "SlotOrder", "type": "object", "required": ["slot", "as"], "additionalProperties": false,
+          "properties": { "slot": { "const": "order" }, "as": { "enum": ["choice", "tiles", "gap_then_type", "type"] } }
+        },
+        {
+          "title": "SlotShadow", "type": "object", "required": ["slot"], "additionalProperties": false,
+          "properties": { "slot": { "const": "shadow" }, "what": { "enum": ["order", "osobno"] } }
+        },
+        {
+          "title": "SlotQuestions", "type": "object", "required": ["slot", "pool", "pick", "listen", "as"], "additionalProperties": false,
+          "properties": {
+            "slot": { "const": "questions" },
+            "pool": { "type": "array", "items": { "$ref": "#/$defs/qId" }, "minItems": 1 },
+            "pick": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 2, "maxItems": 2 },
+            "listen": { "enum": ["always", "never", "first2", "new"], "description": "Перед ответом — понять вопрос на слух (выбор перевода)" },
+            "as": { "enum": ["choice", "gap_options", "gap", "mixed"] }
+          }
+        },
+        {
+          "title": "SlotEvent", "type": "object", "required": ["slot", "pool"], "additionalProperties": false,
+          "properties": { "slot": { "const": "event" }, "pool": { "type": "array", "items": { "enum": ["ev.co_zwykle", "ev.kasjer_pomylka", "ev.nie_ma", "ev.sezon"] }, "minItems": 1 }, "always": { "type": "boolean", "description": "Шаг события есть всегда (сверка), шанс решает только, есть ли в нём ошибка" } }
+        },
+        { "title": "SlotFriend", "type": "object", "required": ["slot"], "additionalProperties": false, "properties": { "slot": { "const": "friend" } } },
+        { "title": "SlotCompose", "type": "object", "required": ["slot"], "additionalProperties": false, "properties": { "slot": { "const": "compose" } } },
+        { "title": "SlotPrice", "type": "object", "required": ["slot"], "additionalProperties": false, "properties": { "slot": { "const": "price" } } },
+        {
+          "title": "SlotServe", "type": "object", "required": ["slot"], "additionalProperties": false,
+          "properties": { "slot": { "const": "serve" }, "line": { "enum": ["serve", "name"] } }
+        }
+      ]
+    }
+  },
+  "properties": {
+    "schema": { "const": 1 },
+    "note": { "type": "string" },
+    "visit": {
+      "type": "object",
+      "required": ["maxSteps", "maxNewWords"],
+      "additionalProperties": false,
+      "properties": { "maxSteps": { "type": "integer", "minimum": 3, "maximum": 12 }, "maxNewWords": { "type": "integer", "minimum": 1, "maximum": 5 } }
+    },
+    "pass": {
+      "title": "SaladPass",
+      "type": "object",
+      "required": ["firstTry", "streak", "minDays", "jumpFirstTry", "fallbackBelow", "stampsPerCard"],
+      "additionalProperties": false,
+      "properties": {
+        "firstTry": { "type": "number", "minimum": 0, "maximum": 1 },
+        "streak": { "type": "integer", "minimum": 1 },
+        "minDays": { "type": "integer", "minimum": 1 },
+        "jumpFirstTry": { "type": "number", "minimum": 0, "maximum": 1 },
+        "fallbackBelow": { "type": "number", "minimum": 0, "maximum": 1 },
+        "stampsPerCard": { "type": "integer", "minimum": 2 }
+      }
+    },
+    "questions": {
+      "type": "object",
+      "propertyNames": { "pattern": "^q\\.[a-z_]+$" },
+      "additionalProperties": {
+        "title": "SaladQuestion",
+        "type": "object",
+        "required": ["lx", "want"],
+        "additionalProperties": false,
+        "properties": {
+          "lx": { "$ref": "common.schema.json#/$defs/lxId" },
+          "want": { "enum": ["size", "dressing_ok", "dressing_name", "osobno", "bread", "bread_which", "drink", "place", "more", "without", "app", "pay", "receipt"] }
+        }
+      }
+    },
+    "answers": { "type": "object", "propertyNames": { "pattern": "^[a-z_]+(\\.[a-z_]+)?$" }, "additionalProperties": { "$ref": "#/$defs/text" } },
+    "levels": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "title": "SaladLevel",
+        "type": "object",
+        "required": ["n", "id", "status", "title", "goal", "minutes", "words", "slots"],
+        "additionalProperties": false,
+        "properties": {
+          "n": { "type": "integer", "minimum": 1, "maximum": 10 },
+          "id": { "type": "string", "pattern": "^salad\\.l[0-9]{2}$" },
+          "status": { "enum": ["ready", "locked"] },
+          "title": { "$ref": "common.schema.json#/$defs/text2" },
+          "goal": { "type": "string", "minLength": 1 },
+          "minutes": { "type": "string", "minLength": 1 },
+          "words": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/lxId" }, "minItems": 1 },
+          "slots": { "type": "array", "items": { "$ref": "#/$defs/slot" }, "minItems": 2 },
+          "realTask": { "$ref": "#/$defs/text" }
+        }
+      }
+    }
+  }
+}

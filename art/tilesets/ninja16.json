@@ -1214,6 +1214,42 @@
     12,
     1
    ]
+  },
+  "w_ss_sciana": {
+   "sprite": "tile.wola",
+   "frame": 25
+  },
+  "w_ss_podloga": {
+   "sprite": "tile.wola",
+   "frame": 26
+  },
+  "w_lada_l": {
+   "sprite": "tile.wola",
+   "frame": 27
+  },
+  "w_lada_m": {
+   "sprite": "tile.wola",
+   "frame": 28
+  },
+  "w_lada_r": {
+   "sprite": "tile.wola",
+   "frame": 29
+  },
+  "w_witryna": {
+   "sprite": "tile.wola",
+   "frame": 30
+  },
+  "w_tablica_l": {
+   "sprite": "tile.wola",
+   "frame": 31
+  },
+  "w_tablica_r": {
+   "sprite": "tile.wola",
+   "frame": 32
+  },
+  "w_kasa": {
+   "sprite": "tile.wola",
+   "frame": 33
   }
  }
 }

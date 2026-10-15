@@ -1,0 +1,19 @@
+{
+ "schema": 1,
+ "note": "Гэги ошибок и события визита (W-02, research/12_salad_story.md §5, §7, §8.6). Гэг: тег ошибки первой попытки → картинка и реплика кассира (recast) поверх правила и перевода; tray — что окажется на подносе. События: minLevel, chance (сид визита), условия считает генератор.",
+ "gags": [
+  { "id": "gag.sok_sos", "onTag": "ph.sok_sos", "sprite": "wola.gag/2", "tray": "sok", "line": { "pl": "Sok… osobno? Proszę bardzo.", "ru": "Сок… отдельно? Пожалуйста." }, "title": { "pl": "Sok zamiast sosu", "ru": "сок вместо соуса" } },
+  { "id": "gag.miska_xxl", "onTag": "gr.rozmiar", "sprite": "wola.gag/0", "tray": "xxl", "line": { "pl": "Powiększona! Bardzo powiększona.", "ru": "Увеличенная! Очень увеличенная." }, "title": { "pl": "Miska jak wanna", "ru": "миска как таз" } },
+  { "id": "gag.na_wynos", "onTag": "gr.miejsce", "sprite": "wola.gag/1", "tray": "torba", "line": { "pl": "Na wynos. Proszę, torba.", "ru": "С собой. Вот пакет." }, "title": { "pl": "Torba przy stoliku", "ru": "пакет за столиком" } },
+  { "id": "gag.salatka", "onTag": "gr.acc_fem", "line": { "pl": "Sałatkę {salad}? Proszę bardzo.", "ru": "Салат {salad}? Пожалуйста." } },
+  { "id": "gag.za_duzo", "onTag": "gr.acc_over", "line": { "pl": "Aha… Rozumiem. Proszę bardzo.", "ru": "Ага… Понял. Пожалуйста." } },
+  { "id": "gag.teen_ty", "onTag": "ph.teen_ty", "sprite": "wola.gag/3", "line": { "pl": "Czter-dzie-ści. Nie czter-na-ście.", "ru": "Сорок. Не четырнадцать." }, "title": { "pl": "Czternaście złotych", "ru": "четырнадцать злотых" } }
+ ],
+ "events": [
+  { "id": "ev.co_zwykle", "minLevel": 5, "chance": 1, "sameOrderLast": 3 },
+  { "id": "ev.kasjer_pomylka", "minLevel": 7, "chance": 0.5, "level10Chance": 0.15 },
+  { "id": "ev.nie_ma", "minLevel": 8, "chance": 0.5, "level10Chance": 0.15 },
+  { "id": "ev.sezon", "minLevel": 10, "chance": 0.3 },
+  { "id": "ev.jak_bylo", "minLevel": 1, "chance": 1 }
+ ]
+}

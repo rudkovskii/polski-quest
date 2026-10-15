@@ -96,6 +96,13 @@ export interface ExerciseCtx {
   errLineFor?(tags: readonly string[]): { who: string; pl: string; plRu?: string } | undefined;
   /** Свои отклики вместо «Dobrze!» / «Jeszcze raz.» (турникет: «Pip!» / «Hyk!»). */
   verdicts?: { ok: string; bad: string };
+  /** Картинка кадра атласа (`pick`, W-02): склейка Wola рисует пиксель-арт; нет — подпись вместо картинки. */
+  picture?(frame: string, scale: number): HTMLElement | null;
+  /**
+   * Смешная развязка ошибки (W-02, Salad Story): по тегам первой неверной попытки — картинка-гэг (и, через
+   * `errLineFor`, переспрос кассира) над стандартными ответом, правилом и переводом. null — гэга нет.
+   */
+  gagFor?(tags: readonly string[]): HTMLElement | null;
 }
 
 export interface ExerciseModule<S extends Step = Step> {

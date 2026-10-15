@@ -253,7 +253,10 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
       // Реакция мира (P-06, СЮЖЕТ_v2 §1 п. 10): реплика NPC сцены на первую ошибку шага.
       const errLine = ctx.errLineFor ? ctx.errLineFor(c.tags.length ? c.tags : spec.cluster ? [spec.cluster] : []) : ctx.errLine;
       const react = errLine && isFirst ? el('span', { class: 'react', 'data-fb': 'react' }, el('b', {}, `${errLine.who}: `), el('span', { lang: 'pl' }, errLine.pl), errLine.plRu ? el('small', { class: 'ru', lang: 'ru' }, ` ${errLine.plRu}`) : null) : null;
+      // Гэг (W-02): кассир буквально выполнил сказанное — картинка над переспросом и разбором, только на первую ошибку.
+      const gag = isFirst ? (ctx.gagFor?.(c.tags.length ? c.tags : spec.cluster ? [spec.cluster] : []) ?? null) : null;
       feedback(v.cls, [
+        gag,
         react,
         ...answerParts,
         rule ? el('span', { class: 'rule', 'data-fb': 'rule' }, '💡 ', rule) : null,

@@ -6,13 +6,13 @@ import type { Grade } from './srs';
 
 export type StepKind =
   | 'say' | 'explain' | 'shadow' | 'stress'
-  | 'choice' | 'listen' | 'match' | 'minimal_pair'
+  | 'choice' | 'listen' | 'match' | 'minimal_pair' | 'pick'
   | 'type' | 'dictation' | 'order' | 'gap';
 
 /** Шаги, которые SRS не трогают (stress идёт в кластер R1, не в карточку). */
 export const NO_SRS: ReadonlySet<StepKind> = new Set(['say', 'explain', 'shadow', 'stress']);
 /** Порог «быстро» для grade 3: выбор → grade3FastMs.choice, ввод → grade3FastMs.input. */
-export const CHOICE_KINDS: ReadonlySet<StepKind> = new Set(['choice', 'listen', 'match', 'minimal_pair']);
+export const CHOICE_KINDS: ReadonlySet<StepKind> = new Set(['choice', 'listen', 'match', 'minimal_pair', 'pick']);
 export const INPUT_KINDS: ReadonlySet<StepKind> = new Set(['type', 'dictation', 'order', 'gap']);
 /** grade 3 только для зрелых карточек: interval ≥ 7. */
 export const GRADE3_MIN_INTERVAL = 7;

@@ -338,6 +338,93 @@
       }
     },
     {
+      "title": "StepPick",
+      "description": "Тап по картинке (витрина Wola, W-02): голос называет, игрок выбирает картинку",
+      "type": "object",
+      "required": [
+        "t",
+        "prompt",
+        "items",
+        "answer"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "t": {
+          "const": "pick"
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "say": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Озвучить при показе (и ▶); без звука — написание и транскрипция"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "title": "PickItem",
+            "type": "object",
+            "required": [
+              "sprite"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "sprite": {
+                "type": "string",
+                "pattern": "^[a-z0-9_.]+/[0-9]+$",
+                "description": "Кадр атласа custom"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Подпись под картинкой (если нет картинки — вместо неё)"
+              }
+            }
+          }
+        },
+        "answer": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "id": {
+          "type": "string",
+          "description": "По умолчанию <lessonId>#<index>"
+        },
+        "item": {
+          "type": "string",
+          "pattern": "^(lx|mp)\\.[a-z0-9_]+$",
+          "description": "lxId или mpId, которое проверяет шаг"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/errorTag"
+          }
+        },
+        "cluster": {
+          "$ref": "common.schema.json#/$defs/cluster"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "why": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 140,
+          "description": "Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)"
+        },
+        "tr": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Транскрипция кириллицей для режима без звука"
+        }
+      }
+    },
+    {
       "title": "StepOrder",
       "description": "Собирает фразу из плиток",
       "type": "object",

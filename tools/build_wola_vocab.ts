@@ -95,6 +95,92 @@ export const PRIORITY: string[] = [
   'dzisiaj', 'jutro', 'teraz', 'godzina', 'która godzina',
 ];
 
+/**
+ * Salad Story (W-02, research/12_salad_story.md §5, §6.4): слова лестницы уровней, тема `jedzenie`, по уровням 1–10.
+ * Карточки: `rec` у всех, `lis` у того, что говорит кассир, `pro` у того, что говорит Дима. Слова главы 1 и тренажёра
+ * (woda, Poproszę, ser, sok, na miejscu, na wynos, jajka, pomidor, Smacznego!, Może być, Zgadza się…) не дублируются: их id берёт меню.
+ */
+type SaladWord = Omit<VocabEntry, 'srs' | 'tags'>;
+const W = (id: string, pl: string, ru: string, tr: string, pos: VocabEntry['pos'], more: Partial<SaladWord> = {}): SaladWord => ({ id, pl, ru, tr, pos, ...more });
+const SAY: VocabEntry['cards'] = ['rec', 'lis'];
+const ANSWER: VocabEntry['cards'] = ['rec', 'pro'];
+export const SALAD_WORDS: SaladWord[] = [
+  // 1. Witryna
+  W('lx.salatka', 'sałatka', 'салат', 'саўа́тка', 'noun', { gender: 'f', forms: { acc: 'sałatkę' }, ex: { pl: 'Poproszę sałatkę Cezar.', ru: 'Салат «Цезарь», пожалуйста.' } }),
+  W('lx.kurczak', 'kurczak', 'курица', 'ку́рчак', 'noun', { gender: 'm' }),
+  W('lx.losos', 'łosoś', 'лосось', 'ўо́сощ', 'noun', { gender: 'm', forms: { gen: 'łososia' } }),
+  W('lx.awokado', 'awokado', 'авокадо', 'авока́до', 'noun', { gender: 'n' }),
+  W('lx.ogorek', 'ogórek', 'огурец', 'огу́рэк', 'noun', { gender: 'm' }),
+  // 2. Poproszę sałatkę
+  W('lx.co_podac', 'Co podać?', 'Что подать? (что вам?)', 'цо по́дачь', 'phrase', { cards: SAY }),
+  // 3. Rozmiar
+  W('lx.normalna', 'normalna', 'обычная (порция)', 'норма́льна', 'adj', { forms: { acc: 'normalną' } }),
+  W('lx.powiekszona', 'powiększona', 'увеличенная (порция)', 'повьенкшо́на', 'adj', { forms: { acc: 'powiększoną' } }),
+  W('lx.porcja', 'porcja', 'порция', 'по́рцъя', 'noun', { gender: 'f', cards: SAY }),
+  // 4. Dressing
+  W('lx.dressing', 'dressing', 'заправка (соус к салату)', 'дрэ́синк', 'noun', { gender: 'm', cards: SAY }),
+  W('lx.sos', 'sos', 'соус', 'сос', 'noun', { gender: 'm' }),
+  W('lx.jaki_dressing', 'Jaki dressing?', 'Какую заправку?', 'я́ки дрэ́синк', 'phrase', { cards: SAY }),
+  W('lx.jogurtowy', 'jogurtowy', 'йогуртовый', 'йогурто́вы', 'adj'),
+  W('lx.fistaszkowy', 'fistaszkowy', 'арахисовый', 'фисташко́вы', 'adj'),
+  W('lx.musztardowo_miodowy', 'musztardowo-miodowy', 'медово-горчичный', 'муштардо́во-мьодо́вы', 'adj', { cards: SAY }),
+  W('lx.osobno', 'osobno', 'отдельно', 'осо́бно', 'adv'),
+  W('lx.wymieszac', 'wymieszać', 'перемешать', 'вымье́шачь', 'verb'),
+  // 5. Do tego?
+  W('lx.do_tego', 'Do tego?', 'К этому? (что-то к этому?)', 'до тэ́го', 'phrase', { cards: SAY }),
+  W('lx.paluch', 'paluch', 'хлебная палочка', 'па́лух', 'noun', { gender: 'm' }),
+  W('lx.buraczkowy', 'buraczkowy', 'свекольный', 'бурачко́вы', 'adj'),
+  W('lx.z_ziarnami', 'z ziarnami', 'с семенами', 'з жьярна́ми', 'phrase'),
+  W('lx.cos_do_picia', 'Coś do picia?', 'Что-нибудь попить?', 'цощ до пи́чя', 'phrase', { cards: SAY }),
+  W('lx.nie_dziekuje', 'Nie, dziękuję.', 'Нет, спасибо.', 'нье, джьенку́йэ', 'phrase', { cards: ANSWER }),
+  // 6. Piszę sam
+  W('lx.chcialbym', 'Chciałbym…', 'Я хотел бы…', 'хьчя́ўбым', 'phrase', { cards: ANSWER }),
+  W('lx.tunczyk', 'tuńczyk', 'тунец', 'ту́ньчык', 'noun', { gender: 'm' }),
+  W('lx.mango', 'mango', 'манго', 'ма́нго', 'noun', { gender: 'n', cards: SAY }),
+  W('lx.tofu', 'tofu', 'тофу', 'то́фу', 'noun', { gender: 'n', cards: SAY }),
+  W('lx.wolowina', 'wołowina', 'говядина', 'воўови́на', 'noun', { gender: 'f' }),
+  // 7. Bez bekonu + kartka
+  W('lx.ze_wszystkim', 'Ze wszystkim?', 'Со всем?', 'зэ фшы́стким', 'phrase', { cards: SAY }),
+  W('lx.bekon', 'bekon', 'бекон', 'бэ́кон', 'noun', { gender: 'm', forms: { gen: 'bekonu' } }),
+  W('lx.grzanki', 'grzanki', 'гренки', 'гжа́нки', 'noun', { gender: 'nmp', forms: { gen: 'grzanek' } }),
+  W('lx.bez_bekonu', 'bez bekonu', 'без бекона', 'бэз бэко́ну', 'phrase', { cards: ANSWER }),
+  W('lx.bez_grzanek', 'bez grzanek', 'без гренок', 'бэз гжа́нэк', 'phrase', { cards: ANSWER }),
+  W('lx.bez_cebuli', 'bez cebuli', 'без лука', 'бэз цэбу́ли', 'phrase', { cards: ANSWER }),
+  W('lx.dla_kolegi', 'dla kolegi', 'для коллеги', 'дла колэ́ги', 'phrase', { cards: ANSWER }),
+  W('lx.nie_tylko', 'nie …, tylko …', 'не …, а …', 'нье …, ты́лько', 'phrase', { cards: ANSWER }),
+  // 8. Stwórz własną
+  W('lx.stworz_wlasna', 'Stwórz własną', 'Собери свой (салат)', 'стфуж вўа́сноў', 'phrase', { cards: SAY }),
+  W('lx.jaka_baza', 'Jaka baza?', 'Какая основа?', 'я́ка ба́за', 'phrase', { cards: SAY }),
+  W('lx.mix_salat', 'mix sałat', 'микс салатов', 'микс са́ўат', 'phrase'),
+  W('lx.szpinak', 'szpinak', 'шпинат', 'шпи́нак', 'noun', { gender: 'm' }),
+  W('lx.rukola', 'rukola', 'руккола', 'руко́ла', 'noun', { gender: 'f' }),
+  W('lx.jakie_bialko', 'Jakie białko?', 'Какой белок?', 'я́кье бья́ўко', 'phrase', { cards: SAY }),
+  W('lx.dodatki', 'dodatki', 'добавки', 'дода́тки', 'noun', { gender: 'nmp', cards: SAY }),
+  W('lx.ziemniaki', 'ziemniaki pieczone', 'печёный картофель', 'жьемня́ки пьечо́нэ', 'phrase'),
+  W('lx.niestety_nie_ma', 'Niestety, nie ma…', 'К сожалению, нет…', 'ньесьтэ́ты, нье ма', 'phrase', { cards: SAY }),
+  W('lx.to_poprosze', 'To poproszę…', 'Тогда дайте…', 'то попро́шэ', 'phrase', { cards: ANSWER }),
+  // 9. Kasa
+  W('lx.ma_pan_aplikacje', 'Ma pan aplikację?', 'У вас есть приложение?', 'ма пан аплика́цъйэ', 'phrase', { cards: SAY }),
+  W('lx.zeskanowac_kod', 'Proszę zeskanować kod.', 'Отсканируйте код.', 'про́шэ зэскано́вачь кот', 'phrase', { cards: SAY }),
+  W('lx.razem', 'razem', 'итого; вместе', 'ра́зэм', 'adv', { cards: SAY }),
+  W('lx.karta_narz', 'kartą', 'картой', 'ка́ртоў', 'phrase'),
+  W('lx.blikiem', 'BLIKiem', 'через BLIK (с телефона)', 'бли́кьем', 'phrase', { cards: ANSWER }),
+  W('lx.przylozyc', 'Proszę przyłożyć.', 'Прикладывайте (карту).', 'про́шэ пшыўо́жычь', 'phrase', { cards: SAY }),
+  W('lx.zlote', 'złote', 'злотых (после 2, 3, 4)', 'зўо́тэ', 'noun', { cards: SAY }),
+  W('lx.zlotych', 'złotych', 'злотых (после 5–21, 25…)', 'зўо́тых', 'noun', { cards: SAY }),
+  W('lx.dwadziescia', 'dwadzieścia', 'двадцать', 'двадже́щчя', 'num', { cards: SAY }),
+  W('lx.trzydziesci', 'trzydzieści', 'тридцать', 'тшыдже́щчи', 'num', { cards: SAY }),
+  W('lx.czterdziesci', 'czterdzieści', 'сорок', 'чтэрдже́щчи', 'num', { cards: SAY }),
+  W('lx.piecdziesiat', 'pięćdziesiąt', 'пятьдесят', 'пеньчдже́щёнт', 'num', { cards: SAY }),
+  // 10. Pora lunchu
+  W('lx.to_co_zwykle', 'To co zwykle?', 'Как обычно?', 'то цо зві́клэ', 'phrase', { cards: SAY }),
+  W('lx.dynia', 'dynia', 'тыква', 'ды́нья', 'noun', { gender: 'f', ff: { ru: 'дыня', means: 'тыква' } }),
+  W('lx.na_nip', 'Na NIP?', 'На фирму (чек с NIP)?', 'на нип', 'phrase', { cards: SAY }),
+];
+
+/** Формы слов главы 1 и тренажёра, нужные Salad Story (винительный после poproszę). */
+const SALAD_FORMS: Record<string, Record<string, string>> = { 'lx.woda': { acc: 'wodę' } };
+
 /** Правки примеров тренажёра (ошибки в польском). Ключ — нормализованный pl. */
 const FIXES: Record<string, Partial<{ ex: { pl: string; ru: string }; ru: string }>> = {
   dwa: { ex: { pl: 'Dwie kawy, proszę.', ru: 'Два кофе, пожалуйста.' } },
@@ -231,12 +317,31 @@ export function buildWolaVocab({ ch01, trainer, prev }: BuildInput): WolaVocabFi
     }
   }
   const food = all.filter(([, e]) => salad.has(e.tags![0]!)).sort(([, a], [, b]) => a._day - b._day || a._ord - b._ord).map(([k]) => k);
+  // Salad Story (W-02): слова лестницы уровней — в конце, в порядке уровней. Дубль по pl или id — ошибка таблицы.
+  const saladTheme = THEMES.find((t) => t.place === 'salad')!.id;
+  for (const w of SALAD_WORDS) {
+    const key = plKey(w.pl);
+    const have = byKey.get(key);
+    // То же слово уже пришло из словарей с тем же id (тренажёр с прошлой версии) — таблица Salad Story главнее.
+    if (have && have.id !== w.id) throw new Error(`build_wola_vocab: слово Salad Story "${w.pl}" уже есть в словарях (${have.id}) — бери его id`);
+    if (!have && [...byKey.values()].some((e) => e.id === w.id)) throw new Error(`build_wola_vocab: id ${w.id} уже занят`);
+    byKey.set(key, { ...w, ...(!w.ex && have?.ex ? { ex: have.ex } : {}), srs: true, tags: [saladTheme], _day: 99, _ord: ord++ });
+    const at = food.indexOf(key);
+    if (at >= 0) food.splice(at, 1);
+    food.push(key);
+  }
+  for (const [id, forms] of Object.entries(SALAD_FORMS)) {
+    const e = [...byKey.values()].find((x) => x.id === id);
+    if (!e) throw new Error(`build_wola_vocab: SALAD_FORMS: нет слова ${id}`);
+    e.forms = { ...e.forms, ...forms };
+  }
   const order = [...head, ...tail, ...food];
 
   const vocab = order.map((k) => {
     const { _day, _ord, ...e } = byKey.get(k)!;
     // Поля в порядке схемы — дифф читается.
     const out: VocabEntry = { id: e.id, pl: e.pl, ru: e.ru, ...(e.tr ? { tr: e.tr } : {}), pos: e.pos, srs: true };
+    if (e.cards) out.cards = e.cards;
     if (e.gender) out.gender = e.gender;
     if (e.forms) out.forms = e.forms;
     if (e.ex) out.ex = e.ex;

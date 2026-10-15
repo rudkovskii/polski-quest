@@ -5,7 +5,7 @@
  "margin": 1,
  "spacing": 2,
  "columns": 16,
- "count": 201,
+ "count": 210,
  "tiles": {
   "altana": {
    "kind": "auto16",
@@ -689,6 +689,30 @@
     198
    ]
   },
+  "w_kasa": {
+   "kind": "single",
+   "frames": [
+    209
+   ]
+  },
+  "w_lada_l": {
+   "kind": "single",
+   "frames": [
+    203
+   ]
+  },
+  "w_lada_m": {
+   "kind": "single",
+   "frames": [
+    204
+   ]
+  },
+  "w_lada_r": {
+   "kind": "single",
+   "frames": [
+    205
+   ]
+  },
   "w_lozko_l": {
    "kind": "single",
    "frames": [
@@ -767,6 +791,30 @@
     185
    ]
   },
+  "w_ss_podloga": {
+   "kind": "single",
+   "frames": [
+    202
+   ]
+  },
+  "w_ss_sciana": {
+   "kind": "single",
+   "frames": [
+    201
+   ]
+  },
+  "w_tablica_l": {
+   "kind": "single",
+   "frames": [
+    207
+   ]
+  },
+  "w_tablica_r": {
+   "kind": "single",
+   "frames": [
+    208
+   ]
+  },
   "w_tram_d": {
    "kind": "single",
    "frames": [
@@ -789,6 +837,12 @@
    "kind": "single",
    "frames": [
     183
+   ]
+  },
+  "w_witryna": {
+   "kind": "single",
+   "frames": [
+    206
    ]
   },
   "wall": {

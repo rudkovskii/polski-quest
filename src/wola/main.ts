@@ -2,7 +2,7 @@
 //   • улица Воли — карта `wola.hub` с ходьбой на движке Location (d-pad, стрелки/WASD, тап = дойти, правила A);
 //     без бобра, режиссёра, вокзала и фотобудки; Дима по умолчанию;
 //   • вход в дверь (`place:<id>`) открывает экран места без ходьбы: дом (ноутбук, полка, банки, кровать), огород,
-//     Salad Story (заглушка до W-02); «Wola» возвращает на улицу к той же двери;
+//     Salad Story (стойка заказа с лестницей уровней, W-02); «Wola» возвращает на улицу к той же двери;
 //   • своё сохранение: IndexedDB `polski-quest-wola`, localStorage с пространством `wola:` — прогресс основной игры
 //     не трогается; облака нет (копия файлом в настройках);
 //   • звук: озвучка слов как в основной игре, «без звука» только в настройках; `?mute=1` — ничего вслух.
@@ -32,13 +32,15 @@ import { mountUpdateToast } from '../ui/updateToast';
 import { wolaContent } from './content';
 import { HUB_MAP, placeOf, type PlaceId } from './systems/places';
 import { routePlaces } from './places';
+import { saladCounter, saladState } from './systems/saladVisit';
 import { hubCounters, wolaBook, type HubCounters } from './systems/wola';
 import { runGarden } from './ui/garden';
 import { runHome } from './ui/home';
 import { mountHub } from './ui/hub';
 import type { WolaDeps } from './ui/kit';
 import { loadPixAtlas } from './ui/pix';
-import { runSalad } from './ui/salad';
+import { mySaladSection } from './ui/mySalad';
+import { planVisit, runSalad } from './ui/salad';
 
 export const WOLA_DB = 'polski-quest-wola';
 export const WOLA_LS = 'wola:';
@@ -62,7 +64,7 @@ async function start(): Promise<void> {
     history.replaceState(null, '', `${location.pathname}${params.size ? `?${params.toString()}` : ''}${location.hash}`);
   }
 
-  const { content, vocab } = wolaContent();
+  const { content, vocab, salad } = wolaContent();
   useContent(content);
   const book = wolaBook(vocab);
 
@@ -114,6 +116,7 @@ async function start(): Promise<void> {
     bus,
     audio,
     atlas,
+    salad,
     clock,
     coarse: matchMedia('(pointer: coarse)').matches,
     activeMs: () => activeMsAt(act, clock.mono()),
@@ -162,7 +165,8 @@ async function start(): Promise<void> {
   const counters = (): HubCounters => {
     const now = clock.now();
     const d = derive(store.progress, deriveContent(content), now);
-    return hubCounters(store.progress, book, d, now, content.tuning);
+    const st = saladState(store.progress.log.events, salad, { dayStartHour: content.tuning.dayStartHour }, now);
+    return { ...hubCounters(store.progress, book, d, now, content.tuning), salad: saladCounter(st, salad, d.today) };
   };
   let busy = false;
   const doors = new Map<PlaceId, [number, number]>();
@@ -174,7 +178,7 @@ async function start(): Promise<void> {
     if (busy) return;
     busy = true;
     try {
-      await runSettings({ overlay, store, bus, clock, build: __BUILD_ID__, wola: true });
+      await runSettings({ overlay, store, bus, clock, build: __BUILD_ID__, wola: true, section: (api) => mySaladSection(salad.menu, api) });
     } finally {
       busy = false;
       hub.refresh();
@@ -202,7 +206,7 @@ async function start(): Promise<void> {
   const open = places.open;
 
   if (devServer) {
-    (window as unknown as { __wola?: Record<string, unknown> }).__wola = { bus, game, store, clock, content, book, overlay, open, counters };
+    (window as unknown as { __wola?: Record<string, unknown> }).__wola = { bus, game, store, clock, content, book, salad, overlay, open, counters, planVisit: (jump = false) => planVisit(deps, jump) };
     if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
   }
 }

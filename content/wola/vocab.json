@@ -4217,6 +4217,9 @@
    "pos": "noun",
    "srs": true,
    "gender": "f",
+   "forms": {
+    "acc": "wodę"
+   },
    "ex": {
     "pl": "Woda niegazowana.",
     "ru": "Вода без газа."
@@ -4782,6 +4785,866 @@
     "pl": "Kawa bez cukru.",
     "ru": "Кофе без сахара."
    },
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.salatka",
+   "pl": "sałatka",
+   "ru": "салат",
+   "tr": "саўа́тка",
+   "pos": "noun",
+   "srs": true,
+   "gender": "f",
+   "forms": {
+    "acc": "sałatkę"
+   },
+   "ex": {
+    "pl": "Poproszę sałatkę Cezar.",
+    "ru": "Салат «Цезарь», пожалуйста."
+   },
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.kurczak",
+   "pl": "kurczak",
+   "ru": "курица",
+   "tr": "ку́рчак",
+   "pos": "noun",
+   "srs": true,
+   "gender": "m",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.losos",
+   "pl": "łosoś",
+   "ru": "лосось",
+   "tr": "ўо́сощ",
+   "pos": "noun",
+   "srs": true,
+   "gender": "m",
+   "forms": {
+    "gen": "łososia"
+   },
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.awokado",
+   "pl": "awokado",
+   "ru": "авокадо",
+   "tr": "авока́до",
+   "pos": "noun",
+   "srs": true,
+   "gender": "n",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.ogorek",
+   "pl": "ogórek",
+   "ru": "огурец",
+   "tr": "огу́рэк",
+   "pos": "noun",
+   "srs": true,
+   "gender": "m",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.co_podac",
+   "pl": "Co podać?",
+   "ru": "Что подать? (что вам?)",
+   "tr": "цо по́дачь",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.normalna",
+   "pl": "normalna",
+   "ru": "обычная (порция)",
+   "tr": "норма́льна",
+   "pos": "adj",
+   "srs": true,
+   "forms": {
+    "acc": "normalną"
+   },
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.powiekszona",
+   "pl": "powiększona",
+   "ru": "увеличенная (порция)",
+   "tr": "повьенкшо́на",
+   "pos": "adj",
+   "srs": true,
+   "forms": {
+    "acc": "powiększoną"
+   },
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.porcja",
+   "pl": "porcja",
+   "ru": "порция",
+   "tr": "по́рцъя",
+   "pos": "noun",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "gender": "f",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.dressing",
+   "pl": "dressing",
+   "ru": "заправка (соус к салату)",
+   "tr": "дрэ́синк",
+   "pos": "noun",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "gender": "m",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.sos",
+   "pl": "sos",
+   "ru": "соус",
+   "tr": "сос",
+   "pos": "noun",
+   "srs": true,
+   "gender": "m",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.jaki_dressing",
+   "pl": "Jaki dressing?",
+   "ru": "Какую заправку?",
+   "tr": "я́ки дрэ́синк",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.jogurtowy",
+   "pl": "jogurtowy",
+   "ru": "йогуртовый",
+   "tr": "йогурто́вы",
+   "pos": "adj",
+   "srs": true,
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.fistaszkowy",
+   "pl": "fistaszkowy",
+   "ru": "арахисовый",
+   "tr": "фисташко́вы",
+   "pos": "adj",
+   "srs": true,
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.musztardowo_miodowy",
+   "pl": "musztardowo-miodowy",
+   "ru": "медово-горчичный",
+   "tr": "муштардо́во-мьодо́вы",
+   "pos": "adj",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.osobno",
+   "pl": "osobno",
+   "ru": "отдельно",
+   "tr": "осо́бно",
+   "pos": "adv",
+   "srs": true,
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.wymieszac",
+   "pl": "wymieszać",
+   "ru": "перемешать",
+   "tr": "вымье́шачь",
+   "pos": "verb",
+   "srs": true,
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.do_tego",
+   "pl": "Do tego?",
+   "ru": "К этому? (что-то к этому?)",
+   "tr": "до тэ́го",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.paluch",
+   "pl": "paluch",
+   "ru": "хлебная палочка",
+   "tr": "па́лух",
+   "pos": "noun",
+   "srs": true,
+   "gender": "m",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.buraczkowy",
+   "pl": "buraczkowy",
+   "ru": "свекольный",
+   "tr": "бурачко́вы",
+   "pos": "adj",
+   "srs": true,
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.z_ziarnami",
+   "pl": "z ziarnami",
+   "ru": "с семенами",
+   "tr": "з жьярна́ми",
+   "pos": "phrase",
+   "srs": true,
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.cos_do_picia",
+   "pl": "Coś do picia?",
+   "ru": "Что-нибудь попить?",
+   "tr": "цощ до пи́чя",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.nie_dziekuje",
+   "pl": "Nie, dziękuję.",
+   "ru": "Нет, спасибо.",
+   "tr": "нье, джьенку́йэ",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "pro"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.chcialbym",
+   "pl": "Chciałbym…",
+   "ru": "Я хотел бы…",
+   "tr": "хьчя́ўбым",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "pro"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.tunczyk",
+   "pl": "tuńczyk",
+   "ru": "тунец",
+   "tr": "ту́ньчык",
+   "pos": "noun",
+   "srs": true,
+   "gender": "m",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.mango",
+   "pl": "mango",
+   "ru": "манго",
+   "tr": "ма́нго",
+   "pos": "noun",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "gender": "n",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.tofu",
+   "pl": "tofu",
+   "ru": "тофу",
+   "tr": "то́фу",
+   "pos": "noun",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "gender": "n",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.wolowina",
+   "pl": "wołowina",
+   "ru": "говядина",
+   "tr": "воўови́на",
+   "pos": "noun",
+   "srs": true,
+   "gender": "f",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.ze_wszystkim",
+   "pl": "Ze wszystkim?",
+   "ru": "Со всем?",
+   "tr": "зэ фшы́стким",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.bekon",
+   "pl": "bekon",
+   "ru": "бекон",
+   "tr": "бэ́кон",
+   "pos": "noun",
+   "srs": true,
+   "gender": "m",
+   "forms": {
+    "gen": "bekonu"
+   },
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.grzanki",
+   "pl": "grzanki",
+   "ru": "гренки",
+   "tr": "гжа́нки",
+   "pos": "noun",
+   "srs": true,
+   "gender": "nmp",
+   "forms": {
+    "gen": "grzanek"
+   },
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.bez_bekonu",
+   "pl": "bez bekonu",
+   "ru": "без бекона",
+   "tr": "бэз бэко́ну",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "pro"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.bez_grzanek",
+   "pl": "bez grzanek",
+   "ru": "без гренок",
+   "tr": "бэз гжа́нэк",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "pro"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.bez_cebuli",
+   "pl": "bez cebuli",
+   "ru": "без лука",
+   "tr": "бэз цэбу́ли",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "pro"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.dla_kolegi",
+   "pl": "dla kolegi",
+   "ru": "для коллеги",
+   "tr": "дла колэ́ги",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "pro"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.nie_tylko",
+   "pl": "nie …, tylko …",
+   "ru": "не …, а …",
+   "tr": "нье …, ты́лько",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "pro"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.stworz_wlasna",
+   "pl": "Stwórz własną",
+   "ru": "Собери свой (салат)",
+   "tr": "стфуж вўа́сноў",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.jaka_baza",
+   "pl": "Jaka baza?",
+   "ru": "Какая основа?",
+   "tr": "я́ка ба́за",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.mix_salat",
+   "pl": "mix sałat",
+   "ru": "микс салатов",
+   "tr": "микс са́ўат",
+   "pos": "phrase",
+   "srs": true,
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.szpinak",
+   "pl": "szpinak",
+   "ru": "шпинат",
+   "tr": "шпи́нак",
+   "pos": "noun",
+   "srs": true,
+   "gender": "m",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.rukola",
+   "pl": "rukola",
+   "ru": "руккола",
+   "tr": "руко́ла",
+   "pos": "noun",
+   "srs": true,
+   "gender": "f",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.jakie_bialko",
+   "pl": "Jakie białko?",
+   "ru": "Какой белок?",
+   "tr": "я́кье бья́ўко",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.dodatki",
+   "pl": "dodatki",
+   "ru": "добавки",
+   "tr": "дода́тки",
+   "pos": "noun",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "gender": "nmp",
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.ziemniaki",
+   "pl": "ziemniaki pieczone",
+   "ru": "печёный картофель",
+   "tr": "жьемня́ки пьечо́нэ",
+   "pos": "phrase",
+   "srs": true,
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.niestety_nie_ma",
+   "pl": "Niestety, nie ma…",
+   "ru": "К сожалению, нет…",
+   "tr": "ньесьтэ́ты, нье ма",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.to_poprosze",
+   "pl": "To poproszę…",
+   "ru": "Тогда дайте…",
+   "tr": "то попро́шэ",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "pro"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.ma_pan_aplikacje",
+   "pl": "Ma pan aplikację?",
+   "ru": "У вас есть приложение?",
+   "tr": "ма пан аплика́цъйэ",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.zeskanowac_kod",
+   "pl": "Proszę zeskanować kod.",
+   "ru": "Отсканируйте код.",
+   "tr": "про́шэ зэскано́вачь кот",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.razem",
+   "pl": "razem",
+   "ru": "итого; вместе",
+   "tr": "ра́зэм",
+   "pos": "adv",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.karta_narz",
+   "pl": "kartą",
+   "ru": "картой",
+   "tr": "ка́ртоў",
+   "pos": "phrase",
+   "srs": true,
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.blikiem",
+   "pl": "BLIKiem",
+   "ru": "через BLIK (с телефона)",
+   "tr": "бли́кьем",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "pro"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.przylozyc",
+   "pl": "Proszę przyłożyć.",
+   "ru": "Прикладывайте (карту).",
+   "tr": "про́шэ пшыўо́жычь",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.zlote",
+   "pl": "złote",
+   "ru": "злотых (после 2, 3, 4)",
+   "tr": "зўо́тэ",
+   "pos": "noun",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.zlotych",
+   "pl": "złotych",
+   "ru": "злотых (после 5–21, 25…)",
+   "tr": "зўо́тых",
+   "pos": "noun",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.dwadziescia",
+   "pl": "dwadzieścia",
+   "ru": "двадцать",
+   "tr": "двадже́щчя",
+   "pos": "num",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.trzydziesci",
+   "pl": "trzydzieści",
+   "ru": "тридцать",
+   "tr": "тшыдже́щчи",
+   "pos": "num",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.czterdziesci",
+   "pl": "czterdzieści",
+   "ru": "сорок",
+   "tr": "чтэрдже́щчи",
+   "pos": "num",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.piecdziesiat",
+   "pl": "pięćdziesiąt",
+   "ru": "пятьдесят",
+   "tr": "пеньчдже́щёнт",
+   "pos": "num",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.to_co_zwykle",
+   "pl": "To co zwykle?",
+   "ru": "Как обычно?",
+   "tr": "то цо зві́клэ",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.dynia",
+   "pl": "dynia",
+   "ru": "тыква",
+   "tr": "ды́нья",
+   "pos": "noun",
+   "srs": true,
+   "gender": "f",
+   "ff": {
+    "ru": "дыня",
+    "means": "тыква"
+   },
+   "tags": [
+    "jedzenie"
+   ]
+  },
+  {
+   "id": "lx.na_nip",
+   "pl": "Na NIP?",
+   "ru": "На фирму (чек с NIP)?",
+   "tr": "на нип",
+   "pos": "phrase",
+   "srs": true,
+   "cards": [
+    "rec",
+    "lis"
+   ],
    "tags": [
     "jedzenie"
    ]

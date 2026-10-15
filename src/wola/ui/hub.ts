@@ -1,5 +1,5 @@
 // Улица Воли поверх карты (W-01): подписи мест над дверями (`world:spots` от сцены) со счётчиками — дома «новых слов: 5»,
-// в огороде «!» и число растений к удобрению; ⚙ настроек и название района. Тап по подписи — дойти до двери
+// в огороде «!» и число растений к удобрению, у Salad Story «уровень N» или «новое блюдо дня» (W-02); ⚙ настроек и название района. Тап по подписи — дойти до двери
 // (intent `goto`, тот же путь, что тап по клетке). Пока открыт экран места, подписи спрятаны.
 import type { Bus } from '../../systems/bus';
 import type { BusEvents } from '../../types/bus';
@@ -29,7 +29,7 @@ export function counterText(id: PlaceId, c: HubCounters | null): { text: string;
     const parts = [c.due ? `! ${c.due}` : '', c.ripe ? `★ ${c.ripe}` : ''].filter(Boolean);
     return parts.length ? { text: parts.join(' · '), due: c.due > 0 } : null;
   }
-  return { text: 'скоро' };
+  return c.salad ?? null;
 }
 
 export function mountHub(root: HTMLElement, deps: HubDeps): HubUi {

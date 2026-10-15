@@ -103,6 +103,11 @@ export interface SettingsMap {
   'sound.mode': 'on' | 'off';
   /** Wola (W-01): дневная порция новых слов на ноутбуке (3–8). Потолок дня — `newItemsPerDay`. */
   'wola.portion': number;
+  /**
+   * Wola (W-02): «мой обычный заказ» в Salad Story — салат из меню, порция, dressing (нет — салата по умолчанию),
+   * отдельно ли, палочка. null — первый салат меню. Уровни 1–3 строятся вокруг него.
+   */
+  'wola.salad': { salad: string; size: 'normalna' | 'powiekszona'; dressing?: string; osobno?: boolean; bread?: string } | null;
 }
 
 export const SETTINGS_DEFAULTS: SettingsMap = {
@@ -120,6 +125,7 @@ export const SETTINGS_DEFAULTS: SettingsMap = {
   avatar: null,
   'sound.mode': 'on',
   'wola.portion': 5,
+  'wola.salad': null,
 };
 
 export function getSetting<K extends keyof SettingsMap>(p: Progress, key: K): SettingsMap[K] {

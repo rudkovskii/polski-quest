@@ -108,10 +108,57 @@ const css = `
   padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); background: rgba(26, 28, 44, .92); }
 .wl-legend { display: inline-block; color: #141b1b; background: rgba(240,229,209,.85); border-radius: 6px; padding: 4px 8px; font-size: 14px; margin: 0 0 8px; }
 
-/* Salad Story: заглушка. */
-.wl-soon { display: flex; flex-direction: column; align-items: center; gap: 12px; color: #f2eaf1; text-align: center; padding: 16px; }
-.wl-soon b { font-size: 26px; }
-.wl-soon small { font-size: 16px; color: #b8dce5; }
+/* Salad Story (W-02): сцена сверху, стойка/шаги визита снизу. */
+.wl-salad .wl-stage { display: block; overflow: hidden; background: #3b3643; }
+.wl-ss { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.wl-ss-top { flex: none; display: flex; justify-content: center; padding: 4px 4px 0; }
+.wl-ss-panel { position: relative; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); }
+.wl-ss-panel .pq-lesson { position: static; width: auto; height: auto; max-height: none; margin: 0 auto; max-width: 620px; }
+.wl-ss-panel .pq-lesson .pq-wood { max-height: none; }
+.wl-ss-scene { overflow: hidden; border: 3px solid #141b1b; border-radius: 6px; }
+.wl-ss-cashier { position: absolute; z-index: 1; }
+.wl-ss-bowl { position: absolute !important; z-index: 2; }
+.wl-ss-board { position: absolute; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #f4f8fb; line-height: 1.05;
+  text-align: center; overflow: hidden; font-family: ui-monospace, Menlo, monospace; }
+.wl-ss-board b { color: #ffd966; font-weight: 700; }
+.wl-ss-think, .wl-ss-say { position: absolute; z-index: 3; max-width: 38%; box-sizing: border-box; padding: 4px 8px; border: 2px solid #141b1b; border-radius: 10px;
+  background: #f4f8fb; color: #141b1b; font-size: 13px; line-height: 1.2; box-shadow: 0 2px 0 #141b1b; }
+/* Облачко — мысль Димы: он стоит перед стойкой, облачко внизу справа, хвостик вниз. Пузырь кассира — вверху слева. */
+.wl-ss-think { right: 4px; bottom: 12px; max-width: 44%; display: flex; align-items: center; gap: 4px; border-radius: 14px; }
+.wl-ss-think::after { content: ''; position: absolute; left: 14px; bottom: -8px; width: 6px; height: 6px; border: 2px solid #141b1b; border-radius: 50%; background: #f4f8fb; }
+.wl-ss-think[hidden], .wl-ss-say[hidden] { display: none; }
+.wl-ss-say { left: 4px; top: 4px; display: flex; flex-direction: column; background: #ffe18d; }
+.wl-ss-say small { color: #543c52; font-size: 11px; }
+.wl-ss-card { max-width: 620px; margin: 0 auto; box-sizing: border-box; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.wl-ss-card h3 { margin: 0; font-size: 20px; color: #543c52; }
+.wl-ss-card h3 small { display: block; font-size: 14px; font-weight: 500; }
+.wl-ss-card .goal { font-size: 15px; color: #345a52; }
+.wl-ss-card .note { font-size: 15px; color: #8f3e56; }
+.wl-ss-card .stat { display: flex; justify-content: space-between; gap: 10px; font-size: 16px; border-bottom: 2px dotted #c8966b; padding: 3px 0; }
+.wl-ss-card .mine { font-size: 14px; color: #543c52; }
+.wl-ss-card .up { font-size: 18px; font-weight: 700; color: #56864c; }
+.wl-ss-card .big { font-size: 28px; font-weight: 800; color: #56864c; text-align: center; }
+.wl-ss-card .big small { font-size: 15px; font-weight: 500; color: #543c52; }
+.wl-ss-stamps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; color: #543c52; }
+.wl-ss-stamps .cells { display: inline-flex; gap: 3px; }
+.wl-ss-stamps .cells i { width: 16px; height: 16px; border: 2px solid #91522c; border-radius: 50%; box-sizing: border-box; }
+.wl-ss-stamps .cells i.on { background: #e0394c; border-color: #8f3e56; }
+.wl-ss-stamps .gold { color: #91522c; font-weight: 700; }
+.wl-ss-tried { display: flex; flex-direction: column; gap: 2px; font-size: 14px; color: #543c52; }
+.wl-ss-tried .bowls { display: flex; flex-wrap: wrap; gap: 2px; }
+.wl-ss-tried .ghost { filter: grayscale(1) brightness(.35); opacity: .45; }
+.wl-ss-tray { position: relative; margin: 0 auto; }
+.wl-ss-item { position: absolute !important; }
+.wl-ss-gag { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #8f3e56; }
+.wl-ss-real { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border: 3px dashed #e89b2f; border-radius: 8px; background: #fff7e0; }
+.wl-ss-real > b { color: #91522c; font-size: 14px; }
+.wl-ss-real .phrase { font-size: 20px; font-weight: 800; color: #141b1b; }
+.wl-ss-real small { font-size: 13px; color: #543c52; }
+.pq-pick { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.pq-pick-item { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 84px; min-height: 84px; padding: 6px; background: #b8dce5; }
+.pq-pick-item .lbl { font-size: 14px; font-weight: 700; }
+.pq-pick-item.ok, .pq-pick-item.show { outline: 4px solid #74a334; }
+.pq-pick-item.bad { outline: 4px solid #e0394c; opacity: .6; }
 `;
 
 export function ensureWolaStyle(doc: Document): void {

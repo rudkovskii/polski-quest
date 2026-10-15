@@ -74,6 +74,8 @@ class Item:
     ready: bool = False
     ids: set[str] = field(default_factory=set)
     src: set[str] = field(default_factory=set)
+    # Написание для голоса (W-02: заимствования Salad Story — «dressing» → «dresing»); ключ манифеста — по `text`.
+    spoken: str | None = None
 
     @property
     def key(self) -> str:
@@ -82,8 +84,32 @@ class Item:
     @property
     def file(self) -> str:
         engine, _, vid = self.voice.partition(':')
-        h = hashlib.sha1(f'{engine}|{vid}|{self.rate}|{self.text}'.encode('utf-8')).hexdigest()
+        base = f'{engine}|{vid}|{self.rate}|{self.text}'
+        # Своё написание входит в хэш: поправил написание — файл пересоберётся. Без него хэш прежний.
+        if self.spoken and self.spoken != self.text:
+            base += f'|{self.spoken}'
+        h = hashlib.sha1(base.encode('utf-8')).hexdigest()
         return f'{h[:12]}.m4a'
+
+
+def respell(text: str, spoken: dict[str, str]) -> str:
+    """Заимствования → написание для польского голоса (длинные ключи первыми, по границам слов)."""
+    out = text
+    for k in sorted(spoken, key=len, reverse=True):
+        out = re.sub(rf'(?<![\wąćęłńóśźżĄĆĘŁŃÓŚŹŻ]){re.escape(k)}(?![\wąćęłńóśźżĄĆĘŁŃÓŚŹŻ])', spoken[k], out)
+    return out
+
+
+def salad_audio(content: Path) -> dict | None:
+    """Строки Salad Story (W-02) из генератора визита: `tsx tools/wola_salad_texts.ts` (тот же код, что играет)."""
+    if not (content / 'wola' / 'salad' / 'menu.json').exists():
+        return None
+    tsx = ROOT / 'node_modules' / '.bin' / 'tsx'
+    cmd = [str(tsx)] if tsx.exists() else ['npx', 'tsx']
+    out = subprocess.run([*cmd, str(ROOT / 'tools' / 'wola_salad_texts.ts'), '--root', str(content)], capture_output=True, text=True, cwd=ROOT)
+    if out.returncode != 0:
+        raise RuntimeError(f'wola_salad_texts.ts: {out.stderr.strip()[:400]}')
+    return json.loads(out.stdout)
 
 
 @dataclass
@@ -123,7 +149,7 @@ def collect(content: Path, default_voice: str) -> Collected:
     c = Collected()
     chars = {ch['id']: ch for ch in load_json(content / 'characters.json')}
 
-    def add(text: str | None, voice: str | None, rates: tuple[str, ...], *, ready: bool, id_: str | None, src: str) -> None:
+    def add(text: str | None, voice: str | None, rates: tuple[str, ...], *, ready: bool, id_: str | None, src: str, spoken: dict[str, str] | None = None) -> None:
         if not text:
             return
         if voice is None:
@@ -132,8 +158,9 @@ def collect(content: Path, default_voice: str) -> Collected:
         t = norm(text)
         if not t:
             return
+        sp = respell(t, spoken) if spoken else None
         for r in rates:
-            it = c.items.setdefault(f'{voice}|{r}|{t}', Item(t, voice, r))
+            it = c.items.setdefault(f'{voice}|{r}|{t}', Item(t, voice, r, spoken=sp if sp != t else None))
             it.ready = it.ready or ready
             it.src.add(src)
             if id_:
@@ -208,14 +235,21 @@ def collect(content: Path, default_voice: str) -> Collected:
                     add(o['pl'], default_voice, one, ready=ready, id_=f"{m['id']}#sign.{x}_{y}", src=rel(mf))
 
     # Короткая версия «Wola» (W-01): слова и примеры content/wola/vocab.json, обязательны как у ready-модуля.
+    # Salad Story (W-02): строки визита из генератора; заимствования (dressing, Cobb, quinoa…) — своим написанием
+    # (content/wola/salad/menu.json → spoken), и в словах Wola тоже.
+    salad = salad_audio(content)
+    spoken = salad['spoken'] if salad else None
     wf = content / 'wola' / 'vocab.json'
     if wf.exists():
         rel = str(wf.relative_to(content))
         for v in load_json(wf).get('vocab', []):
             voice = voice_str(v.get('voice'), default_voice)
-            add(v['pl'], voice, both, ready=True, id_=v['id'], src=rel)
+            add(v['pl'], voice, both, ready=True, id_=v['id'], src=rel, spoken=spoken)
             if v.get('ex'):
-                add(v['ex'].get('pl'), voice, one, ready=True, id_=f"{v['id']}#ex", src=rel)
+                add(v['ex'].get('pl'), voice, one, ready=True, id_=f"{v['id']}#ex", src=rel, spoken=spoken)
+    if salad:
+        for t in salad['texts']:
+            add(t['text'], default_voice, both if t['slow'] else one, ready=True, id_=None, src='wola/salad', spoken=spoken)
 
     # Глобальные строки: в --check только предупреждения.
     lines = content / 'story' / 'lines.json'
@@ -272,7 +306,7 @@ def synth(item: Item, out: Path, tmp: Path) -> None:
     k = float(mult) if mult else 1.0
     txt = tmp / 'text.txt'
     # «[[» в тексте say принял бы за свою команду: разбиваем. Свои команды добавляем после.
-    spoken = item.text.replace('[[', '[ [')
+    spoken = (item.spoken or item.text).replace('[[', '[ [')
     if engine == 'say' and item.rate == SLOW:
         spoken = SAY_SLOW_GAP.join(spoken.split())
     txt.write_text(spoken, encoding='utf-8')

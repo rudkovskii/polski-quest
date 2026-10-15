@@ -110,6 +110,7 @@ export type Step =
   | StepShadow
   | StepListen
   | StepChoice
+  | StepPick
   | StepOrder
   | StepType
   | StepDictation
@@ -130,6 +131,36 @@ export type LineId2 = string;
  */
 export type Dialogues = Dialogue[];
 export type MapObject = MapNpc | MapExit | MapTrigger | MapPlot | MapSign | MapBoard | MapWord | MapSecret;
+export type MenuId = string;
+export type DressingId = string;
+/**
+ * Кадр атласа custom: `<id спрайта>/<n>`
+ */
+export type SpriteFrame = string;
+/**
+ * Слово в огороде (jogurtowy); названия-бренды без lx
+ */
+export type LxId1 = string;
+/**
+ * @minItems 1
+ */
+export type CashierLines = [CashierLine, ...CashierLine[]];
+export type SaladSlot =
+  | SlotGreet
+  | SlotWarmup
+  | SlotPick
+  | SlotPickSalad
+  | SlotListen
+  | SlotExplain
+  | SlotOrder
+  | SlotShadow
+  | SlotQuestions
+  | SlotEvent
+  | SlotFriend
+  | SlotCompose
+  | SlotPrice
+  | SlotServe;
+export type SaladQuestionId = string;
 
 /**
  * Тип каждого файла контента (ключ = вид файла).
@@ -152,6 +183,10 @@ export interface ContentFiles {
   dialogues: Dialogues;
   map: LocationMap;
   wola: WolaVocab;
+  saladMenu: SaladMenu;
+  saladCashiers: SaladCashiers;
+  saladLevels: SaladLevels;
+  saladEvents: SaladEvents;
   step: Step;
   condition: Condition;
   effects: Effects;
@@ -935,6 +970,52 @@ export interface StepChoice {
   why?: string;
 }
 /**
+ * Тап по картинке (витрина Wola, W-02): голос называет, игрок выбирает картинку
+ */
+export interface StepPick {
+  t: 'pick';
+  prompt: string;
+  /**
+   * Озвучить при показе (и ▶); без звука — написание и транскрипция
+   */
+  say?: string;
+  /**
+   * @minItems 2
+   * @maxItems 6
+   */
+  items: [PickItem, PickItem, ...PickItem[]];
+  answer: number;
+  /**
+   * По умолчанию <lessonId>#<index>
+   */
+  id?: string;
+  /**
+   * lxId или mpId, которое проверяет шаг
+   */
+  item?: string;
+  tags?: ErrorTagId[];
+  cluster?: Cluster;
+  hint?: string;
+  /**
+   * Объяснение ошибки одной строкой (правило), показывается после неверного ответа (P-01)
+   */
+  why?: string;
+  /**
+   * Транскрипция кириллицей для режима без звука
+   */
+  tr?: string;
+}
+export interface PickItem {
+  /**
+   * Кадр атласа custom
+   */
+  sprite: string;
+  /**
+   * Подпись под картинкой (если нет картинки — вместо неё)
+   */
+  label?: string;
+}
+/**
  * Собирает фразу из плиток
  */
 export interface StepOrder {
@@ -1316,4 +1397,349 @@ export interface WolaTheme {
    * Тема живёт не дома, а в месте (salad = Salad Story, W-02): не в порциях и не на полке.
    */
   place?: 'salad';
+}
+/**
+ * content/wola/salad/menu.json: меню Salad Story (W-02): салаты, порции, dressingi, палочки, напитки, ингредиенты витрины, свой салат, сезон, написание для озвучки.
+ */
+export interface SaladMenu {
+  schema: 1;
+  note?: string;
+  currency: 'zł';
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  sizes: [SaladSize, SaladSize];
+  /**
+   * @minItems 6
+   */
+  salads: [SaladDish, SaladDish, SaladDish, SaladDish, SaladDish, SaladDish, ...SaladDish[]];
+  /**
+   * @minItems 2
+   */
+  dressings: [SaladDressing, SaladDressing, ...SaladDressing[]];
+  /**
+   * @minItems 1
+   */
+  breads: [SaladExtra, ...SaladExtra[]];
+  /**
+   * @minItems 1
+   */
+  drinks: [SaladExtra, ...SaladExtra[]];
+  /**
+   * @minItems 3
+   */
+  ingredients: [SaladIngredient, SaladIngredient, SaladIngredient, ...SaladIngredient[]];
+  compose: SaladCompose;
+  season: SaladSeason;
+  /**
+   * Заимствование → написание для озвучки (Zosia читает по-польски)
+   */
+  spoken: {
+    [k: string]: string;
+  };
+}
+export interface SaladSize {
+  id: 'normalna' | 'powiekszona';
+  pl: string;
+  acc: string;
+  ru: string;
+  lx: LxId;
+  extra: number;
+}
+export interface SaladDish {
+  id: MenuId;
+  /**
+   * Название без «Sałatka»: не склоняется (sałatkę Cezar)
+   */
+  name: string;
+  ru: string;
+  /**
+   * @minItems 1
+   */
+  has: [LxId, ...LxId[]];
+  dressing: DressingId;
+  price: number;
+  from: number;
+  season?: boolean;
+  sprite: SpriteFrame;
+}
+export interface SaladDressing {
+  id: DressingId;
+  pl: string;
+  ru: string;
+  lx?: LxId1;
+}
+export interface SaladExtra {
+  id: MenuId;
+  pl: string;
+  /**
+   * Короткий ответ кассиру (buraczkowy)
+   */
+  short?: string;
+  /**
+   * Винительный после poproszę (wodę)
+   */
+  acc?: string;
+  ru: string;
+  lx?: LxId;
+  price: number;
+  from: number;
+  sprite: SpriteFrame;
+}
+export interface SaladIngredient {
+  lx: LxId;
+  sprite: SpriteFrame;
+  /**
+   * Родительный (nie ma łososia)
+   */
+  gen: string;
+}
+export interface SaladCompose {
+  from: number;
+  price: number;
+  sprite: SpriteFrame;
+  /**
+   * @minItems 1
+   */
+  slots: [SaladComposeSlot, ...SaladComposeSlot[]];
+}
+export interface SaladComposeSlot {
+  id: string;
+  ask: string;
+  /**
+   * @minItems 2
+   */
+  options: [LxId, LxId, ...LxId[]];
+}
+export interface SaladSeason {
+  from: number;
+  salad: MenuId;
+  board: Text2;
+}
+/**
+ * content/wola/salad/cashiers.json: кассиры Salad Story (W-02) и их реплики. ask кассира заменяет common по ключу.
+ */
+export interface SaladCashiers {
+  schema: 1;
+  note?: string;
+  common: CashierAsks;
+  /**
+   * @minItems 2
+   */
+  cashiers: [Cashier, Cashier, ...Cashier[]];
+}
+export interface CashierAsks {
+  [k: string]: CashierLines;
+}
+export interface CashierLine {
+  pl: string;
+  ru: string;
+  minLevel?: number;
+}
+export interface Cashier {
+  id: CharId;
+  name: string;
+  tempo: 'fast' | 'normal' | 'slow';
+  sprite: string;
+  about?: string;
+  ask: CashierAsks;
+}
+/**
+ * content/wola/salad/levels.json: лестница уровней Salad Story (W-02). Слоты визита раскрывает генератор src/wola/systems/saladVisit.ts в обычные шаги уроков.
+ */
+export interface SaladLevels {
+  schema: 1;
+  note?: string;
+  visit: {
+    maxSteps: number;
+    maxNewWords: number;
+  };
+  pass: SaladPass;
+  questions: {
+    [k: string]: SaladQuestion;
+  };
+  answers: {
+    [k: string]: SaladText;
+  };
+  /**
+   * @minItems 1
+   */
+  levels: [SaladLevel, ...SaladLevel[]];
+}
+export interface SaladPass {
+  firstTry: number;
+  streak: number;
+  minDays: number;
+  jumpFirstTry: number;
+  fallbackBelow: number;
+  stampsPerCard: number;
+}
+export interface SaladQuestion {
+  lx: LxId;
+  want:
+    | 'size'
+    | 'dressing_ok'
+    | 'dressing_name'
+    | 'osobno'
+    | 'bread'
+    | 'bread_which'
+    | 'drink'
+    | 'place'
+    | 'more'
+    | 'without'
+    | 'app'
+    | 'pay'
+    | 'receipt';
+}
+export interface SaladText {
+  pl: string;
+  ru: string;
+  lx?: LxId;
+  tag?: ErrorTagId;
+}
+export interface SaladLevel {
+  n: number;
+  id: string;
+  status: 'ready' | 'locked';
+  title: Text2;
+  goal: string;
+  minutes: string;
+  /**
+   * @minItems 1
+   */
+  words: [LxId, ...LxId[]];
+  /**
+   * @minItems 2
+   */
+  slots: [SaladSlot, SaladSlot, ...SaladSlot[]];
+  realTask?: SaladText;
+}
+export interface SlotGreet {
+  slot: 'greet';
+}
+export interface SlotWarmup {
+  slot: 'warmup';
+}
+/**
+ * Витрина: голос называет ингредиент, тап по картинке
+ */
+export interface SlotPick {
+  slot: 'pick';
+  count: number;
+  /**
+   * Картинок: первый визит уровня, дальше
+   *
+   * @minItems 2
+   * @maxItems 2
+   */
+  options: [number, number];
+}
+export interface SlotPickSalad {
+  slot: 'pick_salad';
+}
+export interface SlotListen {
+  slot: 'listen';
+  say: string;
+  /**
+   * @minItems 2
+   * @maxItems 4
+   */
+  options: [string, string] | [string, string, string] | [string, string, string, string];
+  item: LxId;
+}
+export interface SlotExplain {
+  slot: 'explain';
+  md: string;
+  table?: string[][];
+  /**
+   * Только в первом визите уровня
+   */
+  once?: boolean;
+}
+export interface SlotOrder {
+  slot: 'order';
+  as: 'choice' | 'tiles' | 'gap_then_type' | 'type';
+}
+export interface SlotShadow {
+  slot: 'shadow';
+  what?: 'order' | 'osobno';
+}
+export interface SlotQuestions {
+  slot: 'questions';
+  /**
+   * @minItems 1
+   */
+  pool: [SaladQuestionId, ...SaladQuestionId[]];
+  /**
+   * @minItems 2
+   * @maxItems 2
+   */
+  pick: [number, number];
+  /**
+   * Перед ответом — понять вопрос на слух (выбор перевода)
+   */
+  listen: 'always' | 'never' | 'first2' | 'new';
+  as: 'choice' | 'gap_options' | 'gap' | 'mixed';
+}
+export interface SlotEvent {
+  slot: 'event';
+  /**
+   * @minItems 1
+   */
+  pool: [
+    'ev.co_zwykle' | 'ev.kasjer_pomylka' | 'ev.nie_ma' | 'ev.sezon',
+    ...('ev.co_zwykle' | 'ev.kasjer_pomylka' | 'ev.nie_ma' | 'ev.sezon')[]
+  ];
+  /**
+   * Шаг события есть всегда (сверка), шанс решает только, есть ли в нём ошибка
+   */
+  always?: boolean;
+}
+export interface SlotFriend {
+  slot: 'friend';
+}
+export interface SlotCompose {
+  slot: 'compose';
+}
+export interface SlotPrice {
+  slot: 'price';
+}
+export interface SlotServe {
+  slot: 'serve';
+  line?: 'serve' | 'name';
+}
+/**
+ * content/wola/salad/events.json: гэги ошибок (тег → картинка и реплика кассира) и события визита Salad Story (W-02).
+ */
+export interface SaladEvents {
+  schema: 1;
+  note?: string;
+  gags: SaladGag[];
+  events: SaladEvent[];
+}
+export interface SaladGag {
+  id: string;
+  onTag: ErrorTagId;
+  sprite?: string;
+  /**
+   * Что гэг кладёт на поднос итога
+   */
+  tray?: 'sok' | 'xxl' | 'torba';
+  line: Text2;
+  title?: Text21;
+}
+/**
+ * Название в альбоме «Wpadki»
+ */
+export interface Text21 {
+  pl: string;
+  ru: string;
+}
+export interface SaladEvent {
+  id: 'ev.co_zwykle' | 'ev.kasjer_pomylka' | 'ev.nie_ma' | 'ev.sezon' | 'ev.jak_bylo';
+  minLevel: number;
+  chance: number;
+  level10Chance?: number;
+  sameOrderLast?: number;
 }

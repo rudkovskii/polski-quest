@@ -39,6 +39,8 @@ export interface SettingsDeps {
    * ноутбука; файл копии `polski-quest-wola-<дата>.json`.
    */
   wola?: boolean;
+  /** Свой раздел настроек места (Wola, W-02: «Мой салат» в Salad Story): рисуется после «Слова и ответы». */
+  section?(api: { put<K extends keyof SettingsMap>(key: K, value: SettingsMap[K]): void; progress(): Progress }): HTMLElement | null;
 }
 
 type Choice<K extends keyof SettingsMap> = { key: K; label: string; options: { value: SettingsMap[K]; label: string }[] };
@@ -268,6 +270,7 @@ export function runSettings(deps: SettingsDeps): Promise<void> {
     deps.wola ? null : choice(CHOICES.translations),
     newItems(),
     choice(CHOICES.keyboard),
+    deps.section?.({ put, progress: () => store.progress }) ?? null,
     el('h3', {}, 'Управление'),
     choice(CHOICES.dpad),
     choice(CHOICES.dpadSide),

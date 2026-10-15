@@ -1,0 +1,64 @@
+{
+ "id": "wola.taca",
+ "note": "Salad Story (W-02): поднос итога визита, 48×16: на нём миска заказа, стаканчик соуса, палочка, напиток.",
+ "size": [
+  48,
+  16
+ ],
+ "anchor": [
+  24,
+  15
+ ],
+ "keys": {
+  ".": null,
+  "o": "ink",
+  "w": "white",
+  "q": "blue_7",
+  "Q": "moss_3",
+  "g": "green_1",
+  "G": "green_0",
+  "l": "green_3",
+  "M": "moss_0",
+  "r": "red_0",
+  "R": "red_1",
+  "p": "red_2",
+  "y": "sand_7",
+  "Y": "accent_amber",
+  "n": "orange_2",
+  "N": "orange_0",
+  "b": "brown_5",
+  "B": "brown_0",
+  "c": "brown_3",
+  "s": "sand_4",
+  "S": "sand_0",
+  "k": "grey_6",
+  "K": "grey_1",
+  "u": "blue_3",
+  "U": "blue_6",
+  "v": "plum_2",
+  "e": "x_orange_5",
+  "x": "brown_7",
+  "h": "x_orange_1",
+  "H": "x_orange_3"
+ },
+ "frames": [
+  [
+   "................................................",
+   "................................................",
+   ".oooooooooooooooooooooooooooooooooooooooooooooo.",
+   "occcccccccccccccccccccccccccccccccccccccccccccco",
+   "ocbxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxbco",
+   "ocbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbco",
+   "ocbbBBbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbBBbco",
+   "ocbbBBbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbBBbco",
+   "ocbbBBbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbBBbco",
+   "ocbbBBbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbBBbco",
+   "ocbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbco",
+   "ocbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbco",
+   "ocbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbco",
+   "oBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBo",
+   "oBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBo",
+   ".oooooooooooooooooooooooooooooooooooooooooooooo."
+  ]
+ ]
+}

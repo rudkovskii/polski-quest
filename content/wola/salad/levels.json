@@ -1,0 +1,223 @@
+{
+ "schema": 1,
+ "note": "Лестница уровней Salad Story (W-02, research/12_salad_story.md §5). Визит = шаблон уровня (slots), генератор src/wola/systems/saladVisit.ts раскрывает слоты в обычные шаги уроков. Переход: streak зачётных визитов (firstTry ≥ pass.firstTry) подряд на ≥ minDays разных днях; прыжок: визит уровнем выше с firstTry ≥ jumpFirstTry засчитывает текущий; два визита подряд ниже fallbackBelow — следующий визит по шаблону уровня ниже. status locked — уровень ещё не играется (лестница стоит на последнем ready).",
+ "visit": { "maxSteps": 9, "maxNewWords": 3 },
+ "pass": { "firstTry": 0.8, "streak": 3, "minDays": 2, "jumpFirstTry": 0.9, "fallbackBelow": 0.6, "stampsPerCard": 10 },
+ "questions": {
+  "q.rozmiar": { "lx": "lx.powiekszona", "want": "size" },
+  "q.dressing": { "lx": "lx.dressing", "want": "dressing_ok" },
+  "q.jaki_dressing": { "lx": "lx.jaki_dressing", "want": "dressing_name" },
+  "q.osobno": { "lx": "lx.osobno", "want": "osobno" },
+  "q.paluch": { "lx": "lx.paluch", "want": "bread" },
+  "q.paluch_jaki": { "lx": "lx.buraczkowy", "want": "bread_which" },
+  "q.picie": { "lx": "lx.cos_do_picia", "want": "drink" },
+  "q.miejsce": { "lx": "lx.na_miejscu", "want": "place" },
+  "q.cos_jeszcze": { "lx": "lx.cos_jeszcze", "want": "more" },
+  "q.ze_wszystkim": { "lx": "lx.ze_wszystkim", "want": "without" },
+  "q.aplikacja": { "lx": "lx.ma_pan_aplikacje", "want": "app" },
+  "q.platnosc": { "lx": "lx.karta_narz", "want": "pay" },
+  "q.paragon": { "lx": "lx.paragon", "want": "receipt" }
+ },
+ "answers": {
+  "order": { "pl": "Poproszę sałatkę {salad}.", "ru": "Салат {salad}, пожалуйста." },
+  "order.nom": { "pl": "Poproszę sałatka {salad}.", "ru": "(«sałatka» без -ę)", "tag": "gr.acc_fem" },
+  "order.chce": { "pl": "Chciałbym sałatkę {salad}.", "ru": "Я хотел бы салат {salad}." },
+  "order.gap": { "pl": "Poproszę ___ {salad}.", "ru": "Закажи салат {salad}: вставь «салат» в нужной форме" },
+  "order.friend": { "pl": "I sałatkę {salad} dla kolegi.", "ru": "И салат {salad} для коллеги." },
+  "size.normalna": { "pl": "Normalna.", "ru": "Обычную.", "lx": "lx.normalna" },
+  "size.powiekszona": { "pl": "Powiększona.", "ru": "Увеличенную.", "lx": "lx.powiekszona" },
+  "size.gap": { "pl": "___, poproszę.", "ru": "Ответь кассиру одним словом" },
+  "dressing.ok": { "pl": "Może być.", "ru": "Подойдёт.", "lx": "lx.moze_byc" },
+  "dressing.other": { "pl": "Nie, {dressing}, poproszę.", "ru": "Нет, {dressingRu}, пожалуйста." },
+  "dressing.name": { "pl": "{Dressing}, poproszę.", "ru": "{dressingRu}, пожалуйста." },
+  "dressing.gap": { "pl": "Nie, ___, poproszę.", "ru": "Попроси другую заправку" },
+  "osobno.sos": { "pl": "Sos osobno.", "ru": "Соус отдельно.", "lx": "lx.osobno" },
+  "osobno.sok": { "pl": "Sok osobno.", "ru": "Сок отдельно.", "tag": "ph.sok_sos" },
+  "osobno.mix": { "pl": "Wymieszać.", "ru": "Перемешать.", "lx": "lx.wymieszac" },
+  "osobno.gap": { "pl": "___ osobno.", "ru": "Соус отдельно" },
+  "bread.yes": { "pl": "Tak, {bread}.", "ru": "Да, {breadRu}." },
+  "bread.no": { "pl": "Nie, dziękuję.", "ru": "Нет, спасибо.", "lx": "lx.nie_dziekuje" },
+  "bread.which": { "pl": "{Bread}.", "ru": "{breadRu}." },
+  "drink.yes": { "pl": "{Drink}, poproszę.", "ru": "{drinkRu}, пожалуйста." },
+  "drink.nom": { "pl": "{DrinkNom}, poproszę.", "ru": "(без -ę)", "tag": "gr.acc_fem" },
+  "drink.no": { "pl": "Nie, dziękuję.", "ru": "Нет, спасибо.", "lx": "lx.nie_dziekuje" },
+  "drink.gap": { "pl": "___, poproszę.", "ru": "Попроси напиток" },
+  "place.miejsce": { "pl": "Na miejscu.", "ru": "Здесь.", "lx": "lx.na_miejscu" },
+  "place.wynos": { "pl": "Na wynos.", "ru": "С собой.", "lx": "lx.na_wynos" },
+  "place.gap": { "pl": "Na ___.", "ru": "Здесь или с собой" },
+  "more.no": { "pl": "To wszystko.", "ru": "Это всё.", "lx": "lx.to_wszystko" },
+  "more.yes": { "pl": "Tak, poproszę.", "ru": "Да, пожалуйста (ещё)." },
+  "without.bez": { "pl": "Bez {bez}.", "ru": "Без {bezRu}." },
+  "without.all": { "pl": "Tak, ze wszystkim.", "ru": "Да, со всем." },
+  "app.no": { "pl": "Nie, dziękuję.", "ru": "Нет, спасибо.", "lx": "lx.nie_dziekuje" },
+  "app.yes": { "pl": "Tak, proszę.", "ru": "Да, вот." },
+  "pay.karta": { "pl": "Kartą.", "ru": "Картой.", "lx": "lx.karta_narz" },
+  "pay.blik": { "pl": "BLIKiem.", "ru": "Через BLIK.", "lx": "lx.blikiem" },
+  "receipt.no": { "pl": "Nie, dziękuję.", "ru": "Нет, спасибо.", "lx": "lx.nie_dziekuje" },
+  "receipt.yes": { "pl": "Tak, poproszę.", "ru": "Да, пожалуйста." },
+  "check.ok": { "pl": "Zgadza się.", "ru": "Верно.", "lx": "lx.zgadza_sie" },
+  "check.fix": { "pl": "Nie {wrong}, tylko {right}.", "ru": "Не {wrongRu}, а {rightRu}.", "lx": "lx.nie_tylko" },
+  "zwykle.yes": { "pl": "Tak, poproszę.", "ru": "Да, пожалуйста." },
+  "zwykle.no": { "pl": "Nie, dziś sałatkę {salad}.", "ru": "Нет, сегодня салат {salad}." },
+  "nie_ma.other": { "pl": "To poproszę sałatkę {salad}.", "ru": "Тогда салат {salad}, пожалуйста.", "lx": "lx.to_poprosze" },
+  "nie_ma.item": { "pl": "To poproszę {item}.", "ru": "Тогда {itemRu}, пожалуйста.", "lx": "lx.to_poprosze" },
+  "compose": { "pl": "Stwórz własną, poproszę.", "ru": "Собрать свой, пожалуйста.", "lx": "lx.stworz_wlasna" }
+ },
+ "levels": [
+  {
+   "n": 1, "id": "salad.l01", "status": "ready",
+   "title": { "pl": "Witryna", "ru": "витрина: ткнуть и услышать" },
+   "goal": "Узнавать на слух и по надписи «sałatka» и главные ингредиенты салатов.",
+   "minutes": "1–1,5",
+   "words": ["lx.salatka", "lx.kurczak", "lx.losos", "lx.awokado", "lx.jajka", "lx.pomidor", "lx.ogorek", "lx.smacznego"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "pick", "count": 3, "options": [2, 3] },
+    { "slot": "pick_salad" },
+    { "slot": "listen", "say": "Smacznego!", "options": ["Приятного аппетита!", "До свидания!"], "item": "lx.smacznego" },
+    { "slot": "serve", "line": "name" }
+   ]
+  },
+  {
+   "n": 2, "id": "salad.l02", "status": "ready",
+   "title": { "pl": "Poproszę sałatkę…", "ru": "заказ: выбор из двух" },
+   "goal": "Заказать свой салат чанком «Poproszę sałatkę + название» в верной форме.",
+   "minutes": "1–1,5",
+   "words": ["lx.poprosze", "lx.co_podac", "lx.salatka", "lx.prosze"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "warmup" },
+    { "slot": "explain", "once": true, "md": "**Poproszę** = дайте, пожалуйста. После него меняется только **-a → -ę**: sałatka → **sałatkę**, woda → **wodę**. Название не трогаем: sałatkę **Cezar**. По-русски так же: вода → воду.", "table": [["sałatka", "→", "Poproszę sałatkę."], ["woda", "→", "Poproszę wodę."]] },
+    { "slot": "listen", "say": "Co podać?", "options": ["Что подать?", "Что-нибудь ещё?"], "item": "lx.co_podac" },
+    { "slot": "order", "as": "choice" },
+    { "slot": "shadow" },
+    { "slot": "serve" }
+   ],
+   "realTask": { "pl": "Poproszę sałatkę {salad}.", "ru": "Салат {salad}, пожалуйста." }
+  },
+  {
+   "n": 3, "id": "salad.l03", "status": "ready",
+   "title": { "pl": "Z kafelków + rozmiar", "ru": "плитки и порция" },
+   "goal": "Собрать заказ из плиток и ответить на первый вопрос кассира: порция.",
+   "minutes": "1,5–2",
+   "words": ["lx.normalna", "lx.powiekszona", "lx.porcja"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "warmup" },
+    { "slot": "order", "as": "tiles" },
+    { "slot": "questions", "pool": ["q.rozmiar"], "pick": [1, 1], "listen": "first2", "as": "choice" },
+    { "slot": "serve" }
+   ]
+  },
+  {
+   "n": 4, "id": "salad.l04", "status": "ready",
+   "title": { "pl": "Dressing", "ru": "заправка: какая и отдельно ли" },
+   "goal": "Понять вопрос про dressing и ответить: согласиться, выбрать другой, попросить отдельно.",
+   "minutes": "1,5–2",
+   "words": ["lx.dressing", "lx.sos", "lx.moze_byc", "lx.osobno", "lx.wymieszac", "lx.jogurtowy", "lx.fistaszkowy", "lx.musztardowo_miodowy", "lx.jaki_dressing"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "order", "as": "tiles" },
+    { "slot": "questions", "pool": ["q.rozmiar"], "pick": [1, 1], "listen": "never", "as": "choice" },
+    { "slot": "questions", "pool": ["q.dressing", "q.jaki_dressing"], "pick": [1, 1], "listen": "always", "as": "gap_options" },
+    { "slot": "questions", "pool": ["q.osobno"], "pick": [1, 1], "listen": "first2", "as": "choice" },
+    { "slot": "shadow", "what": "osobno" },
+    { "slot": "serve" }
+   ],
+   "realTask": { "pl": "Poproszę sałatkę {salad}. Dressing osobno.", "ru": "Салат {salad}, пожалуйста. Заправку отдельно." }
+  },
+  {
+   "n": 5, "id": "salad.l05", "status": "ready",
+   "title": { "pl": "Do tego?", "ru": "палочка, напиток, место" },
+   "goal": "Держать обмен из 2–3 вопросов кассира в случайном порядке.",
+   "minutes": "2",
+   "words": ["lx.do_tego", "lx.paluch", "lx.buraczkowy", "lx.z_ziarnami", "lx.cos_do_picia", "lx.woda", "lx.na_miejscu", "lx.na_wynos", "lx.cos_jeszcze", "lx.to_wszystko", "lx.nie_dziekuje"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "event", "pool": ["ev.co_zwykle"] },
+    { "slot": "order", "as": "tiles" },
+    { "slot": "questions", "pool": ["q.rozmiar", "q.dressing", "q.osobno", "q.paluch", "q.picie", "q.miejsce", "q.cos_jeszcze"], "pick": [2, 3], "listen": "new", "as": "mixed" },
+    { "slot": "serve" }
+   ]
+  },
+  {
+   "n": 6, "id": "salad.l06", "status": "ready",
+   "title": { "pl": "Piszę sam", "ru": "набрать заказ" },
+   "goal": "Набрать заказ и ответы на экранной клавиатуре, без вариантов.",
+   "minutes": "2–2,5",
+   "words": ["lx.chcialbym", "lx.tunczyk", "lx.mango", "lx.tofu", "lx.wolowina"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "warmup" },
+    { "slot": "event", "pool": ["ev.co_zwykle"] },
+    { "slot": "order", "as": "gap_then_type" },
+    { "slot": "questions", "pool": ["q.rozmiar", "q.paluch", "q.picie", "q.miejsce", "q.cos_jeszcze"], "pick": [2, 2], "listen": "new", "as": "gap" },
+    { "slot": "serve" }
+   ]
+  },
+  {
+   "n": 7, "id": "salad.l07", "status": "ready",
+   "title": { "pl": "Bez bekonu + kartka", "ru": "изменения и записка коллеги" },
+   "goal": "Изменить состав («bez bekonu»), заказать по записке коллеги и поймать ошибку кассира.",
+   "minutes": "2,5–3",
+   "words": ["lx.ze_wszystkim", "lx.bekon", "lx.grzanki", "lx.bez_bekonu", "lx.bez_grzanek", "lx.bez_cebuli", "lx.dla_kolegi", "lx.zgadza_sie", "lx.nie_tylko"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "order", "as": "type" },
+    { "slot": "questions", "pool": ["q.ze_wszystkim"], "pick": [1, 1], "listen": "new", "as": "choice" },
+    { "slot": "friend" },
+    { "slot": "event", "pool": ["ev.kasjer_pomylka"], "always": true },
+    { "slot": "serve" }
+   ],
+   "realTask": { "pl": "Poproszę sałatkę {salad} bez {bez}.", "ru": "Салат {salad} без {bezRu}, пожалуйста." }
+  },
+  {
+   "n": 8, "id": "salad.l08", "status": "ready",
+   "title": { "pl": "Stwórz własną", "ru": "собрать свой салат" },
+   "goal": "Собрать салат по слотам (основа, белок, добавки) и не растеряться, когда чего-то нет.",
+   "minutes": "2,5–3",
+   "words": ["lx.stworz_wlasna", "lx.jaka_baza", "lx.mix_salat", "lx.szpinak", "lx.rukola", "lx.jakie_bialko", "lx.dodatki", "lx.ziemniaki", "lx.niestety_nie_ma", "lx.to_poprosze"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "compose" },
+    { "slot": "event", "pool": ["ev.nie_ma"] },
+    { "slot": "questions", "pool": ["q.miejsce", "q.paluch"], "pick": [1, 1], "listen": "never", "as": "gap" },
+    { "slot": "serve" }
+   ]
+  },
+  {
+   "n": 9, "id": "salad.l09", "status": "ready",
+   "title": { "pl": "Kasa", "ru": "приложение, сумма, оплата" },
+   "goal": "Пройти кассу: приложение, сумма на слух, оплата, чек.",
+   "minutes": "2–3",
+   "words": ["lx.ma_pan_aplikacje", "lx.razem", "lx.zlote", "lx.zlotych", "lx.dwadziescia", "lx.trzydziesci", "lx.czterdziesci", "lx.piecdziesiat", "lx.karta_narz", "lx.blikiem", "lx.przylozyc", "lx.zeskanowac_kod", "lx.paragon"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "order", "as": "type" },
+    { "slot": "explain", "once": true, "md": "Цена: **1** złoty, **2–4** (22–24, 32–34…) złote, **5–21** (25–31…) złotych. На кассе часто без слов: «trzydzieści siedem dwadzieścia» = 37,20 zł.", "table": [["1", "jeden złoty"], ["43", "czterdzieści trzy złote"], ["37", "trzydzieści siedem złotych"]] },
+    { "slot": "questions", "pool": ["q.aplikacja"], "pick": [1, 1], "listen": "new", "as": "choice" },
+    { "slot": "price" },
+    { "slot": "questions", "pool": ["q.platnosc", "q.paragon"], "pick": [1, 2], "listen": "never", "as": "choice" },
+    { "slot": "serve" }
+   ],
+   "realTask": { "pl": "Razem … złotych.", "ru": "Пойми сумму на слух, не глядя на терминал." }
+  },
+  {
+   "n": 10, "id": "salad.l10", "status": "ready",
+   "title": { "pl": "Pora lunchu", "ru": "живой обед" },
+   "goal": "Беглость на зрелом материале: полный визит без подсказок формата. Уровень не кончается.",
+   "minutes": "2–3",
+   "words": ["lx.to_co_zwykle", "lx.dynia", "lx.na_nip"],
+   "slots": [
+    { "slot": "greet" },
+    { "slot": "warmup" },
+    { "slot": "event", "pool": ["ev.co_zwykle", "ev.nie_ma", "ev.sezon"] },
+    { "slot": "order", "as": "type" },
+    { "slot": "questions", "pool": ["q.rozmiar", "q.dressing", "q.osobno", "q.paluch", "q.picie", "q.miejsce"], "pick": [2, 3], "listen": "never", "as": "gap" },
+    { "slot": "event", "pool": ["ev.kasjer_pomylka"] },
+    { "slot": "price" },
+    { "slot": "serve" }
+   ]
+  }
+ ]
+}

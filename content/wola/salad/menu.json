@@ -1,0 +1,92 @@
+{
+ "schema": 1,
+ "note": "Меню Salad Story для Wola (W-02, research/12_salad_story.md §6). Названия реальные, текстом; цены — ориентир Glovo 15.10.2026, округлены. Порция powiększona = цена + extra [обобщено]. Салат считается без dressingu, у каждого свой по умолчанию. sprite — кадр атласа custom. spoken — написание для озвучки заимствований (tools/build_audio.py).",
+ "currency": "zł",
+ "sizes": [
+  { "id": "normalna", "pl": "normalna", "acc": "normalną", "ru": "обычная", "lx": "lx.normalna", "extra": 0 },
+  { "id": "powiekszona", "pl": "powiększona", "acc": "powiększoną", "ru": "увеличенная", "lx": "lx.powiekszona", "extra": 6 }
+ ],
+ "salads": [
+  { "id": "m.cezar", "name": "Cezar", "ru": "Цезарь", "has": ["lx.kurczak", "lx.jajka", "lx.pomidor", "lx.grzanki", "lx.bekon"], "dressing": "d.vegan_aioli", "price": 37, "from": 1, "sprite": "wola.salatka/0" },
+  { "id": "m.awokado_kurczak", "name": "Awokado Kurczak", "ru": "авокадо и курица", "has": ["lx.awokado", "lx.kurczak", "lx.pomidor", "lx.bekon", "lx.ziemniaki"], "dressing": "d.avo_green_goddess", "price": 40, "from": 1, "sprite": "wola.salatka/1" },
+  { "id": "m.losos_quinoa", "name": "Łosoś Quinoa", "ru": "лосось и киноа", "has": ["lx.losos", "lx.ogorek", "lx.pomidor", "lx.ser"], "dressing": "d.jogurtowy", "price": 43, "from": 1, "sprite": "wola.salatka/2" },
+  { "id": "m.nicejska", "name": "Nicejska", "ru": "Нисуаз", "has": ["lx.tunczyk", "lx.jajka", "lx.ogorek", "lx.pomidor", "lx.ziemniaki"], "dressing": "d.vinaigrette", "price": 40, "from": 2, "sprite": "wola.salatka/3" },
+  { "id": "m.cobb", "name": "Cobb", "ru": "Кобб", "has": ["lx.kurczak", "lx.bekon", "lx.ser", "lx.grzanki", "lx.ogorek", "lx.pomidor"], "dressing": "d.musztardowo_miodowy", "price": 40, "from": 2, "sprite": "wola.salatka/4" },
+  { "id": "m.mango_kurczak", "name": "Mango Kurczak", "ru": "манго и курица", "has": ["lx.mango", "lx.kurczak"], "dressing": "d.fistaszkowy", "price": 40, "from": 4, "sprite": "wola.salatka/5" },
+  { "id": "m.tofu_mango", "name": "Tofu Mango", "ru": "тофу и манго", "has": ["lx.tofu", "lx.mango", "lx.szpinak", "lx.ogorek"], "dressing": "d.fistaszkowy", "price": 37, "from": 4, "sprite": "wola.salatka/6" },
+  { "id": "m.smart_urban", "name": "Smart Urban Mix", "ru": "смарт: курица, сыр, яйцо", "has": ["lx.kurczak", "lx.ser", "lx.jajka", "lx.pomidor", "lx.ogorek"], "dressing": "d.musztardowo_miodowy", "price": 28, "from": 5, "sprite": "wola.salatka/7" },
+  { "id": "m.smart_chilli", "name": "Smart Kurczak Chilli", "ru": "смарт: курица чили", "has": ["lx.kurczak", "lx.pomidor", "lx.ogorek"], "dressing": "d.orientalne_chilli", "price": 28, "from": 5, "sprite": "wola.salatka/8" },
+  { "id": "m.kurczak_batat", "name": "Kurczak Batat", "ru": "курица и батат", "has": ["lx.kurczak", "lx.rukola", "lx.jablko"], "dressing": "d.orientalne_chilli", "price": 40, "from": 6, "sprite": "wola.salatka/9" },
+  { "id": "m.wolowina_teriyaki", "name": "Wołowina Teriyaki", "ru": "говядина терияки", "has": ["lx.wolowina", "lx.ogorek"], "dressing": "d.teriyaki", "price": 43, "from": 6, "sprite": "wola.salatka/10" },
+  { "id": "m.dynia_crunch", "name": "Dynia Crunch", "ru": "тыква (сезон)", "has": ["lx.dynia"], "dressing": "d.sliwkowy_bbq", "price": 40, "from": 10, "season": true, "sprite": "wola.salatka/11" }
+ ],
+ "dressings": [
+  { "id": "d.vegan_aioli", "pl": "Vegan Aioli", "ru": "веганский айоли" },
+  { "id": "d.avo_green_goddess", "pl": "Avo Green Goddess", "ru": "зелёный с авокадо" },
+  { "id": "d.jogurtowy", "pl": "jogurtowy", "ru": "йогуртовый", "lx": "lx.jogurtowy" },
+  { "id": "d.vinaigrette", "pl": "Vinaigrette", "ru": "винегрет (масло и уксус)" },
+  { "id": "d.musztardowo_miodowy", "pl": "musztardowo-miodowy", "ru": "медово-горчичный", "lx": "lx.musztardowo_miodowy" },
+  { "id": "d.fistaszkowy", "pl": "fistaszkowy", "ru": "арахисовый", "lx": "lx.fistaszkowy" },
+  { "id": "d.orientalne_chilli", "pl": "Orientalne Chilli", "ru": "восточный чили" },
+  { "id": "d.teriyaki", "pl": "Teriyaki", "ru": "терияки" },
+  { "id": "d.sliwkowy_bbq", "pl": "Śliwkowy Hot BBQ", "ru": "сливовый барбекю (сезон)" }
+ ],
+ "breads": [
+  { "id": "m.paluch_buraczkowy", "pl": "Paluch Buraczkowy", "short": "buraczkowy", "ru": "свекольная палочка", "lx": "lx.buraczkowy", "price": 6, "from": 5, "sprite": "wola.salatka/12" },
+  { "id": "m.paluch_ziarna", "pl": "Paluch z ziarnami", "short": "z ziarnami", "ru": "палочка с семенами", "lx": "lx.z_ziarnami", "price": 6, "from": 5, "sprite": "wola.salatka/13" }
+ ],
+ "drinks": [
+  { "id": "m.woda", "pl": "woda", "acc": "wodę", "ru": "вода", "lx": "lx.woda", "price": 11, "from": 5, "sprite": "wola.salatka/14" },
+  { "id": "m.lemoniada", "pl": "lemoniada", "acc": "lemoniadę", "ru": "лимонад", "price": 21, "from": 5, "sprite": "wola.salatka/15" },
+  { "id": "m.sok", "pl": "sok pomarańczowy", "acc": "sok pomarańczowy", "ru": "апельсиновый сок", "lx": "lx.sok", "price": 25, "from": 5, "sprite": "wola.salatka/16" }
+ ],
+ "ingredients": [
+  { "lx": "lx.kurczak", "sprite": "wola.skladnik/0", "gen": "kurczaka" },
+  { "lx": "lx.losos", "sprite": "wola.skladnik/1", "gen": "łososia" },
+  { "lx": "lx.awokado", "sprite": "wola.skladnik/2", "gen": "awokado" },
+  { "lx": "lx.jajka", "sprite": "wola.skladnik/3", "gen": "jajek" },
+  { "lx": "lx.pomidor", "sprite": "wola.skladnik/4", "gen": "pomidorów" },
+  { "lx": "lx.ogorek", "sprite": "wola.skladnik/5", "gen": "ogórka" },
+  { "lx": "lx.tunczyk", "sprite": "wola.skladnik/6", "gen": "tuńczyka" },
+  { "lx": "lx.mango", "sprite": "wola.skladnik/7", "gen": "mango" },
+  { "lx": "lx.tofu", "sprite": "wola.skladnik/8", "gen": "tofu" },
+  { "lx": "lx.wolowina", "sprite": "wola.skladnik/9", "gen": "wołowiny" },
+  { "lx": "lx.bekon", "sprite": "wola.skladnik/10", "gen": "bekonu" },
+  { "lx": "lx.grzanki", "sprite": "wola.skladnik/11", "gen": "grzanek" },
+  { "lx": "lx.ser", "sprite": "wola.skladnik/12", "gen": "sera" },
+  { "lx": "lx.szpinak", "sprite": "wola.skladnik/13", "gen": "szpinaku" },
+  { "lx": "lx.rukola", "sprite": "wola.skladnik/14", "gen": "rukoli" },
+  { "lx": "lx.ziemniaki", "sprite": "wola.skladnik/15", "gen": "ziemniaków" },
+  { "lx": "lx.mix_salat", "sprite": "wola.skladnik/16", "gen": "mixu sałat" },
+  { "lx": "lx.dynia", "sprite": "wola.skladnik/17", "gen": "dyni" },
+  { "lx": "lx.jablko", "sprite": "wola.skladnik/18", "gen": "jabłka" }
+ ],
+ "compose": {
+  "from": 8,
+  "price": 21,
+  "sprite": "wola.salatka/17",
+  "slots": [
+   { "id": "baza", "ask": "q.baza", "options": ["lx.mix_salat", "lx.szpinak", "lx.rukola"] },
+   { "id": "bialko", "ask": "q.bialko", "options": ["lx.kurczak", "lx.losos", "lx.tunczyk", "lx.tofu", "lx.jajka"] },
+   { "id": "dodatki", "ask": "q.dodatki", "options": ["lx.pomidor", "lx.ogorek", "lx.awokado", "lx.grzanki", "lx.ziemniaki", "lx.mango"] }
+  ]
+ },
+ "season": { "from": 10, "salad": "m.dynia_crunch", "board": { "pl": "Sezon na dynię!", "ru": "Сезон тыквы!" } },
+ "spoken": {
+  "dressing": "dresing",
+  "Dressing": "Dresing",
+  "Cobb": "Kob",
+  "Quinoa": "Kinoa",
+  "Vegan Aioli": "Wegan Ajoli",
+  "Avo Green Goddess": "Awo Grin Godes",
+  "Vinaigrette": "Winegret",
+  "Teriyaki": "Terijaki",
+  "Smart Urban Mix": "Smart Erben Miks",
+  "Chilli": "Czili",
+  "Hot BBQ": "Hot Bi-Bi-Kju",
+  "Crunch": "Krancz",
+  "mix sałat": "miks sałat",
+  "BLIKiem": "Blikiem",
+  "NIP": "Nip"
+ }
+}

@@ -383,3 +383,23 @@
   «Zbiór» = флаг `wola.jar.<слово>`; кровать — итог и «Do jutra» (`session` + `seg: sleep`). Звук клавиш — `sfx:play`.
 - Dev: `npm run dev` → `/polski-quest/wola/?mute=1[&now=+1d][&reset=1]`, состояние в `window.__wola` (`open('dom')`, `game`).
   Скрытая панель браузера кадры не рисует: шагать `__wola.game.loop.step(t)`.
+## Salad Story (W-02, research/12_salad_story.md)
+- Данные `content/wola/salad/`: `menu.json` (12 салатов, порции, dressingi, палочки, напитки, ингредиенты витрины, свой салат,
+  сезон, `spoken` — написание заимствований для озвучки), `cashiers.json` (4 кассира: `ask` кассира заменяет `common` по ключу,
+  `minLevel` у варианта), `levels.json` (уровни 1–10: `words`, `slots`, `realTask`, `status: ready|locked`; `questions` — что
+  значит вопрос, `answers` — фразы Димы), `events.json` (гэги по тегу ошибки, события визита). Схемы `salad_*.schema.json`,
+  проверка — `checkSalad` в `checkWola` (ссылки на словарь Wola и errorTags, реплики и ответы, которые зовёт генератор).
+- Чисто: `src/wola/systems/saladVisit.ts` — `buildVisit` (слоты → обычные шаги урока `wola.salad.<N>`, сид = игровой день +
+  номер визита, ≤ `maxNewWords` новых слов в порядке уровня, слово без карточки и не новое — шаг без `item`), `saladState`
+  (уровень, серия, прыжок, откат, печати, «Spróbowane», задание в реале — из событий `visit`), `mySalad` (настройка
+  `wola.salad`), `saladTexts` (всё, что визит говорит вслух). Числа и цены — `src/systems/plNumber.ts`.
+- Экран `src/wola/ui/salad.ts`: сцена (интерьер `w_ss_*`, кассир `wola.kasjer/N`, облачко заказа, пузырь кассира над шагом через
+  `RunOptions.onStep`), визит = `runLesson(..., { src: 'order', gagFor, errLineFor })`, событие `visit`, поднос, «Zadanie w realu»
+  (уровни с `realTask`), «I jak było?». Шаг `pick` (картинки витрины, `ctx.picture`). Гэг — `ctx.gagFor` в `frame.ts`.
+- В Wola шаги не режутся по дням: `lessonForToday(lesson, wolaStepGate(silent))`. «Мой салат» — раздел настроек
+  (`SettingsDeps.section`, `src/wola/ui/mySalad.ts`).
+- Озвучка: `npm run audio` берёт строки визита из `npx tsx tools/wola_salad_texts.ts` (тот же генератор); заимствования
+  читаются по `menu.spoken`, написание входит в хэш файла. Новые слова салатной — таблица `SALAD_WORDS` в
+  `tools/build_wola_vocab.ts`, затем пересборка словаря (`--trainer <vocab.js>`).
+- Арт: `art/sprites/wola_{salatka,skladnik,kasjer,gag,taca}.sprite.json` + тайлы интерьера в `wola.sprite.json` (кадры 25–33).
+- Dev: `/polski-quest/wola/?mute=1[&now=+1d]`, `window.__wola.planVisit(jump)` — визит, который начнётся (ответы для проверки).

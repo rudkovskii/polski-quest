@@ -187,6 +187,8 @@ export interface HubCounters {
   ripe: number;
   /** Банок на полке пора проверить. */
   jarsDue: number;
+  /** Salad Story (W-02): «уровень N» или «новое блюдо дня». */
+  salad?: { text: string; due?: boolean };
 }
 
 export function hubCounters(p: Progress, book: WolaBook, d: Derived, now: Ts, t: GardenTuning): HubCounters {
@@ -205,6 +207,9 @@ export interface WolaDay extends DaySummary {
   grewWola: { item: string; from: GardenItem['stage']; to: GardenItem['stage'] }[];
   /** Собрано в банки сегодня. */
   harvestedToday: string[];
+  /** Salad Story (W-02): визитов сегодня; слова, повторённые на кассе (тоже удобрение). */
+  saladVisits: number;
+  saladWords: string[];
 }
 
 const RANK: Record<GardenItem['stage'], number> = { seed: 0, sprout: 1, bush: 2, jar: 3 };
@@ -227,5 +232,12 @@ export function wolaDay(p: Progress, dc: DeriveContent, now: Ts, tz?: string): W
     .filter(([f, ts]) => f.startsWith(JAR_FLAG_PREFIX) && ts >= start && ts <= now)
     .sort((a, b) => a[1] - b[1])
     .map(([f]) => f.slice(JAR_FLAG_PREFIX.length));
-  return { ...s, added: s.planted, fertilized: s.plants, grewWola, harvestedToday };
+  // Salad Story (W-02): ответы на кассе (`src: 'order'`) удобряют растения так же, как обход.
+  const today = p.log.events.filter((e) => e.ts >= start && e.ts <= now);
+  const itemOf = (card: string): string => card.slice(0, card.lastIndexOf('#'));
+  const watered = new Set(today.filter((e): e is EventOf<'rev'> => e.k === 'rev' && (e.src === 'obchod' || e.src === 'express')).map((e) => itemOf(e.card)));
+  const saladWords = [...new Set(today.filter((e): e is EventOf<'rev'> => e.k === 'rev' && e.src === 'order').map((e) => itemOf(e.card)))];
+  const extra = saladWords.filter((w) => !watered.has(w)).length;
+  const saladVisits = today.filter((e) => e.k === 'visit').length;
+  return { ...s, added: s.planted, fertilized: s.plants + extra, grewWola, harvestedToday, saladVisits, saladWords, empty: s.empty && !saladVisits };
 }

@@ -15,12 +15,14 @@ export const listen: ExerciseModule<StepListen> = {
     const opts = optionList(options, () => run.submit(), { cls: step.show === 'sign' ? 'pq-sign' : '', lang: 'pl' });
     const item = step.item ? ctx.content?.vocab(step.item) : undefined;
     // Без звука (P-06, СЮЖЕТ_v2 §7): «Прочитай и выбери» — звук транскрипцией кириллицей, выбор написания.
-    const tr = step.tr ?? item?.tr;
+    // `show: "text"` (Wola, W-02): варианты — переводы реплики; без звука реплика читается написанием, не транскрипцией.
+    const meaning = step.show === 'text';
+    const tr = meaning ? undefined : (step.tr ?? item?.tr);
     const head: (Node | string)[] = ctx.silent && tr
       ? [el('span', { class: 'q' }, 'Как это пишется? ', el('b', { class: 'tr', 'data-tr': '' }, `[${tr}]`))]
       : noAudio
-        ? [el('span', { class: 'q' }, 'Что здесь написано? ', el('b', { lang: 'pl' }, step.say)), el('span', { class: 'pq-noaudio' }, '🔇 звука нет')]
-        : [el('span', { class: 'q' }, 'Что ты слышишь?'), ...audioButtons(ctx.audio, step.say), cantHearButton(ctx, () => run.skipNoAudio())];
+        ? [el('span', { class: 'q' }, meaning ? 'Что это значит? ' : 'Что здесь написано? ', el('b', { lang: 'pl' }, step.say)), el('span', { class: 'pq-noaudio' }, '🔇 звука нет')]
+        : [el('span', { class: 'q' }, meaning ? 'Что ты слышишь? Что это значит?' : 'Что ты слышишь?'), ...audioButtons(ctx.audio, step.say), cantHearButton(ctx, () => run.skipNoAudio())];
     // Без звука с транскрипцией (P-10b) — это чтение звука: ответ засчитывается в карточку `lis`, она не пропадает.
     const reading = ctx.silent === true && !!tr;
     const run = runGraded<number>(ctx, {

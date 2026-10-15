@@ -73,8 +73,8 @@ async function done(s: ReturnType<typeof setup>): Promise<StepResult> {
 const choice: Step = { t: 'choice', q: 'stół это…', options: ['стол', 'стул'], answer: 0, item: 'lx.stol', tags: ['ff.stol'], errorTagByOption: { '1': 'ff.stol' } };
 
 describe('реестр', () => {
-  it('все 12 типов шагов ТЗ §3.5 зарегистрированы, проверяемые помечены', () => {
-    expect(Object.keys(EXERCISES).sort()).toEqual(['choice', 'dictation', 'explain', 'gap', 'listen', 'match', 'minimal_pair', 'order', 'say', 'shadow', 'stress', 'type']);
+  it('все 12 типов шагов ТЗ §3.5 и pick (Wola, W-02) зарегистрированы, проверяемые помечены', () => {
+    expect(Object.keys(EXERCISES).sort()).toEqual(['choice', 'dictation', 'explain', 'gap', 'listen', 'match', 'minimal_pair', 'order', 'pick', 'say', 'shadow', 'stress', 'type']);
     expect(Object.entries(EXERCISES).filter(([, m]) => !m.graded).map(([k]) => k).sort()).toEqual(['explain', 'say', 'shadow']);
   });
 

@@ -47,10 +47,38 @@ export interface EvChal { k: 'chal'; challenge: string }
 export interface EvImp { k: 'imp'; card: CardId; state: Pick<CardState, 'reps' | 'interval' | 'ef' | 'due'>; from: 'trainer' }
 export interface EvSession { k: 'session'; mode: 'day' | 'express'; ms: number; retrievalMs: number }
 export interface EvSeg { k: 'seg'; seg: Seg }
+/** Заказ визита Salad Story (Wola, W-02): что Дима заказал (облачко визита). */
+export interface VisitOrder {
+  salad: string;
+  size: 'normalna' | 'powiekszona';
+  dressing?: string;
+  osobno?: boolean;
+  bread?: string;
+  drink?: string;
+  place?: 'miejsce' | 'wynos';
+  /** Состав «свой салат» (уровень 8): слова слотов. */
+  compose?: string[];
+}
+/**
+ * Визит в Salad Story (Wola, W-02): уровень лестницы, шаблон (уровень ниже при откате), кассир, заказ, точность.
+ * Уровень, серия, «Spróbowane», печати и «Zadanie w realu» считаются из этих событий (src/wola/systems/saladVisit.ts).
+ */
+export interface EvVisit {
+  k: 'visit'; level: number; tpl: number; cashier: string; order: VisitOrder;
+  score: number; firstTry: number; ms: number;
+  /** Визит уровнем выше («Spróbuj wyżej»). */
+  jump?: 1;
+  /** Гэги ошибок визита (sok вместо sos, миска-таз…). */
+  gags?: string[];
+  /** Показана карточка «Zadanie w realu» этого уровня. */
+  task?: number;
+  /** Ответ на «I jak było?» про прошлое задание: получилось / не вышло. */
+  real?: 'ok' | 'no';
+}
 
 export type EventBody =
   | EvRev | EvIntro | EvLesson | EvBoss | EvDiag | EvOrder | EvCook | EvSell
-  | EvFound | EvMini | EvSpend | EvPierog | EvChal | EvImp | EvSession | EvSeg;
+  | EvFound | EvMini | EvSpend | EvPierog | EvChal | EvImp | EvSession | EvSeg | EvVisit;
 
 export type LogEvent = Base & EventBody;
 export type EventKind = EventBody['k'];
@@ -61,7 +89,7 @@ export type EventDraft = EventBody & { ts: Ts };
 
 export const EVENT_KINDS: readonly EventKind[] = [
   'rev', 'intro', 'lesson', 'boss', 'diag', 'order', 'cook', 'sell',
-  'found', 'mini', 'spend', 'pierog', 'chal', 'imp', 'session', 'seg',
+  'found', 'mini', 'spend', 'pierog', 'chal', 'imp', 'session', 'seg', 'visit',
 ];
 
 /** Минимальная проверка формы при чтении файла/облака: id, ts, известный k. */

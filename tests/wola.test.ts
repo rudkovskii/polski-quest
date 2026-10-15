@@ -203,7 +203,7 @@ describe('валидатор content/wola', () => {
     const removed = v.vocab.splice(2, 1)[0]!;
     const hub = structuredClone(wola.get('wola/maps/hub.json')) as { objects: { type: string; to?: string }[] };
     hub.objects.find((o) => o.to === 'place:salad')!.to = 'place:kino';
-    const issues = errors(new Map<string, unknown>([['wola/vocab.json', v], ['wola/maps/hub.json', hub]]), new Set([removed.id]));
+    const issues = errors(new Map<string, unknown>([...wola, ['wola/vocab.json', v], ['wola/maps/hub.json', hub]]), new Set([removed.id]));
     const msgs = issues.map((i) => i.msg).join('\n');
     expect(msgs).toContain('тема "nie_ma"');
     expect(msgs).toContain('не кириллицей');
@@ -302,7 +302,8 @@ describe('петля Wola', () => {
     expect(c.due).toBe(2);
     expect(counterText('dom', c)).toEqual({ text: 'новых слов: 5' });
     expect(counterText('ogrod', c)).toEqual({ text: '! 2', due: true });
-    expect(counterText('salad', c)?.text).toBe('скоро');
+    expect(counterText('salad', c)).toBeNull(); // нет данных Salad Story — подписи нет
+    expect(counterText('salad', { ...c, salad: { text: 'уровень 1' } })?.text).toBe('уровень 1');
     const day = wolaDay(p, dc, now, TZ);
     expect(day.added).toEqual([]);
     expect(day.fertilized).toBe(1);
