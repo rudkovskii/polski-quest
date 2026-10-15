@@ -1,11 +1,14 @@
 // «Mój ogródek» (W-01, ВОЛЯ.md п. 7): грядки = слова (garden.ts: семя → росток → куст → зрелое), без ходьбы.
 // «!» — карточка к повтору (вялое — просрочено), тап или «Nawóz» = раунд повторения (ui/obchod.ts, лестница форматов,
 // ввод с экранной клавиатурой), растение растёт. Зрелое (интервал ≥ 21 дня) → «Zbiór» → банка на полку дома.
-// «Удобрить всё» — экспресс-обход.
+// «Nawóz» (W-04, план дня) — один раунд на норму дня: до PLAN.fertilizeMax растений, сначала хрупкие; остальные
+// «подождут до завтра» без наказания. Норма сделана — «Nawóz» остаётся, но уже по желанию. Дистракторы — той же темы.
+import { isFamiliar } from '../../systems/words';
 import { el } from '../../ui/dom';
 import { runObchod } from '../../ui/obchod';
 import { plBtn, type PlLabel } from '../../ui/overlay/kit';
-import { harvest, wolaGarden, type Plant } from '../systems/wola';
+import { wolaCardStep } from '../systems/steps';
+import { dayPlan, harvest, PLAN, planText, planted, wolaGarden, type Plant } from '../systems/wola';
 import { changed, derived, openPlace, panel, type WolaDeps } from './kit';
 import { spriteEl } from './pix';
 
@@ -37,11 +40,26 @@ export async function runGarden(deps: WolaDeps): Promise<void> {
 
   const fertilize = (fromItem?: string): Promise<void> =>
     run(async () => {
-      for (let opts: Parameters<typeof runObchod>[1] = fromItem ? { mode: 'day', fromItem, nawoz: true } : { mode: 'express', nawoz: true }, guard = 0; guard < 20; guard++) {
-        const r = await runObchod({ ...deps }, opts);
-        if (!r.again) return;
-        opts = { mode: 'day', nawoz: true };
-      }
+      const d = derived(deps);
+      const now = deps.clock.now();
+      const plan = dayPlan(deps.store.progress, deps.book, d, now, deps.content.tuning, deps.tz);
+      // Норма дня (до 15); сделана — ещё раунд по желанию тем же размером.
+      const limit = plan.fertilize > 0 ? plan.fertilize : Math.min(plan.debt, PLAN.fertilizeMax);
+      if (limit <= 0) return;
+      const have = planted(d);
+      const pool = deps.book.vocab;
+      const known = (id: string): boolean => have.has(id);
+      await runObchod(
+        { ...deps },
+        {
+          mode: 'day',
+          nawoz: true,
+          restTomorrow: true,
+          limit,
+          ...(fromItem ? { fromItem } : {}),
+          stepFor: (card) => wolaCardStep(card, (id) => deps.content.vocab.get(id)?.value, pool, (id) => known(id) || isFamiliar(d.cards, id)),
+        },
+      );
     });
 
   const collect = (items: Plant[]): Promise<void> =>
@@ -93,7 +111,9 @@ export async function runGarden(deps: WolaDeps): Promise<void> {
 
   function paint(): void {
     const d = derived(deps);
-    const g = wolaGarden(d, deps.clock.now(), deps.content.tuning, deps.store.progress.world.flags);
+    const now = deps.clock.now();
+    const g = wolaGarden(d, now, deps.content.tuning, deps.store.progress.world.flags);
+    const plan = dayPlan(deps.store.progress, deps.book, d, now, deps.content.tuning, deps.tz);
     const beds = g.plants.map((x) => {
       const v = deps.content.vocab.get(x.item)?.value;
       const b = el(
@@ -115,16 +135,26 @@ export async function runGarden(deps: WolaDeps): Promise<void> {
       return b;
     });
     const due = g.due;
+    // Норма дня ещё есть — «Nawóz (N)» главная; норма сделана, но растения ждут — «ещё по желанию».
+    const norm = plan.fertilize;
+    const extra = !norm && due > 0;
+    const nawoz = plBtn(
+      { pl: `Nawóz (${norm || (extra ? Math.min(due, PLAN.fertilizeMax) : 0)})`, ru: norm ? NAWOZ_ALL.ru : extra ? 'норма сделана · ещё по желанию' : NAWOZ_ALL.ru },
+      () => void fertilize(),
+      norm ? 'primary' : '',
+      { 'data-nav': true, 'data-act': 'nawoz', 'data-norm': String(norm), ...(norm ? { 'data-primary': true } : due ? {} : { disabled: true }) },
+    );
     const actions = el(
       'div',
       { class: 'wl-actions' },
-      plBtn({ pl: `Nawóz (${due})`, ru: NAWOZ_ALL.ru }, () => void fertilize(), due ? 'primary' : '', { 'data-nav': true, 'data-act': 'nawoz', ...(due ? { 'data-primary': true } : { disabled: true }) }),
+      nawoz,
       plBtn({ pl: `Zbiór (${g.ripe})`, ru: ZBIOR.ru }, () => void collect(g.plants), g.ripe && !due ? 'primary' : '', { 'data-nav': true, 'data-act': 'zbior', ...(g.ripe ? {} : { disabled: true }) }),
     );
     frame.stage.replaceChildren(
       el(
         'div',
         { class: 'wl-garden', 'data-plants': g.plants.length, 'data-due': due, 'data-ripe': g.ripe },
+        el('p', { class: 'wl-plan', 'data-plan': `${plan.fertilize}/${plan.fresh}` }, planText(plan), plan.debt > plan.fertilize ? el('small', {}, ` · остальные ${plan.debt - plan.fertilize} — завтра, это нормально`) : null),
         g.plants.length
           ? el('p', { class: 'wl-legend' }, `Растений: ${g.plants.length}. «!» — пора удобрить (повторить слово), ★ — созрело, собери в банку.`)
           : el('div', { class: 'empty' }, 'Грядки пустые. Слова сажаются дома: ноутбук «Słowniczek».'),

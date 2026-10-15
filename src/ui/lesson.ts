@@ -50,6 +50,8 @@ export interface LessonDeps {
   onEvent?(e: LogEvent): void;
   /** Картинки кадров атласа для шага `pick` (Wola, W-02). */
   picture?(frame: string, scale: number): HTMLElement | null;
+  /** Wola (W-04): без звука в «Как это пишется?» неверные варианты — ловушки написания того же слова. */
+  spellTraps?: boolean;
 }
 
 /** Запись о пройденном шаге в `local.resume.answers` (сериализуемая). */
@@ -168,6 +170,8 @@ export interface RunOptions {
   gagFor?: ExerciseCtx['gagFor'];
   /** Перед показом шага (Salad Story: пузырь кассира в сцене над шагом, W-02). */
   onStep?(step: Step, id: string): void;
+  /** Первый ответ на шаг дан (W-04, Salad Story: перевод в пузыре кассира — только после ответа). */
+  onAnswer?(step: Step, id: string, ok: boolean): void;
 }
 
 /**
@@ -327,6 +331,8 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
       ...(verdicts ? { verdicts } : {}),
       ...(deps.picture ? { picture: deps.picture } : {}),
       ...(opts.gagFor ? { gagFor: opts.gagFor } : {}),
+      ...(deps.spellTraps ? { spellTraps: true } : {}),
+      ...(opts.onAnswer ? { onAnswer: (ok: boolean) => opts.onAnswer?.(step, stepId, ok) } : {}),
     };
     opts.onStep?.(step, stepId);
     const res = await mountStep(step, ctx);
@@ -423,7 +429,7 @@ export async function runLesson(lesson: Lesson, deps: LessonDeps, opts: RunOptio
   }
   clearResume();
 
-  const result: LessonResult = { passed, score: round3(score), firstTry: round3(firstTry), ms, planted, ...(exited ? { exited: true } : {}) };
+  const result: LessonResult = { passed, score: round3(score), firstTry: round3(firstTry), answers: n, ms, planted, ...(exited ? { exited: true } : {}) };
   if (exited) {
     close();
     return result;

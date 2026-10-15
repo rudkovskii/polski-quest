@@ -11,8 +11,9 @@ import type { Layer, Overlay } from '../../ui/overlay/host';
 import { btn, plBtn, type AudioPort, type PlLabel } from '../../ui/overlay/kit';
 import type { SettingsStore } from '../../ui/settings';
 import type { SaladData } from '../systems/saladVisit';
+import type { PlaceId } from '../systems/places';
 import type { WolaBook } from '../systems/wola';
-import type { PixAtlas } from './pix';
+import { loadingEl, type PixAtlas } from './pix';
 import { ensureWolaStyle } from './style';
 
 export type WolaStore = LessonStore & SettingsStore & { setProgress(p: Progress): boolean };
@@ -37,6 +38,12 @@ export interface WolaDeps {
   sessionStart?: () => number;
   onSession?: () => void;
   onEvent?(e: LogEvent): void;
+  /** Wola (W-04): без звука «Как это пишется?» с ловушками написания (ExerciseCtx.spellTraps). */
+  spellTraps?: boolean;
+  /** Перейти в другое место после закрытия текущего (W-04: «Сначала огород» с ноутбука ведёт в огород). */
+  go?(id: PlaceId): void;
+  /** Картинки атласа готовы (W-04, `preloadPixImages`): до этого место показывает пиксельный загрузчик. */
+  images?: Promise<void>;
 }
 
 export const BACK: PlLabel = { pl: 'Wola', ru: 'на улицу' };
@@ -69,7 +76,7 @@ export interface PlaceFrame {
 }
 
 /** Экран места: шапка «← Wola» + название, сцена на весь экран. Esc / B / «Wola» — назад на улицу. */
-export function openPlace(deps: Pick<WolaDeps, 'overlay'>, id: string, title: PlLabel): PlaceFrame {
+export function openPlace(deps: Pick<WolaDeps, 'overlay' | 'images'>, id: string, title: PlLabel): PlaceFrame {
   ensureWolaStyle(document);
   const layer = deps.overlay.open(`wl-layer wl-${id}`);
   const stage = el('div', { class: 'wl-stage' });
@@ -86,6 +93,17 @@ export function openPlace(deps: Pick<WolaDeps, 'overlay'>, id: string, title: Pl
     el('div', { class: 'wl-place', 'data-place': id }, el('div', { class: 'wl-bar' }, back, el('h2', {}, el('span', { lang: 'pl' }, title.pl), el('small', {}, title.ru)), tools), stage, foot),
   );
   layer.handle(null);
+  // Пока картинки атласа не готовы — пиксельный загрузчик поверх сцены (W-04), не тёмный экран.
+  if (deps.images) {
+    let ready = false;
+    void deps.images.then(() => {
+      ready = true;
+      layer.el.querySelector('.wl-loading')?.remove();
+    });
+    queueMicrotask(() => {
+      if (!ready && !layer.closed) layer.el.querySelector('.wl-place')?.append(loadingEl(title.pl));
+    });
+  }
   return { layer, stage, tools, foot, closed, close };
 }
 

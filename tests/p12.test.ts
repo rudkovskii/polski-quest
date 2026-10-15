@@ -2,6 +2,7 @@
 // P-12 (четвёртый плейтест, 7 → 8): колонка HUD и тапы по хатке, A у двери и у Казика, без звука — чтение,
 // старая сборка из кэша, перекрытия, «Dalej» после ошибки, путь к цели через карты, спрайт Брзехвы, мелочи.
 import { readFileSync } from 'node:fs';
+import { workboxOptions } from '../tools/lib/pwa';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { nowShown } from '../src/flow';
 import { getContent } from '../src/systems/content';
@@ -331,7 +332,7 @@ describe('4. версия сборки без кэша', () => {
     const cfg = readFileSync('vite.config.ts', 'utf8');
     expect(cfg).toMatch(/fileName: 'version\.json'/);
     expect(cfg).toMatch(/meta name="pq-build"/);
-    expect(cfg).toMatch(/globIgnores: \['\*\*\/version\.json'\]/);
+    expect(workboxOptions().globIgnores).toEqual(['**/version.json']);
     expect(readFileSync('src/main.ts', 'utf8')).toMatch(/watchVersion\(\{ base: import\.meta\.env\.BASE_URL, local: __BUILD_ID__, isStale: staleBuild/);
   });
 });

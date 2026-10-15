@@ -100,3 +100,19 @@ export function registerPwa(o: PwaOptions): void {
     });
   });
 }
+
+/** Вопрос service worker'а (public/sw-wola.js, W-04): «какая страница открыта?». */
+export const WHICH_PAGE = 'pq-which-page';
+
+/**
+ * Отвечать service worker'у, какая это страница (W-04). Новый SW при активации перезагружает вкладки по адресу
+ * `/wola…`, которые не ответили `wola`: так старая основная игра, отданная прошлым SW вместо Wola, сменяется на Wola.
+ */
+export function answerWhichPage(page: 'wola' | 'main', sw: Pick<ServiceWorkerContainer, 'addEventListener' | 'startMessages'> | undefined = typeof navigator === 'undefined' ? undefined : navigator.serviceWorker): void {
+  if (!sw) return;
+  sw.addEventListener('message', (e: MessageEvent) => {
+    const data = e.data as { type?: unknown } | null;
+    if (data?.type === WHICH_PAGE) e.ports[0]?.postMessage({ page });
+  });
+  sw.startMessages?.();
+}

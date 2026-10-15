@@ -9,8 +9,8 @@ import { el } from '../../ui/dom';
 import { runLesson } from '../../ui/lesson';
 import type { Layer } from '../../ui/overlay/host';
 import { btn, plBtn, type PlLabel } from '../../ui/overlay/kit';
-import { CHECK_LESSON } from '../systems/wola';
-import { changed, write, words as wordsN, type WolaDeps } from './kit';
+import { CHECK_LESSON, planText, type DayPlan } from '../systems/wola';
+import { BACK, changed, write, words as wordsN, type WolaDeps } from './kit';
 import { ensureWolaStyle } from './style';
 
 export interface SlowniczekOptions {
@@ -20,12 +20,21 @@ export interface SlowniczekOptions {
   title: PlLabel;
   /** Подсказка на последнем экране (ноутбук: «ещё слова — на полке»). */
   after?: string;
+  /** План дня под заголовком (W-04): «план на сегодня: удобрить N, новых M». */
+  plan?: string;
+  /**
+   * Уйти на улицу прямо с ноутбука (W-04, iPhone: проверка закрывала кнопку «Wola»). Есть — над ноутбуком та же
+   * полоса с «Wola», что у места: она видна всегда, и в карточках, и в проверке.
+   */
+  leave?: () => void;
 }
 
 export interface SlowniczekResult {
   added: string[];
   /** Проверка узнаванием: верно с первой попытки / всего. Нет — проверки не было (прервали, меньше 2 слов). */
   check?: { right: number; total: number };
+  /** Ушли на улицу полосой «Wola» (W-04). */
+  left?: boolean;
 }
 
 export const ADD: PlLabel = { pl: 'Dodaj', ru: 'Добавить' };
@@ -66,9 +75,13 @@ export async function runSlowniczek(deps: WolaDeps, o: SlowniczekOptions): Promi
   const screen = el('div', { class: 'wl-screen', 'data-screen': 'slowniczek' });
   const body = el('div', {});
   let cancel: (() => void) | null = null;
+  let leaving = false;
   const x = btn('✕', () => cancel?.(), 'icon ghost', { 'aria-label': 'Закрыть ноутбук', 'data-act': 'close' });
-  screen.append(el('div', { class: 'head' }, el('b', { lang: 'pl' }, o.title.pl, el('small', {}, o.title.ru)), bar, x), body);
-  layer.el.replaceChildren(el('div', { class: 'wl-laptop', 'data-laptop': o.lesson }, screen, el('div', { class: 'base' })));
+  screen.append(el('div', { class: 'head' }, el('b', { lang: 'pl' }, o.title.pl, el('small', {}, o.title.ru), o.plan ? el('small', { class: 'plan', 'data-plan': o.plan }, o.plan) : null), bar, x), body);
+  layer.el.replaceChildren(
+    ...(o.leave ? [leaveBar(() => ((leaving = true), cancel?.()))] : []),
+    el('div', { class: 'wl-laptop', 'data-laptop': o.lesson }, screen, el('div', { class: 'base' })),
+  );
   paintBar(0);
 
   const added: string[] = [];
@@ -84,7 +97,7 @@ export async function runSlowniczek(deps: WolaDeps, o: SlowniczekOptions): Promi
     for (let i = 0; i < total; i++) {
       const v = o.words[i]!;
       const ok = await card(v, i);
-      if (!ok) return { added };
+      if (!ok) return leaving ? { added, left: true } : { added };
       write(deps, { k: 'intro', ts: deps.clock.now(), item: v.id, lesson: o.lesson, ok: [] });
       added.push(v.id);
       paintBar(added.length);
@@ -92,11 +105,13 @@ export async function runSlowniczek(deps: WolaDeps, o: SlowniczekOptions): Promi
     }
     let check: SlowniczekResult['check'];
     if (added.length >= CHECK_MIN) check = await runCheck();
+    if (leaving) return check ? { added, check, left: true } : { added, left: true };
     await finish(check);
     return check ? { added, check } : { added };
   } finally {
     stopTyping();
     layer.close();
+    if (leaving) o.leave?.();
   }
 
   /** Одна карточка. true — «Dodaj», false — закрыли. */
@@ -176,8 +191,11 @@ export async function runSlowniczek(deps: WolaDeps, o: SlowniczekOptions): Promi
       },
       close: () => layer.close(),
     };
-    cancel = null;
+    // «Wola» над ноутбуком во время проверки: прервать урок (как ✕) и уйти.
+    cancel = () => body.querySelector<HTMLElement>('.pq-lesson [data-act="close"]')?.click();
     const r = await runLesson(lesson, { ...deps }, { layer: sub, noSummary: true });
+    cancel = null;
+    if (leaving) return undefined;
     if (r.cancelled) return undefined;
     changed(deps);
     return { right: Math.round((r.firstTry ?? 0) * steps.length), total: steps.length };
@@ -210,25 +228,36 @@ export async function runSlowniczek(deps: WolaDeps, o: SlowniczekOptions): Promi
   }
 }
 
-/** Экран ноутбука, когда порция на сегодня сделана или слова кончились. */
-export function laptopRest(deps: WolaDeps, text: (HTMLElement | string)[]): Promise<void> {
+/** Полоса «← Wola» над ноутбуком (как у места): выход на улицу виден всегда (W-04). */
+function leaveBar(onLeave: () => void): HTMLElement {
+  const back = plBtn(BACK, onLeave, '', { 'data-act': 'leave', 'data-nav': true, 'aria-label': 'Назад на улицу Wola' });
+  return el('div', { class: 'wl-bar wl-laptop-bar' }, back, el('h2', {}, el('span', { lang: 'pl' }, 'Mój dom'), el('small', {}, 'ноутбук')));
+}
+
+/**
+ * Экран ноутбука, когда порция на сегодня сделана, слова кончились или новых нет из-за огорода (W-04: «Сначала
+ * огород» с кнопкой `go` — ответ 'go'). План дня — строкой под заголовком.
+ */
+export function laptopRest(deps: WolaDeps, text: (HTMLElement | string)[], o: { plan?: DayPlan; go?: PlLabel } = {}): Promise<'ok' | 'go'> {
   ensureWolaStyle(document);
   const layer = deps.overlay.open('wl-laptop-layer');
   layer.el.style.justifyContent = 'center';
   return new Promise((resolve) => {
-    const close = (): void => {
+    const close = (a: 'ok' | 'go' = 'ok'): void => {
       layer.close();
-      resolve();
+      resolve(a);
     };
-    const ok = btn('OK', close, 'primary', { 'data-nav': true, 'data-primary': true, 'data-act': 'close' });
+    const ok = btn('OK', () => close(), o.go ? '' : 'primary', { 'data-nav': true, ...(o.go ? {} : { 'data-primary': true }), 'data-act': 'close' });
+    const go = o.go ? plBtn(o.go, () => close('go'), 'primary', { 'data-nav': true, 'data-primary': true, 'data-act': 'go' }) : null;
+    const plan = o.plan ? planText(o.plan) : null;
     const screen = el(
       'div',
       { class: 'wl-screen', 'data-screen': 'slowniczek-rest' },
-      el('div', { class: 'head' }, el('b', { lang: 'pl' }, 'Słowniczek', el('small', {}, 'мой словарь'))),
-      el('div', { class: 'wl-card' }, ...text.map((t) => (typeof t === 'string' ? el('div', { class: 'msg' }, t) : t)), el('div', { class: 'wl-row' }, ok)),
+      el('div', { class: 'head' }, el('b', { lang: 'pl' }, 'Słowniczek', el('small', {}, 'мой словарь'), plan ? el('small', { class: 'plan', 'data-plan': plan }, plan) : null)),
+      el('div', { class: 'wl-card' }, ...text.map((t) => (typeof t === 'string' ? el('div', { class: 'msg' }, t) : t)), el('div', { class: 'wl-row' }, ok, go)),
     );
     layer.el.replaceChildren(el('div', { class: 'wl-laptop' }, screen, el('div', { class: 'base' })));
     layer.handle({ cancel: () => (close(), true) });
-    queueMicrotask(() => ok.focus({ preventScroll: true }));
+    queueMicrotask(() => (go ?? ok).focus({ preventScroll: true }));
   });
 }

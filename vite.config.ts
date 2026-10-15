@@ -3,8 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin, type ViteDevServer } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-
-const BASE = '/polski-quest/';
+import { BASE, WOLA, workboxOptions } from './tools/lib/pwa';
 
 function buildId(): string {
   const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string };
@@ -43,11 +42,10 @@ const ROOT_DIR = fileURLToPath(new URL('./', import.meta.url));
 
 /**
  * Короткая версия «Wola» (W-01): вторая страница `wola/index.html` рядом с основной игрой. Service worker один на
- * `/polski-quest/` (кэширует обе), манифест у Wola свой: `wola/manifest.webmanifest`, scope и start_url
+ * `/polski-quest/` (кэширует обе; навигацию под /wola отдаёт public/sw-wola.js, W-04 — tools/lib/pwa.ts), манифест у Wola свой: `wola/manifest.webmanifest`, scope и start_url
  * `/polski-quest/wola/` — на телефоне ставится отдельной иконкой. vite-plugin-pwa вставляет ссылку на основной манифест
  * во все страницы: в странице Wola меняем её на свою.
  */
-const WOLA = `${BASE}wola/`;
 function wolaPwa(): Plugin {
   const manifest = {
     id: WOLA,
@@ -197,30 +195,7 @@ export default defineConfig({
           { src: 'icons/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: {
-        skipWaiting: true,
-        clientsClaim: true,
-        cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{js,css,html,png,json,webmanifest}'],
-        // version.json — всегда из сети (P-12): по нему видно, что страница из старого кэша.
-        globIgnores: ['**/version.json'],
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
-        navigateFallback: 'index.html',
-        // Wola (W-01): её страницы не подменяются основной игрой; `/wola/?mute=1` берётся из кэша как `/wola/index.html`.
-        navigateFallbackDenylist: [/supabase/, /\/wola\//],
-        // Параметры адреса (?dev, ?mute, ?now…) — только для клиента: страница из precache и с ними.
-        ignoreURLParametersMatching: [/.*/],
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.pathname.includes('/audio/') && url.pathname.endsWith('.m4a'),
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'pq-audio',
-              expiration: { maxEntries: 2000 },
-            },
-          },
-        ],
-      },
+      workbox: workboxOptions(),
     }),
     wolaPwa(),
   ],

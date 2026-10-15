@@ -5,6 +5,7 @@
   "greet": [
    { "pl": "Dzień dobry, co podać?", "ru": "Здравствуйте, что подать?" },
    { "pl": "Dzień dobry! Co dla pana?", "ru": "Здравствуйте! Что для вас?" },
+   { "pl": "Dzień dobry, słucham?", "ru": "Здравствуйте, слушаю вас." },
    { "pl": "Słucham pana?", "ru": "Слушаю вас?", "minLevel": 6 }
   ],
   "serve": [
@@ -22,7 +23,7 @@
   "q.paluch_jaki": [{ "pl": "Buraczkowy czy z ziarnami?", "ru": "Свекольную или с семенами?" }],
   "q.picie": [{ "pl": "Coś do picia?", "ru": "Что-нибудь попить?" }],
   "q.miejsce": [{ "pl": "Na miejscu czy na wynos?", "ru": "Здесь или с собой?" }],
-  "q.cos_jeszcze": [{ "pl": "Czy coś jeszcze?", "ru": "Что-нибудь ещё?" }],
+  "q.cos_jeszcze": [{ "pl": "Czy coś jeszcze?", "ru": "Что-нибудь ещё?" }, { "pl": "Coś jeszcze?", "ru": "Что-то ещё?" }, { "pl": "Coś poza tym?", "ru": "Что-нибудь кроме этого?" }],
   "q.ze_wszystkim": [{ "pl": "Ze wszystkim?", "ru": "Со всем?" }],
   "q.baza": [{ "pl": "Jaka baza?", "ru": "Какая основа?" }],
   "q.bialko": [{ "pl": "Jakie białko?", "ru": "Какой белок?" }],

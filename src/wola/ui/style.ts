@@ -24,9 +24,11 @@ const css = `
 .wl-tag.top { bottom: calc(100% + 2px); }
 .wl-tag.bottom { top: calc(100% + 2px); }
 
-/* Подписи мест на улице (над дверями, world:spots). */
+/* Подписи мест на улице (W-04: выше двери, над фасадом, или под калиткой — дверь всегда видна). */
 .wl-spots { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 .wl-spot { position: absolute; transform: translate(-50%, -100%); pointer-events: auto; border: 0; background: none; padding: 0 0 4px; cursor: pointer; font: inherit; }
+.wl-spot.below { transform: translate(-50%, 0); padding: 4px 0 0; }
+.wl-spot .cnt { white-space: normal; max-width: 220px; text-align: center; }
 .wl-spot .wl-tag { position: static; transform: none; }
 .wl-hud { position: absolute; right: calc(8px + env(safe-area-inset-right)); top: calc(8px + env(safe-area-inset-top)); z-index: 5; display: flex; gap: 6px; }
 .wl-hud[hidden] { display: none; }
@@ -159,6 +161,40 @@ const css = `
 .pq-pick-item .lbl { font-size: 14px; font-weight: 700; }
 .pq-pick-item.ok, .pq-pick-item.show { outline: 4px solid #74a334; }
 .pq-pick-item.bad { outline: 4px solid #e0394c; opacity: .6; }
+
+/* W-04: план дня, полоса «Wola» над ноутбуком, проверка внутри экрана ноутбука, кнопки салатной у нижнего края. */
+.wl-plan { display: inline-block; margin: 0 0 8px; padding: 4px 10px; border-radius: 6px; background: rgba(240, 229, 209, .94); color: #345a52;
+  font-size: 15px; font-weight: 700; line-height: 1.25; box-shadow: 0 2px 0 #141b1b; }
+.wl-plan small { font-weight: 400; color: #543c52; }
+.wl-plan-top { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 2; margin: 0; max-width: calc(100% - 16px); box-sizing: border-box; text-align: center; }
+.wl-screen .head small.plan { color: #ffd966; margin-top: 2px; }
+.wl-laptop-layer > .wl-laptop-bar { flex: none; align-self: stretch; }
+.wl-laptop-layer > .wl-laptop { flex: 0 1 auto; min-height: 0; }
+.wl-screen > .head { position: sticky; top: -12px; z-index: 2; margin: -12px -14px 10px; padding: 12px 14px 8px; background: #1a1c2c; }
+.wl-screen .pq-lesson { width: auto; height: auto; max-height: none; padding: 0; }
+.wl-screen .pq-lesson > .pq-wood { flex: none; }
+.wl-screen .pq-lesson-main { overflow: visible; }
+.wl-ss-panel .pq-lesson-main { overflow: visible; }
+.wl-ss-panel .pq-ex-actions { background: #f0e5d1; padding-bottom: 6px; z-index: 2; }
+.wl-ss-card > .wl-row:last-child { position: sticky; bottom: -6px; z-index: 2; margin: 0 -14px -12px; padding: 8px 14px; background: #f0e5d1; border-radius: 0 0 8px 8px; }
+.wl-ss-real-mark { color: #345a52; font-weight: 600; }
+
+/* Пиксельный загрузчик (W-04): вместо тёмного экрана при входе в место, пока картинки атласа не готовы. */
+.wl-loading { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: #1a1c2c; color: #b8dce5; font: 700 15px ui-monospace, Menlo, monospace; }
+.wl-loading .blocks { display: flex; gap: 4px; }
+.wl-loading .blocks i { width: 12px; height: 12px; background: #345a52; box-shadow: inset 0 0 0 2px #141b1b; animation: wl-load 0.9s steps(1) infinite; }
+.wl-loading .blocks i:nth-child(2) { animation-delay: .15s; } .wl-loading .blocks i:nth-child(3) { animation-delay: .3s; }
+.wl-loading .blocks i:nth-child(4) { animation-delay: .45s; } .wl-loading .blocks i:nth-child(5) { animation-delay: .6s; }
+@keyframes wl-load { 0% { background: #74a334; } 50% { background: #345a52; } }
+
+/* Быстрые переходы (W-04): мелкие иконки мест в углу улицы, клавиши 1/2/3. */
+.wl-jump { position: absolute; right: calc(8px + env(safe-area-inset-right)); top: calc(52px + env(safe-area-inset-top)); z-index: 5; display: flex; flex-direction: column; gap: 4px; }
+.wl-jump[hidden] { display: none; }
+.wl-jump button { display: flex; align-items: center; gap: 4px; min-width: 0; padding: 2px 6px 2px 2px; border: 2px solid #141b1b; border-radius: 6px;
+  background: rgba(240, 229, 209, .9); color: #141b1b; font: 700 12px ui-monospace, Menlo, monospace; cursor: pointer; }
+.wl-jump button .k { display: inline-block; min-width: 14px; padding: 0 2px; border-radius: 3px; background: #3b3643; color: #f2eaf1; text-align: center; }
+.wl-jump button:focus-visible { outline: 3px solid #ffd966; }
 `;
 
 export function ensureWolaStyle(doc: Document): void {

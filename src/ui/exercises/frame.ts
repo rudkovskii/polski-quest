@@ -228,6 +228,7 @@ export function runGraded<A>(ctx: ExerciseCtx, spec: GradedSpec<A>): GradedRun {
     const c = spec.check(a);
     const isFirst = attempts === 1;
     if (isFirst) first = { verdict: c.verdict, score: c.score, tags: [...c.tags], ms: Math.max(0, Math.round(ctx.now() - t0)), hinted };
+    if (isFirst) ctx.onAnswer?.(isRight(c));
     spec.mark?.(a, c, isFirst);
     const v = verdictText(c);
     const right = isRight(c);

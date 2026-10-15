@@ -44,5 +44,10 @@
   { "id": "gr.miejsce", "ru": "Wola, Salad Story: na miejscu (здесь) / na wynos (с собой)", "hint": "na miejscu = здесь, na wynos = с собой." },
   { "id": "ph.sok_sos", "ru": "Wola, Salad Story: sos (соус) / sok (сок) — одна буква меняет смысл", "hint": "sos = соус, sok = сок." },
   { "id": "ph.teen_ty", "ru": "Wola, Salad Story: -naście (11–19) / -dzieści (20–40): czternaście 14, czterdzieści 40", "hint": "-naście = -надцать (14), -dzieści = -дцать (40)." },
-  { "id": "ff.dynia", "ru": "dynia = тыква, а не дыня (дыня — melon)", "hint": "dynia — тыква. Дыня по-польски melon." }
+  { "id": "ff.dynia", "ru": "dynia = тыква, а не дыня (дыня — melon)", "hint": "dynia — тыква. Дыня по-польски melon." },
+  { "id": "ff.witryna", "ru": "Wola, Salad Story: что на витрине — kurczak, łosoś, pomidor, ogórek…", "hint": "kurczak = курица, łosoś = лосось, pomidor = помидор, ogórek = огурец, jajka = яйца." },
+  { "id": "ff.co_podac", "ru": "Wola, Salad Story: Co podać? / Co dla pana? / Słucham? — кассир спрашивает заказ", "hint": "Co podać? = Что подать? Co dla pana? = Что для вас? Słucham? = Слушаю." },
+  { "id": "ff.jeszcze", "ru": "Wola, Salad Story: Czy coś jeszcze? — что-нибудь ещё? Больше ничего — To wszystko", "hint": "Coś jeszcze? = Что-нибудь ещё? To wszystko = Это всё." },
+  { "id": "ff.smacznego", "ru": "Wola, Salad Story: Smacznego! — приятного аппетита", "hint": "Smacznego! = Приятного аппетита! До свидания — Do widzenia." },
+  { "id": "ff.bez", "ru": "Wola, Salad Story: ze wszystkim — со всем; без чего-то — bez + слово (bez bekonu)", "hint": "Ze wszystkim = со всем. Без бекона — Bez bekonu." }
 ]

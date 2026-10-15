@@ -7,6 +7,9 @@
 //     не трогается; облака нет (копия файлом в настройках);
 //   • звук: озвучка слов как в основной игре, «без звука» только в настройках; `?mute=1` — ничего вслух.
 // Dev (только `npm run dev`): `?now=+1d` — часы, `?reset=1` — стереть сохранение Wola, `window.__wola` — состояние.
+// W-04: `?dev=<id>` — свой профиль проверки (база `polski-quest-wola-<id>`, localStorage `wola-<id>:`), как `?dev=p10a`
+// в основной игре; с ним работает и `now`. «Начать заново» в настройках — автоэкспорт копии, стереть, перезагрузить.
+// Service worker спрашивает страницу «кто ты?» (answerWhichPage): Wola отвечает «wola», и её вкладку не перезагружают.
 import Phaser from 'phaser';
 import { startInput } from '../input';
 import { Boot } from '../scenes/Boot';
@@ -16,7 +19,7 @@ import { useContent } from '../systems/content';
 import { derive, deriveContent } from '../systems/derive';
 import { connectAudio } from '../systems/platform/audio';
 import { createClock } from '../systems/platform/clock';
-import { lastReloadAt, registerPwa, reloadForUpdate, watchVersion } from '../systems/platform/pwa';
+import { answerWhichPage, lastReloadAt, registerPwa, reloadForUpdate, watchVersion } from '../systems/platform/pwa';
 import { connectSfx } from '../systems/platform/sfx';
 import { GameStorage } from '../systems/platform/storage';
 import { getSetting } from '../systems/progress';
@@ -30,34 +33,37 @@ import { busAudio } from '../ui/overlay/kit';
 import { runSettings } from '../ui/settings';
 import { mountUpdateToast } from '../ui/updateToast';
 import { wolaContent } from './content';
-import { HUB_MAP, placeOf, type PlaceId } from './systems/places';
+import { HUB_MAP, PLACES, placeOf, type PlaceId } from './systems/places';
 import { routePlaces } from './places';
+import { wolaProfile } from './profile';
 import { saladCounter, saladState } from './systems/saladVisit';
 import { hubCounters, wolaBook, type HubCounters } from './systems/wola';
 import { runGarden } from './ui/garden';
 import { runHome } from './ui/home';
 import { mountHub } from './ui/hub';
 import type { WolaDeps } from './ui/kit';
-import { loadPixAtlas } from './ui/pix';
+import { loadPixAtlas, preloadPixImages } from './ui/pix';
 import { mySaladSection } from './ui/mySalad';
 import { planVisit, runSalad } from './ui/salad';
 
-export const WOLA_DB = 'polski-quest-wola';
-export const WOLA_LS = 'wola:';
 
 const params = new URLSearchParams(location.search);
 const devServer = import.meta.env.DEV;
 const clock = createClock(devServer || params.get('dev') ? params.get('now') : null);
 const mute = params.get('mute') === '1';
+const profile = wolaProfile(params.get('dev'));
 
 async function start(): Promise<void> {
   const overlayRoot = document.getElementById('overlay');
   const parent = document.getElementById('game');
   if (!overlayRoot || !parent) throw new Error('#overlay или #game не найден');
+  answerWhichPage('wola');
+  // Картинки атласа для мест (DOM-пиксели) — сразу, параллельно со всем остальным: вход в место без тёмного экрана.
+  const images = preloadPixImages(import.meta.env.BASE_URL);
 
-  if (devServer && params.get('reset') === '1') {
+  if ((devServer || profile.id) && params.get('reset') === '1') {
     await new Promise<void>((resolve) => {
-      const req = indexedDB.deleteDatabase(WOLA_DB);
+      const req = indexedDB.deleteDatabase(profile.db);
       req.onsuccess = req.onerror = req.onblocked = () => resolve();
     });
     params.delete('reset');
@@ -81,7 +87,7 @@ async function start(): Promise<void> {
   mountAudioToast(overlayRoot);
   mountUpdateToast(overlayRoot);
 
-  const store = new GameStorage({ dbName: WOLA_DB, lsNamespace: WOLA_LS });
+  const store = new GameStorage({ dbName: profile.db, lsNamespace: profile.ls });
   await store.load(clock.now());
   store.attachLifecycle();
   if (!mute) connectSfx(bus, { volume: () => getSetting(store.progress, 'sfxVolume'), enabled: () => !isSilent(store.progress) });
@@ -119,6 +125,9 @@ async function start(): Promise<void> {
     salad,
     clock,
     coarse: matchMedia('(pointer: coarse)').matches,
+    spellTraps: true,
+    images,
+    go: (id) => places.queue(id),
     activeMs: () => activeMsAt(act, clock.mono()),
     sessionStart: () => sessionStart,
     onSession: () => {
@@ -144,6 +153,8 @@ async function start(): Promise<void> {
     scene: [Boot, Location],
   });
   game.registry.set('world:companion', false);
+  // W-04: короткий тап крестовины — поворот и шаг, A у двери — войти.
+  game.registry.set('world:wola', true);
   game.registry.set('boot:start', { scene: 'Location', data });
   const location_ = (): Location | null => {
     const s = game.scene.getScene('Location') as Location | null;
@@ -178,12 +189,17 @@ async function start(): Promise<void> {
     if (busy) return;
     busy = true;
     try {
-      await runSettings({ overlay, store, bus, clock, build: __BUILD_ID__, wola: true, section: (api) => mySaladSection(salad.menu, api) });
+      await runSettings({ overlay, store, bus, clock, build: __BUILD_ID__, wola: true, section: (api) => mySaladSection(salad.menu, api), reset: resetAll });
     } finally {
       busy = false;
       hub.refresh();
     }
   };
+  /** «Начать заново» (W-04): копию уже сохранили настройки; стереть хранилище этого профиля и перезагрузиться. */
+  async function resetAll(): Promise<void> {
+    await store.wipe();
+    location.reload();
+  }
   const hub = mountHub(overlayRoot, {
     bus,
     counters,
@@ -192,6 +208,15 @@ async function start(): Promise<void> {
       const at = doors.get(id);
       if (at && !busy) bus.emit('input:intent', { type: 'goto', tile: at, to: 'world', source: 'pointer' });
     },
+    jump: (id) => {
+      if (!busy) void places.open(id);
+    },
+  });
+  // Клавиши 1/2/3 на улице (W-04): мгновенно в дом, Salad Story, огород.
+  bus.on('input:intent', (i) => {
+    if (i.type !== 'hotkey' || i.to !== 'world' || busy) return;
+    const id = PLACES[i.n - 1];
+    if (id) void places.open(id);
   });
 
   // ── Вход в место: экран без ходьбы поверх улицы; Дима сразу встаёт у двери (сцена перезапускается под экраном).
@@ -204,9 +229,16 @@ async function start(): Promise<void> {
     },
   });
   const open = places.open;
+  // Пиксельный загрузчик из wola/index.html (W-04) — до первой отрисовки улицы.
+  const boot = document.getElementById('wl-boot');
+  const offBoot = bus.on('world:location', () => {
+    offBoot();
+    requestAnimationFrame(() => boot?.remove());
+  });
+  setTimeout(() => boot?.remove(), 8000);
 
   if (devServer) {
-    (window as unknown as { __wola?: Record<string, unknown> }).__wola = { bus, game, store, clock, content, book, salad, overlay, open, counters, planVisit: (jump = false) => planVisit(deps, jump) };
+    (window as unknown as { __wola?: Record<string, unknown> }).__wola = { bus, game, store, clock, content, book, salad, overlay, open, counters, profile, planVisit: (jump = false) => planVisit(deps, jump) };
     if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
   }
 }

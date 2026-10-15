@@ -39,6 +39,11 @@ export interface SettingsDeps {
    * ноутбука; файл копии `polski-quest-wola-<дата>.json`.
    */
   wola?: boolean;
+  /**
+   * «Начать заново» (Wola, W-04): после подтверждения и автоэкспорта копии стереть сохранение и перезагрузиться.
+   * Нет — кнопки нет. Копию не удалось сохранить — сброса нет.
+   */
+  reset?: () => Promise<void>;
   /** Свой раздел настроек места (Wola, W-02: «Мой салат» в Salad Story): рисуется после «Слова и ответы». */
   section?(api: { put<K extends keyof SettingsMap>(key: K, value: SettingsMap[K]): void; progress(): Progress }): HTMLElement | null;
 }
@@ -260,10 +265,26 @@ export function runSettings(deps: SettingsDeps): Promise<void> {
     await apply(f.progress, 'Прогресс заменён копией из файла');
   };
 
+  const resetNow = async (): Promise<void> => {
+    if (!deps.reset) return;
+    const yes = await confirmBox(
+      deps.overlay,
+      'Начать заново? Весь прогресс на этом устройстве сотрётся. Перед этим сохраню копию файлом: её можно загрузить обратно («Загрузить копию»).',
+      'Начать заново',
+    );
+    if (!yes) return;
+    if (!(await exportNow())) return say('Не удалось сохранить копию: сброс отменён', true);
+    say('Копия сохранена. Начинаю заново…');
+    await deps.reset();
+  };
+
   const sync = deps.syncState?.() ?? null;
   const body = el(
     'div',
     { class: 'body' },
+    // Wola (W-04, Марина): «без звука» не прячется в конце длинного списка — первым.
+    deps.wola ? el('h3', {}, 'Звук') : null,
+    deps.wola ? choice(CHOICES.sound) : null,
     el('h3', {}, deps.wola ? 'Слова и ответы' : 'Ответы'),
     deps.wola ? stepper('wola.portion', 'Новых слов за раз на ноутбуке (3–8)', 3, 8, 'portion') : null,
     choice(CHOICES.diacritics),
@@ -275,7 +296,7 @@ export function runSettings(deps: SettingsDeps): Promise<void> {
     choice(CHOICES.dpad),
     choice(CHOICES.dpadSide),
     el('h3', {}, 'Звук и экран'),
-    choice(CHOICES.sound),
+    deps.wola ? null : choice(CHOICES.sound),
     choice(CHOICES.slow),
     range('sfxVolume', 'Громкость эффектов'),
     range('musicVolume', 'Громкость музыки'),
@@ -296,6 +317,7 @@ export function runSettings(deps: SettingsDeps): Promise<void> {
       btn('Сохранить копию', () => void exportNow(), '', { 'data-nav': true, 'data-act': 'export' }),
       btn('Загрузить копию', () => void importNow(), '', { 'data-nav': true, 'data-act': 'import' }),
     ),
+    deps.reset ? el('div', { class: 'seg' }, btn('Начать заново', () => void resetNow(), '', { 'data-nav': true, 'data-act': 'reset' })) : null,
     msg,
     el('div', { class: 'ver' }, `Версия ${deps.build ?? 'dev'}`),
   );

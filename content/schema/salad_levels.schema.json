@@ -26,7 +26,10 @@
       "required": ["slot"],
       "discriminator": { "propertyName": "slot" },
       "oneOf": [
-        { "title": "SlotGreet", "type": "object", "required": ["slot"], "additionalProperties": false, "properties": { "slot": { "const": "greet" } } },
+        {
+          "title": "SlotGreet", "type": "object", "required": ["slot"], "additionalProperties": false,
+          "properties": { "slot": { "const": "greet" }, "ask": { "type": "boolean", "description": "W-04: приветствие кассира — сразу вопрос «Что это значит?» (перевод в пузыре после ответа), реплика из его вариантов" } }
+        },
         { "title": "SlotWarmup", "type": "object", "required": ["slot"], "additionalProperties": false, "properties": { "slot": { "const": "warmup" } } },
         {
           "title": "SlotPick", "description": "Витрина: голос называет ингредиент, тап по картинке", "type": "object", "required": ["slot", "count", "options"], "additionalProperties": false,
@@ -35,7 +38,7 @@
         { "title": "SlotPickSalad", "type": "object", "required": ["slot"], "additionalProperties": false, "properties": { "slot": { "const": "pick_salad" } } },
         {
           "title": "SlotListen", "type": "object", "required": ["slot", "say", "options", "item"], "additionalProperties": false,
-          "properties": { "slot": { "const": "listen" }, "say": { "type": "string", "minLength": 1 }, "options": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 2, "maxItems": 4 }, "item": { "$ref": "common.schema.json#/$defs/lxId" } }
+          "properties": { "slot": { "const": "listen" }, "say": { "type": "string", "minLength": 1 }, "options": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 2, "maxItems": 4 }, "item": { "$ref": "common.schema.json#/$defs/lxId" }, "tag": { "$ref": "common.schema.json#/$defs/errorTag", "description": "W-04: тег ошибки (гэг кассира)" } }
         },
         {
           "title": "SlotExplain", "type": "object", "required": ["slot", "md"], "additionalProperties": false,

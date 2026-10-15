@@ -74,6 +74,8 @@ export interface EvVisit {
   task?: number;
   /** Ответ на «I jak było?» про прошлое задание: получилось / не вышло. */
   real?: 'ok' | 'no';
+  /** Проверяемых шагов визита (W-04): зачёт считает ошибки, одна ошибка серию не ломает. Нет — старое событие. */
+  answers?: number;
 }
 
 export type EventBody =

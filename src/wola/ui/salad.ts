@@ -18,6 +18,7 @@ import { runLesson } from '../../ui/lesson';
 import type { Layer } from '../../ui/overlay/host';
 import { audioButtons, plBtn, type PlLabel, type PortraitSource } from '../../ui/overlay/kit';
 import {
+  askJakBylo,
   buildVisit,
   canJump,
   danieDnia,
@@ -26,13 +27,14 @@ import {
   SALAD_LESSON_PREFIX,
   saladState,
   showRealTask,
+  visitPassed,
   visitTpl,
   type BubbleLine,
   type SaladData,
   type SaladState,
   type Visit,
 } from '../systems/saladVisit';
-import { planted as plantedOf } from '../systems/wola';
+import { dayCap, newLeft, planted as plantedOf } from '../systems/wola';
 import { boxOf, changed, derived, openPlace, words as wordsN, write, type WolaDeps } from './kit';
 import { fitScale, roomEl, spriteEl, T, type PixAtlas, type Room } from './pix';
 import { ensureWolaStyle } from './style';
@@ -57,6 +59,8 @@ export const ORDER_BTN: PlLabel = { pl: 'Zamawiam', ru: 'заказать' };
 export const JUMP_BTN: PlLabel = { pl: 'Spróbuj wyżej', ru: 'попробовать уровень выше' };
 export const REAL_OK: PlLabel = { pl: 'Udało się!', ru: 'получилось' };
 export const REAL_NO: PlLabel = { pl: 'Nie wyszło', ru: 'не вышло' };
+/** «I jak było?» без ответа (W-04): под Enter — она, а не «Udało się»; спросят в следующий раз. */
+export const REAL_LATER: PlLabel = { pl: 'Później', ru: 'ещё не был · спросить потом' };
 
 const SIZE_RU: Record<VisitOrder['size'], string> = { normalna: 'обычная', powiekszona: 'увеличенная' };
 
@@ -101,7 +105,9 @@ export function orderText(data: SaladData, o: VisitOrder, deps?: Pick<WolaDeps, 
 interface Scene {
   node: HTMLElement;
   think(o: VisitOrder | null): void;
-  say(b: BubbleLine | null): void;
+  /** Пузырь кассира; `hideRu` (W-04) — перевод спрятан до ответа («Что это значит?»), `reveal()` его показывает. */
+  say(b: BubbleLine | null, hideRu?: boolean): void;
+  reveal(): void;
   setCashier(c: Cashier | null): void;
 }
 
@@ -141,10 +147,14 @@ function scene(deps: WolaDeps, data: SaladData, k: number, cashier: Cashier | nu
         el('span', {}, ...orderText(data, o, deps).flatMap((t, i): (string | HTMLElement)[] => (i ? [' · ', t] : [el('b', { lang: 'pl' }, t)]))),
       );
     },
-    say(b) {
+    say(b, hideRu = false) {
       sayEl.hidden = !b;
       if (!b) return sayEl.replaceChildren();
-      sayEl.replaceChildren(el('b', { lang: 'pl' }, b.pl), el('small', { lang: 'ru' }, b.ru));
+      sayEl.replaceChildren(el('b', { lang: 'pl' }, b.pl), el('small', { lang: 'ru', 'data-say-ru': true, ...(hideRu ? { hidden: true } : {}) }, b.ru), ...(hideRu ? [el('small', { 'data-say-wait': true }, '…')] : []));
+    },
+    reveal() {
+      sayEl.querySelector<HTMLElement>('[data-say-ru]')?.removeAttribute('hidden');
+      sayEl.querySelector('[data-say-wait]')?.remove();
     },
   };
 }
@@ -168,6 +178,8 @@ export function planVisit(deps: WolaDeps, jump = false): Visit {
     familiar: (lx) => isFamiliar(d.cards, lx),
     seed: `${day}:${st.visits}`,
     day,
+    // План дня (W-04): новые слова салатной — в общем лимите дня (огород).
+    newLeft: newLeft(dayCap(deps.store.progress, d, now, deps.content.tuning, deps.tz ? { tz: deps.tz } : {})),
   });
 }
 
@@ -229,7 +241,7 @@ export async function runSalad(deps: WolaDeps): Promise<void> {
           el('span', {}, 'Karta stałego klienta'),
           el('span', { class: 'cells' }, ...Array.from({ length: per }, (_, i) => el('i', { class: i < stamps ? 'on' : '' }))),
           cards ? el('small', {}, `Paluch gratis × ${cards}`) : null,
-          st.gold ? el('small', { class: 'gold' }, `★ в реале: ${st.gold}`) : null,
+          st.gold ? el('small', { class: 'wl-ss-real-mark', 'data-real-done': st.gold }, `✓ заказано в реале: ${st.gold}`) : null,
         ),
         el(
           'div',
@@ -249,23 +261,25 @@ export async function runSalad(deps: WolaDeps): Promise<void> {
     queueMicrotask(() => go.focus({ preventScroll: true }));
   };
 
-  /** «I jak było?»: прошлое задание в реале. Ответ без оценки. */
-  const jakBylo = (cashier: Cashier): Promise<'ok' | 'no' | null> =>
+  /** «I jak było?»: прошлое задание в реале (W-04: только со следующего игрового дня). Ответ без оценки; Enter — «Później». */
+  const jakBylo = (cashier: Cashier): Promise<'ok' | 'no' | 'later' | null> =>
     new Promise((resolve) => {
       const b = { pl: data.cashiers.common['jak_bylo']![0]!.pl, ru: data.cashiers.common['jak_bylo']![0]!.ru };
       sc?.say(b);
       if (!isSilent(deps.store.progress)) deps.audio.play(b.pl, { who: cashier.id });
-      const done = (v: 'ok' | 'no' | null): void => {
+      const done = (v: 'ok' | 'no' | 'later' | null): void => {
         frame.layer.handle(null);
         resolve(v);
       };
-      const ok = plBtn(REAL_OK, () => done('ok'), 'primary', { 'data-nav': true, 'data-primary': true, 'data-act': 'real-ok' });
+      // Ни один ответ не главный: под фокусом и Enter — «Później» (W-04: Enter ставил «Udało się» без обеда).
+      const later = plBtn(REAL_LATER, () => done('later'), '', { 'data-nav': true, 'data-act': 'real-later' });
+      const ok = plBtn(REAL_OK, () => done('ok'), '', { 'data-nav': true, 'data-act': 'real-ok' });
       const no = plBtn(REAL_NO, () => done('no'), '', { 'data-nav': true, 'data-act': 'real-no' });
       panel.replaceChildren(
-        el('div', { class: 'pq-wood wl-ss-card', 'data-jak-bylo': true }, el('h3', {}, el('span', { lang: 'pl' }, `${cashier.name}: ${b.pl}`), el('small', {}, b.ru)), el('div', { class: 'goal' }, 'Ты заказывал по-польски на настоящей кассе? Без оценки, просто отметка.'), el('div', { class: 'wl-row' }, no, ok)),
+        el('div', { class: 'pq-wood wl-ss-card', 'data-jak-bylo': true }, el('h3', {}, el('span', { lang: 'pl' }, `${cashier.name}: ${b.pl}`), el('small', {}, b.ru)), el('div', { class: 'goal' }, 'Ты заказывал по-польски на настоящей кассе? Без оценки, просто отметка.'), el('div', { class: 'wl-row' }, later, no, ok)),
       );
       frame.layer.handle({ cancel: () => (done(null), true) });
-      queueMicrotask(() => ok.focus({ preventScroll: true }));
+      queueMicrotask(() => later.focus({ preventScroll: true }));
     });
 
   const visit = async (jump: boolean): Promise<void> => {
@@ -285,10 +299,10 @@ export async function runSalad(deps: WolaDeps): Promise<void> {
     const tpl = v.tpl;
     const s = paintScene(v.cashier);
     let real: 'ok' | 'no' | undefined;
-    if (st.openTask !== null) {
+    if (askJakBylo(st, dayOf(deps.clock.now(), tzOpts(deps)))) {
       const r = await jakBylo(v.cashier);
       if (r === null) return;
-      real = r;
+      if (r !== 'later') real = r;
     }
     s.think(v.order);
     s.say(null);
@@ -325,9 +339,11 @@ export async function runSalad(deps: WolaDeps): Promise<void> {
         src: 'order',
         onStep: (step, id) => {
           const b = v.bubbles[id] ?? v.bubbles[step.id ?? ''];
-          s.say(step.t === 'say' ? null : (b ?? null));
+          // «Что это значит?» (listen): перевод в пузыре спрятан до ответа (W-04), иначе он сам и есть ответ.
+          s.say(step.t === 'say' ? null : (b ?? null), step.t === 'listen');
           if (b && step.t !== 'listen' && !silent) deps.audio.play(b.pl, { who: v.cashier.id });
         },
+        onAnswer: () => s.reveal(),
         errLineFor: (tags) => {
           const g = gagOf(tags);
           return g ? { who: v.cashier.name, pl: fill(g.line.pl), plRu: fill(g.line.ru) } : undefined;
@@ -344,7 +360,7 @@ export async function runSalad(deps: WolaDeps): Promise<void> {
     s.say(null);
     if (r.cancelled) return;
     const firstTry = r.firstTry ?? 0;
-    const task = showRealTask(data, st, tpl, firstTry) && v.realTask ? tpl : undefined;
+    const task = showRealTask(data, st, tpl, firstTry, r.answers) && v.realTask ? tpl : undefined;
     write(deps, {
       k: 'visit',
       ts: deps.clock.now(),
@@ -359,16 +375,19 @@ export async function runSalad(deps: WolaDeps): Promise<void> {
       ...(gags.length ? { gags } : {}),
       ...(task ? { task } : {}),
       ...(real ? { real } : {}),
+      ...(r.answers !== undefined ? { answers: r.answers } : {}),
     });
     changed(deps, ['cards', 'world']);
-    await result(v, st, firstTry, gags, task ? v.realTask : undefined, r.planted ?? []);
+    await result(v, st, firstTry, gags, task ? v.realTask : undefined, r.planted ?? [], r.answers);
   };
 
   /** Итог визита: поднос, «Smacznego!», «Spróbowane», печать, уровень, задание в реале. */
-  const result = (v: Visit, before: SaladState, firstTry: number, gags: string[], task: { pl: string; ru: string } | undefined, planted: string[]): Promise<void> =>
+  const result = (v: Visit, before: SaladState, firstTry: number, gags: string[], task: { pl: string; ru: string } | undefined, planted: string[], answers?: number): Promise<void> =>
     new Promise((resolve) => {
       const after = stateOf(deps);
-      const passed = firstTry >= data.levels.pass.firstTry;
+      // Зачёт (W-04): одна ошибка не ломает — 2 из 3, 4 из 5.
+      const passed = visitPassed(firstTry, answers, data.levels.pass);
+      const wpadki = gags.map((g) => data.events.gags.find((x) => x.id === g)?.title?.ru ?? '').filter(Boolean);
       const pct = Math.round(firstTry * 100);
       const per = data.levels.pass.stampsPerCard;
       const newDish = !before.tried.salads.includes(v.order.salad);
@@ -389,9 +408,10 @@ export async function runSalad(deps: WolaDeps): Promise<void> {
           el('div', { class: 'big', lang: 'pl' }, 'Smacznego!', el('small', { lang: 'ru' }, ' Приятного аппетита!')),
           el('div', { class: 'stat', 'data-first-try': pct }, el('span', {}, 'С первого раза'), el('b', {}, `${pct} %${passed ? ' · зачёт' : ''}`)),
           dish ? el('div', { class: 'stat', 'data-sprobowane': v.order.salad }, el('span', {}, 'Spróbowane'), el('b', { lang: 'pl' }, `${newDish ? 'новое: ' : '✓ '}${dish.name}`)) : null,
-          passed ? el('div', { class: 'stat', 'data-stamp': after.stamps }, el('span', {}, 'Pieczątka'), el('b', {}, `${after.stamps % per || per} из ${per}${after.stamps % per === 0 ? ' · Paluch gratis!' : ''}`)) : el('div', { class: 'note' }, 'Печать — за визит от 80 % с первого раза.'),
+          passed ? el('div', { class: 'stat', 'data-stamp': after.stamps }, el('span', {}, 'Pieczątka'), el('b', {}, `${after.stamps % per || per} из ${per}${after.stamps % per === 0 ? ' · Paluch gratis!' : ''}`)) : el('div', { class: 'note' }, 'Печать — за визит почти без ошибок: одна ошибка не считается.'),
           up ? el('div', { class: 'up', 'data-level-up': after.level }, `Poziom ${after.level}! Открыт уровень ${after.level}: ${levelOf(data, after.level)?.title.ru ?? ''}.`) : el('div', { class: 'goal', 'data-streak': after.streak }, `Серия на уровне ${after.level}: ${after.streak} из ${data.levels.pass.streak}${after.streak ? `, дней ${after.streakDays} из ${data.levels.pass.minDays}` : ''}.`),
-          gags.length ? el('div', { class: 'goal', 'data-wpadki': gags.join(',') }, 'Wpadki: ', ...gags.map((g) => data.events.gags.find((x) => x.id === g)?.title?.ru ?? '').filter(Boolean).join(', ')) : null,
+          // «Wpadki:» только с названиями гэгов (W-04: был пустой заголовок).
+          wpadki.length ? el('div', { class: 'goal', 'data-wpadki': gags.join(',') }, `Wpadki: ${wpadki.join(', ')}`) : null,
           planted.length ? el('div', { class: 'goal', 'data-planted': planted.join(',') }, '🌱 В огород: ', el('b', { lang: 'pl' }, planted.map(pl).join(', ')), ` (${wordsN(planted.length)})`) : null,
           task ? realCard(task, silent) : null,
           el('div', { class: 'wl-row' }, ok),
@@ -449,5 +469,7 @@ export function tray(deps: Pick<WolaDeps, 'atlas'>, data: SaladData, o: VisitOrd
   const dr = data.menu.drinks.find((x) => x.id === o.drink);
   if (dr) put(dr.sprite, 34, 10, k, 'drink');
   if (gags.includes('gag.na_wynos')) put('wola.gag/1', 44, 4, 2, 'torba');
+  // Две миски (W-04, «Coś jeszcze? — Tak, poproszę»): вторая такая же рядом.
+  if (gags.includes('gag.dwie_miski') && !xxl) put(bowl, 26, 6, k, 'bowl2');
   return t;
 }

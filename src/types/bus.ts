@@ -45,6 +45,8 @@ export interface LessonResult {
   score?: number;
   /** Доля проверяемых шагов, верных с первой попытки, 0..1. */
   firstTry?: number;
+  /** Проверяемых шагов в счёте (W-04: зачёт визита Salad Story по числу ошибок). */
+  answers?: number;
   ms?: number;
   /** Слова, посаженные в конце сцены (`intro`). */
   planted?: string[];

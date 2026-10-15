@@ -4,22 +4,26 @@ import type { StepListen } from '../../types/content';
 import { el } from '../dom';
 import { audioButtons, cantHearButton } from '../overlay/kit';
 import { explainOf, runGraded } from './frame';
-import { autoOptions, optionList, seedOf } from './options';
+import { spellingTraps } from '../../systems/spelling';
+import { autoOptions, optionList, seedOf, shuffled } from './options';
 import type { ExerciseModule } from './types';
 
 export const listen: ExerciseModule<StepListen> = {
   graded: true,
   mount(step, ctx) {
-    const { options, answer } = autoOptions(step, ctx.stepId, ctx.content, 3, seedOf(ctx));
+    const auto = autoOptions(step, ctx.stepId, ctx.content, 3, seedOf(ctx));
     const noAudio = ctx.silent === true || !ctx.audio.has(step.say);
-    const opts = optionList(options, () => run.submit(), { cls: step.show === 'sign' ? 'pq-sign' : '', lang: 'pl' });
     const item = step.item ? ctx.content?.vocab(step.item) : undefined;
     // Без звука (P-06, СЮЖЕТ_v2 §7): «Прочитай и выбери» — звук транскрипцией кириллицей, выбор написания.
     // `show: "text"` (Wola, W-02): варианты — переводы реплики; без звука реплика читается написанием, не транскрипцией.
     const meaning = step.show === 'text';
     const tr = meaning ? undefined : (step.tr ?? item?.tr);
+    // Wola (W-04): без звука неверные варианты — то же слово с типичной ошибкой написания; транскрипция их не различает.
+    const traps = ctx.spellTraps && ctx.silent && tr ? spellTrapOptions(auto.options[auto.answer] ?? step.say) : null;
+    const { options, answer } = traps ?? auto;
+    const opts = optionList(options, () => run.submit(), { cls: step.show === 'sign' ? 'pq-sign' : '', lang: 'pl' });
     const head: (Node | string)[] = ctx.silent && tr
-      ? [el('span', { class: 'q' }, 'Как это пишется? ', el('b', { class: 'tr', 'data-tr': '' }, `[${tr}]`))]
+      ? [el('span', { class: 'q' }, 'Как это пишется? ', el('b', { class: 'tr', 'data-tr': '' }, `[${tr}]`), traps && item?.ru ? el('span', { class: 'gloss', 'data-gloss': '' }, ` — «${item.ru}»`) : null)]
       : noAudio
         ? [el('span', { class: 'q' }, meaning ? 'Что это значит? ' : 'Что здесь написано? ', el('b', { lang: 'pl' }, step.say)), el('span', { class: 'pq-noaudio' }, '🔇 звука нет')]
         : [el('span', { class: 'q' }, meaning ? 'Что ты слышишь? Что это значит?' : 'Что ты слышишь?'), ...audioButtons(ctx.audio, step.say), cantHearButton(ctx, () => run.skipNoAudio())];
@@ -57,5 +61,14 @@ export const listen: ExerciseModule<StepListen> = {
     });
     if (!noAudio) ctx.audio.play(step.say);
     return run.result;
+
+    /** Верное написание и до двух ловушек; ловушек меньше двух — добор из обычных вариантов шага. */
+    function spellTrapOptions(correct: string): { options: string[]; answer: number } {
+      const words = new Set((ctx.content?.allVocab() ?? []).map((v) => v.pl.toLocaleLowerCase('pl')));
+      const wrong = spellingTraps(correct, 2, ctx.stepId, (s) => words.has(s.toLocaleLowerCase('pl')));
+      for (const o of auto.options) if (wrong.length < 2 && o !== correct && !wrong.includes(o)) wrong.push(o);
+      const list = shuffled([correct, ...wrong], `${seedOf(ctx)}:spell`);
+      return { options: list, answer: list.indexOf(correct) };
+    }
   },
 };

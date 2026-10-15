@@ -85,6 +85,16 @@ export interface LocationOptions {
   /** Бобр идёт следом (walk-локации без своего NPC bobr). По умолчанию по правилу выше. */
   companion?: boolean;
   facing?: Dir;
+  /**
+   * Wola (W-04): короткое нажатие в другую сторону — поворот и сразу шаг (не только поворот, TURN_MS не ждём).
+   * Удержание — идти, как везде.
+   */
+  tapStep?: boolean;
+  /**
+   * Wola (W-04): A у двери — войти, без цели режиссёра. Дверь перед лицом, рядом, по диагонали или в EXIT_REACH шагах
+   * берётся, когда больше ничего рядом нет.
+   */
+  doorA?: boolean;
 }
 
 const eq = (a: Xy, b: Xy): boolean => a[0] === b[0] && a[1] === b[1];
@@ -174,6 +184,8 @@ export class LocationModel {
   private companionPath: Xy[] = [];
   /** Цель режиссёра (P-10a): A сначала берёт её, если она перед лицом или рядом. */
   private goal: ActionGoal | null = null;
+  private readonly tapStep: boolean;
+  private readonly doorA: boolean;
 
   constructor(map: LocationMap, spawn: Xy, opts: LocationOptions = {}) {
     this.map = map;
@@ -185,6 +197,8 @@ export class LocationModel {
     this.rebuildSolid();
     this.grid = { w, h, passable: (x, y) => this.passable(x, y) };
     this.player = { tile: [spawn[0], spawn[1]], facing: opts.facing ?? 'down', step: null };
+    this.tapStep = opts.tapStep === true;
+    this.doorA = opts.doorA === true;
     const wantCompanion = opts.companion ?? (map.controls === 'walk' && !this.objects.some((o) => o.key === 'npc:bobr'));
     this.companion = wantCompanion ? { tile: this.companionSpawn(), facing: this.player.facing, step: null } : null;
   }
@@ -482,6 +496,7 @@ export class LocationModel {
           this.path = [];
           this.pending = null;
           if (this.player.step) this.queuedDir = i.dir;
+          else if (this.tapStep && !walking) this.tryStep(i.dir); // Wola: поворот и шаг одним нажатием
           else if (!walking && this.turnWait === 0 && this.player.facing !== i.dir) {
             // Стоим и смотрим в другую сторону: сначала поворот на месте, шаг — если кнопку держат.
             this.player.facing = i.dir;
@@ -811,7 +826,35 @@ export class LocationModel {
         if (o) return { key: o.key, tile: c };
       }
     const here = at([x, y], false, false);
-    return here ? { key: here.key, tile: [x, y] } : null;
+    if (here) return { key: here.key, tile: [x, y] };
+    return this.doorA ? this.nearDoor() : null;
+  }
+
+  /** Wola (W-04): ближайшая дверь под рукой для A — перед лицом, рядом, по диагонали или в EXIT_REACH шагах. */
+  private nearDoor(): { key: string; tile: Xy } | null {
+    const [x, y] = this.player.tile;
+    const exits = this.objects.filter((o) => o.kind === 'exit' && !this.hidden.has(o.key));
+    if (!exits.length) return null;
+    const order = [this.player.facing, ...DIR_ORDER.filter((d) => d !== this.player.facing)];
+    for (const d of order) {
+      const c: Xy = [x + DELTA[d][0], y + DELTA[d][1]];
+      const o = exits.find((e) => covers(e, c));
+      if (o) return { key: o.key, tile: c };
+    }
+    for (const [dx, dy] of DIAG) {
+      const c: Xy = [x + dx, y + dy];
+      const o = exits.find((e) => covers(e, c));
+      if (o) return { key: o.key, tile: c };
+    }
+    let best: { key: string; tile: Xy; n: number } | null = null;
+    for (const o of exits)
+      for (let cy = o.at[1]; cy < o.at[1] + o.size[1]; cy++)
+        for (let cx = o.at[0]; cx < o.at[0] + o.size[0]; cx++) {
+          if (Math.abs(cx - x) + Math.abs(cy - y) > EXIT_REACH) continue;
+          const res = findPath(this.walkGrid([cx, cy]), [x, y], [cx, cy]);
+          if (res.exact && res.path.length <= EXIT_REACH && (!best || res.path.length < best.n)) best = { key: o.key, tile: [cx, cy], n: res.path.length };
+        }
+    return best ? { key: best.key, tile: best.tile } : null;
   }
 
   /** Цель режиссёра под рукой: перед лицом, рядом (4-соседство) или под ногами. */

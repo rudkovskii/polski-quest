@@ -21,7 +21,12 @@ export type Intent =
    * Переключить выделенный интерактивный объект в локации `controls: tap` (ТЗ §2.7):
    * стрелки → dir, Tab → next, Shift+Tab → prev. В режиме `walk` роутер его не пропускает.
    */
-  | { type: 'focus'; dir: Dir | 'next' | 'prev' };
+  | { type: 'focus'; dir: Dir | 'next' | 'prev' }
+  /**
+   * Цифра 1–9 на клавиатуре (W-04): в мире Wola — мгновенный переход в место (1 дом, 2 Salad Story, 3 огород),
+   * в оверлее — выбрать вариант ответа с этим номером. Основная игра в мире её не использует.
+   */
+  | { type: 'hotkey'; n: number };
 
 export type Source = 'keyboard' | 'dpad' | 'pointer';
 

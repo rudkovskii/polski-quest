@@ -3,6 +3,7 @@
 // тост «Есть обновление» с кнопкой; перед перезагрузкой прогресс дописывается в базу.
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
+import { workboxOptions } from '../tools/lib/pwa';
 import { RELOAD_GUARD_MS, updateAction } from '../src/systems/update';
 import { lastReloadAt, reloadForUpdate } from '../src/systems/platform/pwa';
 import { mountUpdateToast } from '../src/ui/updateToast';
@@ -59,8 +60,9 @@ describe('политика обновления', () => {
     const cfg = readFileSync('vite.config.ts', 'utf8');
     expect(cfg).toMatch(/registerType: 'autoUpdate'/);
     expect(cfg).toMatch(/injectRegister: false/);
-    expect(cfg).toMatch(/skipWaiting: true/);
-    expect(cfg).toMatch(/clientsClaim: true/);
+    // W-04: опции Workbox вынесены в tools/lib/pwa.ts (их же проверяет tests/pwa_wola.test.ts).
+    expect(cfg).toMatch(/workbox: workboxOptions\(\)/);
+    expect(workboxOptions()).toMatchObject({ skipWaiting: true, clientsClaim: true });
     expect(readFileSync('src/main.ts', 'utf8')).toMatch(/registerPwa\(/);
   });
 });

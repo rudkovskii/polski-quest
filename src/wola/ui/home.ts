@@ -9,7 +9,7 @@ import { activeToday, summaryMin } from '../../ui/daySummary';
 import { el } from '../../ui/dom';
 import { runObchod } from '../../ui/obchod';
 import { btn, type PlLabel } from '../../ui/overlay/kit';
-import { dayCap, LAPTOP_LESSON, overCap, portion, shelf, shelfLesson, wolaDay, wolaGarden, type ShelfTheme } from '../systems/wola';
+import { dayCap, dayPlan, LAPTOP_LESSON, overCap, planText, portion, shelf, shelfLesson, wolaDay, wolaGarden, type ShelfTheme } from '../systems/wola';
 import { boxOf, changed, derived, openPlace, panel, stat, words, write, type WolaDeps } from './kit';
 import { laptopRest, runSlowniczek } from './laptop';
 import { fitScale, roomEl, spriteEl, T, type Room } from './pix';
@@ -51,8 +51,13 @@ export async function runHome(deps: WolaDeps): Promise<void> {
     if (busy) return;
     busy = true;
     try {
-      if (id === 'laptop') await laptop(deps);
-      else if (id === 'slownik') await slownik(deps);
+      if (id === 'laptop') {
+        if ((await laptop(deps, frame.close)) === 'garden') {
+          frame.close();
+          deps.go?.('ogrod');
+        }
+      }
+      else if (id === 'slownik') await slownik(deps, frame.close);
       else if (id === 'sloiki') await sloiki(deps);
       else await lozko(deps, frame.close);
     } finally {
@@ -63,7 +68,8 @@ export async function runHome(deps: WolaDeps): Promise<void> {
   const paint = (): void => {
     const d = derived(deps);
     const now = deps.clock.now();
-    const p = portion(deps.store.progress, deps.book, d);
+    const p = portion(deps.store.progress, deps.book, d, now, deps.content.tuning, deps.tz);
+    const plan = dayPlan(deps.store.progress, deps.book, d, now, deps.content.tuning, deps.tz);
     const g = wolaGarden(d, now, deps.content.tuning, deps.store.progress.world.flags);
     const box = boxOf(frame.stage);
     const k = fitScale(10, 7, box.w - 8, box.h - 40);
@@ -79,7 +85,7 @@ export async function runHome(deps: WolaDeps): Promise<void> {
       scene.append(s);
     });
     const counts: Record<HomeSpot, { text: string; due?: boolean } | null> = {
-      laptop: p.left ? { text: `новых слов: ${p.left}` } : null,
+      laptop: p.left ? { text: `новых слов: ${p.left}` } : p.blocked ? { text: 'сначала огород', due: true } : null,
       slownik: null,
       sloiki: g.jars.length ? { text: `банок: ${g.jars.length}${g.jars.some((j) => j.dueCard) ? ' · !' : ''}`, due: g.jars.some((j) => j.dueCard) } : null,
       lozko: null,
@@ -102,7 +108,8 @@ export async function runHome(deps: WolaDeps): Promise<void> {
       );
       scene.append(hot);
     }
-    frame.stage.replaceChildren(scene);
+    // План дня (W-04): «удобрить N, новых M» над комнатой.
+    frame.stage.replaceChildren(el('p', { class: 'wl-plan wl-plan-top', 'data-plan': `${plan.fertilize}/${plan.fresh}` }, planText(plan)), scene);
   };
   paint();
   const onResize = (): void => paint();
@@ -113,16 +120,16 @@ export async function runHome(deps: WolaDeps): Promise<void> {
   win?.removeEventListener('resize', onResize);
 }
 
-/** Мягкий потолок (ВОЛЯ.md п. 6): выше — предупреждение «огород не справится», решает игрок. */
+/** Мягкий потолок (ВОЛЯ.md п. 6): выше — предупреждение «огород не справится», решает игрок. С W-04 потолок — по плану дня. */
 export async function capOk(deps: WolaDeps, n: number): Promise<boolean> {
-  const c = dayCap(deps.store.progress, derived(deps));
+  const c = dayCap(deps.store.progress, derived(deps), deps.clock.now(), deps.content.tuning, deps.tz ? { tz: deps.tz } : {});
   if (!overCap(c, n)) return true;
   const a = await panel(
     deps.overlay,
     WARN,
     [
       el('div', { class: 'note', 'data-warn': 'cap' }, 'Много на сегодня, огород не справится.'),
-      el('div', {}, `Сегодня уже ${words(c.today)}, потолок — ${c.cap} (меняется в настройках). Новые слова завтра придут на удобрение все разом.`),
+      el('div', {}, c.cap < c.base ? `Сегодня уже ${words(c.today)}. Огород ${c.debt >= 20 ? `ждёт удобрения: ${c.debt}` : 'и так растёт: в ближайшие дни будет просить по 15 растений'}, поэтому потолок сегодня — ${c.cap}.` : `Сегодня уже ${words(c.today)}, потолок — ${c.cap} (меняется в настройках). Новые слова завтра придут на удобрение все разом.`),
     ],
     [
       { act: 'no', label: 'Не сейчас', primary: true },
@@ -134,22 +141,38 @@ export async function capOk(deps: WolaDeps, n: number): Promise<boolean> {
   return a === 'yes';
 }
 
-async function laptop(deps: WolaDeps): Promise<void> {
-  const p = portion(deps.store.progress, deps.book, derived(deps));
+/** Ноутбук: порция плана дня; новых нет из-за огорода — «Сначала огород» с кнопкой в огород (вернёт 'garden'). */
+async function laptop(deps: WolaDeps, leave: () => void): Promise<'garden' | void> {
+  const d = derived(deps);
+  const now = deps.clock.now();
+  const p = portion(deps.store.progress, deps.book, d, now, deps.content.tuning, deps.tz);
+  const plan = dayPlan(deps.store.progress, deps.book, d, now, deps.content.tuning, deps.tz);
   if (!p.left) {
-    const all = !deps.book.home.some((v) => !(derived(deps).cards[`${v.id}#rec`]));
-    await laptopRest(deps, all ? ['Wszystkie słowa w ogródku!', 'Все слова словаря уже в огороде.'] : [`Na dziś wszystko. На сегодня порция (${p.size}) добавлена.`, 'Хочешь ещё — возьми тему с полки «Słownik».']);
+    if (p.blocked) {
+      const a = await laptopRest(
+        deps,
+        [
+          el('div', { class: 'msg warn', 'data-garden-first': plan.debt }, 'Najpierw ogródek! Сначала огород.'),
+          plan.debt >= 20 ? `К удобрению ${plan.debt}: новые слова сегодня огород не потянет.` : `Огород и так растёт: в ближайшие дни будет просить по 15 растений. Новые слова — когда он подрастёт.`,
+          `Сегодня: удобрить ${plan.fertilize}. Остальное подождёт до завтра.`,
+        ],
+        { plan, go: { pl: 'Do ogródka', ru: 'в огород' } },
+      );
+      return a === 'go' ? 'garden' : undefined;
+    }
+    const all = !deps.book.home.some((v) => !d.cards[`${v.id}#rec`]);
+    await laptopRest(deps, all ? ['Wszystkie słowa w ogródku!', 'Все слова словаря уже в огороде.'] : [`Na dziś wszystko. На сегодня новые слова добавлены.`, 'Хочешь ещё — возьми тему с полки «Słownik».'], { plan });
     return;
   }
   if (!(await capOk(deps, p.next.length))) return;
-  await runSlowniczek(deps, { words: p.next, lesson: LAPTOP_LESSON, title: { pl: 'Słowniczek', ru: `новые слова дня · ${p.done + 1}–${p.done + p.next.length}` }, after: 'Ещё слова — на полке «Słownik».' });
+  await runSlowniczek(deps, { words: p.next, lesson: LAPTOP_LESSON, title: { pl: 'Słowniczek', ru: `новые слова · ${p.done + 1}–${p.done + p.next.length}` }, after: 'Ещё слова — на полке «Słownik».', plan: planText(plan), leave });
 }
 
 /** Полка «Słownik»: темы, сколько взято, «взять 5». */
-export async function slownik(deps: WolaDeps): Promise<void> {
+export async function slownik(deps: WolaDeps, leave?: () => void): Promise<void> {
   for (;;) {
     const list = shelf(deps.book, derived(deps));
-    const c = dayCap(deps.store.progress, derived(deps));
+    const c = dayCap(deps.store.progress, derived(deps), deps.clock.now(), deps.content.tuning, deps.tz ? { tz: deps.tz } : {});
     const rows = list.map((s) => themeRow(s));
     const pick = await panel<string>(
       deps.overlay,
@@ -163,7 +186,8 @@ export async function slownik(deps: WolaDeps): Promise<void> {
     const s = list.find((x) => x.theme.id === pick);
     if (!s || !s.next.length) continue;
     if (!(await capOk(deps, s.next.length))) continue;
-    await runSlowniczek(deps, { words: s.next, lesson: shelfLesson(s.theme.id), title: { pl: `Słownik · ${s.theme.pl}`, ru: s.theme.ru } });
+    const r = await runSlowniczek(deps, { words: s.next, lesson: shelfLesson(s.theme.id), title: { pl: `Słownik · ${s.theme.pl}`, ru: s.theme.ru }, ...(leave ? { leave } : {}) });
+    if (r.left) return;
   }
 
   function themeRow(s: ShelfTheme): HTMLElement {

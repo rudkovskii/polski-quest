@@ -256,7 +256,7 @@ describe('петля Wola', () => {
   it('мягкий потолок: 8 по умолчанию, настройка 4–12; выше — предупреждение, не запрет', () => {
     const p = progressOf(book.home.slice(0, 5).map((v, i) => intro(v.id, T0 + i)));
     const c = dayCap(p, d(p, T0 + 10));
-    expect(c).toEqual({ today: 5, cap: 8 });
+    expect(c).toEqual({ today: 5, cap: 8, base: 8, debt: 0 });
     expect(overCap(c, 3)).toBe(false);
     expect(overCap(c, 5)).toBe(true);
     expect(dayCap(setSetting(p, 'newItemsPerDay', 12, T0), d(p, T0 + 10)).cap).toBe(12);
@@ -301,7 +301,8 @@ describe('петля Wola', () => {
     expect(c.dom).toBe(5);
     expect(c.due).toBe(2);
     expect(counterText('dom', c)).toEqual({ text: 'новых слов: 5' });
-    expect(counterText('ogrod', c)).toEqual({ text: '! 2', due: true });
+    // W-04: над огородом — план дня, не долг «! 2».
+    expect(counterText('ogrod', c)).toEqual({ text: 'план на сегодня: удобрить 2, новых 5', due: true });
     expect(counterText('salad', c)).toBeNull(); // нет данных Salad Story — подписи нет
     expect(counterText('salad', { ...c, salad: { text: 'уровень 1' } })?.text).toBe('уровень 1');
     const day = wolaDay(p, dc, now, TZ);
@@ -420,7 +421,8 @@ describe('экраны Wola', () => {
     await flush();
     expect(q('.wl-garden')?.getAttribute('data-due')).toBe('0');
     expect([...host.querySelectorAll('[data-plant]')].map((b) => b.getAttribute('data-stage'))).toEqual(['sprout', 'sprout', 'sprout']);
-    expect(store.progress.log.events.filter((e) => e.k === 'rev' && e.src === 'express').length).toBe(3);
+    // W-04: «Nawóz» — раунд нормы дня (обход, до 15 растений), не экспресс.
+    expect(store.progress.log.events.filter((e) => e.k === 'rev' && e.src === 'obchod').length).toBe(3);
     click('.wl-ogrod [data-act="close"]');
     await garden;
 
@@ -527,7 +529,12 @@ describe('хаб Wola', () => {
     bus.emit('world:spots', { location: HUB_MAP, spots: [{ id: 'dom', x: 100, y: 200, cell: 32 }, { id: 'ogrod', x: 150, y: 400, cell: 32 }] });
     const dom = q<HTMLButtonElement>('.wl-spot[data-place="dom"]')!;
     expect(dom.hidden).toBe(false);
-    expect(dom.style.top).toBe('198px');
+    // W-04: подпись дома на полклетки выше двери, огорода — под калиткой: двери не закрыты.
+    expect(dom.style.top).toBe('184px');
+    expect(dom.classList.contains('below')).toBe(false);
+    const og = q<HTMLButtonElement>('.wl-spot[data-place="ogrod"]')!;
+    expect(og.style.top).toBe('434px');
+    expect(og.classList.contains('below')).toBe(true);
     expect(q('[data-count="dom"]')?.textContent).toBe('новых слов: 5');
     expect(q('[data-count="ogrod"]')?.textContent).toBe('! 3 · ★ 1');
     expect(q<HTMLButtonElement>('.wl-spot[data-place="salad"]')!.hidden).toBe(true);

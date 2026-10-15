@@ -24,6 +24,8 @@ import {
   showRealTask,
   visitAudioTexts,
   visitTpl,
+  askJakBylo,
+  visitPassed,
   type SaladState,
   type Visit,
   type VisitInput,
@@ -167,12 +169,12 @@ describe('Salad Story: генератор визита', () => {
     expect(left).toEqual([]);
   });
 
-  it('уровень 1: за три визита вводит все 8 слов витрины, пока по 3', () => {
+  it('уровень 1: за три визита вводит все 7 слов витрины, пока по 3 (W-04: короче — 2 витрины + sałatka)', () => {
     let pl = new Set<string>();
     for (let i = 0; i < 3; i++) {
       const v = buildVisit(input(1, `x${i}`, { planted: pl, state: { ...empty, visits: i, byTpl: { 1: i } } }));
       expect(v.introduces.length).toBeLessThanOrEqual(3);
-      expect(v.lesson.steps.filter((s) => s.t === 'pick').length).toBe(4);
+      expect(v.lesson.steps.filter((s) => s.t === 'pick').length).toBe(3);
       pl = new Set([...pl, ...v.introduces]);
     }
     expect([...pl].sort()).toEqual([...data.levels.levels[0]!.words].sort());
@@ -539,7 +541,7 @@ describe('Salad Story: экран', () => {
     await place;
   });
 
-  it('уровень 2: «Zadanie w realu» после зачётного визита, в следующий визит «I jak było?» → золотая печать', async () => {
+  it('уровень 2: «Zadanie w realu» после зачётного визита; «I jak było?» — только назавтра, под Enter «Później», отметка скромная', async () => {
     const up = [visitEv(T0 - 2 * DAY, 1, 1), visitEv(T0 - 2 * DAY + 1, 1, 1), visitEv(T0 - DAY, 1, 1)];
     const r = deps(progressOf(up), T0);
     const place = runSalad(r.w);
@@ -553,12 +555,26 @@ describe('Salad Story: экран', () => {
     expect(visits(r.store.progress).at(-1)?.task).toBe(2);
     click('[data-act="done"]');
     await flush();
+    // Тот же игровой день: «I jak było?» не спрашивают (W-04: раньше через две минуты после задания).
+    r.setNow(T0 + 120_000);
+    const same = planVisit(r.w);
+    click('[data-act="order"]');
+    await flush();
+    expect(q('[data-jak-bylo]')).toBeNull();
+    await play(same);
+    await flush();
+    expect(visits(r.store.progress).at(-1)?.real).toBeUndefined();
+    click('[data-act="done"]');
+    await flush();
     r.setNow(T0 + DAY);
     const v2 = planVisit(r.w);
     click('[data-act="order"]');
     await flush();
     expect(q('[data-jak-bylo]')).not.toBeNull();
     expect(r.audio.played.at(-1)?.text).toBe('I jak było?');
+    // Фокус (и Enter) — на нейтральной «Później», не на «Udało się».
+    expect(document.activeElement?.getAttribute('data-act')).toBe('real-later');
+    expect(q('[data-act="real-ok"]')?.hasAttribute('data-primary')).toBe(false);
     click('[data-act="real-ok"]');
     await play(v2);
     await flush();
@@ -566,7 +582,9 @@ describe('Salad Story: экран', () => {
     expect(q('[data-real-task]')).toBeNull(); // задание получилось — больше не даём
     click('[data-act="done"]');
     await flush();
-    expect(q('.wl-ss-stamps .gold')?.textContent).toContain('1');
+    // Скромная отметка вместо золотой звезды.
+    expect(q('[data-real-done]')?.textContent).toBe('✓ заказано в реале: 1');
+    expect(q('.wl-ss-stamps .gold')).toBeNull();
     click('.wl-salad [data-act="close"]');
     await place;
   });
@@ -624,5 +642,115 @@ describe('Salad Story: экран', () => {
     expect(mySalad(p, data.menu)).toMatchObject({ salad: 'm.losos_quinoa', osobno: true });
     expect(box.querySelector('[data-my-salad]')?.textContent).toContain('Poproszę sałatkę Łosoś Quinoa');
     expect(buildVisit(input(2, 'q', { mine: mySalad(p, data.menu) })).order.salad).toBe('m.losos_quinoa');
+  });
+});
+
+// ───────────────────────────── W-04 ─────────────────────────────
+
+const graded = (v: Visit): Step[] => v.lesson.steps.filter((x) => !['say', 'explain', 'shadow'].includes(x.t));
+const tagsOf = (x: Step): string[] => [...((x as { tags?: string[] }).tags ?? []), ...Object.values((x as { errorTagByOption?: Record<string, string> }).errorTagByOption ?? {})];
+
+describe('W-04: лестница Salad Story', () => {
+  it('зачёт визита: одна ошибка не ломает (2 из 3, 3 из 4, 4 из 5), две из трёх — ломают; старые события — от 2/3', () => {
+    const pass = data.levels.pass;
+    expect(visitPassed(2 / 3, 3, pass)).toBe(true);
+    expect(visitPassed(3 / 4, 4, pass)).toBe(true);
+    expect(visitPassed(4 / 5, 5, pass)).toBe(true);
+    expect(visitPassed(5 / 6, 6, pass)).toBe(true);
+    expect(visitPassed(1 / 3, 3, pass)).toBe(false);
+    expect(visitPassed(3 / 5, 5, pass)).toBe(false);
+    expect(visitPassed(8 / 10, 10, pass)).toBe(true);
+    expect(visitPassed(7 / 10, 10, pass)).toBe(false);
+    expect(visitPassed(0.667, undefined, pass)).toBe(true);
+    expect(visitPassed(0.5, undefined, pass)).toBe(false);
+    expect(visitPassed(1, 0, pass)).toBe(true);
+  });
+
+  it('серия уровня 2 не обнуляется одной ошибкой: три визита по одной ошибке на двух днях → уровень 3', () => {
+    const up = [visitEv(T0 - 3 * DAY, 1, 1), visitEv(T0 - 3 * DAY + 1, 1, 1), visitEv(T0 - 2 * DAY, 1, 1)];
+    const one = (ts: number) => visitEv(ts, 2, 4 / 5, { answers: 5 });
+    expect(saladState(progressOf([...up, one(T0 - DAY)]).log.events, data, opts, T0).streak).toBe(1);
+    const st = saladState(progressOf([...up, one(T0 - DAY), one(T0 - DAY + 1000), one(T0)]).log.events, data, opts, T0);
+    expect(st.level).toBe(3);
+    // Марина: старое событие 67 % из трёх шагов — тоже зачёт, серия жива.
+    const old = saladState(progressOf([...up, visitEv(T0 - DAY, 2, 1), visitEv(T0, 2, 0.667)]).log.events, data, opts, T0);
+    expect(old.streak).toBe(2);
+  });
+
+  it('уровень 1 короче уровня 2; на уровне 2 не меньше 5 оцениваемых шагов и разные формулировки кассира', () => {
+    const greet = new Set<string>();
+    const more = new Set<string>();
+    for (let i = 0; i < 24; i++) {
+      const st = { ...empty, visits: i, byTpl: { 1: 3, 2: i } };
+      const l1 = buildVisit(input(1, `s${i}`, { state: st }));
+      const l2 = buildVisit(input(2, `s${i}`, { state: st }));
+      expect(l1.lesson.steps.length).toBeLessThan(l2.lesson.steps.length);
+      expect(graded(l1).length).toBeLessThan(graded(l2).length);
+      expect(graded(l2).length).toBeGreaterThanOrEqual(5);
+      // Первый шаг уровня 2 — «Что это значит?» по приветствию кассира, перевод — вариант ответа.
+      const first = l2.lesson.steps[0]!;
+      expect(first.t).toBe('listen');
+      if (first.t === 'listen') greet.add(first.say);
+      for (const x of l2.lesson.steps) if (x.t === 'listen' && /jeszcze|poza tym/i.test(x.say)) more.add(x.say);
+    }
+    expect(greet.size).toBeGreaterThanOrEqual(3);
+    expect(more.size).toBeGreaterThanOrEqual(2);
+  });
+
+  it('гэги: у каждого уровня есть смешная развязка; на уровнях 1–2 у каждой оцениваемой ошибки свой гэг', () => {
+    const gagTags = new Set(data.events.gags.map((g) => g.onTag));
+    for (const lv of data.levels.levels) {
+      const tags = new Set<string>();
+      for (let i = 0; i < 30; i++) {
+        const st = { ...empty, visits: i, byTpl: { [lv.n]: i }, lastOrders: [] };
+        const v = buildVisit(input(lv.n, `g${i}`, { state: st, planted: new Set(data.levels.levels.flatMap((l) => l.words)) }));
+        for (const x of v.lesson.steps) for (const t of tagsOf(x)) tags.add(t);
+        if (lv.n <= 2) for (const x of graded(v)) if (!(x.id ?? '').includes('warmup')) expect(tagsOf(x).some((t) => gagTags.has(t)), `${lv.n}: ${JSON.stringify(x)}`).toBe(true);
+      }
+      expect([...tags].some((t) => gagTags.has(t)), `уровень ${lv.n}: ${[...tags].join(',')}`).toBe(true);
+    }
+    // У каждого гэга есть название для «Wpadki».
+    for (const g of data.events.gags) expect(g.title?.ru, g.id).toBeTruthy();
+  });
+
+  it('«I jak było?» — только в визит следующего дня', () => {
+    const st = saladState(progressOf([visitEv(T0, 2, 1, { task: 2 })]).log.events, data, opts, T0);
+    expect(st.openTask).toBe(2);
+    expect(askJakBylo(st, dayOf(T0 + 60_000, opts))).toBe(false);
+    expect(askJakBylo(st, dayOf(T0 + DAY, opts))).toBe(true);
+  });
+
+  it('экран: перевод в пузыре кассира спрятан во время «Что это значит?», появляется после ответа; ошибка — гэг, «Wpadki» с названием', async () => {
+    const up = [visitEv(T0 - 2 * DAY, 1, 1), visitEv(T0 - 2 * DAY + 1, 1, 1), visitEv(T0 - DAY, 1, 1)];
+    const r = deps(progressOf(up), T0);
+    const place = runSalad(r.w);
+    await flush();
+    const v = planVisit(r.w);
+    expect(v.tpl).toBe(2);
+    click('[data-act="order"]');
+    await flush();
+    // Первый шаг — приветствие-вопрос: польский в пузыре виден, русский спрятан.
+    const say = q('[data-say]')!;
+    expect(say.hidden).toBe(false);
+    expect(say.querySelector<HTMLElement>('[data-say-ru]')?.hidden).toBe(true);
+    const first = v.lesson.steps[0]!;
+    const right = first.t === 'listen' && Array.isArray(first.options) ? first.options[first.answer]! : '';
+    [...host.querySelectorAll<HTMLElement>('.wl-ss-lesson [data-opt]')].find((b) => b.textContent?.trim() === right)!.click();
+    await flush();
+    expect(say.querySelector<HTMLElement>('[data-say-ru]')?.hidden).toBe(false);
+    // Дальше: ошибка в «Czy coś jeszcze?» (ответ «Tak, poproszę.») — гэг «две миски», визит всё равно зачтён.
+    const rest = await play({ ...v, lesson: { ...v.lesson, steps: v.lesson.steps } }, (x) => x.t === 'choice' && x.options.includes('Tak, poproszę.'));
+    expect(rest.reacts.some((t) => t.includes('dwie miski'))).toBe(true);
+    await flush();
+    const ev = visits(r.store.progress).at(-1)!;
+    expect(ev.answers).toBeGreaterThanOrEqual(5);
+    expect(ev.firstTry).toBeLessThan(1);
+    expect(q('[data-result]')?.getAttribute('data-passed')).toBe('1');
+    expect(q('[data-wpadki]')?.textContent).toBe('Wpadki: два салата вместо одного');
+    expect(q('[data-tray] [data-item="bowl2"]')).not.toBeNull();
+    click('[data-act="done"]');
+    await flush();
+    click('.wl-salad [data-act="close"]');
+    await place;
   });
 });

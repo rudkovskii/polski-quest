@@ -403,3 +403,37 @@
   `tools/build_wola_vocab.ts`, затем пересборка словаря (`--trainer <vocab.js>`).
 - Арт: `art/sprites/wola_{salatka,skladnik,kasjer,gag,taca}.sprite.json` + тайлы интерьера в `wola.sprite.json` (кадры 25–33).
 - Dev: `/polski-quest/wola/?mute=1[&now=+1d]`, `window.__wola.planVisit(jump)` — визит, который начнётся (ответы для проверки).
+## Плейтест Wola 1: правки (W-04, ../research/13_wola_playtest.md)
+- План дня (`src/wola/systems/wola.ts`): `dayCap(p, d, now, t)` — правило долга `newCapFor` (до `PLAN.fullUpTo` 10 растений
+  к удобрению полный `newItemsPerDay`, дальше линейно меньше, от `PLAN.noneFrom` 20 — ноль) и прогноз `forecastDue`
+  (SRS вперёд на 7 дней, удобрение до 15 в день, братья, порог `pro`): новых не больше, чем огород выдержит без дня
+  > `PLAN.fertilizeMax`. У слова Wola 2–3 карточки, первые недели оно просится через день — долг сегодня волну не видит.
+  `portion(…, now, t)` — порция в пределах плана (`blocked` → ноутбук «Сначала огород» и кнопка в огород, `WolaDeps.go`);
+  Salad Story вводит не больше `newLeft` (`VisitInput.newLeft`). «план на сегодня: удобрить N, новых M» — `planText`:
+  над комнатой дома, на экране ноутбука, над огородом на улице, в огороде. «Nawóz» — один раунд нормы дня
+  (`runObchod` `restTomorrow`: без «Ещё раунд», «подождут до завтра»); норма сделана — «ещё по желанию».
+  Тест 14 дней (g2 и g3) — `tests/wola_plan.test.ts`.
+- Service worker: опции Workbox — `tools/lib/pwa.ts` (`workboxOptions`, тесты читают его, а не текст vite.config.ts).
+  `navigateFallbackDenylist` — `WOLA_NAV` (`/wola`, `/wola/`, `/wola?…`); `public/sw-wola.js` через `importScripts`
+  первым отдаёт навигацию под /wola страницей Wola из precache и при активации нового SW перезагружает вкладки /wola, не
+  ответившие «wola» на `pq-which-page` (страница Wola отвечает: `answerWhichPage('wola')`, platform/pwa.ts).
+- Ходьба Wola: registry `world:wola` → `LocationModel` `{ tapStep, doorA }`: короткий тап — поворот и шаг; A у двери
+  (перед лицом, рядом, по диагонали, ≤ `EXIT_REACH` шагов) — войти. Основная игра без флага — как раньше. Карта
+  `wola.hub` 16×14: пути между дверями прямые (≤ 8 клеток), трамвай, фонари, лавка не на пути. Подписи — `LABEL_SIDE`
+  (дом и салатная выше двери, огород под калиткой). Intent `hotkey` (Digit1–9): на улице 1/2/3 — сразу в место
+  (кнопки `.wl-jump` в углу), в оверлее — вариант ответа с этим номером. `routePlaces.queue` — место после текущего.
+- Дистракторы: огород — `wolaCardStep` (`src/wola/systems/steps.ts`, `runObchod` `stepFor`): «X — это…» из той же темы;
+  без звука «Как это пишется?» с `ExerciseCtx.spellTraps` (LessonDeps/WolaDeps `spellTraps`) — варианты из
+  `spellingTraps` (`src/systems/spelling.ts`: rz/ż, ó/u, ch/h, ę/e, sz/ś…, настоящие слова не ловушки) и перевод в вопросе.
+- Salad Story: уровень 1 — 2 витрины + sałatka; уровень 2 — `greet` с `ask` (приветствие кассира = «Что это значит?»),
+  заказ, «Czy coś jeszcze?» (перефразы в cashiers.json), «Smacznego!», ≥ 5 оцениваемых. Перевод в пузыре кассира у
+  listen — после ответа (`RunOptions.onAnswer` → `ExerciseCtx.onAnswer`). Зачёт визита — `visitPassed` (одна ошибка не
+  ломает: ≤ max(1, ⌊n·0,2⌋) ошибок; событие `visit.answers` = `LessonResult.answers`). Гэги на теги `ff.*` для всех
+  оцениваемых ошибок уровней 1–2, у каждого гэга `title` («Wpadki:» без пустого заголовка). «I jak było?» — `askJakBylo`
+  (задание выдано в прошлый игровой день), фокус и Enter — «Później», «Udało się» — скромная отметка «✓ заказано в реале».
+- Вёрстка: над ноутбуком полоса «Wola» (`SlowniczekOptions.leave`), проверка внутри экрана ноутбука; в салатной кнопки
+  шага и «Gotowe» прилипают к низу панели. Пиксельный загрузчик: `#wl-boot` в wola/index.html до первой отрисовки улицы,
+  `preloadPixImages` при старте и `.wl-loading` в месте, пока картинки атласа не готовы (`WolaDeps.images`).
+- Профили: `?dev=<id>` — база `polski-quest-wola-<id>` и localStorage `wola-<id>:` (`src/wola/profile.ts`), с ним `now`
+  и `reset=1` работают и на проде. Настройки Wola: «Звук» первым, «Начать заново» — подтверждение, автоэкспорт копии,
+  `GameStorage.wipe()` и перезагрузка (копия не сохранилась — сброса нет).

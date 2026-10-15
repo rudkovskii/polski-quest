@@ -13,8 +13,10 @@ export interface PlaceRoutes {
   after?(id: PlaceId): void;
 }
 
-export function routePlaces(bus: Bus<BusEvents>, r: PlaceRoutes): { open(id: PlaceId): Promise<void>; readonly busy: boolean; dispose(): void } {
+export function routePlaces(bus: Bus<BusEvents>, r: PlaceRoutes): { open(id: PlaceId): Promise<void>; queue(id: PlaceId): void; readonly busy: boolean; dispose(): void } {
   let busy = false;
+  /** Место, куда перейти сразу после текущего (W-04: «Сначала огород» с ноутбука, быстрые клавиши во время экрана). */
+  let pending: PlaceId | null = null;
   const open = async (id: PlaceId): Promise<void> => {
     if (busy) return;
     busy = true;
@@ -27,6 +29,13 @@ export function routePlaces(bus: Bus<BusEvents>, r: PlaceRoutes): { open(id: Pla
       r.onBusy?.(false);
       r.after?.(id);
     }
+    const next = pending;
+    pending = null;
+    if (next) await open(next);
+  };
+  const queue = (id: PlaceId): void => {
+    if (busy) pending = id;
+    else void open(id);
   };
   const off = bus.on('world:exit', ({ to }) => {
     const id = placeOf(to);
@@ -34,6 +43,7 @@ export function routePlaces(bus: Bus<BusEvents>, r: PlaceRoutes): { open(id: Pla
   });
   return {
     open,
+    queue,
     get busy() {
       return busy;
     },

@@ -41,6 +41,13 @@ export interface ObchodOptions {
   limit?: number;
   /** Wola (W-01): огород удобряют, а не поливают — подписи «Nawóz / удобрено» вместо «Obchód / полито». */
   nawoz?: boolean;
+  /**
+   * Wola (W-04, план дня): раунд — вся норма на сегодня. Итог без «Ещё раунд»: оставшиеся «подождут до завтра»,
+   * это не долг и не наказание.
+   */
+  restTomorrow?: boolean;
+  /** Свой шаг карточки (Wola, W-04: дистракторы той же темы, без звука — правдоподобные написания). */
+  stepFor?(card: string): Step | null;
   /** Вечер: пары этого кластера первыми. */
   cluster?: string;
   /**
@@ -244,7 +251,7 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
     for (let i = 0; i < plan.cards.length; i++) {
       if (express && clock.mono() - startMono >= plan.maxMs) break;
       const card = plan.cards[i]!;
-      const step = cardStep(card, content);
+      const step = o.stepFor?.(card) ?? cardStep(card, content);
       if (!step) continue;
       const lesson: Lesson = {
         id: `${express ? 'express' : evening ? 'wieczor' : 'obchod'}.${card}`,
@@ -291,15 +298,17 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
     const ds = dayState(d1, t);
     // P-10b: спать — только в хатке (один конец дня), обход сон не предлагает.
     const actions: { act: 'more' | 'ok'; label: PlLabel; primary?: boolean }[] = [];
-    if (left > 0) actions.push({ act: 'more', label: BTN.round, primary: true });
-    actions.push({ act: 'ok', label: BTN.done, primary: left === 0 });
+    const more = left > 0 && !o.restTomorrow;
+    if (more) actions.push({ act: 'more', label: BTN.round, primary: true });
+    actions.push({ act: 'ok', label: BTN.done, primary: !more });
     const act = await panel(
       layer,
       W.round,
       [
         ds.locked ? bobrLine(content, 'sys.kazik.jam') : null,
         stat(W.did, `${correct} из ${answered}`),
-        stat(W.wait, String(left)),
+        o.restTomorrow && left > 0 ? stat('Подождут до завтра', String(left)) : stat(W.wait, String(left)),
+        o.restTomorrow && left > 0 ? el('div', { class: 'line2', 'data-rest': left }, 'На сегодня хватит. Остальные — завтра, за день ничего не завянет.') : null,
         // Ошибка на обходе (СЮЖЕТ_v2 d02.kazik.obchod.err): Казик делает вторую зарубку.
         correct < answered ? bobrLine(content, 'd02.kazik.obchod.err') : null,
       ],

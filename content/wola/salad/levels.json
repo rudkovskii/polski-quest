@@ -68,28 +68,28 @@
    "n": 1, "id": "salad.l01", "status": "ready",
    "title": { "pl": "Witryna", "ru": "витрина: ткнуть и услышать" },
    "goal": "Узнавать на слух и по надписи «sałatka» и главные ингредиенты салатов.",
-   "minutes": "1–1,5",
-   "words": ["lx.salatka", "lx.kurczak", "lx.losos", "lx.awokado", "lx.jajka", "lx.pomidor", "lx.ogorek", "lx.smacznego"],
+   "minutes": "0,5–1",
+   "words": ["lx.salatka", "lx.kurczak", "lx.losos", "lx.awokado", "lx.jajka", "lx.pomidor", "lx.ogorek"],
    "slots": [
     { "slot": "greet" },
-    { "slot": "pick", "count": 3, "options": [2, 3] },
+    { "slot": "pick", "count": 2, "options": [2, 3] },
     { "slot": "pick_salad" },
-    { "slot": "listen", "say": "Smacznego!", "options": ["Приятного аппетита!", "До свидания!"], "item": "lx.smacznego" },
     { "slot": "serve", "line": "name" }
    ]
   },
   {
    "n": 2, "id": "salad.l02", "status": "ready",
    "title": { "pl": "Poproszę sałatkę…", "ru": "заказ: выбор из двух" },
-   "goal": "Заказать свой салат чанком «Poproszę sałatkę + название» в верной форме.",
+   "goal": "Понять кассира (Co podać? Co dla pana? Coś jeszcze?) и заказать свой салат чанком «Poproszę sałatkę + название» в верной форме.",
    "minutes": "1–1,5",
-   "words": ["lx.poprosze", "lx.co_podac", "lx.salatka", "lx.prosze"],
+   "words": ["lx.poprosze", "lx.co_podac", "lx.salatka", "lx.prosze", "lx.smacznego"],
    "slots": [
-    { "slot": "greet" },
+    { "slot": "greet", "ask": true },
     { "slot": "warmup" },
     { "slot": "explain", "once": true, "md": "**Poproszę** = дайте, пожалуйста. После него меняется только **-a → -ę**: sałatka → **sałatkę**, woda → **wodę**. Название не трогаем: sałatkę **Cezar**. По-русски так же: вода → воду.", "table": [["sałatka", "→", "Poproszę sałatkę."], ["woda", "→", "Poproszę wodę."]] },
-    { "slot": "listen", "say": "Co podać?", "options": ["Что подать?", "Что-нибудь ещё?"], "item": "lx.co_podac" },
     { "slot": "order", "as": "choice" },
+    { "slot": "questions", "pool": ["q.cos_jeszcze"], "pick": [1, 1], "listen": "always", "as": "choice" },
+    { "slot": "listen", "say": "Smacznego!", "options": ["Приятного аппетита!", "До свидания!"], "item": "lx.smacznego", "tag": "ff.smacznego" },
     { "slot": "shadow" },
     { "slot": "serve" }
    ],

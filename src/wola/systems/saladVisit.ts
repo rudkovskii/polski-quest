@@ -100,6 +100,20 @@ export function mySalad(p: Progress | null, menu: SaladMenu): MyOrder {
   return { salad, size, dressing, osobno: !!s?.osobno, bread };
 }
 
+// ── Зачёт визита (W-04).
+
+/**
+ * Визит зачтён: с первого раза ≥ `pass.firstTry` (80 %), но одна ошибка зачёт не ломает — ошибок не больше
+ * max(1, ⌊n · (1 − pass.firstTry)⌋): 1 из 3, 1 из 4, 1 из 5, 2 из 10. Старое событие без числа ответов — по доле,
+ * от 2/3 (визит из трёх шагов с одной ошибкой, как у Марины).
+ */
+export function visitPassed(firstTry: number, answers: number | undefined, pass: Pick<SaladLevels['pass'], 'firstTry'>): boolean {
+  if (firstTry >= pass.firstTry - 1e-9) return true;
+  if (answers === undefined || answers <= 0) return firstTry >= 2 / 3 - 1e-3;
+  const wrong = Math.round(answers * (1 - firstTry));
+  return wrong <= Math.max(1, Math.floor(answers * (1 - pass.firstTry) + 1e-9));
+}
+
 // ── Состояние из журнала.
 
 export interface SaladState {
@@ -126,6 +140,8 @@ export interface SaladState {
   gold: number;
   /** Задание «в реале» ждёт ответа «I jak było?»: уровень задания. */
   openTask: number | null;
+  /** Игровой день, когда выдано ждущее задание (W-04: «I jak było?» — только в визит следующего дня или позже). */
+  openTaskDay: Day | null;
   /** Уровни, чьё задание уже было выдано. */
   tasksGiven: number[];
   /** Уровни, чьё задание получилось в реале («Udało się»). */
@@ -156,6 +172,7 @@ export function saladState(events: readonly LogEvent[], data: SaladData, opts: T
   let stamps = 0;
   let gold = 0;
   let openTask: number | null = null;
+  let openTaskDay: Day | null = null;
   const tasksGiven = new Set<number>();
   const tasksDone = new Set<number>();
   const wpadki = new Set<string>();
@@ -171,16 +188,18 @@ export function saladState(events: readonly LogEvent[], data: SaladData, opts: T
         if (openTask !== null) tasksDone.add(openTask);
       }
       openTask = null;
+      openTaskDay = null;
     }
     if (v.task) {
       openTask = v.task;
+      openTaskDay = day;
       tasksGiven.add(v.task);
     }
     tried.salads.add(v.order.salad);
     if (v.order.dressing) tried.dressings.add(v.order.dressing);
     if (v.order.bread) tried.breads.add(v.order.bread);
     for (const g of v.gags ?? []) wpadki.add(g);
-    const ok = v.firstTry >= pass.firstTry;
+    const ok = visitPassed(v.firstTry, v.answers, pass);
     if (ok) stamps++;
     if (v.jump && v.tpl === level + 1) {
       // «Spróbuj wyżej»: визит уровнем выше на ≥ jumpFirstTry засчитывает текущий уровень.
@@ -215,6 +234,7 @@ export function saladState(events: readonly LogEvent[], data: SaladData, opts: T
     stamps,
     gold,
     openTask,
+    openTaskDay,
     tasksGiven: [...tasksGiven].sort((a, b) => a - b),
     tasksDone: [...tasksDone].sort((a, b) => a - b),
     wpadki: [...wpadki],
@@ -222,6 +242,11 @@ export function saladState(events: readonly LogEvent[], data: SaladData, opts: T
     lastGags: last?.gags ?? [],
     ...(last ? { last } : {}),
   };
+}
+
+/** «I jak było?» в этот визит (W-04): задание ждёт ответа и выдано в прошлый игровой день или раньше, не сегодня. */
+export function askJakBylo(s: Pick<SaladState, 'openTask' | 'openTaskDay'>, today: Day): boolean {
+  return s.openTask !== null && s.openTaskDay !== null && s.openTaskDay < today;
 }
 
 /** Уровень шаблона следующего визита: откат на уровень ниже, прыжок на уровень выше, иначе текущий. */
@@ -234,9 +259,9 @@ export function visitTpl(s: Pick<SaladState, 'level' | 'cap' | 'fallback'>, jump
  * Карточка «Zadanie w realu» после визита: у уровня шаблона есть задание (2, 4, 7, 9), визит зачётный, прошлое задание не
  * ждёт ответа и это задание ещё не получилось в реале.
  */
-export function showRealTask(data: SaladData, s: Pick<SaladState, 'openTask' | 'tasksDone'>, tpl: number, firstTry: number): boolean {
+export function showRealTask(data: SaladData, s: Pick<SaladState, 'openTask' | 'tasksDone'>, tpl: number, firstTry: number, answers?: number): boolean {
   const lv = levelOf(data, tpl);
-  return !!lv?.realTask && firstTry >= data.levels.pass.firstTry && s.openTask === null && !s.tasksDone.includes(tpl);
+  return !!lv?.realTask && visitPassed(firstTry, answers, data.levels.pass) && s.openTask === null && !s.tasksDone.includes(tpl);
 }
 
 /** Можно ли «Spróbuj wyżej»: есть следующий играбельный уровень. */
@@ -273,6 +298,8 @@ export interface VisitInput {
   familiar?(id: string): boolean;
   seed: string;
   day: Day;
+  /** План дня (W-04): сколько новых слов ещё можно ввести сегодня; визит вводит не больше (и не больше maxNewWords). */
+  newLeft?: number;
 }
 
 /** Реплика кассира над шагом (пузырь в сцене, озвучка). */
@@ -439,8 +466,9 @@ export function buildVisit(inp: VisitInput): Visit {
   const cashier = pickOne(r, data.cashiers.cashiers.filter((c) => c.id !== prev).length ? data.cashiers.cashiers.filter((c) => c.id !== prev) : data.cashiers.cashiers);
   const order = planOrder(inp, r, tpl);
   const atTpl = inp.state.byTpl[tpl] ?? 0;
-  // Новые слова визита: первые maxNewWords слов уровня без карточек (в порядке уровня).
-  const intro = new Set(level.words.filter((w) => !inp.planted.has(w)).slice(0, data.levels.visit.maxNewWords));
+  // Новые слова визита: первые maxNewWords слов уровня без карточек (в порядке уровня), в пределах плана дня (W-04).
+  const maxNew = Math.max(0, Math.min(data.levels.visit.maxNewWords, inp.newLeft ?? Infinity));
+  const intro = new Set(level.words.filter((w) => !inp.planted.has(w)).slice(0, maxNew));
   const ctx: Ctx = {
     in: inp,
     r,
@@ -462,7 +490,7 @@ export function buildVisit(inp: VisitInput): Visit {
   trim(ctx);
   const usedAll = new Set(ctx.steps.map((s) => s.item).filter((x): x is string => !!x));
   // Новые слова визита: слова уровня без карточек, которые есть в шагах (в порядке уровня, не больше maxNewWords).
-  const introduces = level.words.filter((w) => !inp.planted.has(w) && usedAll.has(w)).slice(0, data.levels.visit.maxNewWords);
+  const introduces = level.words.filter((w) => !inp.planted.has(w) && usedAll.has(w)).slice(0, maxNew);
   const lessonId = saladLesson(tpl);
   // Слово шага без карточки и не из новых этого визита — шаг остаётся, SRS не трогает (слово введут позже).
   const usable = (id: string): boolean => inp.planted.has(id) || introduces.includes(id);
@@ -536,9 +564,18 @@ const answer = (c: Ctx, key: string, vars: Vars = c.vars): SaladText & { pl: str
 
 function expand(c: Ctx, slot: SaladSlot): void {
   switch (slot.slot) {
-    case 'greet':
-      push(c, 'greet', { t: 'say', who: c.cashier.id, ...line(c, 'greet') });
+    case 'greet': {
+      const bub = line(c, 'greet');
+      if (slot.ask) {
+        // W-04: приветствие и есть вопрос — «Что это значит?» по одной из реплик кассира (Co podać? / Co dla pana? /
+        // Słucham?), перевод в пузыре появляется после ответа (сцена), а не до него.
+        const other = otherQuestionRu(c, 'greet', bub.ru);
+        push(c, 'q', { t: 'listen', say: bub.pl, options: [bub.ru, other], answer: 0, show: 'text', tags: ['ff.co_podac'], ...(/pod(ać|ac)/i.test(bub.pl) ? { item: 'lx.co_podac' } : {}) }, bub);
+        return;
+      }
+      push(c, 'greet', { t: 'say', who: c.cashier.id, ...bub });
       return;
+    }
     case 'serve': {
       const l = line(c, slot.line === 'name' ? 'name' : 'serve');
       push(c, 'serve', { t: 'say', who: c.cashier.id, ...l });
@@ -552,7 +589,8 @@ function expand(c: Ctx, slot: SaladSlot): void {
       return pickSalad(c);
     case 'listen': {
       const v = c.in.vocab(slot.item);
-      push(c, 'listen', { t: 'listen', say: slot.say, options: slot.options as [string, string], answer: 0, item: slot.item, show: 'text', ...(v?.tr ? { tr: v.tr } : {}) });
+      // Пузырь кассира с репликой (W-04): перевод в нём — только после ответа.
+      push(c, 'listen', { t: 'listen', say: slot.say, options: slot.options as [string, string], answer: 0, item: slot.item, show: 'text', ...(slot.tag ? { tags: [slot.tag] } : {}), ...(v?.tr ? { tr: v.tr } : {}) }, { pl: slot.say, ru: slot.options[0]! });
       return;
     }
     case 'explain':
@@ -624,7 +662,7 @@ function pickSlot(c: Ctx, count: number, n: number): void {
     const pool = shuffle(c.r, ing.filter((i) => i.lx !== t && levelIng.includes(i.lx)));
     const more = shuffle(c.r, ing.filter((i) => i.lx !== t && !levelIng.includes(i.lx)));
     const items = [it, ...[...pool, ...more].slice(0, n - 1)].map((i) => ({ sprite: i.sprite, label: vocab(i.lx)?.pl ?? i.lx }));
-    push(c, 'pick', { t: 'pick', prompt: `Ткни на витрине: ${v?.pl ?? t}`, say: v?.pl ?? t, items: items as [{ sprite: string; label: string }, { sprite: string; label: string }], answer: 0, item: t, ...(v?.tr ? { tr: v.tr } : {}) });
+    push(c, 'pick', { t: 'pick', prompt: `Ткни на картинку: ${v?.pl ?? t}`, say: v?.pl ?? t, items: items as [{ sprite: string; label: string }, { sprite: string; label: string }], answer: 0, item: t, tags: ['ff.witryna'], ...(v?.tr ? { tr: v.tr } : {}) });
   }
 }
 
@@ -639,7 +677,7 @@ function pickSalad(c: Ctx): void {
     { sprite: bread.sprite, label: 'paluch' },
     ...(c.first ? [] : [{ sprite: drink.sprite, label: drink.pl }]),
   ];
-  push(c, 'pick', { t: 'pick', prompt: 'А где здесь sałatka?', say: 'sałatka', items: items as [(typeof items)[0], (typeof items)[0]], answer: 0, item: 'lx.salatka', ...(v?.tr ? { tr: v.tr } : {}) });
+  push(c, 'pick', { t: 'pick', prompt: 'А где здесь sałatka?', say: 'sałatka', items: items as [(typeof items)[0], (typeof items)[0]], answer: 0, item: 'lx.salatka', tags: ['ff.witryna'], ...(v?.tr ? { tr: v.tr } : {}) });
 }
 
 // ── Заказ салата.
@@ -662,7 +700,8 @@ function orderSlot(c: Ctx, as: 'choice' | 'tiles' | 'gap_then_type' | 'type'): v
       answer: 0,
       dir: 'ru-pl',
       item: 'lx.salatka',
-      ...(byForm ? { errorTagByOption: { '1': 'gr.acc_fem' }, why: WHY_ACC } : {}),
+      // Не тот салат — гэг «для другого пана» (W-04: у каждой ошибки уровня своя развязка).
+      ...(byForm ? { errorTagByOption: { '1': 'gr.acc_fem' }, why: WHY_ACC } : { errorTagByOption: { '1': 'ff.witryna' } }),
     });
     return;
   }
@@ -823,12 +862,12 @@ function spec(c: Ctx, q: SaladQuestion): AnswerSpec | null {
       };
     }
     case 'more':
-      return { right: a('more.no'), wrong: { pl: a('more.yes').pl }, gap: { text: 'To ___.', answer: 'wszystko', trap: 'wszyscy', accept: ['wszystko'] }, item: 'lx.to_wszystko', want: 'больше ничего' };
+      return { right: a('more.no'), wrong: { pl: a('more.yes').pl, tag: 'ff.jeszcze' }, gap: { text: 'To ___.', answer: 'wszystko', trap: 'wszyscy', accept: ['wszystko'] }, item: 'lx.to_wszystko', want: 'больше ничего' };
     case 'without': {
       const bez = o.without;
       if (bez) {
         const lx = bez === 'lx.bekon' ? 'lx.bez_bekonu' : 'lx.bez_grzanek';
-        return { right: a('without.bez'), wrong: { pl: a('without.all').pl }, item: lx, want: `без: ${c.vars['bezRu']}` };
+        return { right: a('without.bez'), wrong: { pl: a('without.all').pl, tag: 'ff.bez' }, item: lx, want: `без: ${c.vars['bezRu']}` };
       }
       return { right: a('without.all'), wrong: { pl: a('without.bez', { ...c.vars, bez: 'bekonu' }).pl }, want: 'со всем, как есть' };
     }
@@ -870,7 +909,8 @@ function questions(c: Ctx, pool: string[], [min, max]: number[], listen: 'always
     if (wantListen) {
       const other = otherQuestionRu(c, qid, bub.ru);
       const v = c.in.vocab(q.lx);
-      push(c, 'q', { t: 'listen', say: bub.pl, options: [bub.ru, other], answer: 0, item: q.lx, show: 'text', ...(v && v.pl === bub.pl && v.tr ? { tr: v.tr } : {}) }, bub);
+      const tag = LISTEN_TAG[qid];
+      push(c, 'q', { t: 'listen', say: bub.pl, options: [bub.ru, other], answer: 0, item: q.lx, show: 'text', ...(tag ? { tags: [tag] } : {}), ...(v && v.pl === bub.pl && v.tr ? { tr: v.tr } : {}) }, bub);
     }
     // Пропуск без настоящей ловушки (вариант совпал с ответом) — выбор целой фразой.
     if (sp.gap && sp.gap.trap.toLowerCase() === sp.gap.answer.toLowerCase()) delete sp.gap;
@@ -919,8 +959,18 @@ function questions(c: Ctx, pool: string[], [min, max]: number[], listen: 'always
   }
 }
 
+/** Не понял вопрос кассира на слух (W-04): тег ошибки — гэг той же темы (миска-ванна, пакет, две миски…). */
+const LISTEN_TAG: Readonly<Record<string, string>> = {
+  'q.rozmiar': 'gr.rozmiar',
+  'q.miejsce': 'gr.miejsce',
+  'q.cos_jeszcze': 'ff.jeszcze',
+  'q.osobno': 'ph.sok_sos',
+  'q.ze_wszystkim': 'ff.bez',
+};
+
 function otherQuestionRu(c: Ctx, qid: string, ru: string): string {
-  const keys = Object.keys(c.in.data.levels.questions).filter((k) => k !== qid);
+  // Приветствие («Что подать?») не путаем с «Что-нибудь ещё?»: оба про заказ, но первый вопрос визита — не «ещё».
+  const keys = Object.keys(c.in.data.levels.questions).filter((k) => k !== qid && !(qid === 'greet' && k === 'q.cos_jeszcze'));
   for (const k of shuffle(c.r, keys)) {
     const l = c.in.data.cashiers.common[k]?.[0];
     if (l && l.ru !== ru && !l.ru.includes('{')) return l.ru;
@@ -1054,8 +1104,8 @@ function compose(c: Ctx): void {
     const sp = (lx: string) => ing.find((i) => i.lx === lx)?.sprite ?? comp.sprite;
     // Основа — картинкой (витрина), белок и добавки — словом.
     if (slot.id === 'baza')
-      push(c, 'compose', { t: 'pick', prompt: `Кассир: «${bub.pl}» Ткни: ${v?.pl ?? want}`, items: [{ sprite: sp(want), label: v?.pl ?? want }, { sprite: sp(other), label: ov?.pl ?? other }], answer: 0, item: want, ...(v?.tr ? { tr: v.tr } : {}) }, bub);
-    else push(c, 'compose', { t: 'choice', q: `Кассир: «${bub.pl}» Ты хочешь: ${v?.ru ?? want}.`, options: [cap(v?.pl ?? want), cap(ov?.pl ?? other)], answer: 0, dir: 'ru-pl', item: want }, bub);
+      push(c, 'compose', { t: 'pick', prompt: `Кассир: «${bub.pl}» Ткни: ${v?.pl ?? want}`, items: [{ sprite: sp(want), label: v?.pl ?? want }, { sprite: sp(other), label: ov?.pl ?? other }], answer: 0, item: want, tags: ['ff.witryna'], ...(v?.tr ? { tr: v.tr } : {}) }, bub);
+    else push(c, 'compose', { t: 'choice', q: `Кассир: «${bub.pl}» Ты хочешь: ${v?.ru ?? want}.`, options: [cap(v?.pl ?? want), cap(ov?.pl ?? other)], answer: 0, dir: 'ru-pl', item: want, errorTagByOption: { '1': 'ff.witryna' } }, bub);
   }
   c.order.compose = picked;
   c.order.salad = 'm.wlasna';
@@ -1122,7 +1172,8 @@ export function saladTexts(data: SaladData, vocab: (id: string) => VocabEntry | 
     return acc;
   };
   // Реплики кассиров: пузыри вопросов слушаются медленно на «Подсказку» шага listen.
-  const listened = new Set([...Object.keys(data.levels.questions), 'razem', 'co_zwykle', 'nie_ma', 'nie_ma_item', 'powtorka']);
+  // W-04: приветствие уровня 2 — тоже вопрос «Что это значит?» (slot greet ask): медленная версия на «Подсказку».
+  const listened = new Set([...Object.keys(data.levels.questions), 'greet', 'razem', 'co_zwykle', 'nie_ma', 'nie_ma_item', 'powtorka']);
   const lines = (key: string, ls: CashierLine[]): void => {
     for (const l of ls) for (const t of expandAll(l.pl)) add(t, listened.has(key));
   };

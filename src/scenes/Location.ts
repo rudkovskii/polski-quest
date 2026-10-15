@@ -168,7 +168,9 @@ export class Location extends Phaser.Scene {
       typeof spawnRef === 'string' ? (this.mapDef.spawns[spawnRef] ?? this.mapDef.spawns.default)! : spawnRef;
     // Wola (W-01): без бобра — склейка ставит `world:companion = false` в registry, переживает перезапуск сцены.
     const companion = this.registry.get('world:companion') === false ? { companion: false } : {};
-    this.model = new LocationModel(this.mapDef, [spawn[0]!, spawn[1]!], { facing: this.data0.facing ?? 'down', ...companion });
+    // Wola (W-04): короткий тап крестовины — поворот и шаг; A у двери — войти (`world:wola` в registry).
+    const wola = this.registry.get('world:wola') === true ? { tapStep: true, doorA: true } : {};
+    this.model = new LocationModel(this.mapDef, [spawn[0]!, spawn[1]!], { facing: this.data0.facing ?? 'down', ...companion, ...wola });
     this.sprites = this.cache.json.get('sprites') as SpritesMeta;
 
     this.createAnims();

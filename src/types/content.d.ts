@@ -160,6 +160,10 @@ export type SaladSlot =
   | SlotCompose
   | SlotPrice
   | SlotServe;
+/**
+ * W-04: тег ошибки (гэг кассира)
+ */
+export type ErrorTagId1 = string;
 export type SaladQuestionId = string;
 
 /**
@@ -1617,6 +1621,10 @@ export interface SaladLevel {
 }
 export interface SlotGreet {
   slot: 'greet';
+  /**
+   * W-04: приветствие кассира — сразу вопрос «Что это значит?» (перевод в пузыре после ответа), реплика из его вариантов
+   */
+  ask?: boolean;
 }
 export interface SlotWarmup {
   slot: 'warmup';
@@ -1647,6 +1655,7 @@ export interface SlotListen {
    */
   options: [string, string] | [string, string, string] | [string, string, string, string];
   item: LxId;
+  tag?: ErrorTagId1;
 }
 export interface SlotExplain {
   slot: 'explain';
@@ -1725,7 +1734,7 @@ export interface SaladGag {
   /**
    * Что гэг кладёт на поднос итога
    */
-  tray?: 'sok' | 'xxl' | 'torba';
+  tray?: 'sok' | 'xxl' | 'torba' | 'dwie';
   line: Text2;
   title?: Text21;
 }

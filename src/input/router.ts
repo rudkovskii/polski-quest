@@ -161,6 +161,9 @@ export function createRouter(opts: RouterOptions = {}): Router {
       case 'interact':
         emit(intent, 'world', source);
         return true;
+      case 'hotkey':
+        emit(intent, 'world', source);
+        return true;
     }
   };
 

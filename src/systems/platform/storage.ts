@@ -286,6 +286,8 @@ export class GameStorage {
   private writing: Promise<void> = Promise.resolve();
   /** Записей прогресса в полёте: pagehide может оборвать их, поэтому аварийная копия нужна и для них. */
   private inFlightP = 0;
+  /** Хранилище стёрто (`wipe`): больше ничего не пишем, дальше только перезагрузка страницы. */
+  private wiped = false;
 
   constructor(opts: StorageOptions = {}) {
     this.ls = opts.ls === undefined ? globalLocalStorage() : opts.ls;
@@ -453,6 +455,7 @@ export class GameStorage {
       clearTimeout(this.timer);
       this.timer = null;
     }
+    if (this.wiped) return this.writing;
     const entries: [string, unknown][] = [];
     const wroteP = this.dirtyP && !this.ro && this.p !== null;
     if (wroteP) entries.push([KEYS.progress, this.p]);
@@ -487,11 +490,45 @@ export class GameStorage {
    * Нужна только когда основной бэкенд асинхронный.
    */
   flushSync(): void {
+    if (this.wiped) return;
     if (!(this.dirtyP || this.inFlightP > 0) || this.ro || !this.p || !this.ls || this.kv.kind !== 'idb') return;
     try {
       this.ls.setItem(this.tailKey, JSON.stringify(this.p));
     } catch (e) {
       console.warn('storage: аварийная копия не записана', e);
+    }
+  }
+
+  /**
+   * «Начать заново» (Wola, W-04): стереть всё хранилище этой версии игры — прогресс, local, снапшоты и аварийную
+   * копию. Автоэкспорт делает UI до вызова. Дальше хранилище ничего не пишет (и при уходе со страницы тоже): склейка
+   * перезагружает страницу, и `load` создаёт чистый мир.
+   */
+  async wipe(): Promise<void> {
+    this.wiped = true;
+    if (this.timer !== null) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+    this.dirtyP = this.dirtyL = false;
+    await this.writing.catch(() => undefined);
+    let keys: string[] = [];
+    try {
+      keys = await this.kv.keys();
+    } catch {
+      keys = [];
+    }
+    for (const k of new Set([...keys, KEYS.progress, KEYS.local])) {
+      try {
+        await this.kv.del(k);
+      } catch {
+        // ключа нет в этом бэкенде
+      }
+    }
+    try {
+      this.ls?.removeItem(this.tailKey);
+    } catch {
+      // приватный режим
     }
   }
 

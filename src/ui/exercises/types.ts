@@ -103,6 +103,13 @@ export interface ExerciseCtx {
    * `errLineFor`, переспрос кассира) над стандартными ответом, правилом и переводом. null — гэга нет.
    */
   gagFor?(tags: readonly string[]): HTMLElement | null;
+  /**
+   * Wola (W-04): без звука «Как это пишется? [транскрипция]» — неверные варианты не другие слова (их различает сама
+   * транскрипция), а правдоподобные написания того же слова (rz/ż, ó/u, ę/e…), и в вопросе перевод.
+   */
+  spellTraps?: boolean;
+  /** Первый ответ шага дан (W-04, Salad Story: подпись-перевод в пузыре кассира появляется после ответа). */
+  onAnswer?(ok: boolean): void;
 }
 
 export interface ExerciseModule<S extends Step = Step> {

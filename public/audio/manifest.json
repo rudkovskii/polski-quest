@@ -53,6 +53,7 @@
   "say:Zosia|normal|Coś bez recepty?": "15a7b9eb6e14.m4a",
   "say:Zosia|normal|Coś do picia?": "7480268f64d2.m4a",
   "say:Zosia|normal|Coś jeszcze?": "24c8b4675a95.m4a",
+  "say:Zosia|normal|Coś poza tym?": "7d4cde4fb5b6.m4a",
   "say:Zosia|normal|Czech": "217d579be36d.m4a",
   "say:Zosia|normal|Czerwone jabłko.": "1eab867c5da5.m4a",
   "say:Zosia|normal|Cześć!": "0edc18c0d091.m4a",
@@ -174,6 +175,7 @@
   "say:Zosia|normal|Dzień dobry! Co dla pana?": "a17f3cd8626d.m4a",
   "say:Zosia|normal|Dzień dobry, co podać?": "aa950599d54b.m4a",
   "say:Zosia|normal|Dzień dobry, pani Aniu!": "58f581c6d71e.m4a",
+  "say:Zosia|normal|Dzień dobry, słucham?": "298e28eaf7da.m4a",
   "say:Zosia|normal|Dzięki": "b50d78cd25c5.m4a",
   "say:Zosia|normal|Dzięki za pomoc.": "ff54d5eb6d4d.m4a",
   "say:Zosia|normal|Dziękuję bardzo!": "d0eed0439614.m4a",
@@ -1084,6 +1086,7 @@
   "say:Zosia|slow|Co to znaczy?": "33f29ce23632.m4a",
   "say:Zosia|slow|Coś do picia?": "b17438ddf164.m4a",
   "say:Zosia|slow|Coś jeszcze?": "f0c5d3c87c23.m4a",
+  "say:Zosia|slow|Coś poza tym?": "ccb36211ac62.m4a",
   "say:Zosia|slow|Czech": "b53173da6ebf.m4a",
   "say:Zosia|slow|Czy coś jeszcze?": "a6f60d808049.m4a",
   "say:Zosia|slow|Czy jest wolny stolik?": "83abf357c25d.m4a",
@@ -1167,6 +1170,10 @@
   "say:Zosia|slow|Dressing Śliwkowy Hot BBQ, może być?": "b4d8c2809984.m4a",
   "say:Zosia|slow|Dworzec Centralny": "7f6af11b8bf3.m4a",
   "say:Zosia|slow|Dzień dobry": "0e3b67aea9f5.m4a",
+  "say:Zosia|slow|Dzień dobry! Co dla pana dzisiaj?": "72af8e065de3.m4a",
+  "say:Zosia|slow|Dzień dobry! Co dla pana?": "f06896975083.m4a",
+  "say:Zosia|slow|Dzień dobry, co podać?": "f3e85923f4dd.m4a",
+  "say:Zosia|slow|Dzień dobry, słucham?": "7bc1277a00eb.m4a",
   "say:Zosia|slow|Dzięki": "02570cecc458.m4a",
   "say:Zosia|slow|Dziękuję za pomoc": "122c257e8dc0.m4a",
   "say:Zosia|slow|Dziękuję. Proszę. Są.": "6317b5372a78.m4a",
@@ -1377,6 +1384,7 @@
   "say:Zosia|slow|Sos osobno?": "d5e81f2925f2.m4a",
   "say:Zosia|slow|Stwórz własną": "a7e1189374c3.m4a",
   "say:Zosia|slow|Stół. Słucham.": "4eba91ebc3c4.m4a",
+  "say:Zosia|slow|Słucham pana?": "79cc1566cbaf.m4a",
   "say:Zosia|slow|Słucham?": "1d4d5c468205.m4a",
   "say:Zosia|slow|Tak": "fb04cff6818a.m4a",
   "say:Zosia|slow|To co zwykle?": "48167df1f729.m4a",
@@ -3116,6 +3124,11 @@
    "dur": 0.94,
    "voice": "say:Zosia",
    "rate": "slow"
+  },
+  "298e28eaf7da.m4a": {
+   "dur": 1.97,
+   "voice": "say:Zosia",
+   "rate": "normal"
   },
   "29c11fefff9c.m4a": {
    "dur": 1.3,
@@ -5762,6 +5775,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "72af8e065de3.m4a": {
+   "dur": 6.05,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
   "72e626beb339.m4a": {
    "dur": 3.65,
    "voice": "say:Zosia",
@@ -6032,6 +6050,11 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "79cc1566cbaf.m4a": {
+   "dur": 2.1,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
   "79d5cb829032.m4a": {
    "dur": 0.64,
    "voice": "say:Zosia",
@@ -6091,6 +6114,11 @@
    "dur": 1.17,
    "voice": "say:Zosia",
    "rate": "normal"
+  },
+  "7bc1277a00eb.m4a": {
+   "dur": 3.36,
+   "voice": "say:Zosia",
+   "rate": "slow"
   },
   "7c1f89c91cbc.m4a": {
    "dur": 1.34,
@@ -6164,6 +6192,11 @@
   },
   "7d384ebaa236.m4a": {
    "dur": 0.66,
+   "voice": "say:Zosia",
+   "rate": "normal"
+  },
+  "7d4cde4fb5b6.m4a": {
+   "dur": 1.13,
    "voice": "say:Zosia",
    "rate": "normal"
   },
@@ -8962,6 +8995,11 @@
    "voice": "say:Zosia",
    "rate": "normal"
   },
+  "ccb36211ac62.m4a": {
+   "dur": 2.6,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
   "ccf84539cc00.m4a": {
    "dur": 2.57,
    "voice": "say:Zosia",
@@ -10112,6 +10150,11 @@
    "voice": "say:Zosia",
    "rate": "slow"
   },
+  "f06896975083.m4a": {
+   "dur": 4.78,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
   "f06a8c584ab7.m4a": {
    "dur": 1.82,
    "voice": "say:Zosia",
@@ -10239,6 +10282,11 @@
   },
   "f368b56ddebf.m4a": {
    "dur": 5.19,
+   "voice": "say:Zosia",
+   "rate": "slow"
+  },
+  "f3e85923f4dd.m4a": {
+   "dur": 3.82,
    "voice": "say:Zosia",
    "rate": "slow"
   },

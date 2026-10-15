@@ -58,6 +58,13 @@ export function createOverlay(root: HTMLElement, opts: OverlayOptions = {}): Ove
         // не должен обрывать урок.
         if (h?.cancel?.() !== true && i.source !== 'pointer') top.el.querySelector<HTMLElement>('[data-act="close"]')?.click();
         return;
+      case 'hotkey': {
+        // Цифра — вариант ответа с этим номером (W-04: на Mac 1–3 выбирают ответ, как тап).
+        const opts = [...top.el.querySelectorAll<HTMLButtonElement>('[data-opt]')].filter((b) => !b.hidden && !b.closest('[hidden]'));
+        const b = opts[i.n - 1];
+        if (b && !b.disabled) b.click();
+        return;
+      }
       default:
         return;
     }

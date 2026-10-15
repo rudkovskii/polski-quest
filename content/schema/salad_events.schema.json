@@ -20,7 +20,7 @@
           "id": { "type": "string", "pattern": "^gag\\.[a-z0-9_]+$" },
           "onTag": { "$ref": "common.schema.json#/$defs/errorTag" },
           "sprite": { "type": "string", "pattern": "^[a-z0-9_.]+/[0-9]+$" },
-          "tray": { "enum": ["sok", "xxl", "torba"], "description": "Что гэг кладёт на поднос итога" },
+          "tray": { "enum": ["sok", "xxl", "torba", "dwie"], "description": "Что гэг кладёт на поднос итога" },
           "line": { "$ref": "common.schema.json#/$defs/text2" },
           "title": { "$ref": "common.schema.json#/$defs/text2", "description": "Название в альбоме «Wpadki»" }
         }

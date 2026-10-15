@@ -114,3 +114,29 @@ export async function loadPixAtlas(base: string, load: (url: string) => Promise<
     return null;
   }
 }
+
+/** Картинки атласа, которые рисуют места (CSS-фоны). */
+export const PIX_IMAGES = ['atlas/ninja16.png', 'atlas/custom.png'];
+
+/**
+ * Предзагрузка и декодирование картинок атласа (W-04): склейка зовёт при старте, место показывает пиксельный
+ * загрузчик, пока обещание не выполнено (обычно уже выполнено — вход мгновенный). Ошибка — не беда: рисуем как есть.
+ */
+export function preloadPixImages(base: string, make: () => HTMLImageElement = () => new Image()): Promise<void> {
+  return Promise.all(
+    PIX_IMAGES.map(async (path) => {
+      const img = make();
+      img.src = `${base}${path}`;
+      try {
+        await img.decode();
+      } catch {
+        // нет сети или формат: CSS-фон догрузится сам
+      }
+    }),
+  ).then(() => undefined);
+}
+
+/** Пиксельный загрузчик (W-04): блоки по очереди зеленеют, подпись. */
+export function loadingEl(text = 'Wola…'): HTMLElement {
+  return el('div', { class: 'wl-loading', 'data-loading': true, role: 'status' }, el('span', { class: 'blocks' }, el('i', {}), el('i', {}), el('i', {}), el('i', {}), el('i', {})), el('span', {}, text));
+}

@@ -9,7 +9,7 @@
  "controls": "walk",
  "size": [
   16,
-  18
+  14
  ],
  "legend": {
   ".": {
@@ -149,25 +149,21 @@
    "oxOxox..SLSSLSLS",
    "xOxxOx..LSSLSSLS",
    "oxxxox..SLSLSSLS",
-   "xOxxOx..<==>SLSS",
-   "oxDxox.lQdQzSESS",
-   ".......i........",
+   "xOxxOx.l<==>SLSS",
+   "oxDxox.iQdQzSESS",
    "................",
+   ",,,,,,,,,,[--|-]",
    ",,,,,,,,,,,,,,,,",
-   ",,[--|-],,,,,,,,",
-   ",,,,,,,,,,,,,,,,",
-   "..P.bmn.....l...",
-   "............i...",
-   "T.####F#####..T.",
-   "..#vvvvvvvv#....",
-   "..#vuuvvuuv#..B.",
-   "..#vuuvvuuv#....",
-   "..##########..T."
+   ".P........bmn...",
+   ".####F#####....T",
+   ".#vvvvvvvv#..l..",
+   ".#vuuvvuuv#..i..",
+   ".##########..BT."
   ]
  },
  "spawns": {
   "default": [
-   7,
+   5,
    7
   ],
   "from_dom": [
@@ -179,8 +175,8 @@
    6
   ],
   "from_ogrod": [
-   6,
-   12
+   5,
+   9
   ]
  },
  "objects": [
@@ -205,8 +201,8 @@
   {
    "type": "exit",
    "at": [
-    6,
-    13
+    5,
+    10
    ],
    "to": "place:ogrod",
    "spawn": "from_ogrod"
