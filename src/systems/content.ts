@@ -162,10 +162,19 @@ export function buildContent(files: Readonly<Record<string, unknown>>, prefix = 
 
 let cached: Content | null = null;
 
+/**
+ * Подменить контент игры (Wola, W-01: своя сборка `src/wola/content.ts` — словарь Wola и карта хаба). Вызывает
+ * склейка до первой сцены: Location и экраны берут контент через `getContent()`.
+ */
+export function useContent(c: Content): void {
+  cached = c;
+}
+
 /** Контент игры из content/ (eager-импорт: JSON попадает в бандл, загрузка синхронная). */
 export function getContent(): Content {
   if (!cached) {
-    const files = import.meta.glob<unknown>(['/content/**/*.json', '!/content/schema/**'], {
+    // content/wola/ — короткая версия (своя точка входа), в основную игру не попадает.
+    const files = import.meta.glob<unknown>(['/content/**/*.json', '!/content/schema/**', '!/content/wola/**'], {
       eager: true,
       import: 'default',
     });

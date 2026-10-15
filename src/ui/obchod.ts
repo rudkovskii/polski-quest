@@ -39,6 +39,8 @@ export interface ObchodOptions {
   practice?: boolean;
   /** Сколько карточек (вечер первого дня — 3 пары). */
   limit?: number;
+  /** Wola (W-01): огород удобряют, а не поливают — подписи «Nawóz / удобрено» вместо «Obchód / полито». */
+  nawoz?: boolean;
   /** Вечер: пары этого кластера первыми. */
   cluster?: string;
   /**
@@ -151,6 +153,12 @@ function panel<A extends string>(layer: Layer, title: string | PlLabel, body: (H
 
 const WIECZOR: PlLabel = { pl: 'Wieczór', ru: 'вечер, звуки у реки' };
 
+/** Подписи раунда: полив działki (основная игра) или удобрение огорода (Wola). */
+const WORDS = {
+  water: { round: { pl: 'Obchód', ru: 'обход грядок' }, step: 'Obchód', stepRu: 'полив', expressRu: 'быстрый полив', did: 'Полито', wait: 'Ещё ждут полива', all: 'Всё полито', tomorrow: 'Завтра к поливу' },
+  nawoz: { round: { pl: 'Nawóz', ru: 'удобрить огород' }, step: 'Nawóz', stepRu: 'удобрение', expressRu: 'удобрить всё', did: 'Удобрено', wait: 'Ещё ждут удобрения', all: 'Всё удобрено', tomorrow: 'Завтра к удобрению' },
+} as const;
+
 const stat = (label: string, value: string): HTMLElement => el('div', { class: 'stat' }, el('span', {}, label), el('b', {}, value));
 
 /** Тап по растению без полива (P-11): слово и одна короткая строка — «Rośnie. Jutro podlej.», без цифр интервала. */
@@ -197,6 +205,7 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
       .slice(0, o.limit ?? t.phoneticPerDay)
       .map((p) => `${p.id}#pair`);
   }
+  const W = o.nawoz ? WORDS.nawoz : WORDS.water;
   const layer = deps.overlay.open('pq-obchod-layer');
   try {
     if (o.practice && o.fromItem) return await practiceOne(deps, layer, o.fromItem);
@@ -224,7 +233,7 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
     }
     if (!plan.cards.length) {
       const tomorrow = summaryTomorrow(d0);
-      await panel(layer, 'Всё полито', [el('div', { class: 'line2' }, `Завтра к поливу: ${tomorrow}.`)], [{ act: 'ok', label: 'OK', primary: true }], 'ok');
+      await panel(layer, W.all, [el('div', { class: 'line2' }, `${W.tomorrow}: ${tomorrow}.`)], [{ act: 'ok', label: 'OK', primary: true }], 'ok');
       return { answered: 0, correct: 0, empty: true, left: 0 };
     }
 
@@ -240,7 +249,7 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
       const lesson: Lesson = {
         id: `${express ? 'express' : evening ? 'wieczor' : 'obchod'}.${card}`,
         kind: 'practice',
-        title: { pl: express ? 'Ekspres' : evening ? 'Wieczór' : 'Obchód', ru: `${express ? 'быстрый полив' : evening ? 'вечер, звуки' : 'полив'} · ${i + 1} из ${plan.cards.length}` },
+        title: { pl: express ? 'Ekspres' : evening ? 'Wieczór' : W.step, ru: `${express ? W.expressRu : evening ? 'вечер, звуки' : W.stepRu} · ${i + 1} из ${plan.cards.length}` },
         minutes: 1,
         steps: [step],
       };
@@ -272,8 +281,8 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
       // Мини-итог (§4.5): две строки.
       await panel(
         layer,
-        o.more3 ? 'Ещё 3 минуты' : { pl: 'Ekspres', ru: 'быстрый полив' },
-        [el('div', { class: 'line2' }, `Полито ${correct} из ${answered} за ${minutes} мин.`), el('div', { class: 'line2' }, left ? `Ещё ждут полива: ${left}.` : 'Всё полито.')],
+        o.more3 ? 'Ещё 3 минуты' : { pl: 'Ekspres', ru: W.expressRu },
+        [el('div', { class: 'line2' }, `${W.did} ${correct} из ${answered} за ${minutes} мин.`), el('div', { class: 'line2' }, left ? `${W.wait}: ${left}.` : `${W.all}.`)],
         [{ act: 'ok', label: BTN.done, primary: true }],
         'ok',
       );
@@ -286,11 +295,11 @@ export async function runObchod(deps: ObchodDeps, o: ObchodOptions): Promise<Obc
     actions.push({ act: 'ok', label: BTN.done, primary: left === 0 });
     const act = await panel(
       layer,
-      { pl: 'Obchód', ru: 'обход грядок' },
+      W.round,
       [
         ds.locked ? bobrLine(content, 'sys.kazik.jam') : null,
-        stat('Полито', `${correct} из ${answered}`),
-        stat('Ещё ждут полива', String(left)),
+        stat(W.did, `${correct} из ${answered}`),
+        stat(W.wait, String(left)),
         // Ошибка на обходе (СЮЖЕТ_v2 d02.kazik.obchod.err): Казик делает вторую зарубку.
         correct < answered ? bobrLine(content, 'd02.kazik.obchod.err') : null,
       ],

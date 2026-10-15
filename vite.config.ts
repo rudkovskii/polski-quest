@@ -40,6 +40,52 @@ function buildVersion(): Plugin {
 }
 
 const ROOT_DIR = fileURLToPath(new URL('./', import.meta.url));
+
+/**
+ * Короткая версия «Wola» (W-01): вторая страница `wola/index.html` рядом с основной игрой. Service worker один на
+ * `/polski-quest/` (кэширует обе), манифест у Wola свой: `wola/manifest.webmanifest`, scope и start_url
+ * `/polski-quest/wola/` — на телефоне ставится отдельной иконкой. vite-plugin-pwa вставляет ссылку на основной манифест
+ * во все страницы: в странице Wola меняем её на свою.
+ */
+const WOLA = `${BASE}wola/`;
+function wolaPwa(): Plugin {
+  const manifest = {
+    id: WOLA,
+    name: 'Wola · Pierogi i Przypadki',
+    short_name: 'Wola',
+    description: 'Короткая версия: район Воля, слова дома, огород, Salad Story',
+    lang: 'ru',
+    display: 'standalone',
+    orientation: 'portrait',
+    start_url: WOLA,
+    scope: WOLA,
+    background_color: '#1a1c2c',
+    theme_color: '#1a1c2c',
+    icons: [
+      { src: `${BASE}icons/icon-180.png`, sizes: '180x180', type: 'image/png' },
+      { src: `${BASE}icons/icon-192.png`, sizes: '192x192', type: 'image/png' },
+      { src: `${BASE}icons/icon-512.png`, sizes: '512x512', type: 'image/png' },
+      { src: `${BASE}icons/icon-512-maskable.png`, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    ],
+  };
+  return {
+    name: 'pq-wola-pwa',
+    apply: 'build',
+    // После vite-plugin-pwa (у него enforce: post): ссылка на основной манифест уже вставлена — заменяем её.
+    enforce: 'post',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, ctx) {
+        if (!/(^|\/)wola\/index\.html$/.test(ctx.path)) return html;
+        const link = `<link rel="manifest" href="${WOLA}manifest.webmanifest">`;
+        return /<link rel="manifest"[^>]*>/.test(html) ? html.replace(/<link rel="manifest"[^>]*>/, link) : html.replace('</head>', `${link}</head>`);
+      },
+    },
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'wola/manifest.webmanifest', source: `${JSON.stringify(manifest, null, 2)}\n` });
+    },
+  };
+}
 const CONTENT_DIR = fileURLToPath(new URL('./content/', import.meta.url));
 const TSX = fileURLToPath(new URL('./node_modules/.bin/tsx', import.meta.url));
 
@@ -114,6 +160,13 @@ export default defineConfig({
   build: {
     target: 'es2022',
     chunkSizeWarningLimit: 2000,
+    // Две страницы (W-01): основная игра и короткая версия «Wola» (/polski-quest/wola/).
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        wola: fileURLToPath(new URL('./wola/index.html', import.meta.url)),
+      },
+    },
   },
   plugins: [
     contentValidator(),
@@ -153,7 +206,10 @@ export default defineConfig({
         globIgnores: ['**/version.json'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: 'index.html',
-        navigateFallbackDenylist: [/supabase/],
+        // Wola (W-01): её страницы не подменяются основной игрой; `/wola/?mute=1` берётся из кэша как `/wola/index.html`.
+        navigateFallbackDenylist: [/supabase/, /\/wola\//],
+        // Параметры адреса (?dev, ?mute, ?now…) — только для клиента: страница из precache и с ними.
+        ignoreURLParametersMatching: [/.*/],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.includes('/audio/') && url.pathname.endsWith('.m4a'),
@@ -166,5 +222,6 @@ export default defineConfig({
         ],
       },
     }),
+    wolaPwa(),
   ],
 });

@@ -110,6 +110,8 @@ export class Location extends Phaser.Scene {
   private anchorKey = '';
   /** Последняя подпись растения (`world:label`). */
   private labelKey = '';
+  /** Последние отправленные входы в места (`world:spots`, Wola). */
+  private spotsKey = '';
   /** Цель шага — бобр-компаньон: контур и стрелка идут за ним каждый кадр (P-10a). */
   private guideLive = false;
   /** Запас сверху и снизу под HUD и d-pad, CSS-пиксели (layout). */
@@ -144,6 +146,7 @@ export class Location extends Phaser.Scene {
     this.aHiddenMark = null;
     this.anchorKey = '';
     this.labelKey = '';
+    this.spotsKey = '';
     this.guideLive = false;
   }
 
@@ -163,7 +166,9 @@ export class Location extends Phaser.Scene {
     const spawnRef = this.data0.spawn ?? (id === content.world.start.location ? content.world.start.spawn : 'default');
     const spawn: readonly number[] =
       typeof spawnRef === 'string' ? (this.mapDef.spawns[spawnRef] ?? this.mapDef.spawns.default)! : spawnRef;
-    this.model = new LocationModel(this.mapDef, [spawn[0]!, spawn[1]!], { facing: this.data0.facing ?? 'down' });
+    // Wola (W-01): без бобра — склейка ставит `world:companion = false` в registry, переживает перезапуск сцены.
+    const companion = this.registry.get('world:companion') === false ? { companion: false } : {};
+    this.model = new LocationModel(this.mapDef, [spawn[0]!, spawn[1]!], { facing: this.data0.facing ?? 'down', ...companion });
     this.sprites = this.cache.json.get('sprites') as SpritesMeta;
 
     this.createAnims();
@@ -210,6 +215,7 @@ export class Location extends Phaser.Scene {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
       bus.emit('world:anchor', { id: 'bobr', at: null });
       bus.emit('world:label', null);
+      if (this.spotsKey) bus.emit('world:spots', { location: this.mapDef.id, spots: [] });
     });
     this.cameras.main.fadeIn(150, 26, 28, 44);
     bus.emit('world:location', { id: this.mapDef.id, controls: this.mapDef.controls });
@@ -406,9 +412,28 @@ export class Location extends Phaser.Scene {
     }
     const key = at ? `${at.x},${at.y}` : '-';
     this.emitPlantLabel();
+    this.emitSpots();
     if (key === this.anchorKey) return;
     this.anchorKey = key;
     bus.emit('world:anchor', { id: 'bobr', at });
+  }
+
+  /** Входы в места (Wola, W-01): экранные точки дверей `place:<id>` для подписей DOM. */
+  private emitSpots(): void {
+    const doors = this.model.objects.filter((o) => o.kind === 'exit' && (o.src as { to: string }).to.startsWith('place:'));
+    if (!doors.length && this.spotsKey === '') return;
+    const cam = this.cameras.main;
+    const r = this.game.canvas.getBoundingClientRect();
+    const spots = doors.map((o) => ({
+      id: (o.src as { to: string }).to.slice('place:'.length),
+      x: Math.round(((o.at[0] + 0.5) * T - cam.worldView.x) * cam.zoom + cam.x + r.left),
+      y: Math.round((o.at[1] * T - cam.worldView.y) * cam.zoom + cam.y + r.top),
+      cell: Math.round(T * cam.zoom),
+    }));
+    const key = `${this.mapDef.id}|${spots.map((s) => `${s.id}:${s.x},${s.y}`).join(';')}`;
+    if (key === this.spotsKey) return;
+    this.spotsKey = key;
+    bus.emit('world:spots', { location: this.mapDef.id, spots });
   }
 
   /** Подпись растения под «A» (P-11): какое слово растёт на клетке, с которой сработает A. Текст рисует DOM. */
@@ -827,7 +852,8 @@ export class Location extends Phaser.Scene {
       }
       case 'exit':
         bus.emit('world:exit', { from: this.mapDef.id, to: ev.to, ...(ev.spawn ? { spawn: ev.spawn } : {}) });
-        if (ev.to !== 'worldmap') this.go(ev.to, ev.spawn ?? 'default');
+        // `place:<id>` (Wola, W-01): вход в место без карты — экран места открывает склейка, сцена остаётся.
+        if (ev.to !== 'worldmap' && !ev.to.startsWith('place:')) this.go(ev.to, ev.spawn ?? 'default');
         break;
       case 'bump':
         this.bump = { dir: ev.dir, until: time + 120 };
@@ -853,7 +879,8 @@ export class Location extends Phaser.Scene {
     this.model.halt();
     const cam = this.cameras.main;
     cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ location, spawn, ...(facing ? { facing } : {}) }));
-    cam.fadeOut(150, 26, 28, 44);
+    // force: телепорт сразу после входа (идёт fadeIn) иначе игнорировался, сцена зависала в `leaving` (W-01).
+    cam.fade(150, 26, 28, 44, true);
   }
 
   // ───────────── отрисовка актёров ─────────────

@@ -362,3 +362,24 @@
   Строка «Сейчас» в первые дни видна сразу у разговора с человеком/предметом и у сна (`flow.nowShown`), прячется у полива.
 - Брзехва на карте — `art/sprites/brzechwa.sprite.json` (16×32, как портрет). Урок `ch01.s01` — 12 шагов без telefon/Warszawa
   (они на турникете дня 2).
+## Короткая версия «Wola» (W-01, ../ВОЛЯ.md)
+- Отдельная страница `wola/index.html` → `src/wola/main.ts` (склейка), сборка Vite multi-page, адрес `/polski-quest/wola/`.
+  Service worker один на `/polski-quest/`, манифест у Wola свой (`wola/manifest.webmanifest`, scope `/polski-quest/wola/`,
+  плагин `wolaPwa` в vite.config.ts). `ignoreURLParametersMatching: [/.*/]` — страница из кэша и с `?mute=1`.
+- Сохранение отдельно: IndexedDB `polski-quest-wola`, localStorage с пространством `wola:` (`GameStorage({ lsNamespace })`,
+  аварийная копия тоже). Облака нет: копия файлом в настройках (`runSettings({ wola: true })`, файл `polski-quest-wola-<дата>.json`).
+- Слои внутри `src/wola/`: `systems/` = systems (чисто), `ui/` = ui, остальное = склейка (check_layers/check_banned знают).
+- Контент: `content/wola/vocab.json` (схема `wola.schema.json`) собирает `npx tsx tools/build_wola_vocab.ts [--trainer <vocab.js>]`
+  из главы 1 и тренажёра, руками не править; порядок `vocab` = порядок дневных порций, `tags[0]` = тема, тема с `place: salad`
+  (`jedzenie`) — для Salad Story, не дома. id не удалять (валидатор сверяет с git). Карты Wola — `content/wola/maps/*.json`
+  (id `wola.<name>`), вход в место — выход `to: "place:<dom|salad|ogrod>"` + спавн возврата `from_<место>`. Основная игра
+  `content/wola/**` не грузит; Wola собирает свой контент (`src/wola/content.ts`, порог зрелого слова 21 день в tuning).
+- Улица — движок Location с ходьбой (`world:companion = false` в registry — без бобра); выход `place:*` шлёт только `world:exit`,
+  сцена шлёт `world:spots` (экранные точки дверей для подписей). Места — экраны без ходьбы (`src/wola/ui/home|garden|salad.ts`),
+  пиксель-арт DOM (`ui/pix.ts`: тайлы ninja16 и кадры custom как CSS-фоны), арт — `art/sprites/wola.sprite.json` + тайлы `w_*`.
+- Петля (`src/wola/systems/wola.ts`): ноутбук «Słowniczek» — порция `wola.portion` (5), «Dodaj» = `intro` (lesson `wola.laptop`,
+  ok []), проверка узнаванием = урок `wola.sprawdzian`; полка «Słownik» — +5 темы (`wola.slownik.<тема>`); потолок дня
+  `newItemsPerDay` — предупреждение, не запрет; огород — стадия по лучшей из rec/lis, «Nawóz» = `runObchod({ nawoz: true })`,
+  «Zbiór» = флаг `wola.jar.<слово>`; кровать — итог и «Do jutra» (`session` + `seg: sleep`). Звук клавиш — `sfx:play`.
+- Dev: `npm run dev` → `/polski-quest/wola/?mute=1[&now=+1d][&reset=1]`, состояние в `window.__wola` (`open('dom')`, `game`).
+  Скрытая панель браузера кадры не рисует: шагать `__wola.game.loop.step(t)`.

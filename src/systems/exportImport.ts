@@ -22,9 +22,9 @@ export function serializeFile(file: SaveFile): string {
   return JSON.stringify(file);
 }
 
-/** `polski-quest-YYYY-MM-DD.json` по календарной дате устройства. */
-export function fileName(now: Ts, opts: Pick<TimeOpts, 'tz'> = {}): string {
-  return `polski-quest-${dayOf(now, { dayStartHour: 0, tz: opts.tz })}.json`;
+/** `polski-quest-YYYY-MM-DD.json` по календарной дате устройства; `prefix` — другая версия (Wola: `polski-quest-wola`). */
+export function fileName(now: Ts, opts: Pick<TimeOpts, 'tz'> & { prefix?: string } = {}): string {
+  return `${opts.prefix ?? 'polski-quest'}-${dayOf(now, { dayStartHour: 0, tz: opts.tz })}.json`;
 }
 
 export type ParsedFile =

@@ -34,6 +34,11 @@ export interface SettingsDeps {
   /** Выбрать файл: по умолчанию `<input type=file>`. Тесты подменяют. */
   pickFile?: () => Promise<string | null>;
   build?: string;
+  /**
+   * Короткая версия «Wola» (W-01): без перевода реплик (диалогов нет) и облака (синк позже), с дневной порцией слов
+   * ноутбука; файл копии `polski-quest-wola-<дата>.json`.
+   */
+  wola?: boolean;
 }
 
 type Choice<K extends keyof SettingsMap> = { key: K; label: string; options: { value: SettingsMap[K]; label: string }[] };
@@ -196,26 +201,29 @@ export function runSettings(deps: SettingsDeps): Promise<void> {
     return el('div', { class: 'set' }, el('span', {}, label), input);
   };
 
-  const newItems = (): HTMLElement => {
-    const val = el('b', { 'data-value': true }, String(getSetting(store.progress, 'newItemsPerDay')));
+  const stepper = (key: 'newItemsPerDay' | 'wola.portion', label: string, min: number, max: number, act: string): HTMLElement => {
+    const val = el('b', { 'data-value': true }, String(getSetting(store.progress, key)));
     const step = (d: number): void => {
-      const v = Math.min(12, Math.max(4, getSetting(store.progress, 'newItemsPerDay') + d));
-      put('newItemsPerDay', v);
+      const v = Math.min(max, Math.max(min, getSetting(store.progress, key) + d));
+      put(key, v);
       val.textContent = String(v);
     };
     return el(
       'div',
-      { class: 'set' },
-      el('span', {}, 'Новых слов в день (4–12)'),
-      el('div', { class: 'seg' }, btn('−', () => step(-1), 'icon', { 'data-nav': true, 'data-act': 'new-minus', 'aria-label': 'меньше' }), val, btn('+', () => step(1), 'icon', { 'data-nav': true, 'data-act': 'new-plus', 'aria-label': 'больше' })),
+      { class: 'set', 'data-set': key },
+      el('span', {}, label),
+      el('div', { class: 'seg' }, btn('−', () => step(-1), 'icon', { 'data-nav': true, 'data-act': `${act}-minus`, 'aria-label': 'меньше' }), val, btn('+', () => step(1), 'icon', { 'data-nav': true, 'data-act': `${act}-plus`, 'aria-label': 'больше' })),
     );
   };
+  const newItems = (): HTMLElement =>
+    deps.wola ? stepper('newItemsPerDay', 'Потолок новых слов в день (4–12): выше — предупреждение', 4, 12, 'new') : stepper('newItemsPerDay', 'Новых слов в день (4–12)', 4, 12, 'new');
 
   const exportNow = async (): Promise<boolean> => {
     const ts = now();
-    const r = await save(fileName(ts), serializeFile(toFile(store.progress, ts)));
+    const name = fileName(ts, deps.wola ? { prefix: 'polski-quest-wola' } : {});
+    const r = await save(name, serializeFile(toFile(store.progress, ts)));
     if (r === 'failed') say('Не получилось сохранить файл', true);
-    else say(r === 'shared' ? 'Копия отправлена' : `Копия сохранена: ${fileName(ts)}`);
+    else say(r === 'shared' ? 'Копия отправлена' : `Копия сохранена: ${name}`);
     return r !== 'failed';
   };
 
@@ -254,9 +262,10 @@ export function runSettings(deps: SettingsDeps): Promise<void> {
   const body = el(
     'div',
     { class: 'body' },
-    el('h3', {}, 'Ответы'),
+    el('h3', {}, deps.wola ? 'Слова и ответы' : 'Ответы'),
+    deps.wola ? stepper('wola.portion', 'Новых слов за раз на ноутбуке (3–8)', 3, 8, 'portion') : null,
     choice(CHOICES.diacritics),
-    choice(CHOICES.translations),
+    deps.wola ? null : choice(CHOICES.translations),
     newItems(),
     choice(CHOICES.keyboard),
     el('h3', {}, 'Управление'),
@@ -270,10 +279,13 @@ export function runSettings(deps: SettingsDeps): Promise<void> {
     choice(CHOICES.motion),
     choice(CHOICES.debt),
     el('h3', {}, 'Сохранение в облаке'),
-    sync ? el('div', { class: 'set', 'data-sync': sync }, el('span', {}, 'Облако'), el('div', {}, SYNC_RU[sync])) : null,
-    deps.hasLink?.()
-      ? btn('Сохрани свою ссылку', () => bus.emit('ui:screen:open', { screen: 'link' }), '', { 'data-nav': true, 'data-act': 'link' })
-      : el('div', { class: 'set' }, el('span', {}, 'Приватной ссылки пока нет: прогресс живёт на этом устройстве')),
+    deps.wola ? el('div', { class: 'set', 'data-cloud': 'off' }, el('span', {}, 'Облака пока нет: прогресс Wola живёт на этом устройстве, копия — файлом ниже')) : null,
+    !deps.wola && sync ? el('div', { class: 'set', 'data-sync': sync }, el('span', {}, 'Облако'), el('div', {}, SYNC_RU[sync])) : null,
+    deps.wola
+      ? null
+      : deps.hasLink?.()
+        ? btn('Сохрани свою ссылку', () => bus.emit('ui:screen:open', { screen: 'link' }), '', { 'data-nav': true, 'data-act': 'link' })
+        : el('div', { class: 'set' }, el('span', {}, 'Приватной ссылки пока нет: прогресс живёт на этом устройстве')),
     el('h3', {}, 'Копия прогресса'),
     el(
       'div',

@@ -101,6 +101,8 @@ export interface SettingsMap {
    * на перроне (P-05, флаги `d01.sound.on|mute`) и переключатель в настройках.
    */
   'sound.mode': 'on' | 'off';
+  /** Wola (W-01): дневная порция новых слов на ноутбуке (3–8). Потолок дня — `newItemsPerDay`. */
+  'wola.portion': number;
 }
 
 export const SETTINGS_DEFAULTS: SettingsMap = {
@@ -117,6 +119,7 @@ export const SETTINGS_DEFAULTS: SettingsMap = {
   'keyboard.mode': 'auto',
   avatar: null,
   'sound.mode': 'on',
+  'wola.portion': 5,
 };
 
 export function getSetting<K extends keyof SettingsMap>(p: Progress, key: K): SettingsMap[K] {

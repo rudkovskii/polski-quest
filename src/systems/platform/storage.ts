@@ -73,8 +73,12 @@ export function idbKV(store: UseStore): KV {
   };
 }
 
-/** localStorage: значения как JSON. Операции синхронные внутри (важно для pagehide), ошибки — rejected promise. */
-export function lsKV(ls: StorageLike, prefix = 'pq_'): KV {
+/**
+ * localStorage: значения как JSON. Операции синхронные внутри (важно для pagehide), ошибки — rejected promise.
+ * `ns` — пространство имён другой версии игры в том же origin (Wola, W-01: `wola:`): ключ `k` лежит как `ns + k`,
+ * `keys()` видит только своё и отдаёт ключи без `ns`. Основная игра — пустое `ns`, ключи как раньше.
+ */
+export function lsKV(ls: StorageLike, prefix = 'pq_', ns = ''): KV {
   const sync = <T>(fn: () => T): Promise<T> => {
     try {
       return Promise.resolve(fn());
@@ -86,20 +90,22 @@ export function lsKV(ls: StorageLike, prefix = 'pq_'): KV {
     kind: 'local',
     get: (k) =>
       sync(() => {
-        const s = ls.getItem(k);
+        const s = ls.getItem(ns + k);
         return s === null ? undefined : (JSON.parse(s) as unknown);
       }),
     setMany: (entries) =>
       sync(() => {
-        for (const [k, v] of entries) ls.setItem(k, JSON.stringify(v));
+        for (const [k, v] of entries) ls.setItem(ns + k, JSON.stringify(v));
       }),
-    del: (k) => sync(() => ls.removeItem(k)),
+    del: (k) => sync(() => ls.removeItem(ns + k)),
     keys: () =>
       sync(() => {
         const out: string[] = [];
         for (let i = 0; i < ls.length; i++) {
           const k = ls.key(i);
-          if (k !== null && k.startsWith(prefix) && k !== KEYS.tail) out.push(k);
+          if (k === null || !k.startsWith(ns + prefix)) continue;
+          const own = k.slice(ns.length);
+          if (own !== KEYS.tail) out.push(own);
         }
         return out;
       }),
@@ -220,6 +226,11 @@ export interface StorageOptions {
   randomId?: (len: number) => string;
   /** Пояс для имени снапшота (`pq_backup_v<n>_<YYYY-MM-DD>`). */
   tz?: string;
+  /**
+   * Пространство имён в localStorage (запасной бэкенд и аварийная копия) для другой версии игры в том же origin:
+   * Wola (W-01) — `wola:`. IndexedDB разводится `dbName`. Основная игра — пусто.
+   */
+  lsNamespace?: string;
 }
 
 export interface LoadResult {
@@ -263,6 +274,7 @@ export class GameStorage {
   private readonly keepBackups: number;
   private readonly randomId: (len: number) => string;
   private readonly tz: string | undefined;
+  private readonly tailKey: string;
 
   private p: Progress | null = null;
   private l: LocalState | null = null;
@@ -284,12 +296,13 @@ export class GameStorage {
     this.keepBackups = opts.keepBackups ?? 3;
     this.randomId = opts.randomId ?? randomBase32;
     this.tz = opts.tz;
+    this.tailKey = `${opts.lsNamespace ?? ''}${KEYS.tail}`;
     if (opts.kv) this.kv = opts.kv;
     else {
       const chain: KV[] = [];
       const idb = opts.idb === undefined ? defaultIdb(opts.dbName ?? 'polski-quest') : opts.idb;
       if (idb) chain.push(idbKV(idb));
-      if (this.ls) chain.push(lsKV(this.ls));
+      if (this.ls) chain.push(lsKV(this.ls, 'pq_', opts.lsNamespace ?? ''));
       chain.push(memoryKV());
       this.kv = new FallbackKV(chain);
     }
@@ -476,7 +489,7 @@ export class GameStorage {
   flushSync(): void {
     if (!(this.dirtyP || this.inFlightP > 0) || this.ro || !this.p || !this.ls || this.kv.kind !== 'idb') return;
     try {
-      this.ls.setItem(KEYS.tail, JSON.stringify(this.p));
+      this.ls.setItem(this.tailKey, JSON.stringify(this.p));
     } catch (e) {
       console.warn('storage: аварийная копия не записана', e);
     }
@@ -545,7 +558,7 @@ export class GameStorage {
   private readTail(problems: string[]): unknown {
     if (!this.ls) return undefined;
     try {
-      const s = this.ls.getItem(KEYS.tail);
+      const s = this.ls.getItem(this.tailKey);
       return s === null ? undefined : (JSON.parse(s) as unknown);
     } catch (e) {
       problems.push(`аварийная копия: ${String(e)}`);
@@ -555,7 +568,7 @@ export class GameStorage {
 
   private clearTail(): void {
     try {
-      this.ls?.removeItem(KEYS.tail);
+      this.ls?.removeItem(this.tailKey);
     } catch {
       /* не критично */
     }
