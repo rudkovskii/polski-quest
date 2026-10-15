@@ -18,6 +18,9 @@ const css = `
 .wl-tag small { font-size: 12px; font-weight: 400; color: #b8dce5; }
 .wl-tag .cnt { margin-top: 2px; padding: 0 6px; border-radius: 8px; background: #e89b2f; color: #141b1b; font-size: 12px; font-weight: 700; }
 .wl-tag .cnt.due { background: #e0394c; color: #fff; }
+.wl-scene.small .wl-tag { font-size: 12px; padding: 1px 5px; }
+.wl-scene.small .wl-tag small { display: none; }
+.wl-scene.small .wl-tag .cnt { font-size: 11px; }
 .wl-tag.top { bottom: calc(100% + 2px); }
 .wl-tag.bottom { top: calc(100% + 2px); }
 
@@ -72,7 +75,8 @@ const css = `
 .wl-panel .stat { display: flex; justify-content: space-between; gap: 12px; font-size: 18px; border-bottom: 2px dotted #c8966b; padding: 4px 0; }
 .wl-panel .list { font-size: 16px; color: #345a52; }
 .wl-panel .note { font-size: 16px; color: #8f3e56; }
-.wl-theme { display: flex; align-items: center; gap: 10px; text-align: left; justify-content: flex-start; }
+.wl-theme { flex: none; display: flex; align-items: center; gap: 10px; text-align: left; justify-content: flex-start; }
+.wl-panel .body > * { flex-shrink: 0; }
 .wl-theme .t { flex: 1; display: flex; flex-direction: column; }
 .wl-theme .t small { font-weight: 400; font-size: 14px; color: #543c52; }
 .wl-theme .n { font-size: 15px; color: #345a52; white-space: nowrap; }

@@ -1134,18 +1134,18 @@
    "sprite": "tile.wola",
    "frame": 15,
    "under": [
-    "water",
-    5,
-    13
+    "interior",
+    12,
+    1
    ]
   },
   "w_biurko_r": {
    "sprite": "tile.wola",
    "frame": 16,
    "under": [
-    "water",
-    5,
-    13
+    "interior",
+    12,
+    1
    ]
   },
   "w_regal_g": {
@@ -1161,9 +1161,9 @@
    "sprite": "tile.wola",
    "frame": 18,
    "under": [
-    "water",
-    5,
-    13
+    "interior",
+    12,
+    1
    ]
   },
   "w_polka": {
@@ -1201,18 +1201,18 @@
    "sprite": "tile.wola",
    "frame": 23,
    "under": [
-    "water",
-    5,
-    13
+    "interior",
+    12,
+    1
    ]
   },
   "w_lozko_r": {
    "sprite": "tile.wola",
    "frame": 24,
    "under": [
-    "water",
-    5,
-    13
+    "interior",
+    12,
+    1
    ]
   }
  }

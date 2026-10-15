@@ -26,18 +26,18 @@ export const HOME_ROOM: Room = {
     'FFFFFFFFFF',
   ],
   legend: {
-    W: 'wall', F: 'deck', R: 'w_regal_g', r: 'w_regal_d', O: 'w_okno', J: 'w_polka', L: 'w_biurko_l', B: 'w_biurko_r',
+    W: 'wall', F: 'hall', R: 'w_regal_g', r: 'w_regal_d', O: 'w_okno', J: 'w_polka', L: 'w_biurko_l', B: 'w_biurko_r',
     b: 'w_lozko_l', c: 'w_lozko_r', d: 'w_dywan',
   },
-  under: 'deck',
+  under: 'hall',
 };
 
 export type HomeSpot = 'laptop' | 'slownik' | 'sloiki' | 'lozko';
 /** Предметы: клетки [x, y, w, h], подпись (польская + русская), где подпись (над/под). */
 export const HOME_SPOTS: { id: HomeSpot; at: [number, number, number, number]; label: PlLabel; tag: 'top' | 'bottom' }[] = [
   { id: 'laptop', at: [4, 2, 2, 1], label: { pl: 'Słowniczek', ru: 'ноутбук: новые слова' }, tag: 'bottom' },
-  { id: 'slownik', at: [1, 1, 1, 2], label: { pl: 'Słownik', ru: 'полка: темы' }, tag: 'bottom' },
-  { id: 'sloiki', at: [6, 1, 2, 1], label: { pl: 'Słoiki', ru: 'банки урожая' }, tag: 'bottom' },
+  { id: 'slownik', at: [1, 1, 1, 2], label: { pl: 'Słownik', ru: 'полка: темы' }, tag: 'top' },
+  { id: 'sloiki', at: [6, 1, 2, 1], label: { pl: 'Słoiki', ru: 'банки урожая' }, tag: 'top' },
   { id: 'lozko', at: [8, 2, 2, 1], label: { pl: 'Łóżko', ru: 'итог дня' }, tag: 'bottom' },
 ];
 
@@ -67,7 +67,8 @@ export async function runHome(deps: WolaDeps): Promise<void> {
     const g = wolaGarden(d, now, deps.content.tuning, deps.store.progress.world.flags);
     const box = boxOf(frame.stage);
     const k = fitScale(10, 7, box.w - 8, box.h - 40);
-    const scene = el('div', { class: 'wl-scene', 'data-k': k });
+    // Мелкий масштаб (телефон): подписи компактнее, без русской строки — не закрывают соседние предметы.
+    const scene = el('div', { class: `wl-scene${k < 3 ? ' small' : ''}`, 'data-k': k });
     scene.append(roomEl(deps.atlas, HOME_ROOM, k));
     // Банки на полке: до 8 штук, остальное числом.
     g.jars.slice(0, 8).forEach((_, i) => {
