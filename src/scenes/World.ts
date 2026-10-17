@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { bus } from '../systems/bus';
 import type { TileHit } from '../input/pointer';
+import type { BusEvents } from '../types/bus';
 import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap, PropObject } from '../types/map';
 import { frameFor, tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
@@ -45,6 +46,12 @@ bus.on('input:dpad', ({ visible }) => {
   for (const fn of watchers) fn();
 });
 
+/** Цель указателя первых шагов (`guide:goal` из ui/hintsGuide.ts): переживает перезапуск сцены при смене карты. */
+let guideGoal: string | null = null;
+bus.on('guide:goal', ({ use }) => {
+  guideGoal = use;
+});
+
 /** `env(safe-area-inset-*)` в CSS-пикселях (iPhone: «чёлка» сверху, полоска «домой» снизу). */
 function safeArea(): { top: number; bottom: number } {
   if (typeof document === 'undefined' || !document.body) return { top: 0, bottom: 0 };
@@ -68,6 +75,7 @@ export class World extends Phaser.Scene {
   private marker!: Phaser.GameObjects.Graphics;
   private markerKey = '';
   private nearKey = '';
+  private guideKey = '';
   private bump: { dir: Dir; until: number } | null = null;
   private start0: WorldStart = {};
   private leaving = false;
@@ -95,6 +103,7 @@ export class World extends Phaser.Scene {
     this.wasMoving = false;
     this.markerKey = '';
     this.nearKey = '';
+    this.guideKey = '';
   }
 
   preload(): void {
@@ -109,8 +118,8 @@ export class World extends Phaser.Scene {
     const id = this.start0.map ?? START.map;
     this.mapDef = getMap(id);
     const spawn = resolveSpawn(this.mapDef, this.start0.spawn ?? START.spawn, this.start0.facing);
-    this.model = new LocationModel(this.mapDef, spawn.tile, { facing: spawn.facing });
     this.sprites = this.cache.json.get('sprites') as SpritesMeta;
+    this.model = new LocationModel(this.mapDef, spawn.tile, { facing: spawn.facing, spriteSize: (id) => this.sprites[id]?.size });
 
     this.createAnims();
     this.buildTiles();
@@ -158,7 +167,7 @@ export class World extends Phaser.Scene {
     const tx = Math.floor(p.x / T);
     const ty = Math.floor(p.y / T);
     if (tx < 0 || ty < 0 || tx >= this.model.parsed.w || ty >= this.model.parsed.h) return null;
-    const target = this.model.targetAt([tx, ty]);
+    const target = this.model.targetAtPoint(p.x / T, p.y / T);
     return target ? { tile: [tx, ty], target } : { tile: [tx, ty] };
   }
 
@@ -191,6 +200,31 @@ export class World extends Phaser.Scene {
     this.syncCat();
     this.updateCamera();
     this.drawActionBubble(time);
+    this.emitGuide();
+  }
+
+  /**
+   * Указатель первых шагов: где на экране герой и цель (объект на этой карте или дверь к карте, где он стоит).
+   * Экран открыт, мини-игра или переход — null.
+   */
+  private emitGuide(): void {
+    let out: BusEvents['fx:guide'] = null;
+    if (guideGoal && this.inputOn && !this.leaving && !this.farm?.auto) {
+      const prop = this.model.objects.find((o) => o.kind === 'prop' && o.use === guideGoal);
+      const o = prop ?? this.model.objects.find((x) => x.kind === 'exit');
+      if (o) {
+        const [hx, hy] = LocationModel.pos(this.model.player);
+        const hero = this.toScreen((hx + 0.5) * T, (hy + 1) * T - 34);
+        // Дверь в стене дома (снаружи) нарисована на клетку выше выхода.
+        const top = prop ? this.propTop(o.at, o.size, o.key) : (o.at[1] - (this.model.passable(o.at[0], o.at[1] - 1) ? 0 : 1)) * T;
+        const target = this.toScreen((o.at[0] + o.size[0] / 2) * T, top - 2);
+        out = { hero, target, via: prop ? 'object' : 'door' };
+      }
+    }
+    const key = out ? [out.hero.x, out.hero.y, out.target.x, out.target.y].map(Math.round).join(',') + out.via : '';
+    if (key === this.guideKey) return;
+    this.guideKey = key;
+    bus.emit('fx:guide', out);
   }
 
   // ───────────── камера ─────────────
@@ -200,12 +234,13 @@ export class World extends Phaser.Scene {
     const { width, height } = this.scale;
     const mw = this.model.parsed.w * T;
     const mh = this.model.parsed.h * T;
-    const zoom = pickZoom(width, height, mw, mh);
+    const safe = safeArea();
+    this.insets = { top: HUD_TOP_INSET + safe.top, bottom: Math.max(dpadVisible ? DPAD_INSET + safe.bottom : 0, this.panelBottom) };
+    // Масштаб не прыгает от панели мини-игры: для укрупнения комнаты считаем только HUD и d-pad.
+    const zoom = pickZoom(width, height, mw, mh, height - HUD_TOP_INSET - safe.top - (dpadVisible ? DPAD_INSET + safe.bottom : 0));
     cam.setZoom(zoom);
     cam.stopFollow();
     cam.removeBounds();
-    const safe = safeArea();
-    this.insets = { top: HUD_TOP_INSET + safe.top, bottom: Math.max(dpadVisible ? DPAD_INSET + safe.bottom : 0, this.panelBottom) };
     this.cam0 = { zoom, mw, mh, fitsW: mw * zoom <= width, fitsH: mh * zoom <= height - this.insets.top - this.insets.bottom };
     this.updateCamera();
   }
@@ -430,6 +465,7 @@ export class World extends Phaser.Scene {
     if (this.leaving) return;
     this.leaving = true;
     this.model.halt();
+    this.emitGuide();
     const cam = this.cameras.main;
     cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ map, spawn }));
     // force: переход сразу после входа (идёт fadeIn) иначе игнорировался бы, сцена зависла бы в `leaving`.

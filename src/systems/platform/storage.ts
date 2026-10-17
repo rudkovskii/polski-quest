@@ -175,12 +175,25 @@ function defaultIdb(dbName: string): UseStore | null {
 
 // ── Хранилище игры.
 
+/** Профиль для тестов: `?dev=<id>` → база `polski-farm-<id>` (id: латиница, цифры, `-`, `_`, до 32 знаков; иначе null). */
+export function parseProfile(raw: string | null): string | null {
+  if (!raw || raw === '0') return null;
+  const id = raw.trim().toLowerCase();
+  return /^[a-z0-9_-]{1,32}$/.test(id) ? id : null;
+}
+
+export function profileDbName(profile: string): string {
+  return `polski-farm-${profile}`;
+}
+
 export interface StorageOptions {
   /** Готовый бэкенд (тесты). Иначе цепочка IndexedDB → localStorage → память. */
   kv?: KV;
   /** Своя IndexedDB-база (тесты); null — не использовать IndexedDB. */
   idb?: UseStore | null;
   dbName?: string;
+  /** Профиль (`?dev=<id>`): своя база `polski-farm-<id>` и свои ключи localStorage, основное сохранение не трогаем. */
+  profile?: string;
   /** localStorage для запасного бэкенда и аварийной копии; null — не использовать. */
   ls?: StorageLike | null;
   debounceMs?: number;
@@ -200,6 +213,8 @@ export interface LoadResult {
 export class GameStorage {
   readonly kv: KV;
   private readonly ls: StorageLike | null;
+  /** Префикс ключей localStorage профиля ('' — основной). */
+  private readonly ns: string;
   private readonly debounceMs: number;
   private readonly maxWaitMs: number;
   private s: Save | null = null;
@@ -213,14 +228,15 @@ export class GameStorage {
 
   constructor(opts: StorageOptions = {}) {
     this.ls = opts.ls === undefined ? globalLocalStorage() : opts.ls;
+    this.ns = opts.profile ? `${profileDbName(opts.profile)}:` : '';
     this.debounceMs = opts.debounceMs ?? 400;
     this.maxWaitMs = opts.maxWaitMs ?? 2000;
     if (opts.kv) this.kv = opts.kv;
     else {
       const chain: KV[] = [];
-      const idb = opts.idb === undefined ? defaultIdb(opts.dbName ?? 'polski-quest-farm') : opts.idb;
+      const idb = opts.idb === undefined ? defaultIdb(opts.dbName ?? (opts.profile ? profileDbName(opts.profile) : 'polski-quest-farm')) : opts.idb;
       if (idb) chain.push(idbKV(idb));
-      if (this.ls) chain.push(lsKV(this.ls));
+      if (this.ls) chain.push(lsKV(this.ls, 'pq_', this.ns));
       chain.push(memoryKV());
       this.kv = new FallbackKV(chain);
     }
@@ -315,7 +331,7 @@ export class GameStorage {
   flushSync(): void {
     if (this.wiped || !(this.dirty0 || this.inFlight > 0) || !this.s || !this.ls || this.kv.kind !== 'idb') return;
     try {
-      this.ls.setItem(KEYS.tail, JSON.stringify(this.s));
+      this.ls.setItem(this.ns + KEYS.tail, JSON.stringify(this.s));
     } catch (e) {
       console.warn('storage: аварийная копия не записана', e);
     }
@@ -381,7 +397,7 @@ export class GameStorage {
 
   private readTail(): Save | null {
     try {
-      const raw = this.ls?.getItem(KEYS.tail);
+      const raw = this.ls?.getItem(this.ns + KEYS.tail);
       return raw ? normalizeSave(JSON.parse(raw)) : null;
     } catch {
       return null;
@@ -390,7 +406,7 @@ export class GameStorage {
 
   private clearTail(): void {
     try {
-      this.ls?.removeItem(KEYS.tail);
+      this.ls?.removeItem(this.ns + KEYS.tail);
     } catch {
       // приватный режим
     }

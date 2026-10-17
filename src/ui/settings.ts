@@ -16,6 +16,9 @@ ${THEME_CSS}
 .pq-card .note { font-size: 13px; opacity: .75; min-height: 1.3em; }
 .pq-card .pq-btn { width: 100%; }
 .pq-toggle[aria-pressed=true] { background: #5a8f3e; }
+.pq-toggle:disabled { opacity: .6; cursor: default; }
+.pq-card .ver { font-size: 11px; opacity: .55; text-align: center; user-select: text; -webkit-user-select: text; }
+.pq-card .ver:empty { display: none; }
 `;
 
 export interface SettingsDeps {
@@ -28,6 +31,11 @@ export interface SettingsDeps {
   importSave(text: string): Promise<{ ok: boolean; message: string }>;
   /** Сброс: автоэкспорт, стирание, перезагрузка. */
   reset(): Promise<void>;
+  /** Звук выключен ссылкой (`?mute=1`): переключатель показывает «Выкл» и не работает. */
+  muted?: boolean;
+  /** Версия сборки (`0.2.0+abc1234`) и профиль (`?dev=<id>`) — мелко внизу панели. */
+  version?: string;
+  profile?: string;
 }
 
 export interface SettingsPanel {
@@ -42,11 +50,16 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
   const note = el('div', { class: 'note', 'data-note': '', role: 'status' });
   const sound = el('button', { type: 'button', class: 'pq-btn pq-toggle', 'aria-pressed': String(deps.getSound()) });
   const paintSound = (): void => {
-    const on = deps.getSound();
+    const on = !deps.muted && deps.getSound();
     sound.setAttribute('aria-pressed', String(on));
     sound.textContent = on ? 'Вкл' : 'Выкл';
+    if (deps.muted) {
+      sound.disabled = true;
+      sound.title = 'Звук выключен ссылкой (?mute=1)';
+    }
   };
   sound.onclick = () => {
+    if (deps.muted) return;
     deps.setSound(!deps.getSound());
     paintSound();
   };
@@ -82,6 +95,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     reset,
     note,
     closeBtn,
+    el('div', { class: 'ver', 'data-version': '' }, [deps.version ? `Версия ${deps.version}` : '', deps.profile ? `профиль ${deps.profile}` : '', deps.muted ? 'звук выключен ссылкой' : ''].filter(Boolean).join(' · ')),
   );
   const root = el('div', { class: 'pq-modal', hidden: true, 'data-settings': '' }, el('style', {}, css), card);
   root.addEventListener('click', (e) => {

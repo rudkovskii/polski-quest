@@ -107,7 +107,12 @@ export interface LocationOptions {
   cat?: boolean;
   /** Случай для поведения кота (тесты подставляют свой). */
   rand?: () => number;
+  /** Размер спрайта в пикселях (16 = клетка): тап по видимой части объекта, а не только по его клеткам коллизии. */
+  spriteSize?: (sprite: string) => Xy | undefined;
 }
+
+/** Пикселей в клетке: для перевода размера спрайта в клетки. */
+const TILE_PX = 16;
 
 const eq = (a: Xy, b: Xy): boolean => a[0] === b[0] && a[1] === b[1];
 const manhattan = (a: Xy, b: Xy): number => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
@@ -154,6 +159,30 @@ export function around(rects: readonly Rect[]): Xy[] {
   return out.filter((c) => !rects.some((r) => inRect(r, c)));
 }
 
+/**
+ * Клетки подхода к интерактивному объекту по порядку предпочтения: `approach` из карты или сторона `face` (по умолчанию низ,
+ * вид 3/4), от середины к краям. Остальные клетки вокруг — запасные, когда сторона лица занята или недостижима.
+ */
+export function approachCells(o: WorldObject): { face: Xy[]; rest: Xy[] } {
+  const all = around(hitRects(o));
+  const src = o.src.type === 'prop' ? o.src : null;
+  if (!src || !o.use) return { face: all, rest: [] };
+  let face: Xy[];
+  if (src.approach?.length) face = src.approach.map((c): Xy => [c[0], c[1]]);
+  else {
+    const [x0, y0] = o.at;
+    const [w, h] = o.size;
+    const side = src.face ?? 'down';
+    const line: Xy[] =
+      side === 'down' || side === 'up'
+        ? Array.from({ length: w }, (_, i): Xy => [x0 + i, side === 'down' ? y0 + h : y0 - 1])
+        : Array.from({ length: h }, (_, i): Xy => [side === 'right' ? x0 + w : x0 - 1, y0 + h - 1 - i]);
+    const mid = side === 'down' || side === 'up' ? x0 + (w - 1) / 2 : y0 + (h - 1) / 2;
+    face = line.sort((a, b) => (side === 'down' || side === 'up' ? Math.abs(a[0] - mid) - Math.abs(b[0] - mid) : Math.abs(a[1] - mid) - Math.abs(b[1] - mid)));
+  }
+  return { face, rest: all.filter((c) => !face.some((f) => eq(f, c))) };
+}
+
 export class LocationModel {
   readonly map: LocationMap;
   readonly parsed: ParsedMap;
@@ -176,6 +205,7 @@ export class LocationModel {
   private out: WorldEvent[] = [];
   private solidObj: boolean[][];
   private readonly rand: () => number;
+  private readonly spriteSize: ((sprite: string) => Xy | undefined) | null;
   /** След героя: клетки, где он стоял (последняя — текущая). Кот идёт по нему. */
   private trail: Xy[] = [];
   private idleMs = 0;
@@ -186,6 +216,7 @@ export class LocationModel {
     this.parsed = parseAscii(map);
     this.objects = buildObjects(map);
     this.rand = opts.rand ?? Math.random;
+    this.spriteSize = opts.spriteSize ?? null;
     const { w, h } = this.parsed;
     this.solidObj = Array.from({ length: h }, () => Array<boolean>(w).fill(false));
     for (const o of this.objects)
@@ -287,9 +318,48 @@ export class LocationModel {
     return this.objects.find((o) => o.use && o.kind === 'prop' && o.rects.some((r) => inRect(r, tile))) ?? this.plants.find((o) => hitRects(o).some((r) => inRect(r, tile)));
   }
 
-  /** Что под пальцем: ключ интерактивного объекта или null. */
+  /** Что под пальцем: ключ интерактивного объекта или двери (`exit:x,y`), иначе null. */
   targetAt(tile: Xy): string | null {
-    return this.usableAt(tile)?.key ?? null;
+    return this.usableAt(tile)?.key ?? this.doorAt(tile)?.key ?? null;
+  }
+
+  /**
+   * Тап в точку мира (в клетках, дробные): сначала видимая часть интерактивного спрайта (верх стола, доски, полки —
+   * над их клетками коллизии), передний (ниже на экране) побеждает; потом клетки объектов и растений; потом дверь.
+   */
+  targetAtPoint(x: number, y: number): string | null {
+    const tile: Xy = [Math.floor(x), Math.floor(y)];
+    let best: WorldObject | null = null;
+    for (const o of this.objects) {
+      if (!o.use || o.kind !== 'prop' || o.src.type !== 'prop') continue;
+      const px = this.spriteSize?.(o.src.sprite);
+      const sw = px ? px[0] / TILE_PX : o.size[0];
+      const sh = px ? px[1] / TILE_PX : o.size[1];
+      const cx = o.at[0] + o.size[0] / 2;
+      const bottom = o.at[1] + o.size[1];
+      if (x < cx - sw / 2 || x >= cx + sw / 2 || y < bottom - sh || y >= bottom) continue;
+      if (!best || bottom > best.at[1] + best.size[1]) best = o;
+    }
+    // Растение в клетке важнее края чужого спрайта: грядки плотные.
+    const plant = this.plants.find((o) => hitRects(o).some((r) => inRect(r, tile)));
+    if (plant) return plant.key;
+    return best?.key ?? this.targetAt(tile);
+  }
+
+  /** Дверь под пальцем: клетка выхода или до двух непроходимых клеток стены прямо над ней или под ней (спрайт двери выше клетки). */
+  private doorAt(tile: Xy): WorldObject | undefined {
+    for (const o of this.objects) {
+      if (o.kind !== 'exit') continue;
+      if (eq(o.at, tile)) return o;
+      if (tile[0] !== o.at[0]) continue;
+      const dy = tile[1] - o.at[1];
+      if (Math.abs(dy) > 2 || dy === 0) continue;
+      const step = Math.sign(dy);
+      let solid = true;
+      for (let k = step; Math.abs(k) <= Math.abs(dy); k += step) if (this.passable(o.at[0], o.at[1] + k)) solid = false;
+      if (solid) return o;
+    }
+    return undefined;
   }
 
   /** Куда сейчас уйдёт кнопка действия: объект и клетка. Для подсказки «A». */
@@ -513,22 +583,39 @@ export class LocationModel {
     this.fire(o, 'action', t.tile);
   }
 
-  /** Тап по объекту: дойти до соседней клетки и сделать действие. */
+  /**
+   * Тап по объекту: дойти до клетки подхода со стороны лица (занята или недостижима — до ближайшей другой), повернуться и
+   * сделать действие. Тап по двери: войти в неё (снаружи — в дом, изнутри — на ферму).
+   */
   private interactTarget(key: string): void {
     const o = this.object(key);
-    if (!o || !o.use) return;
+    if (!o) return;
     this.heldDir = null;
     this.queuedDirs = [];
-    if (!this.player.step && this.near(o)) {
-      this.path = [];
+    this.pending = null;
+    if (o.kind === 'exit') {
+      this.path = findPath(this.walkGrid(o.at), this.from(), o.at).path;
+      return;
+    }
+    if (!o.use) return;
+    const here = this.from();
+    const grid = this.walkGrid();
+    const free = (c: Xy): boolean => grid.passable(c[0], c[1]) || eq(c, here);
+    const { face, rest } = approachCells(o);
+    let res = findPathToAny(grid, here, face.filter(free), o.at);
+    if (!res.exact) {
+      // Сторона лица недоступна: уже рядом — действие сразу, иначе к любой клетке вокруг.
+      if (!this.player.step && this.near(o)) res = { path: [], end: here, exact: true };
+      else res = findPathToAny(grid, here, rest.filter(free), o.at);
+    }
+    this.path = res.path;
+    if (!res.exact) return;
+    if (!res.path.length && !this.player.step) {
       this.faceTo(o);
       this.fire(o, 'tap');
       return;
     }
-    const goals = around(hitRects(o)).filter(([x, y]) => this.walkGrid().passable(x, y));
-    const res = findPathToAny(this.walkGrid(), this.from(), goals, o.at);
-    this.path = res.path;
-    this.pending = res.exact ? o.key : null;
+    this.pending = o.key;
   }
 
   private fire(o: WorldObject, via: 'action' | 'tap', tile?: Xy): void {

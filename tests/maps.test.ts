@@ -101,12 +101,19 @@ describe('карты: форма и ссылки', () => {
     expect(plot.reserve!.size[0] * plot.reserve!.size[1]).toBeGreaterThan(24);
   });
 
-  it('карты удобны на iPhone (zoom 2): дом целиком, ферма крупнее экрана', async () => {
+  it('карты удобны на iPhone: дом крупно (zoom 3, по высоте целиком, камера вдоль комнаты), ферма zoom 2', async () => {
     const { pickZoom } = await import('../src/world/camera');
     const home = getMap('home');
     const farm = getMap('farm');
-    expect(pickZoom(390, 844, home.size[0] * 16, home.size[1] * 16)).toBe(2);
-    expect(home.size[0] * 16 * 2).toBeLessThanOrEqual(390);
+    // Высота между HUD (52 + чёлка 47) и d-pad (148 + полоска 34).
+    const usable = 844 - 52 - 47 - 148 - 34;
+    expect(pickZoom(390, 844, home.size[0] * 16, home.size[1] * 16, usable)).toBe(3);
+    expect(home.size[1] * 16 * 3).toBeLessThanOrEqual(usable);
+    expect(390 / 48).toBeGreaterThanOrEqual(7.5);
+    // iPhone SE тоже 3; телефон боком: по высоте не влезает — остаётся 2, целиком.
+    expect(pickZoom(375, 667, home.size[0] * 16, home.size[1] * 16, 667 - 52 - 20 - 148)).toBe(3);
+    expect(pickZoom(844, 390, home.size[0] * 16, home.size[1] * 16, 390 - 52 - 148)).toBe(2);
+    expect(pickZoom(390, 844, farm.size[0] * 16, farm.size[1] * 16, usable)).toBe(2);
     expect(pickZoom(390, 844, farm.size[0] * 16, farm.size[1] * 16)).toBe(2);
     // Mac: целый масштаб, не больше 4
     expect([3, 4]).toContain(pickZoom(1440, 900, home.size[0] * 16, home.size[1] * 16));

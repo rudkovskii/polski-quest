@@ -62,6 +62,10 @@ export interface BusEvents {
   'fx:label': { text: string; x: number; y: number } | null;
   /** Герой стоит у объекта, с которым сработает A (над ним рисуется «A»): `x`,`y` — точка над объектом в экранных CSS px; null — отошёл или экран открыт. */
   'fx:near': { use: string; id: string; x: number; y: number } | null;
+  /** Первые шаги новичка (`ui/hintsGuide.ts`): к какому объекту вести героя (`desk`, `board`); null — указатель погас. */
+  'guide:goal': { use: string | null };
+  /** Где на экране герой и цель указателя (CSS px); `via: 'door'` — цель на другой карте, указываем на дверь. null — спрятать. */
+  'fx:guide': { hero: { x: number; y: number }; target: { x: number; y: number }; via: 'object' | 'door' } | null;
   /** Озвучить польскую строку. `id` — запись манифеста, `text` — запасной текст, `slow` — медленно. */
   'audio:play': { id?: string; text?: string; slow?: boolean; voice?: string; queue?: boolean; done?: (via: AudioVia) => void };
   'audio:stop': Record<string, never>;

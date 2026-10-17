@@ -4,6 +4,7 @@ import type { FarmAct, PlantView } from '../types/farm';
 import type { Dir } from '../types/input';
 import type { Xy } from '../world/ascii';
 import { LocationModel } from '../world/location';
+import { LabelGate } from '../world/labelGate';
 
 // Огород на ферме: растения на грядках (спрайты стадий), вскопанные клетки, подпись над растением у героя и автобег во
 // время мини-игры: очередь действий (полив, удобрение, урожай → коробка). Ответы не ждут анимацию: действия копятся и
@@ -55,6 +56,7 @@ export class FarmLayer {
   private focusWalked = '';
   private item: Phaser.GameObjects.Sprite | null = null;
   private lastLabel = '';
+  private labelGate = new LabelGate();
   private offs: (() => void)[] = [];
   private views: PlantView[] = [];
 
@@ -164,7 +166,7 @@ export class FarmLayer {
       } else if (!m.busy) m.faceTile(this.focus.tile);
     }
     this.syncItem();
-    this.drawLabel();
+    this.drawLabel(time);
   }
 
   private markRipe(id: string): void {
@@ -302,10 +304,13 @@ export class FarmLayer {
   }
 
   /** Подпись над растением: в мини-игре — текущее задание, вне её — растение, к которому повернулся герой. */
-  private drawLabel(): void {
+  private drawLabel(time: number): void {
     let target: { label: string; tile: Xy } | null = null;
-    if (this.auto && this.focus) target = this.focus;
-    else if (!this.auto && this.h.inputOn()) {
+    let sticky = false;
+    if (this.auto && this.focus) {
+      target = this.focus;
+      sticky = true;
+    } else if (!this.auto && this.h.inputOn()) {
       const hint = this.h.model.actionHint();
       if (hint && hint.key.startsWith('plant:')) {
         const id = hint.key.slice(6);
@@ -313,6 +318,8 @@ export class FarmLayer {
         if (v) target = { label: v.label, tile: v.tile };
       }
     }
+    // Вне мини-игры подпись гаснет через пару секунд: не висит над героем, пока он стоит у грядки.
+    if (!this.labelGate.show(target ? `${sticky ? 'q' : 'p'}:${target.label}@${target.tile.join(',')}` : null, time, sticky)) target = null;
     if (!target) {
       if (this.lastLabel) bus.emit('fx:label', null);
       this.lastLabel = '';

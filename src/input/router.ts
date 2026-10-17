@@ -12,6 +12,10 @@ export interface RouterOptions {
   controls?: Partial<ControlsSettings>;
   mapControls?: MapControls;
   focus?: Focus;
+  /** Касание уже было в прошлых запусках (флаг в сохранении): d-pad виден с первого кадра. */
+  touchSeen?: boolean;
+  /** Первое касание в этом запуске (main.ts пишет флаг в сохранение). */
+  onTouch?: () => void;
 }
 
 export interface RouterState {
@@ -43,8 +47,14 @@ interface Held {
   dir: Dir;
 }
 
+/**
+ * Сенсорное устройство: грубый основной указатель, любой грубый указатель или точки касания (iPhone, iPad, эмулятор
+ * телефона). Mac с трекпадом: `maxTouchPoints` = 0, указатель точный.
+ */
 export function detectCoarse(): boolean {
-  return typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+  const mq = (q: string): boolean => typeof matchMedia === 'function' && matchMedia(q).matches;
+  const touchPoints = typeof navigator !== 'undefined' && typeof navigator.maxTouchPoints === 'number' ? navigator.maxTouchPoints : 0;
+  return mq('(pointer: coarse)') || mq('(any-pointer: coarse)') || touchPoints > 0;
 }
 
 /** Правило видимости d-pad. */
@@ -64,7 +74,7 @@ export function createRouter(opts: RouterOptions = {}): Router {
     controls: { dpad: 'auto', dpadSide: 'left', ...opts.controls },
     lastSource: null,
     coarse: opts.coarse ?? detectCoarse(),
-    touchSeen: false,
+    touchSeen: opts.touchSeen ?? false,
     heldDir: null,
     dpadVisible: false,
   };
@@ -190,6 +200,7 @@ export function createRouter(opts: RouterOptions = {}): Router {
     noteTouch() {
       if (state.touchSeen) return;
       state.touchSeen = true;
+      opts.onTouch?.();
       syncDpad();
     },
     get state() {

@@ -15,8 +15,22 @@ export const MAX_ZOOM = 4;
 /** Карте можно чуть вылезти за экран (обрезается край забора), если это даёт масштаб на ступень крупнее. */
 export const FIT_SLACK = 1.05;
 
-export function pickZoom(viewW: number, viewH: number, mapW: number, mapH: number): number {
+/** Маленькая карта (комната) занимает меньше этой доли экрана — её укрупняем на ступень. */
+export const SMALL_MAP_SHARE = 0.5;
+/** При укрупнении комнаты по ширине видно не меньше стольких клеток (камера идёт за героем). */
+export const MIN_TILES_ROOM = 7.5;
+
+/**
+ * `usableH` — высота между HUD и d-pad: маленькая карта (дом), которая на базовом масштабе занимает меньше половины экрана,
+ * растягивается на ступень крупнее (iPhone портрет: дом 2 → 3), если по высоте помещается целиком, а по ширине видно не
+ * меньше 7,5 клетки (камера идёт за героем вдоль комнаты).
+ */
+export function pickZoom(viewW: number, viewH: number, mapW: number, mapH: number, usableH = viewH): number {
   const base = Math.min(MAX_ZOOM, Math.max(1, Math.floor(Math.min(viewW, viewH) / (MIN_TILES_SHORT * TILE))));
   const fit = Math.floor(Math.min(viewW / mapW, viewH / mapH) * FIT_SLACK);
-  return Math.max(base, Math.min(fit, MAX_ZOOM));
+  const z = Math.max(base, Math.min(fit, MAX_ZOOM));
+  const up = z + 1;
+  const small = mapW * z * mapH * z < SMALL_MAP_SHARE * viewW * viewH;
+  if (up <= MAX_ZOOM && small && mapH * up <= usableH && viewW / (TILE * up) >= MIN_TILES_ROOM) return up;
+  return z;
 }

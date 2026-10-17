@@ -59,8 +59,12 @@ export function mountHints(parent: HTMLElement, deps: HintsDeps, bus: Bus<BusEve
       if (timer) clearTimeout(timer);
       timer = setTimeout(hide, deps.hideAfterMs ?? HINT_MS);
     }),
-    // Игрок сделал то, о чём подсказка, или открылся экран: пузырь не нужен.
-    bus.on('world:interact', hide),
+    // Игрок сделал то, о чём подсказка, или открылся экран: пузырь не нужен и больше не всплывёт (в том числе после
+    // закрытия экрана: подсказка только при подходе до первого открытия).
+    bus.on('world:interact', ({ use }) => {
+      hide();
+      if (HINTS[use] && !deps.seen(use)) deps.mark(use);
+    }),
     bus.on('world:input', ({ enabled }) => {
       if (!enabled) hide();
     }),

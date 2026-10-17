@@ -8,7 +8,7 @@ import { connectAudio } from './systems/platform/audio';
 import { createClock } from './systems/platform/clock';
 import { connectSfx } from './systems/platform/sfx';
 import { lastReloadAt, registerPwa, reloadForUpdate, watchVersion } from './systems/platform/pwa';
-import { GameStorage, memoryKV } from './systems/platform/storage';
+import { GameStorage, memoryKV, parseProfile } from './systems/platform/storage';
 import { exportFileName, exportSave, importSave, type Save } from './systems/save';
 import { staleBuild, updateAction } from './systems/update';
 import type { BusEvents } from './types/bus';
@@ -22,12 +22,15 @@ import { mountPlantCard } from './ui/plantCard';
 import { mountSummary } from './ui/summary';
 import { mountDpad } from './ui/dpad';
 import { mountHints } from './ui/hints';
+import { mountGuide, type GuideStage } from './ui/hintsGuide';
 import { mountHud } from './ui/hud';
 import { mountSettings } from './ui/settings';
 import { mountUpdateToast } from './ui/updateToast';
 
 const params = new URLSearchParams(location.search);
-const dev = params.get('dev') === '1';
+// `?dev=<id>`: dev-режим (`window.__pq`) и отдельный профиль сохранения `polski-farm-<id>` (тесты не трогают игру Шэфа).
+const profile = parseProfile(params.get('dev'));
+const dev = profile !== null;
 // Без звука вслух: `?mute=1` — `audio:play` только в консоль.
 const mute = params.get('mute') === '1';
 
@@ -58,7 +61,7 @@ async function main(): Promise<void> {
   const parent = document.getElementById('game');
   if (!overlay || !parent) throw new Error('#overlay или #game не найден');
 
-  const store = new GameStorage(params.get('mem') === '1' ? { kv: memoryKV(), ls: null } : {});
+  const store = new GameStorage(params.get('mem') === '1' ? { kv: memoryKV(), ls: null } : profile ? { profile } : {});
   const { save } = await store.load(Date.now());
   store.attachLifecycle();
   void store.requestPersist();
@@ -73,6 +76,9 @@ async function main(): Promise<void> {
   mountUpdateToast(overlay);
 
   const settings = mountSettings(overlay, {
+    muted: mute,
+    version: __BUILD_ID__,
+    ...(profile ? { profile } : {}),
     getSound: () => store.save.settings.sound,
     setSound: (on) => {
       if (!on) bus.emit('audio:stop', {});
@@ -109,9 +115,21 @@ async function main(): Promise<void> {
     say: (id, slow) => bus.emit('audio:play', { id, text: farm.word(id)?.pl ?? farm.phrase(id)?.pl ?? '', ...(slow ? { slow } : {}) }),
   });
   mountFloats(overlay);
-  mountHints(overlay, {
-    seen: (use) => store.save.hints.includes(use),
-    mark: (use) => store.update((s: Save) => ({ ...s, hints: [...s.hints, use] }), Date.now()),
+  const hasHint = (h: string): boolean => store.save.hints.includes(h);
+  const addHint = (h: string): void => {
+    if (!hasHint(h)) store.update((s: Save) => ({ ...s, hints: [...s.hints, h] }), Date.now());
+  };
+  mountHints(overlay, { seen: hasHint, mark: addHint });
+  // Первые шаги: к столу (до первого открытия словаря), потом к доске (до первой мини-игры). Игрок, который уже сажал
+  // слова или отвечал, указателя не видит.
+  mountGuide(overlay, {
+    stage: (): GuideStage | null => {
+      const g = store.save.garden;
+      if (!hasHint('guide:desk') && g.planted.length === 0) return 'desk';
+      if (!hasHint('guide:board') && g.log.length === 0) return 'board';
+      return null;
+    },
+    done: (stage) => addHint(`guide:${stage}`),
   });
   const game = mountMinigame(overlay, {
     next: (mode, only) => farm.next(mode, only),
@@ -164,6 +182,9 @@ async function main(): Promise<void> {
   const input = startInput({
     dpad,
     mapControls: 'walk',
+    // Касание уже было в прошлый раз: d-pad и A видны с первого кадра и после перезагрузки.
+    touchSeen: hasHint('touch'),
+    onTouch: () => addHint('touch'),
     pointer: { target: parent, tileAt: (x, y) => world()?.tileAt(x, y) ?? null },
   });
   bus.on('world:location', ({ controls }) => input.router.setMapControls(controls));
