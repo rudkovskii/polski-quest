@@ -162,3 +162,20 @@ describe('мелочи', () => {
     expect(root.querySelector('[data-version]')!.textContent).toContain('t1');
   });
 });
+
+describe('HUD: сколько до следующего подуровня', () => {
+  it('у полоски опыта «до A0.1: 25 слов», склонение, A1 достигнут', async () => {
+    const { mountHud, wordsRu } = await import('../src/ui/hud');
+    const bus = testBus();
+    const root = document.createElement('div');
+    mountHud(root, { bus, onSettings: () => {} });
+    const next = () => root.querySelector('[data-xp-next]')!.textContent;
+    bus.emit('hud:xp', { level: 'A0', ratio: 0.2, next: { level: 'A0.1', words: 25 } });
+    expect(next()).toBe('до A0.1: 25 слов');
+    bus.emit('hud:xp', { level: 'A0', ratio: 0.9, next: { level: 'A0.1', words: 1 } });
+    expect(next()).toBe('до A0.1: 1 слово');
+    bus.emit('hud:xp', { level: 'A0.9', ratio: 1, next: null });
+    expect(next()).toBe('A1 достигнут');
+    expect([wordsRu(2), wordsRu(11), wordsRu(22), wordsRu(105)]).toEqual(['слова', 'слов', 'слова', 'слов']);
+  });
+});

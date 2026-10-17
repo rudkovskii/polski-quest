@@ -39,6 +39,12 @@
 ## Мир (F-01)
 - Карты ASCII: `content/maps/home.json`, `farm.json` (формат — `src/types/map.ts`). `parseAscii` + тайлсет; объекты: `prop`, `exit`, `plot`, `spot`.
 - Управление: стрелки/WASD, d-pad (удержание = идти, короткий тап = шаг), тап по карте = дойти, A/E/Пробел = действие, тап по объекту = дойти и действие.
+- Тап по объекту (P1a): попадание по видимому спрайту (`LocationModel.targetAtPoint`), герой идёт на клетку подхода со стороны лица
+  (`face` у prop, по умолчанию `down`; свои клетки — `approach`), занято — ближайшая другая, поворачивается и шлёт `interact`.
+  Тап по двери (и по стене над выходом) проводит сквозь неё. Тесты — `tests/approach.test.ts`.
+- D-pad виден сразу на сенсорных устройствах (`detectCoarse`: pointer/any-pointer coarse, `maxTouchPoints`) и после перезагрузки
+  (флаг `touch` в `Save.hints`). Первые шаги новичка — `ui/hintsGuide.ts` (`guide:goal` → сцена шлёт `fx:guide`; флаги `guide:desk`, `guide:board`).
+- Камера: маленькая карта (дом) на ступень крупнее, если по высоте влезает между HUD и d-pad (`pickZoom(..., usableH)`, iPhone: дом zoom 3).
 - Герой `hero` (16×32, 4 стороны × 3 кадра), портрет `hero_portrait` 32×32, кот `cat` (Rudy, 16×16: ходит, сидит, умывается, спит).
 - Кот: идёт за героем по следу, не стоит на двери, подходах к дверям и объектам, на клетке героя, перед ним и над ним; уступает дорогу;
   в доме при долгом покое спит у кровати (`spot:cat_sleep`).
@@ -79,4 +85,6 @@
 ## Проверка
 `npm run check` = typecheck + audio:check + check:layers + check:banned + test + sprites:check + build. Dev: `npm run dev`
 (`http://localhost:5173/polski-quest/?mute=1&dev=1&mem=1`: без звука, `window.__pq`, сохранение в памяти).
+`?dev=<id>` — dev-режим и отдельный профиль сохранения `polski-farm-<id>` (IndexedDB и ключи localStorage), игра Шэфа не задета.
+Версия сборки видна внизу настроек; при `?mute=1` звук там «Выкл».
 Браузерная панель, в которой вкладка скрыта, не рисует кадры: покажи панель (`show_pane preview`), иначе экран пустой.

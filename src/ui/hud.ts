@@ -13,6 +13,9 @@ ${THEME_CSS}
 .pq-xp { display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 6px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); border-radius: 8px;
   box-shadow: 0 3px 0 var(--pq-ink); color: var(--pq-cream); font: 700 15px/1 -apple-system, BlinkMacSystemFont, sans-serif; }
 .pq-xp-lvl { min-width: 30px; text-align: center; padding: 4px 6px; background: var(--pq-accent); color: var(--pq-ink); border-radius: 4px; }
+.pq-xp-col { display: flex; flex-direction: column; gap: 3px; }
+.pq-xp-next { font: 600 11px/1 -apple-system, BlinkMacSystemFont, sans-serif; opacity: .85; white-space: nowrap; }
+.pq-xp-next:empty { display: none; }
 .pq-xp-bar { position: relative; width: 84px; height: 10px; background: #2a1418; border-radius: 3px; overflow: hidden; }
 .pq-xp-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--pq-leaf); box-shadow: inset 0 2px 0 rgba(255,255,255,.35); }
 .pq-xp { position: relative; }
@@ -24,10 +27,20 @@ ${THEME_CSS}
 .pq-gear { width: 44px; height: 44px; padding: 0; font-size: 22px; line-height: 40px; text-align: center; }
 `;
 
+/** «1 слово», «2 слова», «5 слов». */
+export function wordsRu(n: number): string {
+  const a = Math.abs(n) % 100;
+  const b = a % 10;
+  if (a > 10 && a < 20) return 'слов';
+  if (b === 1) return 'слово';
+  if (b >= 2 && b <= 4) return 'слова';
+  return 'слов';
+}
+
 export interface Hud {
   root: HTMLElement;
   gear: HTMLButtonElement;
-  setXp(level: string, ratio: number): void;
+  setXp(level: string, ratio: number, next?: { level: string; words: number } | null): void;
   dispose(): void;
 }
 
@@ -36,18 +49,23 @@ export function mountHud(parent: HTMLElement, o: { onSettings(): void; bus?: Bus
   const lvl = el('span', { class: 'pq-xp-lvl', 'data-xp-level': '' }, 'A0');
   const fill = el('span', { class: 'pq-xp-fill', style: 'width: 0%' });
   const bar = el('span', { class: 'pq-xp-bar', role: 'progressbar', 'aria-label': 'Опыт', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': 0 }, fill);
-  const xp = el('div', { class: 'pq-xp' }, lvl, bar);
+  const nextEl = el('span', { class: 'pq-xp-next', 'data-xp-next': '' });
+  const xp = el('div', { class: 'pq-xp' }, lvl, el('span', { class: 'pq-xp-col' }, bar, nextEl));
   const gear = el('button', { type: 'button', class: 'pq-btn pq-gear', 'aria-label': 'Настройки', onclick: () => o.onSettings() }, '⚙');
   const root = el('div', { class: 'pq-hud' }, el('style', {}, css), xp, gear);
   parent.append(root);
-  const setXp = (level: string, ratio: number): void => {
+  const setXp = (level: string, ratio: number, next?: { level: string; words: number } | null): void => {
     const r = Math.max(0, Math.min(1, ratio));
     lvl.textContent = level;
+    // Подсказка у полоски: сколько слов вырастить до следующего подуровня (нет поля — молчим, null — A1 достигнут).
+    if (next === undefined) nextEl.textContent = '';
+    else nextEl.textContent = next ? `до ${next.level}: ${next.words} ${wordsRu(next.words)}` : 'A1 достигнут';
+    bar.setAttribute('aria-valuetext', nextEl.textContent || `${Math.round(r * 100)}%`);
     fill.style.width = `${Math.round(r * 100)}%`;
     bar.setAttribute('aria-valuenow', String(Math.round(r * 100)));
   };
-  const off = bus.on('hud:xp', ({ level, ratio, gain, up }) => {
-    setXp(level, ratio);
+  const off = bus.on('hud:xp', ({ level, ratio, gain, up, next }) => {
+    setXp(level, ratio, next);
     if (gain && gain > 0) {
       const g = el('span', { class: 'pq-xp-gain', 'data-xp-gain': '' }, `+${gain}`);
       xp.append(g);

@@ -8,7 +8,7 @@ import { approachCells, DELTA, LocationModel, STEP_MS, type WorldEvent } from '.
 import { getMap, resolveSpawn } from '../src/world/maps';
 import { run, seeded, send } from './helpers';
 
-const size = (id: string): [number, number] | undefined => (sprites as Record<string, { size: [number, number] }>)[id]?.size;
+const size = (id: string): [number, number] | undefined => (sprites as unknown as Record<string, { size: [number, number] }>)[id]?.size;
 
 function at(map: string | LocationMap, spawn: string | [number, number], facing?: Dir): LocationModel {
   const m = typeof map === 'string' ? getMap(map) : map;
