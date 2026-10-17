@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// Озвучка (ТЗ §7.2, I-09): манифест, очередь, медленная версия, fallback на Web Speech, блокировка iOS, шина.
+// Озвучка: манифест, очередь, медленная версия, fallback на Web Speech, блокировка iOS, шина.
 import { describe, expect, it } from 'vitest';
 import { createBus } from '../src/systems/bus';
 import { connectAudio, createSpeech, entryKey, silentWav, type AudioManifest, type SpeechDeps } from '../src/systems/platform/audio';

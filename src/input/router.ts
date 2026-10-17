@@ -1,4 +1,4 @@
-// Роутер ввода (ТЗ §2.7): сырые intents трёх источников → один поток `input:intent` в шину.
+// Роутер ввода: сырые intents трёх источников → один поток `input:intent` в шину.
 // Решает, кому адресован intent (мир или оверлей), сводит удержания («последний источник
 // выигрывает»), применяет режим локации `walk | tap` и видимость d-pad.
 import { bus as globalBus, type Bus } from '../systems/bus';
@@ -47,7 +47,7 @@ export function detectCoarse(): boolean {
   return typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 }
 
-/** Правило видимости d-pad (ТЗ §2.7, §5.4). */
+/** Правило видимости d-pad. */
 export function dpadVisible(s: Omit<RouterState, 'dpadVisible' | 'heldDir'>): boolean {
   if (s.focus === 'ui' || s.mapControls === 'tap') return false;
   if (s.controls.dpad === 'never') return false;

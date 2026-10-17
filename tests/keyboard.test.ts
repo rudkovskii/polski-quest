@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// Экранная клавиатура (ТЗ §5.13, §10.1): полоска, QWERTY, «ąę», Alt-сочетания, Shift, фокус.
+// Экранная клавиатура: полоска, QWERTY, «ąę», Alt-сочетания, Shift, фокус.
 import { beforeEach, describe, expect, it } from 'vitest';
 import { attachKeyboard, type AttachOptions } from '../src/ui/keyboard';
 

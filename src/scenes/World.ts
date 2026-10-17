@@ -1,0 +1,413 @@
+import Phaser from 'phaser';
+import { bus } from '../systems/bus';
+import type { TileHit } from '../input/pointer';
+import type { Dir, RoutedIntent } from '../types/input';
+import type { LocationMap, PropObject } from '../types/map';
+import { tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
+import { pickZoom } from '../world/camera';
+import { LocationModel, type Actor, type WorldEvent } from '../world/location';
+import { getMap, resolveSpawn, START } from '../world/maps';
+
+// Сцена мира: карта, герой, кот, объекты. Логика в world/location.ts; сцена рисует и переводит события модели в шину.
+// Ввод приходит intents через bus (`input:intent`, to = world); тап по карте разбирает PointerSource через tileAt().
+
+const T = 16;
+const ATLAS = 'custom';
+const TILESET = 'farm';
+/** Высота d-pad снизу в CSS-пикселях (крест 120 px + отступ 16 px + запас): пока он виден, карта не прячет низ под ним. */
+export const DPAD_INSET = 148;
+/** Сверху кнопки HUD. */
+export const HUD_TOP_INSET = 52;
+/** Цвет за краем карты: тёмная листва. */
+export const BG_COLOR = '#2e5b3b';
+
+interface SpriteMeta {
+  size: [number, number];
+  anchor: [number, number];
+  frames: string[];
+  anims: Record<string, string[]>;
+}
+type SpritesMeta = Record<string, SpriteMeta>;
+
+export interface WorldStart {
+  map?: string;
+  spawn?: string | readonly number[];
+  facing?: Dir;
+}
+
+const url = (p: string): string => `${import.meta.env.BASE_URL}${p}`;
+
+let dpadVisible = false;
+const watchers = new Set<() => void>();
+bus.on('input:dpad', ({ visible }) => {
+  dpadVisible = visible;
+  for (const fn of watchers) fn();
+});
+
+/** `env(safe-area-inset-*)` в CSS-пикселях (iPhone: «чёлка» сверху, полоска «домой» снизу). */
+function safeArea(): { top: number; bottom: number } {
+  if (typeof document === 'undefined' || !document.body) return { top: 0, bottom: 0 };
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;left:0;top:0;width:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)';
+  document.body.append(probe);
+  const cs = getComputedStyle(probe);
+  const out = { top: parseFloat(cs.paddingTop) || 0, bottom: parseFloat(cs.paddingBottom) || 0 };
+  probe.remove();
+  return out;
+}
+
+export class World extends Phaser.Scene {
+  private model!: LocationModel;
+  private mapDef!: LocationMap;
+  private sprites!: SpritesMeta;
+  private hero!: Phaser.GameObjects.Sprite;
+  private heroShadow!: Phaser.GameObjects.Image;
+  private catSprite: Phaser.GameObjects.Sprite | null = null;
+  private catShadow: Phaser.GameObjects.Image | null = null;
+  private marker!: Phaser.GameObjects.Graphics;
+  private markerKey = '';
+  private bump: { dir: Dir; until: number } | null = null;
+  private start0: WorldStart = {};
+  private leaving = false;
+  private wasMoving = false;
+  private inputOn = true;
+  private insets = { top: HUD_TOP_INSET, bottom: 0 };
+  private cam0: { zoom: number; mw: number; mh: number; fitsW: boolean; fitsH: boolean } | null = null;
+
+  constructor() {
+    super('World');
+  }
+
+  init(data: WorldStart): void {
+    this.start0 = data ?? {};
+    this.leaving = false;
+    this.catSprite = null;
+    this.catShadow = null;
+    this.bump = null;
+    this.wasMoving = false;
+    this.markerKey = '';
+  }
+
+  preload(): void {
+    if (!this.textures.exists(TILESET)) this.load.image(TILESET, url(`atlas/${TILESET}.png`));
+    if (!this.cache.json.exists(TILESET)) this.load.json(TILESET, url(`atlas/${TILESET}.json`));
+    if (!this.textures.exists(ATLAS)) this.load.atlas(ATLAS, url('atlas/custom.png'), url('atlas/custom.json'));
+    if (!this.cache.json.exists('sprites')) this.load.json('sprites', url('atlas/sprites.json'));
+  }
+
+  create(): void {
+    this.cameras.main.setBackgroundColor(BG_COLOR);
+    const id = this.start0.map ?? START.map;
+    this.mapDef = getMap(id);
+    const spawn = resolveSpawn(this.mapDef, this.start0.spawn ?? START.spawn, this.start0.facing);
+    this.model = new LocationModel(this.mapDef, spawn.tile, { facing: spawn.facing });
+    this.sprites = this.cache.json.get('sprites') as SpritesMeta;
+
+    this.createAnims();
+    this.buildTiles();
+    this.buildProps();
+    this.buildActors();
+    this.marker = this.add.graphics().setDepth(10_000);
+
+    this.layout();
+    this.scale.on(Phaser.Scale.Events.RESIZE, this.layout, this);
+    const offIntent = bus.on('input:intent', (i) => this.onIntent(i));
+    const offInput = bus.on('world:input', ({ enabled }) => {
+      this.inputOn = enabled;
+      if (!enabled) this.model.halt();
+    });
+    // Вкладка свернулась: стоп ходьбы, чтобы после возврата герой стоял на той же клетке, а не «доходил» зажатую кнопку.
+    const onHidden = (): void => this.model.halt();
+    this.game.events.on(Phaser.Core.Events.HIDDEN, onHidden);
+    const onDpad = (): void => this.layout();
+    watchers.add(onDpad);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      offIntent();
+      offInput();
+      watchers.delete(onDpad);
+      this.game.events.off(Phaser.Core.Events.HIDDEN, onHidden);
+      this.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
+    });
+    this.cameras.main.fadeIn(150, 46, 91, 59);
+    bus.emit('world:location', { id: this.mapDef.id, controls: 'walk' });
+    const [x, y] = this.model.player.tile;
+    bus.emit('world:position', { location: this.mapDef.id, x, y, facing: this.model.player.facing });
+  }
+
+  /** Экранные CSS-пиксели канваса → клетка и объект под пальцем (для PointerSource). */
+  tileAt(x: number, y: number): TileHit | null {
+    if (!this.model || this.leaving || !this.inputOn) return null;
+    const p = this.cameras.main.getWorldPoint(x, y);
+    const tx = Math.floor(p.x / T);
+    const ty = Math.floor(p.y / T);
+    if (tx < 0 || ty < 0 || tx >= this.model.parsed.w || ty >= this.model.parsed.h) return null;
+    const target = this.model.targetAt([tx, ty]);
+    return target ? { tile: [tx, ty], target } : { tile: [tx, ty] };
+  }
+
+  /** Состояние для проверок в браузере и тестах. */
+  get state(): { location: string; tile: Xy; facing: Dir; moving: boolean; aBubble: string | null; cat: { tile: Xy; mode: string } | null; zoom: number } {
+    const m = this.model;
+    const a = this.inputOn ? m.actionHint() : null;
+    return {
+      location: this.mapDef.id,
+      tile: m.player.tile,
+      facing: m.player.facing,
+      moving: m.moving,
+      aBubble: a ? a.key : null,
+      cat: m.cat ? { tile: m.cat.tile, mode: m.cat.mode } : null,
+      zoom: this.cameras.main.zoom,
+    };
+  }
+
+  override update(time: number, delta: number): void {
+    if (this.leaving) return;
+    for (const ev of this.model.update(Math.min(delta, 100))) this.onWorldEvent(ev, time);
+    const moving = this.model.moving;
+    if (this.wasMoving && !moving && !this.leaving) {
+      const [x, y] = this.model.player.tile;
+      bus.emit('world:position', { location: this.mapDef.id, x, y, facing: this.model.player.facing });
+    }
+    this.wasMoving = moving;
+    this.syncHero(time);
+    this.syncCat();
+    this.updateCamera();
+    this.drawActionBubble(time);
+  }
+
+  // ───────────── камера ─────────────
+
+  private layout(): void {
+    const cam = this.cameras.main;
+    const { width, height } = this.scale;
+    const mw = this.model.parsed.w * T;
+    const mh = this.model.parsed.h * T;
+    const zoom = pickZoom(width, height, mw, mh);
+    cam.setZoom(zoom);
+    cam.stopFollow();
+    cam.removeBounds();
+    const safe = safeArea();
+    this.insets = { top: HUD_TOP_INSET + safe.top, bottom: dpadVisible ? DPAD_INSET + safe.bottom : 0 };
+    this.cam0 = { zoom, mw, mh, fitsW: mw * zoom <= width, fitsH: mh * zoom <= height - this.insets.top - this.insets.bottom };
+    this.updateCamera();
+  }
+
+  /**
+   * Центр камеры вручную каждый кадр: по оси, где карта не влезает, следует за героем (центр видимой зоны между HUD и
+   * d-pad); где влезает — карта по центру зоны. Центр кратен 1/zoom: пиксели ровные.
+   */
+  private updateCamera(): void {
+    const c0 = this.cam0;
+    if (!c0) return;
+    const z = c0.zoom;
+    const W = this.scale.width / z;
+    const H = this.scale.height / z;
+    const tz = this.insets.top / z;
+    const bz = this.insets.bottom / z;
+    const [px, py] = LocationModel.pos(this.model.player);
+    const shift = (bz - tz) / 2;
+    const cx = c0.fitsW ? c0.mw / 2 : Math.min(Math.max(Math.round((px + 0.5) * T), W / 2), c0.mw - W / 2);
+    const cy = c0.fitsH ? c0.mh / 2 + shift : Math.min(Math.max(Math.round(py * T + T / 2) + shift, H / 2 - tz), c0.mh - H / 2 + bz);
+    this.cameras.main.centerOn(Math.round(cx * z) / z, Math.round(cy * z) / z);
+  }
+
+  // ───────────── «A»-пузырёк ─────────────
+
+  /** Пиксельная «A» 5×6 (текст в canvas запрещён, только DOM). */
+  private static readonly GLYPH_A = ['.XXX.', 'X...X', 'X...X', 'XXXXX', 'X...X', 'X...X'];
+
+  /** Белый пузырёк с «A» над объектом, с которым сработает кнопка действия с этой клетки. */
+  private drawActionBubble(time: number): void {
+    const t = this.inputOn && !this.leaving ? this.model.actionHint() : null;
+    const bob = Math.floor(time / 450) % 2;
+    const key = t ? `${t.key}@${t.tile[0]},${t.tile[1]}:${bob}` : '';
+    if (key === this.markerKey) return;
+    this.markerKey = key;
+    const g = this.marker.clear();
+    const o = t ? this.model.object(t.key) : undefined;
+    if (!t || !o) return;
+    const w = 11;
+    const h = 10;
+    const cx = (o.at[0] + o.size[0] / 2) * T;
+    const tip = this.propTop(o.at, o.size, o.key) - 1 - bob;
+    const x0 = Math.round(cx - w / 2);
+    const y0 = tip - 3 - h;
+    const ink = 0x2a1418;
+    g.fillStyle(ink, 1).fillTriangle(cx - 3, y0 + h, cx + 3, y0 + h, cx, tip + 1);
+    g.fillStyle(ink, 1).fillRect(x0 - 1, y0, w + 2, h).fillRect(x0, y0 - 1, w, h + 2);
+    g.fillStyle(0xfff8e8, 1).fillRect(x0, y0, w, h);
+    g.fillStyle(0xb84c40, 1);
+    World.GLYPH_A.forEach((row, ry) => {
+      for (let rx = 0; rx < row.length; rx++) if (row[rx] === 'X') g.fillRect(x0 + 3 + rx, y0 + 2 + ry, 1, 1);
+    });
+  }
+
+  /** Верх спрайта объекта в пикселях мира (пузырёк стоит над ним). */
+  private propTop(at: Xy, size: Xy, key: string): number {
+    const src = this.mapDef.objects.find((o): o is PropObject => o.type === 'prop' && `prop:${o.id}` === key);
+    const meta = src ? this.sprites[src.sprite] : undefined;
+    return (at[1] + size[1]) * T - (meta ? meta.size[1] : T);
+  }
+
+  // ───────────── построение ─────────────
+
+  private createAnims(): void {
+    for (const id of ['hero', 'cat']) {
+      const meta = this.sprites[id];
+      if (!meta) continue;
+      for (const [name, frames] of Object.entries(meta.anims)) {
+        const key = `${id}:${name}`;
+        if (this.anims.exists(key)) continue;
+        const walk = name.startsWith('walk');
+        const rate = walk ? 9 : name === 'wash' ? 3 : name === 'sleep' ? 1.2 : 1;
+        this.anims.create({ key, frames: frames.map((frame) => ({ key: ATLAS, frame })), frameRate: rate, repeat: -1 });
+      }
+    }
+  }
+
+  private buildTiles(): void {
+    const ts = this.cache.json.get(TILESET) as TilesetMeta;
+    const { ground, deco } = tileLayers(ts, this.mapDef, this.model.parsed);
+    const { w, h } = this.model.parsed;
+    const map = this.make.tilemap({ width: w, height: h, tileWidth: T, tileHeight: T });
+    const tileset = map.addTilesetImage(TILESET, TILESET, T, T, ts.margin, ts.spacing);
+    if (!tileset) throw new Error('World: тайлсет не загрузился');
+    const put = (name: string, grid: number[][], depth: number): void => {
+      if (!grid.some((r) => r.some((i) => i >= 0))) return;
+      const layer = map.createBlankLayer(name, tileset, 0, 0, w, h, T, T);
+      if (!layer) return;
+      layer.setDepth(depth);
+      grid.forEach((row, y) => row.forEach((i, x) => i >= 0 && layer.putTileAt(i, x, y)));
+    };
+    put('ground', ground, 0);
+    put('deco', deco, 3);
+  }
+
+  /** Мягкая тень: полупрозрачный овал в два слоя (в атласе альфы нет). Текстура на каждую ширину один раз. */
+  private shadowTexture(width: number): string {
+    const key = `shadow:${width}`;
+    if (this.textures.exists(key)) return key;
+    const h = Math.max(4, Math.round(width / 3.4));
+    const tex = this.textures.createCanvas(key, width, h);
+    if (!tex) return key;
+    const ctx = tex.context;
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < width; x++) {
+        const dx = (x + 0.5 - width / 2) / (width / 2);
+        const dy = (y + 0.5 - h / 2) / (h / 2);
+        const d = dx * dx + dy * dy;
+        if (d > 1) continue;
+        ctx.fillStyle = d < 0.5 ? 'rgba(34, 20, 30, 0.26)' : 'rgba(34, 20, 30, 0.14)';
+        ctx.fillRect(x, y, 1, 1);
+      }
+    tex.refresh();
+    return key;
+  }
+
+  private placeShadow(cx: number, bottom: number, width: number, depth: number): Phaser.GameObjects.Image {
+    const key = this.shadowTexture(width);
+    const img = this.add.image(Math.round(cx), Math.round(bottom), key);
+    img.setOrigin(0.5, 0.65).setDepth(depth);
+    return img;
+  }
+
+  private buildProps(): void {
+    for (const o of this.model.objects) {
+      if (o.kind !== 'prop') continue;
+      const src = o.src as PropObject;
+      const meta = this.sprites[src.sprite];
+      if (!meta) throw new Error(`World: нет спрайта "${src.sprite}"`);
+      const cx = (o.at[0] + o.size[0] / 2) * T;
+      const bottom = (o.at[1] + o.size[1]) * T;
+      const s = this.add.sprite(cx, bottom, ATLAS, meta.frames[0]);
+      s.setOrigin(0.5, 1);
+      s.setDepth(src.depth === 'floor' ? 1.5 : src.depth === 'wall' ? 2 : 10 + bottom);
+      if (src.shadow) this.placeShadow(cx, bottom - 1, src.shadow, 2.5);
+    }
+  }
+
+  private buildActors(): void {
+    const p = this.model.player;
+    this.heroShadow = this.placeShadow(0, 0, 12, 9);
+    this.hero = this.add.sprite(0, 0, ATLAS, 'hero/0').setOrigin(0.5, 1);
+    this.syncHero(0);
+    void p;
+    const c = this.model.cat;
+    if (c) {
+      this.catShadow = this.placeShadow(0, 0, 10, 9);
+      this.catSprite = this.add.sprite(0, 0, ATLAS, 'cat/0').setOrigin(0.5, 1);
+      this.syncCat();
+    }
+  }
+
+  // ───────────── ввод и события ─────────────
+
+  private onIntent(i: RoutedIntent): void {
+    if (i.to !== 'world' || this.leaving || !this.inputOn) return;
+    this.model.intent(i);
+  }
+
+  private onWorldEvent(ev: WorldEvent, time: number): void {
+    switch (ev.type) {
+      case 'interact': {
+        const { type: _t, ...rest } = ev;
+        bus.emit('world:interact', { location: this.mapDef.id, ...rest, tile: [ev.tile[0], ev.tile[1]] });
+        break;
+      }
+      case 'exit':
+        bus.emit('world:exit', { from: this.mapDef.id, to: ev.to, spawn: ev.spawn });
+        this.go(ev.to, ev.spawn);
+        break;
+      case 'bump':
+        this.bump = { dir: ev.dir, until: time + 120 };
+        break;
+      case 'step':
+        break;
+    }
+  }
+
+  private go(map: string, spawn: string): void {
+    if (this.leaving) return;
+    this.leaving = true;
+    this.model.halt();
+    const cam = this.cameras.main;
+    cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ map, spawn }));
+    // force: переход сразу после входа (идёт fadeIn) иначе игнорировался бы, сцена зависла бы в `leaving`.
+    cam.fade(150, 46, 91, 59, true);
+  }
+
+  // ───────────── отрисовка актёров ─────────────
+
+  private put(s: Phaser.GameObjects.Sprite, shadow: Phaser.GameObjects.Image | null, a: Actor, ox = 0, oy = 0): void {
+    const [fx, fy] = LocationModel.pos(a);
+    const x = Math.round(fx * T + T / 2 + ox);
+    const bottom = Math.round(fy * T + T + oy);
+    s.setPosition(x, bottom);
+    s.setDepth(10 + bottom);
+    shadow?.setPosition(x, bottom - 1);
+  }
+
+  private syncHero(time: number): void {
+    const a = this.model.player;
+    let ox = 0;
+    let oy = 0;
+    if (this.bump && this.bump.until > time) {
+      ox = this.bump.dir === 'left' ? -1 : this.bump.dir === 'right' ? 1 : 0;
+      oy = this.bump.dir === 'up' ? -1 : this.bump.dir === 'down' ? 1 : 0;
+    }
+    this.put(this.hero, this.heroShadow, a, ox, oy);
+    // Герой выше кота на той же строке: рисуем поверх.
+    this.hero.setDepth(this.hero.depth + 0.5);
+    const key = `hero:${a.step ? 'walk' : 'idle'}_${a.facing}`;
+    if (this.hero.anims.currentAnim?.key !== key) this.hero.play(key);
+  }
+
+  private syncCat(): void {
+    const c = this.model.cat;
+    const s = this.catSprite;
+    if (!c || !s) return;
+    this.put(s, this.catShadow, c);
+    const key = c.mode === 'follow' ? `cat:${c.step ? 'walk' : 'idle'}_${c.facing}` : `cat:${c.mode}`;
+    if (s.anims.currentAnim?.key !== key) s.play(key);
+  }
+}

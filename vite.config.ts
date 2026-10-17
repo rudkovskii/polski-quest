@@ -1,9 +1,8 @@
-import { execFile, execFileSync, execSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { defineConfig, type Plugin, type ViteDevServer } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import { BASE, WOLA, workboxOptions } from './tools/lib/pwa';
+import { BASE, workboxOptions } from './tools/lib/pwa';
 
 function buildId(): string {
   const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string };
@@ -21,10 +20,9 @@ function buildId(): string {
 const BUILD_ID = buildId();
 
 /**
- * Версия сборки снаружи кэша (P-12, Андрей увидел старую c732548 без тоста): `index.html` несёт
- * `<meta name="pq-build">`, рядом лежит `version.json` `{ "build": … }`. Игра читает его с `cache: 'no-store'`
- * (src/systems/platform/pwa.ts `checkVersion`) и при расхождении со своим `__BUILD_ID__` перезагружается на титуле
- * или показывает тост. version.json не кладётся в precache service worker'а (globIgnores ниже).
+ * Версия сборки снаружи кэша: `index.html` несёт `<meta name="pq-build">`, рядом лежит `version.json` `{ "build": … }`.
+ * Игра читает его с `cache: 'no-store'` (src/systems/platform/pwa.ts `watchVersion`) и при расхождении со своим
+ * `__BUILD_ID__` перезагружается или показывает тост. version.json не кладётся в precache service worker'а.
  */
 function buildVersion(): Plugin {
   return {
@@ -38,118 +36,6 @@ function buildVersion(): Plugin {
   };
 }
 
-const ROOT_DIR = fileURLToPath(new URL('./', import.meta.url));
-
-/**
- * Короткая версия «Wola» (W-01): вторая страница `wola/index.html` рядом с основной игрой. Service worker один на
- * `/polski-quest/` (кэширует обе; навигацию под /wola отдаёт public/sw-wola.js, W-04 — tools/lib/pwa.ts), манифест у Wola свой: `wola/manifest.webmanifest`, scope и start_url
- * `/polski-quest/wola/` — на телефоне ставится отдельной иконкой. vite-plugin-pwa вставляет ссылку на основной манифест
- * во все страницы: в странице Wola меняем её на свою.
- */
-function wolaPwa(): Plugin {
-  const manifest = {
-    id: WOLA,
-    name: 'Wola · Pierogi i Przypadki',
-    short_name: 'Wola',
-    description: 'Короткая версия: район Воля, слова дома, огород, Salad Story',
-    lang: 'ru',
-    display: 'standalone',
-    orientation: 'portrait',
-    start_url: WOLA,
-    scope: WOLA,
-    background_color: '#1a1c2c',
-    theme_color: '#1a1c2c',
-    icons: [
-      { src: `${BASE}icons/icon-180.png`, sizes: '180x180', type: 'image/png' },
-      { src: `${BASE}icons/icon-192.png`, sizes: '192x192', type: 'image/png' },
-      { src: `${BASE}icons/icon-512.png`, sizes: '512x512', type: 'image/png' },
-      { src: `${BASE}icons/icon-512-maskable.png`, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-    ],
-  };
-  return {
-    name: 'pq-wola-pwa',
-    apply: 'build',
-    // После vite-plugin-pwa (у него enforce: post): ссылка на основной манифест уже вставлена — заменяем её.
-    enforce: 'post',
-    transformIndexHtml: {
-      order: 'post',
-      handler(html, ctx) {
-        if (!/(^|\/)wola\/index\.html$/.test(ctx.path)) return html;
-        const link = `<link rel="manifest" href="${WOLA}manifest.webmanifest">`;
-        return /<link rel="manifest"[^>]*>/.test(html) ? html.replace(/<link rel="manifest"[^>]*>/, link) : html.replace('</head>', `${link}</head>`);
-      },
-    },
-    generateBundle() {
-      this.emitFile({ type: 'asset', fileName: 'wola/manifest.webmanifest', source: `${JSON.stringify(manifest, null, 2)}\n` });
-    },
-  };
-}
-const CONTENT_DIR = fileURLToPath(new URL('./content/', import.meta.url));
-const TSX = fileURLToPath(new URL('./node_modules/.bin/tsx', import.meta.url));
-
-/**
- * Dev: валидатор контента (ТЗ §3.13, tools/validate_content.ts) при старте и при каждой правке content/**.
- * Ошибки показываются оверлеем Vite поверх игры; после исправления страница перезагружается.
- */
-function contentValidator(): Plugin {
-  let last = '';
-  const send = (server: ViteDevServer): void => {
-    if (!last) return;
-    server.ws.send({
-      type: 'error',
-      err: { message: `Контент не прошёл валидацию (npm run validate):\n${last}`, stack: '', plugin: 'pq-content' },
-    });
-  };
-  const run = async (server: ViteDevServer): Promise<void> => {
-    const had = last;
-    // Отдельный процесс: конфиг Vite не тянет за собой ajv и tools/, ошибки те же, что у `npm run validate`.
-    last = await new Promise<string>((done) => {
-      execFile(TSX, ['tools/validate_content.ts', '--quiet'], { cwd: ROOT_DIR }, (err, _out, stderr) => {
-        done(err ? stderr.trim() || err.message : '');
-      });
-    });
-    if (last) {
-      server.config.logger.error(`[content] ошибки валидации:\n${last}`);
-      send(server);
-    } else if (had) {
-      server.config.logger.info('[content] валидация ок');
-      server.ws.send({ type: 'full-reload' });
-    }
-  };
-  return {
-    name: 'pq-content-validator',
-    apply: 'serve',
-    configureServer(server) {
-      void run(server);
-      server.ws.on('connection', () => send(server));
-      const onFs = (file: string): void => {
-        if (file.startsWith(CONTENT_DIR) && file.endsWith('.json')) void run(server);
-      };
-      server.watcher.on('change', onFs).on('add', onFs).on('unlink', onFs);
-    },
-  };
-}
-
-/**
- * Сборка для людей (P-01): `PQ_RELEASE=1 npm run build` (или `npm run build:release`) сначала гоняет
- * валидатор с `--release` и падает, если в бит первого дня попала реплика-заглушка `todo`.
- */
-function releaseGate(): Plugin {
-  return {
-    name: 'pq-release-gate',
-    apply: 'build',
-    buildStart() {
-      if (process.env.PQ_RELEASE !== '1') return;
-      try {
-        execFileSync(TSX, ['tools/validate_content.ts', '--release', '--quiet'], { cwd: ROOT_DIR, stdio: ['ignore', 'pipe', 'pipe'] });
-      } catch (e) {
-        const err = e as { stderr?: Buffer; message: string };
-        this.error(`PQ_RELEASE=1: контент не готов к сборке для людей:\n${err.stderr?.toString().trim() || err.message}`);
-      }
-    },
-  };
-}
-
 export default defineConfig({
   base: BASE,
   define: {
@@ -158,36 +44,26 @@ export default defineConfig({
   build: {
     target: 'es2022',
     chunkSizeWarningLimit: 2000,
-    // Две страницы (W-01): основная игра и короткая версия «Wola» (/polski-quest/wola/).
-    rollupOptions: {
-      input: {
-        main: fileURLToPath(new URL('./index.html', import.meta.url)),
-        wola: fileURLToPath(new URL('./wola/index.html', import.meta.url)),
-      },
-    },
   },
   plugins: [
-    contentValidator(),
-    releaseGate(),
     buildVersion(),
     VitePWA({
-      // P-10a: новая сборка берёт страницу сразу (skipWaiting + clientsClaim), регистрация из кода
-      // (src/systems/platform/pwa.ts): на титуле — перезагрузка, в игре — тост «Есть обновление».
+      // Новая сборка берёт страницу сразу (skipWaiting + clientsClaim), регистрация из кода (src/systems/platform/pwa.ts).
       registerType: 'autoUpdate',
       injectRegister: false,
       includeAssets: ['icons/apple-touch-icon.png'],
       manifest: {
         id: BASE,
-        name: 'Pierogi i Przypadki',
-        short_name: 'Polski',
-        description: 'Пиксельная игра для изучения польского',
+        name: 'Ferma',
+        short_name: 'Ferma',
+        description: 'Пиксельная ферма, где растут польские слова',
         lang: 'ru',
         display: 'standalone',
         orientation: 'portrait',
         start_url: BASE,
         scope: BASE,
-        background_color: '#1a1c2c',
-        theme_color: '#1a1c2c',
+        background_color: '#2e5b3b',
+        theme_color: '#2e5b3b',
         icons: [
           { src: 'icons/icon-180.png', sizes: '180x180', type: 'image/png' },
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
@@ -197,6 +73,5 @@ export default defineConfig({
       },
       workbox: workboxOptions(),
     }),
-    wolaPwa(),
   ],
 });

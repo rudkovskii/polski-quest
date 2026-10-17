@@ -13,10 +13,10 @@ export interface Rule {
   allow?: string;
 }
 
-const inPureSystems = (p: string): boolean => (p.startsWith('src/systems/') && !p.startsWith('src/systems/platform/')) || p.startsWith('src/wola/systems/');
+const inPureSystems = (p: string): boolean => (p.startsWith('src/systems/') && !p.startsWith('src/systems/platform/'));
 /** Сцены, мир и экраны: ввод только через intents (src/input); исключение — поля ввода (src/ui/keyboard). */
 const inScenesOrScreens = (p: string): boolean =>
-  /^src\/(scenes|world|ui|wola\/ui)\//.test(p) && !p.startsWith('src/ui/keyboard/');
+  /^src\/(scenes|world|ui)\//.test(p) && !p.startsWith('src/ui/keyboard/');
 
 export const RULES: Rule[] = [
   // Phaser 3 API, удалённое или заменённое в Phaser 4
@@ -51,8 +51,6 @@ export const RULES: Rule[] = [
     why: 'Ввод только через src/input (intents в bus); keydown/pointerdown слушают src/input и src/ui/keyboard',
     scope: inScenesOrScreens,
   },
-  // Секрет приватной ссылки
-  { re: /#k=[a-z2-7]{26}\b/, why: 'Похоже на секрет приватной ссылки в коде' },
 ];
 
 export interface Hit {

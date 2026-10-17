@@ -1,4 +1,4 @@
-// Поиск пути для тапа (ТЗ §2.7, §5.4, I-07): BFS по 4 соседям, недостижимое → ближайшая достижимая.
+// Поиск пути для тапа: BFS по 4 соседям, недостижимое → ближайшая достижимая.
 import { describe, expect, it } from 'vitest';
 import { around, findPath, pathToAdjacent, type Grid } from '../src/world/pathfind';
 

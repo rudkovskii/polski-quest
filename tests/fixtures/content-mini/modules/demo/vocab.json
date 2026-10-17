@@ -1,8 +1,0 @@
-[
-  { "id": "lx.maly", "pl": "mały", "ru": "маленький", "tr": "ма́ўы", "pos": "adj", "srs": true, "clusters": ["R3"], "tags": ["kawiarnia"] },
-  { "id": "lx.slucham", "pl": "słucham", "ru": "слушаю", "tr": "сўу́хам", "pos": "phrase", "srs": true, "clusters": ["R3"] },
-  { "id": "lx.stol", "pl": "stół", "ru": "стол", "tr": "стуў", "pos": "noun", "gender": "m", "srs": true, "ff": { "ru": "стул", "means": "krzesło" }, "tags": ["dom", "ff"] },
-  { "id": "lx.kawa", "pl": "kawa", "ru": "кофе", "tr": "ка́ва", "pos": "noun", "gender": "f", "srs": true, "tags": ["kawiarnia"] },
-  { "id": "lx.wyjscie", "pl": "wyjście", "ru": "выход", "tr": "вы́йщче", "pos": "sign", "srs": true, "tags": ["sign"] },
-  { "id": "lx.mleko", "pl": "mleko", "ru": "молоко", "tr": "млэ́ко", "pos": "noun", "gender": "n", "srs": false }
-]

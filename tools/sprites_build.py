@@ -6,12 +6,13 @@
     python3 tools/sprites_build.py --quantize <png> [--out <png>]   # привести чужой лист к палитре
 
 Входы:
-  art/palette.json              имя → #rrggbb (собирает tools/palette_extract.py)
-  art/sprites/*.sprite.json     sprite-as-data: keys (символ → имя цвета | null), frames, anims
-  art/imports.json              кадры из листов art/vendor (персонажи NA), квантуются в палитру
-  art/tilesets/<id>.json        тайлсет локаций: имя тайла → клетка листа / кадр спрайта / auto16
-  art/avatar/*.sprite.json      слои аватара (P-03) + avatar.json: только проверка, в атлас не идут
+  art/palette.json              базовые цвета: имя → #rrggbb
+  art/materials.json            материалы: имя → средний тон; рампа (линия, тень, основной, свет, блик, контур) считается
+                                tools/art_ramp.py (sdvRamp с дашборда жаб) и входит в палитру как `<материал>.0…4`, `.o`
+  art/sprites/*.sprite.json     sprite-as-data: keys (символ → имя цвета | null), frames, anims.
+                                Рисует tools/gen_sprites.py (npm run art), JSON можно править руками
                                 (кадр может быть ссылкой: число i или {"flip": i})
+  art/tilesets/<id>.json        тайлсет локаций: имя тайла → кадр спрайта / auto16
 
 Выходы (руками не править, AGENTS.md):
   public/atlas/custom.png + custom.json      Phaser atlas JSON hash, кадры `<id>/<n>`, padding 1, extrude 1
@@ -30,6 +31,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from PIL import Image
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from art_ramp import load_materials, ramp_colors  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 ART = ROOT / 'art'
@@ -101,7 +105,12 @@ class Palette:
 def load_palette(path: Path | None = None) -> Palette:
     path = path or ART / 'palette.json'
     data = json.loads(path.read_text('utf8'))
-    return Palette({k: hex_to_rgb(v) for k, v in data['colors'].items()})
+    colors = dict(data['colors'])
+    for name, c in ramp_colors(load_materials()).items():
+        if name in colors:
+            raise BuildError(f'цвет "{name}" есть и в palette.json, и среди рамп материалов')
+        colors[name] = c
+    return Palette({k: hex_to_rgb(v) for k, v in colors.items()})
 
 
 def quantize(img: Image.Image, pal: Palette) -> tuple[Image.Image, int]:
@@ -196,86 +205,6 @@ def load_sprite(path: Path, pal: Palette) -> SpriteDef:
     return SpriteDef(d['id'], (w, h), anchor, frames, anims, rel)
 
 
-def load_imports(pal: Palette) -> tuple[list[SpriteDef], list[str]]:
-    """art/imports.json: кадры из листов паков (сетка frame[0]×frame[1]), квантованные в палитру."""
-    path = ART / 'imports.json'
-    if not path.exists():
-        return [], []
-    notes: list[str] = []
-    out: list[SpriteDef] = []
-    for d in json.loads(path.read_text('utf8'))['sprites']:
-        src = ART / d['src']
-        if not src.exists():
-            raise BuildError(f'art/imports.json: {d["id"]}: нет файла art/{d["src"]}')
-        sheet, changed = quantize(Image.open(src), pal)
-        if changed:
-            notes.append(f'{d["id"]}: {changed} px приведено к палитре')
-        fw, fh = d['frame']
-        if fw % T or fh % T:
-            raise BuildError(f'art/imports.json: {d["id"]}: кадр {fw}×{fh} не кратен {T}')
-        x0, y0, rw, rh = d.get('rect', [0, 0, sheet.width, sheet.height])
-        frames = [
-            sheet.crop((x, y, x + fw, y + fh))
-            for y in range(y0, y0 + rh, fh)
-            for x in range(x0, x0 + rw, fw)
-        ]
-        out.append(SpriteDef(d['id'], (fw, fh), tuple(d.get('anchor', [fw // 2, fh - 1])), frames, d.get('anims', {}), f'art/{d["src"]}'))
-    return out, notes
-
-
-AVATAR_KINDS = ('skin', 'hair', 'hairColor', 'beard', 'glasses', 'top', 'topColor')
-
-
-def check_avatar(pal: Palette, sprites: dict[str, SpriteDef]) -> list[SpriteDef]:
-    """art/avatar (P-03): слои аватара собираются в игре (src/systems/avatar.ts), в атлас не идут.
-    Проверка: палитра, кадры и якорь как у Димы, подстановки ramp из палитры, слои из avatar.json существуют."""
-    root = ART / 'avatar'
-    if not root.exists():
-        return []
-    layers: dict[str, SpriteDef] = {}
-    for p in sorted(root.glob('*.sprite.json')):
-        s = load_sprite(p, pal)
-        if s.id in layers or s.id in sprites:
-            raise BuildError(f'{s.source}: дубль id "{s.id}"')
-        layers[s.id] = s
-    ref = sprites.get('dima')
-    for s in layers.values():
-        if ref and (s.size != ref.size or tuple(s.anchor) != tuple(ref.anchor) or len(s.frames) != len(ref.frames) or s.anims != ref.anims):
-            raise BuildError(f'{s.source}: размер, якорь, число кадров и anims должны совпадать с dima')
-    opt_path = root / 'avatar.json'
-    rel = opt_path.relative_to(ROOT).as_posix()
-    if not opt_path.exists():
-        raise BuildError(f'{rel}: нет файла (опции аватара)')
-    opt = json.loads(opt_path.read_text('utf8'))
-
-    def color(name: str, where: str) -> None:
-        if name not in pal.names:
-            raise BuildError(f'{rel}: {where}: цвета "{name}" нет в art/palette.json')
-
-    for kind, names in opt['base'].items():
-        for n in names:
-            color(n, f'base.{kind}')
-    ramp_len = {'skin': len(opt['base']['skin']), 'hairColor': len(opt['base']['hair']), 'topColor': len(opt['base']['top'])}
-    for kind in AVATAR_KINDS:
-        ids = set()
-        for o in opt[kind]:
-            if o['id'] in ids:
-                raise BuildError(f'{rel}: {kind}: дубль id "{o["id"]}"')
-            ids.add(o['id'])
-            if 'ramp' in o:
-                if len(o['ramp']) != ramp_len[kind]:
-                    raise BuildError(f'{rel}: {kind}.{o["id"]}: ramp длины {ramp_len[kind]}')
-                for n in o['ramp']:
-                    color(n, f'{kind}.{o["id"]}')
-            if 'beard' in o:
-                color(o['beard'], f'{kind}.{o["id"]}.beard')
-            if o.get('layer') and o['layer'] not in layers:
-                raise BuildError(f'{rel}: {kind}.{o["id"]}: нет слоя art/avatar/{o["layer"]}.sprite.json')
-        if opt['default'][kind] not in ids:
-            raise BuildError(f'{rel}: default.{kind}: нет варианта "{opt["default"][kind]}"')
-    return list(layers.values())
-
-
 def load_sprites(pal: Palette) -> tuple[dict[str, SpriteDef], list[str]]:
     sprites: dict[str, SpriteDef] = {}
     for p in sorted((ART / 'sprites').glob('*.sprite.json')):
@@ -283,15 +212,7 @@ def load_sprites(pal: Palette) -> tuple[dict[str, SpriteDef], list[str]]:
         if s.id in sprites:
             raise BuildError(f'{s.source}: дубль id "{s.id}" (уже в {sprites[s.id].source})')
         sprites[s.id] = s
-    imported, notes = load_imports(pal)
-    for s in imported:
-        if s.id in sprites:
-            raise BuildError(f'art/imports.json: дубль id "{s.id}"')
-        sprites[s.id] = s
-    avatar = check_avatar(pal, sprites)
-    if avatar:
-        notes.append(f'art/avatar: {len(avatar)} слоёв аватара проверено (в атлас не идут, собираются в игре)')
-    return sprites, notes
+    return sprites, []
 
 
 # ───────────────────────────── упаковка ─────────────────────────────
@@ -385,7 +306,7 @@ def build_tileset(tsid: str, sprites: dict[str, SpriteDef], pal: Palette) -> tup
     d = json.loads(path.read_text('utf8'))
     sheets: dict[str, Image.Image] = {}
     notes: list[str] = []
-    for key, src in d['sources'].items():
+    for key, src in d.get('sources', {}).items():
         p = ART / src
         if not p.exists():
             raise BuildError(f'{rel}: источник "{key}": нет файла art/{src}')
@@ -546,9 +467,9 @@ def check() -> int:
     except BuildError as e:
         print(f'sprites --check: {e}', file=sys.stderr)
         return 1
-    if len(pal.rgbs) > 64:
-        errs.append(f'art/palette.json: {len(pal.rgbs)} цветов, максимум 64')
-    pngs = sorted(OUT.glob('*.png')) + sorted((ART / 'src').glob('*.png') if (ART / 'src').exists() else [])
+    if len(pal.rgbs) > 320:
+        errs.append(f'art/palette.json: {len(pal.rgbs)} цветов, максимум 320')
+    pngs = sorted(OUT.glob('*.png'))
     for p in pngs:
         errs += check_png(p, pal, p.relative_to(ROOT).as_posix())
     # Кадры атласов: имена и кратность 16

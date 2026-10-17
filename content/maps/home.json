@@ -1,0 +1,165 @@
+{
+ "id": "home",
+ "name": "Дом",
+ "size": [
+  12,
+  9
+ ],
+ "defaultGround": "F",
+ "legend": {
+  "F": {
+   "tile": "floor"
+  },
+  "m": {
+   "tile": "mat"
+  },
+  "W": {
+   "tile": "wall_top",
+   "solid": true
+  },
+  "w": {
+   "tile": "wall_face",
+   "solid": true
+  },
+  "d": {
+   "tile": "door"
+  }
+ },
+ "layers": {
+  "ground": [
+   "WWWWWWWWWWWW",
+   "wwwwwwwwwwww",
+   "FFFFFFFFFFFF",
+   "FFFFFFFFFFFF",
+   "FFFFFFFFFFFF",
+   "FFFFFFFFFFFF",
+   "FFFFFFFFFFFF",
+   "FFFFFFmFFFFF",
+   "wwwwwwdwwwww"
+  ]
+ },
+ "spawns": {
+  "default": [
+   6,
+   7,
+   "up"
+  ],
+  "from_farm": [
+   6,
+   7,
+   "up"
+  ]
+ },
+ "objects": [
+  {
+   "type": "prop",
+   "id": "window_l",
+   "sprite": "window",
+   "at": [
+    3,
+    1
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false,
+   "depth": "wall"
+  },
+  {
+   "type": "prop",
+   "id": "window_r",
+   "sprite": "window",
+   "at": [
+    9,
+    1
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false,
+   "depth": "wall"
+  },
+  {
+   "type": "prop",
+   "id": "rug",
+   "sprite": "rug",
+   "at": [
+    4,
+    4
+   ],
+   "size": [
+    2,
+    2
+   ],
+   "solid": false,
+   "depth": "floor"
+  },
+  {
+   "type": "prop",
+   "id": "bed",
+   "use": "bed",
+   "label": "Łóżko · Кровать",
+   "sprite": "bed",
+   "at": [
+    1,
+    2
+   ],
+   "size": [
+    2,
+    2
+   ],
+   "shadow": 0
+  },
+  {
+   "type": "prop",
+   "id": "shelf",
+   "use": "shelf",
+   "label": "Półka · Банки",
+   "sprite": "shelf",
+   "at": [
+    5,
+    2
+   ],
+   "size": [
+    2,
+    1
+   ],
+   "shadow": 0
+  },
+  {
+   "type": "prop",
+   "id": "desk",
+   "use": "desk",
+   "label": "Słownik · Словарь",
+   "sprite": "desk",
+   "at": [
+    8,
+    3
+   ],
+   "size": [
+    2,
+    1
+   ],
+   "shadow": 28
+  },
+  {
+   "type": "exit",
+   "at": [
+    6,
+    8
+   ],
+   "to": "farm",
+   "spawn": "house_door"
+  },
+  {
+   "type": "spot",
+   "id": "cat_sleep",
+   "at": [
+    3,
+    3
+   ]
+  }
+ ]
+}

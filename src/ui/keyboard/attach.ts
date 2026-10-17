@@ -1,5 +1,5 @@
 // attachKeyboard(field, opts): один хелпер подключает экранную клавиатуру к любому
-// <input>/<textarea> оверлея (ТЗ §5.13). Полоска над полем, QWERTY под полем, физическая
+// <input>/<textarea> оверлея. Полоска над полем, QWERTY под полем, физическая
 // клавиатура работает параллельно, Alt/Option + a c e l n o s z x → ą ć ę ł ń ó ś ż ź.
 // Прямой keydown здесь разрешён (AGENTS.md): это поле ввода, а не мир.
 import { ALT_CODES, upper } from './chars';
@@ -9,7 +9,7 @@ import { createQwerty } from './qwerty';
 import { createStrip } from './strip';
 import { ensureKeyboardStyle } from './style';
 
-/** Настройка `keyboard.mode` (ТЗ §5.13): auto по устройству, strip = только полоска, full = полоска + QWERTY. */
+/** Настройка `keyboard.mode`: auto по устройству, strip = только полоска, full = полоска + QWERTY. */
 export type KeyboardMode = 'auto' | 'strip' | 'full';
 
 export interface AttachOptions {

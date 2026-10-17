@@ -1,8 +1,8 @@
-// ASCII-локация (ТЗ §3.7) → слои тайлов и коллизии. Чистый TS без Phaser: тестируется в vitest,
+// ASCII-локация → слои тайлов и коллизии. Чистый TS без Phaser: тестируется в vitest,
 // сцена Location только раскладывает готовые индексы по TilemapLayer.
-import type { LegendEntry, LocationMap } from '../types/content';
+import type { LegendEntry, LocationMap, Xy } from '../types/map';
 
-export type Xy = readonly [number, number];
+export type { Xy };
 
 export class AsciiError extends Error {
   override name = 'AsciiError';
@@ -79,7 +79,7 @@ export function parseAscii(map: LocationMap): ParsedMap {
   return { id: map.id, w, h, ground, deco, solid };
 }
 
-/** Биты соседей для автотайла (ТЗ §3.7 `auto`): N=1, E=2, S=4, W=8. За краем карты = такой же. */
+/** Биты соседей для автотайла (`auto` в легенде): N=1, E=2, S=4, W=8. За краем карты = такой же. */
 export const N = 1;
 export const E = 2;
 export const S = 4;

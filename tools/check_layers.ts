@@ -9,9 +9,6 @@ type Layer = 'systems' | 'platform' | 'world' | 'ui' | 'input' | 'types' | 'root
 export function layerOf(path: string): Layer {
   if (path.startsWith('src/systems/platform/')) return 'platform';
   if (path.startsWith('src/systems/')) return 'systems';
-  // Короткая версия «Wola» (W-01): те же слои внутри src/wola/ (склейка — src/wola/*.ts в корне папки).
-  if (path.startsWith('src/wola/systems/')) return 'systems';
-  if (path.startsWith('src/wola/ui/')) return 'ui';
   if (path.startsWith('src/scenes/') || path.startsWith('src/world/')) return 'world';
   if (path.startsWith('src/ui/')) return 'ui';
   if (path.startsWith('src/input/')) return 'input';

@@ -1,7 +1,7 @@
 {
   "name": "polski-quest",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "engines": {
     "node": ">=24"
@@ -9,22 +9,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:release": "PQ_RELEASE=1 vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
-    "gen:types": "tsx tools/gen_types.ts",
-    "validate": "tsx tools/validate_content.ts",
-    "validate:release": "tsx tools/validate_content.ts --release",
     "check:layers": "tsx tools/check_layers.ts",
     "check:banned": "tsx tools/check_banned.ts",
     "test": "vitest run",
     "sprites": "python3 tools/sprites_build.py",
     "sprites:check": "python3 tools/sprites_build.py --check",
-    "palette": "python3 tools/palette_extract.py",
     "audio": "python3 tools/build_audio.py",
     "audio:check": "python3 tools/build_audio.py --check",
-    "check": "npm run typecheck && npm run validate && npm run audio:check && npm run check:layers && npm run check:banned && npm run test && npm run sprites:check && npm run build",
-    "sync:smoke": "tsx tools/sync_smoke.ts"
+    "check": "npm run typecheck && npm run audio:check && npm run check:layers && npm run check:banned && npm run test && npm run sprites:check && npm run build",
+    "art": "python3 tools/gen_sprites.py"
   },
   "dependencies": {
     "idb-keyval": "6.3.0",
@@ -33,11 +28,8 @@
   },
   "devDependencies": {
     "@types/node": "24.19.2",
-    "ajv": "8.20.0",
-    "ajv-formats": "3.0.1",
     "fake-indexeddb": "6.2.5",
     "happy-dom": "21.0.1",
-    "json-schema-to-typescript": "16.0.0",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
     "vite": "8.3.4",

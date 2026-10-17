@@ -1,4 +1,4 @@
-// Intent, Source, Dir по ТЗ §2.7. Определения в src/types/input.ts (на них ссылается шина).
+// Intent, Source, Dir Определения в src/types/input.ts (на них ссылается шина).
 export type {
   ControlsSettings,
   Dir,

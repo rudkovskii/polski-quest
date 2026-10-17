@@ -1,4 +1,4 @@
-// Типизированный emitter без зависимостей (ТЗ §2.2). Связь scenes/world ⇄ ui только через него.
+// Типизированный emitter без зависимостей. Связь scenes/world ⇄ ui только через него.
 import type { BusEvents } from '../types/bus';
 
 type Handler<P> = (payload: P) => void;

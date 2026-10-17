@@ -1,4 +1,4 @@
-// Озвучка польского (ТЗ §7.2, I-09): файл из манифеста → Web Speech pl-PL → 'none'.
+// Озвучка польского: файл из манифеста → Web Speech pl-PL → 'none'.
 // Речь только через HTMLAudioElement (на iOS играет в беззвучном режиме и надёжнее после фона).
 // Элементы пула создаются заранее и разблокируются тихим звуком внутри первого жеста (Title,
 // любой click/touchend); потом им можно менять src без жеста. Web Audio (AudioContext) здесь
@@ -8,7 +8,7 @@ import type { AudioVia, BusEvents } from '../../types/bus';
 
 export type { AudioVia } from '../../types/bus';
 
-/** `public/audio/manifest.json`, пишет tools/build_audio.py (ТЗ §7.1 п. 6). */
+/** `public/audio/manifest.json`, пишет tools/build_audio.py. */
 export interface AudioManifest {
   v: 1;
   /** Голос по умолчанию, `engine:id` (`say:Zosia` в срезе). */
@@ -55,7 +55,7 @@ export interface SpeechDeps {
   Utterance?: typeof SpeechSynthesisUtterance | null;
   emit?: Emit;
   poolSize?: number;
-  /** Сколько ждать `voiceschanged`, мс (ТЗ §7.2: до 1 с). */
+  /** Сколько ждать `voiceschanged`, мс. */
   voicesWaitMs?: number;
   /** Страховка, если `ended` не пришёл: длительность + этот запас, мс. */
   endSlackMs?: number;
@@ -311,7 +311,7 @@ export function createSpeech(deps: SpeechDeps): Speech {
       if (job.done) return;
       if (r === 'ok') return finish(job, 'file');
       if (r === 'blocked') {
-        // Жест потерян (возврат из фона, iOS): ждём unlock() из тоста и повторяем (ТЗ §7.2).
+        // Жест потерян (возврат из фона, iOS): ждём unlock() из тоста и повторяем.
         blocked = job;
         unlocked = false;
         emit('audio:state', { state: 'blocked', text: job.text, ...(job.id ? { id: job.id } : {}) });
@@ -433,7 +433,7 @@ export function getSpeech(): Speech {
 let emitter: Emit | null = null;
 
 /**
- * Разблокировка аудио (ТЗ §5.2, §7.2): элементы речи, Web Speech и AudioContext.
+ * Разблокировка аудио: элементы речи, Web Speech и AudioContext.
  * Вызывать строго внутри обработчика жеста (tap/click): синхронная часть идёт первой.
  */
 export async function unlockAudio(): Promise<boolean> {

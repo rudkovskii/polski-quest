@@ -1,4 +1,4 @@
-// DpadSource (ТЗ §2.7): экранный крест и кнопки «A»/«B» → сырые intents.
+// DpadSource: экранный крест и кнопки «A»/«B» → сырые intents.
 // Вёрстка и стили — src/ui/dpad.ts; здесь только pointer events на готовых элементах.
 // Каждый элемент ведёт свой pointerId, поэтому крест и «A» работают одновременно (мультитач).
 import type { Router } from './router';

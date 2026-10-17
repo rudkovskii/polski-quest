@@ -1,0 +1,13 @@
+{
+  "tiles": {
+    "grass": { "variants": [ {"sprite":"t_grass","frame":0}, {"sprite":"t_grass","frame":1}, {"sprite":"t_grass","frame":2}, {"sprite":"t_grass","frame":3} ] },
+    "path": { "sprite": "t_path", "mask": "auto16" },
+    "soil": { "sprite": "t_soil", "mask": "auto16" },
+    "fence": { "sprite": "t_fence", "mask": "auto16" },
+    "floor": { "variants": [ {"sprite":"t_floor","frame":0}, {"sprite":"t_floor","frame":1}, {"sprite":"t_floor","frame":2} ] },
+    "wall_top": { "sprite": "t_wall_top" },
+    "wall_face": { "sprite": "t_wall_face" },
+    "door": { "sprite": "t_door" },
+    "mat": { "sprite": "t_mat" }
+  }
+}

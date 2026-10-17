@@ -1,4 +1,4 @@
-// KeyboardSource (ТЗ §2.7): физическая клавиатура → сырые intents в роутер.
+// KeyboardSource: физическая клавиатура → сырые intents в роутер.
 // Читаем `e.code`, а не `e.key`: раскладка (русская, польская) не важна.
 import type { Router } from './router';
 import type { Dir, Intent } from './types';
@@ -109,7 +109,7 @@ export function createKeyboardSource(router: Router, target: Window | Document |
     if (isTextTarget(e.target)) releaseAll();
   };
   target.addEventListener('focusin', onFocusIn);
-  // Вкладку свернули с зажатой стрелкой (P-02): blur приходит не всегда (iOS, Cmd+Tab в полноэкранном), отпускаем сами.
+  // Вкладку свернули с зажатой стрелкой: blur приходит не всегда (iOS, Cmd+Tab в полноэкранном), отпускаем сами.
   const doc = typeof document !== 'undefined' ? document : null;
   const onVisibility = (): void => {
     if (doc?.visibilityState === 'hidden') releaseAll();

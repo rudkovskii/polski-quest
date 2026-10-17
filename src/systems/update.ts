@@ -1,4 +1,4 @@
-// Обновление сборки (P-10a): новый service worker уже управляет страницей (autoUpdate: skipWaiting + clientsClaim),
+// Обновление сборки: новый service worker уже управляет страницей (autoUpdate: skipWaiting + clientsClaim),
 // а на экране старый код. Что делать — решает чистая политика, склейка (src/systems/platform/pwa.ts, main.ts)
 // только перезагружает или показывает тост.
 //   • Игрок ещё на титуле (не нажал «Начать») — перезагрузить сразу: ничего не начато, прогресс в базе.
@@ -17,7 +17,7 @@ export function updateAction(o: { started: boolean; lastReloadAt: number | null;
 }
 
 /**
- * Сборка на экране не та, что на сервере (P-12): `local` — `__BUILD_ID__` кода, `index` — `<meta name="pq-build">`
+ * Сборка на экране не та, что на сервере: `local` — `__BUILD_ID__` кода, `index` — `<meta name="pq-build">`
  * из index.html (null — нет), `remote` — `version.json` без кэша (null — не прочитали: офлайн, dev). Расхождение —
  * повод перезагрузиться на титуле или показать тост (`updateAction`).
  */

@@ -1,4 +1,4 @@
-// Типы системы ввода (ТЗ §2.7). Живут в types/, чтобы на них ссылалась шина (types/bus.ts);
+// Типы системы ввода . Живут в types/, чтобы на них ссылалась шина (types/bus.ts);
 // src/input/types.ts реэкспортирует их для кода ввода.
 
 export type Dir = 'up' | 'down' | 'left' | 'right';
@@ -18,14 +18,11 @@ export type Intent =
   | { type: 'interact'; target?: string } // кнопка действия / тап по объекту (target = id объекта)
   | { type: 'cancel' } // Esc, кнопка «B», тап мимо оверлея
   /**
-   * Переключить выделенный интерактивный объект в локации `controls: tap` (ТЗ §2.7):
+   * Переключить выделенный интерактивный объект в локации `controls: tap` :
    * стрелки → dir, Tab → next, Shift+Tab → prev. В режиме `walk` роутер его не пропускает.
    */
   | { type: 'focus'; dir: Dir | 'next' | 'prev' }
-  /**
-   * Цифра 1–9 на клавиатуре (W-04): в мире Wola — мгновенный переход в место (1 дом, 2 Salad Story, 3 огород),
-   * в оверлее — выбрать вариант ответа с этим номером. Основная игра в мире её не использует.
-   */
+  /** Цифра 1–9 на клавиатуре: в оверлее (F-03) — выбрать вариант ответа с этим номером; мир её не использует. */
   | { type: 'hotkey'; n: number };
 
 export type Source = 'keyboard' | 'dpad' | 'pointer';
@@ -33,10 +30,10 @@ export type Source = 'keyboard' | 'dpad' | 'pointer';
 /** Куда идут intents: в мир (Phaser) или в DOM-оверлей. */
 export type Focus = 'world' | 'ui';
 
-/** Режим управления локации (`map.controls`, ТЗ §3.7). */
+/** Режим управления локации: walk (ходьба) или tap (только тап; в мире Фермы не используется). */
 export type MapControls = 'walk' | 'tap';
 
-/** Настройки `controls.*` (ТЗ §2.7, §5.11). */
+/** Настройки `controls.*` . */
 export type DpadSetting = 'auto' | 'always' | 'never';
 export type DpadSide = 'left' | 'right';
 export interface ControlsSettings {

@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// P-10a: новая сборка подхватывается при запуске. На титуле — перезагрузка сразу (с защитой от петли), в игре —
+// Новая сборка подхватывается при запуске. На титуле — перезагрузка сразу (с защитой от петли), в игре —
 // тост «Есть обновление» с кнопкой; перед перезагрузкой прогресс дописывается в базу.
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -7,7 +7,7 @@ import { workboxOptions } from '../tools/lib/pwa';
 import { RELOAD_GUARD_MS, updateAction } from '../src/systems/update';
 import { lastReloadAt, reloadForUpdate } from '../src/systems/platform/pwa';
 import { mountUpdateToast } from '../src/ui/updateToast';
-import { testBus } from './overlayKit';
+import { testBus } from './helpers';
 
 describe('политика обновления', () => {
   it('титул — перезагрузка; уже играет — тост; только что перезагружались — тост', () => {
@@ -36,7 +36,7 @@ describe('политика обновления', () => {
     expect(order2).toEqual(['reload']);
   });
 
-  it('тост «Есть обновление»: один, кнопка «Odśwież / Обновить» шлёт app:reload', () => {
+  it('тост «Есть обновление»: один, кнопка «Обновить» шлёт app:reload', () => {
     const root = document.createElement('div');
     document.body.append(root);
     const bus = testBus();
@@ -60,7 +60,7 @@ describe('политика обновления', () => {
     const cfg = readFileSync('vite.config.ts', 'utf8');
     expect(cfg).toMatch(/registerType: 'autoUpdate'/);
     expect(cfg).toMatch(/injectRegister: false/);
-    // W-04: опции Workbox вынесены в tools/lib/pwa.ts (их же проверяет tests/pwa_wola.test.ts).
+    // Опции Workbox вынесены в tools/lib/pwa.ts (тот же конфиг уходит в сборку).
     expect(cfg).toMatch(/workbox: workboxOptions\(\)/);
     expect(workboxOptions()).toMatchObject({ skipWaiting: true, clientsClaim: true });
     expect(readFileSync('src/main.ts', 'utf8')).toMatch(/registerPwa\(/);

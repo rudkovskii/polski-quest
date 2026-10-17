@@ -1,362 +1,259 @@
-// Модель локации (ТЗ §2.7, §5.4–5.5, I-07, P-02): ходьба по intents (4,5 клетки/с, поворот на месте, удержание,
-// очередь коротких нажатий), тап с путём, действие и «A»-пузырёк, грядки по клеткам, выходы, бобр, tap-режим.
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import type { LocationMap } from '../src/types/content';
-import { pickZoom } from '../src/world/camera';
-import { CELLS_PER_SEC, LocationModel, STEP_MS, TURN_MS, type WorldEvent } from '../src/world/location';
+import type { Dir } from '../src/types/input';
+import { CAT_SIT_AFTER_MS, CAT_SLEEP_AFTER_MS, LocationModel, STEP_MS, type WorldEvent } from '../src/world/location';
+import { modelAt, press, release, run, seeded, send } from './helpers';
 
-const map = (over: Partial<LocationMap> = {}): LocationMap => ({
-  id: 't.room',
-  title: { pl: 'x', ru: 'x' },
-  tileset: 'ninja16',
-  controls: 'walk',
-  size: [8, 6],
-  defaultGround: '.',
-  legend: { '.': { tile: 'floor' }, '#': { tile: 'wall', solid: true }, '=': { tile: 'stairs' } },
-  layers: { ground: ['########', '#......#', '#......#', '#......#', '#......#', '###=####'] },
-  spawns: { default: [3, 3] },
-  objects: [
-    { type: 'word', id: 'tablica', at: [1, 1], item: 'lx.wyjscie', ex: 'listen', sprite: 'sign_exit' },
-    { type: 'npc', id: 'pan_marek', at: [6, 1], facing: 'down' },
-    { type: 'trigger', id: 'mat', at: [5, 4], on: 'enter', do: [], once: true },
-    { type: 'exit', at: [3, 5], to: 'ch01.dzialka', spawn: 'from_metro' },
-  ],
-  ...over,
-});
+const exits = (evs: WorldEvent[]) => evs.filter((e) => e.type === 'exit');
+const interacts = (evs: WorldEvent[]) => evs.filter((e) => e.type === 'interact');
 
-const run = (m: LocationModel, ms: number): WorldEvent[] => {
-  const out: WorldEvent[] = [];
-  for (let t = 0; t < ms; t += 16) out.push(...m.update(16));
-  return out;
-};
-const of = <T extends WorldEvent['type']>(evs: WorldEvent[], type: T) => evs.filter((e) => e.type === type) as Extract<WorldEvent, { type: T }>[];
-
-describe('ходьба по intents', () => {
-  it('скорость 4–5 клеток в секунду', () => {
-    expect(CELLS_PER_SEC).toBeGreaterThanOrEqual(4);
-    expect(CELLS_PER_SEC).toBeLessThanOrEqual(5);
-    expect(STEP_MS).toBeCloseTo(1000 / CELLS_PER_SEC, 5);
-  });
-  it('удержание = идти, отпускание — стоп на клетке', () => {
-    const m = new LocationModel(map(), [1, 3], { facing: 'right' });
-    m.intent({ type: 'move', dir: 'right', held: true });
-    run(m, 560); // 2 полных шага (444 мс) и начат 3-й
-    m.intent({ type: 'move', dir: 'right', held: false });
-    run(m, 400);
-    expect(m.player.tile).toEqual([4, 3]); // начатый шаг доходит до клетки
+describe('ходьба', () => {
+  it('удержание стрелки идёт непрерывно, отпускание останавливает на клетке', () => {
+    const m = modelAt('farm', [10, 8], 'down');
+    press(m, 'right');
+    run(m, STEP_MS * 3.5);
+    release(m, 'right');
+    run(m, STEP_MS * 2);
+    expect(m.player.tile).toEqual([14, 8]);
     expect(m.moving).toBe(false);
   });
-  it('удержание без пауз: шаги идут встык, остаток времени переходит в следующий шаг', () => {
-    const m = new LocationModel(map(), [1, 3], { facing: 'right' });
-    m.intent({ type: 'move', dir: 'right', held: true });
-    m.update(STEP_MS * 1.5);
-    expect(m.player.tile).toEqual([2, 3]);
-    expect(LocationModel.pos(m.player)[0]).toBeCloseTo(2.5, 5);
+
+  it('короткий тап стрелки = один шаг, в том числе с поворотом', () => {
+    const m = modelAt('farm', [10, 8], 'down');
+    press(m, 'right');
+    release(m, 'right');
+    run(m, STEP_MS * 3);
+    expect(m.player.tile).toEqual([11, 8]);
+    expect(m.player.facing).toBe('right');
   });
-  it('короткое нажатие туда, куда смотрит, = один шаг; нажатие посреди шага ставится в очередь', () => {
-    const m = new LocationModel(map(), [1, 3], { facing: 'right' });
-    m.intent({ type: 'move', dir: 'right', held: true });
-    m.intent({ type: 'move', dir: 'right', held: false });
-    run(m, 50);
-    m.intent({ type: 'move', dir: 'right', held: true });
-    m.intent({ type: 'move', dir: 'right', held: false });
-    run(m, 600);
-    expect(m.player.tile).toEqual([3, 3]);
+
+  it('стена: бамп один раз, без шага', () => {
+    const m = modelAt('home', [7, 2], 'up');
+    press(m, 'up');
+    const evs = run(m, 400);
+    expect(evs.filter((e) => e.type === 'bump')).toHaveLength(1);
+    expect(m.player.tile).toEqual([7, 2]);
   });
-  it('очередь коротких нажатий в разные стороны: каждое — шаг, без пауз на поворот', () => {
-    const m = new LocationModel(map(), [2, 2], { facing: 'right' });
-    m.intent({ type: 'move', dir: 'right', held: true });
-    m.intent({ type: 'move', dir: 'right', held: false });
-    m.update(30);
-    m.intent({ type: 'move', dir: 'down', held: true });
-    m.intent({ type: 'move', dir: 'down', held: false });
-    run(m, STEP_MS * 2 + 50);
-    expect(m.player.tile).toEqual([3, 3]);
-    expect(m.player.facing).toBe('down');
+
+  it('тап = дойти: goto ведёт по пути в клетку, стены и объекты обходит', () => {
+    const m = modelAt('home', [6, 7], 'up');
+    send(m, { type: 'goto', tile: [1, 5] });
+    run(m, STEP_MS * 12);
+    expect(m.player.tile).toEqual([1, 5]);
   });
-  it('короткое нажатие в другую сторону = поворот на месте без шага', () => {
-    const m = new LocationModel(map(), [3, 3], { facing: 'down' });
-    m.intent({ type: 'move', dir: 'left', held: true });
-    run(m, TURN_MS / 2);
-    m.intent({ type: 'move', dir: 'left', held: false });
-    run(m, 500);
-    expect(m.player.tile).toEqual([3, 3]);
-    expect(m.player.facing).toBe('left');
-  });
-  it('удержание в другую сторону: поворот, через TURN_MS пошёл', () => {
-    const m = new LocationModel(map(), [3, 3], { facing: 'down' });
-    m.intent({ type: 'move', dir: 'left', held: true });
-    m.update(TURN_MS - 10);
-    expect(m.moving).toBe(false);
-    expect(m.player.facing).toBe('left');
-    m.update(20);
-    expect(m.moving).toBe(true);
-    m.intent({ type: 'move', dir: 'left', held: false });
-    run(m, 400);
-    expect(m.player.tile).toEqual([2, 3]);
-  });
-  it('смена направления на ходу: без остановки и без паузы на поворот', () => {
-    const m = new LocationModel(map(), [1, 1], { facing: 'right' });
-    m.intent({ type: 'move', dir: 'right', held: true });
-    m.update(STEP_MS / 2);
-    // Роутер: новое удержание (вниз), потом снятие старого (вправо).
-    m.intent({ type: 'move', dir: 'down', held: true });
-    m.intent({ type: 'move', dir: 'right', held: false });
-    m.update(STEP_MS / 2 + STEP_MS / 4); // шаг вправо дошёл, следующий вниз уже идёт
-    expect(m.player.tile).toEqual([2, 1]);
-    expect(m.player.step?.to).toEqual([2, 2]);
-    expect(LocationModel.pos(m.player)[1]).toBeCloseTo(1.25, 5);
-  });
-  it('стена: стоит, смотрит в стену, одно событие bump на нажатие', () => {
-    const m = new LocationModel(map(), [1, 3]);
-    m.intent({ type: 'move', dir: 'left', held: true });
-    const evs = run(m, 500);
-    expect(m.player.tile).toEqual([1, 3]);
-    expect(m.player.facing).toBe('left');
-    expect(of(evs, 'bump')).toHaveLength(1);
-  });
-  it('NPC и слово непроходимы', () => {
-    const m = new LocationModel(map(), [6, 3]);
-    m.intent({ type: 'move', dir: 'up', held: true });
-    run(m, 1000);
-    expect(m.player.tile).toEqual([6, 2]);
-  });
-  it('интерполяция: позиция между клетками во время шага', () => {
-    const m = new LocationModel(map(), [1, 3], { facing: 'right' });
-    m.intent({ type: 'move', dir: 'right', held: true });
-    m.update(STEP_MS / 2);
-    const [x] = LocationModel.pos(m.player);
-    expect(x).toBeCloseTo(1.5, 5);
+
+  it('новая стрелка отменяет путь', () => {
+    const m = modelAt('farm', [5, 7], 'down');
+    send(m, { type: 'goto', tile: [20, 10] });
+    run(m, STEP_MS * 2);
+    press(m, 'up');
+    release(m, 'up');
+    run(m, STEP_MS * 4);
+    expect(m.player.tile[0]).toBeLessThan(10);
   });
 });
 
-describe('тап и путь', () => {
-  it('goto: путь BFS до клетки', () => {
-    const m = new LocationModel(map(), [1, 3]);
-    m.intent({ type: 'goto', tile: [6, 4] });
-    run(m, 2000);
-    expect(m.player.tile).toEqual([6, 4]);
-  });
-  it('goto в стену → к ближайшей достижимой', () => {
-    const m = new LocationModel(map(), [1, 3]);
-    m.intent({ type: 'goto', tile: [7, 3] });
-    run(m, 2000);
-    expect(m.player.tile).toEqual([6, 3]);
-  });
-  it('move отменяет путь goto', () => {
-    const m = new LocationModel(map(), [1, 3]);
-    m.intent({ type: 'goto', tile: [6, 3] });
-    run(m, 200);
-    m.intent({ type: 'move', dir: 'down', held: true });
-    m.intent({ type: 'move', dir: 'down', held: false });
-    run(m, 1500);
-    expect(m.player.tile[1]).toBe(4);
-    expect(m.player.tile[0]).toBeLessThan(6);
-  });
-  it('тап по объекту вдали: подойти, развернуться, interact', () => {
-    const m = new LocationModel(map(), [5, 4 - 1]);
-    m.intent({ type: 'interact', target: 'word:tablica' });
-    const evs = run(m, 3000);
-    const it = of(evs, 'interact');
-    expect(it).toHaveLength(1);
-    expect(it[0]).toMatchObject({ kind: 'word', id: 'tablica', item: 'lx.wyjscie', ex: 'listen', via: 'tap', tile: [1, 1] });
-    const [px, py] = m.player.tile;
-    expect(Math.abs(px - 1) + Math.abs(py - 1)).toBe(1);
-  });
-});
-
-describe('кнопка действия и подсветка', () => {
-  it('действие с объектом перед Димой, иначе с соседним', () => {
-    const m = new LocationModel(map(), [6, 2], { facing: 'left' });
-    expect(m.highlight()).toEqual({ key: 'npc:pan_marek', tile: [6, 1] });
-    m.intent({ type: 'interact' });
-    const evs = run(m, 20);
-    expect(of(evs, 'interact')[0]).toMatchObject({ kind: 'npc', id: 'pan_marek', via: 'action' });
-    expect(m.player.facing).toBe('up');
-  });
-  it('нет соседей — нет события и нет подсветки', () => {
-    const m = new LocationModel(map(), [3, 3]);
-    expect(m.highlight()).toBeNull();
-    m.intent({ type: 'interact' });
-    expect(of(run(m, 20), 'interact')).toHaveLength(0);
-  });
-  it('во время шага подсветки нет, действие выполняется по приходу', () => {
-    const m = new LocationModel(map(), [6, 3], { facing: 'up' });
-    m.intent({ type: 'move', dir: 'up', held: true });
-    m.intent({ type: 'move', dir: 'up', held: false });
-    m.update(10);
-    expect(m.highlight()).toBeNull();
-    m.intent({ type: 'interact' });
-    const evs = run(m, 300);
-    expect(of(evs, 'interact')[0]).toMatchObject({ id: 'pan_marek' });
-  });
-});
-
-describe('триггеры и выходы', () => {
-  it('trigger on enter срабатывает при входе, once — один раз', () => {
-    const m = new LocationModel(map(), [4, 4]);
-    const go = (dir: 'left' | 'right'): WorldEvent[] => {
-      m.intent({ type: 'move', dir, held: true });
-      const evs = run(m, TURN_MS + 20); // поворот, если смотрел не туда, и шаг
-      m.intent({ type: 'move', dir, held: false });
-      return [...evs, ...run(m, 300)];
-    };
-    expect(of(go('right'), 'interact')).toMatchObject([{ kind: 'trigger', id: 'mat', via: 'enter' }]);
-    go('left');
-    expect(of(go('right'), 'interact')).toHaveLength(0);
-  });
-  it('шаг на выход → событие exit, дальше модель стоит', () => {
-    const m = new LocationModel(map(), [3, 4]);
-    m.intent({ type: 'move', dir: 'down', held: true });
-    const evs = run(m, 1000);
-    expect(of(evs, 'exit')).toEqual([{ type: 'exit', to: 'ch01.dzialka', spawn: 'from_metro', tile: [3, 5] }]);
+describe('двери и переходы', () => {
+  it('из дома: шаг в дверь даёт exit на ферму со спавном у двери дома', () => {
+    const m = modelAt('home', 'from_farm');
+    press(m, 'down');
+    const evs = run(m, STEP_MS * 3);
+    expect(exits(evs)).toEqual([{ type: 'exit', to: 'farm', spawn: 'house_door', tile: [6, 8] }]);
     expect(m.done).toBe(true);
-    expect(m.player.tile).toEqual([3, 5]);
+  });
+
+  it('с фермы: шаг в дверь дома даёт exit в дом', () => {
+    const m = modelAt('farm', 'house_door');
+    press(m, 'up');
+    const evs = run(m, STEP_MS * 3);
+    expect(exits(evs)).toEqual([{ type: 'exit', to: 'home', spawn: 'from_farm', tile: [5, 5] }]);
+  });
+
+  it('A перед дверью проводит в дверь; тап по двери тоже', () => {
+    const a = modelAt('farm', 'house_door', 'up');
+    send(a, { type: 'interact' });
+    expect(exits(run(a, STEP_MS * 3))).toHaveLength(1);
+    const t = modelAt('farm', 'house_door', 'down');
+    send(t, { type: 'goto', tile: [5, 5] });
+    expect(exits(run(t, STEP_MS * 3))).toHaveLength(1);
+  });
+
+  it('путь по тапу не идёт сквозь чужую дверь', () => {
+    const m = modelAt('home', [6, 7], 'up');
+    send(m, { type: 'goto', tile: [6, 6] });
+    run(m, STEP_MS * 3);
+    expect(m.done).toBe(false);
   });
 });
 
-describe('бобр-компаньон', () => {
-  it('в walk-локации идёт следом, на клетку, которую Дима покинул', () => {
-    const m = new LocationModel(map(), [2, 3]);
-    expect(m.companion).not.toBeNull();
-    m.intent({ type: 'move', dir: 'right', held: true });
-    run(m, 500);
-    m.intent({ type: 'move', dir: 'right', held: false });
-    run(m, 300);
-    const [px, py] = m.player.tile;
-    expect(m.companion!.tile).toEqual([px - 1, py]);
+describe('интерактивные объекты', () => {
+  it('A у стола: событие interact с use=desk, id и подписью', () => {
+    const m = modelAt('home', [8, 4], 'up');
+    send(m, { type: 'interact' });
+    expect(interacts(run(m, 100))).toEqual([{ type: 'interact', id: 'desk', use: 'desk', label: 'Słownik · Словарь', key: 'prop:desk', tile: [8, 3], via: 'action', facing: 'up' }]);
   });
-  it('в tap-локации и там, где бобр стоит NPC, компаньона нет', () => {
-    expect(new LocationModel(map({ controls: 'tap' }), [3, 3]).companion).toBeNull();
-    const withBobr = map({ objects: [{ type: 'npc', id: 'bobr', at: [5, 2] }] });
-    expect(new LocationModel(withBobr, [3, 3]).companion).toBeNull();
+
+  it('A без объекта рядом ничего не делает', () => {
+    const m = modelAt('home', [6, 5], 'down');
+    send(m, { type: 'interact' });
+    expect(run(m, 100)).toEqual([]);
+  });
+
+  it('тап по объекту издалека: герой подходит и шлёт interact (via tap)', () => {
+    const m = modelAt('farm', [5, 8], 'down');
+    send(m, { type: 'interact', target: 'prop:board' });
+    const evs = run(m, STEP_MS * 12);
+    expect(interacts(evs)).toMatchObject([{ use: 'board', via: 'tap' }]);
+    const [dx = 0, dy = 0] = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] }[m.player.facing];
+    expect(m.usableAt([m.player.tile[0] + dx, m.player.tile[1] + dy])?.use).toBe('board');
+  });
+
+  it('все пять: bed, desk, shelf дома; bin, board на ферме', () => {
+    const cases: [string, string, [number, number], Dir][] = [
+      ['home', 'bed', [1, 4], 'up'],
+      ['home', 'shelf', [5, 3], 'up'],
+      ['home', 'desk', [9, 4], 'up'],
+      ['farm', 'bin', [9, 6], 'up'],
+      ['farm', 'board', [12, 10], 'up'],
+    ];
+    for (const [map, use, at, face] of cases) {
+      const m = modelAt(map, at, face);
+      send(m, { type: 'interact' });
+      expect(interacts(run(m, 100)).map((e) => (e.type === 'interact' ? e.use : '')), `${map}:${use}`).toEqual([use]);
+    }
+  });
+
+  it('герой не проходит сквозь объекты', () => {
+    const m = modelAt('home', [8, 4], 'up');
+    press(m, 'up');
+    run(m, 400);
+    expect(m.player.tile).toEqual([8, 4]);
   });
 });
 
-describe('tap-локация (режим остался для карт-меню)', () => {
-  const tapMap = map({
-    controls: 'tap',
-    objects: [
-      { type: 'plot', id: 'grzadki', at: [1, 1], size: [3, 2] },
-      { type: 'npc', id: 'bobr', at: [5, 2], facing: 'left' },
-      { type: 'trigger', id: 'altana_sleep', at: [5, 4], on: 'tap', do: [] },
-      { type: 'exit', at: [3, 5], to: 'ch01.metro', spawn: 'from_dzialka' },
-    ],
+describe('рыжий кот', () => {
+  it('идёт за героем по пятам и переходит между картами вместе с ним', () => {
+    const m = modelAt('farm', [5, 8], 'right');
+    press(m, 'right');
+    run(m, STEP_MS * 12);
+    release(m, 'right');
+    run(m, 1500);
+    expect(Math.abs(m.cat!.tile[0] - m.player.tile[0]) + Math.abs(m.cat!.tile[1] - m.player.tile[1])).toBeLessThanOrEqual(2);
+    // новая карта: кот создаётся рядом с героем у двери, не на двери и не на нём
+    const h = modelAt('home', 'from_farm');
+    expect(h.cat).not.toBeNull();
+    expect(h.cat!.tile).not.toEqual(h.player.tile);
+    expect(h.isExit(h.cat!.tile)).toBe(false);
   });
-  it('ходьбы нет: move и goto игнорируются', () => {
-    const m = new LocationModel(tapMap, [3, 4]);
-    m.intent({ type: 'move', dir: 'up', held: true });
-    m.intent({ type: 'goto', tile: [3, 3] });
-    run(m, 1000);
-    expect(m.player.tile).toEqual([3, 4]);
-    expect(m.actionHint()).toBeNull(); // «A»-пузырька в tap-режиме нет
-  });
-  it('тап по грядке: interact с клеткой грядки; по траве — не цель; по выходу — переход', () => {
-    const m = new LocationModel(tapMap, [3, 4]);
-    const target = m.targetAt([2, 2]);
-    expect(target).toBe('plot:grzadki@2,2');
-    m.intent({ type: 'interact', target: target! });
-    expect(of(run(m, 16), 'interact')[0]).toMatchObject({ kind: 'plot', id: 'grzadki', tile: [2, 2], via: 'tap' });
-    expect(m.targetAt([4, 3])).toBeNull();
-    m.intent({ type: 'interact', target: m.targetAt([3, 5])! });
-    expect(of(run(m, 16), 'exit')[0]).toMatchObject({ to: 'ch01.metro' });
-  });
-  it('Tab/стрелки двигают выделение, Enter = interact выделенного', () => {
-    const m = new LocationModel(tapMap, [3, 4]);
-    m.intent({ type: 'focus', dir: 'next' });
-    expect(m.highlight()?.key).toBe('plot:grzadki');
-    m.intent({ type: 'focus', dir: 'right' });
-    expect(m.highlight()?.key).toBe('npc:bobr');
-    m.intent({ type: 'interact' });
-    expect(of(run(m, 16), 'interact')[0]).toMatchObject({ kind: 'npc', id: 'bobr', via: 'action' });
-  });
-});
 
-describe('działka с ходьбой (P-02)', () => {
-  const dz = JSON.parse(readFileSync('content/modules/ch01/maps/dzialka.json', 'utf8')) as LocationMap;
-  const plot = dz.objects.find((o) => o.type === 'plot')!;
-  const [px0, py0] = plot.at;
-  const cell = (x: number, y: number) => ({ at: [px0 + x, py0 + y] as [number, number] });
-  const garden = [{ ...cell(0, 0), item: 'lx.woda' }, { ...cell(1, 0), item: 'lx.kawa' }, cell(2, 0), cell(3, 0)];
-
-  it('карта ходьбы: d-pad, а не тап; стрелками доходишь от калитки до грядок', () => {
-    expect(dz.controls).toBe('walk');
-    const m = new LocationModel(dz, dz.spawns.default as [number, number], { facing: 'up' });
-    m.intent({ type: 'move', dir: 'up', held: true });
-    run(m, 3000);
-    expect(m.player.tile[1]).toBeLessThan(dz.spawns.default![1]!);
+  it('когда герой стоит, садится рядом: не на клетке героя и не перед его лицом', () => {
+    const m = modelAt('farm', [14, 7], 'right');
+    run(m, CAT_SIT_AFTER_MS + 5000);
+    const c = m.cat!;
+    expect(['sit', 'wash']).toContain(c.mode);
+    expect(c.tile).not.toEqual(m.player.tile);
+    expect(c.tile).not.toEqual([15, 7]);
+    expect(c.tile).not.toEqual([14, 6]); // над героем его закрывал бы высокий спрайт
+    expect(Math.abs(c.tile[0] - 14) + Math.abs(c.tile[1] - 7)).toBeLessThanOrEqual(2);
   });
-  it('A у грядки: подойти, повернуться к клетке — полив именно этого растения', () => {
-    // Встать под клеткой «lx.kawa» (на клетку ниже грядки) и посмотреть вверх.
-    const below: [number, number] = [px0 + 1, py0 + plot.size![1]!];
-    const m = new LocationModel(dz, below, { facing: 'left' });
-    m.setGarden(garden.map((c) => ({ ...c, at: [c.at[0], c.at[1] + plot.size![1]! - 1] as [number, number] })), 0);
-    m.intent({ type: 'move', dir: 'up', held: true });
-    m.intent({ type: 'move', dir: 'up', held: false }); // короткое: только поворот
+
+  it('не загораживает дверь: ни на ней, ни на клетке подхода, пока герой стоит у двери', () => {
+    const m = modelAt('farm', 'house_door', 'up');
+    run(m, 15_000);
+    const c = m.cat!;
+    expect(c.tile).not.toEqual([5, 5]);
+    expect(c.tile).not.toEqual([5, 6]);
+    expect(c.tile).not.toEqual(m.player.tile);
+    const home = modelAt('home', 'from_farm', 'up');
+    run(home, 15_000);
+    expect(home.cat!.tile).not.toEqual([6, 8]);
+    expect(home.cat!.tile).not.toEqual([6, 7]);
+  });
+
+  it('в доме при долгом покое идёт спать к кровати, от движения героя просыпается', () => {
+    const m = modelAt('home', [6, 6], 'up');
+    run(m, CAT_SLEEP_AFTER_MS + 8000);
+    expect(m.cat!.mode).toBe('sleep');
+    expect(m.cat!.tile).toEqual(m.spot('cat_sleep'));
+    press(m, 'left');
+    release(m, 'left');
+    run(m, 100);
+    expect(m.cat!.mode).toBe('follow');
+  });
+
+  it('герой шагает на кота: кот уступает, на клетке героя его нет', () => {
+    const m = modelAt('farm', [14, 7], 'right');
+    // загнать кота прямо перед героя
     run(m, 200);
-    expect(m.player.tile).toEqual(below);
-    expect(m.actionHint()).toEqual({ key: 'plot:grzadki', tile: [px0 + 1, py0 + plot.size![1]! - 1] });
-    m.intent({ type: 'interact' });
-    expect(of(run(m, 16), 'interact')[0]).toMatchObject({ kind: 'plot', id: 'grzadki', via: 'action', tile: [px0 + 1, py0 + plot.size![1]! - 1] });
+    const c = m.cat!;
+    c.step = null;
+    c.tile = [15, 7];
+    press(m, 'right');
+    for (let t = 0; t < 600; t += 16) {
+      m.update(16);
+      const step = c.step as { to: [number, number]; sync?: boolean } | null;
+      if (step && !step.sync) expect(step.to).not.toEqual(m.player.tile);
+      if (!step) expect(c.tile).not.toEqual(m.player.tile);
+    }
+    release(m, 'right');
   });
-  it('A по пустой клетке: без семян — не цель (нет пузырька), с семенем — посадка', () => {
-    const m = new LocationModel(dz, [px0 + 2, py0 - 1], { facing: 'down' });
-    m.setGarden(garden, 0);
-    expect(m.actionHint()).toBeNull();
-    m.intent({ type: 'interact' });
-    expect(of(run(m, 16), 'interact')).toHaveLength(0);
-    m.setGarden(garden, 1);
-    expect(m.actionHint()).toEqual({ key: 'plot:grzadki', tile: [px0 + 2, py0] });
-    m.intent({ type: 'interact' });
-    expect(of(run(m, 16), 'interact')[0]).toMatchObject({ kind: 'plot', tile: [px0 + 2, py0], via: 'action' });
-  });
-  it('грядка — только перед лицом: соседнее растение сбоку A не поливает', () => {
-    const m = new LocationModel(dz, [px0 + 1, py0 - 1], { facing: 'up' });
-    m.setGarden(garden, 0);
-    expect(m.actionHint()).toBeNull();
-  });
-  it('тап по растению вдали: дойти до соседней с ним клетки, повернуться, полить именно его', () => {
-    const m = new LocationModel(dz, dz.spawns.default as [number, number]);
-    m.setGarden(garden, 0);
-    const t = m.targetAt([px0 + 1, py0]);
-    expect(t).toBe(`plot:grzadki@${px0 + 1},${py0}`);
-    m.intent({ type: 'interact', target: t! });
-    const evs = of(run(m, 8000), 'interact');
-    expect(evs).toHaveLength(1);
-    expect(evs[0]).toMatchObject({ kind: 'plot', tile: [px0 + 1, py0], via: 'tap' });
-    const [x, y] = m.player.tile;
-    expect(Math.abs(x - (px0 + 1)) + Math.abs(y - py0)).toBe(1); // рядом, не на ней
-    const ahead = [x + { up: 0, down: 0, left: -1, right: 1 }[m.player.facing], y + { up: -1, down: 1, left: 0, right: 0 }[m.player.facing]];
-    expect(ahead).toEqual([px0 + 1, py0]); // смотрит на неё
-  });
-  it('тап по пустой клетке без семян — просто дойти туда', () => {
-    const m = new LocationModel(dz, dz.spawns.default as [number, number]);
-    m.setGarden(garden, 0);
-    expect(m.targetAt([px0 + 3, py0])).toBeNull();
-  });
-  it('берег — A перед ним; выход — шаг в калитку', () => {
-    // P-10b: альтанка больше не триггер сна (спать только в хатке), A проверяем на береге Вислы.
-    expect(dz.objects.some((o) => o.type === 'trigger' && o.id === 'altana_sleep')).toBe(false);
-    const alt = dz.objects.find((o) => o.type === 'trigger' && o.id === 'ryby') as Extract<LocationMap['objects'][number], { type: 'trigger' }>;
-    const m = new LocationModel(dz, [alt.at[0] - 1, alt.at[1]], { facing: 'right' });
-    expect(m.actionHint()?.key).toBe('trigger:ryby');
-    const ex = dz.objects.find((o) => o.type === 'exit')!;
-    const m2 = new LocationModel(dz, [ex.at[0], ex.at[1] - 1], { facing: 'down' });
-    m2.intent({ type: 'move', dir: 'down', held: true });
-    expect(of(run(m2, 600), 'exit')[0]).toMatchObject({ to: 'ch01.metro' });
+
+  it('инвариант на случайной ходьбе: кот не на клетке героя, не на двери, не сидит у двери', () => {
+    for (const first of ['farm', 'home']) {
+      const rand = seeded(7);
+      const dirs: Dir[] = ['up', 'down', 'left', 'right'];
+      let m = modelAt(first, 'default', 'down', 3);
+      let held: Dir | null = null;
+      let frames = 0;
+      let doors = 0;
+      let overlap = 0;
+      const nearExit = (c: readonly [number, number]): boolean => m.objects.some((o) => o.kind === 'exit' && Math.abs(o.at[0] - c[0]) + Math.abs(o.at[1] - c[1]) <= 1);
+      for (let i = 0; i < 8000; i++) {
+        if (i % 20 === 0) {
+          const r = rand();
+          if (held) release(m, held);
+          held = null;
+          if (r < 0.55) {
+            held = dirs[Math.floor(rand() * 4)]!;
+            press(m, held);
+          } else if (r < 0.7) send(m, { type: 'goto', tile: [Math.floor(rand() * m.parsed.w), Math.floor(rand() * m.parsed.h)] });
+          else if (r < 0.75) send(m, { type: 'interact' });
+        }
+        const evs = m.update(16 + Math.floor(rand() * 20));
+        const ex = exits(evs)[0];
+        if (ex?.type === 'exit') {
+          // как в сцене: новая карта, герой и кот заново у двери
+          doors++;
+          held = null;
+          m = modelAt(ex.to, ex.spawn, undefined, i);
+          continue;
+        }
+        const c = m.cat!;
+        frames++;
+        // Кот на клетке героя бывает только мгновение: уступает дорогу, шаг прочь уже идёт (меньше шага кота).
+        if (c.tile[0] === m.player.tile[0] && c.tile[1] === m.player.tile[1]) {
+          overlap++;
+          expect(c.step && !c.step.sync, `${m.map.id}: кот стоит на клетке героя, кадр ${i}`).toBeTruthy();
+          expect(overlap, `${m.map.id}: кот долго на клетке героя, кадр ${i}`).toBeLessThanOrEqual(14);
+        } else overlap = 0;
+        expect(m.isExit(c.tile), `${m.map.id}: кот на двери, кадр ${i}`).toBe(false);
+        if (c.step && !c.step.sync) expect(c.step.to).not.toEqual(m.player.tile);
+        if (!c.step && (c.mode === 'sit' || c.mode === 'wash') && !m.busy) expect(nearExit(c.tile), `${m.map.id}: кот сидит у двери, кадр ${i}`).toBe(false);
+      }
+      expect(frames).toBeGreaterThan(3000);
+      expect(doors).toBeGreaterThanOrEqual(0);
+    }
   });
 });
 
-describe('камера', () => {
-  it('целый zoom: iPhone портрет — 2 (≈12 клеток в ширину), Mac 800×600 — 3, большой экран ≤ 4', () => {
-    expect(pickZoom(393, 760, 320, 224)).toBe(2); // metro на iPhone
-    expect(pickZoom(375, 812, 256, 256)).toBe(2); // działka на iPhone SE
-    expect(pickZoom(430, 932, 256, 256)).toBe(2); // działka на iPhone Pro Max
-    expect(pickZoom(800, 600, 256, 256)).toBe(3); // Mac, маленькое окно
-    expect(pickZoom(1024, 768, 320, 224)).toBe(4);
-    expect(pickZoom(2560, 1400, 160, 112)).toBe(4);
-    expect(pickZoom(1440, 800, 1600, 1600)).toBe(4); // большая карта: база по короткой стороне, не крупнее 4
-    expect(pickZoom(300, 300, 64, 64)).toBe(4); // крошечная карта растягивается, но не больше 4
+describe('позиция', () => {
+  it('остановка героя даёт клетку и поворот для сохранения', () => {
+    const m = modelAt('farm', [10, 8], 'down');
+    press(m, 'left');
+    run(m, STEP_MS * 2.2);
+    release(m, 'left');
+    run(m, STEP_MS * 2);
+    expect(m.player.tile).toEqual([7, 8]);
+    expect(m.player.facing).toBe('left');
+    expect(m).toBeInstanceOf(LocationModel);
   });
 });

@@ -1,216 +1,132 @@
 import Phaser from 'phaser';
 import { startInput } from './input';
-import { Boot, type BootStart } from './scenes/Boot';
-import { Location, type LocationData } from './scenes/Location';
-import { Title } from './scenes/Title';
-import { offlineRpc, startCloud, type CloudOptions } from './cloud';
-import { startFlow } from './flow';
-import { startAvatar, startPlayerName } from './avatarGlue';
-import { withAvatarPortraits } from './ui/avatar';
-import { mountCreator } from './ui/creator';
-import { mountGuide } from './ui/guide';
-import { bus } from './systems/bus';
+import { Boot } from './scenes/Boot';
+import { BG_COLOR, World, type WorldStart } from './scenes/World';
+import { bus, type Bus } from './systems/bus';
 import { connectAudio } from './systems/platform/audio';
-import { setSoundUnavailable } from './systems/sound';
-import { getContent } from './systems/content';
-import { mountUi } from './ui';
-import { mountAudioToast } from './ui/audioToast';
-import { mountUpdateToast } from './ui/updateToast';
 import { lastReloadAt, registerPwa, reloadForUpdate, watchVersion } from './systems/platform/pwa';
-import { staleBuild, updateAction } from './systems/update';
-import { loadPortraits, mountPlay, type PlayDeps } from './ui/play';
-import { dpadLabelsOn, mountDpad } from './ui/dpad';
-import { setTodoVisible } from './ui/todo';
-import { startDay } from './day';
-import { createClock } from './systems/platform/clock';
-import { storedSecret } from './systems/platform/secret';
 import { GameStorage, memoryKV } from './systems/platform/storage';
-import { busAudio } from './ui/overlay/kit';
-import { setFlag } from './systems/progress';
-import { seedFlag } from './world/dzialka';
+import { exportFileName, exportSave, importSave, type Save } from './systems/save';
+import { staleBuild, updateAction } from './systems/update';
+import type { BusEvents } from './types/bus';
+import { mountAudioToast } from './ui/audioToast';
+import { mountBubble } from './ui/bubble';
+import { mountDpad } from './ui/dpad';
+import { mountHud } from './ui/hud';
+import { mountSettings } from './ui/settings';
+import { mountUpdateToast } from './ui/updateToast';
 
 const params = new URLSearchParams(location.search);
-const dev = params.get('dev');
-/**
- * Dev-прогон всей игры (I-13): `?dev=play` (или `?reset=1` без dev) — Title → LinkSetup → режиссёр, но прогресс
- * в отдельной базе `polski-quest-play` и облако выключено (ничего не уходит в Supabase). `reset=1` стирает базу:
- * чистый профиль. Повторный запуск — `?dev=play&mute=1` (база сохранилась), `&now=+8d` — весна.
- */
-// Свой профиль параллельной проверки (`?dev=p10a`): тот же прогон, отдельная база `polski-quest-p10a`.
-const playProfile = !!dev && /^p\d+[a-z]?$/.test(dev);
-const playDev = dev === 'play' || playProfile || (!dev && params.get('reset') === '1');
-// Dev-часы (I-12): `?now=<ISO>` или `?now=+1d` сдвигают время во всех deps; только вместе с `dev`.
-const clock = createClock(dev || playDev ? params.get('now') : null);
-// Без звука вслух (AGENTS.md): `?mute=1` — `audio:play` только в консоль.
+const dev = params.get('dev') === '1';
+// Без звука вслух: `?mute=1` — `audio:play` только в консоль.
 const mute = params.get('mute') === '1';
-// Реплики-заглушки `[todo: id]` (P-01): только dev-сервер с dev-режимом; в сборке никогда, `&todo=0` прячет.
-const showTodo = import.meta.env.DEV && (!!dev || playDev) && params.get('todo') !== '0';
-setTodoVisible(showTodo);
 
-interface StartOptions {
-  /** Хранилище без облака (dev=world): отдельная база, синк не запускается. */
-  devStore?: Promise<GameStorage>;
-  /** Опции синка (dev=play: своя база и облако выключено). */
-  cloud?: CloudOptions;
-  /** P-06: `&day=N` — чистый мир сразу в игровой день N (src/dev/seedDay.ts). */
-  seedDay?: number;
+function download(name: string, text: string): void {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
-// Склейка слоёв (ТЗ §2.1): DOM-оверлей, d-pad, ввод, Phaser. Порядок важен (I-03): сначала d-pad
-// (он слушает `input:dpad`), потом startInput, тап по карте разбирает активная сцена Location.
-function startGame(start?: BootStart, opts: StartOptions = {}): Phaser.Game {
+/** Шина для озвучки с выключателем: звук выкл — `audio:play` не доходит до плеера, но `done` вызывается. */
+function gatedAudioBus(source: Bus<BusEvents>, enabled: () => boolean): Bus<BusEvents> {
+  return {
+    ...source,
+    on(type, fn) {
+      if (type !== 'audio:play') return source.on(type, fn);
+      return source.on('audio:play', (p) => {
+        if (enabled()) (fn as (p: BusEvents['audio:play']) => void)(p);
+        else p.done?.('none');
+      });
+    },
+  };
+}
+
+async function main(): Promise<void> {
   const overlay = document.getElementById('overlay');
   const parent = document.getElementById('game');
   if (!overlay || !parent) throw new Error('#overlay или #game не найден');
-  mountUi(overlay);
-  // Озвучка (I-09): `audio:play` из UI, разблокировка на Title и первом жесте, тост после фона.
+
+  const store = new GameStorage(params.get('mem') === '1' ? { kv: memoryKV(), ls: null } : {});
+  const { save } = await store.load(Date.now());
+  store.attachLifecycle();
+  void store.requestPersist();
+
+  // Звук: выключатель в настройках, `?mute=1` — вообще без звука.
   if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
-  else connectAudio(bus);
-  // P-12: звука нет на деле — задания на слух читаются, как при «Bez dźwięku» (systems/sound.ts). `?mute=1` — сразу;
-  // фразу нечем озвучить (`none`) — до первой прозвучавшей.
-  if (mute) setSoundUnavailable(true);
-  bus.on('audio:state', ({ state }) => {
-    if (mute) return;
-    if (state === 'none') setSoundUnavailable(true);
-    else if (state === 'playing') setSoundUnavailable(false);
-  });
+  else connectAudio(gatedAudioBus(bus, () => store.save.settings.sound));
   mountAudioToast(overlay);
   mountUpdateToast(overlay);
-  const store0 = opts.devStore ?? startCloud({ dev: dev === '1', ...opts.cloud }).then((c) => c.storage);
-  const seedDay = opts.seedDay;
-  const store = seedDay ? Promise.all([store0, import('./dev/seedDay')]).then(([s, m]) => (m.seedStoryDay(s, getContent(), seedDay, clock.now()), s)) : store0;
-  // Диалоги и упражнения (I-08): world:interact → оверлей, события журнала → хранилище синка.
-  const content = getContent();
-  // Внешность из Fotobudka (P-03): `avatar:changed` → текстура `avatar` в мире, голова аватара в портретах.
-  const avatar = startAvatar(store);
-  // Имя из Fotobudka в репликах (P-10a): `{name}` → имя игрока, раньше подписчиков play/flow.
-  startPlayerName(content, store);
-  const portraits = loadPortraits(content).then((src) => withAvatarPortraits(src, avatar.current));
-  const playDeps: PlayDeps = { content, store, portraits, clock };
-  const play = mountPlay(overlay, playDeps);
-  const creator = mountCreator({ overlay: play.overlay, store, clock });
+  mountBubble(overlay);
 
-  // Конфигурация из ТЗ §2.4. WorldMap добавится в I-11.
+  const settings = mountSettings(overlay, {
+    getSound: () => store.save.settings.sound,
+    setSound: (on) => {
+      if (!on) bus.emit('audio:stop', {});
+      store.update((s) => ({ ...s, settings: { ...s.settings, sound: on } }), Date.now());
+    },
+    exportSave: () => {
+      const name = exportFileName(Date.now(), new Date().getTimezoneOffset());
+      download(name, exportSave(store.save));
+      return name;
+    },
+    importSave: async (text) => {
+      const r = importSave(text);
+      if (!r.ok) return { ok: false, message: r.reason === 'version' ? 'Файл из более новой версии игры.' : 'Это не сохранение «Фермы».' };
+      await store.replace(r.save, Date.now());
+      setTimeout(() => location.reload(), 400);
+      return { ok: true, message: 'Сохранение загружено, перезапускаю.' };
+    },
+    reset: async () => {
+      download(exportFileName(Date.now(), new Date().getTimezoneOffset()), exportSave(store.save));
+      await store.wipe();
+      location.reload();
+    },
+  });
+  mountHud(overlay, { onSettings: () => settings.open() });
+
+  // Позиция героя и поворот: пишем, когда он остановился.
+  bus.on('world:position', ({ location: map, x, y, facing }) => {
+    store.update((s: Save) => ({ ...s, position: { map, x, y, facing } }), Date.now());
+  });
+
+  const start: WorldStart = save.position ? { map: save.position.map, spawn: [save.position.x, save.position.y], facing: save.position.facing } : {};
   const game = new Phaser.Game({
     type: Phaser.WEBGL,
     parent,
     pixelArt: true,
     roundPixels: true,
-    backgroundColor: '#1a1c2c',
+    backgroundColor: BG_COLOR,
     scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.NO_CENTER },
     input: { activePointers: 2 },
-    scene: [Boot, Title, Location],
+    scene: [Boot, World],
   });
-  if (start) game.registry.set('boot:start', start);
+  game.registry.set('boot:start', start);
 
-  const location = (): Location | null => {
-    const s = game.scene.getScene('Location') as Location | null;
-    return s && game.scene.isActive('Location') ? s : null;
+  const world = (): World | null => {
+    const s = game.scene.getScene('World') as World | null;
+    return s && game.scene.isActive('World') ? s : null;
   };
-  // Подписи «A · действие», «B · назад» первые дни (P-01).
-  const dpad = mountDpad(document.body, bus, { labels: () => !storeNow || dpadLabelsOn(storeNow.progress.log.events) });
+  // Порядок важен: сначала d-pad (он слушает `input:dpad`), потом startInput.
+  const dpad = mountDpad(document.body, bus);
   const input = startInput({
     dpad,
-    // До первой локации (Title, экраны) d-pad не нужен: режим как у tap-локации, его сменит `world:location`.
-    mapControls: 'tap',
-    pointer: { target: parent, tileAt: (x, y) => location()?.tileAt(x, y) ?? null },
+    mapControls: 'walk',
+    pointer: { target: parent, tileAt: (x, y) => world()?.tileAt(x, y) ?? null },
   });
-  // Режим локации (`map.controls`, ТЗ §2.7): walk = все источники, tap = только тап, d-pad скрыт.
   bus.on('world:location', ({ controls }) => input.router.setMapControls(controls));
-  // Петля дня (I-12): грядки, обход, экспресс, итог дня, настройки, позиция, таймер сессии.
-  let storeNow: GameStorage | null = null;
-  void store.then((s) => (storeNow = s));
-  // Новая сборка (P-10a): service worker уже новый — на титуле перезагрузка сразу, в игре тост «Есть обновление».
-  let started = false;
-  bus.once('title:start', () => (started = true));
-  const reload = (): void => void reloadForUpdate(() => storeNow?.flush());
+
+  // Новая сборка: service worker уже новый — на старте перезагрузка сразу, в игре тост «Есть обновление».
+  const startedAt = Date.now();
+  const reload = (): void => void reloadForUpdate(() => store.flush());
   bus.on('app:reload', reload);
-  const needReload = (): void => (updateAction({ started, lastReloadAt: lastReloadAt(), now: Date.now() }) === 'reload' ? reload() : bus.emit('app:update', {}));
+  const needReload = (): void => (updateAction({ started: Date.now() - startedAt > 3000, lastReloadAt: lastReloadAt(), now: Date.now() }) === 'reload' ? reload() : bus.emit('app:update', {}));
   registerPwa({ onNeedReload: needReload });
-  // P-12: страница из старого кэша (HTTP-кэш index.html, встроенный браузер без SW) — версия с сервера без кэша.
+  // Страница из старого кэша (HTTP-кэш index.html, встроенный браузер без SW): версия с сервера без кэша.
   watchVersion({ base: import.meta.env.BASE_URL, local: __BUILD_ID__, isStale: staleBuild, onStale: needReload });
-  const day = startDay({
-    root: overlay,
-    overlay: play.overlay,
-    content,
-    store,
-    audio: busAudio(bus),
-    clock,
-    router: input.router,
-    hasLink: () => !!storeNow && !!storedSecret(storeNow),
-    build: __BUILD_ID__,
-  });
-  // Режиссёр (I-13): строка «Сейчас», пузырь Казика, подсветка цели, запуск сразу в шаг, первый день.
-  const guide = mountGuide(overlay, { bus, content, portraits, coarse: () => matchMedia('(pointer: coarse)').matches, dev: showTodo });
-  const flow = startFlow({
-    content,
-    store,
-    clock,
-    play,
-    day,
-    audio: busAudio(bus),
-    portraits,
-    hasLink: () => !!storeNow && !!storedSecret(storeNow),
-  });
-  playDeps.claim = (p) => flow.claim(p);
-  if (dev || playDev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game, play, day, store, clock, content, flow, guide, creator, avatar };
-  return game;
+
+  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game, store, world, settings, input };
 }
 
-if (dev === 'creator') {
-  // `/?dev=creator&mute=1` (P-03): Fotobudka без мира, прогресс в памяти; после «Gotowe» — паспорт и галерея.
-  void import('./dev/creator').then((m) => m.mountCreatorDev(params));
-} else if (dev === 'audio') {
-  // Dev-страница озвучки без Phaser (I-09).
-  void import('./dev/audio').then((m) => m.mountAudioDev(document.body));
-} else if (dev === 'input') {
-  // Dev-страница без Phaser (I-03).
-  void import('./dev/input').then((m) => m.mountInputDev(document.body));
-} else if (dev === 'lesson') {
-  // `/?dev=lesson&id=<lessonId>[&dlg=<dialogueId>][&days=N]`: урок или диалог без мира, журнал в консоль (I-08).
-  void import('./dev/lesson').then((m) => m.mountLessonDev(params));
-} else if (dev === 'world') {
-  // `/?dev=world&map=ch01.metro[&spawn=from_dzialka]`: сразу в локацию, события мира в консоль (I-07).
-  // I-12: `&now=<ISO>|+1d` — часы; `&mute=1` — без звука; `&reset=1` — журнал в памяти; `&plant=lx.a,lx.b` —
-  // посадить слова (dev-событие intro, как после сцены). Прогресс в отдельной базе polski-quest-dev, без облака.
-  const data: LocationData = { location: params.get('map') ?? 'ch01.metro' };
-  const spawn = params.get('spawn');
-  if (spawn) data.spawn = spawn;
-  const devStore = (async (): Promise<GameStorage> => {
-    const s = new GameStorage(params.get('reset') ? { kv: memoryKV(), ls: null } : { dbName: 'polski-quest-dev', ls: null });
-    await s.load(clock.now());
-    for (const item of (params.get('plant') ?? '').split(',').filter(Boolean)) {
-      if (s.progress.log.events.some((e) => e.k === 'intro' && e.item === item)) continue;
-      s.append({ k: 'intro', ts: clock.now(), item, lesson: 'dev.plant', ok: ['lis', 'rec'] });
-    }
-    // P-02: `&seed=lx.a,lx.b` — слова семенами в кармане: сажать руками (A или тап по пустой клетке грядки).
-    for (const item of (params.get('seed') ?? '').split(',').filter(Boolean)) {
-      if (!s.progress.log.events.some((e) => e.k === 'intro' && e.item === item)) s.append({ k: 'intro', ts: clock.now(), item, lesson: 'dev.seed', ok: ['lis', 'rec'] });
-      s.setProgress(setFlag(s.progress, seedFlag(item), clock.now()));
-    }
-    return s;
-  })();
-  startGame({ scene: 'Location', data }, { devStore });
-  for (const ev of ['world:interact', 'world:exit', 'world:location', 'world:position'] as const)
-    bus.on(ev, (p) => console.info(`[${ev}]`, JSON.stringify(p)));
-  bus.on('world:marks', (m) => console.info('[world:marks]', JSON.stringify({ location: m.location, due: m.dueItems, cells: m.plots.flatMap((p) => p.cells.filter((c) => c.item).map((c) => `${c.item}:${c.stage}/${c.interval}${c.due ? '!' : ''}${c.wilted ? '~' : ''}`)) })));
-  if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
-} else if (playDev) {
-  const dbName = playProfile ? `polski-quest-${dev}` : 'polski-quest-play';
-  const reset = params.get('reset') === '1';
-  if (reset) {
-    // Стираем один раз: перезагрузка вкладки (в том числе HMR) продолжает тот же мир, а не чистый.
-    params.delete('reset');
-    if (!params.get('dev')) params.set('dev', 'play');
-    history.replaceState(null, '', `${location.pathname}?${params.toString()}${location.hash}`);
-  }
-  const fresh = reset ? new Promise<void>((resolve) => {
-    const req = indexedDB.deleteDatabase(dbName);
-    req.onsuccess = req.onerror = req.onblocked = () => resolve();
-  }) : Promise.resolve();
-  void fresh.then(() => {
-    const day = Number(params.get('day') ?? '0');
-    startGame(undefined, { cloud: { storage: new GameStorage({ dbName, ls: null }), rpc: offlineRpc }, ...(day >= 2 ? { seedDay: day } : {}) });
-    if (clock.offsetMs) console.info('[clock] now =', new Date(clock.now()).toString());
-  });
-} else startGame();
+void main();

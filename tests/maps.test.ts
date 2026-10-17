@@ -1,0 +1,120 @@
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import type { LocationMap, PropObject } from '../src/types/map';
+import { frameFor, parseAscii, tileLayers, type TilesetMeta } from '../src/world/ascii';
+import { LocationModel, around, buildObjects } from '../src/world/location';
+import { findPath } from '../src/world/pathfind';
+import { MAPS, getMap, resolveSpawn, START } from '../src/world/maps';
+
+const tileset = JSON.parse(readFileSync('public/atlas/farm.json', 'utf8')) as TilesetMeta;
+const sprites = JSON.parse(readFileSync('public/atlas/sprites.json', 'utf8')) as Record<string, { size: [number, number] }>;
+
+describe('карты: форма и ссылки', () => {
+  it('две карты: дом и ферма; старт на ферме', () => {
+    expect(Object.keys(MAPS).sort()).toEqual(['farm', 'home']);
+    expect(START).toEqual({ map: 'farm', spawn: 'start' });
+  });
+
+  for (const [id, map] of Object.entries(MAPS)) {
+    describe(id, () => {
+      it('ASCII разбирается, каждый тайл легенды есть в тайлсете', () => {
+        expect(map.id).toBe(id);
+        const parsed = parseAscii(map);
+        expect([parsed.w, parsed.h]).toEqual(map.size);
+        const { ground } = tileLayers(tileset, map, parsed);
+        expect(ground.flat().every((i) => i >= 0)).toBe(true);
+        for (const [ch, e] of Object.entries(map.legend)) expect(tileset.tiles[e.tile], `легенда "${ch}" → ${e.tile}`).toBeTruthy();
+      });
+
+      it('спрайты объектов есть в атласе', () => {
+        for (const o of map.objects) if (o.type === 'prop') expect(sprites[o.sprite], `${o.id}: ${o.sprite}`).toBeTruthy();
+      });
+
+      it('спавны на проходимых клетках, не на двери', () => {
+        const m = new LocationModel(map, resolveSpawn(map, 'default').tile, { cat: false });
+        for (const [name, s] of Object.entries(map.spawns)) {
+          expect(m.passable(s[0], s[1]), `спавн ${name}`).toBe(true);
+          expect(m.isExit([s[0], s[1]]), `спавн ${name} не дверь`).toBe(false);
+        }
+      });
+
+      it('объекты внутри карты, id уникальны', () => {
+        const ids = map.objects.map((o) => ('id' in o ? `${o.type}:${o.id}` : `exit:${o.at}`));
+        expect(new Set(ids).size).toBe(ids.length);
+        for (const o of buildObjects(map)) {
+          expect(o.at[0] >= 0 && o.at[1] >= 0 && o.at[0] + o.size[0] <= map.size[0] && o.at[1] + o.size[1] <= map.size[1], o.key).toBe(true);
+        }
+      });
+
+      it('все проходимые клетки связаны с точкой входа', () => {
+        const m = new LocationModel(map, resolveSpawn(map, 'default').tile, { cat: false });
+        const from = resolveSpawn(map, 'default').tile;
+        const [w, h] = map.size;
+        // Кроме клеток внутри забора вокруг грядок: туда тоже должен быть вход (ворота), поэтому проверяем всё.
+        for (let y = 0; y < h; y++)
+          for (let x = 0; x < w; x++) {
+            if (!m.passable(x, y) || m.isExit([x, y])) continue;
+            const r = findPath({ w, h, passable: (cx, cy) => m.passable(cx, cy) && !m.isExit([cx, cy]) }, from, [x, y]);
+            expect(r.exact, `клетка ${x},${y} недостижима`).toBe(true);
+          }
+      });
+    });
+  }
+
+  it('двери ведут друг к другу: шаг в дверь даёт спавн на другой карте, откуда видна обратная дверь', () => {
+    for (const map of Object.values(MAPS)) {
+      for (const o of map.objects) {
+        if (o.type !== 'exit') continue;
+        const to = getMap(o.to);
+        expect(to.spawns[o.spawn], `${map.id} → ${o.to}:${o.spawn}`).toBeTruthy();
+        const back = to.objects.find((x) => x.type === 'exit' && x.to === map.id);
+        expect(back, `у ${o.to} нет двери обратно в ${map.id}`).toBeTruthy();
+        // Спавн стоит рядом с обратной дверью, лицом в сторону от неё не обязательно, но рядом.
+        const s = to.spawns[o.spawn]!;
+        const d = Math.abs(s[0] - back!.at[0]) + Math.abs(s[1] - back!.at[1]);
+        expect(d).toBeLessThanOrEqual(2);
+      }
+    }
+  });
+
+  it('пять интерактивных объектов: стол, доска, коробка, полка, кровать; к каждому можно подойти', () => {
+    const uses: Record<string, string> = { home: 'bed,desk,shelf', farm: 'bin,board' };
+    for (const [id, list] of Object.entries(uses)) {
+      const map = getMap(id);
+      const found = map.objects.filter((o): o is PropObject => o.type === 'prop' && !!o.use).map((o) => o.use);
+      expect(found.sort()).toEqual(list.split(','));
+      const m = new LocationModel(map, resolveSpawn(map, 'default').tile, { cat: false });
+      for (const o of m.objects.filter((x) => x.use)) {
+        const free = around(o.rects).filter(([x, y]) => m.passable(x, y));
+        expect(free.length, `${o.key}: подходов`).toBeGreaterThanOrEqual(2);
+      }
+    }
+  });
+
+  it('грядки: участок 6×4 из земли, с запасом на расширение внутри забора', () => {
+    const farm = getMap('farm');
+    const plot = farm.objects.find((o) => o.type === 'plot')!;
+    if (plot.type !== 'plot') throw new Error();
+    expect(plot.size).toEqual([6, 4]);
+    const parsed = parseAscii(farm);
+    for (let y = plot.at[1]; y < plot.at[1] + 4; y++) for (let x = plot.at[0]; x < plot.at[0] + 6; x++) expect(parsed.ground[y]![x]).toBe('s');
+    expect(plot.reserve!.size[0] * plot.reserve!.size[1]).toBeGreaterThan(24);
+  });
+
+  it('карты удобны на iPhone (zoom 2): дом целиком, ферма крупнее экрана', async () => {
+    const { pickZoom } = await import('../src/world/camera');
+    const home = getMap('home');
+    const farm = getMap('farm');
+    expect(pickZoom(390, 844, home.size[0] * 16, home.size[1] * 16)).toBe(2);
+    expect(home.size[0] * 16 * 2).toBeLessThanOrEqual(390);
+    expect(pickZoom(390, 844, farm.size[0] * 16, farm.size[1] * 16)).toBe(2);
+    // Mac: целый масштаб, не больше 4
+    expect([3, 4]).toContain(pickZoom(1440, 900, home.size[0] * 16, home.size[1] * 16));
+  });
+
+  it('кадры автотайлов: фрейм находится для каждой клетки', () => {
+    const farm = getMap('farm');
+    const parsed = parseAscii(farm);
+    for (let y = 0; y < parsed.h; y++) for (let x = 0; x < parsed.w; x++) expect(frameFor(tileset, farm as LocationMap, parsed.ground, x, y)).toBeGreaterThanOrEqual(0);
+  });
+});

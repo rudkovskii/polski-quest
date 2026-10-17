@@ -1,8 +1,7 @@
-// Вёрстка d-pad (ТЗ §2.7): крест 120 px слева внизу, «A» справа внизу, «B» мелкая рядом с «A».
+// Вёрстка d-pad: крест 120 px слева внизу, «A» справа внизу, «B» мелкая рядом с «A».
 // Отступ = safe-area + 16 px; сторона креста — `controls.dpadSide`. Видимость решает роутер
 // (событие `input:dpad`). Нажатия обрабатывает src/input/dpad.ts: здесь слушателей ввода нет.
-// P-01: первые дни под «A» и над «B» мелкие подписи «A · действие», «B · назад» (флаг `labels`).
-import type { LogEvent } from '../systems/log';
+// Под «A» и над «B» мелкие подписи «A · действие», «B · назад» (флаг `labels`).
 import { bus as globalBus, type Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import { el } from './dom';
@@ -44,15 +43,6 @@ export interface DpadView {
   a: HTMLElement;
   b: HTMLElement;
   dispose(): void;
-}
-
-/** Подписи «A · действие», «B · назад» нужны первые дни: до третьего «Dobranoc» (P-01). */
-export const DPAD_LABEL_SLEEPS = 3;
-
-export function dpadLabelsOn(events: readonly LogEvent[]): boolean {
-  let sleeps = 0;
-  for (const e of events) if (e.k === 'seg' && e.seg === 'sleep' && ++sleeps >= DPAD_LABEL_SLEEPS) return false;
-  return true;
 }
 
 export interface DpadOptions {

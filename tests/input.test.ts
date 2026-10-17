@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// Система ввода (ТЗ §2.7, §10.1): клавиатура, d-pad, тап → один поток intents.
+// Система ввода: клавиатура, d-pad, тап → один поток intents.
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createDpadSource, dirFromOffset } from '../src/input/dpad';
 import { createKeyboardSource } from '../src/input/keyboard';
@@ -134,7 +134,7 @@ describe('KeyboardSource', () => {
     expect(got).toHaveLength(2);
   });
 
-  it('диагональ (↑ и → вместе): идёт по последней нажатой оси, отпустил её — по первой (P-02)', () => {
+  it('диагональ (↑ и → вместе): идёт по последней нажатой оси, отпустил её — по первой', () => {
     const r = router();
     keyboard(r);
     key('keydown', 'ArrowUp');
@@ -150,7 +150,7 @@ describe('KeyboardSource', () => {
     expect(got.map((i) => (i.type === 'move' ? `${i.dir}:${i.held}` : i.type))).toEqual(['up:true', 'right:true', 'up:true', 'left:true', 'up:true', 'up:false']);
   });
 
-  it('вкладку свернули с зажатой стрелкой: удержание снимается (P-02)', () => {
+  it('вкладку свернули с зажатой стрелкой: удержание снимается', () => {
     const r = router();
     keyboard(r);
     key('keydown', 'ArrowLeft');

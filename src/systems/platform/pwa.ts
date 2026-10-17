@@ -1,5 +1,5 @@
 /// <reference types="vite-plugin-pwa/vanillajs" />
-// Service worker (P-10a): регистрация из кода (`virtual:pwa-register`), а не вставленным скриптом, чтобы новая
+// Service worker: регистрация из кода (`virtual:pwa-register`), а не вставленным скриптом, чтобы новая
 // сборка подхватывалась при запуске без ручной перезагрузки. Политика — src/systems/update.ts.
 //   • autoUpdate (vite.config.ts): новый SW сразу берёт страницу (skipWaiting + clientsClaim) → `onNeedReload`;
 //   • проверка обновления при возврате в приложение и раз в 30 минут (PWA на iPhone живёт днями);
@@ -54,13 +54,13 @@ export async function fetchRemoteBuild(base: string, o: { fetch?: typeof fetch; 
   }
 }
 
-/** `<meta name="pq-build">` из index.html (P-12): какой сборкой отдана страница. */
+/** `<meta name="pq-build">` из index.html: какой сборкой отдана страница. */
 export function indexBuild(doc: Document | null = typeof document === 'undefined' ? null : document): string | null {
   return doc?.querySelector<HTMLMetaElement>('meta[name="pq-build"]')?.content || null;
 }
 
 /**
- * Проверка версии (P-12): сейчас и при каждом возврате во вкладку. Сборка устарела — сначала просим service worker
+ * Проверка версии: сейчас и при каждом возврате во вкладку. Сборка устарела — сначала просим service worker
  * обновиться (новый SW возьмёт страницу и сам вызовет onNeedReload), потом `onStale` (политика — systems/update.ts).
  */
 export function watchVersion(o: { base: string; local: string; isStale: (x: { local: string; index: string | null; remote: string | null }) => boolean; onStale(): void }): void {
@@ -99,20 +99,4 @@ export function registerPwa(o: PwaOptions): void {
       },
     });
   });
-}
-
-/** Вопрос service worker'а (public/sw-wola.js, W-04): «какая страница открыта?». */
-export const WHICH_PAGE = 'pq-which-page';
-
-/**
- * Отвечать service worker'у, какая это страница (W-04). Новый SW при активации перезагружает вкладки по адресу
- * `/wola…`, которые не ответили `wola`: так старая основная игра, отданная прошлым SW вместо Wola, сменяется на Wola.
- */
-export function answerWhichPage(page: 'wola' | 'main', sw: Pick<ServiceWorkerContainer, 'addEventListener' | 'startMessages'> | undefined = typeof navigator === 'undefined' ? undefined : navigator.serviceWorker): void {
-  if (!sw) return;
-  sw.addEventListener('message', (e: MessageEvent) => {
-    const data = e.data as { type?: unknown } | null;
-    if (data?.type === WHICH_PAGE) e.ports[0]?.postMessage({ page });
-  });
-  sw.startMessages?.();
 }

@@ -1,4 +1,4 @@
-// PointerSource (ТЗ §2.7): тап по карте → `goto` клетки или `interact` с объектом.
+// PointerSource: тап по карте → `goto` клетки или `interact` с объектом.
 // Единственное место, где слушают pointerdown на canvas. Что под пальцем, решает сцена
 // через колбэк `tileAt` (экранные координаты элемента → клетка и id объекта).
 import type { Router } from './router';

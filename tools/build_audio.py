@@ -1,29 +1,27 @@
 #!/usr/bin/env python3
-"""Предгенерация озвучки в билд (ТЗ §7.1, I-09).
+"""Предгенерация озвучки в билд.
 
-Собирает польские строки из content/ (слова, примеры, шаги уроков, реплики NPC в диалогах,
-таблички, минимальные пары, реплики story/lines.json без todo, слова и примеры Wola — content/wola/vocab.json), озвучивает их и пишет
-public/audio/<sha1[:12]>.m4a + public/audio/manifest.json.
+Берёт польские строки из `content/audio.json` (`{"phrases": [{"id": "lx.maly", "pl": "mały", "slow": true}, …]}`),
+озвучивает их и пишет public/audio/<sha1[:12]>.m4a + public/audio/manifest.json. Список строк дают F-02 и F-03
+(слова и фразы A1, примеры); в F-01 он пуст, манифест пустой.
 
     npm run audio                         # = python3 tools/build_audio.py (только Mac: say + afconvert)
     npm run audio:check                   # = --check: всё ли озвучено; ничего не генерирует, работает в CI (Linux)
-    python3 tools/build_audio.py --voice say:Zosia      # голос по умолчанию (с этапа 2: piper:pl_PL-gosia-medium)
+    python3 tools/build_audio.py --voice say:Zosia      # голос по умолчанию
     python3 tools/build_audio.py --prune  # удалить файлы, на которые больше не ссылается манифест
     python3 tools/build_audio.py --dry-run  # показать, что будет сгенерировано
 
-Голос строки: characters[who].voice для реплик (engine "none" = не озвучиваем, так у Димы),
-vocab.voice если задан, иначе --voice. Ключ файла: sha1(engine|voice|rateTag|text), уже
-существующие файлы не генерируются заново. Медленная версия (rateTag "slow") — для vocab.pl
-и шагов listen, dictation, shadow, minimal_pair, а также пар из phonetics.json.
+Фраза: `pl` обязателен, `voice` необязателен (иначе --voice), `slow: true` добавляет медленную версию, `ex` — пример
+(строка `<id>#ex`). Ключ файла: sha1(engine|voice|rateTag|text), существующие файлы заново не генерируются.
+Звук вслух на проверках не играть: эта утилита только пишет файлы.
 
-Манифест (детерминированный, без дат, чтобы повторный прогон не давал диффа):
+Манифест (детерминированный, без дат):
   { "v": 1, "default": "say:Zosia",
-    "entries": { "<voice>|<rateTag>|<text>": "a1b2c3d4e5f6.m4a" },        # контракт ТЗ §7.1 п. 6
+    "entries": { "<voice>|<rateTag>|<text>": "a1b2c3d4e5f6.m4a" },
     "files":   { "a1b2c3d4e5f6.m4a": { "dur": 0.62, "voice": "say:Zosia", "rate": "normal" } },
     "ids":     { "lx.maly": { "text": "mały", "voice": "say:Zosia", "slow": true } } }
 
---check: строки модулей status: ready без записи или файла = ошибка (exit 1);
-для draft и глобальных строк (lines, phonetics) — предупреждение.
+--check: фразы без записи или файла = ошибка (exit 1).
 """
 from __future__ import annotations
 
@@ -55,15 +53,9 @@ PIPER_MODELS = Path.home() / '.cache' / 'piper'
 BITRATE = 64000
 
 
-# Имя игрока в репликах (P-10a, src/systems/playerName.ts): озвучка собирается под имя по умолчанию,
-# другое имя рантайм отдаёт Web Speech (или без озвучки).
-NAME_TOKEN = '{name}'
-DEFAULT_NAME = 'Dima'
-
-
 def norm(text: str) -> str:
-    """NFC + trim: так же нормализует рантайм (src/systems/platform/audio.ts); `{name}` → «Dima»."""
-    return unicodedata.normalize('NFC', text.replace(NAME_TOKEN, DEFAULT_NAME)).strip()
+    """NFC + trim: так же нормализует рантайм (src/systems/platform/audio.ts)."""
+    return unicodedata.normalize('NFC', text).strip()
 
 
 @dataclass
@@ -74,7 +66,7 @@ class Item:
     ready: bool = False
     ids: set[str] = field(default_factory=set)
     src: set[str] = field(default_factory=set)
-    # Написание для голоса (W-02: заимствования Salad Story — «dressing» → «dresing»); ключ манифеста — по `text`.
+    # Своё написание для голоса (заимствования); ключ манифеста — по `text`.
     spoken: str | None = None
 
     @property
@@ -100,38 +92,11 @@ def respell(text: str, spoken: dict[str, str]) -> str:
     return out
 
 
-def salad_audio(content: Path) -> dict | None:
-    """Строки Salad Story (W-02) из генератора визита: `tsx tools/wola_salad_texts.ts` (тот же код, что играет)."""
-    if not (content / 'wola' / 'salad' / 'menu.json').exists():
-        return None
-    tsx = ROOT / 'node_modules' / '.bin' / 'tsx'
-    cmd = [str(tsx)] if tsx.exists() else ['npx', 'tsx']
-    out = subprocess.run([*cmd, str(ROOT / 'tools' / 'wola_salad_texts.ts'), '--root', str(content)], capture_output=True, text=True, cwd=ROOT)
-    if out.returncode != 0:
-        raise RuntimeError(f'wola_salad_texts.ts: {out.stderr.strip()[:400]}')
-    return json.loads(out.stdout)
-
-
 @dataclass
 class Collected:
     items: dict[str, Item] = field(default_factory=dict)
     ids: dict[str, dict] = field(default_factory=dict)
     skipped_todo: list[str] = field(default_factory=list)
-    unvoiced: int = 0
-
-
-def voice_of_char(ch: dict | None) -> str | None:
-    """`characters[].voice` → "say:Zosia" (или "say:Zosia@0.9" при rate ≠ 1); None = не озвучивать."""
-    if not ch:
-        return None
-    v = ch.get('voice') or {}
-    if v.get('engine') in (None, 'none'):
-        return None
-    s = f"{v['engine']}:{v['id']}"
-    rate = v.get('rate')
-    if rate is not None and float(rate) != 1.0:
-        s += f'@{float(rate):g}'
-    return s
 
 
 def voice_str(v: str | None, default: str) -> str:
@@ -147,124 +112,29 @@ def load_json(p: Path):
 
 def collect(content: Path, default_voice: str) -> Collected:
     c = Collected()
-    chars = {ch['id']: ch for ch in load_json(content / 'characters.json')}
+    f = content / 'audio.json'
+    phrases = load_json(f).get('phrases', []) if f.exists() else []
+    both = (NORMAL, SLOW)
+    one = (NORMAL,)
 
-    def add(text: str | None, voice: str | None, rates: tuple[str, ...], *, ready: bool, id_: str | None, src: str, spoken: dict[str, str] | None = None) -> None:
-        if not text:
-            return
-        if voice is None:
-            c.unvoiced += 1
-            return
-        t = norm(text)
+    def add(text: str | None, voice: str, rates: tuple[str, ...], id_: str | None) -> None:
+        t = norm(text or '')
         if not t:
             return
-        sp = respell(t, spoken) if spoken else None
         for r in rates:
-            it = c.items.setdefault(f'{voice}|{r}|{t}', Item(t, voice, r, spoken=sp if sp != t else None))
-            it.ready = it.ready or ready
-            it.src.add(src)
+            it = c.items.setdefault(f'{voice}|{r}|{t}', Item(t, voice, r, ready=True))
+            it.src.add(f.name)
             if id_:
                 it.ids.add(id_)
         if id_ and id_ not in c.ids:
             c.ids[id_] = {'text': t, 'voice': voice, 'slow': SLOW in rates}
 
-    def say_voice(who: str | None) -> str | None:
-        if who is None:
-            return default_voice
-        return voice_of_char(chars.get(who))
-
-    both = (NORMAL, SLOW)
-    one = (NORMAL,)
-    for mdir in sorted((content / 'modules').glob('*/')):
-        mfile = mdir / 'module.json'
-        if not mfile.exists():
-            continue
-        mod = load_json(mfile)
-        ready = mod.get('status') == 'ready'
-        rel = lambda p: str(p.relative_to(content))  # noqa: E731
-
-        vf = mdir / 'vocab.json'
-        for v in load_json(vf) if vf.exists() else []:
-            voice = voice_str(v.get('voice'), default_voice)
-            add(v['pl'], voice, both, ready=ready, id_=v['id'], src=rel(vf))
-            if v.get('ex'):
-                add(v['ex'].get('pl'), voice, one, ready=ready, id_=f"{v['id']}#ex", src=rel(vf))
-
-        lf = mdir / 'lessons.json'
-        for lesson in load_json(lf) if lf.exists() else []:
-            groups: list[tuple[str, list]] = []
-            if lesson.get('steps'):
-                groups.append(('', lesson['steps']))
-            for part in lesson.get('parts') or []:
-                groups.append((f"{part['id']}.", part['steps']))
-            for prefix, steps in groups:
-                for i, s in enumerate(steps):
-                    sid = s.get('id') or f"{lesson['id']}#{prefix}{i}"
-                    t = s['t']
-                    src = rel(lf)
-                    if t == 'say':
-                        if s.get('audio') is False:
-                            continue
-                        add(s['pl'], say_voice(s.get('who')), one, ready=ready, id_=sid, src=src)
-                    elif t == 'shadow':
-                        add(s['pl'], default_voice, both, ready=ready, id_=sid, src=src)
-                    elif t in ('listen', 'dictation'):
-                        add(s.get('say'), default_voice, both, ready=ready, id_=sid, src=src)
-                    elif t in ('order', 'type', 'gap'):
-                        add(s.get('say'), default_voice, one, ready=ready, id_=sid, src=src)
-                    elif t == 'minimal_pair':
-                        for j, w in enumerate(s['pair']):
-                            add(w, default_voice, both, ready=ready, id_=f'{sid}.{j}', src=src)
-                    elif t == 'stress':
-                        say = s.get('say')
-                        if say is False:
-                            continue
-                        add(say if isinstance(say, str) else s['word'], default_voice, both, ready=ready, id_=sid, src=src)
-
-        df = mdir / 'dialogues.json'
-        for d in load_json(df) if df.exists() else []:
-            for nid, n in d['nodes'].items():
-                if n.get('pl'):
-                    add(n['pl'], say_voice(n['who']), one, ready=ready, id_=f"{d['id']}#{nid}", src=rel(df))
-
-        for mf in sorted((mdir / 'maps').glob('*.json')):
-            m = load_json(mf)
-            for o in m.get('objects', []):
-                if o.get('type') == 'sign' and o.get('pl'):
-                    x, y = o['at']
-                    add(o['pl'], default_voice, one, ready=ready, id_=f"{m['id']}#sign.{x}_{y}", src=rel(mf))
-
-    # Короткая версия «Wola» (W-01): слова и примеры content/wola/vocab.json, обязательны как у ready-модуля.
-    # Salad Story (W-02): строки визита из генератора; заимствования (dressing, Cobb, quinoa…) — своим написанием
-    # (content/wola/salad/menu.json → spoken), и в словах Wola тоже.
-    salad = salad_audio(content)
-    spoken = salad['spoken'] if salad else None
-    wf = content / 'wola' / 'vocab.json'
-    if wf.exists():
-        rel = str(wf.relative_to(content))
-        for v in load_json(wf).get('vocab', []):
-            voice = voice_str(v.get('voice'), default_voice)
-            add(v['pl'], voice, both, ready=True, id_=v['id'], src=rel, spoken=spoken)
-            if v.get('ex'):
-                add(v['ex'].get('pl'), voice, one, ready=True, id_=f"{v['id']}#ex", src=rel, spoken=spoken)
-    if salad:
-        for t in salad['texts']:
-            add(t['text'], default_voice, both if t['slow'] else one, ready=True, id_=None, src='wola/salad', spoken=spoken)
-
-    # Глобальные строки: в --check только предупреждения.
-    lines = content / 'story' / 'lines.json'
-    for line in load_json(lines) if lines.exists() else []:
-        if line.get('todo'):
-            c.skipped_todo.append(line['id'])
-            continue
-        if line['id'].endswith('.anyname') and NAME_TOKEN in (line.get('pl') or ''):
-            continue  # звучит только с именем не «Dima»: в рантайме Web Speech
-        add(line.get('pl'), voice_of_char(chars.get(line['who'])), one, ready=False, id_=line['id'], src='story/lines.json')
-    ph = content / 'phonetics.json'
-    if ph.exists():
-        for p in load_json(ph).get('pairs', []):
-            add(p['a'], default_voice, both, ready=False, id_=f"{p['id']}#a", src='phonetics.json')
-            add(p['b'], default_voice, both, ready=False, id_=f"{p['id']}#b", src='phonetics.json')
+    for p in phrases:
+        voice = voice_str(p.get('voice'), default_voice)
+        add(p['pl'], voice, both if p.get('slow') else one, p.get('id'))
+        ex = p.get('ex')
+        if ex:
+            add(ex, voice, one, f"{p['id']}#ex" if p.get('id') else None)
     return c
 
 
@@ -355,7 +225,7 @@ def main() -> int:
     ap.add_argument('--prune', action='store_true', help='удалить файлы, которых нет в манифесте')
     ap.add_argument('--force', action='store_true', help='перегенерировать все файлы (после смены параметров голоса)')
     ap.add_argument('--dry-run', action='store_true', help='показать, что будет сгенерировано')
-    ap.add_argument('--root', type=Path, default=ROOT / 'content', help='папка content/')
+    ap.add_argument('--root', type=Path, default=ROOT / 'content', help='папка content/ (там audio.json)')
     ap.add_argument('--out', type=Path, default=ROOT / 'public' / 'audio', help='папка public/audio/')
     a = ap.parse_args()
 

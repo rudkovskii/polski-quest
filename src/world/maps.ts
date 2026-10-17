@@ -1,0 +1,46 @@
+// Карты мира: JSON из content/maps/ бандлится в код. Проверка формы — tests/maps.test.ts.
+import farm from '../../content/maps/farm.json';
+import home from '../../content/maps/home.json';
+import type { Dir } from '../types/input';
+import type { LocationMap } from '../types/map';
+import { parseAscii } from './ascii';
+import { buildObjects } from './location';
+
+export const MAPS: Readonly<Record<string, LocationMap>> = {
+  farm: farm as unknown as LocationMap,
+  home: home as unknown as LocationMap,
+};
+
+/** Где игра стартует с чистого сохранения. */
+export const START = { map: 'farm', spawn: 'start' } as const;
+
+export function getMap(id: string): LocationMap {
+  const m = MAPS[id];
+  if (!m) throw new Error(`Нет карты "${id}"`);
+  return m;
+}
+
+export interface Spawn {
+  tile: [number, number];
+  facing: Dir;
+}
+
+/**
+ * Где поставить героя: имя спавна или клетка (сохранение). Клетка непроходима, занята объектом или за краем — спавн карты
+ * по умолчанию. `facing` перекрывает поворот из карты.
+ */
+export function resolveSpawn(map: LocationMap, spawn: string | readonly number[] | undefined, facing?: Dir): Spawn {
+  const named = (name: string): Spawn => {
+    const s = map.spawns[name] ?? map.spawns.default;
+    if (!s) throw new Error(`${map.id}: нет спавна "${name}" и default`);
+    return { tile: [s[0], s[1]], facing: facing ?? (s[2] as Dir | undefined) ?? 'down' };
+  };
+  if (typeof spawn === 'string') return named(spawn);
+  if (spawn && spawn.length >= 2) {
+    const [x, y] = spawn as [number, number];
+    const p = parseAscii(map);
+    const ok = x >= 0 && y >= 0 && x < p.w && y < p.h && !p.solid[y]![x] && !buildObjects(map).some((o) => o.rects.some((r) => x >= r[0] && y >= r[1] && x < r[0] + r[2] && y < r[1] + r[3]));
+    if (ok) return { tile: [x, y], facing: facing ?? 'down' };
+  }
+  return named('default');
+}

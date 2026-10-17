@@ -1,4 +1,4 @@
-// Хелпер el(): DOM-оверлей на ванильном TS без фреймворка (ТЗ §2.4).
+// Хелпер el(): DOM-оверлей на ванильном TS без фреймворка.
 
 type Attrs = Record<string, string | number | boolean | EventListener | undefined>;
 type Child = Node | string | number | null | undefined | false;
