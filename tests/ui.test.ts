@@ -20,6 +20,17 @@ describe('HUD', () => {
     expect(root.querySelector<HTMLElement>('.pq-xp-fill')?.style.width).toBe('50%');
     hud.dispose();
   });
+
+  it('«+N» рядом с полоской и вспышка при новом уровне', () => {
+    const root = document.createElement('div');
+    const bus = testBus();
+    const hud = mountHud(root, { onSettings: () => {}, bus });
+    bus.emit('hud:xp', { level: 'A0', ratio: 0.1, xp: 12, gain: 11 });
+    expect(root.querySelector('[data-xp-gain]')?.textContent).toBe('+11');
+    bus.emit('hud:xp', { level: 'A0.5', ratio: 0, xp: 5000, gain: 1, up: true });
+    expect(root.querySelector('.pq-xp')?.classList.contains('flash')).toBe(true);
+    hud.dispose();
+  });
 });
 
 describe('пузырь-заглушка', () => {

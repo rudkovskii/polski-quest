@@ -105,6 +105,14 @@ describe('сохранение: экспорт и импорт', () => {
     expect(r).toEqual({ ok: true, save: s });
   });
 
+  it('огород (v2) переживает экспорт и импорт; сохранение v1 читается с пустым огородом', () => {
+    const garden = { planted: [{ t: 1, id: 'w.kot' }], log: [{ t: 2, day: 0, id: 'w.kot', side: 'pr' as const, ok: true, mode: 1 as const }], slots: { 'w.kot': 0 }, tier: 0 };
+    const s = { ...newSave(NOW), garden };
+    expect(importSave(exportSave(s))).toEqual({ ok: true, save: s });
+    const old = normalizeSave({ v: 1, created: 1, updated: 2, position: null, settings: { sound: true } });
+    expect(old?.garden).toEqual({ planted: [], log: [], slots: {}, tier: 0 });
+  });
+
   it('чужой файл, мусор и версия из будущего отклоняются', () => {
     expect(importSave('не json')).toEqual({ ok: false, reason: 'json' });
     expect(importSave('{"app":"other","save":{}}')).toEqual({ ok: false, reason: 'format' });

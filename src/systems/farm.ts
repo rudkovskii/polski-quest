@@ -229,6 +229,7 @@ export function createFarm(d: FarmDeps): Farm {
       emitPlants();
       const lvl1 = level().level;
       emitXp(o.xp, lvl1 !== lvl0);
+      if (lvl1 !== lvl0) d.bus.emit('audio:play', { text: `Brawo! Poziom ${lvl1}.`, queue: true });
       changed();
       const c = content(q.id);
       const note = r.verdict === 'diacritics' ? 'Засчитано, но проверь польские буквы' : r.verdict === 'ortho' || r.verdict === 'typo' ? 'Засчитано, но есть ошибка в написании' : undefined;
