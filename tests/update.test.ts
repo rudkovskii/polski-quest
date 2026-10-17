@@ -10,11 +10,11 @@ import { mountUpdateToast } from '../src/ui/updateToast';
 import { testBus } from './helpers';
 
 describe('политика обновления', () => {
-  it('титул — перезагрузка; уже играет — тост; только что перезагружались — тост', () => {
-    expect(updateAction({ started: false, lastReloadAt: null, now: 1_000_000 })).toBe('reload');
-    expect(updateAction({ started: true, lastReloadAt: null, now: 1_000_000 })).toBe('toast');
-    expect(updateAction({ started: false, lastReloadAt: 1_000_000 - 5_000, now: 1_000_000 })).toBe('toast');
-    expect(updateAction({ started: false, lastReloadAt: 1_000_000 - RELOAD_GUARD_MS - 1, now: 1_000_000 })).toBe('reload');
+  it('нет открытых экранов — тихая перезагрузка; экран открыт — тост; только что перезагружались — тост (без петли)', () => {
+    expect(updateAction({ busy: false, lastReloadAt: null, now: 1_000_000 })).toBe('reload');
+    expect(updateAction({ busy: true, lastReloadAt: null, now: 1_000_000 })).toBe('toast');
+    expect(updateAction({ busy: false, lastReloadAt: 1_000_000 - 5_000, now: 1_000_000 })).toBe('toast');
+    expect(updateAction({ busy: false, lastReloadAt: 1_000_000 - RELOAD_GUARD_MS - 1, now: 1_000_000 })).toBe('reload');
   });
 
   it('перезагрузка: сначала flush прогресса, потом reload; отметка от петли в sessionStorage', async () => {
@@ -46,7 +46,7 @@ describe('политика обновления', () => {
     bus.emit('app:update', {});
     bus.emit('app:update', {});
     expect(root.querySelectorAll('[data-update]')).toHaveLength(1);
-    expect(root.textContent).toContain('Есть обновление');
+    expect(root.querySelector('[data-update] span')?.textContent).toContain('Есть новая версия');
     const b = root.querySelector<HTMLButtonElement>('[data-update] button')!;
     expect(b.textContent).toContain('Обновить');
     b.click();

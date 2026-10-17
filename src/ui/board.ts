@@ -3,7 +3,7 @@ import type { Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import type { GameMode } from '../types/farm';
 import { el } from './dom';
-import { MODE_TITLE } from './minigame';
+import { MODE_NAME } from './glossary';
 import { createPanel, nav } from './panel';
 
 export interface BoardDeps {
@@ -14,10 +14,10 @@ export interface BoardDeps {
 }
 
 const DESC: Record<GameMode, string> = {
-  1: 'Польское слово → выбери перевод',
-  2: 'Русское слово → польское (кусты — набрать самому)',
-  3: 'Русская фраза → собери по-польски из плиток',
-  4: 'Польская фраза → собери по-русски из плиток',
+  1: 'Видишь польское слово, выбери перевод',
+  2: 'Видишь перевод, выбери польское слово (у кустика — напиши сам)',
+  3: 'Видишь русскую фразу, собери её по-польски из плиток',
+  4: 'Видишь польскую фразу, собери её по-русски из плиток',
 };
 
 export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(): void; close(): void; readonly isOpen: boolean } {
@@ -36,11 +36,11 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(): void
             : 'Нет посаженных слов: посади их в словаре дома'
           : c.assemble > 0
             ? ''
-            : 'Нет посаженных фраз для сборки (от 3 слов): фраза открывается в словаре, когда все её слова — кусты';
+            : 'Нет посаженных фраз для сборки (от 3 слов): фраза открывается в словаре, когда все её слова дошли до стадии «кустик»';
       const b = el(
         'button',
         { type: 'button', class: 'pq-btn', 'data-mode': m, disabled: !!why, style: 'text-align:left;line-height:1.3', ...nav('modes', 'v', `mode:${m}`), onclick: () => (panel.close(), deps.onPick(m)) },
-        el('div', { style: 'font-size:18px;font-weight:800' }, `${m}. ${MODE_TITLE[m]}`),
+        el('div', { style: 'font-size:18px;font-weight:800' }, `${m}. ${MODE_NAME[m].ru} `, el('small', { class: 'board-pl', style: 'font-size:12px;font-weight:600;opacity:.65;white-space:nowrap' }, MODE_NAME[m].pl)),
         el('div', { style: 'font-weight:500;font-size:14px;opacity:.85' }, why || DESC[m]),
       );
       list.append(b);

@@ -61,7 +61,16 @@ export class FarmLayer {
   private views: PlantView[] = [];
 
   constructor(private h: FarmHost) {
+    // Старт сцены (в том числе после перезагрузки): растение под боком у героя не подписываем.
+    this.labelGate.arm();
     this.offs.push(
+      bus.on('world:input', ({ enabled }) => {
+        if (!enabled) return;
+        // Экран закрылся: убрать подпись и не показывать её для растения, у которого герой стоит.
+        this.labelGate.arm();
+        this.lastLabel = '';
+        bus.emit('fx:label', null);
+      }),
       bus.on('farm:plants', ({ plants, cells }) => this.setPlants(plants, cells)),
       bus.on('farm:act', (a) => {
         // Урожай: растение сразу спелое и остаётся на грядке, пока герой его не сорвёт (раскладка его уже убрала).
@@ -83,6 +92,9 @@ export class FarmLayer {
         if (!on) {
           this.focus = null;
           this.focusWalked = '';
+          this.labelGate.arm();
+          this.lastLabel = '';
+          bus.emit('fx:label', null);
         }
       }),
     );

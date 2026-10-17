@@ -3,9 +3,11 @@ import type { Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import type { FarmApi } from '../types/farm';
 import { el } from './dom';
+import { TIP_CSS, type Tips } from './glossary';
 import { createPanel, nav } from './panel';
 
 const css = `
+${TIP_CSS}
 .pantry-sum { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
 .pantry-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 14px 10px; padding-bottom: 6px; }
 .jar-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; font: inherit; color: var(--pq-ink); background: none; border: 0; border-bottom: 6px solid var(--pq-wood);
@@ -34,7 +36,7 @@ export interface PantryScreen {
   readonly isOpen: boolean;
 }
 
-export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>): PantryScreen {
+export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips): PantryScreen {
   const panel = createPanel({
     title: 'Spiżarnia · Кладовая',
     bus,
@@ -81,6 +83,7 @@ export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEven
     });
     content.replaceChildren(
       el('div', { class: 'pantry-sum', 'data-sum': '' }, `Собрано: ${all.length - phrases} слов, ${phrases} фраз`),
+      ...[tips?.note('jar')].filter((n): n is HTMLElement => !!n),
       el('div', { class: 'pantry-shelf' }, ...jars),
     );
   }
@@ -121,6 +124,7 @@ export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEven
   panel.onClose(() => {
     off?.();
     off = null;
+    tips?.commit();
   });
   return {
     open() {

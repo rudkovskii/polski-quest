@@ -4,6 +4,7 @@ import type { Phrase, Topic, Word } from '../src/types/content';
 import type { FarmApi, FarmStats, ItemInfo, ItemStatus } from '../src/types/farm';
 import { mountDictionary } from '../src/ui/dictionary';
 import { mountPantry } from '../src/ui/pantry';
+import { createTips } from '../src/ui/glossary';
 import { mountPlantCard } from '../src/ui/plantCard';
 import { mountSummary } from '../src/ui/summary';
 import { testBus } from './helpers';
@@ -135,7 +136,7 @@ describe('Słownik', () => {
     expect(rows(root)).toEqual(['p.mam_kota', 'p.jem_chleb']);
     expect(root.querySelector('[data-id="p.mam_kota"] .st')?.textContent).toBe('🔒');
     root.querySelector<HTMLElement>('[data-id="p.mam_kota"]')!.click();
-    expect(root.querySelector('[data-lock]')?.textContent).toContain('Откроется, когда эти слова станут кустом');
+    expect(root.querySelector('[data-lock]')?.textContent).toContain('Откроется, когда эти слова вырастут до стадии «кустик»');
     expect(root.querySelector('[data-lock]')?.textContent).toContain('kot — кот');
     expect(root.querySelector<HTMLButtonElement>('[data-plant]')!.disabled).toBe(true);
   });
@@ -154,6 +155,37 @@ describe('Słownik', () => {
     root.querySelector<HTMLElement>('[data-tab="phrases"]')!.click();
     root.querySelector<HTMLElement>('[data-topic="zwierzeta"]')!.click();
     expect(root.querySelector<HTMLButtonElement>('[data-bulk]')!.hidden).toBe(true); // единственная фраза темы закрыта
+  });
+
+  it('после «Посадить всю тему» тема остаётся выбранной и подсвечена, подпись стадии русская', () => {
+    const { root, bus } = setup();
+    mountDictionary(root, fakeApi().api, bus).open();
+    const chip = (t: string) => root.querySelector(`[data-topic="${t}"]`)!;
+    expect(chip('').classList.contains('on')).toBe(true);
+    chip('zwierzeta').dispatchEvent(new Event('click'));
+    expect(chip('zwierzeta').classList.contains('on')).toBe(true);
+    expect(chip('').classList.contains('on')).toBe(false);
+    root.querySelector<HTMLButtonElement>('[data-bulk]')!.click();
+    expect(chip('zwierzeta').classList.contains('on')).toBe(true);
+    expect(rows(root).every((id) => ['w.kot', 'w.zolw', 'w.pies'].includes(id ?? ''))).toBe(true);
+    root.querySelector<HTMLElement>('[data-id="w.kot"]')!.click();
+    expect(root.querySelector('[data-status]')?.textContent).toContain('росток');
+    expect(root.querySelector('[data-status] [data-icon="icon_sprout"]')).not.toBeNull();
+    expect([...root.querySelectorAll('[data-legend] [data-stage]')].map((e) => e.textContent)).toEqual(['семечко', 'росток', 'кустик', 'урожай', 'перезрело — повтори']);
+  });
+
+  it('пояснение «Банка = выученное слово» показывается один раз, после закрытия экрана — больше нет', () => {
+    const { root, bus } = setup();
+    const seen: string[] = [];
+    const tips = createTips({ seen: (id) => seen.includes(id), mark: (id) => seen.push(id) });
+    const sum = mountSummary(root, fakeApi().api, bus, tips);
+    sum.openBed();
+    expect(root.querySelector('[data-tip="jar"]')?.textContent).toContain('Банка = выученное слово');
+    expect(root.querySelector('[data-tip="bag"]')?.textContent).toContain('Мешок = семена, которым не хватило грядки');
+    sum.close();
+    expect(seen).toEqual(['tip:jar', 'tip:bag']);
+    sum.openBed();
+    expect(root.querySelector('[data-tip]')).toBeNull();
   });
 
   it('стрелки и Enter через шину: ход по [data-nav] и нажатие', () => {
