@@ -253,11 +253,11 @@ const plural = (n: number, one: string, few: string, many: string): string => {
 export function progressText(it: ItemState | undefined, now: number, day?: number): string {
   if (!it) return 'не посажено';
   const s = stageOf(it, now);
-  if (s === 'overripe') return 'один верный ответ — и обратно в банку';
+  if (s === 'overripe') return 'один верный ответ, и слово снова в банке';
   if (s === null) {
     const d = dueAt(it);
     const days = d === null ? 0 : Math.max(1, Math.ceil((d - now) / DAY_MS));
-    return `в банке, вернётся повторить через ${days} ${plural(days, 'день', 'дня', 'дней')}`;
+    return `слово выучено и лежит в банке, вернётся повторить через ${days} ${plural(days, 'день', 'дня', 'дней')}`;
   }
   if (s === 'seed') {
     const n = Math.max(1, SPROUT_DROPS - it.drops);
@@ -267,7 +267,7 @@ export function progressText(it: ItemState | undefined, now: number, day?: numbe
     if (!it.sides.pr && !it.sides.rp) return 'нужно ответить в обе стороны: с польского и по-польски';
     if (!it.sides.rp) return 'нужно ответить по-польски';
     if (!it.sides.pr) return 'нужно ответить с польского';
-    return 'ещё 1 полив до куста';
+    return 'ещё 1 полив до кустика';
   }
   // Куст: дни (сегодняшний, если ещё не засчитан, идёт в счёт) и ответ по-польски.
   const today = day !== undefined && !it.days.has(day);

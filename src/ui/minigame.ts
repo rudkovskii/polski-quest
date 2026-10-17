@@ -7,15 +7,9 @@ import type { Question } from '../systems/quiz';
 import type { BusEvents } from '../types/bus';
 import type { GameMode } from '../types/farm';
 import { el } from './dom';
+import { MODE_NAME } from './glossary';
 import { attachKeyboard, type AttachedKeyboard } from './keyboard';
 import { THEME_CSS } from './theme';
-
-export const MODE_TITLE: Record<GameMode, string> = {
-  1: 'Polski → Rosyjski',
-  2: 'Rosyjski → Polski',
-  3: 'Złóż zdanie po polsku',
-  4: 'Złóż zdanie po rosyjsku',
-};
 
 export interface AnswerResult {
   ok: boolean;
@@ -74,9 +68,13 @@ ${THEME_CSS}
 .pq-fb .pq-progress { margin: 4px 0 0; }
 .pq-rev { font-size: 12px; font-weight: 700; background: var(--pq-cream); color: var(--pq-ink); border-radius: 6px; padding: 1px 6px; }
 .pq-soon { margin-left: auto; font-weight: 600; font-size: 13px; opacity: .9; }
-.pq-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.pq-game .pq-opt { text-align: left; color: var(--pq-ink); background: #fffaf0; font-size: 17px; line-height: 1.2; padding: 10px; min-height: 48px; overflow-wrap: anywhere; }
-.pq-game .pq-opt .n { display: inline-block; min-width: 18px; opacity: .5; font-size: 13px; }
+.pq-game-title { min-width: 0; }
+.pq-game-title small { font-size: 11px; font-weight: 600; opacity: .7; margin-left: 4px; }
+/* Ряд вариантов: высота кнопки фиксирована (до 3 строк), длинный ответ переносится внутри кнопки и не двигает остальные. */
+.pq-opts { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 74px; gap: 8px; }
+.pq-game .pq-opt { display: flex; align-items: center; gap: 4px; box-sizing: border-box; height: 100%; text-align: left; color: var(--pq-ink); background: #fffaf0; font-size: 17px; line-height: 1.15; padding: 8px 10px; overflow: hidden; }
+.pq-game .pq-opt .n { flex: 0 0 auto; min-width: 18px; opacity: .5; font-size: 13px; }
+.pq-game .pq-opt .t { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
 .pq-game .pq-opt.right { background: #8cc66a; }
 .pq-game .pq-opt.wrong { background: #e88e7c; }
 .pq-built { min-height: 44px; display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 2px dashed var(--pq-wood); border-radius: 6px; margin-bottom: 8px; background: #fffaf0; }
@@ -87,7 +85,7 @@ ${THEME_CSS}
 .pq-fb { margin-top: 8px; font-size: 15px; }
 .pq-fb .big { font-size: 20px; font-weight: 800; }
 .pq-game .is-focus { outline: 3px solid var(--pq-accent); outline-offset: 1px; }
-@media (max-width: 520px) { .pq-q { font-size: 20px; } .pq-game .pq-opt { min-height: 40px; padding: 7px; font-size: 15px; } .pq-game-paper { padding: 8px; } }
+@media (max-width: 520px) { .pq-q { font-size: 20px; } .pq-opts { grid-auto-rows: 64px; } .pq-game .pq-opt { padding: 6px 7px; font-size: 15px; } .pq-game-paper { padding: 8px; } }
 `;
 
 /** Строка прогресса растения с большой буквы. */
@@ -95,7 +93,7 @@ const progressLine = (t: string): string => t.charAt(0).toUpperCase() + t.slice(
 
 export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame {
   const bus = deps.bus ?? globalBus;
-  const title = el('span', {}, '');
+  const title = el('span', { class: 'pq-game-title', 'data-title': '' }, '');
   const rev = el('span', { class: 'pq-rev', 'data-reverse': '', hidden: true, title: 'Задание наоборот: растению нужна другая сторона' }, '↔ наоборот');
   const soon = el('span', { class: 'pq-soon', 'data-soon': '', hidden: true }, '');
   const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', onclick: () => api.stop() }, 'Выйти ✕');
@@ -176,7 +174,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   const renderChoice = (qq: Extract<Question, { kind: 'choice' }>): void => {
     const grid = el('div', { class: 'pq-opts' });
     qq.options.forEach((o, i) => {
-      const b = el('button', { type: 'button', class: 'pq-btn pq-opt', 'data-nav': '', 'data-opt': o, onclick: () => pick(i) }, el('span', { class: 'n' }, `${i + 1}`), ` ${o}`);
+      const b = el('button', { type: 'button', class: 'pq-btn pq-opt', 'data-nav': '', 'data-opt': o, onclick: () => pick(i) }, el('span', { class: 'n' }, `${i + 1}`), el('span', { class: 't' }, o));
       grid.append(b);
     });
     paper.append(grid);
@@ -245,7 +243,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     rev.hidden = !q.reverse;
     const hint: Record<GameMode, string> = {
       1: 'Выбери перевод',
-      2: q.kind === 'type' ? 'Напиши по-польски (куст: уже без подсказок)' : 'Выбери польское слово',
+      2: q.kind === 'type' ? 'Напиши по-польски (кустик: уже без подсказок)' : 'Выбери польское слово',
       3: 'Собери фразу по-польски',
       4: 'Собери фразу по-русски',
     };
@@ -304,7 +302,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     start(m, onlyId) {
       mode = m;
       only = onlyId;
-      title.textContent = MODE_TITLE[m];
+      title.replaceChildren(MODE_NAME[m].ru, el('small', {}, MODE_NAME[m].pl));
       soon.hidden = true;
       soon.textContent = '';
       if (!open) {
