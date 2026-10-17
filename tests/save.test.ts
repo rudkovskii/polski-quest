@@ -113,6 +113,13 @@ describe('сохранение: экспорт и импорт', () => {
     expect(old?.garden).toEqual({ planted: [], log: [], slots: {}, tier: 0 });
   });
 
+  it('подсказки: флаги переживают экспорт; сохранение без них читается, мусор отбрасывается', () => {
+    const s = { ...newSave(NOW), hints: ['desk', 'bin'] };
+    expect(importSave(exportSave(s))).toEqual({ ok: true, save: s });
+    expect(normalizeSave({ v: 2, created: 1, updated: 2, position: null, settings: {} })?.hints).toEqual([]);
+    expect(normalizeSave({ v: 2, created: 1, updated: 2, position: null, settings: {}, hints: ['desk', 5, 'desk', null] })?.hints).toEqual(['desk']);
+  });
+
   it('чужой файл, мусор и версия из будущего отклоняются', () => {
     expect(importSave('не json')).toEqual({ ok: false, reason: 'json' });
     expect(importSave('{"app":"other","save":{}}')).toEqual({ ok: false, reason: 'format' });

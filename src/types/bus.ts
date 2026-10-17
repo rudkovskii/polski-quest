@@ -60,6 +60,8 @@ export interface BusEvents {
   'fx:float': { x: number; y: number; text: string; kind: 'xp' | 'miss' | 'info' };
   /** Подпись над растением у героя (экранные CSS px); null — спрятать. */
   'fx:label': { text: string; x: number; y: number } | null;
+  /** Герой стоит у объекта, с которым сработает A (над ним рисуется «A»): `x`,`y` — точка над объектом в экранных CSS px; null — отошёл или экран открыт. */
+  'fx:near': { use: string; id: string; x: number; y: number } | null;
   /** Озвучить польскую строку. `id` — запись манифеста, `text` — запасной текст, `slow` — медленно. */
   'audio:play': { id?: string; text?: string; slow?: boolean; voice?: string; queue?: boolean; done?: (via: AudioVia) => void };
   'audio:stop': Record<string, never>;

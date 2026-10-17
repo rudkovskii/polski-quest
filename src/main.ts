@@ -6,6 +6,7 @@ import { bus, type Bus } from './systems/bus';
 import { createFarm } from './systems/farm';
 import { connectAudio } from './systems/platform/audio';
 import { createClock } from './systems/platform/clock';
+import { connectSfx } from './systems/platform/sfx';
 import { lastReloadAt, registerPwa, reloadForUpdate, watchVersion } from './systems/platform/pwa';
 import { GameStorage, memoryKV } from './systems/platform/storage';
 import { exportFileName, exportSave, importSave, type Save } from './systems/save';
@@ -20,6 +21,7 @@ import { mountPantry } from './ui/pantry';
 import { mountPlantCard } from './ui/plantCard';
 import { mountSummary } from './ui/summary';
 import { mountDpad } from './ui/dpad';
+import { mountHints } from './ui/hints';
 import { mountHud } from './ui/hud';
 import { mountSettings } from './ui/settings';
 import { mountUpdateToast } from './ui/updateToast';
@@ -63,7 +65,10 @@ async function main(): Promise<void> {
 
   // Звук: выключатель в настройках, `?mute=1` — вообще без звука.
   if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
-  else connectAudio(gatedAudioBus(bus, () => store.save.settings.sound));
+  else {
+    connectAudio(gatedAudioBus(bus, () => store.save.settings.sound));
+    connectSfx(bus, () => store.save.settings.sound);
+  }
   mountAudioToast(overlay);
   mountUpdateToast(overlay);
 
@@ -104,6 +109,10 @@ async function main(): Promise<void> {
     say: (id, slow) => bus.emit('audio:play', { id, text: farm.word(id)?.pl ?? farm.phrase(id)?.pl ?? '', ...(slow ? { slow } : {}) }),
   });
   mountFloats(overlay);
+  mountHints(overlay, {
+    seen: (use) => store.save.hints.includes(use),
+    mark: (use) => store.update((s: Save) => ({ ...s, hints: [...s.hints, use] }), Date.now()),
+  });
   const game = mountMinigame(overlay, {
     next: (mode, only) => farm.next(mode, only),
     answer: (q, given) => farm.answer(q, given),

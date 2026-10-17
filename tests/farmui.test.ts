@@ -182,6 +182,23 @@ describe('Spiżarnia', () => {
   });
 });
 
+describe('Spiżarnia: Esc и B', () => {
+  it('в списке банки Esc/B возвращает к полке, на полке закрывает панель', () => {
+    const { root, bus } = setup();
+    const p = mountPantry(root, fakeApi().api, bus);
+    p.open();
+    const cancel = (): void => bus.emit('input:intent', { type: 'cancel', to: 'ui', source: 'keyboard' });
+    root.querySelector<HTMLElement>('[data-jar="jedzenie"]')!.click();
+    expect(root.querySelector('[data-jar-list]')).not.toBeNull();
+    cancel();
+    expect(p.isOpen).toBe(true);
+    expect(root.querySelector('[data-jar-list]')).toBeNull();
+    expect(root.querySelector('[data-jar="jedzenie"]')).not.toBeNull();
+    cancel();
+    expect(p.isOpen).toBe(false);
+  });
+});
+
 describe('коробка, кровать и карточка растения', () => {
   it('кровать показывает уровень и опыт; коробка — только урожай; открытие одной панели закрывает другую', () => {
     const { root, bus, input } = setup();

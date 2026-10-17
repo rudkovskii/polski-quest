@@ -35,7 +35,19 @@ export interface PantryScreen {
 }
 
 export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>): PantryScreen {
-  const panel = createPanel({ title: 'Spiżarnia · Кладовая', bus });
+  const panel = createPanel({
+    title: 'Spiżarnia · Кладовая',
+    bus,
+    // Esc/B в списке банки возвращает к полке; на самой полке закрывает.
+    onCancel: () => {
+      if (!current) return false;
+      current = null;
+      renderAll();
+      panel.body.scrollTop = 0;
+      panel.focus();
+      return true;
+    },
+  });
   const content = el('div', {});
   panel.body.append(el('style', {}, css), content);
   parent.append(panel.root);

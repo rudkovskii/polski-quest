@@ -9,6 +9,8 @@ import { findPath, findPathToAny, type Grid } from './pathfind';
 /** Скорость ходьбы: 4,5 клетки в секунду. */
 export const CELLS_PER_SEC = 4.5;
 export const STEP_MS = 1000 / CELLS_PER_SEC;
+/** Сколько коротких нажатий помнит очередь, пока идёт шаг (первое нажатие шагает сразу: три нажатия = три шага). */
+export const QUEUE_MAX = 3;
 /** Кот чуть проворнее героя: не отстаёт. */
 export const CAT_STEP_MS = 190;
 /** Герой стоит так долго, и кот подходит и садится рядом, мс. */
@@ -164,7 +166,8 @@ export class LocationModel {
   speed = 1;
   private plants: WorldObject[] = [];
   private heldDir: Dir | null = null;
-  private queuedDir: Dir | null = null;
+  /** Короткие нажатия, пришедшие во время шага: до QUEUE_MAX, по порядку. */
+  private queuedDirs: Dir[] = [];
   private bumped = false;
   private path: Xy[] = [];
   private pending: string | null = null;
@@ -242,7 +245,7 @@ export class LocationModel {
    */
   walkNear(target: Xy, extra: readonly Rect[] = []): boolean {
     this.heldDir = null;
-    this.queuedDir = null;
+    this.queuedDirs = [];
     this.pending = null;
     this.actionQueued = false;
     const rects: Rect[] = extra.length ? [...extra] : [[target[0], target[1], 1, 1]];
@@ -312,7 +315,7 @@ export class LocationModel {
 
   /** Герой занят: идёт, держит стрелку или ждёт поворота. */
   get busy(): boolean {
-    return this.player.step !== null || this.path.length > 0 || this.heldDir !== null || this.queuedDir !== null;
+    return this.player.step !== null || this.path.length > 0 || this.heldDir !== null || this.queuedDirs.length > 0;
   }
 
   // ───────────── intents ─────────────
@@ -327,13 +330,15 @@ export class LocationModel {
           this.path = [];
           this.pending = null;
           // Короткое нажатие = шаг: поворот и шаг одним нажатием. Удержание продолжает идти само.
-          if (this.player.step) this.queuedDir = i.dir;
+          if (this.player.step) {
+            if (this.queuedDirs.length < QUEUE_MAX) this.queuedDirs.push(i.dir);
+          }
           else this.tryStep(i.dir);
         } else if (this.heldDir === i.dir) this.heldDir = null;
         return;
       case 'goto':
         this.heldDir = null;
-        this.queuedDir = null;
+        this.queuedDirs = [];
         this.pending = null;
         this.path = findPath(this.walkGrid(i.tile), this.from(), i.tile).path;
         return;
@@ -343,7 +348,7 @@ export class LocationModel {
         else this.doAction();
         return;
       case 'cancel':
-        this.queuedDir = null;
+        this.queuedDirs = [];
         this.path = [];
         this.pending = null;
         return;
@@ -356,7 +361,7 @@ export class LocationModel {
   /** Оверлей открылся или локация уходит: стоп без событий. */
   halt(): void {
     this.heldDir = null;
-    this.queuedDir = null;
+    this.queuedDirs = [];
     this.path = [];
     this.pending = null;
     this.actionQueued = false;
@@ -436,10 +441,9 @@ export class LocationModel {
 
   /** Следующее действие без начатого шага. true = начался шаг. */
   private next(): boolean {
-    const queued = this.queuedDir;
-    this.queuedDir = null;
-    if (this.heldDir) return this.tryStep(this.heldDir);
+    const queued = this.queuedDirs.shift();
     if (queued) return this.tryStep(queued);
+    if (this.heldDir) return this.tryStep(this.heldDir);
     if (this.path.length) {
       const nxt = this.path[0]!;
       if (!this.passable(nxt[0], nxt[1])) {
@@ -514,7 +518,7 @@ export class LocationModel {
     const o = this.object(key);
     if (!o || !o.use) return;
     this.heldDir = null;
-    this.queuedDir = null;
+    this.queuedDirs = [];
     if (!this.player.step && this.near(o)) {
       this.path = [];
       this.faceTo(o);

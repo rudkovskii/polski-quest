@@ -47,7 +47,7 @@
 Шлёт сцена при A рядом с интерактивным объектом или тапе по нему. Мир ничего не открывает: слушатель решает, что показать.
 `{ location: 'home'|'farm', use, id, key, label, tile, via: 'action'|'tap', facing }`, где `use` (= `id`):
 `desk` (Słownik на столе дома), `shelf` (банки, Spiżarnia), `bed` (кровать), `board` (выбор мини-игры, ферма), `bin` (коробка урожая, ферма).
-Пока слушает только заглушка `ui/bubble.ts` (пузырь с названием). На время экрана F-03 шлёт `world:input {enabled:false}` (герой встаёт,
+Пока слушает только заглушка `ui/bubble.ts` (пузырь с названием; в игре не подключена). На время экрана F-03 шлёт `world:input {enabled:false}` (герой встаёт,
 ввод идёт в оверлей), потом `true`. Участок грядок — объект `plot:garden` (6×4 в `farm.json`, запас под расширение в `reserve`).
 Прочие события: `world:exit` (шаг в дверь), `world:position` (остановка героя, пишет сохранение), `hud:xp {level, ratio}` (F-03 шлёт опыт).
 
@@ -61,6 +61,9 @@
 - Мир: `scenes/farmLayer.ts` — растения, вскопанные клетки, подпись, автобег (`farm:act` в очередь, ускорение при очереди).
   События шины: `farm:plants`, `farm:auto`, `farm:focus`, `farm:act`, `fx:float`, `fx:label`, `hud:xp {gain, up}`.
 - Озвучка: `python3 tools/audio_list.py` пишет `content/audio.json` (слова обычно и медленно, фразы), потом `npm run audio`.
+- Подсказки: `ui/hints.ts` (пузырь «Słownik · Посади слова» при первом подходе к столу, доске, коробке; сцена шлёт `fx:near`, флаги в `Save.hints`).
+  Звук нового уровня: `systems/platform/sfx.ts` (WebAudio-тон, тихий, под тем же выключателем звука). Иконки PWA: `npm run icons` (`tools/gen_icons.py`, портрет героя).
+  Короткие нажатия стрелки во время шага ставятся в очередь (до 3, `QUEUE_MAX` в `world/location.ts`). Esc/B в панели: `createPanel({ onCancel })`.
 - Проверка дней: `?now=+1d`, `+2d` (часы `platform/clock.ts`). В dev `window.__pq.farm` — фасад фермы.
 
 ## Сохранение

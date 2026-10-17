@@ -67,6 +67,7 @@ export class World extends Phaser.Scene {
   private catShadow: Phaser.GameObjects.Image | null = null;
   private marker!: Phaser.GameObjects.Graphics;
   private markerKey = '';
+  private nearKey = '';
   private bump: { dir: Dir; until: number } | null = null;
   private start0: WorldStart = {};
   private leaving = false;
@@ -93,6 +94,7 @@ export class World extends Phaser.Scene {
     this.bump = null;
     this.wasMoving = false;
     this.markerKey = '';
+    this.nearKey = '';
   }
 
   preload(): void {
@@ -236,6 +238,7 @@ export class World extends Phaser.Scene {
   private drawActionBubble(time: number): void {
     const t = this.inputOn && !this.leaving ? this.model.actionHint() : null;
     const bob = Math.floor(time / 450) % 2;
+    this.emitNear(t);
     const key = t ? `${t.key}@${t.tile[0]},${t.tile[1]}:${bob}` : '';
     if (key === this.markerKey) return;
     this.markerKey = key;
@@ -256,6 +259,20 @@ export class World extends Phaser.Scene {
     World.GLYPH_A.forEach((row, ry) => {
       for (let rx = 0; rx < row.length; rx++) if (row[rx] === 'X') g.fillRect(x0 + 3 + rx, y0 + 2 + ry, 1, 1);
     });
+  }
+
+  /** Подсказка первого подхода: сообщаем DOM, что герой стоит у объекта (и где он на экране); отошёл или экран открыт — null. */
+  private emitNear(t: { key: string; tile: Xy } | null): void {
+    const o = t ? this.model.object(t.key) : undefined;
+    const key = o?.use ? o.key : '';
+    if (key === this.nearKey) return;
+    this.nearKey = key;
+    if (!o?.use) {
+      bus.emit('fx:near', null);
+      return;
+    }
+    const p = this.toScreen((o.at[0] + o.size[0] / 2) * T, this.propTop(o.at, o.size, o.key) - 22);
+    bus.emit('fx:near', { use: o.use, id: o.id, x: p.x, y: p.y });
   }
 
   /** Верх спрайта объекта в пикселях мира (пузырёк стоит над ним). */

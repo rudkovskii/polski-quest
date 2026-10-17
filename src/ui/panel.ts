@@ -47,6 +47,8 @@ export interface PanelOptions {
   title: string;
   wide?: boolean;
   bus?: Bus<BusEvents>;
+  /** Esc/B внутри панели: вернуть true, если шаг назад обработан экраном (подэкран), иначе панель закроется. */
+  onCancel?: () => boolean;
 }
 
 export interface Panel {
@@ -133,7 +135,9 @@ export function createPanel(opts: PanelOptions): Panel {
 
   const onIntent = (i: BusEvents['input:intent']): void => {
     if (!isOpen || i.to !== 'ui') return;
-    if (i.type === 'cancel') api.close();
+    if (i.type === 'cancel') {
+      if (!opts.onCancel?.()) api.close();
+    }
     else if (i.type === 'move') move(i.dir);
     else if (i.type === 'interact') {
       const list = items();

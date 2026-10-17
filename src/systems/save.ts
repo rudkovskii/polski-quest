@@ -26,10 +26,12 @@ export interface Save {
   settings: Settings;
   /** Огород: посадки, журнал ответов (только дописывается), грядки. Опыт и стадии выводятся из него. */
   garden: GardenSave;
+  /** Подсказки-пузыри, которые уже показаны (по `use` объекта: desk, board, bin). Каждая показывается один раз. */
+  hints: string[];
 }
 
 export function newSave(now: number): Save {
-  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true }, garden: newGarden() };
+  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true }, garden: newGarden(), hints: [] };
 }
 
 const DIRS: readonly Dir[] = ['up', 'down', 'left', 'right'];
@@ -54,6 +56,7 @@ export function normalizeSave(raw: unknown): Save | null {
     position,
     settings: { sound: st.sound !== false },
     garden: normalizeGarden(r.garden),
+    hints: Array.isArray(r.hints) ? [...new Set(r.hints.filter((h): h is string => typeof h === 'string'))].slice(0, 32) : [],
   };
 }
 

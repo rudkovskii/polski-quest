@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Dir } from '../src/types/input';
-import { CAT_SIT_AFTER_MS, CAT_SLEEP_AFTER_MS, LocationModel, STEP_MS, type WorldEvent } from '../src/world/location';
+import { CAT_SIT_AFTER_MS, CAT_SLEEP_AFTER_MS, LocationModel, QUEUE_MAX, STEP_MS, type WorldEvent } from '../src/world/location';
 import { modelAt, press, release, run, seeded, send } from './helpers';
 
 const exits = (evs: WorldEvent[]) => evs.filter((e) => e.type === 'exit');
@@ -24,6 +24,46 @@ describe('ходьба', () => {
     run(m, STEP_MS * 3);
     expect(m.player.tile).toEqual([11, 8]);
     expect(m.player.facing).toBe('right');
+  });
+
+  it('три быстрых нажатия стрелки = три шага: очередь не теряет нажатия во время шага', () => {
+    const m = modelAt('farm', [10, 8], 'down');
+    for (let i = 0; i < 3; i++) {
+      press(m, 'right');
+      release(m, 'right');
+      run(m, 20);
+    }
+    run(m, STEP_MS * 5);
+    expect(m.player.tile).toEqual([13, 8]);
+    expect(m.moving).toBe(false);
+  });
+
+  it('очередь коротких нажатий ограничена тремя; смена направления в очереди сохраняет порядок', () => {
+    const m = modelAt('farm', [10, 8], 'down');
+    for (let i = 0; i < 8; i++) {
+      press(m, 'right');
+      release(m, 'right');
+    }
+    run(m, STEP_MS * 10);
+    expect(m.player.tile).toEqual([10 + 1 + QUEUE_MAX, 8]);
+    const k = modelAt('farm', [10, 8], 'down');
+    for (const d of ['right', 'down', 'left'] as const) {
+      press(k, d);
+      release(k, d);
+    }
+    run(k, STEP_MS * 5);
+    expect(k.player.tile).toEqual([10, 9]);
+  });
+
+  it('cancel сбрасывает очередь нажатий', () => {
+    const m = modelAt('farm', [10, 8], 'down');
+    for (let i = 0; i < 3; i++) {
+      press(m, 'right');
+      release(m, 'right');
+    }
+    send(m, { type: 'cancel' });
+    run(m, STEP_MS * 5);
+    expect(m.player.tile).toEqual([11, 8]);
   });
 
   it('стена: бамп один раз, без шага', () => {
