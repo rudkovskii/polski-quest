@@ -108,30 +108,36 @@ def well() -> None:
 
 
 def bin_() -> None:
+    """Коробка урожая: резной ящик с открытым верхом, внутри виден урожай; золотой кант и бирка для силуэта издали."""
     parts = {'lid': P('wood', r=2, g='lid'), 'top': P('shade', r=2, g='top'), 'front': P('wood', r=3, g='front'),
-             'dark': P('wood_dark', r=1, g='dark'), 'crop': P('petal_yellow', r=1, g='crop')}
+             'dark': P('wood_dark', r=1, g='dark'), 'gold': P('gold', r=1, g='gold'), 'tag': P('cream', r=1, g='tag')}
     c = Cv(32, 32, parts)
-    c.rect(3, 4, 26, 6, 'lid')
-    c.rect(3, 11, 26, 18, 'dark')
-    c.rect(5, 13, 22, 5, 'top')
-    c.dots([8, 14, 12, 15, 19, 14, 23, 15], 'petal_yellow.3')
-    c.rect(3, 18, 26, 11, 'front')
-    for x in (9, 15, 21):
+    c.rect(2, 5, 28, 5, 'lid')
+    c.rect(2, 10, 28, 19, 'dark')
+    c.rect(4, 11, 24, 6, 'top')
+    for x, y, m in ((6, 12, 'tomato'), (11, 11, 'sunflower'), (16, 12, 'tomato'), (21, 11, 'tomato'), (24, 12, 'sunflower')):
+        c.dots([x, y, x + 1, y, x, y + 1, x + 1, y + 1], f'{m}.2'); c.dot(x, y, f'{m}.4')
+    c.rect(2, 17, 28, 12, 'front')
+    for x in (9, 16, 23):
         c.vline(x, 19, 28, 'wood.1')
-    c.rect(3, 18, 26, 2, 'dark')
+    c.rect(2, 17, 28, 2, 'dark')
+    c.rect(2, 5, 28, 1, 'gold')
+    c.rect(12, 21, 8, 5, 'tag'); c.hline(13, 19, 23, 'jam_red.2'); c.vline(16, 22, 25, 'jam_red.2')
     single('bin', c.render(), anchor=[16, 31])
 
 
 def board() -> None:
-    parts = {'post': P('trunk', r=2, g='post'), 'board': P('sign', r=4, g='board'), 'paper': P('paper', r=2, g='paper'),
-             'paper2': P('paper', r=2, g='paper2'), 'paper3': P('cream', r=2, g='paper3')}
+    """Доска заданий: тёмная рама и красная крыша (виден издали), яркие листки с цветными кнопками."""
+    parts = {'post': P('trunk', r=2, g='post'), 'board': P('trunk', r=4, g='board'), 'roof': P('roof', r=2, g='roof'),
+             'paper': P('paper', r=2, g='paper'), 'paper2': P('cream', r=2, g='paper2'), 'paper3': P('petal_yellow', r=2, g='paper3')}
     c = Cv(32, 32, parts)
-    c.rect(4, 14, 3, 17, 'post'); c.rect(25, 14, 3, 17, 'post')
-    c.rect(2, 2, 28, 19, 'board')
-    c.rect(5, 5, 7, 9, 'paper'); c.rect(14, 4, 7, 10, 'paper2'); c.rect(23, 6, 5, 8, 'paper3'); c.rect(7, 15, 8, 4, 'paper3')
-    for (x, y, w) in ((6, 7, 5), (6, 9, 4), (6, 11, 5), (15, 6, 5), (15, 8, 4), (15, 10, 5), (15, 12, 3)):
+    c.rect(4, 17, 3, 14, 'post'); c.rect(25, 17, 3, 14, 'post')
+    c.rect(2, 5, 28, 17, 'board')
+    c.poly([[0, 6], [16, 0], [32, 6]], 'roof'); c.rect(0, 5, 32, 3, 'roof')
+    c.rect(5, 9, 7, 9, 'paper'); c.rect(14, 8, 7, 11, 'paper2'); c.rect(23, 10, 5, 8, 'paper3')
+    for (x, y, w) in ((6, 12, 5), (6, 14, 4), (6, 16, 5), (15, 11, 5), (15, 13, 4), (15, 15, 5), (15, 17, 3)):
         c.hline(x, x + w, y, 'paper.1')
-    c.dots([8, 5, 17, 4, 25, 6, 10, 15], 'jam_red.2')
+    c.dots([8, 9, 17, 8, 25, 10], 'jam_red.2'); c.dots([11, 9, 20, 8], 'blanket.2')
     single('board', c.render(), anchor=[16, 31])
 
 
@@ -169,18 +175,25 @@ def bed() -> None:
 
 
 def desk() -> None:
-    parts = {'top': P('wood', r=4, g='top'), 'front': P('wood_dark', r=2, g='front'), 'leg': P('wood_dark', r=1, g='leg'),
-             'page': P('paper', r=3, g='book'), 'cover': P('book', r=1, g='book'), 'ink': P('jam_green', r=1, g='ink')}
+    """Стол со словарём: красная скатерть, раскрытая книга, чернильница и свеча (вертикальный акцент для силуэта)."""
+    parts = {'top': P('wood', r=4, g='top'), 'cloth': P('rug', r=2, g='cloth'), 'leg': P('wood_dark', r=1, g='leg'),
+             'page': P('paper', r=3, g='book'), 'cover': P('book', r=1, g='book'), 'ink': P('jam_green', r=1, g='ink'),
+             'wax': P('cream', r=1, g='wax'), 'flame': P('gold', flat=3)}
     c = Cv(32, 32, parts)
-    c.rect(3, 21, 3, 10, 'leg'); c.rect(26, 21, 3, 10, 'leg')
-    c.rect(1, 8, 30, 13, 'top')
-    c.rect(1, 21, 30, 4, 'front')
-    c.rect(6, 10, 20, 8, 'cover')
-    c.rect(7, 10, 8, 7, 'page'); c.rect(17, 10, 8, 7, 'page')
-    c.vline(16, 10, 17, 'book.1')
-    for y in (12, 14, 16):
+    c.rect(3, 23, 3, 8, 'leg'); c.rect(26, 23, 3, 8, 'leg')
+    c.rect(1, 10, 30, 12, 'top')
+    c.rect(1, 22, 30, 5, 'cloth')
+    for x in range(3, 30, 4):
+        c.rect(x, 22, 2, 5, 'rug2' if False else 'cloth')
+    c.rect(6, 11, 20, 9, 'cover')
+    c.rect(7, 11, 8, 8, 'page'); c.rect(17, 11, 8, 8, 'page')
+    c.vline(16, 11, 19, 'book.1')
+    for y in (13, 15, 17):
         c.hline(8, 14, y, 'paper.1'); c.hline(18, 24, y, 'paper.1')
-    c.rect(27, 11, 3, 4, 'ink')
+    c.rect(27, 12, 3, 4, 'ink')
+    c.rect(2, 4, 3, 6, 'wax'); c.rect(2, 2, 3, 2, 'flame')
+    for x in range(3, 30, 4):
+        c.vline(x, 23, 27, 'rug2.2')
     single('desk', c.render(), anchor=[16, 31])
 
 

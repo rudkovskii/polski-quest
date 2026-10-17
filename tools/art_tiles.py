@@ -66,6 +66,47 @@ def patch(mat: str, seed: int, mask: int, furrow: bool):
     return g
 
 
+def soil_patch(seed: int, mask: int):
+    """Вскопанная земля (Stardew): тёмная влажная почва, прерывистые борозды с гребнем, комки; у открытых сторон мягкий край к траве.
+    Фактура на внутренних клетках периодична по 16 px (стыкуется), края рваные, свет сверху-слева."""
+    rng = random.Random(1031)  # зерно одно на все маски: клетки стыкуются
+    g = [['soil.2'] * T for _ in range(T)]
+    # крупное пятнистое зерно: чуть светлее/темнее участки
+    for _ in range(20):
+        x, y = rng.randrange(T), rng.randrange(T)
+        g[y][x] = 'soil.3' if rng.random() < 0.5 else 'soil.1'
+    # борозды: две на клетку, с разрывами (чтобы не читалось полосами), гребень сверху светлее
+    for gy, gaps in ((4, (3, 4, 10)), (12, (1, 8, 9))):
+        for x in range(T):
+            if x in gaps:
+                continue
+            g[gy][x] = 'soil.0' if (x + gy) % 5 else 'soil.1'
+            g[gy + 1][x] = 'soil.1'
+            g[gy - 1][x] = 'soil.3' if (x * 3 + gy) % 4 else 'soil.4'
+    # комки: светлая точка + тень справа-снизу
+    for x, y in ((2, 8), (7, 1), (12, 9), (14, 2), (5, 14), (10, 6)):
+        g[y][x] = 'soil.4'
+        g[y + 1][x + 1 if x + 1 < T else 0] = 'soil.1'
+    rng = random.Random(seed)
+    # открытые стороны: рваный край, светлая кромка сверху/слева, тень снизу/справа
+    for y in range(T):
+        for x in range(T):
+            d = edge_dist(mask, x, y)
+            if d > 2 and not corner_cut(mask, x, y):
+                continue
+            lit = (not mask & N and y <= 2) or (not mask & W and x <= 2)
+            r = rng.random()
+            if corner_cut(mask, x, y):
+                g[y][x] = 'grass.1' if (x + y) % 2 else 'grass.2'
+            elif d == 0:
+                g[y][x] = 'grass.2' if r < 0.55 else ('grass.1' if r < 0.8 else 'soil.1')
+            elif d == 1:
+                g[y][x] = 'soil.1' if (r < 0.55 or not lit) else ('grass.1' if r < 0.62 else 'soil.3')
+            elif d == 2:
+                g[y][x] = 'soil.3' if (lit and r < 0.55) else ('soil.1' if r < 0.12 else g[y][x])
+    return g
+
+
 def floor(seed: int):
     rng = random.Random(seed)
     g = grid('plank.2')
@@ -154,7 +195,7 @@ def build() -> None:
     for sid, mat, furrow, seed in (('t_path', 'dirt', False, 21), ('t_soil', 'soil', True, 31)):
         s = Sheet(sid, T, T, anchor=[8, 15])
         for mask in range(16):
-            s.add(patch(mat, seed + mask, mask, furrow))
+            s.add(soil_patch(seed + mask, mask) if furrow else patch(mat, seed + mask, mask, furrow))
         emit(s)
     f = Sheet('t_fence', T, T, anchor=[8, 15])
     for mask in range(16):
