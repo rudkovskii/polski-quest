@@ -27,6 +27,8 @@ export interface FarmHost {
   soil(cells: readonly Xy[]): void;
   /** Мир → экранные CSS px. */
   toScreen(x: number, y: number): { x: number; y: number };
+  /** Мир принимает ввод (не открыт экран). */
+  inputOn(): boolean;
 }
 
 interface Job {
@@ -303,7 +305,7 @@ export class FarmLayer {
   private drawLabel(): void {
     let target: { label: string; tile: Xy } | null = null;
     if (this.auto && this.focus) target = this.focus;
-    else if (!this.auto) {
+    else if (!this.auto && this.h.inputOn()) {
       const hint = this.h.model.actionHint();
       if (hint && hint.key.startsWith('plant:')) {
         const id = hint.key.slice(6);

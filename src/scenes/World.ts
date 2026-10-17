@@ -115,7 +115,7 @@ export class World extends Phaser.Scene {
     this.buildProps();
     this.buildActors();
     this.marker = this.add.graphics().setDepth(10_000);
-    this.farm = this.mapDef.id === 'farm' ? new FarmLayer({ scene: this, model: this.model, sprites: this.sprites, hero: this.hero, soil: (c) => this.soil(c), toScreen: (x, y) => this.toScreen(x, y) }) : null;
+    this.farm = this.mapDef.id === 'farm' ? new FarmLayer({ scene: this, model: this.model, sprites: this.sprites, hero: this.hero, soil: (c) => this.soil(c), toScreen: (x, y) => this.toScreen(x, y), inputOn: () => this.inputOn }) : null;
     const offAuto = bus.on('farm:auto', ({ on, bottom }) => {
       this.panelBottom = on ? bottom : 0;
       this.layout();
