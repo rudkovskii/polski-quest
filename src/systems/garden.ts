@@ -375,6 +375,8 @@ export interface PickOpts {
   recent?: readonly string[];
   /** Можно ли собрать фразу из плиток (игры 3 и 4). Остальные фразы растут через игры 1 и 2 как слова. По умолчанию все. */
   assemble?: (id: string) => boolean;
+  /** Можно дать задание «наоборот» (игры 1 и 2): тогда нужда в другой стороне тоже поднимает слово в очереди. */
+  reverse?: boolean;
 }
 
 /** Сколько заданий подряд одно растение не повторяется: min(5, в пуле − 1). */
@@ -390,6 +392,21 @@ export function answersOnDay(g: GardenSave, day: number): Map<string, number> {
   }
   return out;
 }
+
+/**
+ * Дать ли задание «наоборот» (игра 2 — с польского выбором, игра 1 — на польский выбором): растению для куста или урожая не хватает другой стороны, а ответ в сторону игры ему сейчас не нужен.
+ */
+export function wantsReverse(it: ItemState, mode: GameMode, day: number, now: number): boolean {
+  if (mode > 2 || it.stage === null || isOverripe(it, now)) return false;
+  const side = sideOf(mode);
+  const other: Side = side === 'pr' ? 'rp' : 'pr';
+  if (harvestsNow(it, side, day)) return false;
+  if (harvestsNow(it, other, day)) return true;
+  return !needsSide(it, side) && needsSide(it, other);
+}
+
+/** Задание «наоборот» не чаще, чем каждое REVERSE_EVERY-е. */
+export const REVERSE_EVERY = 3;
 
 /** Верный ответ в эту сторону сейчас соберёт урожай. */
 export function harvestsNow(it: ItemState, side: Side, day: number): boolean {
@@ -413,7 +430,8 @@ export function needsSide(it: ItemState, side: Side): boolean {
  * Порядок (P2a: очередь ведёт растения к урожаю, а не размазывает ответы по всей теме):
  *   перезревшие → кому верный ответ сейчас даст урожай → кому сегодня не хватает зачёта дня (рост начат раньше; ближе к
  *   урожаю — раньше) → кому не хватает этой стороны (игра 2 — «по-польски», игра 1 — «с польского»; ближе к урожаю —
- *   раньше) → прежние правила: у кого сегодня меньше ответов, кому ответ поможет, ближе к урожаю, давно не отвечал.
+ *   раньше; с `reverse` — и другой стороны, тогда ферма даёт задание «наоборот») → прежние правила: у кого сегодня меньше
+ *   ответов, кому ответ поможет, ближе к урожаю, давно не отвечал.
  * Одно и то же растение не раньше, чем через `repeatGap` заданий.
  */
 export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: number, day: number, opts: PickOpts = {}): string | null {
@@ -428,15 +446,17 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
   const today = answersOnDay(g, day);
   const gap = repeatGap(pool.length);
   const banned = new Set(gap > 0 ? (opts.recent ?? []).slice(-gap) : []);
+  const other: Side = side === 'pr' ? 'rp' : 'pr';
+  const rev = !!opts.reverse && mode <= 2;
   const key = (it: ItemState): number[] => {
     const over = isOverripe(it, now);
-    const helps = over || canProgress(it, side, day, now);
+    const helps = over || canProgress(it, side, day, now) || (rev && canProgress(it, other, day, now));
     const progress = (STAGE_RANK[it.stage ?? 'seed'] ?? 0) * 100 + it.days.size * 10 + it.drops;
     const day0 = !over && needsDay(it, day);
-    const side0 = !over && !day0 && needsSide(it, side);
+    const side0 = !over && !day0 && (needsSide(it, side) || (rev && needsSide(it, other)));
     return [
       over ? 0 : 1,
-      !over && harvestsNow(it, side, day) ? 0 : 1,
+      !over && (harvestsNow(it, side, day) || (rev && harvestsNow(it, other, day))) ? 0 : 1,
       day0 ? 0 : 1,
       side0 ? 0 : 1,
       day0 || side0 ? -progress : 0,

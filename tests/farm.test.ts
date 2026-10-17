@@ -85,12 +85,16 @@ describe('ферма: фасад', () => {
     const ids = f.words.slice(0, 19).map((w) => w.id);
     f.plant(ids);
     const seen: string[] = [];
-    for (let i = 0; i < 19; i++) {
+    // P2a: каждое 3-е задание может быть «наоборот» (слову с одним поливом нужна другая сторона); свои задания идут по кругу.
+    const own: string[] = [];
+    while (own.length < 19) {
       const q = f.next(1)!;
       seen.push(q.id);
+      if (!q.reverse) own.push(q.id);
       f.answer(q, q.kind === 'choice' ? q.answer : '');
     }
-    expect(new Set(seen).size).toBe(19);
+    expect(new Set(own).size).toBe(19);
+    expect(seen.length).toBeLessThanOrEqual(29);
     // 19 верных ответов уже заметно двигают полоску A0 → A0.1, хотя выращенного ещё нет
     expect(f.stats()).toMatchObject({ level: 'A0', grownWords: 0 });
     expect(f.stats().ratio).toBeGreaterThan(0.1);

@@ -72,6 +72,7 @@ ${THEME_CSS}
 .pq-q-hint { font-size: 13px; opacity: .7; margin-bottom: 8px; }
 .pq-progress { font-size: 13px; margin: -4px 0 8px; color: #4a6b2a; font-weight: 600; }
 .pq-fb .pq-progress { margin: 4px 0 0; }
+.pq-rev { font-size: 12px; font-weight: 700; background: var(--pq-cream); color: var(--pq-ink); border-radius: 6px; padding: 1px 6px; }
 .pq-soon { margin-left: auto; font-weight: 600; font-size: 13px; opacity: .9; }
 .pq-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .pq-game .pq-opt { text-align: left; color: var(--pq-ink); background: #fffaf0; font-size: 17px; line-height: 1.2; padding: 10px; min-height: 48px; overflow-wrap: anywhere; }
@@ -95,11 +96,12 @@ const progressLine = (t: string): string => t.charAt(0).toUpperCase() + t.slice(
 export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame {
   const bus = deps.bus ?? globalBus;
   const title = el('span', {}, '');
+  const rev = el('span', { class: 'pq-rev', 'data-reverse': '', hidden: true, title: 'Задание наоборот: растению нужна другая сторона' }, '↔ наоборот');
   const soon = el('span', { class: 'pq-soon', 'data-soon': '', hidden: true }, '');
   const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', onclick: () => api.stop() }, 'Выйти ✕');
   const paper = el('div', { class: 'pq-game-paper', 'data-game': '' });
   const foot = el('div', { class: 'pq-game-foot', 'data-foot': '' });
-  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, soon, exitBtn), paper, foot);
+  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, rev, soon, exitBtn), paper, foot);
   const root = el('div', { class: 'pq-game', hidden: true }, el('style', {}, css), box);
   parent.append(root);
 
@@ -234,18 +236,20 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     built = [];
     tileAdder = null;
     focusIdx = -1;
+    rev.hidden = true;
     if (!q || !mode) {
       paper.append(el('div', { class: 'pq-q' }, 'Пока нечего поливать'), el('div', { class: 'pq-q-hint' }, mode && mode >= 3 ? 'Посади фразу в словаре дома.' : 'Посади слова в словаре дома.'));
       requestAnimationFrame(reportHeight);
       return;
     }
+    rev.hidden = !q.reverse;
     const hint: Record<GameMode, string> = {
       1: 'Выбери перевод',
       2: q.kind === 'type' ? 'Напиши по-польски (куст: уже без подсказок)' : 'Выбери польское слово',
       3: 'Собери фразу по-польски',
       4: 'Собери фразу по-русски',
     };
-    paper.append(el('div', { class: 'pq-q', lang: q.promptLang, 'data-prompt': '' }, q.prompt), el('div', { class: 'pq-q-hint' }, hint[mode]));
+    paper.append(el('div', { class: 'pq-q', lang: q.promptLang, 'data-prompt': '' }, q.prompt), el('div', { class: 'pq-q-hint' }, hint[q.mode]));
     if (q.progress) paper.append(el('div', { class: 'pq-progress', 'data-progress': '' }, `🌱 ${progressLine(q.progress)}`));
     if (q.kind === 'choice') renderChoice(q);
     else if (q.kind === 'type') renderType();

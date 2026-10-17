@@ -8,12 +8,15 @@ import type { Phrase, Word } from '../types/content';
 import type { GameMode } from '../types/farm';
 import { checkAnswer, type Verdict } from './answer';
 
-/** `progress` — что осталось растению до урожая («ещё 1 полив до ростка»), его дописывает ферма (P2a). */
+/**
+ * `progress` — что осталось растению до урожая («ещё 1 полив до ростка»), его дописывает ферма (P2a).
+ * `reverse` — задание «наоборот»: в игре 2 пришло с польского (mode 1), в игре 1 — на польский (mode 2), всегда выбором.
+ */
 export type Question = (
   | { mode: GameMode; id: string; kind: 'choice'; prompt: string; promptLang: 'pl' | 'ru'; options: string[]; answer: string }
   | { mode: GameMode; id: string; kind: 'type'; prompt: string; promptLang: 'ru'; answer: string; accept: string[] }
   | { mode: GameMode; id: string; kind: 'tiles'; prompt: string; promptLang: 'pl' | 'ru'; tiles: string[]; answer: string[] }
-) & { progress?: string };
+) & { progress?: string; reverse?: boolean };
 
 /** Минимум плиток, чтобы фразу имело смысл собирать (игры 3 и 4). */
 export const MIN_TILES = 3;

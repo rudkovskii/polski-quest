@@ -59,6 +59,44 @@ describe('P2a: очередь ведёт к урожаю', () => {
     }
   });
 
+  it('только игра 2 (или только игра 1): 19 слов, 3 дня по 20 ответов → не меньше 8 урожаев за счёт заданий «наоборот»', () => {
+    for (const seed of [1, 2, 3]) {
+      expect(play(() => 2, 20, seed)).toBeGreaterThanOrEqual(8);
+      expect(play(() => 1, 20, seed)).toBeGreaterThanOrEqual(8);
+    }
+  });
+
+  it('«наоборот»: в игре 2 — с польского выбором, не чаще каждого 3-го задания, по «Повторить» не бывает', () => {
+    const s = setup();
+    const ids = s.farm.words.slice(0, 6).map((w) => w.id);
+    s.farm.plant(ids);
+    const qs: Question[] = [];
+    for (let d = 0; d < 3; d++)
+      for (let i = 0; i < 20; i++) {
+        s.setNow(T0 + d * DAY_MS + (i + 1) * 60_000);
+        const q = s.farm.next(2);
+        if (!q) break; // всё собрано
+        qs.push(q);
+        s.farm.answer(q, q.answer);
+      }
+    const rev = qs.map((q, i) => (q.reverse ? i : -1)).filter((i) => i >= 0);
+    expect(rev.length).toBeGreaterThan(0);
+    for (const i of rev) expect(qs[i]).toMatchObject({ mode: 1, kind: 'choice', promptLang: 'pl' });
+    for (let k = 1; k < rev.length; k++) expect(rev[k]! - rev[k - 1]!).toBeGreaterThanOrEqual(3);
+    for (const q of qs) if (!q.reverse) expect(q.mode).toBe(2);
+    expect(s.farm.stats().grownTotal).toBe(6);
+    // Росток без «с польского»: по «Повторить» (only) — без подмены.
+    const t = setup();
+    t.farm.plant(['w.kot']);
+    for (let i = 0; i < 2; i++) {
+      const q = t.farm.next(2, 'w.kot')!;
+      t.farm.answer(q, q.answer);
+    }
+    expect(t.farm.next(2, 'w.kot')).toMatchObject({ mode: 2 });
+    expect(t.farm.next(2, 'w.kot')!.reverse).toBeUndefined();
+    expect(t.farm.next(2)).toMatchObject({ mode: 1, reverse: true });
+  });
+
   it('одно слово, 3 дня по 2 ответа в разные стороны → урожай', () => {
     const s = setup();
     const id = s.farm.words[0]!.id;
@@ -182,6 +220,18 @@ describe('P2a: прогресс до урожая виден', () => {
     const soon = root.querySelector('[data-soon]') as HTMLElement;
     expect(soon.hidden).toBe(false);
     expect(soon.textContent).toBe('🌾 созреет завтра: 3');
+    g.stop();
+  });
+
+  it('задание «наоборот»: пометка «↔ наоборот» в шапке и подсказка по стороне задания', () => {
+    const root = document.createElement('div');
+    const R: Question = { mode: 1, id: 'w.kot', kind: 'choice', prompt: 'kot', promptLang: 'pl', options: ['собака', 'кот', 'дом', 'мама'], answer: 'кот', reverse: true };
+    const g = mountMinigame(root, { bus: testBus(), next: () => R, answer: () => ({ ok: true, correct: 'кот', pl: 'kot', ru: 'кот', tr: 'кот' }), say: () => {} });
+    g.start(2);
+    const mark = root.querySelector('[data-reverse]') as HTMLElement;
+    expect(mark.hidden).toBe(false);
+    expect(mark.textContent).toBe('↔ наоборот');
+    expect(root.querySelector('.pq-q-hint')?.textContent).toBe('Выбери перевод');
     g.stop();
   });
 });

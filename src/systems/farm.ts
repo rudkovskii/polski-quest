@@ -19,6 +19,8 @@ import {
   plant,
   progressText,
   ripeSoon,
+  REVERSE_EVERY,
+  wantsReverse,
   sideOf,
   stageOf,
   statusOf,
@@ -79,6 +81,8 @@ export function createFarm(d: FarmDeps): Farm {
   let st: GardenState = derive(g);
   /** Последние показанные id: основа правила «не повторять чаще, чем раз в N заданий». */
   const recent: string[] = [];
+  /** Заданий с последнего «наоборот» (P2a: не чаще, чем каждое 3-е). */
+  let sinceReverse = REVERSE_EVERY - 1;
   const listeners = new Set<() => void>();
 
   const today = (): number => {
@@ -212,7 +216,8 @@ export function createFarm(d: FarmDeps): Farm {
     },
     next(mode, only) {
       const now = d.now();
-      const id = only ?? pickTask(g, st, mode, now, today(), { recent, assemble });
+      const canReverse = !only && mode <= 2 && sinceReverse >= REVERSE_EVERY - 1;
+      const id = only ?? pickTask(g, st, mode, now, today(), { recent, assemble, reverse: canReverse });
       if (!id) {
         d.bus.emit('farm:focus', { id: null, tile: null, label: '' });
         return null;
@@ -221,9 +226,13 @@ export function createFarm(d: FarmDeps): Farm {
       if (recent.length > 8) recent.shift();
       const it = st.items.get(id);
       const stage = it ? stageOf(it, now) : null;
-      const typed = mode === 2 && (stage === 'bush' || stage === 'overripe');
-      const made = makeQuestion(mode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: WORDS, phrases: PHRASES }, rand, typed);
-      const q = made && { ...made, progress: progressText(it, now, today()) };
+      // «Наоборот»: растению не хватает другой стороны — в игре 2 спросим с польского, в игре 1 — на польский (выбором).
+      const reverse = canReverse && !!it && wantsReverse(it, mode, today(), now);
+      if (!only) sinceReverse = reverse ? 0 : sinceReverse + 1;
+      const qmode: GameMode = reverse ? (mode === 1 ? 2 : 1) : mode;
+      const typed = !reverse && mode === 2 && (stage === 'bush' || stage === 'overripe');
+      const made = makeQuestion(qmode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: WORDS, phrases: PHRASES }, rand, typed);
+      const q = made && { ...made, progress: progressText(it, now, today()), ...(reverse ? { reverse: true } : {}) };
       const slot = g.slots[id];
       const cell = slot !== undefined ? PLOT_CELLS[slot] : undefined;
       d.bus.emit('farm:focus', { id, tile: cell ? [cell[0], cell[1]] : null, label: plOf(id) });
