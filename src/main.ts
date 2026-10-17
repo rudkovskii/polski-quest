@@ -3,14 +3,22 @@ import { startInput } from './input';
 import { Boot } from './scenes/Boot';
 import { BG_COLOR, World, type WorldStart } from './scenes/World';
 import { bus, type Bus } from './systems/bus';
+import { createFarm } from './systems/farm';
 import { connectAudio } from './systems/platform/audio';
+import { createClock } from './systems/platform/clock';
 import { lastReloadAt, registerPwa, reloadForUpdate, watchVersion } from './systems/platform/pwa';
 import { GameStorage, memoryKV } from './systems/platform/storage';
 import { exportFileName, exportSave, importSave, type Save } from './systems/save';
 import { staleBuild, updateAction } from './systems/update';
 import type { BusEvents } from './types/bus';
 import { mountAudioToast } from './ui/audioToast';
-import { mountBubble } from './ui/bubble';
+import { mountBoard } from './ui/board';
+import { mountDictionary } from './ui/dictionary';
+import { mountFloats } from './ui/float';
+import { mountMinigame } from './ui/minigame';
+import { mountPantry } from './ui/pantry';
+import { mountPlantCard } from './ui/plantCard';
+import { mountSummary } from './ui/summary';
 import { mountDpad } from './ui/dpad';
 import { mountHud } from './ui/hud';
 import { mountSettings } from './ui/settings';
@@ -58,7 +66,6 @@ async function main(): Promise<void> {
   else connectAudio(gatedAudioBus(bus, () => store.save.settings.sound));
   mountAudioToast(overlay);
   mountUpdateToast(overlay);
-  mountBubble(overlay);
 
   const settings = mountSettings(overlay, {
     getSound: () => store.save.settings.sound,
@@ -86,13 +93,48 @@ async function main(): Promise<void> {
   });
   mountHud(overlay, { onSettings: () => settings.open() });
 
+  // Ферма (F-03): огород, словарь, банки, мини-игры. Часы со сдвигом `?now=+1d` для проверки дней.
+  const clock = createClock(params.get('now'));
+  const farm = createFarm({
+    bus,
+    load: () => store.save.garden,
+    save: (garden) => store.update((s: Save) => ({ ...s, garden }), clock.now()),
+    now: () => clock.now(),
+    tz: (t) => new Date(t).getTimezoneOffset(),
+    say: (id, slow) => bus.emit('audio:play', { id, text: farm.word(id)?.pl ?? farm.phrase(id)?.pl ?? '', ...(slow ? { slow } : {}) }),
+  });
+  mountFloats(overlay);
+  const game = mountMinigame(overlay, {
+    next: (mode, only) => farm.next(mode, only),
+    answer: (q, given) => farm.answer(q, given),
+    say: (id) => farm.say(id),
+  });
+  const board = mountBoard(overlay, { counts: () => (farm.refresh(), farm.counts()), onPick: (mode) => game.start(mode) });
+  const dictionary = mountDictionary(overlay, farm);
+  const pantry = mountPantry(overlay, farm);
+  const summary = mountSummary(overlay, farm);
+  const plantCard = mountPlantCard(overlay, farm, { onReview: (id) => game.start(farm.reviewMode(id), id) });
+  bus.on('world:interact', ({ use, id }) => {
+    if (game.isOpen) return;
+    if (use === 'desk') dictionary.open();
+    else if (use === 'shelf') pantry.open();
+    else if (use === 'bed') summary.openBed();
+    else if (use === 'bin') summary.openBin();
+    else if (use === 'board') board.open();
+    else if (use === 'plant') plantCard.open(id);
+  });
+  bus.on('world:location', ({ id }) => {
+    if (id === 'farm') farm.refresh();
+  });
+  farm.refresh();
+
   // Позиция героя и поворот: пишем, когда он остановился.
   bus.on('world:position', ({ location: map, x, y, facing }) => {
     store.update((s: Save) => ({ ...s, position: { map, x, y, facing } }), Date.now());
   });
 
   const start: WorldStart = save.position ? { map: save.position.map, spawn: [save.position.x, save.position.y], facing: save.position.facing } : {};
-  const game = new Phaser.Game({
+  const phaser = new Phaser.Game({
     type: Phaser.WEBGL,
     parent,
     pixelArt: true,
@@ -102,11 +144,11 @@ async function main(): Promise<void> {
     input: { activePointers: 2 },
     scene: [Boot, World],
   });
-  game.registry.set('boot:start', start);
+  phaser.registry.set('boot:start', start);
 
   const world = (): World | null => {
-    const s = game.scene.getScene('World') as World | null;
-    return s && game.scene.isActive('World') ? s : null;
+    const s = phaser.scene.getScene('World') as World | null;
+    return s && phaser.scene.isActive('World') ? s : null;
   };
   // Порядок важен: сначала d-pad (он слушает `input:dpad`), потом startInput.
   const dpad = mountDpad(document.body, bus);
@@ -126,7 +168,7 @@ async function main(): Promise<void> {
   // Страница из старого кэша (HTTP-кэш index.html, встроенный браузер без SW): версия с сервера без кэша.
   watchVersion({ base: import.meta.env.BASE_URL, local: __BUILD_ID__, isStale: staleBuild, onStale: needReload });
 
-  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game, store, world, settings, input };
+  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock };
 }
 
 void main();

@@ -5,7 +5,7 @@
 озвучивает их и пишет public/audio/<sha1[:12]>.m4a + public/audio/manifest.json. Список строк дают F-02 и F-03
 (слова и фразы A1, примеры); в F-01 он пуст, манифест пустой.
 
-    npm run audio                         # = python3 tools/build_audio.py (только Mac: say + afconvert)
+    npm run audio                         # = python3 tools/build_audio.py (только Mac: say + afconvert; --jobs 6 параллельно)
     npm run audio:check                   # = --check: всё ли озвучено; ничего не генерирует, работает в CI (Linux)
     python3 tools/build_audio.py --voice say:Zosia      # голос по умолчанию
     python3 tools/build_audio.py --prune  # удалить файлы, на которые больше не ссылается манифест
@@ -36,6 +36,7 @@ import subprocess
 import sys
 import tempfile
 import unicodedata
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -225,6 +226,7 @@ def main() -> int:
     ap.add_argument('--prune', action='store_true', help='удалить файлы, которых нет в манифесте')
     ap.add_argument('--force', action='store_true', help='перегенерировать все файлы (после смены параметров голоса)')
     ap.add_argument('--dry-run', action='store_true', help='показать, что будет сгенерировано')
+    ap.add_argument('--jobs', type=int, default=6, help='сколько строк озвучивать параллельно (say и afconvert — отдельные процессы)')
     ap.add_argument('--root', type=Path, default=ROOT / 'content', help='папка content/ (там audio.json)')
     ap.add_argument('--out', type=Path, default=ROOT / 'public' / 'audio', help='папка public/audio/')
     a = ap.parse_args()
@@ -281,16 +283,21 @@ def main() -> int:
     durs: dict[str, float | None] = {}
     failed = 0
     with tempfile.TemporaryDirectory(prefix='pq-audio-') as td:
-        tmp = Path(td)
-        for n, it in enumerate(todo, 1):
-            target = out / it.file
+
+        def job(n: int, it: Item) -> bool:
+            # Своя временная папка на задачу: параллельные say не пишут в один файл.
+            tmp = Path(td) / str(n)
+            tmp.mkdir()
             try:
-                synth(it, target, tmp)
+                synth(it, out / it.file, tmp)
             except (RuntimeError, subprocess.CalledProcessError) as e:
-                failed += 1
                 print(f'  ! {it.text} [{it.voice}|{it.rate}]: {e}', file=sys.stderr)
-                continue
-            print(f'  [{n}/{len(todo)}] {it.file} {it.rate:6} {it.text}')
+                return False
+            print(f'  [{n}/{len(todo)}] {it.file} {it.rate:6} {it.text}', flush=True)
+            return True
+
+        with ThreadPoolExecutor(max_workers=max(1, a.jobs)) as pool:
+            failed = sum(1 for ok in pool.map(lambda x: job(*x), enumerate(todo, 1)) if not ok)
     for it in items:
         if not (out / it.file).exists():
             continue

@@ -51,9 +51,21 @@
 ввод идёт в оверлей), потом `true`. Участок грядок — объект `plot:garden` (6×4 в `farm.json`, запас под расширение в `reserve`).
 Прочие события: `world:exit` (шаг в дверь), `world:position` (остановка героя, пишет сохранение), `hud:xp {level, ratio}` (F-03 шлёт опыт).
 
+## Ферма (F-03)
+- База A1: `content/a1/{words,phrases}.json` — копия `../data/a1` без правок (правится там, сюда копируется). Темы и индексы — `src/systems/content.ts`.
+- Модель огорода `src/systems/garden.ts` (чистая): посадки + журнал ответов (только дописывается) → стадии, капли, дни, урожай,
+  перезревание 7/21/60, опыт, уровень; раскладка по грядкам `PLOT_TIERS` (24 → резерв 10×6 → ряды → второй участок → мешок).
+  Задания мини-игр — `src/systems/quiz.ts`. Фасад `FarmApi` для экранов — `src/systems/farm.ts` (`src/types/farm.ts`).
+- Экраны: `ui/dictionary.ts` (стол), `ui/pantry.ts` (полка), `ui/summary.ts` (коробка, кровать), `ui/plantCard.ts` (растение),
+  `ui/board.ts` (доска), `ui/minigame.ts` (панель вопроса снизу), общая модалка `ui/panel.ts`, надписи над миром `ui/float.ts`.
+- Мир: `scenes/farmLayer.ts` — растения, вскопанные клетки, подпись, автобег (`farm:act` в очередь, ускорение при очереди).
+  События шины: `farm:plants`, `farm:auto`, `farm:focus`, `farm:act`, `fx:float`, `fx:label`, `hud:xp {gain, up}`.
+- Озвучка: `python3 tools/audio_list.py` пишет `content/audio.json` (слова обычно и медленно, фразы), потом `npm run audio`.
+- Проверка дней: `?now=+1d`, `+2d` (часы `platform/clock.ts`). В dev `window.__pq.farm` — фасад фермы.
+
 ## Сохранение
 `systems/save.ts` (модель, экспорт/импорт файлом) + `platform/storage.ts` (IndexedDB → localStorage → память, запись с дебаунсом,
-аварийная копия при уходе). Сейчас: позиция героя и звук. F-03 добавляет грядки/слова/опыт: подними `SAVE_V`, допиши `normalizeSave`.
+аварийная копия при уходе). v2: позиция героя, звук, огород (`garden`: посадки, журнал, грядки).
 Сброс = автоэкспорт файла, потом стирание.
 
 ## Проверка

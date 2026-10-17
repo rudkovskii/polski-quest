@@ -1,4 +1,5 @@
 // Полный список событий шины. Связь scenes/world ⇄ ui и склейка main.ts идут только через неё.
+import type { FarmAct, PlantView } from './farm';
 import type { DpadSide, Dir, MapControls, RoutedIntent, Source } from './input';
 
 /** Чем прозвучала фраза: файл из манифеста, Web Speech pl-PL или никак (показать текст). */
@@ -10,7 +11,7 @@ export type AudioVia = 'file' | 'webspeech' | 'none';
 export type AudioState = 'idle' | 'playing' | 'blocked' | 'none';
 
 /** Объекты, с которыми можно что-то сделать (`use` в content/maps/*.json). Логику каждого делает F-03. */
-export type UseKind = 'desk' | 'board' | 'bin' | 'shelf' | 'bed';
+export type UseKind = 'desk' | 'board' | 'bin' | 'shelf' | 'bed' | 'plant';
 
 /**
  * КОНТРАКТ ДЛЯ F-03. Игрок нажал A рядом с интерактивным объектом или тапнул по нему (мир сам подошёл).
@@ -45,8 +46,20 @@ export interface BusEvents {
   'world:location': { id: string; controls: MapControls };
   /** Герой остановился: склейка пишет позицию в сохранение. */
   'world:position': { location: string; x: number; y: number; facing: Dir };
-  /** Опыт и уровень для HUD (F-03 шлёт; в F-01 «A0» и 0%). */
-  'hud:xp': { level: string; ratio: number };
+  /** Опыт и уровень для HUD. `xp` — всего очков; `gain` — сколько пришло сейчас («+N»); `up` — новый уровень (вспышка). */
+  'hud:xp': { level: string; ratio: number; xp?: number; gain?: number; up?: boolean };
+  /** Грядки фермы: растения и вскопанные клетки (шлёт склейка при любом изменении и при входе на ферму). */
+  'farm:plants': { plants: PlantView[]; cells: [number, number][] };
+  /** Мини-игра открыта (герой бегает сам) или закрыта. `bottom` — высота панели вопроса снизу, CSS px. */
+  'farm:auto': { on: boolean; bottom: number };
+  /** Текущее задание мини-игры: герой идёт к этой грядке, подпись над ней. */
+  'farm:focus': { id: string | null; tile: [number, number] | null; label: string };
+  /** Действие героя по ответу (полив, удобрение, урожай, промах): встаёт в очередь автобега. */
+  'farm:act': FarmAct;
+  /** Всплывающая надпись над точкой мира (экранные CSS px): «+10», подпись растения. */
+  'fx:float': { x: number; y: number; text: string; kind: 'xp' | 'miss' | 'info' };
+  /** Подпись над растением у героя (экранные CSS px); null — спрятать. */
+  'fx:label': { text: string; x: number; y: number } | null;
   /** Озвучить польскую строку. `id` — запись манифеста, `text` — запасной текст, `slow` — медленно. */
   'audio:play': { id?: string; text?: string; slow?: boolean; voice?: string; queue?: boolean; done?: (via: AudioVia) => void };
   'audio:stop': Record<string, never>;

@@ -27,7 +27,7 @@ type Rect = readonly [number, number, number, number];
 export interface WorldObject {
   /** `prop:desk`, `exit:5,5`, `plot:garden`, `spot:cat_sleep`. */
   key: string;
-  kind: 'prop' | 'exit' | 'plot' | 'spot';
+  kind: 'prop' | 'exit' | 'plot' | 'spot' | 'plant';
   id: string;
   at: Xy;
   size: Xy;
@@ -36,7 +36,19 @@ export interface WorldObject {
   src: LocationMap['objects'][number];
   use?: string;
   label?: string;
+  /** Клетки, по которым с объектом взаимодействуют, если он проходим (растение на грядке). Иначе — `rects`. */
+  cells?: Rect[];
 }
+
+/** Растение на грядке для модели: проходимо, но с ним можно взаимодействовать (A, тап). */
+export interface PlantSpot {
+  /** id растения (слово или фраза). */
+  id: string;
+  tile: Xy;
+  label: string;
+}
+
+const hitRects = (o: WorldObject): Rect[] => o.cells ?? o.rects;
 
 export interface InteractEvent {
   type: 'interact';
@@ -148,6 +160,9 @@ export class LocationModel {
   readonly cat: Cat | null;
   readonly grid: Grid;
 
+  /** Множитель скорости шага (автобег ускоряется, когда действия копятся в очереди). */
+  speed = 1;
+  private plants: WorldObject[] = [];
   private heldDir: Dir | null = null;
   private queuedDir: Dir | null = null;
   private bumped = false;
@@ -202,7 +217,61 @@ export class LocationModel {
   }
 
   object(key: string): WorldObject | undefined {
-    return this.objects.find((o) => o.key === key);
+    return this.objects.find((o) => o.key === key) ?? this.plants.find((o) => o.key === key);
+  }
+
+  /** Растения на грядках (ключ `plant:<id>`): проходимы, A и тап по ним шлют `interact` с `use: 'plant'`. */
+  setPlants(list: readonly PlantSpot[]): void {
+    this.plants = list.map((p): WorldObject => ({
+      key: `plant:${p.id}`,
+      kind: 'plant',
+      id: p.id,
+      at: [p.tile[0], p.tile[1]],
+      size: [1, 1],
+      rects: [],
+      cells: [[p.tile[0], p.tile[1], 1, 1]],
+      src: { type: 'spot', id: p.id, at: [p.tile[0], p.tile[1]] },
+      use: 'plant',
+      label: p.label,
+    }));
+  }
+
+  /**
+   * Автобег: дойти до клетки рядом с `target` (лучше снизу — герой смотрит вверх на грядку) и встать. Ввод игрока при этом
+   * выключен (мини-игра). Возвращает false, если уже стоит рядом (или дойти некуда).
+   */
+  walkNear(target: Xy, extra: readonly Rect[] = []): boolean {
+    this.heldDir = null;
+    this.queuedDir = null;
+    this.pending = null;
+    this.actionQueued = false;
+    const rects: Rect[] = extra.length ? [...extra] : [[target[0], target[1], 1, 1]];
+    const here = this.from();
+    const prefer: Xy[] = [];
+    if (!extra.length) for (const d of ['down', 'left', 'right', 'up'] as Dir[]) prefer.push([target[0] + DELTA[d][0], target[1] + DELTA[d][1]]);
+    const goals = (prefer.length ? prefer : around(rects)).filter(([x, y]) => this.walkGrid().passable(x, y));
+    if (goals.some((g) => eq(g, here))) {
+      this.path = [];
+      return false;
+    }
+    // Растение: снизу, если туда можно дойти; иначе любая соседняя. Объект (коробка): ближайшая клетка рядом.
+    if (!extra.length) for (const g of goals) {
+      const r = findPath(this.walkGrid(), here, g);
+      if (r.exact && r.path.length) {
+        this.path = r.path;
+        return true;
+      }
+    }
+    const res = findPathToAny(this.walkGrid(), here, goals, target);
+    this.path = res.path;
+    return res.path.length > 0;
+  }
+
+  /** Повернуть героя к клетке. */
+  faceTile(c: Xy): void {
+    const [x, y] = this.player.tile;
+    if (x === c[0] && y === c[1]) return;
+    this.player.facing = dirBetween(this.player.tile, c);
   }
 
   spot(id: string): Xy | null {
@@ -211,7 +280,7 @@ export class LocationModel {
 
   /** Интерактивный объект, чьи клетки покрывают `tile` (иначе undefined). */
   usableAt(tile: Xy): WorldObject | undefined {
-    return this.objects.find((o) => o.use && o.kind === 'prop' && o.rects.some((r) => inRect(r, tile)));
+    return this.objects.find((o) => o.use && o.kind === 'prop' && o.rects.some((r) => inRect(r, tile))) ?? this.plants.find((o) => hitRects(o).some((r) => inRect(r, tile)));
   }
 
   /** Что под пальцем: ключ интерактивного объекта или null. */
@@ -337,7 +406,7 @@ export class LocationModel {
   private startStep(to: Xy): void {
     const from = this.player.tile;
     this.player.facing = dirBetween(from, to);
-    this.player.step = { from, to, t: 0, ms: STEP_MS };
+    this.player.step = { from, to, t: 0, ms: STEP_MS / Math.max(0.25, this.speed) };
     this.out.push({ type: 'step', from, to });
     this.yieldCat(to, from);
   }
@@ -401,12 +470,12 @@ export class LocationModel {
   /** Герой рядом с объектом (4-соседство). */
   private near(o: WorldObject): boolean {
     const [x, y] = this.player.tile;
-    return DIR_ORDER.some((d) => o.rects.some((r) => inRect(r, [x + DELTA[d][0], y + DELTA[d][1]])));
+    return DIR_ORDER.some((d) => hitRects(o).some((r) => inRect(r, [x + DELTA[d][0], y + DELTA[d][1]])));
   }
 
   private faceTo(o: WorldObject): void {
     const [x, y] = this.player.tile;
-    for (const d of DIR_ORDER) if (o.rects.some((r) => inRect(r, [x + DELTA[d][0], y + DELTA[d][1]]))) {
+    for (const d of DIR_ORDER) if (hitRects(o).some((r) => inRect(r, [x + DELTA[d][0], y + DELTA[d][1]]))) {
       this.player.facing = d;
       return;
     }
@@ -451,7 +520,7 @@ export class LocationModel {
       this.fire(o, 'tap');
       return;
     }
-    const goals = around(o.rects).filter(([x, y]) => this.walkGrid().passable(x, y));
+    const goals = around(hitRects(o)).filter(([x, y]) => this.walkGrid().passable(x, y));
     const res = findPathToAny(this.walkGrid(), this.from(), goals, o.at);
     this.path = res.path;
     this.pending = res.exact ? o.key : null;

@@ -15,6 +15,12 @@ ${THEME_CSS}
 .pq-xp-lvl { min-width: 30px; text-align: center; padding: 4px 6px; background: var(--pq-accent); color: var(--pq-ink); border-radius: 4px; }
 .pq-xp-bar { position: relative; width: 84px; height: 10px; background: #2a1418; border-radius: 3px; overflow: hidden; }
 .pq-xp-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--pq-leaf); box-shadow: inset 0 2px 0 rgba(255,255,255,.35); }
+.pq-xp { position: relative; }
+.pq-xp-gain { position: absolute; left: 100%; top: 4px; margin-left: 6px; color: #f2d552; font: 800 15px/1 -apple-system, sans-serif; text-shadow: 0 2px 0 var(--pq-ink);
+  pointer-events: none; animation: pq-gain 1s ease-out forwards; white-space: nowrap; }
+@keyframes pq-gain { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-18px); } }
+.pq-xp.flash { animation: pq-flash 1.6s ease-out; }
+@keyframes pq-flash { 0%, 30%, 60% { background: #f2d552; color: var(--pq-ink); transform: scale(1.12); } 15%, 45%, 100% { background: var(--pq-wood-dark); transform: scale(1); } }
 .pq-gear { width: 44px; height: 44px; padding: 0; font-size: 22px; line-height: 40px; text-align: center; }
 `;
 
@@ -40,7 +46,20 @@ export function mountHud(parent: HTMLElement, o: { onSettings(): void; bus?: Bus
     fill.style.width = `${Math.round(r * 100)}%`;
     bar.setAttribute('aria-valuenow', String(Math.round(r * 100)));
   };
-  const off = bus.on('hud:xp', ({ level, ratio }) => setXp(level, ratio));
+  const off = bus.on('hud:xp', ({ level, ratio, gain, up }) => {
+    setXp(level, ratio);
+    if (gain && gain > 0) {
+      const g = el('span', { class: 'pq-xp-gain', 'data-xp-gain': '' }, `+${gain}`);
+      xp.append(g);
+      setTimeout(() => g.remove(), 1000);
+    }
+    if (up) {
+      xp.classList.remove('flash');
+      void xp.offsetWidth;
+      xp.classList.add('flash');
+      xp.title = `Новый уровень: ${level}`;
+    }
+  });
   return {
     root,
     gear,

@@ -1,8 +1,9 @@
 // Модель сохранения «Фермы»: одна запись (позиция героя, настройки) плюс экспорт и импорт файлом.
-// Чистые функции без браузера. F-03 добавит сюда грядки, словарь и опыт (поднять SAVE_V и дописать нормализацию).
+// Чистые функции без браузера. v2 (F-03): огород — посадки, журнал ответов, раскладка по грядкам (systems/garden.ts).
 import type { Dir } from '../types/input';
+import { newGarden, normalizeGarden, type GardenSave } from './garden';
 
-export const SAVE_V = 1;
+export const SAVE_V = 2;
 const APP = 'polski-quest-farm';
 
 export interface Position {
@@ -23,10 +24,12 @@ export interface Save {
   updated: number;
   position: Position | null;
   settings: Settings;
+  /** Огород: посадки, журнал ответов (только дописывается), грядки. Опыт и стадии выводятся из него. */
+  garden: GardenSave;
 }
 
 export function newSave(now: number): Save {
-  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true } };
+  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true }, garden: newGarden() };
 }
 
 const DIRS: readonly Dir[] = ['up', 'down', 'left', 'right'];
@@ -50,6 +53,7 @@ export function normalizeSave(raw: unknown): Save | null {
     updated: isNum(r.updated) ? r.updated : 0,
     position,
     settings: { sound: st.sound !== false },
+    garden: normalizeGarden(r.garden),
   };
 }
 

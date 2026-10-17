@@ -1,0 +1,216 @@
+// @vitest-environment happy-dom
+import { describe, expect, it, vi } from 'vitest';
+import type { Phrase, Topic, Word } from '../src/types/content';
+import type { FarmApi, FarmStats, ItemInfo, ItemStatus } from '../src/types/farm';
+import { mountDictionary } from '../src/ui/dictionary';
+import { mountPantry } from '../src/ui/pantry';
+import { mountPlantCard } from '../src/ui/plantCard';
+import { mountSummary } from '../src/ui/summary';
+import { testBus } from './helpers';
+
+const w = (id: string, pl: string, ru: string, topic: string, extra: Partial<Word> = {}): Word => ({
+  id: `w.${id}`, pl, ru, tr: `[${id}]`, pos: 'noun', forms: {}, topic, freq: 1, band: 1, order: 1, ff: null, ex: null, ...extra,
+});
+const ph = (id: string, pl: string, ru: string, words: string[], topic: string): Phrase => ({
+  id: `p.${id}`, pl, ru, tr: `[${id}]`, words, tiles_pl: [], tiles_ru: [], distract_pl: [], distract_ru: [], topic, level: 1,
+});
+
+function fakeApi(over: Partial<FarmStats> = {}) {
+  const words = [
+    w('kot', 'kot', 'кот', 'zwierzeta', { gender: 'm', ex: { pl: 'Mam kota.', ru: 'У меня есть кот.' } }),
+    w('zolw', 'żółw', 'черепаха', 'zwierzeta'),
+    w('pies', 'pies', 'собака', 'zwierzeta'),
+    w('chleb', 'chleb', 'хлеб', 'jedzenie'),
+    w('ser', 'ser', 'сыр', 'jedzenie', { ff: { ru: 'сэр', note: 'сыр' } }),
+    w('woda', 'woda', 'вода', 'jedzenie'),
+  ];
+  const phrases = [ph('mam_kota', 'Mam kota.', 'У меня есть кот.', ['w.kot'], 'zwierzeta'), ph('jem_chleb', 'Jem chleb.', 'Я ем хлеб.', ['w.chleb'], 'jedzenie')];
+  const topics: Topic[] = [
+    { id: 'zwierzeta', pl: 'Zwierzęta', ru: 'Животные' },
+    { id: 'jedzenie', pl: 'Jedzenie', ru: 'Еда' },
+  ];
+  const status = new Map<string, ItemStatus>([['w.kot', 'growing'], ['w.chleb', 'grown']]);
+  const stage = new Map<string, ItemInfo['stage']>([['w.kot', 'sprout'], ['p.jem_chleb', null]]);
+  const listeners = new Set<() => void>();
+  const plant = vi.fn((ids: readonly string[]) => {
+    let planted = 0;
+    for (const id of ids) {
+      if ((status.get(id) ?? 'new') === 'new') {
+        status.set(id, 'growing');
+        stage.set(id, 'seed');
+        planted++;
+      }
+    }
+    for (const f of listeners) f();
+    return { planted, bag: 0, skipped: ids.length - planted };
+  });
+  const say = vi.fn();
+  const info = (id: string): ItemInfo => ({
+    id, kind: id.startsWith('p.') ? 'phrase' : 'word', status: status.get(id) ?? 'new', stage: stage.get(id) ?? null, drops: 2,
+    sides: { pr: true, rp: false }, days: 1, next: 'ещё 1 верный', harvests: 0, dueAt: null, slot: null,
+  });
+  const api: FarmApi = {
+    words, phrases, topics,
+    word: (id) => words.find((x) => x.id === id),
+    phrase: (id) => phrases.find((x) => x.id === id),
+    info,
+    // Фраза «Mam kota.» заблокирована: кот ещё не куст.
+    missingWords: (id) => (id === 'p.mam_kota' ? ['w.kot'] : []),
+    plant,
+    stats: () => ({ xp: 120, level: 'A0.5', ratio: 0.4, grownToday: 3, grownTotal: 17, grownWords: 12, grownPhrases: 5, growing: 4, bag: 1, answersToday: 25, ...over }),
+    pantry: () => [{ topic: 'jedzenie', ids: ['w.chleb'] }],
+    say,
+    onChange: (fn) => (listeners.add(fn), () => listeners.delete(fn)),
+  };
+  return { api, plant, say, status };
+}
+
+const setup = () => {
+  const root = document.createElement('div');
+  document.body.append(root);
+  const bus = testBus();
+  const input: boolean[] = [];
+  bus.on('world:input', ({ enabled }) => input.push(enabled));
+  return { root, bus, input };
+};
+const esc = (bus: ReturnType<typeof testBus>) => bus.emit('input:intent', { type: 'cancel', to: 'ui', source: 'keyboard' });
+const rows = (root: HTMLElement) => [...root.querySelectorAll<HTMLElement>('.dict-row')].map((r) => r.getAttribute('data-id'));
+const type = (root: HTMLElement, text: string) => {
+  const input = root.querySelector<HTMLInputElement>('[data-search]')!;
+  input.value = text;
+  input.dispatchEvent(new Event('input'));
+};
+
+describe('Słownik', () => {
+  it('открытие отключает мир, Esc закрывает и возвращает ввод', () => {
+    const { root, bus, input } = setup();
+    const d = mountDictionary(root, fakeApi().api, bus);
+    d.open();
+    expect(d.isOpen).toBe(true);
+    expect(rows(root)).toHaveLength(6);
+    esc(bus);
+    expect(d.isOpen).toBe(false);
+    expect(input).toEqual([false, true]);
+  });
+
+  it('поиск без диакритики и регистра: «ZOLW» находит «żółw», русский тоже', () => {
+    const { root, bus } = setup();
+    mountDictionary(root, fakeApi().api, bus).open();
+    type(root, 'ZOLW');
+    expect(rows(root)).toEqual(['w.zolw']);
+    type(root, 'сыр');
+    expect(rows(root)).toEqual(['w.ser']);
+  });
+
+  it('кнопка «Посадить» сажает выбранное слово и пишет результат', () => {
+    const { root, bus } = setup();
+    const { api, plant } = fakeApi();
+    mountDictionary(root, api, bus).open();
+    root.querySelector<HTMLElement>('[data-id="w.pies"]')!.click();
+    expect(root.querySelector('[data-card] [data-pl]')?.textContent).toBe('pies');
+    root.querySelector<HTMLButtonElement>('[data-plant]')!.click();
+    expect(plant).toHaveBeenCalledWith(['w.pies']);
+    expect(root.querySelector('[data-note]')?.textContent).toBe('Посажено на грядку');
+    expect(root.querySelector('[data-plant]')).toBeNull();
+  });
+
+  it('карточка слова: род, пример, ложный друг; ▶ и «медленно» озвучивают', () => {
+    const { root, bus } = setup();
+    const { api, say } = fakeApi();
+    mountDictionary(root, api, bus).open();
+    root.querySelector<HTMLElement>('[data-id="w.ser"]')!.click();
+    expect(root.querySelector('.ff')?.textContent).toBe('Не путать: похоже на «сэр», а значит: сыр');
+    root.querySelector<HTMLElement>('[data-id="w.kot"]')!.click();
+    expect(root.querySelector('[data-card]')?.textContent).toContain('м. р.');
+    expect(root.querySelector('[data-card]')?.textContent).toContain('Mam kota.');
+    root.querySelector<HTMLButtonElement>('[data-say]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-say-slow]')!.click();
+    expect(say.mock.calls).toEqual([['w.kot'], ['w.kot', true]]);
+  });
+
+  it('заблокированная фраза: замок, недостающие слова, кнопка неактивна', () => {
+    const { root, bus } = setup();
+    mountDictionary(root, fakeApi().api, bus).open();
+    root.querySelector<HTMLElement>('[data-tab="phrases"]')!.click();
+    expect(rows(root)).toEqual(['p.mam_kota', 'p.jem_chleb']);
+    expect(root.querySelector('[data-id="p.mam_kota"] .st')?.textContent).toBe('🔒');
+    root.querySelector<HTMLElement>('[data-id="p.mam_kota"]')!.click();
+    expect(root.querySelector('[data-lock]')?.textContent).toContain('Откроется, когда эти слова станут кустом');
+    expect(root.querySelector('[data-lock]')?.textContent).toContain('kot — кот');
+    expect(root.querySelector<HTMLButtonElement>('[data-plant]')!.disabled).toBe(true);
+  });
+
+  it('«Посадить всю тему» сажает только новые (и доступные), в «Все» кнопки нет', () => {
+    const { root, bus } = setup();
+    const { api, plant } = fakeApi();
+    mountDictionary(root, api, bus).open();
+    const bulk = root.querySelector<HTMLButtonElement>('[data-bulk]')!;
+    expect(bulk.hidden).toBe(true);
+    root.querySelector<HTMLElement>('[data-topic="zwierzeta"]')!.click();
+    expect(bulk.hidden).toBe(false);
+    expect(bulk.textContent).toBe('Посадить всю тему (2)'); // kot уже растёт
+    bulk.click();
+    expect(plant).toHaveBeenCalledWith(['w.zolw', 'w.pies']);
+    root.querySelector<HTMLElement>('[data-tab="phrases"]')!.click();
+    root.querySelector<HTMLElement>('[data-topic="zwierzeta"]')!.click();
+    expect(root.querySelector<HTMLButtonElement>('[data-bulk]')!.hidden).toBe(true); // единственная фраза темы закрыта
+  });
+
+  it('стрелки и Enter через шину: ход по [data-nav] и нажатие', () => {
+    const { root, bus } = setup();
+    mountDictionary(root, fakeApi().api, bus).open();
+    const focus = () => root.querySelector('.is-focus')?.getAttribute('data-nav');
+    expect(focus()).toBe('row:w.kot');
+    bus.emit('input:intent', { type: 'move', dir: 'down', held: true, to: 'ui', source: 'keyboard' });
+    expect(focus()).toBe('row:w.zolw');
+    bus.emit('input:intent', { type: 'interact', to: 'ui', source: 'keyboard' });
+    expect(root.querySelector('[data-card] [data-pl]')?.textContent).toBe('żółw');
+    bus.emit('input:intent', { type: 'move', dir: 'right', held: true, to: 'ui', source: 'keyboard' });
+    expect(focus()).toBe('say');
+  });
+});
+
+describe('Spiżarnia', () => {
+  it('банка открывает список слов темы', () => {
+    const { root, bus } = setup();
+    const p = mountPantry(root, fakeApi().api, bus);
+    p.open();
+    expect(root.querySelector('[data-sum]')?.textContent).toBe('Собрано: 1 слов, 0 фраз');
+    root.querySelector<HTMLElement>('[data-jar="jedzenie"]')!.click();
+    expect(root.querySelector('[data-jar-list]')?.textContent).toContain('chleb');
+    expect(root.querySelector('[data-jar-list]')?.textContent).toContain('хлеб');
+  });
+});
+
+describe('коробка, кровать и карточка растения', () => {
+  it('кровать показывает уровень и опыт; коробка — только урожай; открытие одной панели закрывает другую', () => {
+    const { root, bus, input } = setup();
+    const s = mountSummary(root, fakeApi().api, bus);
+    const d = mountDictionary(root, fakeApi().api, bus);
+    s.openBin();
+    expect(root.textContent).toContain('Skrzynka');
+    expect(root.textContent).toContain('носит фермер сам');
+    s.openBed();
+    expect(root.querySelector('[data-level]')?.textContent).toBe('A0.5');
+    expect(root.textContent).toContain('120 опыта');
+    expect(root.textContent).not.toMatch(/до завтра|лимит|приходи завтра/);
+    d.open();
+    expect(s.isOpen).toBe(false);
+    expect(d.isOpen).toBe(true);
+    d.close();
+    expect(input.at(-1)).toBe(true);
+  });
+
+  it('карточка растения: стадия, капли, «Повторить сейчас» закрывает и зовёт onReview', () => {
+    const { root, bus } = setup();
+    const onReview = vi.fn();
+    const c = mountPlantCard(root, fakeApi().api, { onReview }, bus);
+    c.open('w.kot');
+    expect(root.textContent).toContain('росток');
+    expect(root.textContent).toContain('💧×2');
+    expect(root.textContent).toContain('1 из 3');
+    root.querySelector<HTMLButtonElement>('[data-review]')!.click();
+    expect(c.isOpen).toBe(false);
+    expect(onReview).toHaveBeenCalledWith('w.kot');
+  });
+});

@@ -1,1 +1,7431 @@
-{ "phrases": [] }
+{
+"phrases": [
+{
+"id": "w.dzien_dobry",
+"pl": "Dzień dobry",
+"slow": true
+},
+{
+"id": "w.dobry_wieczor",
+"pl": "Dobry wieczór",
+"slow": true
+},
+{
+"id": "w.dobranoc",
+"pl": "Dobranoc",
+"slow": true
+},
+{
+"id": "w.do_widzenia",
+"pl": "Do widzenia",
+"slow": true
+},
+{
+"id": "w.prosze",
+"pl": "Proszę",
+"slow": true
+},
+{
+"id": "w.dziekuje",
+"pl": "Dziękuję",
+"slow": true
+},
+{
+"id": "w.dziekuje_bardzo",
+"pl": "Dziękuję bardzo",
+"slow": true
+},
+{
+"id": "w.przepraszam",
+"pl": "Przepraszam",
+"slow": true
+},
+{
+"id": "w.milo_mi",
+"pl": "Miło mi",
+"slow": true
+},
+{
+"id": "w.jak_sie_masz",
+"pl": "Jak się masz?",
+"slow": true
+},
+{
+"id": "w.tak",
+"pl": "Tak",
+"slow": true
+},
+{
+"id": "w.nie",
+"pl": "Nie",
+"slow": true
+},
+{
+"id": "w.oczywiscie",
+"pl": "Oczywiście",
+"slow": true
+},
+{
+"id": "w.pan",
+"pl": "Pan",
+"slow": true
+},
+{
+"id": "w.pani",
+"pl": "Pani",
+"slow": true
+},
+{
+"id": "w.ja",
+"pl": "ja",
+"slow": true
+},
+{
+"id": "w.ty",
+"pl": "ty",
+"slow": true
+},
+{
+"id": "w.on",
+"pl": "on",
+"slow": true
+},
+{
+"id": "w.ona",
+"pl": "ona",
+"slow": true
+},
+{
+"id": "w.moj",
+"pl": "mój",
+"slow": true
+},
+{
+"id": "w.twoj",
+"pl": "twój",
+"slow": true
+},
+{
+"id": "w.ten",
+"pl": "ten",
+"slow": true
+},
+{
+"id": "w.to",
+"pl": "to",
+"slow": true
+},
+{
+"id": "w.cos",
+"pl": "coś",
+"slow": true
+},
+{
+"id": "w.wszystko",
+"pl": "wszystko",
+"slow": true
+},
+{
+"id": "w.sie",
+"pl": "się",
+"slow": true
+},
+{
+"id": "w.imie",
+"pl": "imię",
+"slow": true
+},
+{
+"id": "w.dziecko",
+"pl": "dziecko",
+"slow": true
+},
+{
+"id": "w.mama",
+"pl": "mama",
+"slow": true
+},
+{
+"id": "w.rodzice",
+"pl": "rodzice",
+"slow": true
+},
+{
+"id": "w.syn",
+"pl": "syn",
+"slow": true
+},
+{
+"id": "w.corka",
+"pl": "córka",
+"slow": true
+},
+{
+"id": "w.brat",
+"pl": "brat",
+"slow": true
+},
+{
+"id": "w.siostra",
+"pl": "siostra",
+"slow": true
+},
+{
+"id": "w.zona",
+"pl": "żona",
+"slow": true
+},
+{
+"id": "w.rodzina",
+"pl": "rodzina",
+"slow": true
+},
+{
+"id": "w.przyjaciel",
+"pl": "przyjaciel",
+"slow": true
+},
+{
+"id": "w.kolega",
+"pl": "kolega",
+"slow": true
+},
+{
+"id": "w.polska",
+"pl": "Polska",
+"slow": true
+},
+{
+"id": "w.polak",
+"pl": "Polak",
+"slow": true
+},
+{
+"id": "w.polka",
+"pl": "Polka",
+"slow": true
+},
+{
+"id": "w.polski",
+"pl": "polski",
+"slow": true
+},
+{
+"id": "w.rosja",
+"pl": "Rosja",
+"slow": true
+},
+{
+"id": "w.rosyjski",
+"pl": "rosyjski",
+"slow": true
+},
+{
+"id": "w.jezyk",
+"pl": "język",
+"slow": true
+},
+{
+"id": "w.po_polsku",
+"pl": "po polsku",
+"slow": true
+},
+{
+"id": "w.po_rosyjsku",
+"pl": "po rosyjsku",
+"slow": true
+},
+{
+"id": "w.po_angielsku",
+"pl": "po angielsku",
+"slow": true
+},
+{
+"id": "w.warszawa",
+"pl": "Warszawa",
+"slow": true
+},
+{
+"id": "w.dwa",
+"pl": "dwa",
+"slow": true
+},
+{
+"id": "w.trzy",
+"pl": "trzy",
+"slow": true
+},
+{
+"id": "w.cztery",
+"pl": "cztery",
+"slow": true
+},
+{
+"id": "w.piec",
+"pl": "pięć",
+"slow": true
+},
+{
+"id": "w.siedem",
+"pl": "siedem",
+"slow": true
+},
+{
+"id": "w.dziesiec",
+"pl": "dziesięć",
+"slow": true
+},
+{
+"id": "w.dwadziescia",
+"pl": "dwadzieścia",
+"slow": true
+},
+{
+"id": "w.trzydziesci",
+"pl": "trzydzieści",
+"slow": true
+},
+{
+"id": "w.sto",
+"pl": "sto",
+"slow": true
+},
+{
+"id": "w.razem",
+"pl": "razem",
+"slow": true
+},
+{
+"id": "w.czas",
+"pl": "czas",
+"slow": true
+},
+{
+"id": "w.godzina",
+"pl": "godzina",
+"slow": true
+},
+{
+"id": "w.minuta",
+"pl": "minuta",
+"slow": true
+},
+{
+"id": "w.dzien",
+"pl": "dzień",
+"slow": true
+},
+{
+"id": "w.rano",
+"pl": "rano",
+"slow": true
+},
+{
+"id": "w.wieczor",
+"pl": "wieczór",
+"slow": true
+},
+{
+"id": "w.dzis",
+"pl": "dziś",
+"slow": true
+},
+{
+"id": "w.jutro",
+"pl": "jutro",
+"slow": true
+},
+{
+"id": "w.wczoraj",
+"pl": "wczoraj",
+"slow": true
+},
+{
+"id": "w.potem",
+"pl": "potem",
+"slow": true
+},
+{
+"id": "w.pozniej",
+"pl": "później",
+"slow": true
+},
+{
+"id": "w.czasami",
+"pl": "czasami",
+"slow": true
+},
+{
+"id": "w.tydzien",
+"pl": "tydzień",
+"slow": true
+},
+{
+"id": "w.weekend",
+"pl": "weekend",
+"slow": true
+},
+{
+"id": "w.rok",
+"pl": "rok",
+"slow": true
+},
+{
+"id": "w.poniedzialek",
+"pl": "poniedziałek",
+"slow": true
+},
+{
+"id": "w.wtorek",
+"pl": "wtorek",
+"slow": true
+},
+{
+"id": "w.niedziela",
+"pl": "niedziela",
+"slow": true
+},
+{
+"id": "w.dom",
+"pl": "dom",
+"slow": true
+},
+{
+"id": "w.mieszkanie",
+"pl": "mieszkanie",
+"slow": true
+},
+{
+"id": "w.pokoj",
+"pl": "pokój",
+"slow": true
+},
+{
+"id": "w.kuchnia",
+"pl": "kuchnia",
+"slow": true
+},
+{
+"id": "w.lazienka",
+"pl": "łazienka",
+"slow": true
+},
+{
+"id": "w.okno",
+"pl": "okno",
+"slow": true
+},
+{
+"id": "w.ogrod",
+"pl": "ogród",
+"slow": true
+},
+{
+"id": "w.klucz",
+"pl": "klucz",
+"slow": true
+},
+{
+"id": "w.stol",
+"pl": "stół",
+"slow": true
+},
+{
+"id": "w.krzeslo",
+"pl": "krzesło",
+"slow": true
+},
+{
+"id": "w.lozko",
+"pl": "łóżko",
+"slow": true
+},
+{
+"id": "w.jedzenie",
+"pl": "jedzenie",
+"slow": true
+},
+{
+"id": "w.sniadanie",
+"pl": "śniadanie",
+"slow": true
+},
+{
+"id": "w.obiad",
+"pl": "obiad",
+"slow": true
+},
+{
+"id": "w.chleb",
+"pl": "chleb",
+"slow": true
+},
+{
+"id": "w.ser",
+"pl": "ser",
+"slow": true
+},
+{
+"id": "w.jajko",
+"pl": "jajko",
+"slow": true
+},
+{
+"id": "w.mieso",
+"pl": "mięso",
+"slow": true
+},
+{
+"id": "w.zupa",
+"pl": "zupa",
+"slow": true
+},
+{
+"id": "w.kanapka",
+"pl": "kanapka",
+"slow": true
+},
+{
+"id": "w.cebula",
+"pl": "cebula",
+"slow": true
+},
+{
+"id": "w.jablko",
+"pl": "jabłko",
+"slow": true
+},
+{
+"id": "w.mleko",
+"pl": "mleko",
+"slow": true
+},
+{
+"id": "w.ciasto",
+"pl": "ciasto",
+"slow": true
+},
+{
+"id": "w.cukier",
+"pl": "cukier",
+"slow": true
+},
+{
+"id": "w.woda",
+"pl": "woda",
+"slow": true
+},
+{
+"id": "w.kawa",
+"pl": "kawa",
+"slow": true
+},
+{
+"id": "w.gazowany",
+"pl": "gazowany",
+"slow": true
+},
+{
+"id": "w.menu",
+"pl": "menu",
+"slow": true
+},
+{
+"id": "w.karta",
+"pl": "karta",
+"slow": true
+},
+{
+"id": "w.rachunek",
+"pl": "rachunek",
+"slow": true
+},
+{
+"id": "w.danie",
+"pl": "danie",
+"slow": true
+},
+{
+"id": "w.sklep",
+"pl": "sklep",
+"slow": true
+},
+{
+"id": "w.cena",
+"pl": "cena",
+"slow": true
+},
+{
+"id": "w.pieniadze",
+"pl": "pieniądze",
+"slow": true
+},
+{
+"id": "w.zloty",
+"pl": "złoty",
+"slow": true
+},
+{
+"id": "w.zakupy",
+"pl": "zakupy",
+"slow": true
+},
+{
+"id": "w.torba",
+"pl": "torba",
+"slow": true
+},
+{
+"id": "w.rozmiar",
+"pl": "rozmiar",
+"slow": true
+},
+{
+"id": "w.kilogram",
+"pl": "kilogram",
+"slow": true
+},
+{
+"id": "w.tani",
+"pl": "tani",
+"slow": true
+},
+{
+"id": "w.drogi",
+"pl": "drogi",
+"slow": true
+},
+{
+"id": "w.otwarty",
+"pl": "otwarty",
+"slow": true
+},
+{
+"id": "w.centrum",
+"pl": "centrum",
+"slow": true
+},
+{
+"id": "w.park",
+"pl": "park",
+"slow": true
+},
+{
+"id": "w.szkola",
+"pl": "szkoła",
+"slow": true
+},
+{
+"id": "w.szpital",
+"pl": "szpital",
+"slow": true
+},
+{
+"id": "w.droga",
+"pl": "droga",
+"slow": true
+},
+{
+"id": "w.wyjscie",
+"pl": "wyjście",
+"slow": true
+},
+{
+"id": "w.autobus",
+"pl": "autobus",
+"slow": true
+},
+{
+"id": "w.tramwaj",
+"pl": "tramwaj",
+"slow": true
+},
+{
+"id": "w.pociag",
+"pl": "pociąg",
+"slow": true
+},
+{
+"id": "w.bilet",
+"pl": "bilet",
+"slow": true
+},
+{
+"id": "w.przystanek",
+"pl": "przystanek",
+"slow": true
+},
+{
+"id": "w.dworzec",
+"pl": "dworzec",
+"slow": true
+},
+{
+"id": "w.glowa",
+"pl": "głowa",
+"slow": true
+},
+{
+"id": "w.plecy",
+"pl": "plecy",
+"slow": true
+},
+{
+"id": "w.reka",
+"pl": "ręka",
+"slow": true
+},
+{
+"id": "w.brzuch",
+"pl": "brzuch",
+"slow": true
+},
+{
+"id": "w.lekarz",
+"pl": "lekarz",
+"slow": true
+},
+{
+"id": "w.apteka",
+"pl": "apteka",
+"slow": true
+},
+{
+"id": "w.lekarstwo",
+"pl": "lekarstwo",
+"slow": true
+},
+{
+"id": "w.kaszel",
+"pl": "kaszel",
+"slow": true
+},
+{
+"id": "w.chory",
+"pl": "chory",
+"slow": true
+},
+{
+"id": "w.praca",
+"pl": "praca",
+"slow": true
+},
+{
+"id": "w.firma",
+"pl": "firma",
+"slow": true
+},
+{
+"id": "w.biuro",
+"pl": "biuro",
+"slow": true
+},
+{
+"id": "w.zawod",
+"pl": "zawód",
+"slow": true
+},
+{
+"id": "w.spotkanie",
+"pl": "spotkanie",
+"slow": true
+},
+{
+"id": "w.dokument",
+"pl": "dokument",
+"slow": true
+},
+{
+"id": "w.programista",
+"pl": "programista",
+"slow": true
+},
+{
+"id": "w.rolnik",
+"pl": "rolnik",
+"slow": true
+},
+{
+"id": "w.lekcja",
+"pl": "lekcja",
+"slow": true
+},
+{
+"id": "w.kurs",
+"pl": "kurs",
+"slow": true
+},
+{
+"id": "w.nauczycielka",
+"pl": "nauczycielka",
+"slow": true
+},
+{
+"id": "w.student",
+"pl": "student",
+"slow": true
+},
+{
+"id": "w.egzamin",
+"pl": "egzamin",
+"slow": true
+},
+{
+"id": "w.pytanie",
+"pl": "pytanie",
+"slow": true
+},
+{
+"id": "w.odpowiedz",
+"pl": "odpowiedź",
+"slow": true
+},
+{
+"id": "w.slowo",
+"pl": "słowo",
+"slow": true
+},
+{
+"id": "w.ksiazka",
+"pl": "książka",
+"slow": true
+},
+{
+"id": "w.muzyka",
+"pl": "muzyka",
+"slow": true
+},
+{
+"id": "w.koncert",
+"pl": "koncert",
+"slow": true
+},
+{
+"id": "w.film",
+"pl": "film",
+"slow": true
+},
+{
+"id": "w.trening",
+"pl": "trening",
+"slow": true
+},
+{
+"id": "w.spacer",
+"pl": "spacer",
+"slow": true
+},
+{
+"id": "w.pogoda",
+"pl": "pogoda",
+"slow": true
+},
+{
+"id": "w.slonce",
+"pl": "słońce",
+"slow": true
+},
+{
+"id": "w.deszcz",
+"pl": "deszcz",
+"slow": true
+},
+{
+"id": "w.cieplo",
+"pl": "ciepło",
+"slow": true
+},
+{
+"id": "w.zimno",
+"pl": "zimno",
+"slow": true
+},
+{
+"id": "w.kwiat",
+"pl": "kwiat",
+"slow": true
+},
+{
+"id": "w.las",
+"pl": "las",
+"slow": true
+},
+{
+"id": "w.pole",
+"pl": "pole",
+"slow": true
+},
+{
+"id": "w.pies",
+"pl": "pies",
+"slow": true
+},
+{
+"id": "w.kot",
+"pl": "kot",
+"slow": true
+},
+{
+"id": "w.krowa",
+"pl": "krowa",
+"slow": true
+},
+{
+"id": "w.kura",
+"pl": "kura",
+"slow": true
+},
+{
+"id": "w.farma",
+"pl": "farma",
+"slow": true
+},
+{
+"id": "w.koszula",
+"pl": "koszula",
+"slow": true
+},
+{
+"id": "w.kurtka",
+"pl": "kurtka",
+"slow": true
+},
+{
+"id": "w.spodnie",
+"pl": "spodnie",
+"slow": true
+},
+{
+"id": "w.sukienka",
+"pl": "sukienka",
+"slow": true
+},
+{
+"id": "w.but",
+"pl": "but",
+"slow": true
+},
+{
+"id": "w.kolor",
+"pl": "kolor",
+"slow": true
+},
+{
+"id": "w.czarny",
+"pl": "czarny",
+"slow": true
+},
+{
+"id": "w.czerwony",
+"pl": "czerwony",
+"slow": true
+},
+{
+"id": "w.niebieski",
+"pl": "niebieski",
+"slow": true
+},
+{
+"id": "w.zielony",
+"pl": "zielony",
+"slow": true
+},
+{
+"id": "w.telefon",
+"pl": "telefon",
+"slow": true
+},
+{
+"id": "w.komputer",
+"pl": "komputer",
+"slow": true
+},
+{
+"id": "w.wifi",
+"pl": "wifi",
+"slow": true
+},
+{
+"id": "w.mail",
+"pl": "mail",
+"slow": true
+},
+{
+"id": "w.wiadomosc",
+"pl": "wiadomość",
+"slow": true
+},
+{
+"id": "w.numer_telefonu",
+"pl": "numer telefonu",
+"slow": true
+},
+{
+"id": "w.duzy",
+"pl": "duży",
+"slow": true
+},
+{
+"id": "w.maly",
+"pl": "mały",
+"slow": true
+},
+{
+"id": "w.nowy",
+"pl": "nowy",
+"slow": true
+},
+{
+"id": "w.dobry",
+"pl": "dobry",
+"slow": true
+},
+{
+"id": "w.zly",
+"pl": "zły",
+"slow": true
+},
+{
+"id": "w.piekny",
+"pl": "piękny",
+"slow": true
+},
+{
+"id": "w.latwy",
+"pl": "łatwy",
+"slow": true
+},
+{
+"id": "w.trudny",
+"pl": "trudny",
+"slow": true
+},
+{
+"id": "w.wolny",
+"pl": "wolny",
+"slow": true
+},
+{
+"id": "w.zimny",
+"pl": "zimny",
+"slow": true
+},
+{
+"id": "w.goracy",
+"pl": "gorący",
+"slow": true
+},
+{
+"id": "w.smaczny",
+"pl": "smaczny",
+"slow": true
+},
+{
+"id": "w.pyszny",
+"pl": "pyszny",
+"slow": true
+},
+{
+"id": "w.nastepny",
+"pl": "następny",
+"slow": true
+},
+{
+"id": "w.tylko",
+"pl": "tylko",
+"slow": true
+},
+{
+"id": "w.bardzo",
+"pl": "bardzo",
+"slow": true
+},
+{
+"id": "w.dobrze",
+"pl": "dobrze",
+"slow": true
+},
+{
+"id": "w.zle",
+"pl": "źle",
+"slow": true
+},
+{
+"id": "w.troche",
+"pl": "trochę",
+"slow": true
+},
+{
+"id": "w.duzo",
+"pl": "dużo",
+"slow": true
+},
+{
+"id": "w.tam",
+"pl": "tam",
+"slow": true
+},
+{
+"id": "w.daleko",
+"pl": "daleko",
+"slow": true
+},
+{
+"id": "w.blisko",
+"pl": "blisko",
+"slow": true
+},
+{
+"id": "w.prosto",
+"pl": "prosto",
+"slow": true
+},
+{
+"id": "w.w_lewo",
+"pl": "w lewo",
+"slow": true
+},
+{
+"id": "w.w_prawo",
+"pl": "w prawo",
+"slow": true
+},
+{
+"id": "w.moze",
+"pl": "może",
+"slow": true
+},
+{
+"id": "w.jeszcze_raz",
+"pl": "jeszcze raz",
+"slow": true
+},
+{
+"id": "w.w",
+"pl": "w",
+"slow": true
+},
+{
+"id": "w.na",
+"pl": "na",
+"slow": true
+},
+{
+"id": "w.z",
+"pl": "z",
+"slow": true
+},
+{
+"id": "w.do",
+"pl": "do",
+"slow": true
+},
+{
+"id": "w.od",
+"pl": "od",
+"slow": true
+},
+{
+"id": "w.o",
+"pl": "o",
+"slow": true
+},
+{
+"id": "w.po",
+"pl": "po",
+"slow": true
+},
+{
+"id": "w.bez",
+"pl": "bez",
+"slow": true
+},
+{
+"id": "w.dla",
+"pl": "dla",
+"slow": true
+},
+{
+"id": "w.i",
+"pl": "i",
+"slow": true
+},
+{
+"id": "w.a",
+"pl": "a",
+"slow": true
+},
+{
+"id": "w.kto",
+"pl": "kto",
+"slow": true
+},
+{
+"id": "w.co",
+"pl": "co",
+"slow": true
+},
+{
+"id": "w.gdzie",
+"pl": "gdzie",
+"slow": true
+},
+{
+"id": "w.kiedy",
+"pl": "kiedy",
+"slow": true
+},
+{
+"id": "w.jak",
+"pl": "jak",
+"slow": true
+},
+{
+"id": "w.dlaczego",
+"pl": "dlaczego",
+"slow": true
+},
+{
+"id": "w.dokad",
+"pl": "dokąd",
+"slow": true
+},
+{
+"id": "w.skad",
+"pl": "skąd",
+"slow": true
+},
+{
+"id": "w.ile",
+"pl": "ile",
+"slow": true
+},
+{
+"id": "w.ktory",
+"pl": "który",
+"slow": true
+},
+{
+"id": "w.jaki",
+"pl": "jaki",
+"slow": true
+},
+{
+"id": "w.czy",
+"pl": "czy",
+"slow": true
+},
+{
+"id": "w.o_ktorej",
+"pl": "o której",
+"slow": true
+},
+{
+"id": "w.szczesliwy",
+"pl": "szczęśliwy",
+"slow": true
+},
+{
+"id": "w.smutny",
+"pl": "smutny",
+"slow": true
+},
+{
+"id": "w.zmeczony",
+"pl": "zmęczony",
+"slow": true
+},
+{
+"id": "w.glodny",
+"pl": "głodny",
+"slow": true
+},
+{
+"id": "w.zajety",
+"pl": "zajęty",
+"slow": true
+},
+{
+"id": "w.gotowy",
+"pl": "gotowy",
+"slow": true
+},
+{
+"id": "w.poprosze",
+"pl": "Poproszę",
+"slow": true
+},
+{
+"id": "w.byc",
+"pl": "być",
+"slow": true
+},
+{
+"id": "w.miec",
+"pl": "mieć",
+"slow": true
+},
+{
+"id": "w.robic",
+"pl": "robić",
+"slow": true
+},
+{
+"id": "w.isc",
+"pl": "iść",
+"slow": true
+},
+{
+"id": "w.chodzic",
+"pl": "chodzić",
+"slow": true
+},
+{
+"id": "w.jechac",
+"pl": "jechać",
+"slow": true
+},
+{
+"id": "w.jesc",
+"pl": "jeść",
+"slow": true
+},
+{
+"id": "w.pic",
+"pl": "pić",
+"slow": true
+},
+{
+"id": "w.mowic",
+"pl": "mówić",
+"slow": true
+},
+{
+"id": "w.chciec",
+"pl": "chcieć",
+"slow": true
+},
+{
+"id": "w.moc",
+"pl": "móc",
+"slow": true
+},
+{
+"id": "w.musiec",
+"pl": "musieć",
+"slow": true
+},
+{
+"id": "w.wiedziec",
+"pl": "wiedzieć",
+"slow": true
+},
+{
+"id": "w.znac",
+"pl": "znać",
+"slow": true
+},
+{
+"id": "w.rozumiec",
+"pl": "rozumieć",
+"slow": true
+},
+{
+"id": "w.lubic",
+"pl": "lubić",
+"slow": true
+},
+{
+"id": "w.mieszkac",
+"pl": "mieszkać",
+"slow": true
+},
+{
+"id": "w.pracowac",
+"pl": "pracować",
+"slow": true
+},
+{
+"id": "w.uczyc_sie",
+"pl": "uczyć się",
+"slow": true
+},
+{
+"id": "w.czytac",
+"pl": "czytać",
+"slow": true
+},
+{
+"id": "w.pisac",
+"pl": "pisać",
+"slow": true
+},
+{
+"id": "w.ogladac",
+"pl": "oglądać",
+"slow": true
+},
+{
+"id": "w.kupowac",
+"pl": "kupować",
+"slow": true
+},
+{
+"id": "w.kupic",
+"pl": "kupić",
+"slow": true
+},
+{
+"id": "w.placic",
+"pl": "płacić",
+"slow": true
+},
+{
+"id": "w.kosztowac",
+"pl": "kosztować",
+"slow": true
+},
+{
+"id": "w.potrzebowac",
+"pl": "potrzebować",
+"slow": true
+},
+{
+"id": "w.brac",
+"pl": "brać",
+"slow": true
+},
+{
+"id": "w.spac",
+"pl": "spać",
+"slow": true
+},
+{
+"id": "w.wstawac",
+"pl": "wstawać",
+"slow": true
+},
+{
+"id": "w.gotowac",
+"pl": "gotować",
+"slow": true
+},
+{
+"id": "w.dzwonic",
+"pl": "dzwonić",
+"slow": true
+},
+{
+"id": "w.prosic",
+"pl": "prosić",
+"slow": true
+},
+{
+"id": "w.czuc_sie",
+"pl": "czuć się",
+"slow": true
+},
+{
+"id": "w.bolec",
+"pl": "boleć",
+"slow": true
+},
+{
+"id": "w.padac",
+"pl": "padać",
+"slow": true
+},
+{
+"id": "w.rosnac",
+"pl": "rosnąć",
+"slow": true
+},
+{
+"id": "w.pomoc",
+"pl": "pomoc",
+"slow": true
+},
+{
+"id": "w.znaczyc",
+"pl": "znaczyć",
+"slow": true
+},
+{
+"id": "w.czesc",
+"pl": "Cześć",
+"slow": true
+},
+{
+"id": "w.my",
+"pl": "my",
+"slow": true
+},
+{
+"id": "w.wy",
+"pl": "wy",
+"slow": true
+},
+{
+"id": "w.oni",
+"pl": "oni",
+"slow": true
+},
+{
+"id": "w.one",
+"pl": "one",
+"slow": true
+},
+{
+"id": "w.nic",
+"pl": "nic",
+"slow": true
+},
+{
+"id": "w.czlowiek",
+"pl": "człowiek",
+"slow": true
+},
+{
+"id": "w.ludzie",
+"pl": "ludzie",
+"slow": true
+},
+{
+"id": "w.mezczyzna",
+"pl": "mężczyzna",
+"slow": true
+},
+{
+"id": "w.kobieta",
+"pl": "kobieta",
+"slow": true
+},
+{
+"id": "w.chlopak",
+"pl": "chłopak",
+"slow": true
+},
+{
+"id": "w.dziewczyna",
+"pl": "dziewczyna",
+"slow": true
+},
+{
+"id": "w.tata",
+"pl": "tata",
+"slow": true
+},
+{
+"id": "w.maz",
+"pl": "mąż",
+"slow": true
+},
+{
+"id": "w.rosjanin",
+"pl": "Rosjanin",
+"slow": true
+},
+{
+"id": "w.ukraina",
+"pl": "Ukraina",
+"slow": true
+},
+{
+"id": "w.niemcy",
+"pl": "Niemcy",
+"slow": true
+},
+{
+"id": "w.angielski",
+"pl": "angielski",
+"slow": true
+},
+{
+"id": "w.kraj",
+"pl": "kraj",
+"slow": true
+},
+{
+"id": "w.jeden",
+"pl": "jeden",
+"slow": true
+},
+{
+"id": "w.szesc",
+"pl": "sześć",
+"slow": true
+},
+{
+"id": "w.osiem",
+"pl": "osiem",
+"slow": true
+},
+{
+"id": "w.dziewiec",
+"pl": "dziewięć",
+"slow": true
+},
+{
+"id": "w.pierwszy",
+"pl": "pierwszy",
+"slow": true
+},
+{
+"id": "w.drugi",
+"pl": "drugi",
+"slow": true
+},
+{
+"id": "w.numer",
+"pl": "numer",
+"slow": true
+},
+{
+"id": "w.raz",
+"pl": "raz",
+"slow": true
+},
+{
+"id": "w.noc",
+"pl": "noc",
+"slow": true
+},
+{
+"id": "w.dzisiaj",
+"pl": "dzisiaj",
+"slow": true
+},
+{
+"id": "w.teraz",
+"pl": "teraz",
+"slow": true
+},
+{
+"id": "w.miesiac",
+"pl": "miesiąc",
+"slow": true
+},
+{
+"id": "w.sroda",
+"pl": "środa",
+"slow": true
+},
+{
+"id": "w.czwartek",
+"pl": "czwartek",
+"slow": true
+},
+{
+"id": "w.piatek",
+"pl": "piątek",
+"slow": true
+},
+{
+"id": "w.sobota",
+"pl": "sobota",
+"slow": true
+},
+{
+"id": "w.toaleta",
+"pl": "toaleta",
+"slow": true
+},
+{
+"id": "w.drzwi",
+"pl": "drzwi",
+"slow": true
+},
+{
+"id": "w.kolacja",
+"pl": "kolacja",
+"slow": true
+},
+{
+"id": "w.maslo",
+"pl": "masło",
+"slow": true
+},
+{
+"id": "w.ryba",
+"pl": "ryba",
+"slow": true
+},
+{
+"id": "w.pizza",
+"pl": "pizza",
+"slow": true
+},
+{
+"id": "w.pomidor",
+"pl": "pomidor",
+"slow": true
+},
+{
+"id": "w.warzywa",
+"pl": "warzywa",
+"slow": true
+},
+{
+"id": "w.owoce",
+"pl": "owoce",
+"slow": true
+},
+{
+"id": "w.sol",
+"pl": "sól",
+"slow": true
+},
+{
+"id": "w.sok",
+"pl": "sok",
+"slow": true
+},
+{
+"id": "w.herbata",
+"pl": "herbata",
+"slow": true
+},
+{
+"id": "w.niegazowany",
+"pl": "niegazowany",
+"slow": true
+},
+{
+"id": "w.kelner",
+"pl": "kelner",
+"slow": true
+},
+{
+"id": "w.drogo",
+"pl": "drogo",
+"slow": true
+},
+{
+"id": "w.tanio",
+"pl": "tanio",
+"slow": true
+},
+{
+"id": "w.zamkniety",
+"pl": "zamknięty",
+"slow": true
+},
+{
+"id": "w.miasto",
+"pl": "miasto",
+"slow": true
+},
+{
+"id": "w.ulica",
+"pl": "ulica",
+"slow": true
+},
+{
+"id": "w.restauracja",
+"pl": "restauracja",
+"slow": true
+},
+{
+"id": "w.kawiarnia",
+"pl": "kawiarnia",
+"slow": true
+},
+{
+"id": "w.wejscie",
+"pl": "wejście",
+"slow": true
+},
+{
+"id": "w.metro",
+"pl": "metro",
+"slow": true
+},
+{
+"id": "w.samochod",
+"pl": "samochód",
+"slow": true
+},
+{
+"id": "w.stacja",
+"pl": "stacja",
+"slow": true
+},
+{
+"id": "w.oko",
+"pl": "oko",
+"slow": true
+},
+{
+"id": "w.zab",
+"pl": "ząb",
+"slow": true
+},
+{
+"id": "w.noga",
+"pl": "noga",
+"slow": true
+},
+{
+"id": "w.zdrowie",
+"pl": "zdrowie",
+"slow": true
+},
+{
+"id": "w.bol",
+"pl": "ból",
+"slow": true
+},
+{
+"id": "w.zdrowy",
+"pl": "zdrowy",
+"slow": true
+},
+{
+"id": "w.szef",
+"pl": "szef",
+"slow": true
+},
+{
+"id": "w.zadanie",
+"pl": "zadanie",
+"slow": true
+},
+{
+"id": "w.nauczyciel",
+"pl": "nauczyciel",
+"slow": true
+},
+{
+"id": "w.studentka",
+"pl": "studentka",
+"slow": true
+},
+{
+"id": "w.dlugopis",
+"pl": "długopis",
+"slow": true
+},
+{
+"id": "w.slownik",
+"pl": "słownik",
+"slow": true
+},
+{
+"id": "w.hobby",
+"pl": "hobby",
+"slow": true
+},
+{
+"id": "w.gra",
+"pl": "gra",
+"slow": true
+},
+{
+"id": "w.sport",
+"pl": "sport",
+"slow": true
+},
+{
+"id": "w.zdjecie",
+"pl": "zdjęcie",
+"slow": true
+},
+{
+"id": "w.snieg",
+"pl": "śnieg",
+"slow": true
+},
+{
+"id": "w.goraco",
+"pl": "gorąco",
+"slow": true
+},
+{
+"id": "w.drzewo",
+"pl": "drzewo",
+"slow": true
+},
+{
+"id": "w.zwierze",
+"pl": "zwierzę",
+"slow": true
+},
+{
+"id": "w.ubranie",
+"pl": "ubranie",
+"slow": true
+},
+{
+"id": "w.koszulka",
+"pl": "koszulka",
+"slow": true
+},
+{
+"id": "w.sweter",
+"pl": "sweter",
+"slow": true
+},
+{
+"id": "w.bialy",
+"pl": "biały",
+"slow": true
+},
+{
+"id": "w.zolty",
+"pl": "żółty",
+"slow": true
+},
+{
+"id": "w.internet",
+"pl": "internet",
+"slow": true
+},
+{
+"id": "w.stary",
+"pl": "stary",
+"slow": true
+},
+{
+"id": "w.mlody",
+"pl": "młody",
+"slow": true
+},
+{
+"id": "w.ladny",
+"pl": "ładny",
+"slow": true
+},
+{
+"id": "w.mily",
+"pl": "miły",
+"slow": true
+},
+{
+"id": "w.szybki",
+"pl": "szybki",
+"slow": true
+},
+{
+"id": "w.cieply",
+"pl": "ciepły",
+"slow": true
+},
+{
+"id": "w.swiezy",
+"pl": "świeży",
+"slow": true
+},
+{
+"id": "w.slodki",
+"pl": "słodki",
+"slow": true
+},
+{
+"id": "w.malo",
+"pl": "mało",
+"slow": true
+},
+{
+"id": "w.tez",
+"pl": "też",
+"slow": true
+},
+{
+"id": "w.tutaj",
+"pl": "tutaj",
+"slow": true
+},
+{
+"id": "w.trzeba",
+"pl": "trzeba",
+"slow": true
+},
+{
+"id": "w.mozna",
+"pl": "można",
+"slow": true
+},
+{
+"id": "w.nie_mozna",
+"pl": "nie można",
+"slow": true
+},
+{
+"id": "w.przed",
+"pl": "przed",
+"slow": true
+},
+{
+"id": "w.ale",
+"pl": "ale",
+"slow": true
+},
+{
+"id": "w.albo",
+"pl": "albo",
+"slow": true
+},
+{
+"id": "w.bo",
+"pl": "bo",
+"slow": true
+},
+{
+"id": "w.ze",
+"pl": "że",
+"slow": true
+},
+{
+"id": "w.problem",
+"pl": "problem",
+"slow": true
+},
+{
+"id": "w.myslec",
+"pl": "myśleć",
+"slow": true
+},
+{
+"id": "w.kochac",
+"pl": "kochać",
+"slow": true
+},
+{
+"id": "w.sluchac",
+"pl": "słuchać",
+"slow": true
+},
+{
+"id": "w.widziec",
+"pl": "widzieć",
+"slow": true
+},
+{
+"id": "w.siedziec",
+"pl": "siedzieć",
+"slow": true
+},
+{
+"id": "w.miejsce",
+"pl": "miejsce",
+"slow": true
+},
+{
+"id": "w.do_zobaczenia",
+"pl": "Do zobaczenia",
+"slow": true
+},
+{
+"id": "w.na_razie",
+"pl": "Na razie",
+"slow": true
+},
+{
+"id": "w.nie_ma_za_co",
+"pl": "Nie ma za co",
+"slow": true
+},
+{
+"id": "w.prosze_bardzo",
+"pl": "Proszę bardzo",
+"slow": true
+},
+{
+"id": "w.smacznego",
+"pl": "Smacznego",
+"slow": true
+},
+{
+"id": "w.na_zdrowie",
+"pl": "Na zdrowie",
+"slow": true
+},
+{
+"id": "w.powodzenia",
+"pl": "Powodzenia",
+"slow": true
+},
+{
+"id": "w.milego_dnia",
+"pl": "Miłego dnia",
+"slow": true
+},
+{
+"id": "w.slucham",
+"pl": "Słucham",
+"slow": true
+},
+{
+"id": "w.prosze_wejsc",
+"pl": "Proszę wejść",
+"slow": true
+},
+{
+"id": "w.nie_ma_problemu",
+"pl": "Nie ma problemu",
+"slow": true
+},
+{
+"id": "w.zgoda",
+"pl": "Zgoda",
+"slow": true
+},
+{
+"id": "w.osoba",
+"pl": "osoba",
+"slow": true
+},
+{
+"id": "w.zonaty",
+"pl": "żonaty",
+"slow": true
+},
+{
+"id": "w.urodziny",
+"pl": "urodziny",
+"slow": true
+},
+{
+"id": "w.ukrainka",
+"pl": "Ukrainka",
+"slow": true
+},
+{
+"id": "w.niemiec",
+"pl": "Niemiec",
+"slow": true
+},
+{
+"id": "w.krakow",
+"pl": "Kraków",
+"slow": true
+},
+{
+"id": "w.stolica",
+"pl": "stolica",
+"slow": true
+},
+{
+"id": "w.szescdziesiat",
+"pl": "sześćdziesiąt",
+"slow": true
+},
+{
+"id": "w.najpierw",
+"pl": "najpierw",
+"slow": true
+},
+{
+"id": "w.pozno",
+"pl": "późno",
+"slow": true
+},
+{
+"id": "w.zaraz",
+"pl": "zaraz",
+"slow": true
+},
+{
+"id": "w.czesto",
+"pl": "często",
+"slow": true
+},
+{
+"id": "w.nigdy",
+"pl": "nigdy",
+"slow": true
+},
+{
+"id": "w.juz",
+"pl": "już",
+"slow": true
+},
+{
+"id": "w.jeszcze",
+"pl": "jeszcze",
+"slow": true
+},
+{
+"id": "w.data",
+"pl": "data",
+"slow": true
+},
+{
+"id": "w.zima",
+"pl": "zima",
+"slow": true
+},
+{
+"id": "w.wolne",
+"pl": "wolne",
+"slow": true
+},
+{
+"id": "w.wakacje",
+"pl": "wakacje",
+"slow": true
+},
+{
+"id": "w.sypialnia",
+"pl": "sypialnia",
+"slow": true
+},
+{
+"id": "w.winda",
+"pl": "winda",
+"slow": true
+},
+{
+"id": "w.adres",
+"pl": "adres",
+"slow": true
+},
+{
+"id": "w.kanapa",
+"pl": "kanapa",
+"slow": true
+},
+{
+"id": "w.lodowka",
+"pl": "lodówka",
+"slow": true
+},
+{
+"id": "w.bulka",
+"pl": "bułka",
+"slow": true
+},
+{
+"id": "w.salatka",
+"pl": "sałatka",
+"slow": true
+},
+{
+"id": "w.grzyby",
+"pl": "grzyby",
+"slow": true
+},
+{
+"id": "w.alkohol",
+"pl": "alkohol",
+"slow": true
+},
+{
+"id": "w.stolik",
+"pl": "stolik",
+"slow": true
+},
+{
+"id": "w.kawalek",
+"pl": "kawałek",
+"slow": true
+},
+{
+"id": "w.gotowka",
+"pl": "gotówka",
+"slow": true
+},
+{
+"id": "w.kasa",
+"pl": "kasa",
+"slow": true
+},
+{
+"id": "w.paragon",
+"pl": "paragon",
+"slow": true
+},
+{
+"id": "w.promocja",
+"pl": "promocja",
+"slow": true
+},
+{
+"id": "w.bankomat",
+"pl": "bankomat",
+"slow": true
+},
+{
+"id": "w.gram",
+"pl": "gram",
+"slow": true
+},
+{
+"id": "w.godziny_otwarcia",
+"pl": "godziny otwarcia",
+"slow": true
+},
+{
+"id": "w.muzeum",
+"pl": "muzeum",
+"slow": true
+},
+{
+"id": "w.kino",
+"pl": "kino",
+"slow": true
+},
+{
+"id": "w.poczta",
+"pl": "poczta",
+"slow": true
+},
+{
+"id": "w.silownia",
+"pl": "siłownia",
+"slow": true
+},
+{
+"id": "w.mapa",
+"pl": "mapa",
+"slow": true
+},
+{
+"id": "w.rog",
+"pl": "róg",
+"slow": true
+},
+{
+"id": "w.taksowka",
+"pl": "taksówka",
+"slow": true
+},
+{
+"id": "w.samolot",
+"pl": "samolot",
+"slow": true
+},
+{
+"id": "w.lotnisko",
+"pl": "lotnisko",
+"slow": true
+},
+{
+"id": "w.bagaz",
+"pl": "bagaż",
+"slow": true
+},
+{
+"id": "w.walizka",
+"pl": "walizka",
+"slow": true
+},
+{
+"id": "w.parking",
+"pl": "parking",
+"slow": true
+},
+{
+"id": "w.dentysta",
+"pl": "dentysta",
+"slow": true
+},
+{
+"id": "w.tabletka",
+"pl": "tabletka",
+"slow": true
+},
+{
+"id": "w.recepta",
+"pl": "recepta",
+"slow": true
+},
+{
+"id": "w.goraczka",
+"pl": "gorączka",
+"slow": true
+},
+{
+"id": "w.katar",
+"pl": "katar",
+"slow": true
+},
+{
+"id": "w.wizyta",
+"pl": "wizyta",
+"slow": true
+},
+{
+"id": "w.ubezpieczenie",
+"pl": "ubezpieczenie",
+"slow": true
+},
+{
+"id": "w.pogotowie",
+"pl": "pogotowie",
+"slow": true
+},
+{
+"id": "w.podpis",
+"pl": "podpis",
+"slow": true
+},
+{
+"id": "w.karta_pobytu",
+"pl": "karta pobytu",
+"slow": true
+},
+{
+"id": "w.pesel",
+"pl": "PESEL",
+"slow": true
+},
+{
+"id": "w.inzynier",
+"pl": "inżynier",
+"slow": true
+},
+{
+"id": "w.gospodarstwo",
+"pl": "gospodarstwo",
+"slow": true
+},
+{
+"id": "w.przerwa",
+"pl": "przerwa",
+"slow": true
+},
+{
+"id": "w.gramatyka",
+"pl": "gramatyka",
+"slow": true
+},
+{
+"id": "w.wymowa",
+"pl": "wymowa",
+"slow": true
+},
+{
+"id": "w.przyklad",
+"pl": "przykład",
+"slow": true
+},
+{
+"id": "w.praca_domowa",
+"pl": "praca domowa",
+"slow": true
+},
+{
+"id": "w.stopien",
+"pl": "stopień",
+"slow": true
+},
+{
+"id": "w.trawa",
+"pl": "trawa",
+"slow": true
+},
+{
+"id": "w.gora",
+"pl": "góra",
+"slow": true
+},
+{
+"id": "w.morze",
+"pl": "morze",
+"slow": true
+},
+{
+"id": "w.grzadka",
+"pl": "grządka",
+"slow": true
+},
+{
+"id": "w.plon",
+"pl": "plon",
+"slow": true
+},
+{
+"id": "w.czapka",
+"pl": "czapka",
+"slow": true
+},
+{
+"id": "w.haslo",
+"pl": "hasło",
+"slow": true
+},
+{
+"id": "w.ladowarka",
+"pl": "ładowarka",
+"slow": true
+},
+{
+"id": "w.ciezki",
+"pl": "ciężki",
+"slow": true
+},
+{
+"id": "w.wazny",
+"pl": "ważny",
+"slow": true
+},
+{
+"id": "w.ostry",
+"pl": "ostry",
+"slow": true
+},
+{
+"id": "w.tu",
+"pl": "tu",
+"slow": true
+},
+{
+"id": "w.obok",
+"pl": "obok",
+"slow": true
+},
+{
+"id": "w.po_lewej",
+"pl": "po lewej",
+"slow": true
+},
+{
+"id": "w.po_prawej",
+"pl": "po prawej",
+"slow": true
+},
+{
+"id": "w.wolno",
+"pl": "wolno",
+"slow": true
+},
+{
+"id": "w.chyba",
+"pl": "chyba",
+"slow": true
+},
+{
+"id": "w.na_pewno",
+"pl": "na pewno",
+"slow": true
+},
+{
+"id": "w.niestety",
+"pl": "niestety",
+"slow": true
+},
+{
+"id": "w.u",
+"pl": "u",
+"slow": true
+},
+{
+"id": "w.za",
+"pl": "za",
+"slow": true
+},
+{
+"id": "w.pod",
+"pl": "pod",
+"slow": true
+},
+{
+"id": "w.nad",
+"pl": "nad",
+"slow": true
+},
+{
+"id": "w.wiec",
+"pl": "więc",
+"slow": true
+},
+{
+"id": "w.spragniony",
+"pl": "spragniony",
+"slow": true
+},
+{
+"id": "w.szczescie",
+"pl": "szczęście",
+"slow": true
+},
+{
+"id": "w.pomysl",
+"pl": "pomysł",
+"slow": true
+},
+{
+"id": "w.leciec",
+"pl": "lecieć",
+"slow": true
+},
+{
+"id": "w.umiec",
+"pl": "umieć",
+"slow": true
+},
+{
+"id": "w.dawac",
+"pl": "dawać",
+"slow": true
+},
+{
+"id": "w.szukac",
+"pl": "szukać",
+"slow": true
+},
+{
+"id": "w.wracac",
+"pl": "wracać",
+"slow": true
+},
+{
+"id": "w.odpoczywac",
+"pl": "odpoczywać",
+"slow": true
+},
+{
+"id": "w.tanczyc",
+"pl": "tańczyć",
+"slow": true
+},
+{
+"id": "w.plywac",
+"pl": "pływać",
+"slow": true
+},
+{
+"id": "w.spacerowac",
+"pl": "spacerować",
+"slow": true
+},
+{
+"id": "w.zadzwonic",
+"pl": "zadzwonić",
+"slow": true
+},
+{
+"id": "w.zamowic",
+"pl": "zamówić",
+"slow": true
+},
+{
+"id": "w.zobaczyc",
+"pl": "zobaczyć",
+"slow": true
+},
+{
+"id": "w.poznac",
+"pl": "poznać",
+"slow": true
+},
+{
+"id": "w.pomoc_v",
+"pl": "pomóc",
+"slow": true
+},
+{
+"id": "w.swiecic",
+"pl": "świecić",
+"slow": true
+},
+{
+"id": "w.sadzic",
+"pl": "sadzić",
+"slow": true
+},
+{
+"id": "w.siac",
+"pl": "siać",
+"slow": true
+},
+{
+"id": "w.zbierac",
+"pl": "zbierać",
+"slow": true
+},
+{
+"id": "w.podlewac",
+"pl": "podlewać",
+"slow": true
+},
+{
+"id": "w.karmic",
+"pl": "karmić",
+"slow": true
+},
+{
+"id": "w.bac_sie",
+"pl": "bać się",
+"slow": true
+},
+{
+"id": "w.cieszyc_sie",
+"pl": "cieszyć się",
+"slow": true
+},
+{
+"id": "w.nosic",
+"pl": "nosić",
+"slow": true
+},
+{
+"id": "w.nazywac_sie",
+"pl": "nazywać się",
+"slow": true
+},
+{
+"id": "w.szosty",
+"pl": "szósty",
+"slow": true
+},
+{
+"id": "w.siodmy",
+"pl": "siódmy",
+"slow": true
+},
+{
+"id": "w.osmy",
+"pl": "ósmy",
+"slow": true
+},
+{
+"id": "w.dziesiaty",
+"pl": "dziesiąty",
+"slow": true
+},
+{
+"id": "w.po_niemiecku",
+"pl": "po niemiecku",
+"slow": true
+},
+{
+"id": "w.powtorzyc",
+"pl": "powtórzyć",
+"slow": true
+},
+{
+"id": "w.zaplacic",
+"pl": "zapłacić",
+"slow": true
+},
+{
+"id": "w.usiasc",
+"pl": "usiąść",
+"slow": true
+},
+{
+"id": "w.skrecac",
+"pl": "skręcać",
+"slow": true
+},
+{
+"id": "w.do_jutra",
+"pl": "Do jutra",
+"slow": true
+},
+{
+"id": "w.dzieki",
+"pl": "Dzięki",
+"slow": true
+},
+{
+"id": "w.przykro_mi",
+"pl": "Przykro mi",
+"slow": true
+},
+{
+"id": "w.witam",
+"pl": "Witam",
+"slow": true
+},
+{
+"id": "w.okej",
+"pl": "Okej",
+"slow": true
+},
+{
+"id": "w.uwaga",
+"pl": "Uwaga",
+"slow": true
+},
+{
+"id": "w.panstwo",
+"pl": "Państwo",
+"slow": true
+},
+{
+"id": "w.ono",
+"pl": "ono",
+"slow": true
+},
+{
+"id": "w.jego",
+"pl": "jego",
+"slow": true
+},
+{
+"id": "w.jej",
+"pl": "jej",
+"slow": true
+},
+{
+"id": "w.nasz",
+"pl": "nasz",
+"slow": true
+},
+{
+"id": "w.wasz",
+"pl": "wasz",
+"slow": true
+},
+{
+"id": "w.ich",
+"pl": "ich",
+"slow": true
+},
+{
+"id": "w.ktos",
+"pl": "ktoś",
+"slow": true
+},
+{
+"id": "w.nikt",
+"pl": "nikt",
+"slow": true
+},
+{
+"id": "w.kazdy",
+"pl": "każdy",
+"slow": true
+},
+{
+"id": "w.wszyscy",
+"pl": "wszyscy",
+"slow": true
+},
+{
+"id": "w.inny",
+"pl": "inny",
+"slow": true
+},
+{
+"id": "w.taki",
+"pl": "taki",
+"slow": true
+},
+{
+"id": "w.nazwisko",
+"pl": "nazwisko",
+"slow": true
+},
+{
+"id": "w.chlopiec",
+"pl": "chłopiec",
+"slow": true
+},
+{
+"id": "w.dziewczynka",
+"pl": "dziewczynka",
+"slow": true
+},
+{
+"id": "w.matka",
+"pl": "matka",
+"slow": true
+},
+{
+"id": "w.ojciec",
+"pl": "ojciec",
+"slow": true
+},
+{
+"id": "w.babcia",
+"pl": "babcia",
+"slow": true
+},
+{
+"id": "w.dziadek",
+"pl": "dziadek",
+"slow": true
+},
+{
+"id": "w.wujek",
+"pl": "wujek",
+"slow": true
+},
+{
+"id": "w.ciocia",
+"pl": "ciocia",
+"slow": true
+},
+{
+"id": "w.przyjaciolka",
+"pl": "przyjaciółka",
+"slow": true
+},
+{
+"id": "w.kolezanka",
+"pl": "koleżanka",
+"slow": true
+},
+{
+"id": "w.sasiad",
+"pl": "sąsiad",
+"slow": true
+},
+{
+"id": "w.sasiadka",
+"pl": "sąsiadka",
+"slow": true
+},
+{
+"id": "w.gosc",
+"pl": "gość",
+"slow": true
+},
+{
+"id": "w.zamezna",
+"pl": "zamężna",
+"slow": true
+},
+{
+"id": "w.imieniny",
+"pl": "imieniny",
+"slow": true
+},
+{
+"id": "w.rosjanka",
+"pl": "Rosjanka",
+"slow": true
+},
+{
+"id": "w.ukrainiec",
+"pl": "Ukrainiec",
+"slow": true
+},
+{
+"id": "w.ukrainski",
+"pl": "ukraiński",
+"slow": true
+},
+{
+"id": "w.bialorus",
+"pl": "Białoruś",
+"slow": true
+},
+{
+"id": "w.niemka",
+"pl": "Niemka",
+"slow": true
+},
+{
+"id": "w.niemiecki",
+"pl": "niemiecki",
+"slow": true
+},
+{
+"id": "w.anglia",
+"pl": "Anglia",
+"slow": true
+},
+{
+"id": "w.francja",
+"pl": "Francja",
+"slow": true
+},
+{
+"id": "w.francuz",
+"pl": "Francuz",
+"slow": true
+},
+{
+"id": "w.francuzka",
+"pl": "Francuzka",
+"slow": true
+},
+{
+"id": "w.francuski",
+"pl": "francuski",
+"slow": true
+},
+{
+"id": "w.hiszpania",
+"pl": "Hiszpania",
+"slow": true
+},
+{
+"id": "w.wlochy",
+"pl": "Włochy",
+"slow": true
+},
+{
+"id": "w.stany_zjednoczone",
+"pl": "Stany Zjednoczone",
+"slow": true
+},
+{
+"id": "w.amerykanin",
+"pl": "Amerykanin",
+"slow": true
+},
+{
+"id": "w.amerykanka",
+"pl": "Amerykanka",
+"slow": true
+},
+{
+"id": "w.europa",
+"pl": "Europa",
+"slow": true
+},
+{
+"id": "w.narodowosc",
+"pl": "narodowość",
+"slow": true
+},
+{
+"id": "w.swiat",
+"pl": "świat",
+"slow": true
+},
+{
+"id": "w.zero",
+"pl": "zero",
+"slow": true
+},
+{
+"id": "w.jedenascie",
+"pl": "jedenaście",
+"slow": true
+},
+{
+"id": "w.dwanascie",
+"pl": "dwanaście",
+"slow": true
+},
+{
+"id": "w.pietnascie",
+"pl": "piętnaście",
+"slow": true
+},
+{
+"id": "w.czterdziesci",
+"pl": "czterdzieści",
+"slow": true
+},
+{
+"id": "w.piecdziesiat",
+"pl": "pięćdziesiąt",
+"slow": true
+},
+{
+"id": "w.dwiescie",
+"pl": "dwieście",
+"slow": true
+},
+{
+"id": "w.tysiac",
+"pl": "tysiąc",
+"slow": true
+},
+{
+"id": "w.trzeci",
+"pl": "trzeci",
+"slow": true
+},
+{
+"id": "w.czwarty",
+"pl": "czwarty",
+"slow": true
+},
+{
+"id": "w.ostatni",
+"pl": "ostatni",
+"slow": true
+},
+{
+"id": "w.liczba",
+"pl": "liczba",
+"slow": true
+},
+{
+"id": "w.kilka",
+"pl": "kilka",
+"slow": true
+},
+{
+"id": "w.pol",
+"pl": "pół",
+"slow": true
+},
+{
+"id": "w.poludnie",
+"pl": "południe",
+"slow": true
+},
+{
+"id": "w.popoludnie",
+"pl": "popołudnie",
+"slow": true
+},
+{
+"id": "w.pojutrze",
+"pl": "pojutrze",
+"slow": true
+},
+{
+"id": "w.wczesnie",
+"pl": "wcześnie",
+"slow": true
+},
+{
+"id": "w.zawsze",
+"pl": "zawsze",
+"slow": true
+},
+{
+"id": "w.rzadko",
+"pl": "rzadko",
+"slow": true
+},
+{
+"id": "w.dlugo",
+"pl": "długo",
+"slow": true
+},
+{
+"id": "w.styczen",
+"pl": "styczeń",
+"slow": true
+},
+{
+"id": "w.maj",
+"pl": "maj",
+"slow": true
+},
+{
+"id": "w.grudzien",
+"pl": "grudzień",
+"slow": true
+},
+{
+"id": "w.wiosna",
+"pl": "wiosna",
+"slow": true
+},
+{
+"id": "w.lato",
+"pl": "lato",
+"slow": true
+},
+{
+"id": "w.jesien",
+"pl": "jesień",
+"slow": true
+},
+{
+"id": "w.swieto",
+"pl": "święto",
+"slow": true
+},
+{
+"id": "w.salon",
+"pl": "salon",
+"slow": true
+},
+{
+"id": "w.balkon",
+"pl": "balkon",
+"slow": true
+},
+{
+"id": "w.sciana",
+"pl": "ściana",
+"slow": true
+},
+{
+"id": "w.pietro",
+"pl": "piętro",
+"slow": true
+},
+{
+"id": "w.schody",
+"pl": "schody",
+"slow": true
+},
+{
+"id": "w.meble",
+"pl": "meble",
+"slow": true
+},
+{
+"id": "w.szafa",
+"pl": "szafa",
+"slow": true
+},
+{
+"id": "w.polka_sh",
+"pl": "półka",
+"slow": true
+},
+{
+"id": "w.lampa",
+"pl": "lampa",
+"slow": true
+},
+{
+"id": "w.dywan",
+"pl": "dywan",
+"slow": true
+},
+{
+"id": "w.fotel",
+"pl": "fotel",
+"slow": true
+},
+{
+"id": "w.biurko",
+"pl": "biurko",
+"slow": true
+},
+{
+"id": "w.telewizor",
+"pl": "telewizor",
+"slow": true
+},
+{
+"id": "w.kuchenka",
+"pl": "kuchenka",
+"slow": true
+},
+{
+"id": "w.pralka",
+"pl": "pralka",
+"slow": true
+},
+{
+"id": "w.talerz",
+"pl": "talerz",
+"slow": true
+},
+{
+"id": "w.filizanka",
+"pl": "filiżanka",
+"slow": true
+},
+{
+"id": "w.kubek",
+"pl": "kubek",
+"slow": true
+},
+{
+"id": "w.szklanka",
+"pl": "szklanka",
+"slow": true
+},
+{
+"id": "w.widelec",
+"pl": "widelec",
+"slow": true
+},
+{
+"id": "w.noz",
+"pl": "nóż",
+"slow": true
+},
+{
+"id": "w.lyzka",
+"pl": "łyżka",
+"slow": true
+},
+{
+"id": "w.prysznic",
+"pl": "prysznic",
+"slow": true
+},
+{
+"id": "w.mydlo",
+"pl": "mydło",
+"slow": true
+},
+{
+"id": "w.recznik",
+"pl": "ręcznik",
+"slow": true
+},
+{
+"id": "w.swiatlo",
+"pl": "światło",
+"slow": true
+},
+{
+"id": "w.zegarek",
+"pl": "zegarek",
+"slow": true
+},
+{
+"id": "w.smieci",
+"pl": "śmieci",
+"slow": true
+},
+{
+"id": "w.szynka",
+"pl": "szynka",
+"slow": true
+},
+{
+"id": "w.kielbasa",
+"pl": "kiełbasa",
+"slow": true
+},
+{
+"id": "w.kurczak",
+"pl": "kurczak",
+"slow": true
+},
+{
+"id": "w.makaron",
+"pl": "makaron",
+"slow": true
+},
+{
+"id": "w.ryz",
+"pl": "ryż",
+"slow": true
+},
+{
+"id": "w.kasza",
+"pl": "kasza",
+"slow": true
+},
+{
+"id": "w.ziemniaki",
+"pl": "ziemniaki",
+"slow": true
+},
+{
+"id": "w.frytki",
+"pl": "frytki",
+"slow": true
+},
+{
+"id": "w.barszcz",
+"pl": "barszcz",
+"slow": true
+},
+{
+"id": "w.pierogi",
+"pl": "pierogi",
+"slow": true
+},
+{
+"id": "w.nalesniki",
+"pl": "naleśniki",
+"slow": true
+},
+{
+"id": "w.kotlet",
+"pl": "kotlet",
+"slow": true
+},
+{
+"id": "w.ogorek",
+"pl": "ogórek",
+"slow": true
+},
+{
+"id": "w.czosnek",
+"pl": "czosnek",
+"slow": true
+},
+{
+"id": "w.marchewka",
+"pl": "marchewka",
+"slow": true
+},
+{
+"id": "w.kapusta",
+"pl": "kapusta",
+"slow": true
+},
+{
+"id": "w.papryka",
+"pl": "papryka",
+"slow": true
+},
+{
+"id": "w.salata",
+"pl": "sałata",
+"slow": true
+},
+{
+"id": "w.banan",
+"pl": "banan",
+"slow": true
+},
+{
+"id": "w.gruszka",
+"pl": "gruszka",
+"slow": true
+},
+{
+"id": "w.pomarancza",
+"pl": "pomarańcza",
+"slow": true
+},
+{
+"id": "w.cytryna",
+"pl": "cytryna",
+"slow": true
+},
+{
+"id": "w.truskawka",
+"pl": "truskawka",
+"slow": true
+},
+{
+"id": "w.jogurt",
+"pl": "jogurt",
+"slow": true
+},
+{
+"id": "w.twarog",
+"pl": "twaróg",
+"slow": true
+},
+{
+"id": "w.lody",
+"pl": "lody",
+"slow": true
+},
+{
+"id": "w.ciastko",
+"pl": "ciastko",
+"slow": true
+},
+{
+"id": "w.czekolada",
+"pl": "czekolada",
+"slow": true
+},
+{
+"id": "w.pieprz",
+"pl": "pieprz",
+"slow": true
+},
+{
+"id": "w.miod",
+"pl": "miód",
+"slow": true
+},
+{
+"id": "w.olej",
+"pl": "olej",
+"slow": true
+},
+{
+"id": "w.maka",
+"pl": "mąka",
+"slow": true
+},
+{
+"id": "w.piwo",
+"pl": "piwo",
+"slow": true
+},
+{
+"id": "w.wino",
+"pl": "wino",
+"slow": true
+},
+{
+"id": "w.napoj",
+"pl": "napój",
+"slow": true
+},
+{
+"id": "w.kelnerka",
+"pl": "kelnerka",
+"slow": true
+},
+{
+"id": "w.zamowienie",
+"pl": "zamówienie",
+"slow": true
+},
+{
+"id": "w.deser",
+"pl": "deser",
+"slow": true
+},
+{
+"id": "w.smak",
+"pl": "smak",
+"slow": true
+},
+{
+"id": "w.butelka",
+"pl": "butelka",
+"slow": true
+},
+{
+"id": "w.paczka",
+"pl": "paczka",
+"slow": true
+},
+{
+"id": "w.supermarket",
+"pl": "supermarket",
+"slow": true
+},
+{
+"id": "w.rynek",
+"pl": "rynek",
+"slow": true
+},
+{
+"id": "w.piekarnia",
+"pl": "piekarnia",
+"slow": true
+},
+{
+"id": "w.grosz",
+"pl": "grosz",
+"slow": true
+},
+{
+"id": "w.euro",
+"pl": "euro",
+"slow": true
+},
+{
+"id": "w.reszta",
+"pl": "reszta",
+"slow": true
+},
+{
+"id": "w.portfel",
+"pl": "portfel",
+"slow": true
+},
+{
+"id": "w.sprzedawca",
+"pl": "sprzedawca",
+"slow": true
+},
+{
+"id": "w.klient",
+"pl": "klient",
+"slow": true
+},
+{
+"id": "w.bank",
+"pl": "bank",
+"slow": true
+},
+{
+"id": "w.litr",
+"pl": "litr",
+"slow": true
+},
+{
+"id": "w.sztuka",
+"pl": "sztuka",
+"slow": true
+},
+{
+"id": "w.prezent",
+"pl": "prezent",
+"slow": true
+},
+{
+"id": "w.rzecz",
+"pl": "rzecz",
+"slow": true
+},
+{
+"id": "w.za_darmo",
+"pl": "za darmo",
+"slow": true
+},
+{
+"id": "w.wies",
+"pl": "wieś",
+"slow": true
+},
+{
+"id": "w.plac",
+"pl": "plac",
+"slow": true
+},
+{
+"id": "w.most",
+"pl": "most",
+"slow": true
+},
+{
+"id": "w.budynek",
+"pl": "budynek",
+"slow": true
+},
+{
+"id": "w.kosciol",
+"pl": "kościół",
+"slow": true
+},
+{
+"id": "w.teatr",
+"pl": "teatr",
+"slow": true
+},
+{
+"id": "w.biblioteka",
+"pl": "biblioteka",
+"slow": true
+},
+{
+"id": "w.uniwersytet",
+"pl": "uniwersytet",
+"slow": true
+},
+{
+"id": "w.przychodnia",
+"pl": "przychodnia",
+"slow": true
+},
+{
+"id": "w.policja",
+"pl": "policja",
+"slow": true
+},
+{
+"id": "w.urzad",
+"pl": "urząd",
+"slow": true
+},
+{
+"id": "w.hotel",
+"pl": "hotel",
+"slow": true
+},
+{
+"id": "w.bar",
+"pl": "bar",
+"slow": true
+},
+{
+"id": "w.basen",
+"pl": "basen",
+"slow": true
+},
+{
+"id": "w.skrzyzowanie",
+"pl": "skrzyżowanie",
+"slow": true
+},
+{
+"id": "w.swiatla",
+"pl": "światła",
+"slow": true
+},
+{
+"id": "w.rzeka",
+"pl": "rzeka",
+"slow": true
+},
+{
+"id": "w.informacja",
+"pl": "informacja",
+"slow": true
+},
+{
+"id": "w.turysta",
+"pl": "turysta",
+"slow": true
+},
+{
+"id": "w.wycieczka",
+"pl": "wycieczka",
+"slow": true
+},
+{
+"id": "w.auto",
+"pl": "auto",
+"slow": true
+},
+{
+"id": "w.rower",
+"pl": "rower",
+"slow": true
+},
+{
+"id": "w.peron",
+"pl": "peron",
+"slow": true
+},
+{
+"id": "w.plecak",
+"pl": "plecak",
+"slow": true
+},
+{
+"id": "w.paszport",
+"pl": "paszport",
+"slow": true
+},
+{
+"id": "w.podroz",
+"pl": "podróż",
+"slow": true
+},
+{
+"id": "w.linia",
+"pl": "linia",
+"slow": true
+},
+{
+"id": "w.kierunek",
+"pl": "kierunek",
+"slow": true
+},
+{
+"id": "w.cialo",
+"pl": "ciało",
+"slow": true
+},
+{
+"id": "w.twarz",
+"pl": "twarz",
+"slow": true
+},
+{
+"id": "w.ucho",
+"pl": "ucho",
+"slow": true
+},
+{
+"id": "w.nos",
+"pl": "nos",
+"slow": true
+},
+{
+"id": "w.usta",
+"pl": "usta",
+"slow": true
+},
+{
+"id": "w.wlosy",
+"pl": "włosy",
+"slow": true
+},
+{
+"id": "w.szyja",
+"pl": "szyja",
+"slow": true
+},
+{
+"id": "w.palec",
+"pl": "palec",
+"slow": true
+},
+{
+"id": "w.kolano",
+"pl": "kolano",
+"slow": true
+},
+{
+"id": "w.serce",
+"pl": "serce",
+"slow": true
+},
+{
+"id": "w.lekarka",
+"pl": "lekarka",
+"slow": true
+},
+{
+"id": "w.pielegniarka",
+"pl": "pielęgniarka",
+"slow": true
+},
+{
+"id": "w.choroba",
+"pl": "choroba",
+"slow": true
+},
+{
+"id": "w.przeziebienie",
+"pl": "przeziębienie",
+"slow": true
+},
+{
+"id": "w.grypa",
+"pl": "grypa",
+"slow": true
+},
+{
+"id": "w.okulary",
+"pl": "okulary",
+"slow": true
+},
+{
+"id": "w.pracownik",
+"pl": "pracownik",
+"slow": true
+},
+{
+"id": "w.umowa",
+"pl": "umowa",
+"slow": true
+},
+{
+"id": "w.pensja",
+"pl": "pensja",
+"slow": true
+},
+{
+"id": "w.projekt",
+"pl": "projekt",
+"slow": true
+},
+{
+"id": "w.formularz",
+"pl": "formularz",
+"slow": true
+},
+{
+"id": "w.kucharz",
+"pl": "kucharz",
+"slow": true
+},
+{
+"id": "w.dyrektor",
+"pl": "dyrektor",
+"slow": true
+},
+{
+"id": "w.policjant",
+"pl": "policjant",
+"slow": true
+},
+{
+"id": "w.klasa",
+"pl": "klasa",
+"slow": true
+},
+{
+"id": "w.uczen",
+"pl": "uczeń",
+"slow": true
+},
+{
+"id": "w.zdanie",
+"pl": "zdanie",
+"slow": true
+},
+{
+"id": "w.litera",
+"pl": "litera",
+"slow": true
+},
+{
+"id": "w.tekst",
+"pl": "tekst",
+"slow": true
+},
+{
+"id": "w.zeszyt",
+"pl": "zeszyt",
+"slow": true
+},
+{
+"id": "w.olowek",
+"pl": "ołówek",
+"slow": true
+},
+{
+"id": "w.kartka",
+"pl": "kartka",
+"slow": true
+},
+{
+"id": "w.blad",
+"pl": "błąd",
+"slow": true
+},
+{
+"id": "w.cwiczenie",
+"pl": "ćwiczenie",
+"slow": true
+},
+{
+"id": "w.list",
+"pl": "list",
+"slow": true
+},
+{
+"id": "w.temat",
+"pl": "temat",
+"slow": true
+},
+{
+"id": "w.poziom",
+"pl": "poziom",
+"slow": true
+},
+{
+"id": "w.znaczenie",
+"pl": "znaczenie",
+"slow": true
+},
+{
+"id": "w.piosenka",
+"pl": "piosenka",
+"slow": true
+},
+{
+"id": "w.serial",
+"pl": "serial",
+"slow": true
+},
+{
+"id": "w.impreza",
+"pl": "impreza",
+"slow": true
+},
+{
+"id": "w.pilka_nozna",
+"pl": "piłka nożna",
+"slow": true
+},
+{
+"id": "w.mecz",
+"pl": "mecz",
+"slow": true
+},
+{
+"id": "w.plaza",
+"pl": "plaża",
+"slow": true
+},
+{
+"id": "w.radio",
+"pl": "radio",
+"slow": true
+},
+{
+"id": "w.wiatr",
+"pl": "wiatr",
+"slow": true
+},
+{
+"id": "w.chmura",
+"pl": "chmura",
+"slow": true
+},
+{
+"id": "w.temperatura",
+"pl": "temperatura",
+"slow": true
+},
+{
+"id": "w.jezioro",
+"pl": "jezioro",
+"slow": true
+},
+{
+"id": "w.ziemia",
+"pl": "ziemia",
+"slow": true
+},
+{
+"id": "w.roslina",
+"pl": "roślina",
+"slow": true
+},
+{
+"id": "w.kon",
+"pl": "koń",
+"slow": true
+},
+{
+"id": "w.swinia",
+"pl": "świnia",
+"slow": true
+},
+{
+"id": "w.owca",
+"pl": "owca",
+"slow": true
+},
+{
+"id": "w.ptak",
+"pl": "ptak",
+"slow": true
+},
+{
+"id": "w.nasiono",
+"pl": "nasiono",
+"slow": true
+},
+{
+"id": "w.bluzka",
+"pl": "bluzka",
+"slow": true
+},
+{
+"id": "w.bluza",
+"pl": "bluza",
+"slow": true
+},
+{
+"id": "w.plaszcz",
+"pl": "płaszcz",
+"slow": true
+},
+{
+"id": "w.dzinsy",
+"pl": "dżinsy",
+"slow": true
+},
+{
+"id": "w.spodnica",
+"pl": "spódnica",
+"slow": true
+},
+{
+"id": "w.skarpetki",
+"pl": "skarpetki",
+"slow": true
+},
+{
+"id": "w.szalik",
+"pl": "szalik",
+"slow": true
+},
+{
+"id": "w.rekawiczki",
+"pl": "rękawiczki",
+"slow": true
+},
+{
+"id": "w.torebka",
+"pl": "torebka",
+"slow": true
+},
+{
+"id": "w.parasol",
+"pl": "parasol",
+"slow": true
+},
+{
+"id": "w.brazowy",
+"pl": "brązowy",
+"slow": true
+},
+{
+"id": "w.szary",
+"pl": "szary",
+"slow": true
+},
+{
+"id": "w.rozowy",
+"pl": "różowy",
+"slow": true
+},
+{
+"id": "w.pomaranczowy",
+"pl": "pomarańczowy",
+"slow": true
+},
+{
+"id": "w.komorka",
+"pl": "komórka",
+"slow": true
+},
+{
+"id": "w.laptop",
+"pl": "laptop",
+"slow": true
+},
+{
+"id": "w.aplikacja",
+"pl": "aplikacja",
+"slow": true
+},
+{
+"id": "w.strona_internetowa",
+"pl": "strona internetowa",
+"slow": true
+},
+{
+"id": "w.rozmowa",
+"pl": "rozmowa",
+"slow": true
+},
+{
+"id": "w.kod",
+"pl": "kod",
+"slow": true
+},
+{
+"id": "w.brzydki",
+"pl": "brzydki",
+"slow": true
+},
+{
+"id": "w.sympatyczny",
+"pl": "sympatyczny",
+"slow": true
+},
+{
+"id": "w.wysoki",
+"pl": "wysoki",
+"slow": true
+},
+{
+"id": "w.niski",
+"pl": "niski",
+"slow": true
+},
+{
+"id": "w.dlugi",
+"pl": "długi",
+"slow": true
+},
+{
+"id": "w.krotki",
+"pl": "krótki",
+"slow": true
+},
+{
+"id": "w.lekki",
+"pl": "lekki",
+"slow": true
+},
+{
+"id": "w.czysty",
+"pl": "czysty",
+"slow": true
+},
+{
+"id": "w.brudny",
+"pl": "brudny",
+"slow": true
+},
+{
+"id": "w.pusty",
+"pl": "pusty",
+"slow": true
+},
+{
+"id": "w.pelny",
+"pl": "pełny",
+"slow": true
+},
+{
+"id": "w.ciekawy",
+"pl": "ciekawy",
+"slow": true
+},
+{
+"id": "w.nudny",
+"pl": "nudny",
+"slow": true
+},
+{
+"id": "w.glosny",
+"pl": "głośny",
+"slow": true
+},
+{
+"id": "w.cichy",
+"pl": "cichy",
+"slow": true
+},
+{
+"id": "w.slony",
+"pl": "słony",
+"slow": true
+},
+{
+"id": "w.kwasny",
+"pl": "kwaśny",
+"slow": true
+},
+{
+"id": "w.wygodny",
+"pl": "wygodny",
+"slow": true
+},
+{
+"id": "w.rozny",
+"pl": "różny",
+"slow": true
+},
+{
+"id": "w.caly",
+"pl": "cały",
+"slow": true
+},
+{
+"id": "w.starszy",
+"pl": "starszy",
+"slow": true
+},
+{
+"id": "w.mlodszy",
+"pl": "młodszy",
+"slow": true
+},
+{
+"id": "w.lepszy",
+"pl": "lepszy",
+"slow": true
+},
+{
+"id": "w.najlepszy",
+"pl": "najlepszy",
+"slow": true
+},
+{
+"id": "w.jasny",
+"pl": "jasny",
+"slow": true
+},
+{
+"id": "w.ciemny",
+"pl": "ciemny",
+"slow": true
+},
+{
+"id": "w.wiecej",
+"pl": "więcej",
+"slow": true
+},
+{
+"id": "w.mniej",
+"pl": "mniej",
+"slow": true
+},
+{
+"id": "w.szybko",
+"pl": "szybko",
+"slow": true
+},
+{
+"id": "w.glosno",
+"pl": "głośno",
+"slow": true
+},
+{
+"id": "w.cicho",
+"pl": "cicho",
+"slow": true
+},
+{
+"id": "w.znowu",
+"pl": "znowu",
+"slow": true
+},
+{
+"id": "w.prawie",
+"pl": "prawie",
+"slow": true
+},
+{
+"id": "w.naprawde",
+"pl": "naprawdę",
+"slow": true
+},
+{
+"id": "w.pewnie",
+"pl": "pewnie",
+"slow": true
+},
+{
+"id": "w.nie_wolno",
+"pl": "nie wolno",
+"slow": true
+},
+{
+"id": "w.przez",
+"pl": "przez",
+"slow": true
+},
+{
+"id": "w.miedzy",
+"pl": "między",
+"slow": true
+},
+{
+"id": "w.przy",
+"pl": "przy",
+"slow": true
+},
+{
+"id": "w.kolo",
+"pl": "koło",
+"slow": true
+},
+{
+"id": "w.lub",
+"pl": "lub",
+"slow": true
+},
+{
+"id": "w.jesli",
+"pl": "jeśli",
+"slow": true
+},
+{
+"id": "w.dlatego",
+"pl": "dlatego",
+"slow": true
+},
+{
+"id": "w.wesoly",
+"pl": "wesoły",
+"slow": true
+},
+{
+"id": "w.zadowolony",
+"pl": "zadowolony",
+"slow": true
+},
+{
+"id": "w.spokojny",
+"pl": "spokojny",
+"slow": true
+},
+{
+"id": "w.milosc",
+"pl": "miłość",
+"slow": true
+},
+{
+"id": "w.jezdzic",
+"pl": "jeździć",
+"slow": true
+},
+{
+"id": "w.chcialbym",
+"pl": "chciałbym",
+"slow": true
+},
+{
+"id": "w.uczyc",
+"pl": "uczyć",
+"slow": true
+},
+{
+"id": "w.patrzec",
+"pl": "patrzeć",
+"slow": true
+},
+{
+"id": "w.sprzedawac",
+"pl": "sprzedawać",
+"slow": true
+},
+{
+"id": "w.wziac",
+"pl": "wziąć",
+"slow": true
+},
+{
+"id": "w.dac",
+"pl": "dać",
+"slow": true
+},
+{
+"id": "w.pomagac",
+"pl": "pomagać",
+"slow": true
+},
+{
+"id": "w.pytac",
+"pl": "pytać",
+"slow": true
+},
+{
+"id": "w.odpowiadac",
+"pl": "odpowiadać",
+"slow": true
+},
+{
+"id": "w.czekac",
+"pl": "czekać",
+"slow": true
+},
+{
+"id": "w.znalezc",
+"pl": "znaleźć",
+"slow": true
+},
+{
+"id": "w.wchodzic",
+"pl": "wchodzić",
+"slow": true
+},
+{
+"id": "w.wychodzic",
+"pl": "wychodzić",
+"slow": true
+},
+{
+"id": "w.przychodzic",
+"pl": "przychodzić",
+"slow": true
+},
+{
+"id": "w.stac",
+"pl": "stać",
+"slow": true
+},
+{
+"id": "w.lezec",
+"pl": "leżeć",
+"slow": true
+},
+{
+"id": "w.grac",
+"pl": "grać",
+"slow": true
+},
+{
+"id": "w.spiewac",
+"pl": "śpiewać",
+"slow": true
+},
+{
+"id": "w.biegac",
+"pl": "biegać",
+"slow": true
+},
+{
+"id": "w.sprzatac",
+"pl": "sprzątać",
+"slow": true
+},
+{
+"id": "w.myc",
+"pl": "myć",
+"slow": true
+},
+{
+"id": "w.otwierac",
+"pl": "otwierać",
+"slow": true
+},
+{
+"id": "w.zamykac",
+"pl": "zamykać",
+"slow": true
+},
+{
+"id": "w.zaczynac",
+"pl": "zaczynać",
+"slow": true
+},
+{
+"id": "w.konczyc",
+"pl": "kończyć",
+"slow": true
+},
+{
+"id": "w.dziekowac",
+"pl": "dziękować",
+"slow": true
+},
+{
+"id": "w.pamietac",
+"pl": "pamiętać",
+"slow": true
+},
+{
+"id": "w.zapominac",
+"pl": "zapominać",
+"slow": true
+},
+{
+"id": "w.zapomniec",
+"pl": "zapomnieć",
+"slow": true
+},
+{
+"id": "w.powtarzac",
+"pl": "powtarzać",
+"slow": true
+},
+{
+"id": "w.liczyc",
+"pl": "liczyć",
+"slow": true
+},
+{
+"id": "w.zamawiac",
+"pl": "zamawiać",
+"slow": true
+},
+{
+"id": "w.spotkac_sie",
+"pl": "spotkać się",
+"slow": true
+},
+{
+"id": "w.spotykac_sie",
+"pl": "spotykać się",
+"slow": true
+},
+{
+"id": "w.napisac",
+"pl": "napisać",
+"slow": true
+},
+{
+"id": "w.zrobic",
+"pl": "zrobić",
+"slow": true
+},
+{
+"id": "w.studiowac",
+"pl": "studiować",
+"slow": true
+},
+{
+"id": "w.zarabiac",
+"pl": "zarabiać",
+"slow": true
+},
+{
+"id": "w.podrozowac",
+"pl": "podróżować",
+"slow": true
+},
+{
+"id": "w.dziewiaty",
+"pl": "dziewiąty",
+"slow": true
+},
+{
+"id": "w.recepcja",
+"pl": "recepcja",
+"slow": true
+},
+{
+"id": "w.rezerwacja",
+"pl": "rezerwacja",
+"slow": true
+},
+{
+"id": "w.gazeta",
+"pl": "gazeta",
+"slow": true
+},
+{
+"id": "w.zajecia",
+"pl": "zajęcia",
+"slow": true
+},
+{
+"id": "w.koniec",
+"pl": "koniec",
+"slow": true
+},
+{
+"id": "w.poczatek",
+"pl": "początek",
+"slow": true
+},
+{
+"id": "w.ulubiony",
+"pl": "ulubiony",
+"slow": true
+},
+{
+"id": "w.zwykle",
+"pl": "zwykle",
+"slow": true
+},
+{
+"id": "w.piecset",
+"pl": "pięćset",
+"slow": true
+},
+{
+"id": "w.piaty",
+"pl": "piąty",
+"slow": true
+},
+{
+"id": "w.plus",
+"pl": "plus",
+"slow": true
+},
+{
+"id": "w.minus",
+"pl": "minus",
+"slow": true
+},
+{
+"id": "w.czynsz",
+"pl": "czynsz",
+"slow": true
+},
+{
+"id": "w.prad",
+"pl": "prąd",
+"slow": true
+},
+{
+"id": "w.wegetarianski",
+"pl": "wegetariański",
+"slow": true
+},
+{
+"id": "w.korek",
+"pl": "korek",
+"slow": true
+},
+{
+"id": "w.opoznienie",
+"pl": "opóźnienie",
+"slow": true
+},
+{
+"id": "w.odjazd",
+"pl": "odjazd",
+"slow": true
+},
+{
+"id": "w.alergia",
+"pl": "alergia",
+"slow": true
+},
+{
+"id": "w.pilka",
+"pl": "piłka",
+"slow": true
+},
+{
+"id": "w.pszenica",
+"pl": "pszenica",
+"slow": true
+},
+{
+"id": "w.przymierzalnia",
+"pl": "przymierzalnia",
+"slow": true
+},
+{
+"id": "w.zasieg",
+"pl": "zasięg",
+"slow": true
+},
+{
+"id": "w.mniejszy",
+"pl": "mniejszy",
+"slow": true
+},
+{
+"id": "w.naprzeciwko",
+"pl": "naprzeciwko",
+"slow": true
+},
+{
+"id": "w.na_gorze",
+"pl": "na górze",
+"slow": true
+},
+{
+"id": "w.osobno",
+"pl": "osobno",
+"slow": true
+},
+{
+"id": "w.wynajmowac",
+"pl": "wynajmować",
+"slow": true
+},
+{
+"id": "w.tesknic",
+"pl": "tęsknić",
+"slow": true
+},
+{
+"id": "w.nudzic_sie",
+"pl": "nudzić się",
+"slow": true
+},
+{
+"id": "w.dwunasty",
+"pl": "dwunasty",
+"slow": true
+},
+{
+"id": "w.witaj",
+"pl": "Witaj",
+"slow": true
+},
+{
+"id": "w.pozdrawiam",
+"pl": "Pozdrawiam",
+"slow": true
+},
+{
+"id": "w.milego_weekendu",
+"pl": "Miłego weekendu",
+"slow": true
+},
+{
+"id": "w.wszystkiego_dobrego",
+"pl": "Wszystkiego dobrego",
+"slow": true
+},
+{
+"id": "w.wszystkiego_najlepszego",
+"pl": "Wszystkiego najlepszego",
+"slow": true
+},
+{
+"id": "w.prosze_usiasc",
+"pl": "Proszę usiąść",
+"slow": true
+},
+{
+"id": "w.swoj",
+"pl": "swój",
+"slow": true
+},
+{
+"id": "w.tamten",
+"pl": "tamten",
+"slow": true
+},
+{
+"id": "w.sam",
+"pl": "sam",
+"slow": true
+},
+{
+"id": "w.wiek",
+"pl": "wiek",
+"slow": true
+},
+{
+"id": "w.kuzyn",
+"pl": "kuzyn",
+"slow": true
+},
+{
+"id": "w.kuzynka",
+"pl": "kuzynka",
+"slow": true
+},
+{
+"id": "w.wnuk",
+"pl": "wnuk",
+"slow": true
+},
+{
+"id": "w.wnuczka",
+"pl": "wnuczka",
+"slow": true
+},
+{
+"id": "w.rodzenstwo",
+"pl": "rodzeństwo",
+"slow": true
+},
+{
+"id": "w.samotny",
+"pl": "samotny",
+"slow": true
+},
+{
+"id": "w.rozwiedziony",
+"pl": "rozwiedziony",
+"slow": true
+},
+{
+"id": "w.singiel",
+"pl": "singiel",
+"slow": true
+},
+{
+"id": "w.hiszpanski",
+"pl": "hiszpański",
+"slow": true
+},
+{
+"id": "w.wloski",
+"pl": "włoski",
+"slow": true
+},
+{
+"id": "w.azja",
+"pl": "Azja",
+"slow": true
+},
+{
+"id": "w.chiny",
+"pl": "Chiny",
+"slow": true
+},
+{
+"id": "w.japonia",
+"pl": "Japonia",
+"slow": true
+},
+{
+"id": "w.czechy",
+"pl": "Czechy",
+"slow": true
+},
+{
+"id": "w.litwa",
+"pl": "Litwa",
+"slow": true
+},
+{
+"id": "w.turcja",
+"pl": "Turcja",
+"slow": true
+},
+{
+"id": "w.kazachstan",
+"pl": "Kazachstan",
+"slow": true
+},
+{
+"id": "w.po_ukrainsku",
+"pl": "po ukraińsku",
+"slow": true
+},
+{
+"id": "w.granica",
+"pl": "granica",
+"slow": true
+},
+{
+"id": "w.trzynascie",
+"pl": "trzynaście",
+"slow": true
+},
+{
+"id": "w.czternascie",
+"pl": "czternaście",
+"slow": true
+},
+{
+"id": "w.szesnascie",
+"pl": "szesnaście",
+"slow": true
+},
+{
+"id": "w.siedemnascie",
+"pl": "siedemnaście",
+"slow": true
+},
+{
+"id": "w.osiemnascie",
+"pl": "osiemnaście",
+"slow": true
+},
+{
+"id": "w.dziewietnascie",
+"pl": "dziewiętnaście",
+"slow": true
+},
+{
+"id": "w.siedemdziesiat",
+"pl": "siedemdziesiąt",
+"slow": true
+},
+{
+"id": "w.osiemdziesiat",
+"pl": "osiemdziesiąt",
+"slow": true
+},
+{
+"id": "w.dziewiecdziesiat",
+"pl": "dziewięćdziesiąt",
+"slow": true
+},
+{
+"id": "w.trzysta",
+"pl": "trzysta",
+"slow": true
+},
+{
+"id": "w.czterysta",
+"pl": "czterysta",
+"slow": true
+},
+{
+"id": "w.cyfra",
+"pl": "cyfra",
+"slow": true
+},
+{
+"id": "w.polowa",
+"pl": "połowa",
+"slow": true
+},
+{
+"id": "w.para",
+"pl": "para",
+"slow": true
+},
+{
+"id": "w.procent",
+"pl": "procent",
+"slow": true
+},
+{
+"id": "w.sekunda",
+"pl": "sekunda",
+"slow": true
+},
+{
+"id": "w.ranek",
+"pl": "ranek",
+"slow": true
+},
+{
+"id": "w.polnoc",
+"pl": "północ",
+"slow": true
+},
+{
+"id": "w.wtedy",
+"pl": "wtedy",
+"slow": true
+},
+{
+"id": "w.krotko",
+"pl": "krótko",
+"slow": true
+},
+{
+"id": "w.dawno",
+"pl": "dawno",
+"slow": true
+},
+{
+"id": "w.kalendarz",
+"pl": "kalendarz",
+"slow": true
+},
+{
+"id": "w.luty",
+"pl": "luty",
+"slow": true
+},
+{
+"id": "w.marzec",
+"pl": "marzec",
+"slow": true
+},
+{
+"id": "w.kwiecien",
+"pl": "kwiecień",
+"slow": true
+},
+{
+"id": "w.czerwiec",
+"pl": "czerwiec",
+"slow": true
+},
+{
+"id": "w.lipiec",
+"pl": "lipiec",
+"slow": true
+},
+{
+"id": "w.sierpien",
+"pl": "sierpień",
+"slow": true
+},
+{
+"id": "w.wrzesien",
+"pl": "wrzesień",
+"slow": true
+},
+{
+"id": "w.pazdziernik",
+"pl": "październik",
+"slow": true
+},
+{
+"id": "w.listopad",
+"pl": "listopad",
+"slow": true
+},
+{
+"id": "w.urlop",
+"pl": "urlop",
+"slow": true
+},
+{
+"id": "w.kwadrans",
+"pl": "kwadrans",
+"slow": true
+},
+{
+"id": "w.podloga",
+"pl": "podłoga",
+"slow": true
+},
+{
+"id": "w.parter",
+"pl": "parter",
+"slow": true
+},
+{
+"id": "w.garaz",
+"pl": "garaż",
+"slow": true
+},
+{
+"id": "w.wlasciciel",
+"pl": "właściciel",
+"slow": true
+},
+{
+"id": "w.czajnik",
+"pl": "czajnik",
+"slow": true
+},
+{
+"id": "w.garnek",
+"pl": "garnek",
+"slow": true
+},
+{
+"id": "w.patelnia",
+"pl": "patelnia",
+"slow": true
+},
+{
+"id": "w.lyzeczka",
+"pl": "łyżeczka",
+"slow": true
+},
+{
+"id": "w.wanna",
+"pl": "wanna",
+"slow": true
+},
+{
+"id": "w.poduszka",
+"pl": "poduszka",
+"slow": true
+},
+{
+"id": "w.koc",
+"pl": "koc",
+"slow": true
+},
+{
+"id": "w.ogrzewanie",
+"pl": "ogrzewanie",
+"slow": true
+},
+{
+"id": "w.zegar",
+"pl": "zegar",
+"slow": true
+},
+{
+"id": "w.kosz",
+"pl": "kosz",
+"slow": true
+},
+{
+"id": "w.blok",
+"pl": "blok",
+"slow": true
+},
+{
+"id": "w.wieprzowina",
+"pl": "wieprzowina",
+"slow": true
+},
+{
+"id": "w.wolowina",
+"pl": "wołowina",
+"slow": true
+},
+{
+"id": "w.rosol",
+"pl": "rosół",
+"slow": true
+},
+{
+"id": "w.buraki",
+"pl": "buraki",
+"slow": true
+},
+{
+"id": "w.sliwka",
+"pl": "śliwka",
+"slow": true
+},
+{
+"id": "w.winogrona",
+"pl": "winogrona",
+"slow": true
+},
+{
+"id": "w.malina",
+"pl": "malina",
+"slow": true
+},
+{
+"id": "w.arbuz",
+"pl": "arbuz",
+"slow": true
+},
+{
+"id": "w.melon",
+"pl": "melon",
+"slow": true
+},
+{
+"id": "w.dynia",
+"pl": "dynia",
+"slow": true
+},
+{
+"id": "w.orzechy",
+"pl": "orzechy",
+"slow": true
+},
+{
+"id": "w.smietana",
+"pl": "śmietana",
+"slow": true
+},
+{
+"id": "w.smietanka",
+"pl": "śmietanka",
+"slow": true
+},
+{
+"id": "w.dzem",
+"pl": "dżem",
+"slow": true
+},
+{
+"id": "w.lemoniada",
+"pl": "lemoniada",
+"slow": true
+},
+{
+"id": "w.napiwek",
+"pl": "napiwek",
+"slow": true
+},
+{
+"id": "w.wegetarianin",
+"pl": "wegetarianin",
+"slow": true
+},
+{
+"id": "w.puszka",
+"pl": "puszka",
+"slow": true
+},
+{
+"id": "w.sloik",
+"pl": "słoik",
+"slow": true
+},
+{
+"id": "w.porcja",
+"pl": "porcja",
+"slow": true
+},
+{
+"id": "w.kiosk",
+"pl": "kiosk",
+"slow": true
+},
+{
+"id": "w.dolar",
+"pl": "dolar",
+"slow": true
+},
+{
+"id": "w.koszyk",
+"pl": "koszyk",
+"slow": true
+},
+{
+"id": "w.wyprzedaz",
+"pl": "wyprzedaż",
+"slow": true
+},
+{
+"id": "w.kantor",
+"pl": "kantor",
+"slow": true
+},
+{
+"id": "w.waga",
+"pl": "waga",
+"slow": true
+},
+{
+"id": "w.darmowy",
+"pl": "darmowy",
+"slow": true
+},
+{
+"id": "w.chodnik",
+"pl": "chodnik",
+"slow": true
+},
+{
+"id": "w.zamek",
+"pl": "zamek",
+"slow": true
+},
+{
+"id": "w.pomnik",
+"pl": "pomnik",
+"slow": true
+},
+{
+"id": "w.lawka",
+"pl": "ławka",
+"slow": true
+},
+{
+"id": "w.mieszkaniec",
+"pl": "mieszkaniec",
+"slow": true
+},
+{
+"id": "w.kierowca",
+"pl": "kierowca",
+"slow": true
+},
+{
+"id": "w.rozklad_jazdy",
+"pl": "rozkład jazdy",
+"slow": true
+},
+{
+"id": "w.przyjazd",
+"pl": "przyjazd",
+"slow": true
+},
+{
+"id": "w.prawo_jazdy",
+"pl": "prawo jazdy",
+"slow": true
+},
+{
+"id": "w.ramie",
+"pl": "ramię",
+"slow": true
+},
+{
+"id": "w.pacjent",
+"pl": "pacjent",
+"slow": true
+},
+{
+"id": "w.badanie",
+"pl": "badanie",
+"slow": true
+},
+{
+"id": "w.krew",
+"pl": "krew",
+"slow": true
+},
+{
+"id": "w.leczyc",
+"pl": "leczyć",
+"slow": true
+},
+{
+"id": "w.wniosek",
+"pl": "wniosek",
+"slow": true
+},
+{
+"id": "w.nip",
+"pl": "NIP",
+"slow": true
+},
+{
+"id": "w.praca_zdalna",
+"pl": "praca zdalna",
+"slow": true
+},
+{
+"id": "w.menedzer",
+"pl": "menedżer",
+"slow": true
+},
+{
+"id": "w.fryzjer",
+"pl": "fryzjer",
+"slow": true
+},
+{
+"id": "w.mechanik",
+"pl": "mechanik",
+"slow": true
+},
+{
+"id": "w.prawnik",
+"pl": "prawnik",
+"slow": true
+},
+{
+"id": "w.artysta",
+"pl": "artysta",
+"slow": true
+},
+{
+"id": "w.dziennikarz",
+"pl": "dziennikarz",
+"slow": true
+},
+{
+"id": "w.bezrobotny",
+"pl": "bezrobotny",
+"slow": true
+},
+{
+"id": "w.emeryt",
+"pl": "emeryt",
+"slow": true
+},
+{
+"id": "w.kariera",
+"pl": "kariera",
+"slow": true
+},
+{
+"id": "w.tablica",
+"pl": "tablica",
+"slow": true
+},
+{
+"id": "w.dyplom",
+"pl": "dyplom",
+"slow": true
+},
+{
+"id": "w.taniec",
+"pl": "taniec",
+"slow": true
+},
+{
+"id": "w.wystawa",
+"pl": "wystawa",
+"slow": true
+},
+{
+"id": "w.telewizja",
+"pl": "telewizja",
+"slow": true
+},
+{
+"id": "w.gitara",
+"pl": "gitara",
+"slow": true
+},
+{
+"id": "w.szachy",
+"pl": "szachy",
+"slow": true
+},
+{
+"id": "w.joga",
+"pl": "joga",
+"slow": true
+},
+{
+"id": "w.narty",
+"pl": "narty",
+"slow": true
+},
+{
+"id": "w.burza",
+"pl": "burza",
+"slow": true
+},
+{
+"id": "w.niebo",
+"pl": "niebo",
+"slow": true
+},
+{
+"id": "w.chlodno",
+"pl": "chłodno",
+"slow": true
+},
+{
+"id": "w.laka",
+"pl": "łąka",
+"slow": true
+},
+{
+"id": "w.kogut",
+"pl": "kogut",
+"slow": true
+},
+{
+"id": "w.kaczka",
+"pl": "kaczka",
+"slow": true
+},
+{
+"id": "w.koza",
+"pl": "koza",
+"slow": true
+},
+{
+"id": "w.pszczola",
+"pl": "pszczoła",
+"slow": true
+},
+{
+"id": "w.ziarno",
+"pl": "ziarno",
+"slow": true
+},
+{
+"id": "w.studnia",
+"pl": "studnia",
+"slow": true
+},
+{
+"id": "w.traktor",
+"pl": "traktor",
+"slow": true
+},
+{
+"id": "w.ksiezyc",
+"pl": "księżyc",
+"slow": true
+},
+{
+"id": "w.gwiazda",
+"pl": "gwiazda",
+"slow": true
+},
+{
+"id": "w.garnitur",
+"pl": "garnitur",
+"slow": true
+},
+{
+"id": "w.marynarka",
+"pl": "marynarka",
+"slow": true
+},
+{
+"id": "w.pasek",
+"pl": "pasek",
+"slow": true
+},
+{
+"id": "w.pizama",
+"pl": "piżama",
+"slow": true
+},
+{
+"id": "w.fioletowy",
+"pl": "fioletowy",
+"slow": true
+},
+{
+"id": "w.granatowy",
+"pl": "granatowy",
+"slow": true
+},
+{
+"id": "w.zloty_kolor",
+"pl": "złoty",
+"slow": true
+},
+{
+"id": "w.ekran",
+"pl": "ekran",
+"slow": true
+},
+{
+"id": "w.bateria",
+"pl": "bateria",
+"slow": true
+},
+{
+"id": "w.kurier",
+"pl": "kurier",
+"slow": true
+},
+{
+"id": "w.konto",
+"pl": "konto",
+"slow": true
+},
+{
+"id": "w.szeroki",
+"pl": "szeroki",
+"slow": true
+},
+{
+"id": "w.waski",
+"pl": "wąski",
+"slow": true
+},
+{
+"id": "w.gruby",
+"pl": "gruby",
+"slow": true
+},
+{
+"id": "w.chudy",
+"pl": "chudy",
+"slow": true
+},
+{
+"id": "w.prawdziwy",
+"pl": "prawdziwy",
+"slow": true
+},
+{
+"id": "w.gorzki",
+"pl": "gorzki",
+"slow": true
+},
+{
+"id": "w.bogaty",
+"pl": "bogaty",
+"slow": true
+},
+{
+"id": "w.biedny",
+"pl": "biedny",
+"slow": true
+},
+{
+"id": "w.nowoczesny",
+"pl": "nowoczesny",
+"slow": true
+},
+{
+"id": "w.bezpieczny",
+"pl": "bezpieczny",
+"slow": true
+},
+{
+"id": "w.obcy",
+"pl": "obcy",
+"slow": true
+},
+{
+"id": "w.wlasny",
+"pl": "własny",
+"slow": true
+},
+{
+"id": "w.podobny",
+"pl": "podobny",
+"slow": true
+},
+{
+"id": "w.poprzedni",
+"pl": "poprzedni",
+"slow": true
+},
+{
+"id": "w.pewny",
+"pl": "pewny",
+"slow": true
+},
+{
+"id": "w.gorszy",
+"pl": "gorszy",
+"slow": true
+},
+{
+"id": "w.wiekszy",
+"pl": "większy",
+"slow": true
+},
+{
+"id": "w.mokry",
+"pl": "mokry",
+"slow": true
+},
+{
+"id": "w.suchy",
+"pl": "suchy",
+"slow": true
+},
+{
+"id": "w.zbyt",
+"pl": "zbyt",
+"slow": true
+},
+{
+"id": "w.takze",
+"pl": "także",
+"slow": true
+},
+{
+"id": "w.gdzies",
+"pl": "gdzieś",
+"slow": true
+},
+{
+"id": "w.wszedzie",
+"pl": "wszędzie",
+"slow": true
+},
+{
+"id": "w.na_dole",
+"pl": "na dole",
+"slow": true
+},
+{
+"id": "w.dokladnie",
+"pl": "dokładnie",
+"slow": true
+},
+{
+"id": "w.na_szczescie",
+"pl": "na szczęście",
+"slow": true
+},
+{
+"id": "w.nagle",
+"pl": "nagle",
+"slow": true
+},
+{
+"id": "w.ani",
+"pl": "ani",
+"slow": true
+},
+{
+"id": "w.gdy",
+"pl": "gdy",
+"slow": true
+},
+{
+"id": "w.poniewaz",
+"pl": "ponieważ",
+"slow": true
+},
+{
+"id": "w.zeby",
+"pl": "żeby",
+"slow": true
+},
+{
+"id": "w.chociaz",
+"pl": "chociaż",
+"slow": true
+},
+{
+"id": "w.oraz",
+"pl": "oraz",
+"slow": true
+},
+{
+"id": "w.czyj",
+"pl": "czyj",
+"slow": true
+},
+{
+"id": "w.po_co",
+"pl": "po co",
+"slow": true
+},
+{
+"id": "w.zdenerwowany",
+"pl": "zdenerwowany",
+"slow": true
+},
+{
+"id": "w.zakochany",
+"pl": "zakochany",
+"slow": true
+},
+{
+"id": "w.zdziwiony",
+"pl": "zdziwiony",
+"slow": true
+},
+{
+"id": "w.strach",
+"pl": "strach",
+"slow": true
+},
+{
+"id": "w.radosc",
+"pl": "radość",
+"slow": true
+},
+{
+"id": "w.przyjazn",
+"pl": "przyjaźń",
+"slow": true
+},
+{
+"id": "w.humor",
+"pl": "humor",
+"slow": true
+},
+{
+"id": "w.marzenie",
+"pl": "marzenie",
+"slow": true
+},
+{
+"id": "w.przyjezdzac",
+"pl": "przyjeżdżać",
+"slow": true
+},
+{
+"id": "w.smazyc",
+"pl": "smażyć",
+"slow": true
+},
+{
+"id": "w.piec_v",
+"pl": "piec",
+"slow": true
+},
+{
+"id": "w.przepraszac",
+"pl": "przepraszać",
+"slow": true
+},
+{
+"id": "w.pojsc",
+"pl": "pójść",
+"slow": true
+},
+{
+"id": "w.przyjsc",
+"pl": "przyjść",
+"slow": true
+},
+{
+"id": "w.zostac",
+"pl": "zostać",
+"slow": true
+},
+{
+"id": "w.uprawiac",
+"pl": "uprawiać",
+"slow": true
+},
+{
+"id": "w.hodowac",
+"pl": "hodować",
+"slow": true
+},
+{
+"id": "w.kopac",
+"pl": "kopać",
+"slow": true
+},
+{
+"id": "w.martwic_sie",
+"pl": "martwić się",
+"slow": true
+},
+{
+"id": "w.ubierac_sie",
+"pl": "ubierać się",
+"slow": true
+},
+{
+"id": "w.mierzyc",
+"pl": "mierzyć",
+"slow": true
+},
+{
+"id": "w.wolac",
+"pl": "wolać",
+"slow": true
+},
+{
+"id": "w.zapraszac",
+"pl": "zapraszać",
+"slow": true
+},
+{
+"id": "w.pokazywac",
+"pl": "pokazywać",
+"slow": true
+},
+{
+"id": "w.mowic_sie",
+"pl": "mówić się",
+"slow": true
+},
+{
+"id": "w.wygladac",
+"pl": "wyglądać",
+"slow": true
+},
+{
+"id": "w.jedenasty",
+"pl": "jedenasty",
+"slow": true
+},
+{
+"id": "w.po_francusku",
+"pl": "po francusku",
+"slow": true
+},
+{
+"id": "w.po_hiszpansku",
+"pl": "po hiszpańsku",
+"slow": true
+},
+{
+"id": "w.koperta",
+"pl": "koperta",
+"slow": true
+},
+{
+"id": "w.znaczek",
+"pl": "znaczek",
+"slow": true
+},
+{
+"id": "w.sposob",
+"pl": "sposób",
+"slow": true
+},
+{
+"id": "w.smieszny",
+"pl": "śmieszny",
+"slow": true
+},
+{
+"id": "w.dziwny",
+"pl": "dziwny",
+"slow": true
+},
+{
+"id": "w.czynny",
+"pl": "czynny",
+"slow": true
+},
+{
+"id": "w.nieczynny",
+"pl": "nieczynny",
+"slow": true
+},
+{
+"id": "w.wiele",
+"pl": "wiele",
+"slow": true
+},
+{
+"id": "w.spokoj",
+"pl": "spokój",
+"slow": true
+},
+{
+"id": "p.dzien_dobry",
+"pl": "Dzień dobry."
+},
+{
+"id": "p.dobry_wieczor",
+"pl": "Dobry wieczór!"
+},
+{
+"id": "p.dobranoc_mamo",
+"pl": "Dobranoc, mamo."
+},
+{
+"id": "p.do_widzenia_pani_aniu",
+"pl": "Do widzenia, pani Aniu."
+},
+{
+"id": "p.do_zobaczenia_jutro",
+"pl": "Do zobaczenia jutro."
+},
+{
+"id": "p.na_razie",
+"pl": "Na razie!"
+},
+{
+"id": "p.dziekuje_bardzo",
+"pl": "Dziękuję bardzo."
+},
+{
+"id": "p.prosze_bardzo",
+"pl": "Proszę bardzo."
+},
+{
+"id": "p.przepraszam_nie_rozumiem",
+"pl": "Przepraszam, nie rozumiem."
+},
+{
+"id": "p.milo_mi",
+"pl": "Miło mi."
+},
+{
+"id": "p.milo_mi_pana_poznac",
+"pl": "Miło mi pana poznać."
+},
+{
+"id": "p.smacznego",
+"pl": "Smacznego!"
+},
+{
+"id": "p.na_zdrowie",
+"pl": "Na zdrowie!"
+},
+{
+"id": "p.powodzenia",
+"pl": "Powodzenia!"
+},
+{
+"id": "p.milego_dnia",
+"pl": "Miłego dnia!"
+},
+{
+"id": "p.poprosze_kawe",
+"pl": "Poproszę kawę."
+},
+{
+"id": "p.poprosze_rachunek",
+"pl": "Poproszę rachunek."
+},
+{
+"id": "p.czy_moge_prosic_o_wode",
+"pl": "Czy mogę prosić o wodę?"
+},
+{
+"id": "p.prosze_wejsc",
+"pl": "Proszę wejść."
+},
+{
+"id": "p.prosze_mowic_wolno",
+"pl": "Proszę mówić wolno."
+},
+{
+"id": "p.prosze_powtorzyc",
+"pl": "Proszę powtórzyć."
+},
+{
+"id": "p.jeszcze_raz_prosze",
+"pl": "Jeszcze raz, proszę."
+},
+{
+"id": "p.nie_ma_problemu",
+"pl": "Nie ma problemu."
+},
+{
+"id": "p.nie_ma_za_co",
+"pl": "Nie ma za co."
+},
+{
+"id": "p.zgoda",
+"pl": "Zgoda!"
+},
+{
+"id": "p.jak_sie_masz",
+"pl": "Jak się masz?"
+},
+{
+"id": "p.dobrze_a_ty",
+"pl": "Dobrze, a ty?"
+},
+{
+"id": "p.wszystko_dobrze",
+"pl": "Wszystko dobrze."
+},
+{
+"id": "p.jestem_dima",
+"pl": "Jestem Dima."
+},
+{
+"id": "p.mam_na_imie_dima",
+"pl": "Mam na imię Dima."
+},
+{
+"id": "p.jak_masz_na_imie",
+"pl": "Jak masz na imię?"
+},
+{
+"id": "p.skad_jestes",
+"pl": "Skąd jesteś?"
+},
+{
+"id": "p.jestem_z_rosji",
+"pl": "Jestem z Rosji."
+},
+{
+"id": "p.gdzie_mieszkasz",
+"pl": "Gdzie mieszkasz?"
+},
+{
+"id": "p.mieszkam_w_warszawie",
+"pl": "Mieszkam w Warszawie."
+},
+{
+"id": "p.mieszkam_w_polsce",
+"pl": "Mieszkam w Polsce."
+},
+{
+"id": "p.ile_masz_lat",
+"pl": "Ile masz lat?"
+},
+{
+"id": "p.mam_trzydziesci_lat",
+"pl": "Mam trzydzieści lat."
+},
+{
+"id": "p.pracuje_w_warszawie",
+"pl": "Pracuję w Warszawie."
+},
+{
+"id": "p.jestem_programista",
+"pl": "Jestem programistą."
+},
+{
+"id": "p.jestem_studentem",
+"pl": "Jestem studentem."
+},
+{
+"id": "p.ona_jest_polka",
+"pl": "Ona jest Polką."
+},
+{
+"id": "p.on_jest_polakiem",
+"pl": "On jest Polakiem."
+},
+{
+"id": "p.mam_zone",
+"pl": "Mam żonę."
+},
+{
+"id": "p.mam_syna_i_corke",
+"pl": "Mam syna i córkę."
+},
+{
+"id": "p.mam_brata_i_siostre",
+"pl": "Mam brata i siostrę."
+},
+{
+"id": "p.czy_masz_dzieci",
+"pl": "Czy masz dzieci?"
+},
+{
+"id": "p.to_jest_moja_mama",
+"pl": "To jest moja mama."
+},
+{
+"id": "p.to_jest_moja_rodzina",
+"pl": "To jest moja rodzina."
+},
+{
+"id": "p.moja_rodzina_jest_duza",
+"pl": "Moja rodzina jest duża."
+},
+{
+"id": "p.moja_siostra_mieszka_w_krakowie",
+"pl": "Moja siostra mieszka w Krakowie."
+},
+{
+"id": "p.moj_brat_ma_psa",
+"pl": "Mój brat ma psa."
+},
+{
+"id": "p.czy_jestes_zonaty",
+"pl": "Czy jesteś żonaty?"
+},
+{
+"id": "p.jestem_zonaty",
+"pl": "Jestem żonaty."
+},
+{
+"id": "p.kto_to_jest",
+"pl": "Kto to jest?"
+},
+{
+"id": "p.to_jest_moj_przyjaciel",
+"pl": "To jest mój przyjaciel."
+},
+{
+"id": "p.ona_ma_na_imie_anna",
+"pl": "Ona ma na imię Anna."
+},
+{
+"id": "p.moi_rodzice_mieszkaja_w_rosji",
+"pl": "Moi rodzice mieszkają w Rosji."
+},
+{
+"id": "p.dzis_sa_moje_urodziny",
+"pl": "Dziś są moje urodziny."
+},
+{
+"id": "p.mowie_po_polsku",
+"pl": "Mówię po polsku."
+},
+{
+"id": "p.mowie_troche_po_polsku",
+"pl": "Mówię trochę po polsku."
+},
+{
+"id": "p.mowie_po_rosyjsku_i_po_angielsku",
+"pl": "Mówię po rosyjsku i po angielsku."
+},
+{
+"id": "p.czy_mowisz_po_angielsku",
+"pl": "Czy mówisz po angielsku?"
+},
+{
+"id": "p.nie_mowie_po_niemiecku",
+"pl": "Nie mówię po niemiecku."
+},
+{
+"id": "p.czy_pan_mowi_po_polsku",
+"pl": "Czy pan mówi po polsku?"
+},
+{
+"id": "p.warszawa_jest_stolica_polski",
+"pl": "Warszawa jest stolicą Polski."
+},
+{
+"id": "p.krakow_jest_piekny",
+"pl": "Kraków jest piękny."
+},
+{
+"id": "p.jade_do_polski",
+"pl": "Jadę do Polski."
+},
+{
+"id": "p.chce_mieszkac_w_polsce",
+"pl": "Chcę mieszkać w Polsce."
+},
+{
+"id": "p.moja_zona_jest_ukrainka",
+"pl": "Moja żona jest Ukrainką."
+},
+{
+"id": "p.moj_kolega_jest_niemcem",
+"pl": "Mój kolega jest Niemcem."
+},
+{
+"id": "p.polski_to_trudny_jezyk",
+"pl": "Polski to trudny język."
+},
+{
+"id": "p.rosyjski_jest_latwy",
+"pl": "Rosyjski jest łatwy."
+},
+{
+"id": "p.ktora_jest_godzina",
+"pl": "Która jest godzina?"
+},
+{
+"id": "p.jest_osma",
+"pl": "Jest ósma."
+},
+{
+"id": "p.spotkanie_jest_o_dziesiatej",
+"pl": "Spotkanie jest o dziesiątej."
+},
+{
+"id": "p.o_ktorej_jest_obiad",
+"pl": "O której jest obiad?"
+},
+{
+"id": "p.pracuje_od_osmej_do_piatej",
+"pl": "Pracuję od ósmej do piątej."
+},
+{
+"id": "p.wstaje_o_siodmej",
+"pl": "Wstaję o siódmej."
+},
+{
+"id": "p.dzis_jest_poniedzialek",
+"pl": "Dziś jest poniedziałek."
+},
+{
+"id": "p.wczoraj_byla_niedziela",
+"pl": "Wczoraj była niedziela."
+},
+{
+"id": "p.w_poniedzialek_pracuje",
+"pl": "W poniedziałek pracuję."
+},
+{
+"id": "p.we_wtorek_mam_lekcje",
+"pl": "We wtorek mam lekcję."
+},
+{
+"id": "p.mam_czas",
+"pl": "Mam czas."
+},
+{
+"id": "p.nie_mam_czasu",
+"pl": "Nie mam czasu."
+},
+{
+"id": "p.rano_pije_kawe",
+"pl": "Rano piję kawę."
+},
+{
+"id": "p.wieczorem_czytam_ksiazke",
+"pl": "Wieczorem czytam książkę."
+},
+{
+"id": "p.zaraz_wracam",
+"pl": "Zaraz wracam."
+},
+{
+"id": "p.pozniej_zadzwonie",
+"pl": "Później zadzwonię."
+},
+{
+"id": "p.najpierw_kawa_potem_praca",
+"pl": "Najpierw kawa, potem praca."
+},
+{
+"id": "p.czesto_jem_w_domu",
+"pl": "Często jem w domu."
+},
+{
+"id": "p.czasami_jade_autobusem",
+"pl": "Czasami jadę autobusem."
+},
+{
+"id": "p.nigdy_nie_pije_alkoholu",
+"pl": "Nigdy nie piję alkoholu."
+},
+{
+"id": "p.juz_jest_pozno",
+"pl": "Już jest późno."
+},
+{
+"id": "p.kiedy_jest_spotkanie",
+"pl": "Kiedy jest spotkanie?"
+},
+{
+"id": "p.jaka_jest_dzis_data",
+"pl": "Jaka jest dziś data?"
+},
+{
+"id": "p.zima_jest_zimno",
+"pl": "Zimą jest zimno."
+},
+{
+"id": "p.w_weekend_odpoczywam",
+"pl": "W weekend odpoczywam."
+},
+{
+"id": "p.co_robisz_w_weekend",
+"pl": "Co robisz w weekend?"
+},
+{
+"id": "p.ile_to_kosztuje",
+"pl": "Ile to kosztuje?"
+},
+{
+"id": "p.to_kosztuje_dziesiec_zlotych",
+"pl": "To kosztuje dziesięć złotych."
+},
+{
+"id": "p.to_kosztuje_piec_zlotych",
+"pl": "To kosztuje pięć złotych."
+},
+{
+"id": "p.to_kosztuje_dwa_zlote",
+"pl": "To kosztuje dwa złote."
+},
+{
+"id": "p.mam_sto_zlotych",
+"pl": "Mam sto złotych."
+},
+{
+"id": "p.czynsz_to_piecset_zlotych",
+"pl": "Czynsz to pięćset złotych."
+},
+{
+"id": "p.jaki_jest_twoj_numer_telefonu",
+"pl": "Jaki jest twój numer telefonu?"
+},
+{
+"id": "p.w_tygodniu_jest_siedem_dni",
+"pl": "W tygodniu jest siedem dni."
+},
+{
+"id": "p.w_godzinie_jest_szescdziesiat_minut",
+"pl": "W godzinie jest sześćdziesiąt minut."
+},
+{
+"id": "p.mam_dwie_siostry",
+"pl": "Mam dwie siostry."
+},
+{
+"id": "p.mam_trzy_koty",
+"pl": "Mam trzy koty."
+},
+{
+"id": "p.piec_plus_piec_to_dziesiec",
+"pl": "Pięć plus pięć to dziesięć."
+},
+{
+"id": "p.dziesiec_minus_trzy_to_siedem",
+"pl": "Dziesięć minus trzy to siedem."
+},
+{
+"id": "p.poprosze_dwie_kawy",
+"pl": "Poproszę dwie kawy."
+},
+{
+"id": "p.poprosze_trzy_bulki",
+"pl": "Poproszę trzy bułki."
+},
+{
+"id": "p.mam_duzy_dom",
+"pl": "Mam duży dom."
+},
+{
+"id": "p.moje_mieszkanie_jest_male",
+"pl": "Moje mieszkanie jest małe."
+},
+{
+"id": "p.mieszkanie_jest_w_centrum",
+"pl": "Mieszkanie jest w centrum."
+},
+{
+"id": "p.gdzie_jest_kuchnia",
+"pl": "Gdzie jest kuchnia?"
+},
+{
+"id": "p.kuchnia_jest_tam",
+"pl": "Kuchnia jest tam."
+},
+{
+"id": "p.lazienka_jest_na_gorze",
+"pl": "Łazienka jest na górze."
+},
+{
+"id": "p.okno_jest_otwarte",
+"pl": "Okno jest otwarte."
+},
+{
+"id": "p.gdzie_jest_klucz",
+"pl": "Gdzie jest klucz?"
+},
+{
+"id": "p.klucz_jest_na_stole",
+"pl": "Klucz jest na stole."
+},
+{
+"id": "p.lodowka_jest_w_kuchni",
+"pl": "Lodówka jest w kuchni."
+},
+{
+"id": "p.lozko_jest_w_sypialni",
+"pl": "Łóżko jest w sypialni."
+},
+{
+"id": "p.kot_spi_na_kanapie",
+"pl": "Kot śpi na kanapie."
+},
+{
+"id": "p.kot_jest_pod_stolem",
+"pl": "Kot jest pod stołem."
+},
+{
+"id": "p.jaki_jest_twoj_adres",
+"pl": "Jaki jest twój adres?"
+},
+{
+"id": "p.czy_jest_winda",
+"pl": "Czy jest winda?"
+},
+{
+"id": "p.czy_jest_tu_wifi",
+"pl": "Czy jest tu wifi?"
+},
+{
+"id": "p.nie_ma_pradu",
+"pl": "Nie ma prądu."
+},
+{
+"id": "p.nie_ma_wody",
+"pl": "Nie ma wody."
+},
+{
+"id": "p.czy_moge_zobaczyc_mieszkanie",
+"pl": "Czy mogę zobaczyć mieszkanie?"
+},
+{
+"id": "p.ile_kosztuje_czynsz",
+"pl": "Ile kosztuje czynsz?"
+},
+{
+"id": "p.wynajmuje_mieszkanie",
+"pl": "Wynajmuję mieszkanie."
+},
+{
+"id": "p.szukam_mieszkania",
+"pl": "Szukam mieszkania."
+},
+{
+"id": "p.w_pokoju_jest_lozko",
+"pl": "W pokoju jest łóżko."
+},
+{
+"id": "p.w_kuchni_jest_stol_i_cztery_krzesla",
+"pl": "W kuchni jest stół i cztery krzesła."
+},
+{
+"id": "p.poprosze_kawe_z_mlekiem",
+"pl": "Poproszę kawę z mlekiem."
+},
+{
+"id": "p.poprosze_kawe_bez_cukru",
+"pl": "Poproszę kawę bez cukru."
+},
+{
+"id": "p.poprosze_wode_gazowana",
+"pl": "Poproszę wodę gazowaną."
+},
+{
+"id": "p.poprosze_zupe_dnia",
+"pl": "Poproszę zupę dnia."
+},
+{
+"id": "p.poprosze_salatke",
+"pl": "Poproszę sałatkę."
+},
+{
+"id": "p.poprosze_kanapke_z_serem",
+"pl": "Poproszę kanapkę z serem."
+},
+{
+"id": "p.poprosze_kawalek_ciasta",
+"pl": "Poproszę kawałek ciasta."
+},
+{
+"id": "p.poprosze_menu",
+"pl": "Poproszę menu."
+},
+{
+"id": "p.poprosze_stolik_dla_dwoch_osob",
+"pl": "Poproszę stolik dla dwóch osób."
+},
+{
+"id": "p.czy_jest_wolny_stolik",
+"pl": "Czy jest wolny stolik?"
+},
+{
+"id": "p.jakie_jest_danie_dnia",
+"pl": "Jakie jest danie dnia?"
+},
+{
+"id": "p.czy_to_jest_ostre",
+"pl": "Czy to jest ostre?"
+},
+{
+"id": "p.czy_to_jest_wegetarianskie",
+"pl": "Czy to jest wegetariańskie?"
+},
+{
+"id": "p.nie_jem_miesa",
+"pl": "Nie jem mięsa."
+},
+{
+"id": "p.nie_lubie_cebuli",
+"pl": "Nie lubię cebuli."
+},
+{
+"id": "p.lubie_kawe",
+"pl": "Lubię kawę."
+},
+{
+"id": "p.jem_sniadanie_o_osmej",
+"pl": "Jem śniadanie o ósmej."
+},
+{
+"id": "p.na_sniadanie_jem_jajka",
+"pl": "Na śniadanie jem jajka."
+},
+{
+"id": "p.pije_duzo_wody",
+"pl": "Piję dużo wody."
+},
+{
+"id": "p.jestem_glodny",
+"pl": "Jestem głodny."
+},
+{
+"id": "p.jestem_spragniony",
+"pl": "Jestem spragniony."
+},
+{
+"id": "p.zupa_jest_goraca",
+"pl": "Zupa jest gorąca."
+},
+{
+"id": "p.ciasto_jest_pyszne",
+"pl": "Ciasto jest pyszne."
+},
+{
+"id": "p.to_jest_bardzo_smaczne",
+"pl": "To jest bardzo smaczne."
+},
+{
+"id": "p.mleko_jest_w_lodowce",
+"pl": "Mleko jest w lodówce."
+},
+{
+"id": "p.place_karta",
+"pl": "Płacę kartą."
+},
+{
+"id": "p.place_gotowka",
+"pl": "Płacę gotówką."
+},
+{
+"id": "p.czy_moge_placic_karta",
+"pl": "Czy mogę płacić kartą?"
+},
+{
+"id": "p.razem_czy_osobno",
+"pl": "Razem czy osobno?"
+},
+{
+"id": "p.osobno_prosze",
+"pl": "Osobno, proszę."
+},
+{
+"id": "p.chce_jesc",
+"pl": "Chcę jeść."
+},
+{
+"id": "p.czy_masz_cos_do_jedzenia",
+"pl": "Czy masz coś do jedzenia?"
+},
+{
+"id": "p.gdzie_jest_sklep",
+"pl": "Gdzie jest sklep?"
+},
+{
+"id": "p.sklep_jest_otwarty",
+"pl": "Sklep jest otwarty."
+},
+{
+"id": "p.jakie_sa_godziny_otwarcia",
+"pl": "Jakie są godziny otwarcia?"
+},
+{
+"id": "p.to_jest_za_drogie",
+"pl": "To jest za drogie."
+},
+{
+"id": "p.to_jest_tanie",
+"pl": "To jest tanie."
+},
+{
+"id": "p.czy_moge_zaplacic_karta",
+"pl": "Czy mogę zapłacić kartą?"
+},
+{
+"id": "p.poprosze_paragon",
+"pl": "Poproszę paragon."
+},
+{
+"id": "p.potrzebuje_chleba",
+"pl": "Potrzebuję chleba."
+},
+{
+"id": "p.potrzebuje_kurtki",
+"pl": "Potrzebuję kurtki."
+},
+{
+"id": "p.szukam_apteki",
+"pl": "Szukam apteki."
+},
+{
+"id": "p.kupuje_chleb_i_mleko",
+"pl": "Kupuję chleb i mleko."
+},
+{
+"id": "p.jest_promocja",
+"pl": "Jest promocja."
+},
+{
+"id": "p.ile_kosztuje_kilogram_jablek",
+"pl": "Ile kosztuje kilogram jabłek?"
+},
+{
+"id": "p.poprosze_kilogram_jablek",
+"pl": "Poproszę kilogram jabłek."
+},
+{
+"id": "p.jaki_jest_twoj_rozmiar",
+"pl": "Jaki jest twój rozmiar?"
+},
+{
+"id": "p.poprosze_mniejszy_rozmiar",
+"pl": "Poproszę mniejszy rozmiar."
+},
+{
+"id": "p.gdzie_jest_przymierzalnia",
+"pl": "Gdzie jest przymierzalnia?"
+},
+{
+"id": "p.mam_tylko_piec_zlotych",
+"pl": "Mam tylko pięć złotych."
+},
+{
+"id": "p.nie_mam_pieniedzy",
+"pl": "Nie mam pieniędzy."
+},
+{
+"id": "p.gdzie_jest_bankomat",
+"pl": "Gdzie jest bankomat?"
+},
+{
+"id": "p.gdzie_jest_kasa",
+"pl": "Gdzie jest kasa?"
+},
+{
+"id": "p.jaka_jest_cena",
+"pl": "Jaka jest cena?"
+},
+{
+"id": "p.robie_zakupy_w_sklepie",
+"pl": "Robię zakupy w sklepie."
+},
+{
+"id": "p.gdzie_jest_dworzec",
+"pl": "Gdzie jest dworzec?"
+},
+{
+"id": "p.gdzie_jest_przystanek",
+"pl": "Gdzie jest przystanek?"
+},
+{
+"id": "p.gdzie_jest_poczta",
+"pl": "Gdzie jest poczta?"
+},
+{
+"id": "p.gdzie_jest_apteka",
+"pl": "Gdzie jest apteka?"
+},
+{
+"id": "p.idz_prosto",
+"pl": "Idź prosto."
+},
+{
+"id": "p.skrec_w_lewo",
+"pl": "Skręć w lewo."
+},
+{
+"id": "p.skrec_w_prawo",
+"pl": "Skręć w prawo."
+},
+{
+"id": "p.idz_prosto_i_skrec_w_lewo",
+"pl": "Idź prosto i skręć w lewo."
+},
+{
+"id": "p.sklep_jest_po_lewej",
+"pl": "Sklep jest po lewej."
+},
+{
+"id": "p.apteka_jest_po_prawej",
+"pl": "Apteka jest po prawej."
+},
+{
+"id": "p.poczta_jest_naprzeciwko",
+"pl": "Poczta jest naprzeciwko."
+},
+{
+"id": "p.szpital_jest_daleko",
+"pl": "Szpital jest daleko."
+},
+{
+"id": "p.sklep_jest_blisko",
+"pl": "Sklep jest blisko."
+},
+{
+"id": "p.muzeum_jest_obok",
+"pl": "Muzeum jest obok."
+},
+{
+"id": "p.park_jest_za_rogiem",
+"pl": "Park jest za rogiem."
+},
+{
+"id": "p.ide_do_parku",
+"pl": "Idę do parku."
+},
+{
+"id": "p.ide_do_kina",
+"pl": "Idę do kina."
+},
+{
+"id": "p.ide_na_poczte",
+"pl": "Idę na pocztę."
+},
+{
+"id": "p.ide_do_szkoly",
+"pl": "Idę do szkoły."
+},
+{
+"id": "p.mieszkam_w_centrum",
+"pl": "Mieszkam w centrum."
+},
+{
+"id": "p.jak_jechac_do_centrum",
+"pl": "Jak jechać do centrum?"
+},
+{
+"id": "p.gdzie_jest_wyjscie",
+"pl": "Gdzie jest wyjście?"
+},
+{
+"id": "p.mam_mape_w_telefonie",
+"pl": "Mam mapę w telefonie."
+},
+{
+"id": "p.spaceruje_po_parku",
+"pl": "Spaceruję po parku."
+},
+{
+"id": "p.jade_autobusem",
+"pl": "Jadę autobusem."
+},
+{
+"id": "p.jade_tramwajem",
+"pl": "Jadę tramwajem."
+},
+{
+"id": "p.jade_pociagiem_do_krakowa",
+"pl": "Jadę pociągiem do Krakowa."
+},
+{
+"id": "p.lece_samolotem",
+"pl": "Lecę samolotem."
+},
+{
+"id": "p.biore_taksowke",
+"pl": "Biorę taksówkę."
+},
+{
+"id": "p.poprosze_bilet",
+"pl": "Poproszę bilet."
+},
+{
+"id": "p.poprosze_bilet_do_krakowa",
+"pl": "Poproszę bilet do Krakowa."
+},
+{
+"id": "p.ile_kosztuje_bilet",
+"pl": "Ile kosztuje bilet?"
+},
+{
+"id": "p.gdzie_kupic_bilet",
+"pl": "Gdzie kupić bilet?"
+},
+{
+"id": "p.ktory_autobus_jedzie_do_centrum",
+"pl": "Który autobus jedzie do centrum?"
+},
+{
+"id": "p.kiedy_jest_nastepny_autobus",
+"pl": "Kiedy jest następny autobus?"
+},
+{
+"id": "p.nastepny_przystanek",
+"pl": "Następny przystanek."
+},
+{
+"id": "p.pociag_ma_opoznienie",
+"pl": "Pociąg ma opóźnienie."
+},
+{
+"id": "p.odjazd_jest_o_osmej",
+"pl": "Odjazd jest o ósmej."
+},
+{
+"id": "p.mam_bilet",
+"pl": "Mam bilet."
+},
+{
+"id": "p.nie_mam_biletu",
+"pl": "Nie mam biletu."
+},
+{
+"id": "p.mam_duza_walizke",
+"pl": "Mam dużą walizkę."
+},
+{
+"id": "p.moj_bagaz_jest_ciezki",
+"pl": "Mój bagaż jest ciężki."
+},
+{
+"id": "p.gdzie_jest_lotnisko",
+"pl": "Gdzie jest lotnisko?"
+},
+{
+"id": "p.jade_na_lotnisko",
+"pl": "Jadę na lotnisko."
+},
+{
+"id": "p.czy_ten_pociag_jedzie_do_warszawy",
+"pl": "Czy ten pociąg jedzie do Warszawy?"
+},
+{
+"id": "p.czy_tu_jest_parking",
+"pl": "Czy tu jest parking?"
+},
+{
+"id": "p.na_drodze_jest_korek",
+"pl": "Na drodze jest korek."
+},
+{
+"id": "p.boli_mnie_glowa",
+"pl": "Boli mnie głowa."
+},
+{
+"id": "p.boli_mnie_brzuch",
+"pl": "Boli mnie brzuch."
+},
+{
+"id": "p.bola_mnie_plecy",
+"pl": "Bolą mnie plecy."
+},
+{
+"id": "p.mam_goraczke",
+"pl": "Mam gorączkę."
+},
+{
+"id": "p.mam_kaszel_i_katar",
+"pl": "Mam kaszel i katar."
+},
+{
+"id": "p.jestem_chory",
+"pl": "Jestem chory."
+},
+{
+"id": "p.zle_sie_czuje",
+"pl": "Źle się czuję."
+},
+{
+"id": "p.czuje_sie_dobrze",
+"pl": "Czuję się dobrze."
+},
+{
+"id": "p.potrzebuje_lekarza",
+"pl": "Potrzebuję lekarza."
+},
+{
+"id": "p.potrzebuje_lekarstwa",
+"pl": "Potrzebuję lekarstwa."
+},
+{
+"id": "p.mam_wizyte_u_lekarza",
+"pl": "Mam wizytę u lekarza."
+},
+{
+"id": "p.ide_do_lekarza",
+"pl": "Idę do lekarza."
+},
+{
+"id": "p.ide_do_dentysty",
+"pl": "Idę do dentysty."
+},
+{
+"id": "p.potrzebuje_recepty",
+"pl": "Potrzebuję recepty."
+},
+{
+"id": "p.biore_tabletke",
+"pl": "Biorę tabletkę."
+},
+{
+"id": "p.mam_ubezpieczenie",
+"pl": "Mam ubezpieczenie."
+},
+{
+"id": "p.dzwonie_na_pogotowie",
+"pl": "Dzwonię na pogotowie."
+},
+{
+"id": "p.mam_alergie",
+"pl": "Mam alergię."
+},
+{
+"id": "p.pomocy",
+"pl": "Pomocy!"
+},
+{
+"id": "p.potrzebuje_pomocy",
+"pl": "Potrzebuję pomocy."
+},
+{
+"id": "p.mam_zimne_rece",
+"pl": "Mam zimne ręce."
+},
+{
+"id": "p.gdzie_pracujesz",
+"pl": "Gdzie pracujesz?"
+},
+{
+"id": "p.pracuje_w_biurze",
+"pl": "Pracuję w biurze."
+},
+{
+"id": "p.pracuje_w_firmie",
+"pl": "Pracuję w firmie."
+},
+{
+"id": "p.jestem_w_pracy",
+"pl": "Jestem w pracy."
+},
+{
+"id": "p.ide_do_pracy",
+"pl": "Idę do pracy."
+},
+{
+"id": "p.wracam_z_pracy",
+"pl": "Wracam z pracy."
+},
+{
+"id": "p.mam_spotkanie_o_dziesiatej",
+"pl": "Mam spotkanie o dziesiątej."
+},
+{
+"id": "p.mam_duzo_pracy",
+"pl": "Mam dużo pracy."
+},
+{
+"id": "p.szukam_pracy",
+"pl": "Szukam pracy."
+},
+{
+"id": "p.pracuje_w_domu",
+"pl": "Pracuję w domu."
+},
+{
+"id": "p.mam_przerwe_o_dwunastej",
+"pl": "Mam przerwę o dwunastej."
+},
+{
+"id": "p.jaki_jest_twoj_zawod",
+"pl": "Jaki jest twój zawód?"
+},
+{
+"id": "p.jestem_inzynierem",
+"pl": "Jestem inżynierem."
+},
+{
+"id": "p.potrzebuje_dokumentu",
+"pl": "Potrzebuję dokumentu."
+},
+{
+"id": "p.to_jest_moj_podpis",
+"pl": "To jest mój podpis."
+},
+{
+"id": "p.mam_karte_pobytu",
+"pl": "Mam kartę pobytu."
+},
+{
+"id": "p.jaki_jest_twoj_pesel",
+"pl": "Jaki jest twój PESEL?"
+},
+{
+"id": "p.jestem_rolnikiem",
+"pl": "Jestem rolnikiem."
+},
+{
+"id": "p.mam_male_gospodarstwo",
+"pl": "Mam małe gospodarstwo."
+},
+{
+"id": "p.ucze_sie_polskiego",
+"pl": "Uczę się polskiego."
+},
+{
+"id": "p.mam_lekcje_polskiego",
+"pl": "Mam lekcję polskiego."
+},
+{
+"id": "p.chodze_na_kurs_polskiego",
+"pl": "Chodzę na kurs polskiego."
+},
+{
+"id": "p.czytam_ksiazke_po_polsku",
+"pl": "Czytam książkę po polsku."
+},
+{
+"id": "p.co_to_znaczy",
+"pl": "Co to znaczy?"
+},
+{
+"id": "p.jak_to_sie_pisze",
+"pl": "Jak to się pisze?"
+},
+{
+"id": "p.jak_to_sie_mowi_po_polsku",
+"pl": "Jak to się mówi po polsku?"
+},
+{
+"id": "p.nie_znam_tego_slowa",
+"pl": "Nie znam tego słowa."
+},
+{
+"id": "p.nie_rozumiem_tego_slowa",
+"pl": "Nie rozumiem tego słowa."
+},
+{
+"id": "p.mam_pytanie",
+"pl": "Mam pytanie."
+},
+{
+"id": "p.poprosze_przyklad",
+"pl": "Poproszę przykład."
+},
+{
+"id": "p.to_jest_dobra_odpowiedz",
+"pl": "To jest dobra odpowiedź."
+},
+{
+"id": "p.gramatyka_jest_trudna",
+"pl": "Gramatyka jest trudna."
+},
+{
+"id": "p.moja_wymowa_jest_zla",
+"pl": "Moja wymowa jest zła."
+},
+{
+"id": "p.jutro_mam_egzamin",
+"pl": "Jutro mam egzamin."
+},
+{
+"id": "p.mam_prace_domowa",
+"pl": "Mam pracę domową."
+},
+{
+"id": "p.moja_nauczycielka_mowi_po_polsku",
+"pl": "Moja nauczycielka mówi po polsku."
+},
+{
+"id": "p.lubie_muzyke",
+"pl": "Lubię muzykę."
+},
+{
+"id": "p.slucham_muzyki",
+"pl": "Słucham muzyki."
+},
+{
+"id": "p.ogladam_film",
+"pl": "Oglądam film."
+},
+{
+"id": "p.gram_w_pilke",
+"pl": "Gram w piłkę."
+},
+{
+"id": "p.ide_na_spacer",
+"pl": "Idę na spacer."
+},
+{
+"id": "p.ide_na_koncert",
+"pl": "Idę na koncert."
+},
+{
+"id": "p.idziemy_do_kina",
+"pl": "Idziemy do kina."
+},
+{
+"id": "p.ide_na_silownie",
+"pl": "Idę na siłownię."
+},
+{
+"id": "p.mam_trening_o_szostej",
+"pl": "Mam trening o szóstej."
+},
+{
+"id": "p.lubie_czytac",
+"pl": "Lubię czytać."
+},
+{
+"id": "p.lubie_gotowac",
+"pl": "Lubię gotować."
+},
+{
+"id": "p.lubie_spacerowac_po_parku",
+"pl": "Lubię spacerować po parku."
+},
+{
+"id": "p.jade_na_wakacje",
+"pl": "Jadę na wakacje."
+},
+{
+"id": "p.jedziemy_w_gory",
+"pl": "Jedziemy w góry."
+},
+{
+"id": "p.jedziemy_nad_morze",
+"pl": "Jedziemy nad morze."
+},
+{
+"id": "p.jaka_jest_dzis_pogoda",
+"pl": "Jaka jest dziś pogoda?"
+},
+{
+"id": "p.dzis_jest_cieplo",
+"pl": "Dziś jest ciepło."
+},
+{
+"id": "p.pada_deszcz",
+"pl": "Pada deszcz."
+},
+{
+"id": "p.slonce_swieci",
+"pl": "Słońce świeci."
+},
+{
+"id": "p.jest_dwadziescia_stopni",
+"pl": "Jest dwadzieścia stopni."
+},
+{
+"id": "p.jutro_bedzie_cieplo",
+"pl": "Jutro będzie ciepło."
+},
+{
+"id": "p.jutro_bedzie_padac_deszcz",
+"pl": "Jutro będzie padać deszcz."
+},
+{
+"id": "p.mam_farme",
+"pl": "Mam farmę."
+},
+{
+"id": "p.mam_kota_i_psa",
+"pl": "Mam kota i psa."
+},
+{
+"id": "p.krowa_daje_mleko",
+"pl": "Krowa daje mleko."
+},
+{
+"id": "p.kura_daje_jajka",
+"pl": "Kura daje jajka."
+},
+{
+"id": "p.kwiaty_rosna_w_ogrodzie",
+"pl": "Kwiaty rosną w ogrodzie."
+},
+{
+"id": "p.sadze_kwiaty_w_ogrodzie",
+"pl": "Sadzę kwiaty w ogrodzie."
+},
+{
+"id": "p.podlewam_kwiaty",
+"pl": "Podlewam kwiaty."
+},
+{
+"id": "p.zbieram_jablka",
+"pl": "Zbieram jabłka."
+},
+{
+"id": "p.sieje_pszenice",
+"pl": "Sieję pszenicę."
+},
+{
+"id": "p.karmie_kota",
+"pl": "Karmię kota."
+},
+{
+"id": "p.pszenica_rosnie_na_polu",
+"pl": "Pszenica rośnie na polu."
+},
+{
+"id": "p.mam_grzadke_w_ogrodzie",
+"pl": "Mam grządkę w ogrodzie."
+},
+{
+"id": "p.w_lesie_rosna_grzyby",
+"pl": "W lesie rosną grzyby."
+},
+{
+"id": "p.zbieramy_plon",
+"pl": "Zbieramy plon."
+},
+{
+"id": "p.mam_nowa_kurtke",
+"pl": "Mam nową kurtkę."
+},
+{
+"id": "p.mam_czarne_spodnie",
+"pl": "Mam czarne spodnie."
+},
+{
+"id": "p.mam_niebieska_koszule",
+"pl": "Mam niebieską koszulę."
+},
+{
+"id": "p.ta_sukienka_jest_czerwona",
+"pl": "Ta sukienka jest czerwona."
+},
+{
+"id": "p.moje_buty_sa_nowe",
+"pl": "Moje buty są nowe."
+},
+{
+"id": "p.jest_zimno_wiec_nosze_kurtke",
+"pl": "Jest zimno, więc noszę kurtkę."
+},
+{
+"id": "p.potrzebuje_czapki",
+"pl": "Potrzebuję czapki."
+},
+{
+"id": "p.jaki_to_kolor",
+"pl": "Jaki to kolor?"
+},
+{
+"id": "p.trawa_jest_zielona",
+"pl": "Trawa jest zielona."
+},
+{
+"id": "p.co_to_jest",
+"pl": "Co to jest?"
+},
+{
+"id": "p.jak_to_sie_nazywa_po_polsku",
+"pl": "Jak to się nazywa po polsku?"
+},
+{
+"id": "p.dlaczego_jestes_w_domu",
+"pl": "Dlaczego jesteś w domu?"
+},
+{
+"id": "p.dokad_idziesz",
+"pl": "Dokąd idziesz?"
+},
+{
+"id": "p.skad_masz_ten_telefon",
+"pl": "Skąd masz ten telefon?"
+},
+{
+"id": "p.kto_jest_w_domu",
+"pl": "Kto jest w domu?"
+},
+{
+"id": "p.co_robisz",
+"pl": "Co robisz?"
+},
+{
+"id": "p.czy_masz_czas",
+"pl": "Czy masz czas?"
+},
+{
+"id": "p.czy_to_jest_daleko",
+"pl": "Czy to jest daleko?"
+},
+{
+"id": "p.czy_mowisz_po_polsku",
+"pl": "Czy mówisz po polsku?"
+},
+{
+"id": "p.czy_mozesz_mi_pomoc",
+"pl": "Czy możesz mi pomóc?"
+},
+{
+"id": "p.czy_mozesz_mowic_wolno",
+"pl": "Czy możesz mówić wolno?"
+},
+{
+"id": "p.jestem_szczesliwy",
+"pl": "Jestem szczęśliwy."
+},
+{
+"id": "p.jestem_smutny",
+"pl": "Jestem smutny."
+},
+{
+"id": "p.jestem_zmeczony",
+"pl": "Jestem zmęczony."
+},
+{
+"id": "p.jestem_zmeczona",
+"pl": "Jestem zmęczona."
+},
+{
+"id": "p.jestem_zajety",
+"pl": "Jestem zajęty."
+},
+{
+"id": "p.jestem_gotowy",
+"pl": "Jestem gotowy."
+},
+{
+"id": "p.ciesze_sie",
+"pl": "Cieszę się."
+},
+{
+"id": "p.boje_sie_psa",
+"pl": "Boję się psa."
+},
+{
+"id": "p.tesknie_za_mama",
+"pl": "Tęsknię za mamą."
+},
+{
+"id": "p.nudze_sie_w_domu",
+"pl": "Nudzę się w domu."
+},
+{
+"id": "p.to_jest_dobry_pomysl",
+"pl": "To jest dobry pomysł."
+},
+{
+"id": "p.mam_szczescie",
+"pl": "Mam szczęście."
+},
+{
+"id": "p.gdzie_jest_moj_telefon",
+"pl": "Gdzie jest mój telefon?"
+},
+{
+"id": "p.moj_telefon_jest_w_torbie",
+"pl": "Mój telefon jest w torbie."
+},
+{
+"id": "p.dzwonie_do_mamy",
+"pl": "Dzwonię do mamy."
+},
+{
+"id": "p.zadzwonie_jutro",
+"pl": "Zadzwonię jutro."
+},
+{
+"id": "p.pisze_wiadomosc",
+"pl": "Piszę wiadomość."
+},
+{
+"id": "p.pisze_maila",
+"pl": "Piszę maila."
+},
+{
+"id": "p.jakie_jest_haslo_do_wifi",
+"pl": "Jakie jest hasło do wifi?"
+},
+{
+"id": "p.ladowarka_jest_w_pokoju",
+"pl": "Ładowarka jest w pokoju."
+},
+{
+"id": "p.potrzebuje_ladowarki",
+"pl": "Potrzebuję ładowarki."
+},
+{
+"id": "p.nie_ma_zasiegu",
+"pl": "Nie ma zasięgu."
+},
+{
+"id": "p.pracuje_na_komputerze",
+"pl": "Pracuję na komputerze."
+},
+{
+"id": "p.chce_kupic_chleb",
+"pl": "Chcę kupić chleb."
+},
+{
+"id": "p.chce_zamowic_kawe",
+"pl": "Chcę zamówić kawę."
+},
+{
+"id": "p.musze_isc_do_pracy",
+"pl": "Muszę iść do pracy."
+},
+{
+"id": "p.czy_moge_pomoc",
+"pl": "Czy mogę pomóc?"
+},
+{
+"id": "p.czy_moge_usiasc",
+"pl": "Czy mogę usiąść?"
+},
+{
+"id": "p.nie_wiem",
+"pl": "Nie wiem."
+},
+{
+"id": "p.wiem_gdzie_jest_sklep",
+"pl": "Wiem, gdzie jest sklep."
+},
+{
+"id": "p.rozumiem",
+"pl": "Rozumiem."
+},
+{
+"id": "p.nie_rozumiem_po_polsku",
+"pl": "Nie rozumiem po polsku."
+},
+{
+"id": "p.umiem_plywac",
+"pl": "Umiem pływać."
+},
+{
+"id": "p.nie_umiem_tanczyc",
+"pl": "Nie umiem tańczyć."
+},
+{
+"id": "p.tak_poprosze",
+"pl": "Tak, poproszę."
+},
+{
+"id": "p.nie_dziekuje",
+"pl": "Nie, dziękuję."
+},
+{
+"id": "p.tak_oczywiscie",
+"pl": "Tak, oczywiście."
+},
+{
+"id": "p.moze_kawa",
+"pl": "Może kawa?"
+},
+{
+"id": "p.chyba_tak",
+"pl": "Chyba tak."
+},
+{
+"id": "p.na_pewno",
+"pl": "Na pewno."
+},
+{
+"id": "p.jeszcze_nie",
+"pl": "Jeszcze nie."
+},
+{
+"id": "p.mam_wolne",
+"pl": "Mam wolne."
+},
+{
+"id": "p.to_jest_wazne",
+"pl": "To jest ważne."
+},
+{
+"id": "p.niestety_nie_mam_czasu",
+"pl": "Niestety nie mam czasu."
+}
+]
+}

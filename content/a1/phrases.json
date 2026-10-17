@@ -1,0 +1,12514 @@
+[
+ {
+  "id": "p.dzien_dobry",
+  "pl": "Dzień dobry.",
+  "ru": "Здравствуйте.",
+  "tr": "джень до́бры.",
+  "words": [
+   "w.dzien_dobry"
+  ],
+  "tiles_pl": [
+   "Dzień",
+   "dobry"
+  ],
+  "tiles_ru": [
+   "Здравствуйте"
+  ],
+  "distract_pl": [
+   "wieczór",
+   "dobranoc"
+  ],
+  "distract_ru": [
+   "добрый",
+   "вечер"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.dobry_wieczor",
+  "pl": "Dobry wieczór!",
+  "ru": "Добрый вечер!",
+  "tr": "до́бры ве́чур!",
+  "words": [
+   "w.dobry_wieczor"
+  ],
+  "tiles_pl": [
+   "Dobry",
+   "wieczór"
+  ],
+  "tiles_ru": [
+   "Добрый",
+   "вечер"
+  ],
+  "distract_pl": [
+   "dzień",
+   "dobranoc"
+  ],
+  "distract_ru": [
+   "доброе",
+   "утро"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.dobranoc_mamo",
+  "pl": "Dobranoc, mamo.",
+  "ru": "Спокойной ночи, мама.",
+  "tr": "добра́ноц, ма́мо.",
+  "words": [
+   "w.dobranoc",
+   "w.mama"
+  ],
+  "tiles_pl": [
+   "Dobranoc",
+   "mamo"
+  ],
+  "tiles_ru": [
+   "Спокойной",
+   "ночи",
+   "мама"
+  ],
+  "distract_pl": [
+   "tato",
+   "dzień"
+  ],
+  "distract_ru": [
+   "папа",
+   "привет"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.do_widzenia_pani_aniu",
+  "pl": "Do widzenia, pani Aniu.",
+  "ru": "До свидания, пани Аня.",
+  "tr": "до видзэ́ня, па́ни а́ню.",
+  "words": [
+   "w.do_widzenia",
+   "w.pani"
+  ],
+  "tiles_pl": [
+   "Do",
+   "widzenia",
+   "pani",
+   "Aniu"
+  ],
+  "tiles_ru": [
+   "До",
+   "свидания",
+   "пани",
+   "Аня"
+  ],
+  "distract_pl": [
+   "cześć",
+   "panie"
+  ],
+  "distract_ru": [
+   "привет",
+   "пан"
+  ],
+  "topic": "powitania",
+  "level": 2
+ },
+ {
+  "id": "p.do_zobaczenia_jutro",
+  "pl": "Do zobaczenia jutro.",
+  "ru": "До встречи завтра.",
+  "tr": "до зобачэ́ня ю́тро.",
+  "words": [
+   "w.do_zobaczenia",
+   "w.jutro"
+  ],
+  "tiles_pl": [
+   "Do",
+   "zobaczenia",
+   "jutro"
+  ],
+  "tiles_ru": [
+   "До",
+   "встречи",
+   "завтра"
+  ],
+  "distract_pl": [
+   "dziś",
+   "wczoraj"
+  ],
+  "distract_ru": [
+   "сегодня",
+   "вчера"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.na_razie",
+  "pl": "Na razie!",
+  "ru": "Пока!",
+  "tr": "на ра́же!",
+  "words": [
+   "w.na_razie"
+  ],
+  "tiles_pl": [
+   "Na",
+   "razie"
+  ],
+  "tiles_ru": [
+   "Пока"
+  ],
+  "distract_pl": [
+   "jutro",
+   "cześć"
+  ],
+  "distract_ru": [
+   "скоро"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.dziekuje_bardzo",
+  "pl": "Dziękuję bardzo.",
+  "ru": "Большое спасибо.",
+  "tr": "дженку́е ба́рдзо.",
+  "words": [
+   "w.dziekuje_bardzo"
+  ],
+  "tiles_pl": [
+   "Dziękuję",
+   "bardzo"
+  ],
+  "tiles_ru": [
+   "Большое",
+   "спасибо"
+  ],
+  "distract_pl": [
+   "proszę",
+   "dobrze"
+  ],
+  "distract_ru": [
+   "пожалуйста",
+   "очень"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.prosze_bardzo",
+  "pl": "Proszę bardzo.",
+  "ru": "Пожалуйста.",
+  "tr": "про́шэ ба́рдзо.",
+  "words": [
+   "w.prosze_bardzo"
+  ],
+  "tiles_pl": [
+   "Proszę",
+   "bardzo"
+  ],
+  "tiles_ru": [
+   "Пожалуйста"
+  ],
+  "distract_pl": [
+   "dziękuję",
+   "tak"
+  ],
+  "distract_ru": [
+   "спасибо",
+   "большое"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.przepraszam_nie_rozumiem",
+  "pl": "Przepraszam, nie rozumiem.",
+  "ru": "Извините, я не понимаю.",
+  "tr": "пшэпра́шам, нье розу́мем.",
+  "words": [
+   "w.przepraszam",
+   "w.nie",
+   "w.rozumiec"
+  ],
+  "tiles_pl": [
+   "Przepraszam",
+   "nie",
+   "rozumiem"
+  ],
+  "tiles_ru": [
+   "Извините",
+   "я",
+   "не",
+   "понимаю"
+  ],
+  "distract_pl": [
+   "wiem",
+   "rozumiesz"
+  ],
+  "distract_ru": [
+   "знаю",
+   "понимаешь"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.milo_mi",
+  "pl": "Miło mi.",
+  "ru": "Мне приятно.",
+  "tr": "ми́ўо ми.",
+  "words": [
+   "w.milo_mi"
+  ],
+  "tiles_pl": [
+   "Miło",
+   "mi"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "приятно"
+  ],
+  "distract_pl": [
+   "pan",
+   "dobrze"
+  ],
+  "distract_ru": [
+   "мы",
+   "хорошо"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.milo_mi_pana_poznac",
+  "pl": "Miło mi pana poznać.",
+  "ru": "Мне приятно с вами познакомиться.",
+  "tr": "ми́ўо ми па́на по́значь.",
+  "words": [
+   "w.milo_mi",
+   "w.pan",
+   "w.poznac"
+  ],
+  "tiles_pl": [
+   "Miło",
+   "mi",
+   "pana",
+   "poznać"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "приятно",
+   "с",
+   "вами",
+   "познакомиться"
+  ],
+  "distract_pl": [
+   "pani",
+   "znać"
+  ],
+  "distract_ru": [
+   "вашей",
+   "знакомиться"
+  ],
+  "topic": "powitania",
+  "level": 2
+ },
+ {
+  "id": "p.smacznego",
+  "pl": "Smacznego!",
+  "ru": "Приятного аппетита!",
+  "tr": "смачнэ́го!",
+  "words": [
+   "w.smacznego"
+  ],
+  "tiles_pl": [
+   "Smacznego"
+  ],
+  "tiles_ru": [
+   "Приятного",
+   "аппетита"
+  ],
+  "distract_pl": [
+   "dobranoc",
+   "dziękuję"
+  ],
+  "distract_ru": [
+   "спокойной",
+   "спасибо"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.na_zdrowie",
+  "pl": "Na zdrowie!",
+  "ru": "Будьте здоровы!",
+  "tr": "на здро́ве!",
+  "words": [
+   "w.na_zdrowie"
+  ],
+  "tiles_pl": [
+   "Na",
+   "zdrowie"
+  ],
+  "tiles_ru": [
+   "Будьте",
+   "здоровы"
+  ],
+  "distract_pl": [
+   "dobranoc",
+   "cześć"
+  ],
+  "distract_ru": [
+   "привет",
+   "спасибо"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.powodzenia",
+  "pl": "Powodzenia!",
+  "ru": "Удачи!",
+  "tr": "поводзэ́ня!",
+  "words": [
+   "w.powodzenia"
+  ],
+  "tiles_pl": [
+   "Powodzenia"
+  ],
+  "tiles_ru": [
+   "Удачи"
+  ],
+  "distract_pl": [
+   "dziękuję",
+   "proszę"
+  ],
+  "distract_ru": [
+   "спасибо",
+   "пожалуйста"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.milego_dnia",
+  "pl": "Miłego dnia!",
+  "ru": "Хорошего дня!",
+  "tr": "миўэ́го дня!",
+  "words": [
+   "w.milego_dnia"
+  ],
+  "tiles_pl": [
+   "Miłego",
+   "dnia"
+  ],
+  "tiles_ru": [
+   "Хорошего",
+   "дня"
+  ],
+  "distract_pl": [
+   "wieczoru",
+   "weekendu"
+  ],
+  "distract_ru": [
+   "вечера",
+   "уикенда"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_kawe",
+  "pl": "Poproszę kawę.",
+  "ru": "Мне, пожалуйста, кофе.",
+  "tr": "попро́шэ ка́вэ.",
+  "words": [
+   "w.poprosze",
+   "w.kawa"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "kawę"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "кофе"
+  ],
+  "distract_pl": [
+   "herbatę",
+   "wodę"
+  ],
+  "distract_ru": [
+   "чай",
+   "воду"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_rachunek",
+  "pl": "Poproszę rachunek.",
+  "ru": "Счёт, пожалуйста.",
+  "tr": "попро́шэ раху́нэк.",
+  "words": [
+   "w.poprosze",
+   "w.rachunek"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "rachunek"
+  ],
+  "tiles_ru": [
+   "Счёт",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "menu",
+   "paragon"
+  ],
+  "distract_ru": [
+   "меню",
+   "чек"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.czy_moge_prosic_o_wode",
+  "pl": "Czy mogę prosić o wodę?",
+  "ru": "Можно мне воды?",
+  "tr": "чы мо́гэ про́щичь о во́дэ?",
+  "words": [
+   "w.czy",
+   "w.moc",
+   "w.prosic",
+   "w.o",
+   "w.woda"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "mogę",
+   "prosić",
+   "o",
+   "wodę"
+  ],
+  "tiles_ru": [
+   "Можно",
+   "мне",
+   "воды"
+  ],
+  "distract_pl": [
+   "masz",
+   "kawę"
+  ],
+  "distract_ru": [
+   "кофе",
+   "есть"
+  ],
+  "topic": "powitania",
+  "level": 3
+ },
+ {
+  "id": "p.prosze_wejsc",
+  "pl": "Proszę wejść.",
+  "ru": "Проходите, пожалуйста.",
+  "tr": "про́шэ вэйщчь.",
+  "words": [
+   "w.prosze_wejsc"
+  ],
+  "tiles_pl": [
+   "Proszę",
+   "wejść"
+  ],
+  "tiles_ru": [
+   "Проходите",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "wyjść",
+   "usiąść"
+  ],
+  "distract_ru": [
+   "выходите",
+   "садитесь"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.prosze_mowic_wolno",
+  "pl": "Proszę mówić wolno.",
+  "ru": "Говорите медленно, пожалуйста.",
+  "tr": "про́шэ му́вичь во́лно.",
+  "words": [
+   "w.prosze",
+   "w.mowic",
+   "w.wolno"
+  ],
+  "tiles_pl": [
+   "Proszę",
+   "mówić",
+   "wolno"
+  ],
+  "tiles_ru": [
+   "Говорите",
+   "медленно",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "szybko",
+   "głośno"
+  ],
+  "distract_ru": [
+   "быстро",
+   "громко"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.prosze_powtorzyc",
+  "pl": "Proszę powtórzyć.",
+  "ru": "Повторите, пожалуйста.",
+  "tr": "про́шэ пофту́жычь.",
+  "words": [
+   "w.prosze",
+   "w.powtorzyc"
+  ],
+  "tiles_pl": [
+   "Proszę",
+   "powtórzyć"
+  ],
+  "tiles_ru": [
+   "Повторите",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "mówić",
+   "pisać"
+  ],
+  "distract_ru": [
+   "говорите",
+   "пишите"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.jeszcze_raz_prosze",
+  "pl": "Jeszcze raz, proszę.",
+  "ru": "Ещё раз, пожалуйста.",
+  "tr": "е́шчэ рас, про́шэ.",
+  "words": [
+   "w.jeszcze_raz",
+   "w.prosze"
+  ],
+  "tiles_pl": [
+   "Jeszcze",
+   "raz",
+   "proszę"
+  ],
+  "tiles_ru": [
+   "Ещё",
+   "раз",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "dwa",
+   "dziękuję"
+  ],
+  "distract_ru": [
+   "два",
+   "спасибо"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.nie_ma_problemu",
+  "pl": "Nie ma problemu.",
+  "ru": "Нет проблем.",
+  "tr": "нье ма пробле́му.",
+  "words": [
+   "w.nie_ma_problemu"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "ma",
+   "problemu"
+  ],
+  "tiles_ru": [
+   "Нет",
+   "проблем"
+  ],
+  "distract_pl": [
+   "za",
+   "co"
+  ],
+  "distract_ru": [
+   "за",
+   "что"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.nie_ma_za_co",
+  "pl": "Nie ma za co.",
+  "ru": "Не за что.",
+  "tr": "нье ма за цо.",
+  "words": [
+   "w.nie_ma_za_co"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "ma",
+   "za",
+   "co"
+  ],
+  "tiles_ru": [
+   "Не",
+   "за",
+   "что"
+  ],
+  "distract_pl": [
+   "problemu",
+   "bardzo"
+  ],
+  "distract_ru": [
+   "проблем",
+   "очень"
+  ],
+  "topic": "powitania",
+  "level": 2
+ },
+ {
+  "id": "p.zgoda",
+  "pl": "Zgoda!",
+  "ru": "Договорились!",
+  "tr": "зго́да!",
+  "words": [
+   "w.zgoda"
+  ],
+  "tiles_pl": [
+   "Zgoda"
+  ],
+  "tiles_ru": [
+   "Договорились"
+  ],
+  "distract_pl": [
+   "okej",
+   "oczywiście"
+  ],
+  "distract_ru": [
+   "конечно",
+   "хорошо"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.jak_sie_masz",
+  "pl": "Jak się masz?",
+  "ru": "Как дела?",
+  "tr": "як ще маш?",
+  "words": [
+   "w.jak_sie_masz"
+  ],
+  "tiles_pl": [
+   "Jak",
+   "się",
+   "masz"
+  ],
+  "tiles_ru": [
+   "Как",
+   "дела"
+  ],
+  "distract_pl": [
+   "mam",
+   "ma"
+  ],
+  "distract_ru": [
+   "есть",
+   "будет"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.dobrze_a_ty",
+  "pl": "Dobrze, a ty?",
+  "ru": "Хорошо, а ты?",
+  "tr": "до́бжэ, а ты?",
+  "words": [
+   "w.dobrze",
+   "w.a",
+   "w.ty"
+  ],
+  "tiles_pl": [
+   "Dobrze",
+   "a",
+   "ty"
+  ],
+  "tiles_ru": [
+   "Хорошо",
+   "а",
+   "ты"
+  ],
+  "distract_pl": [
+   "źle",
+   "on"
+  ],
+  "distract_ru": [
+   "плохо",
+   "он"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.wszystko_dobrze",
+  "pl": "Wszystko dobrze.",
+  "ru": "Всё хорошо.",
+  "tr": "фшы́стко до́бжэ.",
+  "words": [
+   "w.wszystko",
+   "w.dobrze"
+  ],
+  "tiles_pl": [
+   "Wszystko",
+   "dobrze"
+  ],
+  "tiles_ru": [
+   "Всё",
+   "хорошо"
+  ],
+  "distract_pl": [
+   "nic",
+   "źle"
+  ],
+  "distract_ru": [
+   "ничего",
+   "плохо"
+  ],
+  "topic": "powitania",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_dima",
+  "pl": "Jestem Dima.",
+  "ru": "Я Дима.",
+  "tr": "е́стэм ди́ма.",
+  "words": [
+   "w.byc"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "Dima"
+  ],
+  "tiles_ru": [
+   "Я",
+   "Дима"
+  ],
+  "distract_pl": [
+   "jesteś",
+   "jest"
+  ],
+  "distract_ru": [
+   "ты",
+   "он"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.mam_na_imie_dima",
+  "pl": "Mam na imię Dima.",
+  "ru": "Меня зовут Дима.",
+  "tr": "мам на и́ме ди́ма.",
+  "words": [
+   "w.miec",
+   "w.na",
+   "w.imie"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "na",
+   "imię",
+   "Dima"
+  ],
+  "tiles_ru": [
+   "Меня",
+   "зовут",
+   "Дима"
+  ],
+  "distract_pl": [
+   "ma",
+   "imieniu"
+  ],
+  "distract_ru": [
+   "звать",
+   "тебя"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.jak_masz_na_imie",
+  "pl": "Jak masz na imię?",
+  "ru": "Как тебя зовут?",
+  "tr": "як маш на и́ме?",
+  "words": [
+   "w.jak",
+   "w.miec",
+   "w.na",
+   "w.imie"
+  ],
+  "tiles_pl": [
+   "Jak",
+   "masz",
+   "na",
+   "imię"
+  ],
+  "tiles_ru": [
+   "Как",
+   "тебя",
+   "зовут"
+  ],
+  "distract_pl": [
+   "mam",
+   "imieniu"
+  ],
+  "distract_ru": [
+   "меня",
+   "звать"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.skad_jestes",
+  "pl": "Skąd jesteś?",
+  "ru": "Откуда ты?",
+  "tr": "сконт е́стэщ?",
+  "words": [
+   "w.skad",
+   "w.byc"
+  ],
+  "tiles_pl": [
+   "Skąd",
+   "jesteś"
+  ],
+  "tiles_ru": [
+   "Откуда",
+   "ты"
+  ],
+  "distract_pl": [
+   "dokąd",
+   "gdzie"
+  ],
+  "distract_ru": [
+   "куда",
+   "где"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_z_rosji",
+  "pl": "Jestem z Rosji.",
+  "ru": "Я из России.",
+  "tr": "е́стэм с ро́си.",
+  "words": [
+   "w.byc",
+   "w.z",
+   "w.rosja"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "z",
+   "Rosji"
+  ],
+  "tiles_ru": [
+   "Я",
+   "из",
+   "России"
+  ],
+  "distract_pl": [
+   "Ukrainy",
+   "Polski"
+  ],
+  "distract_ru": [
+   "Украины",
+   "Польши"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_mieszkasz",
+  "pl": "Gdzie mieszkasz?",
+  "ru": "Где ты живёшь?",
+  "tr": "гдже ме́шкаш?",
+  "words": [
+   "w.gdzie",
+   "w.mieszkac"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "mieszkasz"
+  ],
+  "tiles_ru": [
+   "Где",
+   "ты",
+   "живёшь"
+  ],
+  "distract_pl": [
+   "pracujesz",
+   "skąd"
+  ],
+  "distract_ru": [
+   "работаешь",
+   "откуда"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.mieszkam_w_warszawie",
+  "pl": "Mieszkam w Warszawie.",
+  "ru": "Я живу в Варшаве.",
+  "tr": "ме́шкам ф варша́ве.",
+  "words": [
+   "w.mieszkac",
+   "w.w",
+   "w.warszawa"
+  ],
+  "tiles_pl": [
+   "Mieszkam",
+   "w",
+   "Warszawie"
+  ],
+  "tiles_ru": [
+   "Я",
+   "живу",
+   "в",
+   "Варшаве"
+  ],
+  "distract_pl": [
+   "Krakowie",
+   "mieszkasz"
+  ],
+  "distract_ru": [
+   "Кракове",
+   "живёшь"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.mieszkam_w_polsce",
+  "pl": "Mieszkam w Polsce.",
+  "ru": "Я живу в Польше.",
+  "tr": "ме́шкам ф по́лсцэ.",
+  "words": [
+   "w.mieszkac",
+   "w.w",
+   "w.polska"
+  ],
+  "tiles_pl": [
+   "Mieszkam",
+   "w",
+   "Polsce"
+  ],
+  "tiles_ru": [
+   "Я",
+   "живу",
+   "в",
+   "Польше"
+  ],
+  "distract_pl": [
+   "Rosji",
+   "domu"
+  ],
+  "distract_ru": [
+   "России",
+   "доме"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.ile_masz_lat",
+  "pl": "Ile masz lat?",
+  "ru": "Сколько тебе лет?",
+  "tr": "и́ле маш лат?",
+  "words": [
+   "w.ile",
+   "w.miec",
+   "w.rok"
+  ],
+  "tiles_pl": [
+   "Ile",
+   "masz",
+   "lat"
+  ],
+  "tiles_ru": [
+   "Сколько",
+   "тебе",
+   "лет"
+  ],
+  "distract_pl": [
+   "mam",
+   "ma"
+  ],
+  "distract_ru": [
+   "есть",
+   "года"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.mam_trzydziesci_lat",
+  "pl": "Mam trzydzieści lat.",
+  "ru": "Мне тридцать лет.",
+  "tr": "мам тшыдже́щчи лат.",
+  "words": [
+   "w.miec",
+   "w.trzydziesci",
+   "w.rok"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "trzydzieści",
+   "lat"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "тридцать",
+   "лет"
+  ],
+  "distract_pl": [
+   "dwadzieścia",
+   "ma"
+  ],
+  "distract_ru": [
+   "двадцать",
+   "есть"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.pracuje_w_warszawie",
+  "pl": "Pracuję w Warszawie.",
+  "ru": "Я работаю в Варшаве.",
+  "tr": "працу́е ф варша́ве.",
+  "words": [
+   "w.pracowac",
+   "w.w",
+   "w.warszawa"
+  ],
+  "tiles_pl": [
+   "Pracuję",
+   "w",
+   "Warszawie"
+  ],
+  "tiles_ru": [
+   "Я",
+   "работаю",
+   "в",
+   "Варшаве"
+  ],
+  "distract_pl": [
+   "mieszkam",
+   "Polsce"
+  ],
+  "distract_ru": [
+   "живу",
+   "Польше"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_programista",
+  "pl": "Jestem programistą.",
+  "ru": "Я программист.",
+  "tr": "е́стэм програми́стоў.",
+  "words": [
+   "w.byc",
+   "w.programista"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "programistą"
+  ],
+  "tiles_ru": [
+   "Я",
+   "программист"
+  ],
+  "distract_pl": [
+   "studentem",
+   "inżynierem"
+  ],
+  "distract_ru": [
+   "студент",
+   "инженер"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_studentem",
+  "pl": "Jestem studentem.",
+  "ru": "Я студент.",
+  "tr": "е́стэм студэ́нтэм.",
+  "words": [
+   "w.byc",
+   "w.student"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "studentem"
+  ],
+  "tiles_ru": [
+   "Я",
+   "студент"
+  ],
+  "distract_pl": [
+   "programistą",
+   "nauczycielem"
+  ],
+  "distract_ru": [
+   "программист",
+   "учитель"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.ona_jest_polka",
+  "pl": "Ona jest Polką.",
+  "ru": "Она полька.",
+  "tr": "о́на ест по́лкоў.",
+  "words": [
+   "w.ona",
+   "w.byc",
+   "w.polka"
+  ],
+  "tiles_pl": [
+   "Ona",
+   "jest",
+   "Polką"
+  ],
+  "tiles_ru": [
+   "Она",
+   "полька"
+  ],
+  "distract_pl": [
+   "Rosjanką",
+   "ma"
+  ],
+  "distract_ru": [
+   "россиянка",
+   "имеет"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.on_jest_polakiem",
+  "pl": "On jest Polakiem.",
+  "ru": "Он поляк.",
+  "tr": "он ест пола́кем.",
+  "words": [
+   "w.on",
+   "w.byc",
+   "w.polak"
+  ],
+  "tiles_pl": [
+   "On",
+   "jest",
+   "Polakiem"
+  ],
+  "tiles_ru": [
+   "Он",
+   "поляк"
+  ],
+  "distract_pl": [
+   "Rosjaninem",
+   "ona"
+  ],
+  "distract_ru": [
+   "россиянин",
+   "она"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.mam_zone",
+  "pl": "Mam żonę.",
+  "ru": "У меня есть жена.",
+  "tr": "мам жо́нэ.",
+  "words": [
+   "w.miec",
+   "w.zona"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "żonę"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "есть",
+   "жена"
+  ],
+  "distract_pl": [
+   "męża",
+   "mamy"
+  ],
+  "distract_ru": [
+   "муж",
+   "мы"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.mam_syna_i_corke",
+  "pl": "Mam syna i córkę.",
+  "ru": "У меня есть сын и дочь.",
+  "tr": "мам сы́на и цу́ркэ.",
+  "words": [
+   "w.miec",
+   "w.syn",
+   "w.i",
+   "w.corka"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "syna",
+   "i",
+   "córkę"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "есть",
+   "сын",
+   "и",
+   "дочь"
+  ],
+  "distract_pl": [
+   "brata",
+   "ma"
+  ],
+  "distract_ru": [
+   "брат",
+   "нет"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.mam_brata_i_siostre",
+  "pl": "Mam brata i siostrę.",
+  "ru": "У меня есть брат и сестра.",
+  "tr": "мам бра́та и що́стрэ.",
+  "words": [
+   "w.miec",
+   "w.brat",
+   "w.i",
+   "w.siostra"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "brata",
+   "i",
+   "siostrę"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "есть",
+   "брат",
+   "и",
+   "сестра"
+  ],
+  "distract_pl": [
+   "syna",
+   "córkę"
+  ],
+  "distract_ru": [
+   "сын",
+   "дочь"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.czy_masz_dzieci",
+  "pl": "Czy masz dzieci?",
+  "ru": "У тебя есть дети?",
+  "tr": "чы маш дже́чи?",
+  "words": [
+   "w.czy",
+   "w.miec",
+   "w.dziecko"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "masz",
+   "dzieci"
+  ],
+  "tiles_ru": [
+   "У",
+   "тебя",
+   "есть",
+   "дети"
+  ],
+  "distract_pl": [
+   "mam",
+   "ma"
+  ],
+  "distract_ru": [
+   "нет",
+   "мои"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.to_jest_moja_mama",
+  "pl": "To jest moja mama.",
+  "ru": "Это моя мама.",
+  "tr": "то ест мо́я ма́ма.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.moj",
+   "w.mama"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "moja",
+   "mama"
+  ],
+  "tiles_ru": [
+   "Это",
+   "моя",
+   "мама"
+  ],
+  "distract_pl": [
+   "mój",
+   "moje"
+  ],
+  "distract_ru": [
+   "мой",
+   "моё"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.to_jest_moja_rodzina",
+  "pl": "To jest moja rodzina.",
+  "ru": "Это моя семья.",
+  "tr": "то ест мо́я роджи́на.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.moj",
+   "w.rodzina"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "moja",
+   "rodzina"
+  ],
+  "tiles_ru": [
+   "Это",
+   "моя",
+   "семья"
+  ],
+  "distract_pl": [
+   "mój",
+   "rodzice"
+  ],
+  "distract_ru": [
+   "мой",
+   "родители"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.moja_rodzina_jest_duza",
+  "pl": "Moja rodzina jest duża.",
+  "ru": "Моя семья большая.",
+  "tr": "мо́я роджи́на ест ду́жа.",
+  "words": [
+   "w.moj",
+   "w.rodzina",
+   "w.byc",
+   "w.duzy"
+  ],
+  "tiles_pl": [
+   "Moja",
+   "rodzina",
+   "jest",
+   "duża"
+  ],
+  "tiles_ru": [
+   "Моя",
+   "семья",
+   "большая"
+  ],
+  "distract_pl": [
+   "mała",
+   "mój"
+  ],
+  "distract_ru": [
+   "маленькая",
+   "мой"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.moja_siostra_mieszka_w_krakowie",
+  "pl": "Moja siostra mieszka w Krakowie.",
+  "ru": "Моя сестра живёт в Кракове.",
+  "tr": "мо́я що́стра ме́шка ф крако́ве.",
+  "words": [
+   "w.moj",
+   "w.siostra",
+   "w.mieszkac",
+   "w.w",
+   "w.krakow"
+  ],
+  "tiles_pl": [
+   "Moja",
+   "siostra",
+   "mieszka",
+   "w",
+   "Krakowie"
+  ],
+  "tiles_ru": [
+   "Моя",
+   "сестра",
+   "живёт",
+   "в",
+   "Кракове"
+  ],
+  "distract_pl": [
+   "mieszkam",
+   "Warszawie"
+  ],
+  "distract_ru": [
+   "живу",
+   "Варшаве"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 3
+ },
+ {
+  "id": "p.moj_brat_ma_psa",
+  "pl": "Mój brat ma psa.",
+  "ru": "У моего брата есть собака.",
+  "tr": "муй брат ма пса.",
+  "words": [
+   "w.moj",
+   "w.brat",
+   "w.miec",
+   "w.pies"
+  ],
+  "tiles_pl": [
+   "Mój",
+   "brat",
+   "ma",
+   "psa"
+  ],
+  "tiles_ru": [
+   "У",
+   "моего",
+   "брата",
+   "есть",
+   "собака"
+  ],
+  "distract_pl": [
+   "kota",
+   "moja"
+  ],
+  "distract_ru": [
+   "кот",
+   "мой"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.czy_jestes_zonaty",
+  "pl": "Czy jesteś żonaty?",
+  "ru": "Ты женат?",
+  "tr": "чы е́стэщ жона́ты?",
+  "words": [
+   "w.czy",
+   "w.byc",
+   "w.zonaty"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "jesteś",
+   "żonaty"
+  ],
+  "tiles_ru": [
+   "Ты",
+   "женат"
+  ],
+  "distract_pl": [
+   "zamężna",
+   "ma"
+  ],
+  "distract_ru": [
+   "замужем",
+   "есть"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_zonaty",
+  "pl": "Jestem żonaty.",
+  "ru": "Я женат.",
+  "tr": "е́стэм жона́ты.",
+  "words": [
+   "w.byc",
+   "w.zonaty"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "żonaty"
+  ],
+  "tiles_ru": [
+   "Я",
+   "женат"
+  ],
+  "distract_pl": [
+   "zamężna",
+   "nie"
+  ],
+  "distract_ru": [
+   "замужем",
+   "не"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.kto_to_jest",
+  "pl": "Kto to jest?",
+  "ru": "Кто это?",
+  "tr": "кто то ест?",
+  "words": [
+   "w.kto",
+   "w.to",
+   "w.byc"
+  ],
+  "tiles_pl": [
+   "Kto",
+   "to",
+   "jest"
+  ],
+  "tiles_ru": [
+   "Кто",
+   "это"
+  ],
+  "distract_pl": [
+   "co",
+   "gdzie"
+  ],
+  "distract_ru": [
+   "что",
+   "где"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 1
+ },
+ {
+  "id": "p.to_jest_moj_przyjaciel",
+  "pl": "To jest mój przyjaciel.",
+  "ru": "Это мой друг.",
+  "tr": "то ест муй пшыя́чел.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.moj",
+   "w.przyjaciel"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "mój",
+   "przyjaciel"
+  ],
+  "tiles_ru": [
+   "Это",
+   "мой",
+   "друг"
+  ],
+  "distract_pl": [
+   "moja",
+   "kolega"
+  ],
+  "distract_ru": [
+   "моя",
+   "приятель"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.ona_ma_na_imie_anna",
+  "pl": "Ona ma na imię Anna.",
+  "ru": "Её зовут Анна.",
+  "tr": "о́на ма на и́ме а́нна.",
+  "words": [
+   "w.ona",
+   "w.miec",
+   "w.na",
+   "w.imie"
+  ],
+  "tiles_pl": [
+   "Ona",
+   "ma",
+   "na",
+   "imię",
+   "Anna"
+  ],
+  "tiles_ru": [
+   "Её",
+   "зовут",
+   "Анна"
+  ],
+  "distract_pl": [
+   "on",
+   "imieniu"
+  ],
+  "distract_ru": [
+   "его",
+   "звать"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 3
+ },
+ {
+  "id": "p.moi_rodzice_mieszkaja_w_rosji",
+  "pl": "Moi rodzice mieszkają w Rosji.",
+  "ru": "Мои родители живут в России.",
+  "tr": "мо́и роджи́цэ мешка́ёў ф ро́си.",
+  "words": [
+   "w.moj",
+   "w.rodzice",
+   "w.mieszkac",
+   "w.w",
+   "w.rosja"
+  ],
+  "tiles_pl": [
+   "Moi",
+   "rodzice",
+   "mieszkają",
+   "w",
+   "Rosji"
+  ],
+  "tiles_ru": [
+   "Мои",
+   "родители",
+   "живут",
+   "в",
+   "России"
+  ],
+  "distract_pl": [
+   "mój",
+   "mieszka"
+  ],
+  "distract_ru": [
+   "отец",
+   "живёт"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 3
+ },
+ {
+  "id": "p.dzis_sa_moje_urodziny",
+  "pl": "Dziś są moje urodziny.",
+  "ru": "Сегодня мой день рождения.",
+  "tr": "джищ соў мо́е уроджи́ны.",
+  "words": [
+   "w.dzis",
+   "w.byc",
+   "w.moj",
+   "w.urodziny"
+  ],
+  "tiles_pl": [
+   "Dziś",
+   "są",
+   "moje",
+   "urodziny"
+  ],
+  "tiles_ru": [
+   "Сегодня",
+   "мой",
+   "день",
+   "рождения"
+  ],
+  "distract_pl": [
+   "jest",
+   "moja"
+  ],
+  "distract_ru": [
+   "будет",
+   "мои"
+  ],
+  "topic": "ja_i_rodzina",
+  "level": 2
+ },
+ {
+  "id": "p.mowie_po_polsku",
+  "pl": "Mówię po polsku.",
+  "ru": "Я говорю по-польски.",
+  "tr": "му́ве по по́лску.",
+  "words": [
+   "w.mowic",
+   "w.po_polsku"
+  ],
+  "tiles_pl": [
+   "Mówię",
+   "po",
+   "polsku"
+  ],
+  "tiles_ru": [
+   "Я",
+   "говорю",
+   "по-польски"
+  ],
+  "distract_pl": [
+   "rosyjsku",
+   "mówisz"
+  ],
+  "distract_ru": [
+   "по-русски",
+   "говоришь"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 1
+ },
+ {
+  "id": "p.mowie_troche_po_polsku",
+  "pl": "Mówię trochę po polsku.",
+  "ru": "Я говорю немного по-польски.",
+  "tr": "му́ве тро́хэ по по́лску.",
+  "words": [
+   "w.mowic",
+   "w.troche",
+   "w.po_polsku"
+  ],
+  "tiles_pl": [
+   "Mówię",
+   "trochę",
+   "po",
+   "polsku"
+  ],
+  "tiles_ru": [
+   "Я",
+   "говорю",
+   "немного",
+   "по-польски"
+  ],
+  "distract_pl": [
+   "dużo",
+   "bardzo"
+  ],
+  "distract_ru": [
+   "много",
+   "очень"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 2
+ },
+ {
+  "id": "p.mowie_po_rosyjsku_i_po_angielsku",
+  "pl": "Mówię po rosyjsku i po angielsku.",
+  "ru": "Я говорю по-русски и по-английски.",
+  "tr": "му́ве по росы́йску и по анге́лску.",
+  "words": [
+   "w.mowic",
+   "w.po_rosyjsku",
+   "w.i",
+   "w.po_angielsku"
+  ],
+  "tiles_pl": [
+   "Mówię",
+   "po",
+   "rosyjsku",
+   "i",
+   "po",
+   "angielsku"
+  ],
+  "tiles_ru": [
+   "Я",
+   "говорю",
+   "по-русски",
+   "и",
+   "по-английски"
+  ],
+  "distract_pl": [
+   "polsku",
+   "ale"
+  ],
+  "distract_ru": [
+   "по-польски",
+   "но"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 3
+ },
+ {
+  "id": "p.czy_mowisz_po_angielsku",
+  "pl": "Czy mówisz po angielsku?",
+  "ru": "Ты говоришь по-английски?",
+  "tr": "чы му́виш по анге́лску?",
+  "words": [
+   "w.czy",
+   "w.mowic",
+   "w.po_angielsku"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "mówisz",
+   "po",
+   "angielsku"
+  ],
+  "tiles_ru": [
+   "Ты",
+   "говоришь",
+   "по-английски"
+  ],
+  "distract_pl": [
+   "niemiecku",
+   "mówię"
+  ],
+  "distract_ru": [
+   "по-немецки",
+   "говорю"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 2
+ },
+ {
+  "id": "p.nie_mowie_po_niemiecku",
+  "pl": "Nie mówię po niemiecku.",
+  "ru": "Я не говорю по-немецки.",
+  "tr": "нье му́ве по ньеме́цку.",
+  "words": [
+   "w.nie",
+   "w.mowic",
+   "w.po_niemiecku"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "mówię",
+   "po",
+   "niemiecku"
+  ],
+  "tiles_ru": [
+   "Я",
+   "не",
+   "говорю",
+   "по-немецки"
+  ],
+  "distract_pl": [
+   "francusku",
+   "dobrze"
+  ],
+  "distract_ru": [
+   "по-французски",
+   "хорошо"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 2
+ },
+ {
+  "id": "p.czy_pan_mowi_po_polsku",
+  "pl": "Czy pan mówi po polsku?",
+  "ru": "Вы говорите по-польски?",
+  "tr": "чы пан му́ви по по́лску?",
+  "words": [
+   "w.czy",
+   "w.pan",
+   "w.mowic",
+   "w.po_polsku"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "pan",
+   "mówi",
+   "po",
+   "polsku"
+  ],
+  "tiles_ru": [
+   "Вы",
+   "говорите",
+   "по-польски"
+  ],
+  "distract_pl": [
+   "pani",
+   "mówisz"
+  ],
+  "distract_ru": [
+   "мы",
+   "говорим"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 3
+ },
+ {
+  "id": "p.warszawa_jest_stolica_polski",
+  "pl": "Warszawa jest stolicą Polski.",
+  "ru": "Варшава столица Польши.",
+  "tr": "варша́ва ест столи́цоў по́лски.",
+  "words": [
+   "w.warszawa",
+   "w.byc",
+   "w.stolica",
+   "w.polski"
+  ],
+  "tiles_pl": [
+   "Warszawa",
+   "jest",
+   "stolicą",
+   "Polski"
+  ],
+  "tiles_ru": [
+   "Варшава",
+   "столица",
+   "Польши"
+  ],
+  "distract_pl": [
+   "Kraków",
+   "Rosji"
+  ],
+  "distract_ru": [
+   "Краков",
+   "России"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 2
+ },
+ {
+  "id": "p.krakow_jest_piekny",
+  "pl": "Kraków jest piękny.",
+  "ru": "Краков красивый.",
+  "tr": "кра́куф ест пе́нкны.",
+  "words": [
+   "w.krakow",
+   "w.byc",
+   "w.piekny"
+  ],
+  "tiles_pl": [
+   "Kraków",
+   "jest",
+   "piękny"
+  ],
+  "tiles_ru": [
+   "Краков",
+   "красивый"
+  ],
+  "distract_pl": [
+   "Warszawa",
+   "duży"
+  ],
+  "distract_ru": [
+   "Варшава",
+   "большой"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 1
+ },
+ {
+  "id": "p.jade_do_polski",
+  "pl": "Jadę do Polski.",
+  "ru": "Я еду в Польшу.",
+  "tr": "я́дэ до по́лски.",
+  "words": [
+   "w.jechac",
+   "w.do",
+   "w.polski"
+  ],
+  "tiles_pl": [
+   "Jadę",
+   "do",
+   "Polski"
+  ],
+  "tiles_ru": [
+   "Я",
+   "еду",
+   "в",
+   "Польшу"
+  ],
+  "distract_pl": [
+   "Rosji",
+   "jedziesz"
+  ],
+  "distract_ru": [
+   "России",
+   "едешь"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 1
+ },
+ {
+  "id": "p.chce_mieszkac_w_polsce",
+  "pl": "Chcę mieszkać w Polsce.",
+  "ru": "Я хочу жить в Польше.",
+  "tr": "хцэ ме́шкачь ф по́лсцэ.",
+  "words": [
+   "w.chciec",
+   "w.mieszkac",
+   "w.w",
+   "w.polska"
+  ],
+  "tiles_pl": [
+   "Chcę",
+   "mieszkać",
+   "w",
+   "Polsce"
+  ],
+  "tiles_ru": [
+   "Я",
+   "хочу",
+   "жить",
+   "в",
+   "Польше"
+  ],
+  "distract_pl": [
+   "pracować",
+   "Rosji"
+  ],
+  "distract_ru": [
+   "работать",
+   "России"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 2
+ },
+ {
+  "id": "p.moja_zona_jest_ukrainka",
+  "pl": "Moja żona jest Ukrainką.",
+  "ru": "Моя жена украинка.",
+  "tr": "мо́я жо́на ест украи́нкоў.",
+  "words": [
+   "w.moj",
+   "w.zona",
+   "w.byc",
+   "w.ukrainka"
+  ],
+  "tiles_pl": [
+   "Moja",
+   "żona",
+   "jest",
+   "Ukrainką"
+  ],
+  "tiles_ru": [
+   "Моя",
+   "жена",
+   "украинка"
+  ],
+  "distract_pl": [
+   "Rosjanką",
+   "mój"
+  ],
+  "distract_ru": [
+   "россиянка",
+   "мой"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 2
+ },
+ {
+  "id": "p.moj_kolega_jest_niemcem",
+  "pl": "Mój kolega jest Niemcem.",
+  "ru": "Мой приятель немец.",
+  "tr": "муй коле́га ест нье́мцэм.",
+  "words": [
+   "w.moj",
+   "w.kolega",
+   "w.byc",
+   "w.niemiec"
+  ],
+  "tiles_pl": [
+   "Mój",
+   "kolega",
+   "jest",
+   "Niemcem"
+  ],
+  "tiles_ru": [
+   "Мой",
+   "приятель",
+   "немец"
+  ],
+  "distract_pl": [
+   "Francuzem",
+   "moja"
+  ],
+  "distract_ru": [
+   "француз",
+   "моя"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 2
+ },
+ {
+  "id": "p.polski_to_trudny_jezyk",
+  "pl": "Polski to trudny język.",
+  "ru": "Польский трудный язык.",
+  "tr": "по́лски то тру́дны е́ўзык.",
+  "words": [
+   "w.polski",
+   "w.to",
+   "w.trudny",
+   "w.jezyk"
+  ],
+  "tiles_pl": [
+   "Polski",
+   "to",
+   "trudny",
+   "język"
+  ],
+  "tiles_ru": [
+   "Польский",
+   "трудный",
+   "язык"
+  ],
+  "distract_pl": [
+   "łatwy",
+   "rosyjski"
+  ],
+  "distract_ru": [
+   "лёгкий",
+   "русский"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 2
+ },
+ {
+  "id": "p.rosyjski_jest_latwy",
+  "pl": "Rosyjski jest łatwy.",
+  "ru": "Русский язык лёгкий.",
+  "tr": "росы́йски ест ўа́тфы.",
+  "words": [
+   "w.rosyjski",
+   "w.byc",
+   "w.latwy"
+  ],
+  "tiles_pl": [
+   "Rosyjski",
+   "jest",
+   "łatwy"
+  ],
+  "tiles_ru": [
+   "Русский",
+   "язык",
+   "лёгкий"
+  ],
+  "distract_pl": [
+   "trudny",
+   "polski"
+  ],
+  "distract_ru": [
+   "трудный",
+   "польский"
+  ],
+  "topic": "kraje_i_narodowosci",
+  "level": 1
+ },
+ {
+  "id": "p.ktora_jest_godzina",
+  "pl": "Która jest godzina?",
+  "ru": "Который час?",
+  "tr": "кту́ра ест годжи́на?",
+  "words": [
+   "w.ktory",
+   "w.byc",
+   "w.godzina"
+  ],
+  "tiles_pl": [
+   "Która",
+   "jest",
+   "godzina"
+  ],
+  "tiles_ru": [
+   "Который",
+   "час"
+  ],
+  "distract_pl": [
+   "jaka",
+   "dzień"
+  ],
+  "distract_ru": [
+   "какой",
+   "день"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.jest_osma",
+  "pl": "Jest ósma.",
+  "ru": "Восемь часов.",
+  "tr": "ест у́сма.",
+  "words": [
+   "w.byc",
+   "w.osmy"
+  ],
+  "tiles_pl": [
+   "Jest",
+   "ósma"
+  ],
+  "tiles_ru": [
+   "Восемь",
+   "часов"
+  ],
+  "distract_pl": [
+   "siódma",
+   "jestem"
+  ],
+  "distract_ru": [
+   "семь",
+   "буду"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.spotkanie_jest_o_dziesiatej",
+  "pl": "Spotkanie jest o dziesiątej.",
+  "ru": "Встреча в десять.",
+  "tr": "спотка́нье ест о джещо́нтэй.",
+  "words": [
+   "w.spotkanie",
+   "w.byc",
+   "w.o",
+   "w.dziesiaty"
+  ],
+  "tiles_pl": [
+   "Spotkanie",
+   "jest",
+   "o",
+   "dziesiątej"
+  ],
+  "tiles_ru": [
+   "Встреча",
+   "в",
+   "десять"
+  ],
+  "distract_pl": [
+   "ósmej",
+   "dziś"
+  ],
+  "distract_ru": [
+   "восемь",
+   "сегодня"
+  ],
+  "topic": "czas",
+  "level": 2
+ },
+ {
+  "id": "p.o_ktorej_jest_obiad",
+  "pl": "O której jest obiad?",
+  "ru": "Во сколько обед?",
+  "tr": "о кту́рэй ест о́бят?",
+  "words": [
+   "w.o_ktorej",
+   "w.byc",
+   "w.obiad"
+  ],
+  "tiles_pl": [
+   "O",
+   "której",
+   "jest",
+   "obiad"
+  ],
+  "tiles_ru": [
+   "Во",
+   "сколько",
+   "обед"
+  ],
+  "distract_pl": [
+   "kolacja",
+   "będzie"
+  ],
+  "distract_ru": [
+   "ужин",
+   "будет"
+  ],
+  "topic": "czas",
+  "level": 2
+ },
+ {
+  "id": "p.pracuje_od_osmej_do_piatej",
+  "pl": "Pracuję od ósmej do piątej.",
+  "ru": "Я работаю с восьми до пяти.",
+  "tr": "працу́е от у́смэй до пёнтэй.",
+  "words": [
+   "w.pracowac",
+   "w.od",
+   "w.osmy",
+   "w.do",
+   "w.piaty"
+  ],
+  "tiles_pl": [
+   "Pracuję",
+   "od",
+   "ósmej",
+   "do",
+   "piątej"
+  ],
+  "tiles_ru": [
+   "Я",
+   "работаю",
+   "с",
+   "восьми",
+   "до",
+   "пяти"
+  ],
+  "distract_pl": [
+   "dziewiątej",
+   "mieszkam"
+  ],
+  "distract_ru": [
+   "девяти",
+   "живу"
+  ],
+  "topic": "czas",
+  "level": 3
+ },
+ {
+  "id": "p.wstaje_o_siodmej",
+  "pl": "Wstaję o siódmej.",
+  "ru": "Я встаю в семь.",
+  "tr": "фста́е о щу́дмэй.",
+  "words": [
+   "w.wstawac",
+   "w.o",
+   "w.siodmy"
+  ],
+  "tiles_pl": [
+   "Wstaję",
+   "o",
+   "siódmej"
+  ],
+  "tiles_ru": [
+   "Я",
+   "встаю",
+   "в",
+   "семь"
+  ],
+  "distract_pl": [
+   "śpię",
+   "ósmej"
+  ],
+  "distract_ru": [
+   "сплю",
+   "восемь"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.dzis_jest_poniedzialek",
+  "pl": "Dziś jest poniedziałek.",
+  "ru": "Сегодня понедельник.",
+  "tr": "джищ ест поньеджя́ўэк.",
+  "words": [
+   "w.dzis",
+   "w.byc",
+   "w.poniedzialek"
+  ],
+  "tiles_pl": [
+   "Dziś",
+   "jest",
+   "poniedziałek"
+  ],
+  "tiles_ru": [
+   "Сегодня",
+   "понедельник"
+  ],
+  "distract_pl": [
+   "wtorek",
+   "jutro"
+  ],
+  "distract_ru": [
+   "вторник",
+   "завтра"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.wczoraj_byla_niedziela",
+  "pl": "Wczoraj była niedziela.",
+  "ru": "Вчера было воскресенье.",
+  "tr": "фчо́рай бы́ўа ньедже́ла.",
+  "words": [
+   "w.wczoraj",
+   "w.byc",
+   "w.niedziela"
+  ],
+  "tiles_pl": [
+   "Wczoraj",
+   "była",
+   "niedziela"
+  ],
+  "tiles_ru": [
+   "Вчера",
+   "было",
+   "воскресенье"
+  ],
+  "distract_pl": [
+   "jest",
+   "sobota"
+  ],
+  "distract_ru": [
+   "есть",
+   "суббота"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.w_poniedzialek_pracuje",
+  "pl": "W poniedziałek pracuję.",
+  "ru": "В понедельник я работаю.",
+  "tr": "ф поньеджя́ўэк працу́е.",
+  "words": [
+   "w.w",
+   "w.poniedzialek",
+   "w.pracowac"
+  ],
+  "tiles_pl": [
+   "W",
+   "poniedziałek",
+   "pracuję"
+  ],
+  "tiles_ru": [
+   "В",
+   "понедельник",
+   "я",
+   "работаю"
+  ],
+  "distract_pl": [
+   "wtorek",
+   "mieszkam"
+  ],
+  "distract_ru": [
+   "вторник",
+   "живу"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.we_wtorek_mam_lekcje",
+  "pl": "We wtorek mam lekcję.",
+  "ru": "Во вторник у меня урок.",
+  "tr": "вэ фто́рэк мам ле́кце.",
+  "words": [
+   "w.w",
+   "w.wtorek",
+   "w.miec",
+   "w.lekcja"
+  ],
+  "tiles_pl": [
+   "We",
+   "wtorek",
+   "mam",
+   "lekcję"
+  ],
+  "tiles_ru": [
+   "Во",
+   "вторник",
+   "у",
+   "меня",
+   "урок"
+  ],
+  "distract_pl": [
+   "środę",
+   "kurs"
+  ],
+  "distract_ru": [
+   "среду",
+   "курс"
+  ],
+  "topic": "czas",
+  "level": 2
+ },
+ {
+  "id": "p.mam_czas",
+  "pl": "Mam czas.",
+  "ru": "У меня есть время.",
+  "tr": "мам час.",
+  "words": [
+   "w.miec",
+   "w.czas"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "czas"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "есть",
+   "время"
+  ],
+  "distract_pl": [
+   "nie",
+   "wolne"
+  ],
+  "distract_ru": [
+   "нет",
+   "выходной"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.nie_mam_czasu",
+  "pl": "Nie mam czasu.",
+  "ru": "У меня нет времени.",
+  "tr": "нье мам ча́су.",
+  "words": [
+   "w.nie",
+   "w.miec",
+   "w.czas"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "mam",
+   "czasu"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "нет",
+   "времени"
+  ],
+  "distract_pl": [
+   "czas",
+   "ma"
+  ],
+  "distract_ru": [
+   "время",
+   "имею"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.rano_pije_kawe",
+  "pl": "Rano piję kawę.",
+  "ru": "Утром я пью кофе.",
+  "tr": "ра́но пи́е ка́вэ.",
+  "words": [
+   "w.rano",
+   "w.pic",
+   "w.kawa"
+  ],
+  "tiles_pl": [
+   "Rano",
+   "piję",
+   "kawę"
+  ],
+  "tiles_ru": [
+   "Утром",
+   "я",
+   "пью",
+   "кофе"
+  ],
+  "distract_pl": [
+   "wieczorem",
+   "herbatę"
+  ],
+  "distract_ru": [
+   "вечером",
+   "чай"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.wieczorem_czytam_ksiazke",
+  "pl": "Wieczorem czytam książkę.",
+  "ru": "Вечером я читаю книгу.",
+  "tr": "вечо́рэм чы́там кщо́ўшкэ.",
+  "words": [
+   "w.wieczor",
+   "w.czytac",
+   "w.ksiazka"
+  ],
+  "tiles_pl": [
+   "Wieczorem",
+   "czytam",
+   "książkę"
+  ],
+  "tiles_ru": [
+   "Вечером",
+   "я",
+   "читаю",
+   "книгу"
+  ],
+  "distract_pl": [
+   "rano",
+   "piszę"
+  ],
+  "distract_ru": [
+   "утром",
+   "пишу"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.zaraz_wracam",
+  "pl": "Zaraz wracam.",
+  "ru": "Сейчас вернусь.",
+  "tr": "за́рас вра́цам.",
+  "words": [
+   "w.zaraz",
+   "w.wracac"
+  ],
+  "tiles_pl": [
+   "Zaraz",
+   "wracam"
+  ],
+  "tiles_ru": [
+   "Сейчас",
+   "вернусь"
+  ],
+  "distract_pl": [
+   "później",
+   "idę"
+  ],
+  "distract_ru": [
+   "потом",
+   "иду"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.pozniej_zadzwonie",
+  "pl": "Później zadzwonię.",
+  "ru": "Позже я позвоню.",
+  "tr": "пу́жьньей задзво́не.",
+  "words": [
+   "w.pozniej",
+   "w.zadzwonic"
+  ],
+  "tiles_pl": [
+   "Później",
+   "zadzwonię"
+  ],
+  "tiles_ru": [
+   "Позже",
+   "я",
+   "позвоню"
+  ],
+  "distract_pl": [
+   "teraz",
+   "piszę"
+  ],
+  "distract_ru": [
+   "сейчас",
+   "напишу"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.najpierw_kawa_potem_praca",
+  "pl": "Najpierw kawa, potem praca.",
+  "ru": "Сначала кофе, потом работа.",
+  "tr": "на́йперф ка́ва, по́тэм пра́ца.",
+  "words": [
+   "w.najpierw",
+   "w.kawa",
+   "w.potem",
+   "w.praca"
+  ],
+  "tiles_pl": [
+   "Najpierw",
+   "kawa",
+   "potem",
+   "praca"
+  ],
+  "tiles_ru": [
+   "Сначала",
+   "кофе",
+   "потом",
+   "работа"
+  ],
+  "distract_pl": [
+   "teraz",
+   "później"
+  ],
+  "distract_ru": [
+   "сейчас",
+   "позже"
+  ],
+  "topic": "czas",
+  "level": 2
+ },
+ {
+  "id": "p.czesto_jem_w_domu",
+  "pl": "Często jem w domu.",
+  "ru": "Я часто ем дома.",
+  "tr": "чэ́ўсто ем ф до́му.",
+  "words": [
+   "w.czesto",
+   "w.jesc",
+   "w.w",
+   "w.dom"
+  ],
+  "tiles_pl": [
+   "Często",
+   "jem",
+   "w",
+   "domu"
+  ],
+  "tiles_ru": [
+   "Я",
+   "часто",
+   "ем",
+   "дома"
+  ],
+  "distract_pl": [
+   "rzadko",
+   "pracy"
+  ],
+  "distract_ru": [
+   "редко",
+   "работе"
+  ],
+  "topic": "czas",
+  "level": 2
+ },
+ {
+  "id": "p.czasami_jade_autobusem",
+  "pl": "Czasami jadę autobusem.",
+  "ru": "Иногда я еду на автобусе.",
+  "tr": "часа́ми я́дэ аутобу́сэм.",
+  "words": [
+   "w.czasami",
+   "w.jechac",
+   "w.autobus"
+  ],
+  "tiles_pl": [
+   "Czasami",
+   "jadę",
+   "autobusem"
+  ],
+  "tiles_ru": [
+   "Иногда",
+   "я",
+   "еду",
+   "на",
+   "автобусе"
+  ],
+  "distract_pl": [
+   "zawsze",
+   "tramwajem"
+  ],
+  "distract_ru": [
+   "всегда",
+   "трамваем"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.nigdy_nie_pije_alkoholu",
+  "pl": "Nigdy nie piję alkoholu.",
+  "ru": "Я никогда не пью алкоголь.",
+  "tr": "ни́гды нье пи́е алкохо́лу.",
+  "words": [
+   "w.nigdy",
+   "w.nie",
+   "w.pic",
+   "w.alkohol"
+  ],
+  "tiles_pl": [
+   "Nigdy",
+   "nie",
+   "piję",
+   "alkoholu"
+  ],
+  "tiles_ru": [
+   "Я",
+   "никогда",
+   "не",
+   "пью",
+   "алкоголь"
+  ],
+  "distract_pl": [
+   "często",
+   "mleko"
+  ],
+  "distract_ru": [
+   "часто",
+   "молоко"
+  ],
+  "topic": "czas",
+  "level": 2
+ },
+ {
+  "id": "p.juz_jest_pozno",
+  "pl": "Już jest późno.",
+  "ru": "Уже поздно.",
+  "tr": "юш ест пу́жьно.",
+  "words": [
+   "w.juz",
+   "w.byc",
+   "w.pozno"
+  ],
+  "tiles_pl": [
+   "Już",
+   "jest",
+   "późno"
+  ],
+  "tiles_ru": [
+   "Уже",
+   "поздно"
+  ],
+  "distract_pl": [
+   "jeszcze",
+   "wcześnie"
+  ],
+  "distract_ru": [
+   "ещё",
+   "рано"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.kiedy_jest_spotkanie",
+  "pl": "Kiedy jest spotkanie?",
+  "ru": "Когда встреча?",
+  "tr": "ке́ды ест спотка́нье?",
+  "words": [
+   "w.kiedy",
+   "w.byc",
+   "w.spotkanie"
+  ],
+  "tiles_pl": [
+   "Kiedy",
+   "jest",
+   "spotkanie"
+  ],
+  "tiles_ru": [
+   "Когда",
+   "встреча"
+  ],
+  "distract_pl": [
+   "gdzie",
+   "jak"
+  ],
+  "distract_ru": [
+   "где",
+   "как"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.jaka_jest_dzis_data",
+  "pl": "Jaka jest dziś data?",
+  "ru": "Какая сегодня дата?",
+  "tr": "я́ка ест джищ да́та?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.dzis",
+   "w.data"
+  ],
+  "tiles_pl": [
+   "Jaka",
+   "jest",
+   "dziś",
+   "data"
+  ],
+  "tiles_ru": [
+   "Какая",
+   "сегодня",
+   "дата"
+  ],
+  "distract_pl": [
+   "który",
+   "dzień"
+  ],
+  "distract_ru": [
+   "какой",
+   "день"
+  ],
+  "topic": "czas",
+  "level": 2
+ },
+ {
+  "id": "p.zima_jest_zimno",
+  "pl": "Zimą jest zimno.",
+  "ru": "Зимой холодно.",
+  "tr": "жи́моў ест жи́мно.",
+  "words": [
+   "w.zima",
+   "w.byc",
+   "w.zimno"
+  ],
+  "tiles_pl": [
+   "Zimą",
+   "jest",
+   "zimno"
+  ],
+  "tiles_ru": [
+   "Зимой",
+   "холодно"
+  ],
+  "distract_pl": [
+   "latem",
+   "ciepło"
+  ],
+  "distract_ru": [
+   "летом",
+   "жарко"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.w_weekend_odpoczywam",
+  "pl": "W weekend odpoczywam.",
+  "ru": "В выходные я отдыхаю.",
+  "tr": "ф уи́кэнт отпочы́вам.",
+  "words": [
+   "w.w",
+   "w.weekend",
+   "w.odpoczywac"
+  ],
+  "tiles_pl": [
+   "W",
+   "weekend",
+   "odpoczywam"
+  ],
+  "tiles_ru": [
+   "В",
+   "выходные",
+   "я",
+   "отдыхаю"
+  ],
+  "distract_pl": [
+   "tygodniu",
+   "pracuję"
+  ],
+  "distract_ru": [
+   "неделе",
+   "работаю"
+  ],
+  "topic": "czas",
+  "level": 1
+ },
+ {
+  "id": "p.co_robisz_w_weekend",
+  "pl": "Co robisz w weekend?",
+  "ru": "Что ты делаешь на выходных?",
+  "tr": "цо ро́биш ф уи́кэнт?",
+  "words": [
+   "w.co",
+   "w.robic",
+   "w.w",
+   "w.weekend"
+  ],
+  "tiles_pl": [
+   "Co",
+   "robisz",
+   "w",
+   "weekend"
+  ],
+  "tiles_ru": [
+   "Что",
+   "ты",
+   "делаешь",
+   "на",
+   "выходных"
+  ],
+  "distract_pl": [
+   "jesz",
+   "tygodniu"
+  ],
+  "distract_ru": [
+   "ешь",
+   "неделе"
+  ],
+  "topic": "czas",
+  "level": 2
+ },
+ {
+  "id": "p.ile_to_kosztuje",
+  "pl": "Ile to kosztuje?",
+  "ru": "Сколько это стоит?",
+  "tr": "и́ле то кошту́е?",
+  "words": [
+   "w.ile",
+   "w.to",
+   "w.kosztowac"
+  ],
+  "tiles_pl": [
+   "Ile",
+   "to",
+   "kosztuje"
+  ],
+  "tiles_ru": [
+   "Сколько",
+   "это",
+   "стоит"
+  ],
+  "distract_pl": [
+   "jak",
+   "kosztujesz"
+  ],
+  "distract_ru": [
+   "как",
+   "стоишь"
+  ],
+  "topic": "liczby",
+  "level": 1
+ },
+ {
+  "id": "p.to_kosztuje_dziesiec_zlotych",
+  "pl": "To kosztuje dziesięć złotych.",
+  "ru": "Это стоит десять злотых.",
+  "tr": "то кошту́е дже́щеньчь зўо́тых.",
+  "words": [
+   "w.to",
+   "w.kosztowac",
+   "w.dziesiec",
+   "w.zloty"
+  ],
+  "tiles_pl": [
+   "To",
+   "kosztuje",
+   "dziesięć",
+   "złotych"
+  ],
+  "tiles_ru": [
+   "Это",
+   "стоит",
+   "десять",
+   "злотых"
+  ],
+  "distract_pl": [
+   "dwadzieścia",
+   "złote"
+  ],
+  "distract_ru": [
+   "двадцать",
+   "злотый"
+  ],
+  "topic": "liczby",
+  "level": 2
+ },
+ {
+  "id": "p.to_kosztuje_piec_zlotych",
+  "pl": "To kosztuje pięć złotych.",
+  "ru": "Это стоит пять злотых.",
+  "tr": "то кошту́е пеньчь зўо́тых.",
+  "words": [
+   "w.to",
+   "w.kosztowac",
+   "w.piec",
+   "w.zloty"
+  ],
+  "tiles_pl": [
+   "To",
+   "kosztuje",
+   "pięć",
+   "złotych"
+  ],
+  "tiles_ru": [
+   "Это",
+   "стоит",
+   "пять",
+   "злотых"
+  ],
+  "distract_pl": [
+   "sześć",
+   "złoty"
+  ],
+  "distract_ru": [
+   "шесть",
+   "злотый"
+  ],
+  "topic": "liczby",
+  "level": 2
+ },
+ {
+  "id": "p.to_kosztuje_dwa_zlote",
+  "pl": "To kosztuje dwa złote.",
+  "ru": "Это стоит два злотых.",
+  "tr": "то кошту́е два зўо́тэ.",
+  "words": [
+   "w.to",
+   "w.kosztowac",
+   "w.dwa",
+   "w.zloty"
+  ],
+  "tiles_pl": [
+   "To",
+   "kosztuje",
+   "dwa",
+   "złote"
+  ],
+  "tiles_ru": [
+   "Это",
+   "стоит",
+   "два",
+   "злотых"
+  ],
+  "distract_pl": [
+   "trzy",
+   "złotych"
+  ],
+  "distract_ru": [
+   "три",
+   "злотый"
+  ],
+  "topic": "liczby",
+  "level": 2
+ },
+ {
+  "id": "p.mam_sto_zlotych",
+  "pl": "Mam sto złotych.",
+  "ru": "У меня сто злотых.",
+  "tr": "мам сто зўо́тых.",
+  "words": [
+   "w.miec",
+   "w.sto",
+   "w.zloty"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "sto",
+   "złotych"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "сто",
+   "злотых"
+  ],
+  "distract_pl": [
+   "dwieście",
+   "mamy"
+  ],
+  "distract_ru": [
+   "двести",
+   "есть"
+  ],
+  "topic": "liczby",
+  "level": 1
+ },
+ {
+  "id": "p.czynsz_to_piecset_zlotych",
+  "pl": "Czynsz to pięćset złotych.",
+  "ru": "Квартплата пятьсот злотых.",
+  "tr": "чынш то пе́ньчьсэт зўо́тых.",
+  "words": [
+   "w.czynsz",
+   "w.to",
+   "w.piecset",
+   "w.zloty"
+  ],
+  "tiles_pl": [
+   "Czynsz",
+   "to",
+   "pięćset",
+   "złotych"
+  ],
+  "tiles_ru": [
+   "Квартплата",
+   "пятьсот",
+   "злотых"
+  ],
+  "distract_pl": [
+   "tysiąc",
+   "dom"
+  ],
+  "distract_ru": [
+   "тысяча",
+   "дом"
+  ],
+  "topic": "liczby",
+  "level": 3
+ },
+ {
+  "id": "p.jaki_jest_twoj_numer_telefonu",
+  "pl": "Jaki jest twój numer telefonu?",
+  "ru": "Какой у тебя номер телефона?",
+  "tr": "я́ки ест тфуй ну́мэр тэлефо́ну?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.twoj",
+   "w.numer_telefonu"
+  ],
+  "tiles_pl": [
+   "Jaki",
+   "jest",
+   "twój",
+   "numer",
+   "telefonu"
+  ],
+  "tiles_ru": [
+   "Какой",
+   "у",
+   "тебя",
+   "номер",
+   "телефона"
+  ],
+  "distract_pl": [
+   "adres",
+   "jaka"
+  ],
+  "distract_ru": [
+   "адрес",
+   "какая"
+  ],
+  "topic": "liczby",
+  "level": 3
+ },
+ {
+  "id": "p.w_tygodniu_jest_siedem_dni",
+  "pl": "W tygodniu jest siedem dni.",
+  "ru": "В неделе семь дней.",
+  "tr": "ф тыго́дню ест ще́дэм дни.",
+  "words": [
+   "w.w",
+   "w.tydzien",
+   "w.byc",
+   "w.siedem",
+   "w.dzien"
+  ],
+  "tiles_pl": [
+   "W",
+   "tygodniu",
+   "jest",
+   "siedem",
+   "dni"
+  ],
+  "tiles_ru": [
+   "В",
+   "неделе",
+   "семь",
+   "дней"
+  ],
+  "distract_pl": [
+   "osiem",
+   "dzień"
+  ],
+  "distract_ru": [
+   "восемь",
+   "день"
+  ],
+  "topic": "liczby",
+  "level": 3
+ },
+ {
+  "id": "p.w_godzinie_jest_szescdziesiat_minut",
+  "pl": "W godzinie jest sześćdziesiąt minut.",
+  "ru": "В часе шестьдесят минут.",
+  "tr": "ф годжи́нье ест шэжьджьдже́щонт ми́нут.",
+  "words": [
+   "w.w",
+   "w.godzina",
+   "w.byc",
+   "w.szescdziesiat",
+   "w.minuta"
+  ],
+  "tiles_pl": [
+   "W",
+   "godzinie",
+   "jest",
+   "sześćdziesiąt",
+   "minut"
+  ],
+  "tiles_ru": [
+   "В",
+   "часе",
+   "шестьдесят",
+   "минут"
+  ],
+  "distract_pl": [
+   "pięćdziesiąt",
+   "dni"
+  ],
+  "distract_ru": [
+   "пятьдесят",
+   "дней"
+  ],
+  "topic": "liczby",
+  "level": 3
+ },
+ {
+  "id": "p.mam_dwie_siostry",
+  "pl": "Mam dwie siostry.",
+  "ru": "У меня две сестры.",
+  "tr": "мам две що́стры.",
+  "words": [
+   "w.miec",
+   "w.dwa",
+   "w.siostra"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "dwie",
+   "siostry"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "две",
+   "сестры"
+  ],
+  "distract_pl": [
+   "dwa",
+   "siostra"
+  ],
+  "distract_ru": [
+   "два",
+   "сестра"
+  ],
+  "topic": "liczby",
+  "level": 1
+ },
+ {
+  "id": "p.mam_trzy_koty",
+  "pl": "Mam trzy koty.",
+  "ru": "У меня три кота.",
+  "tr": "мам тшы ко́ты.",
+  "words": [
+   "w.miec",
+   "w.trzy",
+   "w.kot"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "trzy",
+   "koty"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "три",
+   "кота"
+  ],
+  "distract_pl": [
+   "cztery",
+   "kot"
+  ],
+  "distract_ru": [
+   "четыре",
+   "кошка"
+  ],
+  "topic": "liczby",
+  "level": 1
+ },
+ {
+  "id": "p.piec_plus_piec_to_dziesiec",
+  "pl": "Pięć plus pięć to dziesięć.",
+  "ru": "Пять плюс пять будет десять.",
+  "tr": "пеньчь плус пеньчь то дже́щеньчь.",
+  "words": [
+   "w.piec",
+   "w.plus",
+   "w.to",
+   "w.dziesiec"
+  ],
+  "tiles_pl": [
+   "Pięć",
+   "plus",
+   "pięć",
+   "to",
+   "dziesięć"
+  ],
+  "tiles_ru": [
+   "Пять",
+   "плюс",
+   "пять",
+   "будет",
+   "десять"
+  ],
+  "distract_pl": [
+   "minus",
+   "dziewięć"
+  ],
+  "distract_ru": [
+   "минус",
+   "девять"
+  ],
+  "topic": "liczby",
+  "level": 3
+ },
+ {
+  "id": "p.dziesiec_minus_trzy_to_siedem",
+  "pl": "Dziesięć minus trzy to siedem.",
+  "ru": "Десять минус три будет семь.",
+  "tr": "дже́щеньчь ми́нус тшы то ще́дэм.",
+  "words": [
+   "w.dziesiec",
+   "w.minus",
+   "w.trzy",
+   "w.to",
+   "w.siedem"
+  ],
+  "tiles_pl": [
+   "Dziesięć",
+   "minus",
+   "trzy",
+   "to",
+   "siedem"
+  ],
+  "tiles_ru": [
+   "Десять",
+   "минус",
+   "три",
+   "будет",
+   "семь"
+  ],
+  "distract_pl": [
+   "plus",
+   "osiem"
+  ],
+  "distract_ru": [
+   "плюс",
+   "восемь"
+  ],
+  "topic": "liczby",
+  "level": 3
+ },
+ {
+  "id": "p.poprosze_dwie_kawy",
+  "pl": "Poproszę dwie kawy.",
+  "ru": "Мне, пожалуйста, два кофе.",
+  "tr": "попро́шэ две ка́вы.",
+  "words": [
+   "w.poprosze",
+   "w.dwa",
+   "w.kawa"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "dwie",
+   "kawy"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "два",
+   "кофе"
+  ],
+  "distract_pl": [
+   "dwa",
+   "herbaty"
+  ],
+  "distract_ru": [
+   "две",
+   "чая"
+  ],
+  "topic": "liczby",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_trzy_bulki",
+  "pl": "Poproszę trzy bułki.",
+  "ru": "Мне, пожалуйста, три булочки.",
+  "tr": "попро́шэ тшы бу́ўки.",
+  "words": [
+   "w.poprosze",
+   "w.trzy",
+   "w.bulka"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "trzy",
+   "bułki"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "три",
+   "булочки"
+  ],
+  "distract_pl": [
+   "cztery",
+   "bułka"
+  ],
+  "distract_ru": [
+   "четыре",
+   "булочка"
+  ],
+  "topic": "liczby",
+  "level": 1
+ },
+ {
+  "id": "p.mam_duzy_dom",
+  "pl": "Mam duży dom.",
+  "ru": "У меня большой дом.",
+  "tr": "мам ду́жы дом.",
+  "words": [
+   "w.miec",
+   "w.duzy",
+   "w.dom"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "duży",
+   "dom"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "большой",
+   "дом"
+  ],
+  "distract_pl": [
+   "mały",
+   "mieszkanie"
+  ],
+  "distract_ru": [
+   "маленький",
+   "квартира"
+  ],
+  "topic": "dom",
+  "level": 1
+ },
+ {
+  "id": "p.moje_mieszkanie_jest_male",
+  "pl": "Moje mieszkanie jest małe.",
+  "ru": "Моя квартира маленькая.",
+  "tr": "мо́е мешка́нье ест ма́ўэ.",
+  "words": [
+   "w.moj",
+   "w.mieszkanie",
+   "w.byc",
+   "w.maly"
+  ],
+  "tiles_pl": [
+   "Moje",
+   "mieszkanie",
+   "jest",
+   "małe"
+  ],
+  "tiles_ru": [
+   "Моя",
+   "квартира",
+   "маленькая"
+  ],
+  "distract_pl": [
+   "duże",
+   "mój"
+  ],
+  "distract_ru": [
+   "большая",
+   "мой"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.mieszkanie_jest_w_centrum",
+  "pl": "Mieszkanie jest w centrum.",
+  "ru": "Квартира в центре.",
+  "tr": "мешка́нье ест ф цэ́нтрум.",
+  "words": [
+   "w.mieszkanie",
+   "w.byc",
+   "w.w",
+   "w.centrum"
+  ],
+  "tiles_pl": [
+   "Mieszkanie",
+   "jest",
+   "w",
+   "centrum"
+  ],
+  "tiles_ru": [
+   "Квартира",
+   "в",
+   "центре"
+  ],
+  "distract_pl": [
+   "dom",
+   "parku"
+  ],
+  "distract_ru": [
+   "дом",
+   "парке"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.gdzie_jest_kuchnia",
+  "pl": "Gdzie jest kuchnia?",
+  "ru": "Где кухня?",
+  "tr": "гдже ест ку́хня?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.kuchnia"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "kuchnia"
+  ],
+  "tiles_ru": [
+   "Где",
+   "кухня"
+  ],
+  "distract_pl": [
+   "łazienka",
+   "toaleta"
+  ],
+  "distract_ru": [
+   "ванная",
+   "туалет"
+  ],
+  "topic": "dom",
+  "level": 1
+ },
+ {
+  "id": "p.kuchnia_jest_tam",
+  "pl": "Kuchnia jest tam.",
+  "ru": "Кухня там.",
+  "tr": "ку́хня ест там.",
+  "words": [
+   "w.kuchnia",
+   "w.byc",
+   "w.tam"
+  ],
+  "tiles_pl": [
+   "Kuchnia",
+   "jest",
+   "tam"
+  ],
+  "tiles_ru": [
+   "Кухня",
+   "там"
+  ],
+  "distract_pl": [
+   "tu",
+   "daleko"
+  ],
+  "distract_ru": [
+   "здесь",
+   "далеко"
+  ],
+  "topic": "dom",
+  "level": 1
+ },
+ {
+  "id": "p.lazienka_jest_na_gorze",
+  "pl": "Łazienka jest na górze.",
+  "ru": "Ванная наверху.",
+  "tr": "ўаже́нка ест на гу́жэ.",
+  "words": [
+   "w.lazienka",
+   "w.byc",
+   "w.na_gorze"
+  ],
+  "tiles_pl": [
+   "Łazienka",
+   "jest",
+   "na",
+   "górze"
+  ],
+  "tiles_ru": [
+   "Ванная",
+   "наверху"
+  ],
+  "distract_pl": [
+   "dole",
+   "obok"
+  ],
+  "distract_ru": [
+   "внизу",
+   "рядом"
+  ],
+  "topic": "dom",
+  "level": 3
+ },
+ {
+  "id": "p.okno_jest_otwarte",
+  "pl": "Okno jest otwarte.",
+  "ru": "Окно открыто.",
+  "tr": "о́кно ест отфа́ртэ.",
+  "words": [
+   "w.okno",
+   "w.byc",
+   "w.otwarty"
+  ],
+  "tiles_pl": [
+   "Okno",
+   "jest",
+   "otwarte"
+  ],
+  "tiles_ru": [
+   "Окно",
+   "открыто"
+  ],
+  "distract_pl": [
+   "zamknięte",
+   "drzwi"
+  ],
+  "distract_ru": [
+   "закрыто",
+   "дверь"
+  ],
+  "topic": "dom",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_jest_klucz",
+  "pl": "Gdzie jest klucz?",
+  "ru": "Где ключ?",
+  "tr": "гдже ест клуч?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.klucz"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "klucz"
+  ],
+  "tiles_ru": [
+   "Где",
+   "ключ"
+  ],
+  "distract_pl": [
+   "są",
+   "klucze"
+  ],
+  "distract_ru": [
+   "есть",
+   "ключи"
+  ],
+  "topic": "dom",
+  "level": 1
+ },
+ {
+  "id": "p.klucz_jest_na_stole",
+  "pl": "Klucz jest na stole.",
+  "ru": "Ключ на столе.",
+  "tr": "клуч ест на сто́ле.",
+  "words": [
+   "w.klucz",
+   "w.byc",
+   "w.na",
+   "w.stol"
+  ],
+  "tiles_pl": [
+   "Klucz",
+   "jest",
+   "na",
+   "stole"
+  ],
+  "tiles_ru": [
+   "Ключ",
+   "на",
+   "столе"
+  ],
+  "distract_pl": [
+   "półce",
+   "pod"
+  ],
+  "distract_ru": [
+   "полке",
+   "под"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.lodowka_jest_w_kuchni",
+  "pl": "Lodówka jest w kuchni.",
+  "ru": "Холодильник на кухне.",
+  "tr": "лоду́фка ест ф ку́хни.",
+  "words": [
+   "w.lodowka",
+   "w.byc",
+   "w.w",
+   "w.kuchnia"
+  ],
+  "tiles_pl": [
+   "Lodówka",
+   "jest",
+   "w",
+   "kuchni"
+  ],
+  "tiles_ru": [
+   "Холодильник",
+   "на",
+   "кухне"
+  ],
+  "distract_pl": [
+   "salonie",
+   "łazience"
+  ],
+  "distract_ru": [
+   "гостиной",
+   "ванной"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.lozko_jest_w_sypialni",
+  "pl": "Łóżko jest w sypialni.",
+  "ru": "Кровать в спальне.",
+  "tr": "ўу́шко ест ф сыпя́лни.",
+  "words": [
+   "w.lozko",
+   "w.byc",
+   "w.w",
+   "w.sypialnia"
+  ],
+  "tiles_pl": [
+   "Łóżko",
+   "jest",
+   "w",
+   "sypialni"
+  ],
+  "tiles_ru": [
+   "Кровать",
+   "в",
+   "спальне"
+  ],
+  "distract_pl": [
+   "pokoju",
+   "kuchni"
+  ],
+  "distract_ru": [
+   "комнате",
+   "кухне"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.kot_spi_na_kanapie",
+  "pl": "Kot śpi na kanapie.",
+  "ru": "Кот спит на диване.",
+  "tr": "кот щпи на кана́пе.",
+  "words": [
+   "w.kot",
+   "w.spac",
+   "w.na",
+   "w.kanapa"
+  ],
+  "tiles_pl": [
+   "Kot",
+   "śpi",
+   "na",
+   "kanapie"
+  ],
+  "tiles_ru": [
+   "Кот",
+   "спит",
+   "на",
+   "диване"
+  ],
+  "distract_pl": [
+   "stole",
+   "łóżku"
+  ],
+  "distract_ru": [
+   "столе",
+   "кровати"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.kot_jest_pod_stolem",
+  "pl": "Kot jest pod stołem.",
+  "ru": "Кот под столом.",
+  "tr": "кот ест пот сто́ўэм.",
+  "words": [
+   "w.kot",
+   "w.byc",
+   "w.pod",
+   "w.stol"
+  ],
+  "tiles_pl": [
+   "Kot",
+   "jest",
+   "pod",
+   "stołem"
+  ],
+  "tiles_ru": [
+   "Кот",
+   "под",
+   "столом"
+  ],
+  "distract_pl": [
+   "nad",
+   "kanapą"
+  ],
+  "distract_ru": [
+   "над",
+   "диваном"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.jaki_jest_twoj_adres",
+  "pl": "Jaki jest twój adres?",
+  "ru": "Какой у тебя адрес?",
+  "tr": "я́ки ест тфуй а́дрэс?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.twoj",
+   "w.adres"
+  ],
+  "tiles_pl": [
+   "Jaki",
+   "jest",
+   "twój",
+   "adres"
+  ],
+  "tiles_ru": [
+   "Какой",
+   "у",
+   "тебя",
+   "адрес"
+  ],
+  "distract_pl": [
+   "numer",
+   "jaka"
+  ],
+  "distract_ru": [
+   "номер",
+   "какая"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.czy_jest_winda",
+  "pl": "Czy jest winda?",
+  "ru": "Лифт есть?",
+  "tr": "чы ест ви́нда?",
+  "words": [
+   "w.czy",
+   "w.byc",
+   "w.winda"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "jest",
+   "winda"
+  ],
+  "tiles_ru": [
+   "Лифт",
+   "есть"
+  ],
+  "distract_pl": [
+   "tu",
+   "będzie"
+  ],
+  "distract_ru": [
+   "тут",
+   "будет"
+  ],
+  "topic": "dom",
+  "level": 1
+ },
+ {
+  "id": "p.czy_jest_tu_wifi",
+  "pl": "Czy jest tu wifi?",
+  "ru": "Здесь есть вайфай?",
+  "tr": "чы ест ту ви́фи?",
+  "words": [
+   "w.czy",
+   "w.byc",
+   "w.tu",
+   "w.wifi"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "jest",
+   "tu",
+   "wifi"
+  ],
+  "tiles_ru": [
+   "Здесь",
+   "есть",
+   "вайфай"
+  ],
+  "distract_pl": [
+   "tam",
+   "internet"
+  ],
+  "distract_ru": [
+   "там",
+   "интернет"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.nie_ma_pradu",
+  "pl": "Nie ma prądu.",
+  "ru": "Нет электричества.",
+  "tr": "нье ма про́нду.",
+  "words": [
+   "w.nie",
+   "w.miec",
+   "w.prad"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "ma",
+   "prądu"
+  ],
+  "tiles_ru": [
+   "Нет",
+   "электричества"
+  ],
+  "distract_pl": [
+   "światła",
+   "mam"
+  ],
+  "distract_ru": [
+   "света",
+   "имею"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.nie_ma_wody",
+  "pl": "Nie ma wody.",
+  "ru": "Нет воды.",
+  "tr": "нье ма во́ды.",
+  "words": [
+   "w.nie",
+   "w.miec",
+   "w.woda"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "ma",
+   "wody"
+  ],
+  "tiles_ru": [
+   "Нет",
+   "воды"
+  ],
+  "distract_pl": [
+   "prądu",
+   "jest"
+  ],
+  "distract_ru": [
+   "тока",
+   "есть"
+  ],
+  "topic": "dom",
+  "level": 1
+ },
+ {
+  "id": "p.czy_moge_zobaczyc_mieszkanie",
+  "pl": "Czy mogę zobaczyć mieszkanie?",
+  "ru": "Можно посмотреть квартиру?",
+  "tr": "чы мо́гэ зоба́чычь мешка́нье?",
+  "words": [
+   "w.czy",
+   "w.moc",
+   "w.zobaczyc",
+   "w.mieszkanie"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "mogę",
+   "zobaczyć",
+   "mieszkanie"
+  ],
+  "tiles_ru": [
+   "Можно",
+   "посмотреть",
+   "квартиру"
+  ],
+  "distract_pl": [
+   "pokój",
+   "kupić"
+  ],
+  "distract_ru": [
+   "комнату",
+   "купить"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.ile_kosztuje_czynsz",
+  "pl": "Ile kosztuje czynsz?",
+  "ru": "Сколько стоит квартплата?",
+  "tr": "и́ле кошту́е чынш?",
+  "words": [
+   "w.ile",
+   "w.kosztowac",
+   "w.czynsz"
+  ],
+  "tiles_pl": [
+   "Ile",
+   "kosztuje",
+   "czynsz"
+  ],
+  "tiles_ru": [
+   "Сколько",
+   "стоит",
+   "квартплата"
+  ],
+  "distract_pl": [
+   "bilet",
+   "mieszkanie"
+  ],
+  "distract_ru": [
+   "билет",
+   "квартира"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.wynajmuje_mieszkanie",
+  "pl": "Wynajmuję mieszkanie.",
+  "ru": "Я снимаю квартиру.",
+  "tr": "вынайму́е мешка́нье.",
+  "words": [
+   "w.wynajmowac",
+   "w.mieszkanie"
+  ],
+  "tiles_pl": [
+   "Wynajmuję",
+   "mieszkanie"
+  ],
+  "tiles_ru": [
+   "Я",
+   "снимаю",
+   "квартиру"
+  ],
+  "distract_pl": [
+   "kupuję",
+   "dom"
+  ],
+  "distract_ru": [
+   "покупаю",
+   "дом"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.szukam_mieszkania",
+  "pl": "Szukam mieszkania.",
+  "ru": "Я ищу квартиру.",
+  "tr": "шу́кам мешка́ня.",
+  "words": [
+   "w.szukac",
+   "w.mieszkanie"
+  ],
+  "tiles_pl": [
+   "Szukam",
+   "mieszkania"
+  ],
+  "tiles_ru": [
+   "Я",
+   "ищу",
+   "квартиру"
+  ],
+  "distract_pl": [
+   "domu",
+   "pracy"
+  ],
+  "distract_ru": [
+   "дом",
+   "работу"
+  ],
+  "topic": "dom",
+  "level": 1
+ },
+ {
+  "id": "p.w_pokoju_jest_lozko",
+  "pl": "W pokoju jest łóżko.",
+  "ru": "В комнате есть кровать.",
+  "tr": "ф поко́ю ест ўу́шко.",
+  "words": [
+   "w.w",
+   "w.pokoj",
+   "w.byc",
+   "w.lozko"
+  ],
+  "tiles_pl": [
+   "W",
+   "pokoju",
+   "jest",
+   "łóżko"
+  ],
+  "tiles_ru": [
+   "В",
+   "комнате",
+   "есть",
+   "кровать"
+  ],
+  "distract_pl": [
+   "szafa",
+   "stół"
+  ],
+  "distract_ru": [
+   "шкаф",
+   "стол"
+  ],
+  "topic": "dom",
+  "level": 2
+ },
+ {
+  "id": "p.w_kuchni_jest_stol_i_cztery_krzesla",
+  "pl": "W kuchni jest stół i cztery krzesła.",
+  "ru": "На кухне стол и четыре стула.",
+  "tr": "ф ку́хни ест стуў и чтэ́ры кшэ́сўа.",
+  "words": [
+   "w.w",
+   "w.kuchnia",
+   "w.byc",
+   "w.stol",
+   "w.i",
+   "w.cztery",
+   "w.krzeslo"
+  ],
+  "tiles_pl": [
+   "W",
+   "kuchni",
+   "jest",
+   "stół",
+   "i",
+   "cztery",
+   "krzesła"
+  ],
+  "tiles_ru": [
+   "На",
+   "кухне",
+   "стол",
+   "и",
+   "четыре",
+   "стула"
+  ],
+  "distract_pl": [
+   "dwa",
+   "krzesło"
+  ],
+  "distract_ru": [
+   "два",
+   "стул"
+  ],
+  "topic": "dom",
+  "level": 3
+ },
+ {
+  "id": "p.poprosze_kawe_z_mlekiem",
+  "pl": "Poproszę kawę z mlekiem.",
+  "ru": "Мне, пожалуйста, кофе с молоком.",
+  "tr": "попро́шэ ка́вэ с мле́кем.",
+  "words": [
+   "w.poprosze",
+   "w.kawa",
+   "w.z",
+   "w.mleko"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "kawę",
+   "z",
+   "mlekiem"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "кофе",
+   "с",
+   "молоком"
+  ],
+  "distract_pl": [
+   "bez",
+   "cukrem"
+  ],
+  "distract_ru": [
+   "без",
+   "сахаром"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.poprosze_kawe_bez_cukru",
+  "pl": "Poproszę kawę bez cukru.",
+  "ru": "Мне, пожалуйста, кофе без сахара.",
+  "tr": "попро́шэ ка́вэ бэс цу́кру.",
+  "words": [
+   "w.poprosze",
+   "w.kawa",
+   "w.bez",
+   "w.cukier"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "kawę",
+   "bez",
+   "cukru"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "кофе",
+   "без",
+   "сахара"
+  ],
+  "distract_pl": [
+   "z",
+   "mleka"
+  ],
+  "distract_ru": [
+   "с",
+   "молока"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.poprosze_wode_gazowana",
+  "pl": "Poproszę wodę gazowaną.",
+  "ru": "Мне, пожалуйста, воду с газом.",
+  "tr": "попро́шэ во́дэ газова́ноў.",
+  "words": [
+   "w.poprosze",
+   "w.woda",
+   "w.gazowany"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "wodę",
+   "gazowaną"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "воду",
+   "с",
+   "газом"
+  ],
+  "distract_pl": [
+   "niegazowaną",
+   "sok"
+  ],
+  "distract_ru": [
+   "без",
+   "газа",
+   "сок"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_zupe_dnia",
+  "pl": "Poproszę zupę dnia.",
+  "ru": "Мне, пожалуйста, суп дня.",
+  "tr": "попро́шэ зу́пэ дня.",
+  "words": [
+   "w.poprosze",
+   "w.zupa",
+   "w.dzien"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "zupę",
+   "dnia"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "суп",
+   "дня"
+  ],
+  "distract_pl": [
+   "danie",
+   "noc"
+  ],
+  "distract_ru": [
+   "блюдо",
+   "ночи"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_salatke",
+  "pl": "Poproszę sałatkę.",
+  "ru": "Мне, пожалуйста, салат.",
+  "tr": "попро́шэ саўа́ткэ.",
+  "words": [
+   "w.poprosze",
+   "w.salatka"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "sałatkę"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "салат"
+  ],
+  "distract_pl": [
+   "pizzę",
+   "kanapkę"
+  ],
+  "distract_ru": [
+   "пиццу",
+   "бутерброд"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_kanapke_z_serem",
+  "pl": "Poproszę kanapkę z serem.",
+  "ru": "Мне, пожалуйста, бутерброд с сыром.",
+  "tr": "попро́шэ кана́пкэ с сэ́рэм.",
+  "words": [
+   "w.poprosze",
+   "w.kanapka",
+   "w.z",
+   "w.ser"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "kanapkę",
+   "z",
+   "serem"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "бутерброд",
+   "с",
+   "сыром"
+  ],
+  "distract_pl": [
+   "szynką",
+   "bułkę"
+  ],
+  "distract_ru": [
+   "ветчиной",
+   "булочку"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.poprosze_kawalek_ciasta",
+  "pl": "Poproszę kawałek ciasta.",
+  "ru": "Мне, пожалуйста, кусок пирога.",
+  "tr": "попро́шэ кава́ўэк ча́ста.",
+  "words": [
+   "w.poprosze",
+   "w.kawalek",
+   "w.ciasto"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "kawałek",
+   "ciasta"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "кусок",
+   "пирога"
+  ],
+  "distract_pl": [
+   "paczkę",
+   "lody"
+  ],
+  "distract_ru": [
+   "пачку",
+   "мороженое"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_menu",
+  "pl": "Poproszę menu.",
+  "ru": "Меню, пожалуйста.",
+  "tr": "попро́шэ мэ́ну.",
+  "words": [
+   "w.poprosze",
+   "w.menu"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "menu"
+  ],
+  "tiles_ru": [
+   "Меню",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "rachunek",
+   "kartę"
+  ],
+  "distract_ru": [
+   "счёт",
+   "карту"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_stolik_dla_dwoch_osob",
+  "pl": "Poproszę stolik dla dwóch osób.",
+  "ru": "Столик на двоих, пожалуйста.",
+  "tr": "попро́шэ сто́лик дла двух о́суп.",
+  "words": [
+   "w.poprosze",
+   "w.stolik",
+   "w.dla",
+   "w.dwa",
+   "w.osoba"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "stolik",
+   "dla",
+   "dwóch",
+   "osób"
+  ],
+  "tiles_ru": [
+   "Столик",
+   "на",
+   "двоих",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "trzech",
+   "osoba"
+  ],
+  "distract_ru": [
+   "троих",
+   "человек"
+  ],
+  "topic": "jedzenie",
+  "level": 3
+ },
+ {
+  "id": "p.czy_jest_wolny_stolik",
+  "pl": "Czy jest wolny stolik?",
+  "ru": "Есть свободный столик?",
+  "tr": "чы ест во́лны сто́лик?",
+  "words": [
+   "w.czy",
+   "w.byc",
+   "w.wolny",
+   "w.stolik"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "jest",
+   "wolny",
+   "stolik"
+  ],
+  "tiles_ru": [
+   "Есть",
+   "свободный",
+   "столик"
+  ],
+  "distract_pl": [
+   "pusty",
+   "stół"
+  ],
+  "distract_ru": [
+   "пустой",
+   "стол"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.jakie_jest_danie_dnia",
+  "pl": "Jakie jest danie dnia?",
+  "ru": "Какое блюдо дня?",
+  "tr": "я́ке ест да́нье дня?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.danie",
+   "w.dzien"
+  ],
+  "tiles_pl": [
+   "Jakie",
+   "jest",
+   "danie",
+   "dnia"
+  ],
+  "tiles_ru": [
+   "Какое",
+   "блюдо",
+   "дня"
+  ],
+  "distract_pl": [
+   "zupa",
+   "dzień"
+  ],
+  "distract_ru": [
+   "суп",
+   "день"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.czy_to_jest_ostre",
+  "pl": "Czy to jest ostre?",
+  "ru": "Это острое?",
+  "tr": "чы то ест о́стрэ?",
+  "words": [
+   "w.czy",
+   "w.to",
+   "w.byc",
+   "w.ostry"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "to",
+   "jest",
+   "ostre"
+  ],
+  "tiles_ru": [
+   "Это",
+   "острое"
+  ],
+  "distract_pl": [
+   "słodkie",
+   "zimne"
+  ],
+  "distract_ru": [
+   "сладкое",
+   "холодное"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.czy_to_jest_wegetarianskie",
+  "pl": "Czy to jest wegetariańskie?",
+  "ru": "Это вегетарианское?",
+  "tr": "чы то ест вэгэтаря́ньске?",
+  "words": [
+   "w.czy",
+   "w.to",
+   "w.byc",
+   "w.wegetarianski"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "to",
+   "jest",
+   "wegetariańskie"
+  ],
+  "tiles_ru": [
+   "Это",
+   "вегетарианское"
+  ],
+  "distract_pl": [
+   "mięso",
+   "świeże"
+  ],
+  "distract_ru": [
+   "мясо",
+   "свежее"
+  ],
+  "topic": "jedzenie",
+  "level": 3
+ },
+ {
+  "id": "p.nie_jem_miesa",
+  "pl": "Nie jem mięsa.",
+  "ru": "Я не ем мяса.",
+  "tr": "нье ем ме́ўса.",
+  "words": [
+   "w.nie",
+   "w.jesc",
+   "w.mieso"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "jem",
+   "mięsa"
+  ],
+  "tiles_ru": [
+   "Я",
+   "не",
+   "ем",
+   "мяса"
+  ],
+  "distract_pl": [
+   "ryby",
+   "piję"
+  ],
+  "distract_ru": [
+   "рыбы",
+   "пью"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.nie_lubie_cebuli",
+  "pl": "Nie lubię cebuli.",
+  "ru": "Я не люблю лук.",
+  "tr": "нье лу́бе цэбу́ли.",
+  "words": [
+   "w.nie",
+   "w.lubic",
+   "w.cebula"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "lubię",
+   "cebuli"
+  ],
+  "tiles_ru": [
+   "Я",
+   "не",
+   "люблю",
+   "лук"
+  ],
+  "distract_pl": [
+   "czosnek",
+   "jem"
+  ],
+  "distract_ru": [
+   "чеснок",
+   "ем"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.lubie_kawe",
+  "pl": "Lubię kawę.",
+  "ru": "Я люблю кофе.",
+  "tr": "лу́бе ка́вэ.",
+  "words": [
+   "w.lubic",
+   "w.kawa"
+  ],
+  "tiles_pl": [
+   "Lubię",
+   "kawę"
+  ],
+  "tiles_ru": [
+   "Я",
+   "люблю",
+   "кофе"
+  ],
+  "distract_pl": [
+   "herbatę",
+   "kocham"
+  ],
+  "distract_ru": [
+   "чай",
+   "любишь"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.jem_sniadanie_o_osmej",
+  "pl": "Jem śniadanie o ósmej.",
+  "ru": "Я завтракаю в восемь.",
+  "tr": "ем щняда́нье о у́смэй.",
+  "words": [
+   "w.jesc",
+   "w.sniadanie",
+   "w.o",
+   "w.osmy"
+  ],
+  "tiles_pl": [
+   "Jem",
+   "śniadanie",
+   "o",
+   "ósmej"
+  ],
+  "tiles_ru": [
+   "Я",
+   "завтракаю",
+   "в",
+   "восемь"
+  ],
+  "distract_pl": [
+   "obiad",
+   "ósma"
+  ],
+  "distract_ru": [
+   "обед",
+   "девять"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.na_sniadanie_jem_jajka",
+  "pl": "Na śniadanie jem jajka.",
+  "ru": "На завтрак я ем яйца.",
+  "tr": "на щняда́нье ем я́йка.",
+  "words": [
+   "w.na",
+   "w.sniadanie",
+   "w.jesc",
+   "w.jajko"
+  ],
+  "tiles_pl": [
+   "Na",
+   "śniadanie",
+   "jem",
+   "jajka"
+  ],
+  "tiles_ru": [
+   "На",
+   "завтрак",
+   "я",
+   "ем",
+   "яйца"
+  ],
+  "distract_pl": [
+   "obiad",
+   "piję"
+  ],
+  "distract_ru": [
+   "обед",
+   "пью"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.pije_duzo_wody",
+  "pl": "Piję dużo wody.",
+  "ru": "Я пью много воды.",
+  "tr": "пи́е ду́жо во́ды.",
+  "words": [
+   "w.pic",
+   "w.duzo",
+   "w.woda"
+  ],
+  "tiles_pl": [
+   "Piję",
+   "dużo",
+   "wody"
+  ],
+  "tiles_ru": [
+   "Я",
+   "пью",
+   "много",
+   "воды"
+  ],
+  "distract_pl": [
+   "mało",
+   "woda"
+  ],
+  "distract_ru": [
+   "мало",
+   "вода"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_glodny",
+  "pl": "Jestem głodny.",
+  "ru": "Я голоден.",
+  "tr": "е́стэм гўо́дны.",
+  "words": [
+   "w.byc",
+   "w.glodny"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "głodny"
+  ],
+  "tiles_ru": [
+   "Я",
+   "голоден"
+  ],
+  "distract_pl": [
+   "spragniony",
+   "pełny"
+  ],
+  "distract_ru": [
+   "хочу",
+   "пить",
+   "сыт"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_spragniony",
+  "pl": "Jestem spragniony.",
+  "ru": "Я хочу пить.",
+  "tr": "е́стэм спрагнёны.",
+  "words": [
+   "w.byc",
+   "w.spragniony"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "spragniony"
+  ],
+  "tiles_ru": [
+   "Я",
+   "хочу",
+   "пить"
+  ],
+  "distract_pl": [
+   "głodny",
+   "zmęczony"
+  ],
+  "distract_ru": [
+   "голоден",
+   "устал"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.zupa_jest_goraca",
+  "pl": "Zupa jest gorąca.",
+  "ru": "Суп горячий.",
+  "tr": "зу́па ест горо́нца.",
+  "words": [
+   "w.zupa",
+   "w.byc",
+   "w.goracy"
+  ],
+  "tiles_pl": [
+   "Zupa",
+   "jest",
+   "gorąca"
+  ],
+  "tiles_ru": [
+   "Суп",
+   "горячий"
+  ],
+  "distract_pl": [
+   "zimna",
+   "kawa"
+  ],
+  "distract_ru": [
+   "холодный",
+   "кофе"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.ciasto_jest_pyszne",
+  "pl": "Ciasto jest pyszne.",
+  "ru": "Пирог очень вкусный.",
+  "tr": "ча́сто ест пы́шнэ.",
+  "words": [
+   "w.ciasto",
+   "w.byc",
+   "w.pyszny"
+  ],
+  "tiles_pl": [
+   "Ciasto",
+   "jest",
+   "pyszne"
+  ],
+  "tiles_ru": [
+   "Пирог",
+   "очень",
+   "вкусный"
+  ],
+  "distract_pl": [
+   "świeże",
+   "zupa"
+  ],
+  "distract_ru": [
+   "свежий",
+   "суп"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.to_jest_bardzo_smaczne",
+  "pl": "To jest bardzo smaczne.",
+  "ru": "Это очень вкусно.",
+  "tr": "то ест ба́рдзо сма́чнэ.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.bardzo",
+   "w.smaczny"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "bardzo",
+   "smaczne"
+  ],
+  "tiles_ru": [
+   "Это",
+   "очень",
+   "вкусно"
+  ],
+  "distract_pl": [
+   "mało",
+   "słone"
+  ],
+  "distract_ru": [
+   "мало",
+   "солёно"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.mleko_jest_w_lodowce",
+  "pl": "Mleko jest w lodówce.",
+  "ru": "Молоко в холодильнике.",
+  "tr": "мле́ко ест ф лоду́фцэ.",
+  "words": [
+   "w.mleko",
+   "w.byc",
+   "w.w",
+   "w.lodowka"
+  ],
+  "tiles_pl": [
+   "Mleko",
+   "jest",
+   "w",
+   "lodówce"
+  ],
+  "tiles_ru": [
+   "Молоко",
+   "в",
+   "холодильнике"
+  ],
+  "distract_pl": [
+   "kuchni",
+   "szafie"
+  ],
+  "distract_ru": [
+   "кухне",
+   "шкафу"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.place_karta",
+  "pl": "Płacę kartą.",
+  "ru": "Я плачу картой.",
+  "tr": "пўа́цэ ка́ртоў.",
+  "words": [
+   "w.placic",
+   "w.karta"
+  ],
+  "tiles_pl": [
+   "Płacę",
+   "kartą"
+  ],
+  "tiles_ru": [
+   "Я",
+   "плачу",
+   "картой"
+  ],
+  "distract_pl": [
+   "gotówką",
+   "kartę"
+  ],
+  "distract_ru": [
+   "наличными",
+   "карту"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.place_gotowka",
+  "pl": "Płacę gotówką.",
+  "ru": "Я плачу наличными.",
+  "tr": "пўа́цэ готу́фкоў.",
+  "words": [
+   "w.placic",
+   "w.gotowka"
+  ],
+  "tiles_pl": [
+   "Płacę",
+   "gotówką"
+  ],
+  "tiles_ru": [
+   "Я",
+   "плачу",
+   "наличными"
+  ],
+  "distract_pl": [
+   "kartą",
+   "gotówka"
+  ],
+  "distract_ru": [
+   "картой",
+   "наличные"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.czy_moge_placic_karta",
+  "pl": "Czy mogę płacić kartą?",
+  "ru": "Можно платить картой?",
+  "tr": "чы мо́гэ пўа́чичь ка́ртоў?",
+  "words": [
+   "w.czy",
+   "w.moc",
+   "w.placic",
+   "w.karta"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "mogę",
+   "płacić",
+   "kartą"
+  ],
+  "tiles_ru": [
+   "Можно",
+   "платить",
+   "картой"
+  ],
+  "distract_pl": [
+   "gotówką",
+   "masz"
+  ],
+  "distract_ru": [
+   "наличными",
+   "есть"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.razem_czy_osobno",
+  "pl": "Razem czy osobno?",
+  "ru": "Вместе или раздельно?",
+  "tr": "ра́зэм чы осо́бно?",
+  "words": [
+   "w.razem",
+   "w.czy",
+   "w.osobno"
+  ],
+  "tiles_pl": [
+   "Razem",
+   "czy",
+   "osobno"
+  ],
+  "tiles_ru": [
+   "Вместе",
+   "или",
+   "раздельно"
+  ],
+  "distract_pl": [
+   "oraz",
+   "razy"
+  ],
+  "distract_ru": [
+   "а",
+   "также",
+   "раз"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.osobno_prosze",
+  "pl": "Osobno, proszę.",
+  "ru": "Отдельно, пожалуйста.",
+  "tr": "осо́бно, про́шэ.",
+  "words": [
+   "w.osobno",
+   "w.prosze"
+  ],
+  "tiles_pl": [
+   "Osobno",
+   "proszę"
+  ],
+  "tiles_ru": [
+   "Отдельно",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "razem",
+   "dziękuję"
+  ],
+  "distract_ru": [
+   "вместе",
+   "спасибо"
+  ],
+  "topic": "jedzenie",
+  "level": 2
+ },
+ {
+  "id": "p.chce_jesc",
+  "pl": "Chcę jeść.",
+  "ru": "Я хочу есть.",
+  "tr": "хцэ ещчь.",
+  "words": [
+   "w.chciec",
+   "w.jesc"
+  ],
+  "tiles_pl": [
+   "Chcę",
+   "jeść"
+  ],
+  "tiles_ru": [
+   "Я",
+   "хочу",
+   "есть"
+  ],
+  "distract_pl": [
+   "pić",
+   "mam"
+  ],
+  "distract_ru": [
+   "пить",
+   "имею"
+  ],
+  "topic": "jedzenie",
+  "level": 1
+ },
+ {
+  "id": "p.czy_masz_cos_do_jedzenia",
+  "pl": "Czy masz coś do jedzenia?",
+  "ru": "У тебя есть что-нибудь поесть?",
+  "tr": "чы маш цощ до едзэ́ня?",
+  "words": [
+   "w.czy",
+   "w.miec",
+   "w.cos",
+   "w.do",
+   "w.jedzenie"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "masz",
+   "coś",
+   "do",
+   "jedzenia"
+  ],
+  "tiles_ru": [
+   "У",
+   "тебя",
+   "есть",
+   "что-нибудь",
+   "поесть"
+  ],
+  "distract_pl": [
+   "nic",
+   "kto"
+  ],
+  "distract_ru": [
+   "ничего",
+   "кто"
+  ],
+  "topic": "jedzenie",
+  "level": 3
+ },
+ {
+  "id": "p.gdzie_jest_sklep",
+  "pl": "Gdzie jest sklep?",
+  "ru": "Где магазин?",
+  "tr": "гдже ест склеп?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.sklep"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "sklep"
+  ],
+  "tiles_ru": [
+   "Где",
+   "магазин"
+  ],
+  "distract_pl": [
+   "apteka",
+   "kiedy"
+  ],
+  "distract_ru": [
+   "аптека",
+   "когда"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.sklep_jest_otwarty",
+  "pl": "Sklep jest otwarty.",
+  "ru": "Магазин открыт.",
+  "tr": "склеп ест отфа́рты.",
+  "words": [
+   "w.sklep",
+   "w.byc",
+   "w.otwarty"
+  ],
+  "tiles_pl": [
+   "Sklep",
+   "jest",
+   "otwarty"
+  ],
+  "tiles_ru": [
+   "Магазин",
+   "открыт"
+  ],
+  "distract_pl": [
+   "zamknięty",
+   "bank"
+  ],
+  "distract_ru": [
+   "закрыт",
+   "банк"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.jakie_sa_godziny_otwarcia",
+  "pl": "Jakie są godziny otwarcia?",
+  "ru": "Какие часы работы?",
+  "tr": "я́ке соў годжи́ны отфа́рча?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.godziny_otwarcia"
+  ],
+  "tiles_pl": [
+   "Jakie",
+   "są",
+   "godziny",
+   "otwarcia"
+  ],
+  "tiles_ru": [
+   "Какие",
+   "часы",
+   "работы"
+  ],
+  "distract_pl": [
+   "jaka",
+   "dni"
+  ],
+  "distract_ru": [
+   "какой",
+   "дни"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.to_jest_za_drogie",
+  "pl": "To jest za drogie.",
+  "ru": "Это слишком дорого.",
+  "tr": "то ест за дро́ге.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.za",
+   "w.drogi"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "za",
+   "drogie"
+  ],
+  "tiles_ru": [
+   "Это",
+   "слишком",
+   "дорого"
+  ],
+  "distract_pl": [
+   "tanie",
+   "bardzo"
+  ],
+  "distract_ru": [
+   "дёшево",
+   "очень"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.to_jest_tanie",
+  "pl": "To jest tanie.",
+  "ru": "Это дёшево.",
+  "tr": "то ест та́нье.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.tani"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "tanie"
+  ],
+  "tiles_ru": [
+   "Это",
+   "дёшево"
+  ],
+  "distract_pl": [
+   "drogie",
+   "zbyt"
+  ],
+  "distract_ru": [
+   "дорого",
+   "слишком"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.czy_moge_zaplacic_karta",
+  "pl": "Czy mogę zapłacić kartą?",
+  "ru": "Можно заплатить картой?",
+  "tr": "чы мо́гэ запўа́чичь ка́ртоў?",
+  "words": [
+   "w.czy",
+   "w.moc",
+   "w.zaplacic",
+   "w.karta"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "mogę",
+   "zapłacić",
+   "kartą"
+  ],
+  "tiles_ru": [
+   "Можно",
+   "заплатить",
+   "картой"
+  ],
+  "distract_pl": [
+   "płacić",
+   "gotówką"
+  ],
+  "distract_ru": [
+   "платить",
+   "наличными"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.poprosze_paragon",
+  "pl": "Poproszę paragon.",
+  "ru": "Чек, пожалуйста.",
+  "tr": "попро́шэ пара́гон.",
+  "words": [
+   "w.poprosze",
+   "w.paragon"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "paragon"
+  ],
+  "tiles_ru": [
+   "Чек",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "rachunek",
+   "torbę"
+  ],
+  "distract_ru": [
+   "счёт",
+   "сумку"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.potrzebuje_chleba",
+  "pl": "Potrzebuję chleba.",
+  "ru": "Мне нужен хлеб.",
+  "tr": "потшэбу́е хле́ба.",
+  "words": [
+   "w.potrzebowac",
+   "w.chleb"
+  ],
+  "tiles_pl": [
+   "Potrzebuję",
+   "chleba"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужен",
+   "хлеб"
+  ],
+  "distract_pl": [
+   "mleka",
+   "masło"
+  ],
+  "distract_ru": [
+   "молоко",
+   "масло"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.potrzebuje_kurtki",
+  "pl": "Potrzebuję kurtki.",
+  "ru": "Мне нужна куртка.",
+  "tr": "потшэбу́е ку́ртки.",
+  "words": [
+   "w.potrzebowac",
+   "w.kurtka"
+  ],
+  "tiles_pl": [
+   "Potrzebuję",
+   "kurtki"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужна",
+   "куртка"
+  ],
+  "distract_pl": [
+   "czapki",
+   "spodni"
+  ],
+  "distract_ru": [
+   "шапка",
+   "брюки"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.szukam_apteki",
+  "pl": "Szukam apteki.",
+  "ru": "Я ищу аптеку.",
+  "tr": "шу́кам аптэ́ки.",
+  "words": [
+   "w.szukac",
+   "w.apteka"
+  ],
+  "tiles_pl": [
+   "Szukam",
+   "apteki"
+  ],
+  "tiles_ru": [
+   "Я",
+   "ищу",
+   "аптеку"
+  ],
+  "distract_pl": [
+   "sklepu",
+   "poczty"
+  ],
+  "distract_ru": [
+   "магазин",
+   "почту"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.kupuje_chleb_i_mleko",
+  "pl": "Kupuję chleb i mleko.",
+  "ru": "Я покупаю хлеб и молоко.",
+  "tr": "купу́е хлеп и мле́ко.",
+  "words": [
+   "w.kupowac",
+   "w.chleb",
+   "w.i",
+   "w.mleko"
+  ],
+  "tiles_pl": [
+   "Kupuję",
+   "chleb",
+   "i",
+   "mleko"
+  ],
+  "tiles_ru": [
+   "Я",
+   "покупаю",
+   "хлеб",
+   "и",
+   "молоко"
+  ],
+  "distract_pl": [
+   "masło",
+   "ser"
+  ],
+  "distract_ru": [
+   "масло",
+   "сыр"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.jest_promocja",
+  "pl": "Jest promocja.",
+  "ru": "Есть акция.",
+  "tr": "ест промо́ця.",
+  "words": [
+   "w.byc",
+   "w.promocja"
+  ],
+  "tiles_pl": [
+   "Jest",
+   "promocja"
+  ],
+  "tiles_ru": [
+   "Есть",
+   "акция"
+  ],
+  "distract_pl": [
+   "wyprzedaż",
+   "cena"
+  ],
+  "distract_ru": [
+   "распродажа",
+   "цена"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.ile_kosztuje_kilogram_jablek",
+  "pl": "Ile kosztuje kilogram jabłek?",
+  "ru": "Сколько стоит килограмм яблок?",
+  "tr": "и́ле кошту́е кило́грам я́бўэк?",
+  "words": [
+   "w.ile",
+   "w.kosztowac",
+   "w.kilogram",
+   "w.jablko"
+  ],
+  "tiles_pl": [
+   "Ile",
+   "kosztuje",
+   "kilogram",
+   "jabłek"
+  ],
+  "tiles_ru": [
+   "Сколько",
+   "стоит",
+   "килограмм",
+   "яблок"
+  ],
+  "distract_pl": [
+   "gram",
+   "banan"
+  ],
+  "distract_ru": [
+   "грамм",
+   "банан"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.poprosze_kilogram_jablek",
+  "pl": "Poproszę kilogram jabłek.",
+  "ru": "Мне, пожалуйста, килограмм яблок.",
+  "tr": "попро́шэ кило́грам я́бўэк.",
+  "words": [
+   "w.poprosze",
+   "w.kilogram",
+   "w.jablko"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "kilogram",
+   "jabłek"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "пожалуйста",
+   "килограмм",
+   "яблок"
+  ],
+  "distract_pl": [
+   "jabłko",
+   "gram"
+  ],
+  "distract_ru": [
+   "яблоко",
+   "грамм"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.jaki_jest_twoj_rozmiar",
+  "pl": "Jaki jest twój rozmiar?",
+  "ru": "Какой у тебя размер?",
+  "tr": "я́ки ест тфуй ро́змяр?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.twoj",
+   "w.rozmiar"
+  ],
+  "tiles_pl": [
+   "Jaki",
+   "jest",
+   "twój",
+   "rozmiar"
+  ],
+  "tiles_ru": [
+   "Какой",
+   "у",
+   "тебя",
+   "размер"
+  ],
+  "distract_pl": [
+   "jaka",
+   "kolor"
+  ],
+  "distract_ru": [
+   "какая",
+   "цвет"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.poprosze_mniejszy_rozmiar",
+  "pl": "Poproszę mniejszy rozmiar.",
+  "ru": "Размер поменьше, пожалуйста.",
+  "tr": "попро́шэ мнье́йшы ро́змяр.",
+  "words": [
+   "w.poprosze",
+   "w.mniejszy",
+   "w.rozmiar"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "mniejszy",
+   "rozmiar"
+  ],
+  "tiles_ru": [
+   "Размер",
+   "поменьше",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "większy",
+   "kolor"
+  ],
+  "distract_ru": [
+   "побольше",
+   "цвет"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.gdzie_jest_przymierzalnia",
+  "pl": "Gdzie jest przymierzalnia?",
+  "ru": "Где примерочная?",
+  "tr": "гдже ест пшымежа́лня?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.przymierzalnia"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "przymierzalnia"
+  ],
+  "tiles_ru": [
+   "Где",
+   "примерочная"
+  ],
+  "distract_pl": [
+   "kasa",
+   "toaleta"
+  ],
+  "distract_ru": [
+   "касса",
+   "туалет"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.mam_tylko_piec_zlotych",
+  "pl": "Mam tylko pięć złotych.",
+  "ru": "У меня только пять злотых.",
+  "tr": "мам ты́лко пеньчь зўо́тых.",
+  "words": [
+   "w.miec",
+   "w.tylko",
+   "w.piec",
+   "w.zloty"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "tylko",
+   "pięć",
+   "złotych"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "только",
+   "пять",
+   "злотых"
+  ],
+  "distract_pl": [
+   "dziesięć",
+   "złoty"
+  ],
+  "distract_ru": [
+   "десять",
+   "злотый"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.nie_mam_pieniedzy",
+  "pl": "Nie mam pieniędzy.",
+  "ru": "У меня нет денег.",
+  "tr": "нье мам пене́ндзы.",
+  "words": [
+   "w.nie",
+   "w.miec",
+   "w.pieniadze"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "mam",
+   "pieniędzy"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "нет",
+   "денег"
+  ],
+  "distract_pl": [
+   "czasu",
+   "ma"
+  ],
+  "distract_ru": [
+   "времени",
+   "имею"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_jest_bankomat",
+  "pl": "Gdzie jest bankomat?",
+  "ru": "Где банкомат?",
+  "tr": "гдже ест банко́мат?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.bankomat"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "bankomat"
+  ],
+  "tiles_ru": [
+   "Где",
+   "банкомат"
+  ],
+  "distract_pl": [
+   "bank",
+   "kantor"
+  ],
+  "distract_ru": [
+   "банк",
+   "обменник"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_jest_kasa",
+  "pl": "Gdzie jest kasa?",
+  "ru": "Где касса?",
+  "tr": "гдже ест ка́са?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.kasa"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "kasa"
+  ],
+  "tiles_ru": [
+   "Где",
+   "касса"
+  ],
+  "distract_pl": [
+   "sklep",
+   "wyjście"
+  ],
+  "distract_ru": [
+   "магазин",
+   "выход"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.jaka_jest_cena",
+  "pl": "Jaka jest cena?",
+  "ru": "Какая цена?",
+  "tr": "я́ка ест цэ́на?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.cena"
+  ],
+  "tiles_pl": [
+   "Jaka",
+   "jest",
+   "cena"
+  ],
+  "tiles_ru": [
+   "Какая",
+   "цена"
+  ],
+  "distract_pl": [
+   "jaki",
+   "rozmiar"
+  ],
+  "distract_ru": [
+   "какой",
+   "размер"
+  ],
+  "topic": "zakupy",
+  "level": 1
+ },
+ {
+  "id": "p.robie_zakupy_w_sklepie",
+  "pl": "Robię zakupy w sklepie.",
+  "ru": "Я делаю покупки в магазине.",
+  "tr": "ро́бе заку́пы ф скле́пе.",
+  "words": [
+   "w.robic",
+   "w.zakupy",
+   "w.w",
+   "w.sklep"
+  ],
+  "tiles_pl": [
+   "Robię",
+   "zakupy",
+   "w",
+   "sklepie"
+  ],
+  "tiles_ru": [
+   "Я",
+   "делаю",
+   "покупки",
+   "в",
+   "магазине"
+  ],
+  "distract_pl": [
+   "sklep",
+   "piekarni"
+  ],
+  "distract_ru": [
+   "магазин",
+   "пекарне"
+  ],
+  "topic": "zakupy",
+  "level": 2
+ },
+ {
+  "id": "p.gdzie_jest_dworzec",
+  "pl": "Gdzie jest dworzec?",
+  "ru": "Где вокзал?",
+  "tr": "гдже ест дво́жэц?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.dworzec"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "dworzec"
+  ],
+  "tiles_ru": [
+   "Где",
+   "вокзал"
+  ],
+  "distract_pl": [
+   "przystanek",
+   "lotnisko"
+  ],
+  "distract_ru": [
+   "остановка",
+   "аэропорт"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_jest_przystanek",
+  "pl": "Gdzie jest przystanek?",
+  "ru": "Где остановка?",
+  "tr": "гдже ест пшыста́нэк?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.przystanek"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "przystanek"
+  ],
+  "tiles_ru": [
+   "Где",
+   "остановка"
+  ],
+  "distract_pl": [
+   "dworzec",
+   "stacja"
+  ],
+  "distract_ru": [
+   "вокзал",
+   "станция"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_jest_poczta",
+  "pl": "Gdzie jest poczta?",
+  "ru": "Где почта?",
+  "tr": "гдже ест по́чта?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.poczta"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "poczta"
+  ],
+  "tiles_ru": [
+   "Где",
+   "почта"
+  ],
+  "distract_pl": [
+   "bank",
+   "sklep"
+  ],
+  "distract_ru": [
+   "банк",
+   "магазин"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_jest_apteka",
+  "pl": "Gdzie jest apteka?",
+  "ru": "Где аптека?",
+  "tr": "гдже ест аптэ́ка?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.apteka"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "apteka"
+  ],
+  "tiles_ru": [
+   "Где",
+   "аптека"
+  ],
+  "distract_pl": [
+   "szpital",
+   "sklep"
+  ],
+  "distract_ru": [
+   "больница",
+   "магазин"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.idz_prosto",
+  "pl": "Idź prosto.",
+  "ru": "Иди прямо.",
+  "tr": "ичь про́сто.",
+  "words": [
+   "w.isc",
+   "w.prosto"
+  ],
+  "tiles_pl": [
+   "Idź",
+   "prosto"
+  ],
+  "tiles_ru": [
+   "Иди",
+   "прямо"
+  ],
+  "distract_pl": [
+   "lewo",
+   "skręć"
+  ],
+  "distract_ru": [
+   "налево",
+   "поверни"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.skrec_w_lewo",
+  "pl": "Skręć w lewo.",
+  "ru": "Поверни налево.",
+  "tr": "скрэньчь ф ле́во.",
+  "words": [
+   "w.skrecac",
+   "w.w_lewo"
+  ],
+  "tiles_pl": [
+   "Skręć",
+   "w",
+   "lewo"
+  ],
+  "tiles_ru": [
+   "Поверни",
+   "налево"
+  ],
+  "distract_pl": [
+   "prawo",
+   "idź"
+  ],
+  "distract_ru": [
+   "направо",
+   "иди"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.skrec_w_prawo",
+  "pl": "Skręć w prawo.",
+  "ru": "Поверни направо.",
+  "tr": "скрэньчь ф пра́во.",
+  "words": [
+   "w.skrecac",
+   "w.w_prawo"
+  ],
+  "tiles_pl": [
+   "Skręć",
+   "w",
+   "prawo"
+  ],
+  "tiles_ru": [
+   "Поверни",
+   "направо"
+  ],
+  "distract_pl": [
+   "lewo",
+   "prosto"
+  ],
+  "distract_ru": [
+   "налево",
+   "прямо"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.idz_prosto_i_skrec_w_lewo",
+  "pl": "Idź prosto i skręć w lewo.",
+  "ru": "Иди прямо и поверни налево.",
+  "tr": "ичь про́сто и скрэньчь ф ле́во.",
+  "words": [
+   "w.isc",
+   "w.prosto",
+   "w.i",
+   "w.skrecac",
+   "w.w_lewo"
+  ],
+  "tiles_pl": [
+   "Idź",
+   "prosto",
+   "i",
+   "skręć",
+   "w",
+   "lewo"
+  ],
+  "tiles_ru": [
+   "Иди",
+   "прямо",
+   "и",
+   "поверни",
+   "налево"
+  ],
+  "distract_pl": [
+   "prawo",
+   "potem"
+  ],
+  "distract_ru": [
+   "направо",
+   "потом"
+  ],
+  "topic": "miasto",
+  "level": 3
+ },
+ {
+  "id": "p.sklep_jest_po_lewej",
+  "pl": "Sklep jest po lewej.",
+  "ru": "Магазин слева.",
+  "tr": "склеп ест по ле́вэй.",
+  "words": [
+   "w.sklep",
+   "w.byc",
+   "w.po_lewej"
+  ],
+  "tiles_pl": [
+   "Sklep",
+   "jest",
+   "po",
+   "lewej"
+  ],
+  "tiles_ru": [
+   "Магазин",
+   "слева"
+  ],
+  "distract_pl": [
+   "prawej",
+   "obok"
+  ],
+  "distract_ru": [
+   "справа",
+   "рядом"
+  ],
+  "topic": "miasto",
+  "level": 2
+ },
+ {
+  "id": "p.apteka_jest_po_prawej",
+  "pl": "Apteka jest po prawej.",
+  "ru": "Аптека справа.",
+  "tr": "аптэ́ка ест по пра́вэй.",
+  "words": [
+   "w.apteka",
+   "w.byc",
+   "w.po_prawej"
+  ],
+  "tiles_pl": [
+   "Apteka",
+   "jest",
+   "po",
+   "prawej"
+  ],
+  "tiles_ru": [
+   "Аптека",
+   "справа"
+  ],
+  "distract_pl": [
+   "lewej",
+   "blisko"
+  ],
+  "distract_ru": [
+   "слева",
+   "близко"
+  ],
+  "topic": "miasto",
+  "level": 2
+ },
+ {
+  "id": "p.poczta_jest_naprzeciwko",
+  "pl": "Poczta jest naprzeciwko.",
+  "ru": "Почта напротив.",
+  "tr": "по́чта ест напшэчи́фко.",
+  "words": [
+   "w.poczta",
+   "w.byc",
+   "w.naprzeciwko"
+  ],
+  "tiles_pl": [
+   "Poczta",
+   "jest",
+   "naprzeciwko"
+  ],
+  "tiles_ru": [
+   "Почта",
+   "напротив"
+  ],
+  "distract_pl": [
+   "obok",
+   "daleko"
+  ],
+  "distract_ru": [
+   "рядом",
+   "далеко"
+  ],
+  "topic": "miasto",
+  "level": 2
+ },
+ {
+  "id": "p.szpital_jest_daleko",
+  "pl": "Szpital jest daleko.",
+  "ru": "Больница далеко.",
+  "tr": "шпи́тал ест дале́ко.",
+  "words": [
+   "w.szpital",
+   "w.byc",
+   "w.daleko"
+  ],
+  "tiles_pl": [
+   "Szpital",
+   "jest",
+   "daleko"
+  ],
+  "tiles_ru": [
+   "Больница",
+   "далеко"
+  ],
+  "distract_pl": [
+   "blisko",
+   "tutaj"
+  ],
+  "distract_ru": [
+   "близко",
+   "здесь"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.sklep_jest_blisko",
+  "pl": "Sklep jest blisko.",
+  "ru": "Магазин близко.",
+  "tr": "склеп ест бли́ско.",
+  "words": [
+   "w.sklep",
+   "w.byc",
+   "w.blisko"
+  ],
+  "tiles_pl": [
+   "Sklep",
+   "jest",
+   "blisko"
+  ],
+  "tiles_ru": [
+   "Магазин",
+   "близко"
+  ],
+  "distract_pl": [
+   "daleko",
+   "tam"
+  ],
+  "distract_ru": [
+   "далеко",
+   "там"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.muzeum_jest_obok",
+  "pl": "Muzeum jest obok.",
+  "ru": "Музей рядом.",
+  "tr": "музэ́ум ест о́бок.",
+  "words": [
+   "w.muzeum",
+   "w.byc",
+   "w.obok"
+  ],
+  "tiles_pl": [
+   "Muzeum",
+   "jest",
+   "obok"
+  ],
+  "tiles_ru": [
+   "Музей",
+   "рядом"
+  ],
+  "distract_pl": [
+   "naprzeciwko",
+   "prosto"
+  ],
+  "distract_ru": [
+   "напротив",
+   "прямо"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.park_jest_za_rogiem",
+  "pl": "Park jest za rogiem.",
+  "ru": "Парк за углом.",
+  "tr": "парк ест за ро́гем.",
+  "words": [
+   "w.park",
+   "w.byc",
+   "w.za",
+   "w.rog"
+  ],
+  "tiles_pl": [
+   "Park",
+   "jest",
+   "za",
+   "rogiem"
+  ],
+  "tiles_ru": [
+   "Парк",
+   "за",
+   "углом"
+  ],
+  "distract_pl": [
+   "przed",
+   "szkołą"
+  ],
+  "distract_ru": [
+   "перед",
+   "школой"
+  ],
+  "topic": "miasto",
+  "level": 2
+ },
+ {
+  "id": "p.ide_do_parku",
+  "pl": "Idę do parku.",
+  "ru": "Я иду в парк.",
+  "tr": "и́дэ до па́рку.",
+  "words": [
+   "w.isc",
+   "w.do",
+   "w.park"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "do",
+   "parku"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "в",
+   "парк"
+  ],
+  "distract_pl": [
+   "kina",
+   "lasu"
+  ],
+  "distract_ru": [
+   "кино",
+   "лес"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.ide_do_kina",
+  "pl": "Idę do kina.",
+  "ru": "Я иду в кино.",
+  "tr": "и́дэ до ки́на.",
+  "words": [
+   "w.isc",
+   "w.do",
+   "w.kino"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "do",
+   "kina"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "в",
+   "кино"
+  ],
+  "distract_pl": [
+   "muzeum",
+   "parku"
+  ],
+  "distract_ru": [
+   "музей",
+   "парк"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.ide_na_poczte",
+  "pl": "Idę na pocztę.",
+  "ru": "Я иду на почту.",
+  "tr": "и́дэ на по́чтэ.",
+  "words": [
+   "w.isc",
+   "w.na",
+   "w.poczta"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "na",
+   "pocztę"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "на",
+   "почту"
+  ],
+  "distract_pl": [
+   "bank",
+   "aptekę"
+  ],
+  "distract_ru": [
+   "банк",
+   "аптеку"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.ide_do_szkoly",
+  "pl": "Idę do szkoły.",
+  "ru": "Я иду в школу.",
+  "tr": "и́дэ до шко́ўы.",
+  "words": [
+   "w.isc",
+   "w.do",
+   "w.szkola"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "do",
+   "szkoły"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "в",
+   "школу"
+  ],
+  "distract_pl": [
+   "kościoła",
+   "pracy"
+  ],
+  "distract_ru": [
+   "костёл",
+   "работу"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.mieszkam_w_centrum",
+  "pl": "Mieszkam w centrum.",
+  "ru": "Я живу в центре.",
+  "tr": "ме́шкам ф цэ́нтрум.",
+  "words": [
+   "w.mieszkac",
+   "w.w",
+   "w.centrum"
+  ],
+  "tiles_pl": [
+   "Mieszkam",
+   "w",
+   "centrum"
+  ],
+  "tiles_ru": [
+   "Я",
+   "живу",
+   "в",
+   "центре"
+  ],
+  "distract_pl": [
+   "mieście",
+   "parku"
+  ],
+  "distract_ru": [
+   "городе",
+   "парке"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.jak_jechac_do_centrum",
+  "pl": "Jak jechać do centrum?",
+  "ru": "Как ехать в центр?",
+  "tr": "як е́хачь до цэ́нтрум?",
+  "words": [
+   "w.jak",
+   "w.jechac",
+   "w.do",
+   "w.centrum"
+  ],
+  "tiles_pl": [
+   "Jak",
+   "jechać",
+   "do",
+   "centrum"
+  ],
+  "tiles_ru": [
+   "Как",
+   "ехать",
+   "в",
+   "центр"
+  ],
+  "distract_pl": [
+   "idę",
+   "parku"
+  ],
+  "distract_ru": [
+   "иду",
+   "парк"
+  ],
+  "topic": "miasto",
+  "level": 2
+ },
+ {
+  "id": "p.gdzie_jest_wyjscie",
+  "pl": "Gdzie jest wyjście?",
+  "ru": "Где выход?",
+  "tr": "гдже ест вы́йщче?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.wyjscie"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "wyjście"
+  ],
+  "tiles_ru": [
+   "Где",
+   "выход"
+  ],
+  "distract_pl": [
+   "wejście",
+   "okno"
+  ],
+  "distract_ru": [
+   "вход",
+   "окно"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.mam_mape_w_telefonie",
+  "pl": "Mam mapę w telefonie.",
+  "ru": "У меня карта в телефоне.",
+  "tr": "мам ма́пэ ф тэлефо́нье.",
+  "words": [
+   "w.miec",
+   "w.mapa",
+   "w.w",
+   "w.telefon"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "mapę",
+   "w",
+   "telefonie"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "карта",
+   "в",
+   "телефоне"
+  ],
+  "distract_pl": [
+   "komputerze",
+   "torbie"
+  ],
+  "distract_ru": [
+   "компьютере",
+   "сумке"
+  ],
+  "topic": "miasto",
+  "level": 2
+ },
+ {
+  "id": "p.spaceruje_po_parku",
+  "pl": "Spaceruję po parku.",
+  "ru": "Я гуляю по парку.",
+  "tr": "спацэру́е по па́рку.",
+  "words": [
+   "w.spacerowac",
+   "w.po",
+   "w.park"
+  ],
+  "tiles_pl": [
+   "Spaceruję",
+   "po",
+   "parku"
+  ],
+  "tiles_ru": [
+   "Я",
+   "гуляю",
+   "по",
+   "парку"
+  ],
+  "distract_pl": [
+   "lesie",
+   "mieście"
+  ],
+  "distract_ru": [
+   "лесу",
+   "городу"
+  ],
+  "topic": "miasto",
+  "level": 1
+ },
+ {
+  "id": "p.jade_autobusem",
+  "pl": "Jadę autobusem.",
+  "ru": "Я еду на автобусе.",
+  "tr": "я́дэ аутобу́сэм.",
+  "words": [
+   "w.jechac",
+   "w.autobus"
+  ],
+  "tiles_pl": [
+   "Jadę",
+   "autobusem"
+  ],
+  "tiles_ru": [
+   "Я",
+   "еду",
+   "на",
+   "автобусе"
+  ],
+  "distract_pl": [
+   "tramwajem",
+   "pociągiem"
+  ],
+  "distract_ru": [
+   "трамвае",
+   "поезде"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.jade_tramwajem",
+  "pl": "Jadę tramwajem.",
+  "ru": "Я еду на трамвае.",
+  "tr": "я́дэ трамва́ем.",
+  "words": [
+   "w.jechac",
+   "w.tramwaj"
+  ],
+  "tiles_pl": [
+   "Jadę",
+   "tramwajem"
+  ],
+  "tiles_ru": [
+   "Я",
+   "еду",
+   "на",
+   "трамвае"
+  ],
+  "distract_pl": [
+   "autobusem",
+   "metrem"
+  ],
+  "distract_ru": [
+   "автобусе",
+   "метро"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.jade_pociagiem_do_krakowa",
+  "pl": "Jadę pociągiem do Krakowa.",
+  "ru": "Я еду поездом в Краков.",
+  "tr": "я́дэ почо́нгем до крако́ва.",
+  "words": [
+   "w.jechac",
+   "w.pociag",
+   "w.do",
+   "w.krakow"
+  ],
+  "tiles_pl": [
+   "Jadę",
+   "pociągiem",
+   "do",
+   "Krakowa"
+  ],
+  "tiles_ru": [
+   "Я",
+   "еду",
+   "поездом",
+   "в",
+   "Краков"
+  ],
+  "distract_pl": [
+   "autobusem",
+   "Warszawy"
+  ],
+  "distract_ru": [
+   "автобусом",
+   "Варшаву"
+  ],
+  "topic": "transport",
+  "level": 2
+ },
+ {
+  "id": "p.lece_samolotem",
+  "pl": "Lecę samolotem.",
+  "ru": "Я лечу на самолёте.",
+  "tr": "ле́цэ самоло́тэм.",
+  "words": [
+   "w.leciec",
+   "w.samolot"
+  ],
+  "tiles_pl": [
+   "Lecę",
+   "samolotem"
+  ],
+  "tiles_ru": [
+   "Я",
+   "лечу",
+   "на",
+   "самолёте"
+  ],
+  "distract_pl": [
+   "pociągiem",
+   "jadę"
+  ],
+  "distract_ru": [
+   "поезде",
+   "еду"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.biore_taksowke",
+  "pl": "Biorę taksówkę.",
+  "ru": "Я беру такси.",
+  "tr": "бёрэ таксу́фкэ.",
+  "words": [
+   "w.brac",
+   "w.taksowka"
+  ],
+  "tiles_pl": [
+   "Biorę",
+   "taksówkę"
+  ],
+  "tiles_ru": [
+   "Я",
+   "беру",
+   "такси"
+  ],
+  "distract_pl": [
+   "autobus",
+   "bierzesz"
+  ],
+  "distract_ru": [
+   "автобус",
+   "берёшь"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_bilet",
+  "pl": "Poproszę bilet.",
+  "ru": "Билет, пожалуйста.",
+  "tr": "попро́шэ би́лет.",
+  "words": [
+   "w.poprosze",
+   "w.bilet"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "bilet"
+  ],
+  "tiles_ru": [
+   "Билет",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "paszport",
+   "paragon"
+  ],
+  "distract_ru": [
+   "паспорт",
+   "чек"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_bilet_do_krakowa",
+  "pl": "Poproszę bilet do Krakowa.",
+  "ru": "Билет до Кракова, пожалуйста.",
+  "tr": "попро́шэ би́лет до крако́ва.",
+  "words": [
+   "w.poprosze",
+   "w.bilet",
+   "w.do",
+   "w.krakow"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "bilet",
+   "do",
+   "Krakowa"
+  ],
+  "tiles_ru": [
+   "Билет",
+   "до",
+   "Кракова",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "Warszawy",
+   "dwa"
+  ],
+  "distract_ru": [
+   "Варшавы",
+   "два"
+  ],
+  "topic": "transport",
+  "level": 2
+ },
+ {
+  "id": "p.ile_kosztuje_bilet",
+  "pl": "Ile kosztuje bilet?",
+  "ru": "Сколько стоит билет?",
+  "tr": "и́ле кошту́е би́лет?",
+  "words": [
+   "w.ile",
+   "w.kosztowac",
+   "w.bilet"
+  ],
+  "tiles_pl": [
+   "Ile",
+   "kosztuje",
+   "bilet"
+  ],
+  "tiles_ru": [
+   "Сколько",
+   "стоит",
+   "билет"
+  ],
+  "distract_pl": [
+   "bilety",
+   "jest"
+  ],
+  "distract_ru": [
+   "билеты",
+   "есть"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_kupic_bilet",
+  "pl": "Gdzie kupić bilet?",
+  "ru": "Где купить билет?",
+  "tr": "гдже ку́пичь би́лет?",
+  "words": [
+   "w.gdzie",
+   "w.kupic",
+   "w.bilet"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "kupić",
+   "bilet"
+  ],
+  "tiles_ru": [
+   "Где",
+   "купить",
+   "билет"
+  ],
+  "distract_pl": [
+   "kupuję",
+   "kasa"
+  ],
+  "distract_ru": [
+   "покупаю",
+   "касса"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.ktory_autobus_jedzie_do_centrum",
+  "pl": "Który autobus jedzie do centrum?",
+  "ru": "Какой автобус едет в центр?",
+  "tr": "кту́ры ауто́бус е́дже до цэ́нтрум?",
+  "words": [
+   "w.ktory",
+   "w.autobus",
+   "w.jechac",
+   "w.do",
+   "w.centrum"
+  ],
+  "tiles_pl": [
+   "Który",
+   "autobus",
+   "jedzie",
+   "do",
+   "centrum"
+  ],
+  "tiles_ru": [
+   "Какой",
+   "автобус",
+   "едет",
+   "в",
+   "центр"
+  ],
+  "distract_pl": [
+   "tramwaj",
+   "jadę"
+  ],
+  "distract_ru": [
+   "трамвай",
+   "еду"
+  ],
+  "topic": "transport",
+  "level": 3
+ },
+ {
+  "id": "p.kiedy_jest_nastepny_autobus",
+  "pl": "Kiedy jest następny autobus?",
+  "ru": "Когда следующий автобус?",
+  "tr": "ке́ды ест настэ́мпны ауто́бус?",
+  "words": [
+   "w.kiedy",
+   "w.byc",
+   "w.nastepny",
+   "w.autobus"
+  ],
+  "tiles_pl": [
+   "Kiedy",
+   "jest",
+   "następny",
+   "autobus"
+  ],
+  "tiles_ru": [
+   "Когда",
+   "следующий",
+   "автобус"
+  ],
+  "distract_pl": [
+   "pociąg",
+   "ostatni"
+  ],
+  "distract_ru": [
+   "поезд",
+   "последний"
+  ],
+  "topic": "transport",
+  "level": 2
+ },
+ {
+  "id": "p.nastepny_przystanek",
+  "pl": "Następny przystanek.",
+  "ru": "Следующая остановка.",
+  "tr": "настэ́мпны пшыста́нэк.",
+  "words": [
+   "w.nastepny",
+   "w.przystanek"
+  ],
+  "tiles_pl": [
+   "Następny",
+   "przystanek"
+  ],
+  "tiles_ru": [
+   "Следующая",
+   "остановка"
+  ],
+  "distract_pl": [
+   "ostatni",
+   "dworzec"
+  ],
+  "distract_ru": [
+   "последняя",
+   "вокзал"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.pociag_ma_opoznienie",
+  "pl": "Pociąg ma opóźnienie.",
+  "ru": "Поезд опаздывает.",
+  "tr": "по́чонк ма опужьнье́нье.",
+  "words": [
+   "w.pociag",
+   "w.miec",
+   "w.opoznienie"
+  ],
+  "tiles_pl": [
+   "Pociąg",
+   "ma",
+   "opóźnienie"
+  ],
+  "tiles_ru": [
+   "Поезд",
+   "опаздывает"
+  ],
+  "distract_pl": [
+   "autobus",
+   "mam"
+  ],
+  "distract_ru": [
+   "автобус",
+   "есть"
+  ],
+  "topic": "transport",
+  "level": 2
+ },
+ {
+  "id": "p.odjazd_jest_o_osmej",
+  "pl": "Odjazd jest o ósmej.",
+  "ru": "Отправление в восемь.",
+  "tr": "о́дяст ест о у́смэй.",
+  "words": [
+   "w.odjazd",
+   "w.byc",
+   "w.o",
+   "w.osmy"
+  ],
+  "tiles_pl": [
+   "Odjazd",
+   "jest",
+   "o",
+   "ósmej"
+  ],
+  "tiles_ru": [
+   "Отправление",
+   "в",
+   "восемь"
+  ],
+  "distract_pl": [
+   "przyjazd",
+   "dziewiątej"
+  ],
+  "distract_ru": [
+   "прибытие",
+   "девять"
+  ],
+  "topic": "transport",
+  "level": 3
+ },
+ {
+  "id": "p.mam_bilet",
+  "pl": "Mam bilet.",
+  "ru": "У меня есть билет.",
+  "tr": "мам би́лет.",
+  "words": [
+   "w.miec",
+   "w.bilet"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "bilet"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "есть",
+   "билет"
+  ],
+  "distract_pl": [
+   "paszport",
+   "masz"
+  ],
+  "distract_ru": [
+   "паспорт",
+   "имею"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.nie_mam_biletu",
+  "pl": "Nie mam biletu.",
+  "ru": "У меня нет билета.",
+  "tr": "нье мам биле́ту.",
+  "words": [
+   "w.nie",
+   "w.miec",
+   "w.bilet"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "mam",
+   "biletu"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "нет",
+   "билета"
+  ],
+  "distract_pl": [
+   "paszportu",
+   "bilet"
+  ],
+  "distract_ru": [
+   "паспорта",
+   "билет"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.mam_duza_walizke",
+  "pl": "Mam dużą walizkę.",
+  "ru": "У меня большой чемодан.",
+  "tr": "мам ду́жоў вали́скэ.",
+  "words": [
+   "w.miec",
+   "w.duzy",
+   "w.walizka"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "dużą",
+   "walizkę"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "большой",
+   "чемодан"
+  ],
+  "distract_pl": [
+   "małą",
+   "plecak"
+  ],
+  "distract_ru": [
+   "маленький",
+   "рюкзак"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.moj_bagaz_jest_ciezki",
+  "pl": "Mój bagaż jest ciężki.",
+  "ru": "Мой багаж тяжёлый.",
+  "tr": "муй ба́гаш ест че́ўшки.",
+  "words": [
+   "w.moj",
+   "w.bagaz",
+   "w.byc",
+   "w.ciezki"
+  ],
+  "tiles_pl": [
+   "Mój",
+   "bagaż",
+   "jest",
+   "ciężki"
+  ],
+  "tiles_ru": [
+   "Мой",
+   "багаж",
+   "тяжёлый"
+  ],
+  "distract_pl": [
+   "lekki",
+   "moja"
+  ],
+  "distract_ru": [
+   "лёгкий",
+   "моя"
+  ],
+  "topic": "transport",
+  "level": 2
+ },
+ {
+  "id": "p.gdzie_jest_lotnisko",
+  "pl": "Gdzie jest lotnisko?",
+  "ru": "Где аэропорт?",
+  "tr": "гдже ест лотни́ско?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.lotnisko"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "lotnisko"
+  ],
+  "tiles_ru": [
+   "Где",
+   "аэропорт"
+  ],
+  "distract_pl": [
+   "dworzec",
+   "stacja"
+  ],
+  "distract_ru": [
+   "вокзал",
+   "станция"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.jade_na_lotnisko",
+  "pl": "Jadę na lotnisko.",
+  "ru": "Я еду в аэропорт.",
+  "tr": "я́дэ на лотни́ско.",
+  "words": [
+   "w.jechac",
+   "w.na",
+   "w.lotnisko"
+  ],
+  "tiles_pl": [
+   "Jadę",
+   "na",
+   "lotnisko"
+  ],
+  "tiles_ru": [
+   "Я",
+   "еду",
+   "в",
+   "аэропорт"
+  ],
+  "distract_pl": [
+   "dworzec",
+   "pociągiem"
+  ],
+  "distract_ru": [
+   "вокзал",
+   "поездом"
+  ],
+  "topic": "transport",
+  "level": 1
+ },
+ {
+  "id": "p.czy_ten_pociag_jedzie_do_warszawy",
+  "pl": "Czy ten pociąg jedzie do Warszawy?",
+  "ru": "Этот поезд едет в Варшаву?",
+  "tr": "чы тэн по́чонк е́дже до варша́вы?",
+  "words": [
+   "w.czy",
+   "w.ten",
+   "w.pociag",
+   "w.jechac",
+   "w.do",
+   "w.warszawa"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "ten",
+   "pociąg",
+   "jedzie",
+   "do",
+   "Warszawy"
+  ],
+  "tiles_ru": [
+   "Этот",
+   "поезд",
+   "едет",
+   "в",
+   "Варшаву"
+  ],
+  "distract_pl": [
+   "autobus",
+   "Krakowa"
+  ],
+  "distract_ru": [
+   "автобус",
+   "Краков"
+  ],
+  "topic": "transport",
+  "level": 3
+ },
+ {
+  "id": "p.czy_tu_jest_parking",
+  "pl": "Czy tu jest parking?",
+  "ru": "Здесь есть парковка?",
+  "tr": "чы ту ест па́ркинк?",
+  "words": [
+   "w.czy",
+   "w.tu",
+   "w.byc",
+   "w.parking"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "tu",
+   "jest",
+   "parking"
+  ],
+  "tiles_ru": [
+   "Здесь",
+   "есть",
+   "парковка"
+  ],
+  "distract_pl": [
+   "tam",
+   "dworzec"
+  ],
+  "distract_ru": [
+   "там",
+   "вокзал"
+  ],
+  "topic": "transport",
+  "level": 2
+ },
+ {
+  "id": "p.na_drodze_jest_korek",
+  "pl": "Na drodze jest korek.",
+  "ru": "На дороге пробка.",
+  "tr": "на дро́дзэ ест ко́рэк.",
+  "words": [
+   "w.na",
+   "w.droga",
+   "w.byc",
+   "w.korek"
+  ],
+  "tiles_pl": [
+   "Na",
+   "drodze",
+   "jest",
+   "korek"
+  ],
+  "tiles_ru": [
+   "На",
+   "дороге",
+   "пробка"
+  ],
+  "distract_pl": [
+   "ulicy",
+   "wypadek"
+  ],
+  "distract_ru": [
+   "улице",
+   "авария"
+  ],
+  "topic": "transport",
+  "level": 3
+ },
+ {
+  "id": "p.boli_mnie_glowa",
+  "pl": "Boli mnie głowa.",
+  "ru": "У меня болит голова.",
+  "tr": "бо́ли мнье гўо́ва.",
+  "words": [
+   "w.bolec",
+   "w.ja",
+   "w.glowa"
+  ],
+  "tiles_pl": [
+   "Boli",
+   "mnie",
+   "głowa"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "болит",
+   "голова"
+  ],
+  "distract_pl": [
+   "brzuch",
+   "ręka"
+  ],
+  "distract_ru": [
+   "живот",
+   "рука"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.boli_mnie_brzuch",
+  "pl": "Boli mnie brzuch.",
+  "ru": "У меня болит живот.",
+  "tr": "бо́ли мнье бжух.",
+  "words": [
+   "w.bolec",
+   "w.ja",
+   "w.brzuch"
+  ],
+  "tiles_pl": [
+   "Boli",
+   "mnie",
+   "brzuch"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "болит",
+   "живот"
+  ],
+  "distract_pl": [
+   "głowa",
+   "noga"
+  ],
+  "distract_ru": [
+   "голова",
+   "нога"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.bola_mnie_plecy",
+  "pl": "Bolą mnie plecy.",
+  "ru": "У меня болит спина.",
+  "tr": "бо́лоў мнье пле́цы.",
+  "words": [
+   "w.bolec",
+   "w.ja",
+   "w.plecy"
+  ],
+  "tiles_pl": [
+   "Bolą",
+   "mnie",
+   "plecy"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "болит",
+   "спина"
+  ],
+  "distract_pl": [
+   "nogi",
+   "boli"
+  ],
+  "distract_ru": [
+   "ноги",
+   "больно"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.mam_goraczke",
+  "pl": "Mam gorączkę.",
+  "ru": "У меня жар.",
+  "tr": "мам горо́нчкэ.",
+  "words": [
+   "w.miec",
+   "w.goraczka"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "gorączkę"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "жар"
+  ],
+  "distract_pl": [
+   "kaszel",
+   "grypę"
+  ],
+  "distract_ru": [
+   "кашель",
+   "грипп"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.mam_kaszel_i_katar",
+  "pl": "Mam kaszel i katar.",
+  "ru": "У меня кашель и насморк.",
+  "tr": "мам ка́шэл и ка́тар.",
+  "words": [
+   "w.miec",
+   "w.kaszel",
+   "w.i",
+   "w.katar"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "kaszel",
+   "i",
+   "katar"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "кашель",
+   "и",
+   "насморк"
+  ],
+  "distract_pl": [
+   "gorączkę",
+   "grypa"
+  ],
+  "distract_ru": [
+   "жар",
+   "грипп"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 2
+ },
+ {
+  "id": "p.jestem_chory",
+  "pl": "Jestem chory.",
+  "ru": "Я болен.",
+  "tr": "е́стэм хо́ры.",
+  "words": [
+   "w.byc",
+   "w.chory"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "chory"
+  ],
+  "tiles_ru": [
+   "Я",
+   "болен"
+  ],
+  "distract_pl": [
+   "zdrowy",
+   "zmęczony"
+  ],
+  "distract_ru": [
+   "здоров",
+   "устал"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.zle_sie_czuje",
+  "pl": "Źle się czuję.",
+  "ru": "Мне плохо.",
+  "tr": "жьле ще чу́е.",
+  "words": [
+   "w.zle",
+   "w.sie",
+   "w.czuc_sie"
+  ],
+  "tiles_pl": [
+   "Źle",
+   "się",
+   "czuję"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "плохо"
+  ],
+  "distract_pl": [
+   "dobrze",
+   "czuje"
+  ],
+  "distract_ru": [
+   "хорошо",
+   "чувствует"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.czuje_sie_dobrze",
+  "pl": "Czuję się dobrze.",
+  "ru": "Я чувствую себя хорошо.",
+  "tr": "чу́е ще до́бжэ.",
+  "words": [
+   "w.czuc_sie",
+   "w.sie",
+   "w.dobrze"
+  ],
+  "tiles_pl": [
+   "Czuję",
+   "się",
+   "dobrze"
+  ],
+  "tiles_ru": [
+   "Я",
+   "чувствую",
+   "себя",
+   "хорошо"
+  ],
+  "distract_pl": [
+   "źle",
+   "czujesz"
+  ],
+  "distract_ru": [
+   "плохо",
+   "чувствуешь"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.potrzebuje_lekarza",
+  "pl": "Potrzebuję lekarza.",
+  "ru": "Мне нужен врач.",
+  "tr": "потшэбу́е лека́жа.",
+  "words": [
+   "w.potrzebowac",
+   "w.lekarz"
+  ],
+  "tiles_pl": [
+   "Potrzebuję",
+   "lekarza"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужен",
+   "врач"
+  ],
+  "distract_pl": [
+   "apteki",
+   "pomocy"
+  ],
+  "distract_ru": [
+   "аптека",
+   "помощь"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.potrzebuje_lekarstwa",
+  "pl": "Potrzebuję lekarstwa.",
+  "ru": "Мне нужно лекарство.",
+  "tr": "потшэбу́е лека́рстфа.",
+  "words": [
+   "w.potrzebowac",
+   "w.lekarstwo"
+  ],
+  "tiles_pl": [
+   "Potrzebuję",
+   "lekarstwa"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужно",
+   "лекарство"
+  ],
+  "distract_pl": [
+   "recepty",
+   "tabletki"
+  ],
+  "distract_ru": [
+   "рецепт",
+   "таблетка"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.mam_wizyte_u_lekarza",
+  "pl": "Mam wizytę u lekarza.",
+  "ru": "У меня приём у врача.",
+  "tr": "мам визы́тэ у лека́жа.",
+  "words": [
+   "w.miec",
+   "w.wizyta",
+   "w.u",
+   "w.lekarz"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "wizytę",
+   "u",
+   "lekarza"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "приём",
+   "у",
+   "врача"
+  ],
+  "distract_pl": [
+   "dentysty",
+   "szpitalu"
+  ],
+  "distract_ru": [
+   "стоматолога",
+   "больнице"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 2
+ },
+ {
+  "id": "p.ide_do_lekarza",
+  "pl": "Idę do lekarza.",
+  "ru": "Я иду к врачу.",
+  "tr": "и́дэ до лека́жа.",
+  "words": [
+   "w.isc",
+   "w.do",
+   "w.lekarz"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "do",
+   "lekarza"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "к",
+   "врачу"
+  ],
+  "distract_pl": [
+   "dentysty",
+   "apteki"
+  ],
+  "distract_ru": [
+   "стоматологу",
+   "аптеку"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.ide_do_dentysty",
+  "pl": "Idę do dentysty.",
+  "ru": "Я иду к стоматологу.",
+  "tr": "и́дэ до дэнты́сты.",
+  "words": [
+   "w.isc",
+   "w.do",
+   "w.dentysta"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "do",
+   "dentysty"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "к",
+   "стоматологу"
+  ],
+  "distract_pl": [
+   "lekarza",
+   "szpitala"
+  ],
+  "distract_ru": [
+   "врачу",
+   "больницу"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.potrzebuje_recepty",
+  "pl": "Potrzebuję recepty.",
+  "ru": "Мне нужен рецепт.",
+  "tr": "потшэбу́е рэцэ́пты.",
+  "words": [
+   "w.potrzebowac",
+   "w.recepta"
+  ],
+  "tiles_pl": [
+   "Potrzebuję",
+   "recepty"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужен",
+   "рецепт"
+  ],
+  "distract_pl": [
+   "lekarstwa",
+   "wizyty"
+  ],
+  "distract_ru": [
+   "лекарство",
+   "приём"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.biore_tabletke",
+  "pl": "Biorę tabletkę.",
+  "ru": "Я принимаю таблетку.",
+  "tr": "бёрэ табле́ткэ.",
+  "words": [
+   "w.brac",
+   "w.tabletka"
+  ],
+  "tiles_pl": [
+   "Biorę",
+   "tabletkę"
+  ],
+  "tiles_ru": [
+   "Я",
+   "принимаю",
+   "таблетку"
+  ],
+  "distract_pl": [
+   "lekarstwo",
+   "bierzesz"
+  ],
+  "distract_ru": [
+   "лекарство",
+   "берёшь"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.mam_ubezpieczenie",
+  "pl": "Mam ubezpieczenie.",
+  "ru": "У меня есть страховка.",
+  "tr": "мам убэспечэ́нье.",
+  "words": [
+   "w.miec",
+   "w.ubezpieczenie"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "ubezpieczenie"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "есть",
+   "страховка"
+  ],
+  "distract_pl": [
+   "paszport",
+   "mamy"
+  ],
+  "distract_ru": [
+   "паспорт",
+   "мы"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.dzwonie_na_pogotowie",
+  "pl": "Dzwonię na pogotowie.",
+  "ru": "Я звоню в скорую.",
+  "tr": "дзво́не на погото́ве.",
+  "words": [
+   "w.dzwonic",
+   "w.na",
+   "w.pogotowie"
+  ],
+  "tiles_pl": [
+   "Dzwonię",
+   "na",
+   "pogotowie"
+  ],
+  "tiles_ru": [
+   "Я",
+   "звоню",
+   "в",
+   "скорую"
+  ],
+  "distract_pl": [
+   "policję",
+   "lekarza"
+  ],
+  "distract_ru": [
+   "полицию",
+   "врача"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.mam_alergie",
+  "pl": "Mam alergię.",
+  "ru": "У меня аллергия.",
+  "tr": "мам але́рге.",
+  "words": [
+   "w.miec",
+   "w.alergia"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "alergię"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "аллергия"
+  ],
+  "distract_pl": [
+   "grypę",
+   "gorączkę"
+  ],
+  "distract_ru": [
+   "грипп",
+   "жар"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 2
+ },
+ {
+  "id": "p.pomocy",
+  "pl": "Pomocy!",
+  "ru": "На помощь!",
+  "tr": "помо́цы!",
+  "words": [
+   "w.pomoc"
+  ],
+  "tiles_pl": [
+   "Pomocy"
+  ],
+  "tiles_ru": [
+   "На",
+   "помощь"
+  ],
+  "distract_pl": [
+   "lekarza",
+   "uwaga"
+  ],
+  "distract_ru": [
+   "врача",
+   "внимание"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.potrzebuje_pomocy",
+  "pl": "Potrzebuję pomocy.",
+  "ru": "Мне нужна помощь.",
+  "tr": "потшэбу́е помо́цы.",
+  "words": [
+   "w.potrzebowac",
+   "w.pomoc"
+  ],
+  "tiles_pl": [
+   "Potrzebuję",
+   "pomocy"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужна",
+   "помощь"
+  ],
+  "distract_pl": [
+   "lekarza",
+   "czasu"
+  ],
+  "distract_ru": [
+   "врач",
+   "время"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.mam_zimne_rece",
+  "pl": "Mam zimne ręce.",
+  "ru": "У меня холодные руки.",
+  "tr": "мам жи́мнэ рэ́нцэ.",
+  "words": [
+   "w.miec",
+   "w.zimny",
+   "w.reka"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "zimne",
+   "ręce"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "холодные",
+   "руки"
+  ],
+  "distract_pl": [
+   "ciepłe",
+   "nogi"
+  ],
+  "distract_ru": [
+   "тёплые",
+   "ноги"
+  ],
+  "topic": "cialo_i_zdrowie",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_pracujesz",
+  "pl": "Gdzie pracujesz?",
+  "ru": "Где ты работаешь?",
+  "tr": "гдже працу́еш?",
+  "words": [
+   "w.gdzie",
+   "w.pracowac"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "pracujesz"
+  ],
+  "tiles_ru": [
+   "Где",
+   "ты",
+   "работаешь"
+  ],
+  "distract_pl": [
+   "mieszkasz",
+   "skąd"
+  ],
+  "distract_ru": [
+   "живёшь",
+   "откуда"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.pracuje_w_biurze",
+  "pl": "Pracuję w biurze.",
+  "ru": "Я работаю в офисе.",
+  "tr": "працу́е ф бю́жэ.",
+  "words": [
+   "w.pracowac",
+   "w.w",
+   "w.biuro"
+  ],
+  "tiles_pl": [
+   "Pracuję",
+   "w",
+   "biurze"
+  ],
+  "tiles_ru": [
+   "Я",
+   "работаю",
+   "в",
+   "офисе"
+  ],
+  "distract_pl": [
+   "firmie",
+   "domu"
+  ],
+  "distract_ru": [
+   "фирме",
+   "доме"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.pracuje_w_firmie",
+  "pl": "Pracuję w firmie.",
+  "ru": "Я работаю в фирме.",
+  "tr": "працу́е ф фи́рме.",
+  "words": [
+   "w.pracowac",
+   "w.w",
+   "w.firma"
+  ],
+  "tiles_pl": [
+   "Pracuję",
+   "w",
+   "firmie"
+  ],
+  "tiles_ru": [
+   "Я",
+   "работаю",
+   "в",
+   "фирме"
+  ],
+  "distract_pl": [
+   "biurze",
+   "szkole"
+  ],
+  "distract_ru": [
+   "офисе",
+   "школе"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_w_pracy",
+  "pl": "Jestem w pracy.",
+  "ru": "Я на работе.",
+  "tr": "е́стэм ф пра́цы.",
+  "words": [
+   "w.byc",
+   "w.w",
+   "w.praca"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "w",
+   "pracy"
+  ],
+  "tiles_ru": [
+   "Я",
+   "на",
+   "работе"
+  ],
+  "distract_pl": [
+   "domu",
+   "szkole"
+  ],
+  "distract_ru": [
+   "дома",
+   "школе"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.ide_do_pracy",
+  "pl": "Idę do pracy.",
+  "ru": "Я иду на работу.",
+  "tr": "и́дэ до пра́цы.",
+  "words": [
+   "w.isc",
+   "w.do",
+   "w.praca"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "do",
+   "pracy"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "на",
+   "работу"
+  ],
+  "distract_pl": [
+   "domu",
+   "szkoły"
+  ],
+  "distract_ru": [
+   "домой",
+   "школу"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.wracam_z_pracy",
+  "pl": "Wracam z pracy.",
+  "ru": "Я возвращаюсь с работы.",
+  "tr": "вра́цам с пра́цы.",
+  "words": [
+   "w.wracac",
+   "w.z",
+   "w.praca"
+  ],
+  "tiles_pl": [
+   "Wracam",
+   "z",
+   "pracy"
+  ],
+  "tiles_ru": [
+   "Я",
+   "возвращаюсь",
+   "с",
+   "работы"
+  ],
+  "distract_pl": [
+   "do",
+   "szkoły"
+  ],
+  "distract_ru": [
+   "в",
+   "школу"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.mam_spotkanie_o_dziesiatej",
+  "pl": "Mam spotkanie o dziesiątej.",
+  "ru": "У меня встреча в десять.",
+  "tr": "мам спотка́нье о джещо́нтэй.",
+  "words": [
+   "w.miec",
+   "w.spotkanie",
+   "w.o",
+   "w.dziesiaty"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "spotkanie",
+   "o",
+   "dziesiątej"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "встреча",
+   "в",
+   "десять"
+  ],
+  "distract_pl": [
+   "lekcję",
+   "dziewiątej"
+  ],
+  "distract_ru": [
+   "урок",
+   "девять"
+  ],
+  "topic": "praca",
+  "level": 2
+ },
+ {
+  "id": "p.mam_duzo_pracy",
+  "pl": "Mam dużo pracy.",
+  "ru": "У меня много работы.",
+  "tr": "мам ду́жо пра́цы.",
+  "words": [
+   "w.miec",
+   "w.duzo",
+   "w.praca"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "dużo",
+   "pracy"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "много",
+   "работы"
+  ],
+  "distract_pl": [
+   "mało",
+   "czasu"
+  ],
+  "distract_ru": [
+   "мало",
+   "времени"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.szukam_pracy",
+  "pl": "Szukam pracy.",
+  "ru": "Я ищу работу.",
+  "tr": "шу́кам пра́цы.",
+  "words": [
+   "w.szukac",
+   "w.praca"
+  ],
+  "tiles_pl": [
+   "Szukam",
+   "pracy"
+  ],
+  "tiles_ru": [
+   "Я",
+   "ищу",
+   "работу"
+  ],
+  "distract_pl": [
+   "domu",
+   "klucza"
+  ],
+  "distract_ru": [
+   "дом",
+   "ключ"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.pracuje_w_domu",
+  "pl": "Pracuję w domu.",
+  "ru": "Я работаю дома.",
+  "tr": "працу́е ф до́му.",
+  "words": [
+   "w.pracowac",
+   "w.w",
+   "w.dom"
+  ],
+  "tiles_pl": [
+   "Pracuję",
+   "w",
+   "domu"
+  ],
+  "tiles_ru": [
+   "Я",
+   "работаю",
+   "дома"
+  ],
+  "distract_pl": [
+   "biurze",
+   "mieszkam"
+  ],
+  "distract_ru": [
+   "офисе",
+   "живу"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.mam_przerwe_o_dwunastej",
+  "pl": "Mam przerwę o dwunastej.",
+  "ru": "У меня перерыв в двенадцать.",
+  "tr": "мам пшэ́рвэ о двуна́стэй.",
+  "words": [
+   "w.miec",
+   "w.przerwa",
+   "w.o",
+   "w.dwunasty"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "przerwę",
+   "o",
+   "dwunastej"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "перерыв",
+   "в",
+   "двенадцать"
+  ],
+  "distract_pl": [
+   "jedenastej",
+   "spotkanie"
+  ],
+  "distract_ru": [
+   "одиннадцать",
+   "встреча"
+  ],
+  "topic": "praca",
+  "level": 3
+ },
+ {
+  "id": "p.jaki_jest_twoj_zawod",
+  "pl": "Jaki jest twój zawód?",
+  "ru": "Какая у тебя профессия?",
+  "tr": "я́ки ест тфуй за́вут?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.twoj",
+   "w.zawod"
+  ],
+  "tiles_pl": [
+   "Jaki",
+   "jest",
+   "twój",
+   "zawód"
+  ],
+  "tiles_ru": [
+   "Какая",
+   "у",
+   "тебя",
+   "профессия"
+  ],
+  "distract_pl": [
+   "jaka",
+   "praca"
+  ],
+  "distract_ru": [
+   "какой",
+   "работа"
+  ],
+  "topic": "praca",
+  "level": 2
+ },
+ {
+  "id": "p.jestem_inzynierem",
+  "pl": "Jestem inżynierem.",
+  "ru": "Я инженер.",
+  "tr": "е́стэм инжынье́рэм.",
+  "words": [
+   "w.byc",
+   "w.inzynier"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "inżynierem"
+  ],
+  "tiles_ru": [
+   "Я",
+   "инженер"
+  ],
+  "distract_pl": [
+   "programistą",
+   "kucharzem"
+  ],
+  "distract_ru": [
+   "программист",
+   "повар"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.potrzebuje_dokumentu",
+  "pl": "Potrzebuję dokumentu.",
+  "ru": "Мне нужен документ.",
+  "tr": "потшэбу́е докумэ́нту.",
+  "words": [
+   "w.potrzebowac",
+   "w.dokument"
+  ],
+  "tiles_pl": [
+   "Potrzebuję",
+   "dokumentu"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужен",
+   "документ"
+  ],
+  "distract_pl": [
+   "formularza",
+   "umowy"
+  ],
+  "distract_ru": [
+   "бланк",
+   "договор"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.to_jest_moj_podpis",
+  "pl": "To jest mój podpis.",
+  "ru": "Это моя подпись.",
+  "tr": "то ест муй по́тпис.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.moj",
+   "w.podpis"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "mój",
+   "podpis"
+  ],
+  "tiles_ru": [
+   "Это",
+   "моя",
+   "подпись"
+  ],
+  "distract_pl": [
+   "twój",
+   "imię"
+  ],
+  "distract_ru": [
+   "твоя",
+   "имя"
+  ],
+  "topic": "praca",
+  "level": 2
+ },
+ {
+  "id": "p.mam_karte_pobytu",
+  "pl": "Mam kartę pobytu.",
+  "ru": "У меня есть карта побыта.",
+  "tr": "мам ка́ртэ побы́ту.",
+  "words": [
+   "w.miec",
+   "w.karta_pobytu"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "kartę",
+   "pobytu"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "есть",
+   "карта",
+   "побыта"
+  ],
+  "distract_pl": [
+   "paszport",
+   "pracę"
+  ],
+  "distract_ru": [
+   "паспорт",
+   "работу"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.jaki_jest_twoj_pesel",
+  "pl": "Jaki jest twój PESEL?",
+  "ru": "Какой у тебя PESEL?",
+  "tr": "я́ки ест тфуй пэ́сэл?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.twoj",
+   "w.pesel"
+  ],
+  "tiles_pl": [
+   "Jaki",
+   "jest",
+   "twój",
+   "PESEL"
+  ],
+  "tiles_ru": [
+   "Какой",
+   "у",
+   "тебя",
+   "PESEL"
+  ],
+  "distract_pl": [
+   "numer",
+   "adres"
+  ],
+  "distract_ru": [
+   "номер",
+   "адрес"
+  ],
+  "topic": "praca",
+  "level": 2
+ },
+ {
+  "id": "p.jestem_rolnikiem",
+  "pl": "Jestem rolnikiem.",
+  "ru": "Я фермер.",
+  "tr": "е́стэм ролни́кем.",
+  "words": [
+   "w.byc",
+   "w.rolnik"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "rolnikiem"
+  ],
+  "tiles_ru": [
+   "Я",
+   "фермер"
+  ],
+  "distract_pl": [
+   "kucharzem",
+   "studentem"
+  ],
+  "distract_ru": [
+   "повар",
+   "студент"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.mam_male_gospodarstwo",
+  "pl": "Mam małe gospodarstwo.",
+  "ru": "У меня небольшое хозяйство.",
+  "tr": "мам ма́ўэ господа́рстфо.",
+  "words": [
+   "w.miec",
+   "w.maly",
+   "w.gospodarstwo"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "małe",
+   "gospodarstwo"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "небольшое",
+   "хозяйство"
+  ],
+  "distract_pl": [
+   "duże",
+   "farmę"
+  ],
+  "distract_ru": [
+   "большое",
+   "ферму"
+  ],
+  "topic": "praca",
+  "level": 1
+ },
+ {
+  "id": "p.ucze_sie_polskiego",
+  "pl": "Uczę się polskiego.",
+  "ru": "Я учу польский.",
+  "tr": "у́чэ ще полске́го.",
+  "words": [
+   "w.uczyc_sie",
+   "w.sie",
+   "w.polski"
+  ],
+  "tiles_pl": [
+   "Uczę",
+   "się",
+   "polskiego"
+  ],
+  "tiles_ru": [
+   "Я",
+   "учу",
+   "польский"
+  ],
+  "distract_pl": [
+   "rosyjskiego",
+   "uczysz"
+  ],
+  "distract_ru": [
+   "русский",
+   "учишь"
+  ],
+  "topic": "nauka",
+  "level": 1
+ },
+ {
+  "id": "p.mam_lekcje_polskiego",
+  "pl": "Mam lekcję polskiego.",
+  "ru": "У меня урок польского.",
+  "tr": "мам ле́кце полске́го.",
+  "words": [
+   "w.miec",
+   "w.lekcja",
+   "w.polski"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "lekcję",
+   "polskiego"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "урок",
+   "польского"
+  ],
+  "distract_pl": [
+   "kurs",
+   "angielskiego"
+  ],
+  "distract_ru": [
+   "курс",
+   "английского"
+  ],
+  "topic": "nauka",
+  "level": 1
+ },
+ {
+  "id": "p.chodze_na_kurs_polskiego",
+  "pl": "Chodzę na kurs polskiego.",
+  "ru": "Я хожу на курс польского.",
+  "tr": "хо́дзэ на курс полске́го.",
+  "words": [
+   "w.chodzic",
+   "w.na",
+   "w.kurs",
+   "w.polski"
+  ],
+  "tiles_pl": [
+   "Chodzę",
+   "na",
+   "kurs",
+   "polskiego"
+  ],
+  "tiles_ru": [
+   "Я",
+   "хожу",
+   "на",
+   "курс",
+   "польского"
+  ],
+  "distract_pl": [
+   "lekcję",
+   "idę"
+  ],
+  "distract_ru": [
+   "урок",
+   "иду"
+  ],
+  "topic": "nauka",
+  "level": 2
+ },
+ {
+  "id": "p.czytam_ksiazke_po_polsku",
+  "pl": "Czytam książkę po polsku.",
+  "ru": "Я читаю книгу по-польски.",
+  "tr": "чы́там кщо́ўшкэ по по́лску.",
+  "words": [
+   "w.czytac",
+   "w.ksiazka",
+   "w.po_polsku"
+  ],
+  "tiles_pl": [
+   "Czytam",
+   "książkę",
+   "po",
+   "polsku"
+  ],
+  "tiles_ru": [
+   "Я",
+   "читаю",
+   "книгу",
+   "по-польски"
+  ],
+  "distract_pl": [
+   "piszę",
+   "rosyjsku"
+  ],
+  "distract_ru": [
+   "пишу",
+   "по-русски"
+  ],
+  "topic": "nauka",
+  "level": 2
+ },
+ {
+  "id": "p.co_to_znaczy",
+  "pl": "Co to znaczy?",
+  "ru": "Что это значит?",
+  "tr": "цо то зна́чы?",
+  "words": [
+   "w.co",
+   "w.to",
+   "w.znaczyc"
+  ],
+  "tiles_pl": [
+   "Co",
+   "to",
+   "znaczy"
+  ],
+  "tiles_ru": [
+   "Что",
+   "это",
+   "значит"
+  ],
+  "distract_pl": [
+   "jak",
+   "kto"
+  ],
+  "distract_ru": [
+   "как",
+   "кто"
+  ],
+  "topic": "nauka",
+  "level": 1
+ },
+ {
+  "id": "p.jak_to_sie_pisze",
+  "pl": "Jak to się pisze?",
+  "ru": "Как это пишется?",
+  "tr": "як то ще пи́шэ?",
+  "words": [
+   "w.jak",
+   "w.to",
+   "w.sie",
+   "w.pisac"
+  ],
+  "tiles_pl": [
+   "Jak",
+   "to",
+   "się",
+   "pisze"
+  ],
+  "tiles_ru": [
+   "Как",
+   "это",
+   "пишется"
+  ],
+  "distract_pl": [
+   "mówi",
+   "czyta"
+  ],
+  "distract_ru": [
+   "говорится",
+   "читается"
+  ],
+  "topic": "nauka",
+  "level": 2
+ },
+ {
+  "id": "p.jak_to_sie_mowi_po_polsku",
+  "pl": "Jak to się mówi po polsku?",
+  "ru": "Как это говорится по-польски?",
+  "tr": "як то ще му́ви по по́лску?",
+  "words": [
+   "w.jak",
+   "w.to",
+   "w.sie",
+   "w.mowic",
+   "w.po_polsku"
+  ],
+  "tiles_pl": [
+   "Jak",
+   "to",
+   "się",
+   "mówi",
+   "po",
+   "polsku"
+  ],
+  "tiles_ru": [
+   "Как",
+   "это",
+   "говорится",
+   "по-польски"
+  ],
+  "distract_pl": [
+   "pisze",
+   "rosyjsku"
+  ],
+  "distract_ru": [
+   "пишется",
+   "по-русски"
+  ],
+  "topic": "nauka",
+  "level": 3
+ },
+ {
+  "id": "p.nie_znam_tego_slowa",
+  "pl": "Nie znam tego słowa.",
+  "ru": "Я не знаю этого слова.",
+  "tr": "нье знам тэ́го сўо́ва.",
+  "words": [
+   "w.nie",
+   "w.znac",
+   "w.ten",
+   "w.slowo"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "znam",
+   "tego",
+   "słowa"
+  ],
+  "tiles_ru": [
+   "Я",
+   "не",
+   "знаю",
+   "этого",
+   "слова"
+  ],
+  "distract_pl": [
+   "ten",
+   "zdania"
+  ],
+  "distract_ru": [
+   "это",
+   "предложения"
+  ],
+  "topic": "nauka",
+  "level": 2
+ },
+ {
+  "id": "p.nie_rozumiem_tego_slowa",
+  "pl": "Nie rozumiem tego słowa.",
+  "ru": "Я не понимаю этого слова.",
+  "tr": "нье розу́мем тэ́го сўо́ва.",
+  "words": [
+   "w.nie",
+   "w.rozumiec",
+   "w.ten",
+   "w.slowo"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "rozumiem",
+   "tego",
+   "słowa"
+  ],
+  "tiles_ru": [
+   "Я",
+   "не",
+   "понимаю",
+   "этого",
+   "слова"
+  ],
+  "distract_pl": [
+   "wiem",
+   "litery"
+  ],
+  "distract_ru": [
+   "знаю",
+   "буквы"
+  ],
+  "topic": "nauka",
+  "level": 2
+ },
+ {
+  "id": "p.mam_pytanie",
+  "pl": "Mam pytanie.",
+  "ru": "У меня вопрос.",
+  "tr": "мам пыта́нье.",
+  "words": [
+   "w.miec",
+   "w.pytanie"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "pytanie"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "вопрос"
+  ],
+  "distract_pl": [
+   "odpowiedź",
+   "masz"
+  ],
+  "distract_ru": [
+   "ответ",
+   "есть"
+  ],
+  "topic": "nauka",
+  "level": 1
+ },
+ {
+  "id": "p.poprosze_przyklad",
+  "pl": "Poproszę przykład.",
+  "ru": "Пример, пожалуйста.",
+  "tr": "попро́шэ пшы́кўат.",
+  "words": [
+   "w.poprosze",
+   "w.przyklad"
+  ],
+  "tiles_pl": [
+   "Poproszę",
+   "przykład"
+  ],
+  "tiles_ru": [
+   "Пример",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "błąd",
+   "zdanie"
+  ],
+  "distract_ru": [
+   "ошибку",
+   "предложение"
+  ],
+  "topic": "nauka",
+  "level": 1
+ },
+ {
+  "id": "p.to_jest_dobra_odpowiedz",
+  "pl": "To jest dobra odpowiedź.",
+  "ru": "Это хороший ответ.",
+  "tr": "то ест до́бра отпо́вечь.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.dobry",
+   "w.odpowiedz"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "dobra",
+   "odpowiedź"
+  ],
+  "tiles_ru": [
+   "Это",
+   "хороший",
+   "ответ"
+  ],
+  "distract_pl": [
+   "zły",
+   "pytanie"
+  ],
+  "distract_ru": [
+   "плохой",
+   "вопрос"
+  ],
+  "topic": "nauka",
+  "level": 2
+ },
+ {
+  "id": "p.gramatyka_jest_trudna",
+  "pl": "Gramatyka jest trudna.",
+  "ru": "Грамматика трудная.",
+  "tr": "грама́тыка ест тру́дна.",
+  "words": [
+   "w.gramatyka",
+   "w.byc",
+   "w.trudny"
+  ],
+  "tiles_pl": [
+   "Gramatyka",
+   "jest",
+   "trudna"
+  ],
+  "tiles_ru": [
+   "Грамматика",
+   "трудная"
+  ],
+  "distract_pl": [
+   "łatwa",
+   "wymowa"
+  ],
+  "distract_ru": [
+   "лёгкая",
+   "произношение"
+  ],
+  "topic": "nauka",
+  "level": 1
+ },
+ {
+  "id": "p.moja_wymowa_jest_zla",
+  "pl": "Moja wymowa jest zła.",
+  "ru": "Моё произношение плохое.",
+  "tr": "мо́я вымо́ва ест зўа.",
+  "words": [
+   "w.moj",
+   "w.wymowa",
+   "w.byc",
+   "w.zly"
+  ],
+  "tiles_pl": [
+   "Moja",
+   "wymowa",
+   "jest",
+   "zła"
+  ],
+  "tiles_ru": [
+   "Моё",
+   "произношение",
+   "плохое"
+  ],
+  "distract_pl": [
+   "dobra",
+   "gramatyka"
+  ],
+  "distract_ru": [
+   "хорошее",
+   "грамматика"
+  ],
+  "topic": "nauka",
+  "level": 2
+ },
+ {
+  "id": "p.jutro_mam_egzamin",
+  "pl": "Jutro mam egzamin.",
+  "ru": "Завтра у меня экзамен.",
+  "tr": "ю́тро мам эгза́мин.",
+  "words": [
+   "w.jutro",
+   "w.miec",
+   "w.egzamin"
+  ],
+  "tiles_pl": [
+   "Jutro",
+   "mam",
+   "egzamin"
+  ],
+  "tiles_ru": [
+   "Завтра",
+   "у",
+   "меня",
+   "экзамен"
+  ],
+  "distract_pl": [
+   "dziś",
+   "lekcję"
+  ],
+  "distract_ru": [
+   "сегодня",
+   "урок"
+  ],
+  "topic": "nauka",
+  "level": 1
+ },
+ {
+  "id": "p.mam_prace_domowa",
+  "pl": "Mam pracę domową.",
+  "ru": "У меня домашнее задание.",
+  "tr": "мам пра́цэ домо́воў.",
+  "words": [
+   "w.miec",
+   "w.praca_domowa"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "pracę",
+   "domową"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "домашнее",
+   "задание"
+  ],
+  "distract_pl": [
+   "egzamin",
+   "kurs"
+  ],
+  "distract_ru": [
+   "экзамен",
+   "курс"
+  ],
+  "topic": "nauka",
+  "level": 1
+ },
+ {
+  "id": "p.moja_nauczycielka_mowi_po_polsku",
+  "pl": "Moja nauczycielka mówi po polsku.",
+  "ru": "Моя учительница говорит по-польски.",
+  "tr": "мо́я научыче́лка му́ви по по́лску.",
+  "words": [
+   "w.moj",
+   "w.nauczycielka",
+   "w.mowic",
+   "w.po_polsku"
+  ],
+  "tiles_pl": [
+   "Moja",
+   "nauczycielka",
+   "mówi",
+   "po",
+   "polsku"
+  ],
+  "tiles_ru": [
+   "Моя",
+   "учительница",
+   "говорит",
+   "по-польски"
+  ],
+  "distract_pl": [
+   "mój",
+   "mówię"
+  ],
+  "distract_ru": [
+   "мой",
+   "говорю"
+  ],
+  "topic": "nauka",
+  "level": 3
+ },
+ {
+  "id": "p.lubie_muzyke",
+  "pl": "Lubię muzykę.",
+  "ru": "Я люблю музыку.",
+  "tr": "лу́бе музы́кэ.",
+  "words": [
+   "w.lubic",
+   "w.muzyka"
+  ],
+  "tiles_pl": [
+   "Lubię",
+   "muzykę"
+  ],
+  "tiles_ru": [
+   "Я",
+   "люблю",
+   "музыку"
+  ],
+  "distract_pl": [
+   "film",
+   "lubisz"
+  ],
+  "distract_ru": [
+   "фильм",
+   "любишь"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.slucham_muzyki",
+  "pl": "Słucham muzyki.",
+  "ru": "Я слушаю музыку.",
+  "tr": "сўу́хам музы́ки.",
+  "words": [
+   "w.slucham",
+   "w.muzyka"
+  ],
+  "tiles_pl": [
+   "Słucham",
+   "muzyki"
+  ],
+  "tiles_ru": [
+   "Я",
+   "слушаю",
+   "музыку"
+  ],
+  "distract_pl": [
+   "oglądam",
+   "radio"
+  ],
+  "distract_ru": [
+   "смотрю",
+   "радио"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.ogladam_film",
+  "pl": "Oglądam film.",
+  "ru": "Я смотрю фильм.",
+  "tr": "огло́ндам филм.",
+  "words": [
+   "w.ogladac",
+   "w.film"
+  ],
+  "tiles_pl": [
+   "Oglądam",
+   "film"
+  ],
+  "tiles_ru": [
+   "Я",
+   "смотрю",
+   "фильм"
+  ],
+  "distract_pl": [
+   "słucham",
+   "serial"
+  ],
+  "distract_ru": [
+   "слушаю",
+   "сериал"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.gram_w_pilke",
+  "pl": "Gram w piłkę.",
+  "ru": "Я играю в мяч.",
+  "tr": "грам ф пи́ўкэ.",
+  "words": [
+   "w.gram",
+   "w.w",
+   "w.pilka"
+  ],
+  "tiles_pl": [
+   "Gram",
+   "w",
+   "piłkę"
+  ],
+  "tiles_ru": [
+   "Я",
+   "играю",
+   "в",
+   "мяч"
+  ],
+  "distract_pl": [
+   "gitarze",
+   "szachy"
+  ],
+  "distract_ru": [
+   "гитаре",
+   "шахматы"
+  ],
+  "topic": "czas_wolny",
+  "level": 2
+ },
+ {
+  "id": "p.ide_na_spacer",
+  "pl": "Idę na spacer.",
+  "ru": "Я иду на прогулку.",
+  "tr": "и́дэ на спа́цэр.",
+  "words": [
+   "w.isc",
+   "w.na",
+   "w.spacer"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "na",
+   "spacer"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "на",
+   "прогулку"
+  ],
+  "distract_pl": [
+   "koncert",
+   "park"
+  ],
+  "distract_ru": [
+   "концерт",
+   "парк"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.ide_na_koncert",
+  "pl": "Idę na koncert.",
+  "ru": "Я иду на концерт.",
+  "tr": "и́дэ на ко́нцэрт.",
+  "words": [
+   "w.isc",
+   "w.na",
+   "w.koncert"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "na",
+   "koncert"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "на",
+   "концерт"
+  ],
+  "distract_pl": [
+   "spacer",
+   "basen"
+  ],
+  "distract_ru": [
+   "прогулку",
+   "бассейн"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.idziemy_do_kina",
+  "pl": "Idziemy do kina.",
+  "ru": "Мы идём в кино.",
+  "tr": "идже́мы до ки́на.",
+  "words": [
+   "w.isc",
+   "w.do",
+   "w.kino"
+  ],
+  "tiles_pl": [
+   "Idziemy",
+   "do",
+   "kina"
+  ],
+  "tiles_ru": [
+   "Мы",
+   "идём",
+   "в",
+   "кино"
+  ],
+  "distract_pl": [
+   "teatru",
+   "idę"
+  ],
+  "distract_ru": [
+   "театр",
+   "иду"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.ide_na_silownie",
+  "pl": "Idę na siłownię.",
+  "ru": "Я иду в тренажёрный зал.",
+  "tr": "и́дэ на щиўо́вне.",
+  "words": [
+   "w.isc",
+   "w.na",
+   "w.silownia"
+  ],
+  "tiles_pl": [
+   "Idę",
+   "na",
+   "siłownię"
+  ],
+  "tiles_ru": [
+   "Я",
+   "иду",
+   "в",
+   "тренажёрный",
+   "зал"
+  ],
+  "distract_pl": [
+   "basen",
+   "trening"
+  ],
+  "distract_ru": [
+   "бассейн",
+   "тренировка"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.mam_trening_o_szostej",
+  "pl": "Mam trening o szóstej.",
+  "ru": "У меня тренировка в шесть.",
+  "tr": "мам трэ́нинк о шу́стэй.",
+  "words": [
+   "w.miec",
+   "w.trening",
+   "w.o",
+   "w.szosty"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "trening",
+   "o",
+   "szóstej"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "тренировка",
+   "в",
+   "шесть"
+  ],
+  "distract_pl": [
+   "lekcję",
+   "siódmej"
+  ],
+  "distract_ru": [
+   "урок",
+   "семь"
+  ],
+  "topic": "czas_wolny",
+  "level": 2
+ },
+ {
+  "id": "p.lubie_czytac",
+  "pl": "Lubię czytać.",
+  "ru": "Я люблю читать.",
+  "tr": "лу́бе чы́тачь.",
+  "words": [
+   "w.lubic",
+   "w.czytac"
+  ],
+  "tiles_pl": [
+   "Lubię",
+   "czytać"
+  ],
+  "tiles_ru": [
+   "Я",
+   "люблю",
+   "читать"
+  ],
+  "distract_pl": [
+   "pisać",
+   "słuchać"
+  ],
+  "distract_ru": [
+   "писать",
+   "слушать"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.lubie_gotowac",
+  "pl": "Lubię gotować.",
+  "ru": "Я люблю готовить.",
+  "tr": "лу́бе гото́вачь.",
+  "words": [
+   "w.lubic",
+   "w.gotowac"
+  ],
+  "tiles_pl": [
+   "Lubię",
+   "gotować"
+  ],
+  "tiles_ru": [
+   "Я",
+   "люблю",
+   "готовить"
+  ],
+  "distract_pl": [
+   "jeść",
+   "tańczyć"
+  ],
+  "distract_ru": [
+   "есть",
+   "танцевать"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.lubie_spacerowac_po_parku",
+  "pl": "Lubię spacerować po parku.",
+  "ru": "Я люблю гулять по парку.",
+  "tr": "лу́бе спацэро́вачь по па́рку.",
+  "words": [
+   "w.lubic",
+   "w.spacerowac",
+   "w.po",
+   "w.park"
+  ],
+  "tiles_pl": [
+   "Lubię",
+   "spacerować",
+   "po",
+   "parku"
+  ],
+  "tiles_ru": [
+   "Я",
+   "люблю",
+   "гулять",
+   "по",
+   "парку"
+  ],
+  "distract_pl": [
+   "pływać",
+   "lesie"
+  ],
+  "distract_ru": [
+   "плавать",
+   "лесу"
+  ],
+  "topic": "czas_wolny",
+  "level": 2
+ },
+ {
+  "id": "p.jade_na_wakacje",
+  "pl": "Jadę na wakacje.",
+  "ru": "Я еду в отпуск.",
+  "tr": "я́дэ на вака́це.",
+  "words": [
+   "w.jechac",
+   "w.na",
+   "w.wakacje"
+  ],
+  "tiles_pl": [
+   "Jadę",
+   "na",
+   "wakacje"
+  ],
+  "tiles_ru": [
+   "Я",
+   "еду",
+   "в",
+   "отпуск"
+  ],
+  "distract_pl": [
+   "urlop",
+   "wycieczkę"
+  ],
+  "distract_ru": [
+   "экскурсию",
+   "лечу"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.jedziemy_w_gory",
+  "pl": "Jedziemy w góry.",
+  "ru": "Мы едем в горы.",
+  "tr": "едже́мы ф гу́ры.",
+  "words": [
+   "w.jechac",
+   "w.w",
+   "w.gora"
+  ],
+  "tiles_pl": [
+   "Jedziemy",
+   "w",
+   "góry"
+  ],
+  "tiles_ru": [
+   "Мы",
+   "едем",
+   "в",
+   "горы"
+  ],
+  "distract_pl": [
+   "morze",
+   "las"
+  ],
+  "distract_ru": [
+   "море",
+   "лес"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.jedziemy_nad_morze",
+  "pl": "Jedziemy nad morze.",
+  "ru": "Мы едем к морю.",
+  "tr": "едже́мы нат мо́жэ.",
+  "words": [
+   "w.jechac",
+   "w.nad",
+   "w.morze"
+  ],
+  "tiles_pl": [
+   "Jedziemy",
+   "nad",
+   "morze"
+  ],
+  "tiles_ru": [
+   "Мы",
+   "едем",
+   "к",
+   "морю"
+  ],
+  "distract_pl": [
+   "jezioro",
+   "góry"
+  ],
+  "distract_ru": [
+   "озеру",
+   "горы"
+  ],
+  "topic": "czas_wolny",
+  "level": 1
+ },
+ {
+  "id": "p.jaka_jest_dzis_pogoda",
+  "pl": "Jaka jest dziś pogoda?",
+  "ru": "Какая сегодня погода?",
+  "tr": "я́ка ест джищ пого́да?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.dzis",
+   "w.pogoda"
+  ],
+  "tiles_pl": [
+   "Jaka",
+   "jest",
+   "dziś",
+   "pogoda"
+  ],
+  "tiles_ru": [
+   "Какая",
+   "сегодня",
+   "погода"
+  ],
+  "distract_pl": [
+   "jaki",
+   "dzień"
+  ],
+  "distract_ru": [
+   "какой",
+   "день"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 2
+ },
+ {
+  "id": "p.dzis_jest_cieplo",
+  "pl": "Dziś jest ciepło.",
+  "ru": "Сегодня тепло.",
+  "tr": "джищ ест че́пўо.",
+  "words": [
+   "w.dzis",
+   "w.byc",
+   "w.cieplo"
+  ],
+  "tiles_pl": [
+   "Dziś",
+   "jest",
+   "ciepło"
+  ],
+  "tiles_ru": [
+   "Сегодня",
+   "тепло"
+  ],
+  "distract_pl": [
+   "zimno",
+   "wczoraj"
+  ],
+  "distract_ru": [
+   "холодно",
+   "вчера"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.pada_deszcz",
+  "pl": "Pada deszcz.",
+  "ru": "Идёт дождь.",
+  "tr": "па́да дэшч.",
+  "words": [
+   "w.padac",
+   "w.deszcz"
+  ],
+  "tiles_pl": [
+   "Pada",
+   "deszcz"
+  ],
+  "tiles_ru": [
+   "Идёт",
+   "дождь"
+  ],
+  "distract_pl": [
+   "śnieg",
+   "słońce"
+  ],
+  "distract_ru": [
+   "снег",
+   "солнце"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.slonce_swieci",
+  "pl": "Słońce świeci.",
+  "ru": "Светит солнце.",
+  "tr": "сўо́ньцэ щфе́чи.",
+  "words": [
+   "w.slonce",
+   "w.swiecic"
+  ],
+  "tiles_pl": [
+   "Słońce",
+   "świeci"
+  ],
+  "tiles_ru": [
+   "Светит",
+   "солнце"
+  ],
+  "distract_pl": [
+   "deszcz",
+   "pada"
+  ],
+  "distract_ru": [
+   "дождь",
+   "идёт"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.jest_dwadziescia_stopni",
+  "pl": "Jest dwadzieścia stopni.",
+  "ru": "Двадцать градусов.",
+  "tr": "ест двадже́щча сто́пни.",
+  "words": [
+   "w.byc",
+   "w.dwadziescia",
+   "w.stopien"
+  ],
+  "tiles_pl": [
+   "Jest",
+   "dwadzieścia",
+   "stopni"
+  ],
+  "tiles_ru": [
+   "Двадцать",
+   "градусов"
+  ],
+  "distract_pl": [
+   "dziesięć",
+   "dzień"
+  ],
+  "distract_ru": [
+   "десять",
+   "день"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.jutro_bedzie_cieplo",
+  "pl": "Jutro będzie ciepło.",
+  "ru": "Завтра будет тепло.",
+  "tr": "ю́тро бэ́ньдже че́пўо.",
+  "words": [
+   "w.jutro",
+   "w.byc",
+   "w.cieplo"
+  ],
+  "tiles_pl": [
+   "Jutro",
+   "będzie",
+   "ciepło"
+  ],
+  "tiles_ru": [
+   "Завтра",
+   "будет",
+   "тепло"
+  ],
+  "distract_pl": [
+   "zimno",
+   "jest"
+  ],
+  "distract_ru": [
+   "холодно",
+   "есть"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.jutro_bedzie_padac_deszcz",
+  "pl": "Jutro będzie padać deszcz.",
+  "ru": "Завтра будет идти дождь.",
+  "tr": "ю́тро бэ́ньдже па́дачь дэшч.",
+  "words": [
+   "w.jutro",
+   "w.byc",
+   "w.padac",
+   "w.deszcz"
+  ],
+  "tiles_pl": [
+   "Jutro",
+   "będzie",
+   "padać",
+   "deszcz"
+  ],
+  "tiles_ru": [
+   "Завтра",
+   "будет",
+   "идти",
+   "дождь"
+  ],
+  "distract_pl": [
+   "śnieg",
+   "jest"
+  ],
+  "distract_ru": [
+   "снег",
+   "есть"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 2
+ },
+ {
+  "id": "p.mam_farme",
+  "pl": "Mam farmę.",
+  "ru": "У меня есть ферма.",
+  "tr": "мам фа́рмэ.",
+  "words": [
+   "w.miec",
+   "w.farma"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "farmę"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "есть",
+   "ферма"
+  ],
+  "distract_pl": [
+   "dom",
+   "pole"
+  ],
+  "distract_ru": [
+   "дом",
+   "поле"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.mam_kota_i_psa",
+  "pl": "Mam kota i psa.",
+  "ru": "У меня есть кот и собака.",
+  "tr": "мам ко́та и пса.",
+  "words": [
+   "w.miec",
+   "w.kot",
+   "w.i",
+   "w.pies"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "kota",
+   "i",
+   "psa"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "есть",
+   "кот",
+   "и",
+   "собака"
+  ],
+  "distract_pl": [
+   "konia",
+   "krowę"
+  ],
+  "distract_ru": [
+   "лошадь",
+   "корова"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 2
+ },
+ {
+  "id": "p.krowa_daje_mleko",
+  "pl": "Krowa daje mleko.",
+  "ru": "Корова даёт молоко.",
+  "tr": "кро́ва да́е мле́ко.",
+  "words": [
+   "w.krowa",
+   "w.dawac",
+   "w.mleko"
+  ],
+  "tiles_pl": [
+   "Krowa",
+   "daje",
+   "mleko"
+  ],
+  "tiles_ru": [
+   "Корова",
+   "даёт",
+   "молоко"
+  ],
+  "distract_pl": [
+   "koza",
+   "jajka"
+  ],
+  "distract_ru": [
+   "коза",
+   "яйца"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.kura_daje_jajka",
+  "pl": "Kura daje jajka.",
+  "ru": "Курица несёт яйца.",
+  "tr": "ку́ра да́е я́йка.",
+  "words": [
+   "w.kura",
+   "w.dawac",
+   "w.jajko"
+  ],
+  "tiles_pl": [
+   "Kura",
+   "daje",
+   "jajka"
+  ],
+  "tiles_ru": [
+   "Курица",
+   "несёт",
+   "яйца"
+  ],
+  "distract_pl": [
+   "krowa",
+   "mleko"
+  ],
+  "distract_ru": [
+   "корова",
+   "молоко"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.kwiaty_rosna_w_ogrodzie",
+  "pl": "Kwiaty rosną w ogrodzie.",
+  "ru": "Цветы растут в огороде.",
+  "tr": "кфя́ты ро́сноў ф огро́дже.",
+  "words": [
+   "w.kwiat",
+   "w.rosnac",
+   "w.w",
+   "w.ogrod"
+  ],
+  "tiles_pl": [
+   "Kwiaty",
+   "rosną",
+   "w",
+   "ogrodzie"
+  ],
+  "tiles_ru": [
+   "Цветы",
+   "растут",
+   "в",
+   "огороде"
+  ],
+  "distract_pl": [
+   "drzewo",
+   "lesie"
+  ],
+  "distract_ru": [
+   "дерево",
+   "лесу"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 2
+ },
+ {
+  "id": "p.sadze_kwiaty_w_ogrodzie",
+  "pl": "Sadzę kwiaty w ogrodzie.",
+  "ru": "Я сажаю цветы в огороде.",
+  "tr": "са́дзэ кфя́ты ф огро́дже.",
+  "words": [
+   "w.sadzic",
+   "w.kwiat",
+   "w.w",
+   "w.ogrod"
+  ],
+  "tiles_pl": [
+   "Sadzę",
+   "kwiaty",
+   "w",
+   "ogrodzie"
+  ],
+  "tiles_ru": [
+   "Я",
+   "сажаю",
+   "цветы",
+   "в",
+   "огороде"
+  ],
+  "distract_pl": [
+   "drzewa",
+   "polu"
+  ],
+  "distract_ru": [
+   "деревья",
+   "поле"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 2
+ },
+ {
+  "id": "p.podlewam_kwiaty",
+  "pl": "Podlewam kwiaty.",
+  "ru": "Я поливаю цветы.",
+  "tr": "подле́вам кфя́ты.",
+  "words": [
+   "w.podlewac",
+   "w.kwiat"
+  ],
+  "tiles_pl": [
+   "Podlewam",
+   "kwiaty"
+  ],
+  "tiles_ru": [
+   "Я",
+   "поливаю",
+   "цветы"
+  ],
+  "distract_pl": [
+   "trawę",
+   "zbieram"
+  ],
+  "distract_ru": [
+   "траву",
+   "собираю"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.zbieram_jablka",
+  "pl": "Zbieram jabłka.",
+  "ru": "Я собираю яблоки.",
+  "tr": "збе́рам я́бўка.",
+  "words": [
+   "w.zbierac",
+   "w.jablko"
+  ],
+  "tiles_pl": [
+   "Zbieram",
+   "jabłka"
+  ],
+  "tiles_ru": [
+   "Я",
+   "собираю",
+   "яблоки"
+  ],
+  "distract_pl": [
+   "gruszki",
+   "sadzę"
+  ],
+  "distract_ru": [
+   "груши",
+   "сажаю"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.sieje_pszenice",
+  "pl": "Sieję pszenicę.",
+  "ru": "Я сею пшеницу.",
+  "tr": "ще́е пшэни́цэ.",
+  "words": [
+   "w.siac",
+   "w.pszenica"
+  ],
+  "tiles_pl": [
+   "Sieję",
+   "pszenicę"
+  ],
+  "tiles_ru": [
+   "Я",
+   "сею",
+   "пшеницу"
+  ],
+  "distract_pl": [
+   "zbieram",
+   "ziarno"
+  ],
+  "distract_ru": [
+   "собираю",
+   "зерно"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 2
+ },
+ {
+  "id": "p.karmie_kota",
+  "pl": "Karmię kota.",
+  "ru": "Я кормлю кота.",
+  "tr": "ка́рме ко́та.",
+  "words": [
+   "w.karmic",
+   "w.kot"
+  ],
+  "tiles_pl": [
+   "Karmię",
+   "kota"
+  ],
+  "tiles_ru": [
+   "Я",
+   "кормлю",
+   "кота"
+  ],
+  "distract_pl": [
+   "psa",
+   "kury"
+  ],
+  "distract_ru": [
+   "собаку",
+   "кур"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.pszenica_rosnie_na_polu",
+  "pl": "Pszenica rośnie na polu.",
+  "ru": "Пшеница растёт в поле.",
+  "tr": "пшэни́ца ро́щнье на по́лу.",
+  "words": [
+   "w.pszenica",
+   "w.rosnac",
+   "w.na",
+   "w.pole"
+  ],
+  "tiles_pl": [
+   "Pszenica",
+   "rośnie",
+   "na",
+   "polu"
+  ],
+  "tiles_ru": [
+   "Пшеница",
+   "растёт",
+   "в",
+   "поле"
+  ],
+  "distract_pl": [
+   "łące",
+   "lesie"
+  ],
+  "distract_ru": [
+   "лугу",
+   "лесу"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 3
+ },
+ {
+  "id": "p.mam_grzadke_w_ogrodzie",
+  "pl": "Mam grządkę w ogrodzie.",
+  "ru": "У меня грядка в огороде.",
+  "tr": "мам гжо́нткэ ф огро́дже.",
+  "words": [
+   "w.miec",
+   "w.grzadka",
+   "w.w",
+   "w.ogrod"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "grządkę",
+   "w",
+   "ogrodzie"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "грядка",
+   "в",
+   "огороде"
+  ],
+  "distract_pl": [
+   "pole",
+   "domu"
+  ],
+  "distract_ru": [
+   "поле",
+   "доме"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 2
+ },
+ {
+  "id": "p.w_lesie_rosna_grzyby",
+  "pl": "W lesie rosną grzyby.",
+  "ru": "В лесу растут грибы.",
+  "tr": "ф ле́ще ро́сноў гжы́бы.",
+  "words": [
+   "w.w",
+   "w.las",
+   "w.rosnac",
+   "w.grzyby"
+  ],
+  "tiles_pl": [
+   "W",
+   "lesie",
+   "rosną",
+   "grzyby"
+  ],
+  "tiles_ru": [
+   "В",
+   "лесу",
+   "растут",
+   "грибы"
+  ],
+  "distract_pl": [
+   "polu",
+   "kwiaty"
+  ],
+  "distract_ru": [
+   "поле",
+   "цветы"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 2
+ },
+ {
+  "id": "p.zbieramy_plon",
+  "pl": "Zbieramy plon.",
+  "ru": "Мы собираем урожай.",
+  "tr": "збера́мы плон.",
+  "words": [
+   "w.zbierac",
+   "w.plon"
+  ],
+  "tiles_pl": [
+   "Zbieramy",
+   "plon"
+  ],
+  "tiles_ru": [
+   "Мы",
+   "собираем",
+   "урожай"
+  ],
+  "distract_pl": [
+   "sadzimy",
+   "nasiona"
+  ],
+  "distract_ru": [
+   "сажаем",
+   "семена"
+  ],
+  "topic": "pogoda_i_natura",
+  "level": 1
+ },
+ {
+  "id": "p.mam_nowa_kurtke",
+  "pl": "Mam nową kurtkę.",
+  "ru": "У меня новая куртка.",
+  "tr": "мам но́воў ку́рткэ.",
+  "words": [
+   "w.miec",
+   "w.nowy",
+   "w.kurtka"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "nową",
+   "kurtkę"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "новая",
+   "куртка"
+  ],
+  "distract_pl": [
+   "starą",
+   "czapkę"
+  ],
+  "distract_ru": [
+   "старая",
+   "шапка"
+  ],
+  "topic": "ubrania",
+  "level": 1
+ },
+ {
+  "id": "p.mam_czarne_spodnie",
+  "pl": "Mam czarne spodnie.",
+  "ru": "У меня чёрные брюки.",
+  "tr": "мам ча́рнэ спо́днье.",
+  "words": [
+   "w.miec",
+   "w.czarny",
+   "w.spodnie"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "czarne",
+   "spodnie"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "чёрные",
+   "брюки"
+  ],
+  "distract_pl": [
+   "białe",
+   "koszulę"
+  ],
+  "distract_ru": [
+   "белые",
+   "рубашка"
+  ],
+  "topic": "ubrania",
+  "level": 1
+ },
+ {
+  "id": "p.mam_niebieska_koszule",
+  "pl": "Mam niebieską koszulę.",
+  "ru": "У меня голубая рубашка.",
+  "tr": "мам ньебе́скоў кошу́лэ.",
+  "words": [
+   "w.miec",
+   "w.niebieski",
+   "w.koszula"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "niebieską",
+   "koszulę"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "голубая",
+   "рубашка"
+  ],
+  "distract_pl": [
+   "zieloną",
+   "spodnie"
+  ],
+  "distract_ru": [
+   "зелёная",
+   "брюки"
+  ],
+  "topic": "ubrania",
+  "level": 1
+ },
+ {
+  "id": "p.ta_sukienka_jest_czerwona",
+  "pl": "Ta sukienka jest czerwona.",
+  "ru": "Это платье красное.",
+  "tr": "та суке́нка ест чэрво́на.",
+  "words": [
+   "w.ten",
+   "w.sukienka",
+   "w.byc",
+   "w.czerwony"
+  ],
+  "tiles_pl": [
+   "Ta",
+   "sukienka",
+   "jest",
+   "czerwona"
+  ],
+  "tiles_ru": [
+   "Это",
+   "платье",
+   "красное"
+  ],
+  "distract_pl": [
+   "ten",
+   "żółta"
+  ],
+  "distract_ru": [
+   "этот",
+   "жёлтое"
+  ],
+  "topic": "ubrania",
+  "level": 2
+ },
+ {
+  "id": "p.moje_buty_sa_nowe",
+  "pl": "Moje buty są nowe.",
+  "ru": "Мои ботинки новые.",
+  "tr": "мо́е бу́ты соў но́вэ.",
+  "words": [
+   "w.moj",
+   "w.but",
+   "w.byc",
+   "w.nowy"
+  ],
+  "tiles_pl": [
+   "Moje",
+   "buty",
+   "są",
+   "nowe"
+  ],
+  "tiles_ru": [
+   "Мои",
+   "ботинки",
+   "новые"
+  ],
+  "distract_pl": [
+   "mój",
+   "stare"
+  ],
+  "distract_ru": [
+   "мой",
+   "старые"
+  ],
+  "topic": "ubrania",
+  "level": 2
+ },
+ {
+  "id": "p.jest_zimno_wiec_nosze_kurtke",
+  "pl": "Jest zimno, więc noszę kurtkę.",
+  "ru": "Холодно, поэтому я ношу куртку.",
+  "tr": "ест жи́мно, венц но́шэ ку́рткэ.",
+  "words": [
+   "w.byc",
+   "w.zimno",
+   "w.wiec",
+   "w.nosic",
+   "w.kurtka"
+  ],
+  "tiles_pl": [
+   "Jest",
+   "zimno",
+   "więc",
+   "noszę",
+   "kurtkę"
+  ],
+  "tiles_ru": [
+   "Холодно",
+   "поэтому",
+   "я",
+   "ношу",
+   "куртку"
+  ],
+  "distract_pl": [
+   "ale",
+   "czapkę"
+  ],
+  "distract_ru": [
+   "но",
+   "шапку"
+  ],
+  "topic": "ubrania",
+  "level": 3
+ },
+ {
+  "id": "p.potrzebuje_czapki",
+  "pl": "Potrzebuję czapki.",
+  "ru": "Мне нужна шапка.",
+  "tr": "потшэбу́е ча́пки.",
+  "words": [
+   "w.potrzebowac",
+   "w.czapka"
+  ],
+  "tiles_pl": [
+   "Potrzebuję",
+   "czapki"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужна",
+   "шапка"
+  ],
+  "distract_pl": [
+   "szalika",
+   "kurtki"
+  ],
+  "distract_ru": [
+   "шарф",
+   "куртка"
+  ],
+  "topic": "ubrania",
+  "level": 1
+ },
+ {
+  "id": "p.jaki_to_kolor",
+  "pl": "Jaki to kolor?",
+  "ru": "Какой это цвет?",
+  "tr": "я́ки то ко́лор?",
+  "words": [
+   "w.jaki",
+   "w.to",
+   "w.kolor"
+  ],
+  "tiles_pl": [
+   "Jaki",
+   "to",
+   "kolor"
+  ],
+  "tiles_ru": [
+   "Какой",
+   "это",
+   "цвет"
+  ],
+  "distract_pl": [
+   "jaka",
+   "rozmiar"
+  ],
+  "distract_ru": [
+   "какая",
+   "размер"
+  ],
+  "topic": "ubrania",
+  "level": 1
+ },
+ {
+  "id": "p.trawa_jest_zielona",
+  "pl": "Trawa jest zielona.",
+  "ru": "Трава зелёная.",
+  "tr": "тра́ва ест жело́на.",
+  "words": [
+   "w.trawa",
+   "w.byc",
+   "w.zielony"
+  ],
+  "tiles_pl": [
+   "Trawa",
+   "jest",
+   "zielona"
+  ],
+  "tiles_ru": [
+   "Трава",
+   "зелёная"
+  ],
+  "distract_pl": [
+   "niebo",
+   "żółta"
+  ],
+  "distract_ru": [
+   "небо",
+   "жёлтая"
+  ],
+  "topic": "ubrania",
+  "level": 1
+ },
+ {
+  "id": "p.co_to_jest",
+  "pl": "Co to jest?",
+  "ru": "Что это?",
+  "tr": "цо то ест?",
+  "words": [
+   "w.co",
+   "w.to",
+   "w.byc"
+  ],
+  "tiles_pl": [
+   "Co",
+   "to",
+   "jest"
+  ],
+  "tiles_ru": [
+   "Что",
+   "это"
+  ],
+  "distract_pl": [
+   "kto",
+   "gdzie"
+  ],
+  "distract_ru": [
+   "кто",
+   "где"
+  ],
+  "topic": "pytania",
+  "level": 1
+ },
+ {
+  "id": "p.jak_to_sie_nazywa_po_polsku",
+  "pl": "Jak to się nazywa po polsku?",
+  "ru": "Как это называется по-польски?",
+  "tr": "як то ще назы́ва по по́лску?",
+  "words": [
+   "w.jak",
+   "w.to",
+   "w.sie",
+   "w.nazywac_sie",
+   "w.po_polsku"
+  ],
+  "tiles_pl": [
+   "Jak",
+   "to",
+   "się",
+   "nazywa",
+   "po",
+   "polsku"
+  ],
+  "tiles_ru": [
+   "Как",
+   "это",
+   "называется",
+   "по-польски"
+  ],
+  "distract_pl": [
+   "mówi",
+   "rosyjsku"
+  ],
+  "distract_ru": [
+   "говорится",
+   "по-русски"
+  ],
+  "topic": "pytania",
+  "level": 3
+ },
+ {
+  "id": "p.dlaczego_jestes_w_domu",
+  "pl": "Dlaczego jesteś w domu?",
+  "ru": "Почему ты дома?",
+  "tr": "длачэ́го е́стэщ ф до́му?",
+  "words": [
+   "w.dlaczego",
+   "w.byc",
+   "w.w",
+   "w.dom"
+  ],
+  "tiles_pl": [
+   "Dlaczego",
+   "jesteś",
+   "w",
+   "domu"
+  ],
+  "tiles_ru": [
+   "Почему",
+   "ты",
+   "дома"
+  ],
+  "distract_pl": [
+   "jak",
+   "pracy"
+  ],
+  "distract_ru": [
+   "как",
+   "работе"
+  ],
+  "topic": "pytania",
+  "level": 2
+ },
+ {
+  "id": "p.dokad_idziesz",
+  "pl": "Dokąd idziesz?",
+  "ru": "Куда ты идёшь?",
+  "tr": "до́конт и́джеш?",
+  "words": [
+   "w.dokad",
+   "w.isc"
+  ],
+  "tiles_pl": [
+   "Dokąd",
+   "idziesz"
+  ],
+  "tiles_ru": [
+   "Куда",
+   "ты",
+   "идёшь"
+  ],
+  "distract_pl": [
+   "skąd",
+   "jedziesz"
+  ],
+  "distract_ru": [
+   "откуда",
+   "едешь"
+  ],
+  "topic": "pytania",
+  "level": 1
+ },
+ {
+  "id": "p.skad_masz_ten_telefon",
+  "pl": "Skąd masz ten telefon?",
+  "ru": "Откуда у тебя этот телефон?",
+  "tr": "сконт маш тэн тэле́фон?",
+  "words": [
+   "w.skad",
+   "w.miec",
+   "w.ten",
+   "w.telefon"
+  ],
+  "tiles_pl": [
+   "Skąd",
+   "masz",
+   "ten",
+   "telefon"
+  ],
+  "tiles_ru": [
+   "Откуда",
+   "у",
+   "тебя",
+   "этот",
+   "телефон"
+  ],
+  "distract_pl": [
+   "dokąd",
+   "komputer"
+  ],
+  "distract_ru": [
+   "куда",
+   "компьютер"
+  ],
+  "topic": "pytania",
+  "level": 2
+ },
+ {
+  "id": "p.kto_jest_w_domu",
+  "pl": "Kto jest w domu?",
+  "ru": "Кто дома?",
+  "tr": "кто ест ф до́му?",
+  "words": [
+   "w.kto",
+   "w.byc",
+   "w.w",
+   "w.dom"
+  ],
+  "tiles_pl": [
+   "Kto",
+   "jest",
+   "w",
+   "domu"
+  ],
+  "tiles_ru": [
+   "Кто",
+   "дома"
+  ],
+  "distract_pl": [
+   "co",
+   "pracy"
+  ],
+  "distract_ru": [
+   "что",
+   "работе"
+  ],
+  "topic": "pytania",
+  "level": 2
+ },
+ {
+  "id": "p.co_robisz",
+  "pl": "Co robisz?",
+  "ru": "Что ты делаешь?",
+  "tr": "цо ро́биш?",
+  "words": [
+   "w.co",
+   "w.robic"
+  ],
+  "tiles_pl": [
+   "Co",
+   "robisz"
+  ],
+  "tiles_ru": [
+   "Что",
+   "ты",
+   "делаешь"
+  ],
+  "distract_pl": [
+   "gdzie",
+   "jesz"
+  ],
+  "distract_ru": [
+   "где",
+   "ешь"
+  ],
+  "topic": "pytania",
+  "level": 1
+ },
+ {
+  "id": "p.czy_masz_czas",
+  "pl": "Czy masz czas?",
+  "ru": "У тебя есть время?",
+  "tr": "чы маш час?",
+  "words": [
+   "w.czy",
+   "w.miec",
+   "w.czas"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "masz",
+   "czas"
+  ],
+  "tiles_ru": [
+   "У",
+   "тебя",
+   "есть",
+   "время"
+  ],
+  "distract_pl": [
+   "mam",
+   "pieniądze"
+  ],
+  "distract_ru": [
+   "мало",
+   "деньги"
+  ],
+  "topic": "pytania",
+  "level": 1
+ },
+ {
+  "id": "p.czy_to_jest_daleko",
+  "pl": "Czy to jest daleko?",
+  "ru": "Это далеко?",
+  "tr": "чы то ест дале́ко?",
+  "words": [
+   "w.czy",
+   "w.to",
+   "w.byc",
+   "w.daleko"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "to",
+   "jest",
+   "daleko"
+  ],
+  "tiles_ru": [
+   "Это",
+   "далеко"
+  ],
+  "distract_pl": [
+   "blisko",
+   "tam"
+  ],
+  "distract_ru": [
+   "близко",
+   "там"
+  ],
+  "topic": "pytania",
+  "level": 2
+ },
+ {
+  "id": "p.czy_mowisz_po_polsku",
+  "pl": "Czy mówisz po polsku?",
+  "ru": "Ты говоришь по-польски?",
+  "tr": "чы му́виш по по́лску?",
+  "words": [
+   "w.czy",
+   "w.mowic",
+   "w.po_polsku"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "mówisz",
+   "po",
+   "polsku"
+  ],
+  "tiles_ru": [
+   "Ты",
+   "говоришь",
+   "по-польски"
+  ],
+  "distract_pl": [
+   "rozumiesz",
+   "angielsku"
+  ],
+  "distract_ru": [
+   "понимаешь",
+   "английски"
+  ],
+  "topic": "pytania",
+  "level": 2
+ },
+ {
+  "id": "p.czy_mozesz_mi_pomoc",
+  "pl": "Czy możesz mi pomóc?",
+  "ru": "Можешь мне помочь?",
+  "tr": "чы мо́жэш ми по́муц?",
+  "words": [
+   "w.czy",
+   "w.moc",
+   "w.ja",
+   "w.pomoc_v"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "możesz",
+   "mi",
+   "pomóc"
+  ],
+  "tiles_ru": [
+   "Можешь",
+   "мне",
+   "помочь"
+  ],
+  "distract_pl": [
+   "mogę",
+   "ci"
+  ],
+  "distract_ru": [
+   "могу",
+   "тебе"
+  ],
+  "topic": "pytania",
+  "level": 2
+ },
+ {
+  "id": "p.czy_mozesz_mowic_wolno",
+  "pl": "Czy możesz mówić wolno?",
+  "ru": "Можешь говорить медленно?",
+  "tr": "чы мо́жэш му́вичь во́лно?",
+  "words": [
+   "w.czy",
+   "w.moc",
+   "w.mowic",
+   "w.wolno"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "możesz",
+   "mówić",
+   "wolno"
+  ],
+  "tiles_ru": [
+   "Можешь",
+   "говорить",
+   "медленно"
+  ],
+  "distract_pl": [
+   "szybko",
+   "pisać"
+  ],
+  "distract_ru": [
+   "быстро",
+   "писать"
+  ],
+  "topic": "pytania",
+  "level": 2
+ },
+ {
+  "id": "p.jestem_szczesliwy",
+  "pl": "Jestem szczęśliwy.",
+  "ru": "Я счастлив.",
+  "tr": "е́стэм шчэнщли́вы.",
+  "words": [
+   "w.byc",
+   "w.szczesliwy"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "szczęśliwy"
+  ],
+  "tiles_ru": [
+   "Я",
+   "счастлив"
+  ],
+  "distract_pl": [
+   "smutny",
+   "zmęczony"
+  ],
+  "distract_ru": [
+   "грустен",
+   "устал"
+  ],
+  "topic": "uczucia",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_smutny",
+  "pl": "Jestem smutny.",
+  "ru": "Мне грустно.",
+  "tr": "е́стэм сму́тны.",
+  "words": [
+   "w.byc",
+   "w.smutny"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "smutny"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "грустно"
+  ],
+  "distract_pl": [
+   "szczęśliwy",
+   "wesoły"
+  ],
+  "distract_ru": [
+   "счастлив",
+   "весел"
+  ],
+  "topic": "uczucia",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_zmeczony",
+  "pl": "Jestem zmęczony.",
+  "ru": "Я устал.",
+  "tr": "е́стэм змэнчо́ны.",
+  "words": [
+   "w.byc",
+   "w.zmeczony"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "zmęczony"
+  ],
+  "tiles_ru": [
+   "Я",
+   "устал"
+  ],
+  "distract_pl": [
+   "głodny",
+   "gotowy"
+  ],
+  "distract_ru": [
+   "голоден",
+   "готов"
+  ],
+  "topic": "uczucia",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_zmeczona",
+  "pl": "Jestem zmęczona.",
+  "ru": "Я устала.",
+  "tr": "е́стэм змэнчо́на.",
+  "words": [
+   "w.byc",
+   "w.zmeczony"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "zmęczona"
+  ],
+  "tiles_ru": [
+   "Я",
+   "устала"
+  ],
+  "distract_pl": [
+   "zmęczony",
+   "głodna"
+  ],
+  "distract_ru": [
+   "устал",
+   "голодна"
+  ],
+  "topic": "uczucia",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_zajety",
+  "pl": "Jestem zajęty.",
+  "ru": "Я занят.",
+  "tr": "е́стэм зае́нты.",
+  "words": [
+   "w.byc",
+   "w.zajety"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "zajęty"
+  ],
+  "tiles_ru": [
+   "Я",
+   "занят"
+  ],
+  "distract_pl": [
+   "gotowy",
+   "wolny"
+  ],
+  "distract_ru": [
+   "готов",
+   "свободен"
+  ],
+  "topic": "uczucia",
+  "level": 1
+ },
+ {
+  "id": "p.jestem_gotowy",
+  "pl": "Jestem gotowy.",
+  "ru": "Я готов.",
+  "tr": "е́стэм гото́вы.",
+  "words": [
+   "w.byc",
+   "w.gotowy"
+  ],
+  "tiles_pl": [
+   "Jestem",
+   "gotowy"
+  ],
+  "tiles_ru": [
+   "Я",
+   "готов"
+  ],
+  "distract_pl": [
+   "zajęty",
+   "zdrowy"
+  ],
+  "distract_ru": [
+   "занят",
+   "здоров"
+  ],
+  "topic": "uczucia",
+  "level": 1
+ },
+ {
+  "id": "p.ciesze_sie",
+  "pl": "Cieszę się.",
+  "ru": "Я рад.",
+  "tr": "че́шэ ще.",
+  "words": [
+   "w.cieszyc_sie",
+   "w.sie"
+  ],
+  "tiles_pl": [
+   "Cieszę",
+   "się"
+  ],
+  "tiles_ru": [
+   "Я",
+   "рад"
+  ],
+  "distract_pl": [
+   "boję",
+   "martwię"
+  ],
+  "distract_ru": [
+   "боюсь",
+   "беспокоюсь"
+  ],
+  "topic": "uczucia",
+  "level": 1
+ },
+ {
+  "id": "p.boje_sie_psa",
+  "pl": "Boję się psa.",
+  "ru": "Я боюсь собаки.",
+  "tr": "бо́е ще пса.",
+  "words": [
+   "w.bac_sie",
+   "w.sie",
+   "w.pies"
+  ],
+  "tiles_pl": [
+   "Boję",
+   "się",
+   "psa"
+  ],
+  "tiles_ru": [
+   "Я",
+   "боюсь",
+   "собаки"
+  ],
+  "distract_pl": [
+   "kota",
+   "koń"
+  ],
+  "distract_ru": [
+   "кота",
+   "лошадь"
+  ],
+  "topic": "uczucia",
+  "level": 1
+ },
+ {
+  "id": "p.tesknie_za_mama",
+  "pl": "Tęsknię za mamą.",
+  "ru": "Я скучаю по маме.",
+  "tr": "тэ́ўскне за ма́моў.",
+  "words": [
+   "w.tesknic",
+   "w.za",
+   "w.mama"
+  ],
+  "tiles_pl": [
+   "Tęsknię",
+   "za",
+   "mamą"
+  ],
+  "tiles_ru": [
+   "Я",
+   "скучаю",
+   "по",
+   "маме"
+  ],
+  "distract_pl": [
+   "tatą",
+   "mamy"
+  ],
+  "distract_ru": [
+   "папе",
+   "мамы"
+  ],
+  "topic": "uczucia",
+  "level": 2
+ },
+ {
+  "id": "p.nudze_sie_w_domu",
+  "pl": "Nudzę się w domu.",
+  "ru": "Мне скучно дома.",
+  "tr": "ну́дзэ ще ф до́му.",
+  "words": [
+   "w.nudzic_sie",
+   "w.sie",
+   "w.w",
+   "w.dom"
+  ],
+  "tiles_pl": [
+   "Nudzę",
+   "się",
+   "w",
+   "domu"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "скучно",
+   "дома"
+  ],
+  "distract_pl": [
+   "pracy",
+   "martwię"
+  ],
+  "distract_ru": [
+   "работе",
+   "беспокоюсь"
+  ],
+  "topic": "uczucia",
+  "level": 3
+ },
+ {
+  "id": "p.to_jest_dobry_pomysl",
+  "pl": "To jest dobry pomysł.",
+  "ru": "Это хорошая идея.",
+  "tr": "то ест до́бры по́мысў.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.dobry",
+   "w.pomysl"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "dobry",
+   "pomysł"
+  ],
+  "tiles_ru": [
+   "Это",
+   "хорошая",
+   "идея"
+  ],
+  "distract_pl": [
+   "zły",
+   "problem"
+  ],
+  "distract_ru": [
+   "плохая",
+   "проблема"
+  ],
+  "topic": "uczucia",
+  "level": 2
+ },
+ {
+  "id": "p.mam_szczescie",
+  "pl": "Mam szczęście.",
+  "ru": "Мне везёт.",
+  "tr": "мам шчэ́нщче.",
+  "words": [
+   "w.miec",
+   "w.szczescie"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "szczęście"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "везёт"
+  ],
+  "distract_pl": [
+   "problem",
+   "radość"
+  ],
+  "distract_ru": [
+   "проблема",
+   "радость"
+  ],
+  "topic": "uczucia",
+  "level": 1
+ },
+ {
+  "id": "p.gdzie_jest_moj_telefon",
+  "pl": "Gdzie jest mój telefon?",
+  "ru": "Где мой телефон?",
+  "tr": "гдже ест муй тэле́фон?",
+  "words": [
+   "w.gdzie",
+   "w.byc",
+   "w.moj",
+   "w.telefon"
+  ],
+  "tiles_pl": [
+   "Gdzie",
+   "jest",
+   "mój",
+   "telefon"
+  ],
+  "tiles_ru": [
+   "Где",
+   "мой",
+   "телефон"
+  ],
+  "distract_pl": [
+   "twój",
+   "komputer"
+  ],
+  "distract_ru": [
+   "твой",
+   "компьютер"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 2
+ },
+ {
+  "id": "p.moj_telefon_jest_w_torbie",
+  "pl": "Mój telefon jest w torbie.",
+  "ru": "Мой телефон в сумке.",
+  "tr": "муй тэле́фон ест ф то́рбе.",
+  "words": [
+   "w.moj",
+   "w.telefon",
+   "w.byc",
+   "w.w",
+   "w.torba"
+  ],
+  "tiles_pl": [
+   "Mój",
+   "telefon",
+   "jest",
+   "w",
+   "torbie"
+  ],
+  "tiles_ru": [
+   "Мой",
+   "телефон",
+   "в",
+   "сумке"
+  ],
+  "distract_pl": [
+   "twój",
+   "kieszeni"
+  ],
+  "distract_ru": [
+   "твой",
+   "кармане"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 3
+ },
+ {
+  "id": "p.dzwonie_do_mamy",
+  "pl": "Dzwonię do mamy.",
+  "ru": "Я звоню маме.",
+  "tr": "дзво́не до ма́мы.",
+  "words": [
+   "w.dzwonic",
+   "w.do",
+   "w.mama"
+  ],
+  "tiles_pl": [
+   "Dzwonię",
+   "do",
+   "mamy"
+  ],
+  "tiles_ru": [
+   "Я",
+   "звоню",
+   "маме"
+  ],
+  "distract_pl": [
+   "taty",
+   "pracy"
+  ],
+  "distract_ru": [
+   "папе",
+   "работе"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 1
+ },
+ {
+  "id": "p.zadzwonie_jutro",
+  "pl": "Zadzwonię jutro.",
+  "ru": "Я позвоню завтра.",
+  "tr": "задзво́не ю́тро.",
+  "words": [
+   "w.zadzwonic",
+   "w.jutro"
+  ],
+  "tiles_pl": [
+   "Zadzwonię",
+   "jutro"
+  ],
+  "tiles_ru": [
+   "Я",
+   "позвоню",
+   "завтра"
+  ],
+  "distract_pl": [
+   "dzwonię",
+   "dziś"
+  ],
+  "distract_ru": [
+   "звоню",
+   "сегодня"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 1
+ },
+ {
+  "id": "p.pisze_wiadomosc",
+  "pl": "Piszę wiadomość.",
+  "ru": "Я пишу сообщение.",
+  "tr": "пи́шэ вядо́мощчь.",
+  "words": [
+   "w.pisac",
+   "w.wiadomosc"
+  ],
+  "tiles_pl": [
+   "Piszę",
+   "wiadomość"
+  ],
+  "tiles_ru": [
+   "Я",
+   "пишу",
+   "сообщение"
+  ],
+  "distract_pl": [
+   "list",
+   "maila"
+  ],
+  "distract_ru": [
+   "письмо",
+   "пишет"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 1
+ },
+ {
+  "id": "p.pisze_maila",
+  "pl": "Piszę maila.",
+  "ru": "Я пишу письмо по почте.",
+  "tr": "пи́шэ маи́ла.",
+  "words": [
+   "w.pisac",
+   "w.mail"
+  ],
+  "tiles_pl": [
+   "Piszę",
+   "maila"
+  ],
+  "tiles_ru": [
+   "Я",
+   "пишу",
+   "письмо",
+   "по",
+   "почте"
+  ],
+  "distract_pl": [
+   "wiadomość",
+   "list"
+  ],
+  "distract_ru": [
+   "сообщение",
+   "пишет"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 1
+ },
+ {
+  "id": "p.jakie_jest_haslo_do_wifi",
+  "pl": "Jakie jest hasło do wifi?",
+  "ru": "Какой пароль от вайфая?",
+  "tr": "я́ке ест ха́сўо до ви́фи?",
+  "words": [
+   "w.jaki",
+   "w.byc",
+   "w.haslo",
+   "w.do",
+   "w.wifi"
+  ],
+  "tiles_pl": [
+   "Jakie",
+   "jest",
+   "hasło",
+   "do",
+   "wifi"
+  ],
+  "tiles_ru": [
+   "Какой",
+   "пароль",
+   "от",
+   "вайфая"
+  ],
+  "distract_pl": [
+   "jaki",
+   "numer"
+  ],
+  "distract_ru": [
+   "каков",
+   "номер"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 3
+ },
+ {
+  "id": "p.ladowarka_jest_w_pokoju",
+  "pl": "Ładowarka jest w pokoju.",
+  "ru": "Зарядка в комнате.",
+  "tr": "ўадова́рка ест ф поко́ю.",
+  "words": [
+   "w.ladowarka",
+   "w.byc",
+   "w.w",
+   "w.pokoj"
+  ],
+  "tiles_pl": [
+   "Ładowarka",
+   "jest",
+   "w",
+   "pokoju"
+  ],
+  "tiles_ru": [
+   "Зарядка",
+   "в",
+   "комнате"
+  ],
+  "distract_pl": [
+   "telefon",
+   "kuchni"
+  ],
+  "distract_ru": [
+   "телефон",
+   "кухне"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 2
+ },
+ {
+  "id": "p.potrzebuje_ladowarki",
+  "pl": "Potrzebuję ładowarki.",
+  "ru": "Мне нужна зарядка.",
+  "tr": "потшэбу́е ўадова́рки.",
+  "words": [
+   "w.potrzebowac",
+   "w.ladowarka"
+  ],
+  "tiles_pl": [
+   "Potrzebuję",
+   "ładowarki"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужна",
+   "зарядка"
+  ],
+  "distract_pl": [
+   "telefonu",
+   "hasła"
+  ],
+  "distract_ru": [
+   "телефон",
+   "пароль"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 1
+ },
+ {
+  "id": "p.nie_ma_zasiegu",
+  "pl": "Nie ma zasięgu.",
+  "ru": "Нет сигнала.",
+  "tr": "нье ма заще́нгу.",
+  "words": [
+   "w.nie",
+   "w.miec",
+   "w.zasieg"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "ma",
+   "zasięgu"
+  ],
+  "tiles_ru": [
+   "Нет",
+   "сигнала"
+  ],
+  "distract_pl": [
+   "internetu",
+   "wifi"
+  ],
+  "distract_ru": [
+   "интернета",
+   "вайфай"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 2
+ },
+ {
+  "id": "p.pracuje_na_komputerze",
+  "pl": "Pracuję na komputerze.",
+  "ru": "Я работаю на компьютере.",
+  "tr": "працу́е на компутэ́жэ.",
+  "words": [
+   "w.pracowac",
+   "w.na",
+   "w.komputer"
+  ],
+  "tiles_pl": [
+   "Pracuję",
+   "na",
+   "komputerze"
+  ],
+  "tiles_ru": [
+   "Я",
+   "работаю",
+   "на",
+   "компьютере"
+  ],
+  "distract_pl": [
+   "telefonie",
+   "domu"
+  ],
+  "distract_ru": [
+   "телефоне",
+   "доме"
+  ],
+  "topic": "telefon_i_internet",
+  "level": 1
+ },
+ {
+  "id": "p.chce_kupic_chleb",
+  "pl": "Chcę kupić chleb.",
+  "ru": "Я хочу купить хлеб.",
+  "tr": "хцэ ку́пичь хлеп.",
+  "words": [
+   "w.chciec",
+   "w.kupic",
+   "w.chleb"
+  ],
+  "tiles_pl": [
+   "Chcę",
+   "kupić",
+   "chleb"
+  ],
+  "tiles_ru": [
+   "Я",
+   "хочу",
+   "купить",
+   "хлеб"
+  ],
+  "distract_pl": [
+   "masło",
+   "zamówić"
+  ],
+  "distract_ru": [
+   "масло",
+   "заказать"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.chce_zamowic_kawe",
+  "pl": "Chcę zamówić kawę.",
+  "ru": "Я хочу заказать кофе.",
+  "tr": "хцэ заму́вичь ка́вэ.",
+  "words": [
+   "w.chciec",
+   "w.zamowic",
+   "w.kawa"
+  ],
+  "tiles_pl": [
+   "Chcę",
+   "zamówić",
+   "kawę"
+  ],
+  "tiles_ru": [
+   "Я",
+   "хочу",
+   "заказать",
+   "кофе"
+  ],
+  "distract_pl": [
+   "kupić",
+   "herbatę"
+  ],
+  "distract_ru": [
+   "купить",
+   "чай"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.musze_isc_do_pracy",
+  "pl": "Muszę iść do pracy.",
+  "ru": "Мне нужно идти на работу.",
+  "tr": "му́шэ ищчь до пра́цы.",
+  "words": [
+   "w.musiec",
+   "w.isc",
+   "w.do",
+   "w.praca"
+  ],
+  "tiles_pl": [
+   "Muszę",
+   "iść",
+   "do",
+   "pracy"
+  ],
+  "tiles_ru": [
+   "Мне",
+   "нужно",
+   "идти",
+   "на",
+   "работу"
+  ],
+  "distract_pl": [
+   "jechać",
+   "domu"
+  ],
+  "distract_ru": [
+   "ехать",
+   "домой"
+  ],
+  "topic": "rozmowa",
+  "level": 2
+ },
+ {
+  "id": "p.czy_moge_pomoc",
+  "pl": "Czy mogę pomóc?",
+  "ru": "Могу я помочь?",
+  "tr": "чы мо́гэ по́муц?",
+  "words": [
+   "w.czy",
+   "w.moc",
+   "w.pomoc_v"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "mogę",
+   "pomóc"
+  ],
+  "tiles_ru": [
+   "Могу",
+   "я",
+   "помочь"
+  ],
+  "distract_pl": [
+   "prosić",
+   "pan"
+  ],
+  "distract_ru": [
+   "просить",
+   "вы"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.czy_moge_usiasc",
+  "pl": "Czy mogę usiąść?",
+  "ru": "Можно сесть?",
+  "tr": "чы мо́гэ у́щонщчь?",
+  "words": [
+   "w.czy",
+   "w.moc",
+   "w.usiasc"
+  ],
+  "tiles_pl": [
+   "Czy",
+   "mogę",
+   "usiąść"
+  ],
+  "tiles_ru": [
+   "Можно",
+   "сесть"
+  ],
+  "distract_pl": [
+   "wejść",
+   "stać"
+  ],
+  "distract_ru": [
+   "войти",
+   "стоять"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.nie_wiem",
+  "pl": "Nie wiem.",
+  "ru": "Я не знаю.",
+  "tr": "нье вем.",
+  "words": [
+   "w.nie",
+   "w.wiedziec"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "wiem"
+  ],
+  "tiles_ru": [
+   "Я",
+   "не",
+   "знаю"
+  ],
+  "distract_pl": [
+   "rozumiem",
+   "wie"
+  ],
+  "distract_ru": [
+   "понимаю",
+   "знает"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.wiem_gdzie_jest_sklep",
+  "pl": "Wiem, gdzie jest sklep.",
+  "ru": "Я знаю, где магазин.",
+  "tr": "вем, гдже ест склеп.",
+  "words": [
+   "w.wiedziec",
+   "w.gdzie",
+   "w.byc",
+   "w.sklep"
+  ],
+  "tiles_pl": [
+   "Wiem",
+   "gdzie",
+   "jest",
+   "sklep"
+  ],
+  "tiles_ru": [
+   "Я",
+   "знаю",
+   "где",
+   "магазин"
+  ],
+  "distract_pl": [
+   "kto",
+   "apteka"
+  ],
+  "distract_ru": [
+   "кто",
+   "аптека"
+  ],
+  "topic": "rozmowa",
+  "level": 2
+ },
+ {
+  "id": "p.rozumiem",
+  "pl": "Rozumiem.",
+  "ru": "Я понимаю.",
+  "tr": "розу́мем.",
+  "words": [
+   "w.rozumiec"
+  ],
+  "tiles_pl": [
+   "Rozumiem"
+  ],
+  "tiles_ru": [
+   "Я",
+   "понимаю"
+  ],
+  "distract_pl": [
+   "wiem",
+   "znam"
+  ],
+  "distract_ru": [
+   "знаю",
+   "читаю"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.nie_rozumiem_po_polsku",
+  "pl": "Nie rozumiem po polsku.",
+  "ru": "Я не понимаю по-польски.",
+  "tr": "нье розу́мем по по́лску.",
+  "words": [
+   "w.nie",
+   "w.rozumiec",
+   "w.po_polsku"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "rozumiem",
+   "po",
+   "polsku"
+  ],
+  "tiles_ru": [
+   "Я",
+   "не",
+   "понимаю",
+   "по-польски"
+  ],
+  "distract_pl": [
+   "mówię",
+   "rosyjsku"
+  ],
+  "distract_ru": [
+   "говорю",
+   "по-русски"
+  ],
+  "topic": "rozmowa",
+  "level": 2
+ },
+ {
+  "id": "p.umiem_plywac",
+  "pl": "Umiem pływać.",
+  "ru": "Я умею плавать.",
+  "tr": "у́мем пўы́вачь.",
+  "words": [
+   "w.umiec",
+   "w.plywac"
+  ],
+  "tiles_pl": [
+   "Umiem",
+   "pływać"
+  ],
+  "tiles_ru": [
+   "Я",
+   "умею",
+   "плавать"
+  ],
+  "distract_pl": [
+   "biegać",
+   "tańczyć"
+  ],
+  "distract_ru": [
+   "бегать",
+   "танцевать"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.nie_umiem_tanczyc",
+  "pl": "Nie umiem tańczyć.",
+  "ru": "Я не умею танцевать.",
+  "tr": "нье у́мем та́ньчычь.",
+  "words": [
+   "w.nie",
+   "w.umiec",
+   "w.tanczyc"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "umiem",
+   "tańczyć"
+  ],
+  "tiles_ru": [
+   "Я",
+   "не",
+   "умею",
+   "танцевать"
+  ],
+  "distract_pl": [
+   "śpiewać",
+   "pływać"
+  ],
+  "distract_ru": [
+   "петь",
+   "плавать"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.tak_poprosze",
+  "pl": "Tak, poproszę.",
+  "ru": "Да, пожалуйста.",
+  "tr": "так, попро́шэ.",
+  "words": [
+   "w.tak",
+   "w.poprosze"
+  ],
+  "tiles_pl": [
+   "Tak",
+   "poproszę"
+  ],
+  "tiles_ru": [
+   "Да",
+   "пожалуйста"
+  ],
+  "distract_pl": [
+   "nie",
+   "dziękuję"
+  ],
+  "distract_ru": [
+   "нет",
+   "спасибо"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.nie_dziekuje",
+  "pl": "Nie, dziękuję.",
+  "ru": "Нет, спасибо.",
+  "tr": "нье, дженку́е.",
+  "words": [
+   "w.nie",
+   "w.dziekuje"
+  ],
+  "tiles_pl": [
+   "Nie",
+   "dziękuję"
+  ],
+  "tiles_ru": [
+   "Нет",
+   "спасибо"
+  ],
+  "distract_pl": [
+   "tak",
+   "poproszę"
+  ],
+  "distract_ru": [
+   "да",
+   "пожалуйста"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.tak_oczywiscie",
+  "pl": "Tak, oczywiście.",
+  "ru": "Да, конечно.",
+  "tr": "так, очыви́щче.",
+  "words": [
+   "w.tak",
+   "w.oczywiscie"
+  ],
+  "tiles_pl": [
+   "Tak",
+   "oczywiście"
+  ],
+  "tiles_ru": [
+   "Да",
+   "конечно"
+  ],
+  "distract_pl": [
+   "nie",
+   "niestety"
+  ],
+  "distract_ru": [
+   "нет",
+   "к",
+   "сожалению"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.moze_kawa",
+  "pl": "Może kawa?",
+  "ru": "Может, кофе?",
+  "tr": "мо́жэ ка́ва?",
+  "words": [
+   "w.moze",
+   "w.kawa"
+  ],
+  "tiles_pl": [
+   "Może",
+   "kawa"
+  ],
+  "tiles_ru": [
+   "Может",
+   "кофе"
+  ],
+  "distract_pl": [
+   "herbata",
+   "chyba"
+  ],
+  "distract_ru": [
+   "чай",
+   "наверное"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.chyba_tak",
+  "pl": "Chyba tak.",
+  "ru": "Наверное, да.",
+  "tr": "хы́ба так.",
+  "words": [
+   "w.chyba",
+   "w.tak"
+  ],
+  "tiles_pl": [
+   "Chyba",
+   "tak"
+  ],
+  "tiles_ru": [
+   "Наверное",
+   "да"
+  ],
+  "distract_pl": [
+   "nie",
+   "pewnie"
+  ],
+  "distract_ru": [
+   "нет",
+   "конечно"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.na_pewno",
+  "pl": "Na pewno.",
+  "ru": "Точно.",
+  "tr": "на пэ́вно.",
+  "words": [
+   "w.na_pewno"
+  ],
+  "tiles_pl": [
+   "Na",
+   "pewno"
+  ],
+  "tiles_ru": [
+   "Точно"
+  ],
+  "distract_pl": [
+   "chyba",
+   "może"
+  ],
+  "distract_ru": [
+   "кажется",
+   "может"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.jeszcze_nie",
+  "pl": "Jeszcze nie.",
+  "ru": "Ещё нет.",
+  "tr": "е́шчэ нье.",
+  "words": [
+   "w.jeszcze",
+   "w.nie"
+  ],
+  "tiles_pl": [
+   "Jeszcze",
+   "nie"
+  ],
+  "tiles_ru": [
+   "Ещё",
+   "нет"
+  ],
+  "distract_pl": [
+   "już",
+   "tak"
+  ],
+  "distract_ru": [
+   "уже",
+   "да"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.mam_wolne",
+  "pl": "Mam wolne.",
+  "ru": "У меня выходной.",
+  "tr": "мам во́лнэ.",
+  "words": [
+   "w.miec",
+   "w.wolne"
+  ],
+  "tiles_pl": [
+   "Mam",
+   "wolne"
+  ],
+  "tiles_ru": [
+   "У",
+   "меня",
+   "выходной"
+  ],
+  "distract_pl": [
+   "czas",
+   "pracę"
+  ],
+  "distract_ru": [
+   "время",
+   "работу"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.to_jest_wazne",
+  "pl": "To jest ważne.",
+  "ru": "Это важно.",
+  "tr": "то ест ва́жнэ.",
+  "words": [
+   "w.to",
+   "w.byc",
+   "w.wazny"
+  ],
+  "tiles_pl": [
+   "To",
+   "jest",
+   "ważne"
+  ],
+  "tiles_ru": [
+   "Это",
+   "важно"
+  ],
+  "distract_pl": [
+   "ciekawe",
+   "łatwe"
+  ],
+  "distract_ru": [
+   "интересно",
+   "легко"
+  ],
+  "topic": "rozmowa",
+  "level": 1
+ },
+ {
+  "id": "p.niestety_nie_mam_czasu",
+  "pl": "Niestety nie mam czasu.",
+  "ru": "К сожалению, у меня нет времени.",
+  "tr": "ньестэ́ты нье мам ча́су.",
+  "words": [
+   "w.niestety",
+   "w.nie",
+   "w.miec",
+   "w.czas"
+  ],
+  "tiles_pl": [
+   "Niestety",
+   "nie",
+   "mam",
+   "czasu"
+  ],
+  "tiles_ru": [
+   "К",
+   "сожалению",
+   "у",
+   "меня",
+   "нет",
+   "времени"
+  ],
+  "distract_pl": [
+   "na",
+   "szczęście",
+   "wolne"
+  ],
+  "distract_ru": [
+   "счастью",
+   "выходной"
+  ],
+  "topic": "rozmowa",
+  "level": 2
+ }
+]

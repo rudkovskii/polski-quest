@@ -856,10 +856,7 @@
    "type": "prop",
    "id": "tree_in0",
    "sprite": "tree",
-   "at": [
-    24,
-    13
-   ],
+   "at": [26, 15],
    "size": [
     1,
     1
@@ -870,10 +867,7 @@
    "type": "prop",
    "id": "tree_in1",
    "sprite": "tree2",
-   "at": [
-    25,
-    16
-   ],
+   "at": [26, 18],
    "size": [
     1,
     1
@@ -968,10 +962,7 @@
    "type": "prop",
    "id": "bush4",
    "sprite": "bush",
-   "at": [
-    19,
-    17
-   ],
+   "at": [8, 11],
    "size": [
     1,
     1
@@ -1094,10 +1085,7 @@
    "type": "prop",
    "id": "flower7",
    "sprite": "flower_yellow",
-   "at": [
-    23,
-    18
-   ],
+   "at": [22, 20],
    "size": [
     1,
     1
@@ -1108,10 +1096,7 @@
    "type": "prop",
    "id": "flower8",
    "sprite": "flower_white",
-   "at": [
-    24,
-    19
-   ],
+   "at": [25, 20],
    "size": [
     1,
     1

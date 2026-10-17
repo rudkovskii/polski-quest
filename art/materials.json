@@ -49,6 +49,13 @@
   "water": "#5ba3d2",
   "glass": "#a9d4ec",
   "sign": "#caa06a",
-  "shade": "#3d2f3b"
+  "shade": "#3d2f3b",
+  "tomato": "#d0492f",
+  "sunflower": "#e9b93a",
+  "leaf_dry": "#c8a548",
+  "soil_wet": "#6a4430",
+  "tin": "#9aa9b2",
+  "sack": "#c8a46e",
+  "fruit_old": "#8a3a2c"
  }
 }

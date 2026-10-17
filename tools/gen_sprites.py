@@ -20,11 +20,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import art_core  # noqa: E402
 from art_core import OUT, SHEETS  # noqa: E402
 import art_cat  # noqa: E402
+import art_crops  # noqa: E402
 import art_hero  # noqa: E402
 import art_props  # noqa: E402
 import art_tiles  # noqa: E402
 
-MODULES = [art_hero, art_cat, art_props, art_tiles]
+MODULES = [art_hero, art_cat, art_props, art_tiles, art_crops]
 
 
 def preview(path: Path, scale: int = 6) -> None:

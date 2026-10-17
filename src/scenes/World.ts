@@ -3,7 +3,8 @@ import { bus } from '../systems/bus';
 import type { TileHit } from '../input/pointer';
 import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap, PropObject } from '../types/map';
-import { tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
+import { frameFor, tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
+import { FarmLayer } from './farmLayer';
 import { pickZoom } from '../world/camera';
 import { LocationModel, type Actor, type WorldEvent } from '../world/location';
 import { getMap, resolveSpawn, START } from '../world/maps';
@@ -73,6 +74,12 @@ export class World extends Phaser.Scene {
   private inputOn = true;
   private insets = { top: HUD_TOP_INSET, bottom: 0 };
   private cam0: { zoom: number; mw: number; mh: number; fitsW: boolean; fitsH: boolean } | null = null;
+  private farm: FarmLayer | null = null;
+  private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
+  private tileset: TilesetMeta | null = null;
+  private soilKey = '';
+  /** Высота панели мини-игры снизу (CSS px): камера держит героя над ней. */
+  private panelBottom = 0;
 
   constructor() {
     super('World');
@@ -108,6 +115,11 @@ export class World extends Phaser.Scene {
     this.buildProps();
     this.buildActors();
     this.marker = this.add.graphics().setDepth(10_000);
+    this.farm = this.mapDef.id === 'farm' ? new FarmLayer({ scene: this, model: this.model, sprites: this.sprites, hero: this.hero, soil: (c) => this.soil(c), toScreen: (x, y) => this.toScreen(x, y) }) : null;
+    const offAuto = bus.on('farm:auto', ({ on, bottom }) => {
+      this.panelBottom = on ? bottom : 0;
+      this.layout();
+    });
 
     this.layout();
     this.scale.on(Phaser.Scale.Events.RESIZE, this.layout, this);
@@ -124,6 +136,9 @@ export class World extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       offIntent();
       offInput();
+      offAuto();
+      this.farm?.dispose();
+      this.farm = null;
       watchers.delete(onDpad);
       this.game.events.off(Phaser.Core.Events.HIDDEN, onHidden);
       this.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
@@ -162,6 +177,7 @@ export class World extends Phaser.Scene {
 
   override update(time: number, delta: number): void {
     if (this.leaving) return;
+    this.farm?.update(time);
     for (const ev of this.model.update(Math.min(delta, 100))) this.onWorldEvent(ev, time);
     const moving = this.model.moving;
     if (this.wasMoving && !moving && !this.leaving) {
@@ -187,7 +203,7 @@ export class World extends Phaser.Scene {
     cam.stopFollow();
     cam.removeBounds();
     const safe = safeArea();
-    this.insets = { top: HUD_TOP_INSET + safe.top, bottom: dpadVisible ? DPAD_INSET + safe.bottom : 0 };
+    this.insets = { top: HUD_TOP_INSET + safe.top, bottom: Math.max(dpadVisible ? DPAD_INSET + safe.bottom : 0, this.panelBottom) };
     this.cam0 = { zoom, mw, mh, fitsW: mw * zoom <= width, fitsH: mh * zoom <= height - this.insets.top - this.insets.bottom };
     this.updateCamera();
   }
@@ -258,8 +274,9 @@ export class World extends Phaser.Scene {
       for (const [name, frames] of Object.entries(meta.anims)) {
         const key = `${id}:${name}`;
         if (this.anims.exists(key)) continue;
-        const walk = name.startsWith('walk');
-        const rate = walk ? 9 : name === 'wash' ? 3 : name === 'sleep' ? 1.2 : 1;
+        const walk = name.startsWith('walk') || name.startsWith('carry_walk');
+        const action = name.startsWith('water') || name.startsWith('fert') || name.startsWith('throw');
+        const rate = walk ? 9 : action ? 5 : name === 'wash' ? 3 : name === 'sleep' ? 1.2 : 1;
         this.anims.create({ key, frames: frames.map((frame) => ({ key: ATLAS, frame })), frameRate: rate, repeat: -1 });
       }
     }
@@ -280,7 +297,33 @@ export class World extends Phaser.Scene {
       grid.forEach((row, y) => row.forEach((i, x) => i >= 0 && layer.putTileAt(i, x, y)));
     };
     put('ground', ground, 0);
+    this.groundLayer = map.getLayer('ground')?.tilemapLayer ?? null;
+    this.tileset = ts;
     put('deco', deco, 3);
+  }
+
+  /** Вскопать клетки грядок (расширение участка): земля с автотайлами по соседям. */
+  private soil(cells: readonly Xy[]): void {
+    const key = cells.map((c) => c.join(',')).join(';');
+    if (key === this.soilKey || !this.groundLayer || !this.tileset) return;
+    this.soilKey = key;
+    const grid = this.model.parsed.ground.map((r) => [...r]);
+    for (const [x, y] of cells) if (grid[y]?.[x] !== undefined) grid[y]![x] = 's';
+    const touched = new Set<string>();
+    for (const [x, y] of cells) for (const [dx, dy] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]] as const) touched.add(`${x + dx},${y + dy}`);
+    for (const k of touched) {
+      const [x, y] = k.split(',').map(Number) as [number, number];
+      if (x < 0 || y < 0 || x >= this.model.parsed.w || y >= this.model.parsed.h) continue;
+      this.groundLayer.putTileAt(frameFor(this.tileset, this.mapDef, grid, x, y), x, y);
+    }
+  }
+
+  /** Точка мира → экранные CSS px (для DOM-надписей над миром). */
+  toScreen(x: number, y: number): { x: number; y: number } {
+    const cam = this.cameras.main;
+    const r = this.game.canvas.getBoundingClientRect();
+    const sx = r.width / this.scale.width || 1;
+    return { x: r.left + (x - cam.worldView.x) * cam.zoom * sx, y: r.top + (y - cam.worldView.y) * cam.zoom * sx };
   }
 
   /** Мягкая тень: полупрозрачный овал в два слоя (в атласе альфы нет). Текстура на каждую ширину один раз. */
@@ -343,7 +386,7 @@ export class World extends Phaser.Scene {
   // ───────────── ввод и события ─────────────
 
   private onIntent(i: RoutedIntent): void {
-    if (i.to !== 'world' || this.leaving || !this.inputOn) return;
+    if (i.to !== 'world' || this.leaving || !this.inputOn || this.farm?.blocking) return;
     this.model.intent(i);
   }
 
@@ -398,7 +441,7 @@ export class World extends Phaser.Scene {
     this.put(this.hero, this.heroShadow, a, ox, oy);
     // Герой выше кота на той же строке: рисуем поверх.
     this.hero.setDepth(this.hero.depth + 0.5);
-    const key = `hero:${a.step ? 'walk' : 'idle'}_${a.facing}`;
+    const key = this.farm?.heroAnim(a.facing, !!a.step, (k) => this.anims.exists(k)) ?? `hero:${a.step ? 'walk' : 'idle'}_${a.facing}`;
     if (this.hero.anims.currentAnim?.key !== key) this.hero.play(key);
   }
 
