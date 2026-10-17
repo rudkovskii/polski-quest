@@ -57,7 +57,7 @@ function fakeApi(over: Partial<FarmStats> = {}) {
     // Фраза «Mam kota.» заблокирована: кот ещё не куст.
     missingWords: (id) => (id === 'p.mam_kota' ? ['w.kot'] : []),
     plant,
-    stats: () => ({ xp: 120, level: 'A0.5', ratio: 0.4, grownToday: 3, grownTotal: 17, grownWords: 12, grownPhrases: 5, growing: 4, bag: 1, answersToday: 25, ...over }),
+    stats: () => ({ xp: 120, level: 'A0.5', ratio: 0.4, next: { level: 'A0.8', words: 280 }, grownToday: 3, grownTotal: 17, grownWords: 12, grownPhrases: 5, growing: 4, bag: 1, answersToday: 25, ...over }),
     pantry: () => [{ topic: 'jedzenie', ids: ['w.chleb'] }],
     say,
     onChange: (fn) => (listeners.add(fn), () => listeners.delete(fn)),
@@ -229,5 +229,32 @@ describe('коробка, кровать и карточка растения', 
     root.querySelector<HTMLButtonElement>('[data-review]')!.click();
     expect(c.isOpen).toBe(false);
     expect(onReview).toHaveBeenCalledWith('w.kot');
+  });
+});
+
+describe('значки стадий в словаре', () => {
+  it('семя, росток, куст, урожай, перезревшее и мешок — разные значки; кадры совпадают с атласом', async () => {
+    const { iconKeyOf, ICON_FRAMES } = await import('../src/ui/stageIcon');
+    const base = { kind: 'word' as const };
+    const keys = [
+      iconKeyOf({ ...base, status: 'growing', stage: 'seed' }),
+      iconKeyOf({ ...base, status: 'growing', stage: 'sprout' }),
+      iconKeyOf({ ...base, status: 'growing', stage: 'bush' }),
+      iconKeyOf({ ...base, status: 'grown', stage: null }),
+      iconKeyOf({ ...base, status: 'growing', stage: 'overripe' }),
+    ];
+    expect(new Set(keys).size).toBe(5);
+    expect(iconKeyOf({ ...base, status: 'new', stage: null })).toBeNull();
+    const atlas = (await import('../public/atlas/custom.json')).default as unknown as { frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }> };
+    for (const [k, [x, y]] of Object.entries(ICON_FRAMES)) expect(atlas.frames[`${k}/0`]!.frame).toMatchObject({ x, y, w: 16, h: 16 });
+  });
+  it('в списке у слов на разных стадиях разные значки', () => {
+    const { root, bus } = setup();
+    const { api } = fakeApi();
+    mountDictionary(root, api, bus).open();
+    const ico = (id: string) => root.querySelector(`[data-id="${id}"] [data-icon]`)?.getAttribute('data-icon') ?? null;
+    expect(ico('w.kot')).toBe('icon_sprout');
+    expect(ico('w.chleb')).toBe('icon_ripe');
+    expect(ico('w.pies')).toBeNull();
   });
 });

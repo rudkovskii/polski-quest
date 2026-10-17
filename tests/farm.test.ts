@@ -22,6 +22,11 @@ const solve = (f: ReturnType<typeof setup>['farm'], mode: 1 | 2 | 3 | 4) => {
   return f.answer(q, ans);
 };
 
+const solveId = (f: ReturnType<typeof setup>['farm'], mode: 1 | 2 | 3 | 4, id: string) => {
+  const q = f.next(mode, id)!;
+  return f.answer(q, q.answer);
+};
+
 describe('ферма: фасад', () => {
   it('посадка, полив, рост, урожай через 3 дня; фраза открывается, когда слова — кусты', () => {
     const s = setup();
@@ -37,19 +42,64 @@ describe('ферма: фасад', () => {
     expect(f.info('w.dzien_dobry').stage).toBe('bush');
     expect(f.missingWords('p.dzien_dobry')).toEqual([]);
     expect(f.plant(['p.dzien_dobry']).planted).toBe(1);
-    expect(f.next(2)!.kind).toBe('type');
+    expect(f.next(2, 'w.dzien_dobry')!.kind).toBe('type');
     s.setNow(s.now() + DAY_MS);
-    expect(solve(f, 1).act.kind).toBe('water');
+    expect(solveId(f, 1, 'w.dzien_dobry').act.kind).toBe('water');
     s.setNow(s.now() + DAY_MS);
-    const last = solve(f, 1);
+    const last = solveId(f, 1, 'w.dzien_dobry');
     expect(last.act).toMatchObject({ kind: 'harvest', id: 'w.dzien_dobry', tile: [12, 14], xp: 11 });
     expect(f.info('w.dzien_dobry').status).toBe('grown');
     expect(f.stats()).toMatchObject({ grownToday: 1, grownTotal: 1, grownWords: 1 });
     expect(f.pantry()).toEqual([{ topic: 'powitania', ids: ['w.dzien_dobry'] }]);
     expect(s.xp.at(-1)?.gain).toBe(11);
     // Ошибка: правильный ответ и минус капля.
-    const q = f.next(3)!;
-    const r = f.answer(q, ['nie']);
-    expect(r).toMatchObject({ ok: false, correct: 'Dzień dobry', act: { kind: 'miss' } });
+    // «Dzień dobry.» короче 3 плиток: в сборку не идёт, растёт в играх 1 и 2 как слово.
+    expect(f.next(3)).toBeNull();
+    expect(f.counts()).toEqual({ words: 0, phrases: 1, assemble: 0 });
+    const q = f.next(1, 'p.dzien_dobry')!;
+    expect(q.kind).toBe('choice');
+    const r = f.answer(q, 'не то');
+    expect(r).toMatchObject({ ok: false, correct: 'Здравствуйте.', act: { kind: 'miss' } });
+  });
+
+  it('полоска опыта двигается с первых ответов, hud:xp несёт подуровень и «сколько до следующего»', () => {
+    const s = setup();
+    const f = s.farm;
+    const ids = ['w.dzien_dobry', 'w.dobry_wieczor', 'w.dobranoc', 'w.do_widzenia', 'w.prosze'].filter((id) => f.word(id));
+    f.plant(ids);
+    const ev: { level: string; ratio: number; next?: { level: string; words: number } | null }[] = [];
+    s.bus.on('hud:xp', (x) => ev.push(x));
+    expect(f.stats()).toMatchObject({ level: 'A0', ratio: 0, next: { level: 'A0.1', words: 25 } });
+    solve(f, 1);
+    solve(f, 1);
+    solve(f, 1);
+    const last = ev.at(-1)!;
+    expect(last.level).toBe('A0');
+    expect(last.ratio).toBeGreaterThanOrEqual(0.03);
+    expect(last.next).toEqual({ level: 'A0.1', words: 25 });
+  });
+
+  it('очередь: за 17 ответов проходят все 19 посаженных, одно слово не чаще раза в 6 заданий', () => {
+    const s = setup();
+    const f = s.farm;
+    const ids = f.words.slice(0, 19).map((w) => w.id);
+    f.plant(ids);
+    const seen: string[] = [];
+    for (let i = 0; i < 19; i++) {
+      const q = f.next(1)!;
+      seen.push(q.id);
+      f.answer(q, q.kind === 'choice' ? q.answer : '');
+    }
+    expect(new Set(seen).size).toBe(19);
+    // 19 верных ответов уже заметно двигают полоску A0 → A0.1, хотя выращенного ещё нет
+    expect(f.stats()).toMatchObject({ level: 'A0', grownWords: 0 });
+    expect(f.stats().ratio).toBeGreaterThan(0.1);
+    // и дальше второй круг не повторяет слова встык
+    for (let i = 0; i < 40; i++) {
+      const q = f.next(i % 2 ? 2 : 1)!;
+      seen.push(q.id);
+      f.answer(q, q.kind === 'choice' ? q.answer : q.kind === 'type' ? q.answer : '');
+    }
+    for (let i = 5; i < seen.length; i++) expect(seen.slice(i - 5, i)).not.toContain(seen[i]);
   });
 });

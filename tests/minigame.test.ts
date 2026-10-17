@@ -33,3 +33,29 @@ describe('мини-игра', () => {
     expect(input).toEqual([false, true]);
   });
 });
+
+describe('панель мини-игры', () => {
+  it('кнопки действий закреплены в полосе внизу, а не в прокручиваемой бумаге; «Dalej» на том же месте', () => {
+    const root = document.createElement('div');
+    const g = mountMinigame(root, {
+      bus: testBus(),
+      next: () => Q,
+      answer: (_q, a) => ({ ok: a === 'кот', correct: 'кот', pl: 'kot', ru: 'кот', tr: 'кот' }),
+      say: () => {},
+    });
+    g.start(1);
+    const foot = root.querySelector('[data-foot]')!;
+    const paper = root.querySelector('[data-game]')!;
+    expect(foot.parentElement).toBe(paper.parentElement);
+    root.querySelector<HTMLElement>('[data-opt="собака"]')!.click();
+    expect(foot.querySelector('[data-next]')).not.toBeNull();
+    expect(paper.querySelector('[data-next]')).toBeNull();
+    expect(root.querySelector('.pq-game-box')?.parentElement).toBe(root.querySelector('.pq-game'));
+    // высота панели задана стилем и не зависит от содержимого
+    const css = root.querySelector('style')!.textContent!;
+    expect(css).toMatch(/\.pq-game-box[^}]*\bheight: clamp\(/);
+    expect(css).toMatch(/\.pq-game-foot[^}]*flex: 0 0 auto/);
+    root.querySelector<HTMLElement>('[data-next]')!.click();
+    expect(foot.querySelector('[data-next]')).toBeNull();
+  });
+});

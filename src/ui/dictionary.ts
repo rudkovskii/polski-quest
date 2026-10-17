@@ -6,6 +6,7 @@ import type { Phrase, Word } from '../types/content';
 import type { FarmApi, ItemInfo } from '../types/farm';
 import { el } from './dom';
 import { createPanel, nav, STAGE_RU } from './panel';
+import { iconKeyOf, stageIcon, STAGE_ICON_CSS } from './stageIcon';
 
 type Tab = 'words' | 'phrases';
 type Filter = 'all' | 'new' | 'growing' | 'grown';
@@ -20,6 +21,7 @@ const FILTERS: [Filter, string][] = [
 const GENDER: Record<NonNullable<Word['gender']>, string> = { m: 'м. р.', f: 'ж. р.', n: 'ср. р.', pl: 'мн. ч.' };
 
 const css = `
+${STAGE_ICON_CSS}
 .dict { display: flex; flex-direction: column; gap: 10px; }
 .dict-tabs, .dict-filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .dict-tabs .pq-btn { flex: 1 1 0; font-size: 17px; }
@@ -37,7 +39,7 @@ const css = `
 .dict-row.sel { background: #f2d9a0; }
 .dict-row .pl { font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
 .dict-row .ru { grid-column: 1; font-size: 14px; opacity: .8; overflow-wrap: anywhere; }
-.dict-row .st { grid-row: 1 / span 2; grid-column: 2; font-size: 18px; min-width: 22px; text-align: center; }
+.dict-row .st { grid-row: 1 / span 2; grid-column: 2; font-size: 18px; min-width: 32px; min-height: 32px; display: flex; align-items: center; justify-content: center; }
 .dict-empty { opacity: .7; padding: 12px 4px; }
 .dict-card { background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; align-content: start; }
 .dict-card .big { font-size: 28px; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
@@ -154,10 +156,12 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   const plantable = (): string[] => (topic ? entries[tab].filter((e) => e.topic === topic && info(e.id).status === 'new' && !locked(e.id)).map((e) => e.id) : []);
 
   // ---- отрисовка
-  const statusIcon = (id: string): string => {
+  /** Значок стадии: семя, росток, куст, урожай (в банке), перезревшее; в мешке — тусклое семя. */
+  const statusIcon = (id: string): Node | string => {
     if (locked(id)) return '🔒';
-    const s = info(id).status;
-    return s === 'new' ? '' : s === 'grown' ? '🫙' : '🌱';
+    const i = info(id);
+    const k = iconKeyOf(i);
+    return k ? stageIcon(k, import.meta.env.BASE_URL, i.status === 'bag') : '';
   };
 
   function renderTabs(): void {

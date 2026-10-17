@@ -29,6 +29,8 @@ export interface SummaryScreen {
   readonly isOpen: boolean;
 }
 
+const plural = (n: number): string => (n % 10 === 1 && n % 100 !== 11 ? 'слово' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'слова' : 'слов');
+
 export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>): SummaryScreen {
   const panel = createPanel({ title: '', bus });
   const content = el('div', { class: 'sum' });
@@ -62,7 +64,7 @@ export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEve
         { class: 'sum-level' },
         el('div', { class: 'top' }, el('span', { class: 'lvl', 'data-level': '' }, s.level), el('span', {}, `${s.xp} опыта`)),
         el('div', { class: 'sum-bar', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, el('i', { style: `width:${pct}%` })),
-        el('div', { class: 'sum-hint', style: 'margin-top:4px' }, `${pct}% пути до следующего уровня`),
+        el('div', { class: 'sum-hint', style: 'margin-top:4px' }, s.next ? `${pct}% пути до ${s.next.level}: вырастить ещё ${s.next.words} ${plural(s.next.words)}` : 'Уровень A1: вся база выращена'),
       ),
       el(
         'div',

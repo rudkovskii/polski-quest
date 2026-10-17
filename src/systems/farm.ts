@@ -12,6 +12,8 @@ import {
   derive,
   dueAt,
   levelOf,
+  partialUnits,
+  type LevelInfo,
   nextText,
   pickTask,
   plant,
@@ -23,7 +25,7 @@ import {
   type GardenSave,
   type GardenState,
 } from './garden';
-import { grade, makeQuestion, type Question } from './quiz';
+import { canAssemble, grade, makeQuestion, type Question } from './quiz';
 
 export interface FarmDeps {
   bus: Bus<BusEvents>;
@@ -53,7 +55,8 @@ export interface Farm extends FarmApi {
   /** Режим для «Повторить сейчас»: тот, что продвинет растение. */
   reviewMode(id: string): GameMode;
   plants(): PlantView[];
-  counts(): { words: number; phrases: number };
+  /** На грядках: слов, фраз всего и сколько из фраз годятся для сборки (игры 3 и 4; остальные идут в игры 1 и 2). */
+  counts(): { words: number; phrases: number; assemble: number };
   /** Пересчитать раскладку (время идёт: перезревшие возвращаются) и разослать грядки и опыт. */
   refresh(): void;
   readonly garden: GardenSave;
@@ -66,7 +69,8 @@ export function createFarm(d: FarmDeps): Farm {
   const rand = d.rand ?? Math.random;
   let g: GardenSave = d.load();
   let st: GardenState = derive(g);
-  let lastId: string | null = null;
+  /** Последние показанные id: основа правила «не повторять чаще, чем раз в N заданий». */
+  const recent: string[] = [];
   const listeners = new Set<() => void>();
 
   const today = (): number => {
@@ -76,7 +80,12 @@ export function createFarm(d: FarmDeps): Farm {
 
   const grownWords = (): number => [...st.items.values()].filter((it) => !it.phrase && it.harvests > 0).length;
   const grownPhrases = (): number => [...st.items.values()].filter((it) => it.phrase && it.harvests > 0).length;
-  const level = (): { level: string; ratio: number } => levelOf(grownWords(), grownPhrases(), WORDS.length, PHRASES.length);
+  const level = (): LevelInfo => levelOf(grownWords(), grownPhrases(), WORDS.length, PHRASES.length, partialUnits(st));
+  /** Фраза для сборки из плиток (иначе растёт в играх 1 и 2 как слово). */
+  const assemble = (id: string): boolean => {
+    const p = PHRASE_BY_ID.get(id);
+    return !!p && canAssemble(p);
+  };
 
   const plants = (): PlantView[] => {
     const now = d.now();
@@ -97,7 +106,7 @@ export function createFarm(d: FarmDeps): Farm {
   };
   const emitXp = (gain = 0, up = false): void => {
     const l = level();
-    d.bus.emit('hud:xp', { level: l.level, ratio: l.ratio, xp: st.xp, ...(gain ? { gain } : {}), ...(up ? { up } : {}) });
+    d.bus.emit('hud:xp', { level: l.level, ratio: l.ratio, xp: st.xp, next: l.next, ...(gain ? { gain } : {}), ...(up ? { up } : {}) });
   };
   const changed = (): void => {
     d.save(g);
@@ -168,6 +177,7 @@ export function createFarm(d: FarmDeps): Farm {
         xp: st.xp,
         level: l.level,
         ratio: l.ratio,
+        next: l.next,
         grownToday: st.grownByDay.get(day) ?? 0,
         grownTotal: items.filter((it) => it.harvests > 0).length,
         grownWords: grownWords(),
@@ -193,16 +203,17 @@ export function createFarm(d: FarmDeps): Farm {
     },
     next(mode, only) {
       const now = d.now();
-      const id = only ?? pickTask(g, st, mode, now, today(), lastId);
+      const id = only ?? pickTask(g, st, mode, now, today(), { recent, assemble });
       if (!id) {
         d.bus.emit('farm:focus', { id: null, tile: null, label: '' });
         return null;
       }
-      lastId = id;
+      recent.push(id);
+      if (recent.length > 8) recent.shift();
       const it = st.items.get(id);
       const stage = it ? stageOf(it, now) : null;
       const typed = mode === 2 && (stage === 'bush' || stage === 'overripe');
-      const q = makeQuestion(mode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: WORDS }, rand, typed);
+      const q = makeQuestion(mode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: WORDS, phrases: PHRASES }, rand, typed);
       const slot = g.slots[id];
       const cell = slot !== undefined ? PLOT_CELLS[slot] : undefined;
       d.bus.emit('farm:focus', { id, tile: cell ? [cell[0], cell[1]] : null, label: plOf(id) });
@@ -237,7 +248,7 @@ export function createFarm(d: FarmDeps): Farm {
     },
     reviewMode(id) {
       const it = st.items.get(id);
-      if (isPhraseId(id)) return it && !it.sides.rp ? 3 : it && !it.sides.pr ? 4 : 3;
+      if (isPhraseId(id) && assemble(id)) return it && !it.sides.rp ? 3 : it && !it.sides.pr ? 4 : 3;
       if (!it) return 1;
       if (it.stage === 'seed') return 1;
       if (!it.sides.rp || !it.rpOk) return 2;
@@ -248,8 +259,9 @@ export function createFarm(d: FarmDeps): Farm {
     counts() {
       let words = 0;
       let phrases = 0;
-      for (const p of plants()) p.phrase ? phrases++ : words++;
-      return { words, phrases };
+      let long = 0;
+      for (const p of plants()) p.phrase ? (phrases++, assemble(p.id) && long++) : words++;
+      return { words, phrases, assemble: long };
     },
     refresh() {
       const now = d.now();
