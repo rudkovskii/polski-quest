@@ -27,6 +27,10 @@ export interface AnswerResult {
   tr: string;
   /** Пометка мягкого зачёта («без диакритики»). */
   note?: string;
+  /** Что осталось растению после ответа («до урожая: ещё 1 день»). */
+  progress?: string;
+  /** Сколько растений созреет завтра. */
+  tomorrow?: number;
 }
 
 export interface MinigameDeps {
@@ -66,6 +70,9 @@ ${THEME_CSS}
 .pq-game-paper.bad { background: #f6d7cc; }
 .pq-q { font-size: 24px; font-weight: 800; margin: 0 0 4px; overflow-wrap: anywhere; }
 .pq-q-hint { font-size: 13px; opacity: .7; margin-bottom: 8px; }
+.pq-progress { font-size: 13px; margin: -4px 0 8px; color: #4a6b2a; font-weight: 600; }
+.pq-fb .pq-progress { margin: 4px 0 0; }
+.pq-soon { margin-left: auto; font-weight: 600; font-size: 13px; opacity: .9; }
 .pq-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .pq-game .pq-opt { text-align: left; color: var(--pq-ink); background: #fffaf0; font-size: 17px; line-height: 1.2; padding: 10px; min-height: 48px; overflow-wrap: anywhere; }
 .pq-game .pq-opt .n { display: inline-block; min-width: 18px; opacity: .5; font-size: 13px; }
@@ -82,13 +89,17 @@ ${THEME_CSS}
 @media (max-width: 520px) { .pq-q { font-size: 20px; } .pq-game .pq-opt { min-height: 40px; padding: 7px; font-size: 15px; } .pq-game-paper { padding: 8px; } }
 `;
 
+/** Строка прогресса растения с большой буквы. */
+const progressLine = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
+
 export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame {
   const bus = deps.bus ?? globalBus;
   const title = el('span', {}, '');
+  const soon = el('span', { class: 'pq-soon', 'data-soon': '', hidden: true }, '');
   const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', onclick: () => api.stop() }, 'Выйти ✕');
   const paper = el('div', { class: 'pq-game-paper', 'data-game': '' });
   const foot = el('div', { class: 'pq-game-foot', 'data-foot': '' });
-  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, exitBtn), paper, foot);
+  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, soon, exitBtn), paper, foot);
   const root = el('div', { class: 'pq-game', hidden: true }, el('style', {}, css), box);
   parent.append(root);
 
@@ -135,6 +146,11 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       if (q) deps.say(q.id);
     } else {
       fb.append(el('div', {}, 'Правильно:'), el('div', { class: 'big' }, r.correct), el('div', {}, `${r.pl} — ${r.ru}`), el('div', { class: 'pq-muted' }, r.tr));
+    }
+    if (r.progress) fb.append(el('div', { class: 'pq-progress', 'data-progress-after': '' }, `🌱 ${progressLine(r.progress)}`));
+    if (r.tomorrow !== undefined) {
+      soon.hidden = r.tomorrow < 1;
+      soon.textContent = r.tomorrow > 0 ? `🌾 созреет завтра: ${r.tomorrow}` : '';
     }
     const dalej = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-next': '', onclick: () => advance() }, 'Dalej →');
     paper.append(fb);
@@ -230,6 +246,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       4: 'Собери фразу по-русски',
     };
     paper.append(el('div', { class: 'pq-q', lang: q.promptLang, 'data-prompt': '' }, q.prompt), el('div', { class: 'pq-q-hint' }, hint[mode]));
+    if (q.progress) paper.append(el('div', { class: 'pq-progress', 'data-progress': '' }, `🌱 ${progressLine(q.progress)}`));
     if (q.kind === 'choice') renderChoice(q);
     else if (q.kind === 'type') renderType();
     else renderTiles(q);
@@ -284,6 +301,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       mode = m;
       only = onlyId;
       title.textContent = MODE_TITLE[m];
+      soon.hidden = true;
+      soon.textContent = '';
       if (!open) {
         open = true;
         root.hidden = false;

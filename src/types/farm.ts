@@ -57,7 +57,7 @@ export interface FarmApi {
   word(id: string): Word | undefined;
   phrase(id: string): Phrase | undefined;
   info(id: string): ItemInfo;
-  /** Слова фразы, которые ещё не «куст» (пусто = фразу можно сажать). */
+  /** Слова фразы, которые ещё не «росток» (семя или не посажены; пусто = фразу можно сажать). */
   missingWords(phraseId: string): string[];
   /** Посадить (новое — семенем на свободную грядку или в мешок). Уже посаженное пропускается. */
   plant(ids: readonly string[]): { planted: number; bag: number; skipped: number };

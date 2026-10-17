@@ -71,7 +71,7 @@ describe('рост', () => {
     expect(stage(g, 'w.kot', T0)).toBe('bush');
     g = answer(g, 'w.kot', D(1), 1);
     expect(stage(g, 'w.kot', D(1))).toBe('bush');
-    expect(nextText(derive(g).items.get('w.kot'), D(1))).toMatch(/1 другой день/);
+    expect(nextText(derive(g).items.get('w.kot'), D(1))).toMatch(/До урожая: ещё 1 день/);
     g = answer(g, 'w.kot', D(2), 1);
     expect(derive(g).items.get('w.kot')!.stage).toBeNull();
     expect(statusOf(derive(g), g, 'w.kot', D(2))).toBe('grown');

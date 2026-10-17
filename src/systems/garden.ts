@@ -238,31 +238,70 @@ export function statusOf(st: GardenState, g: GardenSave, id: string, now: number
   return g.slots[id] !== undefined ? 'growing' : it.stage === null ? 'growing' : 'bag';
 }
 
-/** Сколько разных дней ещё нужно до урожая и что вообще нужно до следующей стадии, по-русски. */
-export function nextText(it: ItemState | undefined, now: number): string {
-  if (!it) return 'Посадить в словаре';
+const plural = (n: number, one: string, few: string, many: string): string => {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+};
+
+/**
+ * Одна строка «что осталось» (P2a), с маленькой буквы: «ещё 1 полив до ростка», «нужно ответить по-польски»,
+ * «до урожая: ещё 1 день», «созреет со следующим верным ответом». `day` — сегодняшний календарный день: засчитан ли он уже.
+ */
+export function progressText(it: ItemState | undefined, now: number, day?: number): string {
+  if (!it) return 'не посажено';
   const s = stageOf(it, now);
-  if (s === 'overripe') return 'Один верный ответ — и обратно в банку';
+  if (s === 'overripe') return 'один верный ответ — и обратно в банку';
   if (s === null) {
     const d = dueAt(it);
     const days = d === null ? 0 : Math.max(1, Math.ceil((d - now) / DAY_MS));
-    return `В банке. Вернётся повторить через ${days} дн.`;
+    return `в банке, вернётся повторить через ${days} ${plural(days, 'день', 'дня', 'дней')}`;
   }
   if (s === 'seed') {
-    const n = SPROUT_DROPS - it.drops;
-    return `Ещё ${n} ${n === 1 ? 'верный ответ' : 'верных ответа'} — и росток`;
+    const n = Math.max(1, SPROUT_DROPS - it.drops);
+    return `ещё ${n} ${plural(n, 'полив', 'полива', 'поливов')} до ростка`;
   }
   if (s === 'sprout') {
-    const need: string[] = [];
-    if (!it.sides.pr) need.push('верно с польского');
-    if (!it.sides.rp) need.push('верно на польский');
-    return `До куста: ${need.join(' и ')}`;
+    if (!it.sides.pr && !it.sides.rp) return 'нужно ответить в обе стороны: с польского и по-польски';
+    if (!it.sides.rp) return 'нужно ответить по-польски';
+    if (!it.sides.pr) return 'нужно ответить с польского';
+    return 'ещё 1 полив до куста';
   }
+  // Куст: дни (сегодняшний, если ещё не засчитан, идёт в счёт) и ответ по-польски.
+  const today = day !== undefined && !it.days.has(day);
   const left = Math.max(0, HARVEST_DAYS - it.days.size);
-  const parts: string[] = [];
-  if (left > 0) parts.push(`верные ответы ещё в ${left} ${left === 1 ? 'другой день' : 'других дня'}`);
-  if (!it.rpOk) parts.push('хотя бы раз по-польски');
-  return parts.length ? `До урожая: ${parts.join(', ')}` : 'Следующий верный ответ — урожай';
+  if (!it.rpOk) {
+    if (left <= 1 && (left === 0 || today)) return 'нужно ответить по-польски — и урожай';
+    return `нужно ответить по-польски; до урожая: ещё ${left} ${plural(left, 'день', 'дня', 'дней')}`;
+  }
+  if (left === 0 || (left === 1 && today)) return 'созреет со следующим верным ответом';
+  if (today) return `до урожая: ещё ${left} ${plural(left, 'день', 'дня', 'дней')}, сегодняшний тоже в счёт`;
+  return `до урожая: ещё ${left} ${plural(left, 'день', 'дня', 'дней')}`;
+}
+
+/** Что нужно до урожая, с большой буквы (словарь, карточка растения). */
+export function nextText(it: ItemState | undefined, now: number, day?: number): string {
+  if (!it) return 'Посадить в словаре';
+  const t = progressText(it, now, day);
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+/**
+ * Скоро урожай: `today` — созреет сегодня одним верным ответом (куст, дни набраны с учётом сегодняшнего, по-польски был);
+ * `tomorrow` — сегодня уже засчитан и завтра будет последний нужный день.
+ */
+export function ripeSoon(st: GardenState, day: number): { today: number; tomorrow: number } {
+  let today = 0;
+  let tomorrow = 0;
+  for (const it of st.items.values()) {
+    if (it.stage !== 'bush' || !it.rpOk) continue;
+    const has = it.days.has(day);
+    if (it.days.size + (has ? 0 : 1) >= HARVEST_DAYS) today++;
+    else if (has && it.days.size + 1 >= HARVEST_DAYS) tomorrow++;
+  }
+  return { today, tomorrow };
 }
 
 /** Посадить: новые id в конец журнала посадок (уже посаженное пропускается). */
@@ -323,7 +362,8 @@ export const modeKind = (mode: GameMode): 'word' | 'phrase' => (mode <= 2 ? 'wor
 export function canProgress(it: ItemState, side: Side, day: number, now: number): boolean {
   if (isOverripe(it, now)) return true;
   if (it.stage === 'seed') return true;
-  if (it.stage === 'sprout') return !it.sides[side];
+  // Росток: ответ в недостающую сторону, или обе стороны уже были (за один ответ — одна стадия, куст ждёт следующего).
+  if (it.stage === 'sprout') return !it.sides[side] || it.sides[side === 'pr' ? 'rp' : 'pr'];
   if (it.stage === 'bush') return !it.days.has(day) || (side === 'rp' && !it.rpOk);
   return false;
 }
@@ -351,11 +391,30 @@ export function answersOnDay(g: GardenSave, day: number): Map<string, number> {
   return out;
 }
 
+/** Верный ответ в эту сторону сейчас соберёт урожай. */
+export function harvestsNow(it: ItemState, side: Side, day: number): boolean {
+  return it.stage === 'bush' && (it.rpOk || side === 'rp') && it.days.size + (it.days.has(day) ? 0 : 1) >= HARVEST_DAYS;
+}
+
+/** Растению сегодня не хватает зачёта дня для урожая: рост уже начат в прошлые дни, сегодня верного ответа ещё нет. */
+export function needsDay(it: ItemState, day: number): boolean {
+  return it.stage !== null && it.days.size > 0 && !it.days.has(day);
+}
+
+/** Растению для куста или урожая не хватает именно этой стороны. */
+export function needsSide(it: ItemState, side: Side): boolean {
+  if (it.stage === 'seed' || it.stage === 'sprout') return !it.sides[side];
+  return it.stage === 'bush' && side === 'rp' && !it.rpOk;
+}
+
 /**
  * Следующее задание мини-игры из посаженного на грядках. Игры 1 и 2 берут слова и «короткие» фразы (их не собрать из плиток),
  * игры 3 и 4 — фразы, пригодные для сборки.
- * Порядок: перезревшие → у кого сегодня меньше ответов (так проходим всех по кругу) → тем, кому ответ сегодня поможет →
- * ближе к урожаю → давно не отвечал. Одно и то же растение не раньше, чем через `repeatGap` заданий.
+ * Порядок (P2a: очередь ведёт растения к урожаю, а не размазывает ответы по всей теме):
+ *   перезревшие → кому верный ответ сейчас даст урожай → кому сегодня не хватает зачёта дня (рост начат раньше; ближе к
+ *   урожаю — раньше) → кому не хватает этой стороны (игра 2 — «по-польски», игра 1 — «с польского»; ближе к урожаю —
+ *   раньше) → прежние правила: у кого сегодня меньше ответов, кому ответ поможет, ближе к урожаю, давно не отвечал.
+ * Одно и то же растение не раньше, чем через `repeatGap` заданий.
  */
 export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: number, day: number, opts: PickOpts = {}): string | null {
   const side = sideOf(mode);
@@ -372,8 +431,22 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
   const key = (it: ItemState): number[] => {
     const over = isOverripe(it, now);
     const helps = over || canProgress(it, side, day, now);
-    const progress = helps ? (STAGE_RANK[it.stage ?? 'seed'] ?? 0) * 100 + it.days.size * 10 + it.drops : 0;
-    return [over ? 0 : 1, today.get(it.id) ?? 0, helps ? 0 : 1, it.answers === 0 ? 0 : 1, -progress, it.lastAnswer ?? 0, g.slots[it.id] ?? 0];
+    const progress = (STAGE_RANK[it.stage ?? 'seed'] ?? 0) * 100 + it.days.size * 10 + it.drops;
+    const day0 = !over && needsDay(it, day);
+    const side0 = !over && !day0 && needsSide(it, side);
+    return [
+      over ? 0 : 1,
+      !over && harvestsNow(it, side, day) ? 0 : 1,
+      day0 ? 0 : 1,
+      side0 ? 0 : 1,
+      day0 || side0 ? -progress : 0,
+      today.get(it.id) ?? 0,
+      helps ? 0 : 1,
+      it.answers === 0 ? 0 : 1,
+      helps ? -progress : 0,
+      it.lastAnswer ?? 0,
+      g.slots[it.id] ?? 0,
+    ];
   };
   const sorted = pool
     .filter((it) => !banned.has(it.id))
