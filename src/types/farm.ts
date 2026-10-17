@@ -36,8 +36,10 @@ export interface ItemInfo {
 export interface FarmStats {
   xp: number;
   level: string;
-  /** 0..1 до следующего уровня. */
+  /** 0..1 внутри текущего подуровня (выращенное + частичный зачёт за растущее). */
   ratio: number;
+  /** До следующего подуровня: имя и сколько слов (на последнем шаге слов и фраз) выращивать. null — A1. */
+  next: { level: string; words: number } | null;
   grownToday: number;
   grownTotal: number;
   grownWords: number;

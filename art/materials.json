@@ -6,7 +6,7 @@
   "leaf2": "#74b448",
   "trunk": "#7d5535",
   "dirt": "#c9a26b",
-  "soil": "#8d5d3d",
+  "soil": "#7a4e34",
   "stone": "#a09b94",
   "wood": "#b9834f",
   "wood_dark": "#785036",
@@ -52,10 +52,11 @@
   "shade": "#3d2f3b",
   "tomato": "#d0492f",
   "sunflower": "#e9b93a",
-  "leaf_dry": "#c8a548",
-  "soil_wet": "#6a4430",
+  "leaf_dry": "#dcb53c",
+  "soil_wet": "#4d3224",
   "tin": "#9aa9b2",
   "sack": "#c8a46e",
-  "fruit_old": "#8a3a2c"
+  "fruit_old": "#7a3340",
+  "loose": "#a06f4a"
  }
 }

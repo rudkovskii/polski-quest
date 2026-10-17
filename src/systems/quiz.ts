@@ -1,6 +1,7 @@
 // Задания мини-игр (ФЕРМА.md, решение 9): чистые функции. Случай приходит параметром (`rand`).
 //   1 Polski → Rosyjski: польское слово, выбор из 4 русских (отвлекающие из той же темы, лучше той же части речи);
 //   2 Rosyjski → Polski: русское слово, выбор из 4 польских; когда слово уже «куст» — ввод с клавиатуры (мягкая проверка);
+//   Короткие фразы (меньше 3 плиток, `canAssemble`) растут через игры 1 и 2 как слова: сборка из 1–2 плиток бессмысленна.
 //   3 Złóż zdanie po polsku: русская фраза, плитки tiles_pl + distract_pl;
 //   4 Złóż zdanie po rosyjsku: польская фраза, плитки tiles_ru + distract_ru.
 import type { Phrase, Word } from '../types/content';
@@ -11,6 +12,12 @@ export type Question =
   | { mode: GameMode; id: string; kind: 'choice'; prompt: string; promptLang: 'pl' | 'ru'; options: string[]; answer: string }
   | { mode: GameMode; id: string; kind: 'type'; prompt: string; promptLang: 'ru'; answer: string; accept: string[] }
   | { mode: GameMode; id: string; kind: 'tiles'; prompt: string; promptLang: 'pl' | 'ru'; tiles: string[]; answer: string[] };
+
+/** Минимум плиток, чтобы фразу имело смысл собирать (игры 3 и 4). */
+export const MIN_TILES = 3;
+
+/** Фраза годится для сборки из плиток в обе стороны. Короткие («Dzień dobry.») идут в игры 1 и 2. */
+export const canAssemble = (p: Pick<Phrase, 'tiles_pl' | 'tiles_ru'>): boolean => p.tiles_pl.length >= MIN_TILES && p.tiles_ru.length >= MIN_TILES;
 
 export function shuffle<T>(xs: readonly T[], rand: () => number): T[] {
   const a = [...xs];
@@ -45,17 +52,43 @@ export function distractors(w: Word, words: readonly Word[], field: 'pl' | 'ru',
   return out;
 }
 
+/** 3 отвлекающих для фразы: та же тема (короткие рядом с короткими), потом любые. */
+export function phraseDistractors(p: Phrase, phrases: readonly Phrase[], field: 'pl' | 'ru', rand: () => number, n = 3): string[] {
+  const own = p[field].trim().toLowerCase();
+  const out: string[] = [];
+  const seen = new Set([own]);
+  const short = (x: Phrase): boolean => !canAssemble(x);
+  for (const tier of [phrases.filter((x) => x.topic === p.topic && short(x)), phrases.filter((x) => x.topic === p.topic), phrases.filter(short), phrases]) {
+    for (const x of shuffle(tier, rand)) {
+      if (out.length >= n) return out;
+      const k = x[field].trim().toLowerCase();
+      if (x.id === p.id || seen.has(k)) continue;
+      seen.add(k);
+      out.push(x[field].trim());
+    }
+  }
+  return out;
+}
+
 /** Собрать задание. `typed` — слово уже «куст» (режим 2 переходит на ввод). */
 export function makeQuestion(
   mode: GameMode,
   id: string,
-  db: { word(id: string): Word | undefined; phrase(id: string): Phrase | undefined; words: readonly Word[] },
+  db: { word(id: string): Word | undefined; phrase(id: string): Phrase | undefined; words: readonly Word[]; phrases?: readonly Phrase[] },
   rand: () => number,
   typed = false,
 ): Question | null {
   if (mode === 1 || mode === 2) {
     const w = db.word(id);
-    if (!w) return null;
+    if (!w) {
+      // Короткая фраза в играх 1 и 2: как слово, отвлекающие — другие фразы.
+      const p = db.phrase(id);
+      if (!p) return null;
+      if (mode === 2 && typed) return { mode, id, kind: 'type', prompt: p.ru, promptLang: 'ru', answer: p.pl, accept: [p.pl] };
+      const f = mode === 1 ? 'ru' : 'pl';
+      const options = shuffle([p[f], ...phraseDistractors(p, db.phrases ?? [], f, rand)], rand);
+      return { mode, id, kind: 'choice', prompt: mode === 1 ? p.pl : p.ru, promptLang: mode === 1 ? 'pl' : 'ru', options, answer: p[f] };
+    }
     if (mode === 2 && typed) return { mode, id, kind: 'type', prompt: w.ru, promptLang: 'ru', answer: w.pl, accept: [w.pl] };
     const field = mode === 1 ? 'ru' : 'pl';
     const options = shuffle([w[field], ...distractors(w, db.words, field, rand)], rand);

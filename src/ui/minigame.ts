@@ -55,10 +55,13 @@ ${THEME_CSS}
   font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); }
 .pq-game[hidden] { display: none; }
 .pq-game-box { pointer-events: auto; width: min(720px, 100%); box-sizing: border-box; background: var(--pq-wood); border: 3px solid var(--pq-ink); border-radius: 12px;
-  box-shadow: 0 4px 0 var(--pq-ink), inset 0 0 0 2px var(--pq-wood-dark); padding: 6px 8px 8px; max-height: 62dvh; display: flex; flex-direction: column; }
-.pq-game-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--pq-cream); padding: 0 2px 6px; font-weight: 700; font-size: 14px; }
+  box-shadow: 0 4px 0 var(--pq-ink), inset 0 0 0 2px var(--pq-wood-dark); padding: 6px 8px 8px; height: clamp(250px, 56dvh, 400px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; }
+.pq-game-head { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--pq-cream); padding: 0 2px 6px; font-weight: 700; font-size: 14px; }
 .pq-game-head .pq-btn { padding: 6px 10px; font-size: 14px; }
-.pq-game-paper { background: var(--pq-cream); border: 2px solid var(--pq-ink); border-radius: 6px; padding: 10px 12px; overflow-y: auto; transition: background .15s; }
+.pq-game-paper { flex: 1 1 auto; min-height: 0; background: var(--pq-cream); border: 2px solid var(--pq-ink); border-radius: 6px; padding: 10px 12px; overflow-y: auto; overflow-x: hidden; transition: background .15s; }
+/* Закреплённая полоса действий: «Sprawdź / Dalej» всегда на одном месте и не уходят за край. */
+.pq-game-foot { flex: 0 0 auto; display: flex; gap: 8px; align-items: stretch; min-height: 46px; padding-top: 8px; }
+.pq-game-foot .pq-btn { flex: 1 1 auto; }
 .pq-game-paper.ok { background: #d6efc0; }
 .pq-game-paper.bad { background: #f6d7cc; }
 .pq-q { font-size: 24px; font-weight: 800; margin: 0 0 4px; overflow-wrap: anywhere; }
@@ -72,8 +75,6 @@ ${THEME_CSS}
 .pq-pool { display: flex; flex-wrap: wrap; gap: 6px; }
 .pq-game .pq-tile { color: var(--pq-ink); background: #f2dcae; font-size: 17px; padding: 8px 10px; }
 .pq-game .pq-tile[disabled] { opacity: .25; }
-.pq-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.pq-row .pq-btn { flex: 1 1 auto; }
 .pq-type { width: 100%; box-sizing: border-box; font-size: 20px; padding: 8px 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fffaf0; color: var(--pq-ink); }
 .pq-fb { margin-top: 8px; font-size: 15px; }
 .pq-fb .big { font-size: 20px; font-weight: 800; }
@@ -86,7 +87,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   const title = el('span', {}, '');
   const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', onclick: () => api.stop() }, 'Выйти ✕');
   const paper = el('div', { class: 'pq-game-paper', 'data-game': '' });
-  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, exitBtn), paper);
+  const foot = el('div', { class: 'pq-game-foot', 'data-foot': '' });
+  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, exitBtn), paper, foot);
   const root = el('div', { class: 'pq-game', hidden: true }, el('style', {}, css), box);
   parent.append(root);
 
@@ -135,9 +137,10 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       fb.append(el('div', {}, 'Правильно:'), el('div', { class: 'big' }, r.correct), el('div', {}, `${r.pl} — ${r.ru}`), el('div', { class: 'pq-muted' }, r.tr));
     }
     const dalej = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-next': '', onclick: () => advance() }, 'Dalej →');
-    fb.append(el('div', { class: 'pq-row' }, dalej));
     paper.append(fb);
-    for (const b of paper.querySelectorAll<HTMLButtonElement>('.pq-opt, .pq-tile, [data-check], [data-reset]')) b.disabled = true;
+    for (const b of box.querySelectorAll<HTMLButtonElement>('.pq-opt, .pq-tile, [data-check], [data-reset]')) b.disabled = true;
+    foot.replaceChildren(dalej);
+    if (typeof fb.scrollIntoView === 'function') fb.scrollIntoView({ block: 'nearest' });
     detachKb();
     const input = paper.querySelector<HTMLInputElement>('.pq-type');
     if (input) input.disabled = true;
@@ -174,7 +177,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   const renderType = (): void => {
     const input = el('input', { type: 'text', class: 'pq-type', 'data-type': '', placeholder: 'Напиши по-польски', enterkeyhint: 'done' });
     const check = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-check': '', onclick: () => submit(input.value) }, 'Sprawdź · Проверить');
-    paper.append(input, el('div', { class: 'pq-row' }, check));
+    paper.append(input);
+    foot.replaceChildren(check);
     kb = attachKeyboard(input, { onEnter: () => submit(input.value) });
     setTimeout(() => input.focus({ preventScroll: true }), 30);
   };
@@ -197,7 +201,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     tileAdder = addTile;
     const check = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-check': '', onclick: () => submit(built.map((i) => qq.tiles[i]!)) }, 'Sprawdź · Проверить');
     const reset = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-reset': '', onclick: () => ((built = []), paint()) }, 'Сбросить');
-    paper.append(row, pool, el('div', { class: 'pq-row' }, reset, check));
+    paper.append(row, pool);
+    foot.replaceChildren(reset, check);
     paint();
   };
   let tileAdder: ((i: number) => void) | null = null;
@@ -207,6 +212,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     detachKb();
     paper.classList.remove('ok', 'bad');
     paper.replaceChildren();
+    foot.replaceChildren();
+    paper.scrollTop = 0;
     answered = false;
     built = [];
     tileAdder = null;

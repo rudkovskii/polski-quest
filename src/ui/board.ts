@@ -9,7 +9,7 @@ import { createPanel, nav } from './panel';
 export interface BoardDeps {
   bus?: Bus<BusEvents>;
   /** Сколько на грядках слов и фраз. */
-  counts(): { words: number; phrases: number };
+  counts(): { words: number; phrases: number; assemble: number };
   onPick(mode: GameMode): void;
 }
 
@@ -28,7 +28,15 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(): void
     const list = el('div', { style: 'display:flex;flex-direction:column;gap:8px' });
     list.append(el('div', { class: 'pq-muted' }, `На грядках: слов ${c.words}, фраз ${c.phrases}. Пока отвечаешь, фермер сам поливает.`));
     for (const m of [1, 2, 3, 4] as GameMode[]) {
-      const why = m <= 2 ? (c.words ? '' : 'Нет посаженных слов: посади их в словаре дома') : c.phrases ? '' : 'Нет посаженных фраз: фраза открывается в словаре, когда все её слова — кусты';
+      // Фразы короче 3 плиток растут в играх 1 и 2 как слова; сборка — только из длинных.
+      const why =
+        m <= 2
+          ? c.words + (c.phrases - c.assemble) > 0
+            ? ''
+            : 'Нет посаженных слов: посади их в словаре дома'
+          : c.assemble > 0
+            ? ''
+            : 'Нет посаженных фраз для сборки (от 3 слов): фраза открывается в словаре, когда все её слова — кусты';
       const b = el(
         'button',
         { type: 'button', class: 'pq-btn', 'data-mode': m, disabled: !!why, style: 'text-align:left;line-height:1.3', ...nav('modes', 'v', `mode:${m}`), onclick: () => (panel.close(), deps.onPick(m)) },

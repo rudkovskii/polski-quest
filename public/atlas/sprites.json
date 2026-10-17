@@ -535,6 +535,76 @@
   ],
   "anims": {}
  },
+ "icon_bush": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "icon_bush/0"
+  ],
+  "anims": {}
+ },
+ "icon_overripe": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "icon_overripe/0"
+  ],
+  "anims": {}
+ },
+ "icon_ripe": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "icon_ripe/0"
+  ],
+  "anims": {}
+ },
+ "icon_seed": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "icon_seed/0"
+  ],
+  "anims": {}
+ },
+ "icon_sprout": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "icon_sprout/0"
+  ],
+  "anims": {}
+ },
  "item_crop": {
   "size": [
    16,

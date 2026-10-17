@@ -12,6 +12,7 @@ import {
   newGarden,
   nextText,
   normalizeGarden,
+  partialUnits,
   pickTask,
   plant,
   stageOf,
@@ -20,7 +21,7 @@ import {
   type AnswerEntry,
   type GardenSave,
 } from '../src/systems/garden';
-import { distractors, grade, makeQuestion } from '../src/systems/quiz';
+import { canAssemble, distractors, grade, makeQuestion } from '../src/systems/quiz';
 import type { GameMode } from '../src/types/farm';
 import { seeded } from './helpers';
 
@@ -160,20 +161,49 @@ describe('выбор задания', () => {
     let g = garden(['w.kot', 'w.pies', 'w.dom', 'p.dzien_dobry']);
     expect(pickTask(g, derive(g), 3, T0, dayOf(T0))).toBe('p.dzien_dobry');
     g = answer(g, 'w.pies', T0 + 1, 1);
-    expect(pickTask(g, derive(g), 1, T0 + 2, dayOf(T0))).toBe('w.pies');
-    expect(pickTask(g, derive(g), 1, T0 + 2, dayOf(T0), 'w.pies')).toBe('w.kot');
+    // у кого сегодня меньше ответов — раньше: pies уже отвечал, kot и dom ещё нет
+    expect(pickTask(g, derive(g), 1, T0 + 2, dayOf(T0))).not.toBe('w.pies');
+    // при равных ответах сегодня — ближе к урожаю (pies в росте дальше всех)
+    g = answer(answer(g, 'w.kot', T0 + 3, 1), 'w.dom', T0 + 4, 1);
+    expect(pickTask(g, derive(g), 1, T0 + 5, dayOf(T0))).toBe('w.pies');
+    expect(pickTask(g, derive(g), 1, T0 + 5, dayOf(T0), { recent: ['w.pies'] })).not.toBe('w.pies');
     expect(pickTask(newGarden(), derive(newGarden()), 1, T0, 0)).toBeNull();
   });
 });
 
 describe('уровень', () => {
   it('A0 → A0.5 (400) → A0.8 (800) → A1 (вся база)', () => {
-    expect(levelOf(0, 0, 1167, 398)).toEqual({ level: 'A0', ratio: 0 });
-    expect(levelOf(200, 0, 1167, 398).ratio).toBeCloseTo(0.5);
+    expect(levelOf(0, 0, 1167, 398)).toEqual({ level: 'A0', ratio: 0, next: { level: 'A0.1', words: 25 } });
+    expect(levelOf(300, 0, 1167, 398).ratio).toBeCloseTo(0.5);
     expect(levelOf(400, 0, 1167, 398).level).toBe('A0.5');
     expect(levelOf(800, 10, 1167, 398).level).toBe('A0.8');
     expect(levelOf(1167, 397, 1167, 398).level).toBe('A0.8');
-    expect(levelOf(1167, 398, 1167, 398)).toEqual({ level: 'A1', ratio: 1 });
+    expect(levelOf(1167, 398, 1167, 398)).toEqual({ level: 'A1', ratio: 1, next: null });
+  });
+  it('подуровни A0.1…A0.4: 25 / 50 / 100 / 200 выращенных слов, полоска внутри подуровня', () => {
+    const lv = (w: number) => levelOf(w, 0, 1167, 398).level;
+    expect([24, 25, 49, 50, 99, 100, 199, 200, 399].map(lv)).toEqual(['A0', 'A0.1', 'A0.1', 'A0.2', 'A0.2', 'A0.3', 'A0.3', 'A0.4', 'A0.4']);
+    expect(levelOf(75, 0, 1167, 398)).toMatchObject({ level: 'A0.2', next: { level: 'A0.3', words: 25 } });
+    expect(levelOf(75, 0, 1167, 398).ratio).toBeCloseTo(0.5);
+  });
+  it('частичный зачёт двигает полоску, но не меняет уровень и не перескакивает порог', () => {
+    const p = levelOf(0, 0, 1167, 398, { words: 5, phrases: 0 });
+    expect(p.level).toBe('A0');
+    expect(p.ratio).toBeCloseTo(5 / 25);
+    const cap = levelOf(24, 0, 1167, 398, { words: 10, phrases: 0 });
+    expect(cap.level).toBe('A0');
+    expect(cap.ratio).toBeLessThan(1);
+    // первый ответ уже заметен
+    expect(levelOf(0, 0, 1167, 398, { words: 0.1, phrases: 0 }).ratio).toBeGreaterThanOrEqual(0.03);
+  });
+  it('частичный зачёт растений: опыт/6, не больше 0,9 на растение, выращенные не считаются', () => {
+    let g = garden(['w.kot', 'w.pies']);
+    for (let i = 0; i < 4; i++) g = answer(g, 'w.kot', T0 + i, 1);
+    g = answer(g, 'w.pies', T0 + 9, 1);
+    const u = partialUnits(derive(g));
+    expect(u.phrases).toBe(0);
+    expect(u.words).toBeGreaterThan(0.1);
+    expect(u.words).toBeLessThanOrEqual(1.8);
   });
 });
 
@@ -228,13 +258,93 @@ describe('выбор задания по кругу', () => {
     for (let i = 0; i < 6; i++) for (const id of ['w.kot', 'w.pies', 'w.dom']) g = answer(g, id, ++t, 1);
     // все ростки, режим 1 им не помогает: идут по кругу
     const seen: string[] = [];
-    let last: string | null = null;
     for (let i = 0; i < 6; i++) {
-      const id: string = pickTask(g, derive(g), 1, t + 1, dayOf(t), last)!;
+      const id: string = pickTask(g, derive(g), 1, t + 1, dayOf(t), { recent: seen })!;
       seen.push(id);
       g = answer(g, id, ++t, 1);
-      last = id;
     }
     expect(new Set(seen).size).toBe(3);
+  });
+});
+
+describe('разнообразие очереди', () => {
+  const ids = WORDS.slice(0, 19).map((w) => w.id);
+  it('19 слов: за 19 заданий звучат все, одно слово не повторяется чаще раза в 6 заданий', () => {
+    let g = garden(ids);
+    const seen: string[] = [];
+    let t = T0;
+    for (let i = 0; i < 19; i++) {
+      const id = pickTask(g, derive(g), 1, t + 1, dayOf(t), { recent: seen })!;
+      seen.push(id);
+      g = answer(g, id, ++t, 1);
+    }
+    expect(new Set(seen).size).toBe(19);
+  });
+  it('пул из 3 слов: окно повтора = пул − 1, из 1 слова — повторять можно', () => {
+    let g = garden(ids.slice(0, 3));
+    const seen: string[] = [];
+    let t = T0;
+    for (let i = 0; i < 9; i++) {
+      const id = pickTask(g, derive(g), 1, t + 1, dayOf(t), { recent: seen })!;
+      if (i >= 2) expect(seen.slice(-2)).not.toContain(id);
+      seen.push(id);
+      g = answer(g, id, ++t, 1);
+    }
+    const one = garden(ids.slice(0, 1));
+    expect(pickTask(one, derive(one), 1, T0, dayOf(T0), { recent: ['w.' + 'x', ids[0]!] })).toBe(ids[0]);
+  });
+  it('перезревшее идёт первым даже при большом числе ответов', () => {
+    let g = garden(ids.slice(0, 4));
+    const h = T0;
+    // быстро вырастить первое слово и вернуть на грядку перезревшим
+    for (const [i, day] of [[0, 0], [1, 0], [2, 0], [3, 0]] as const) g = answer(g, ids[0]!, h + i + day, 1);
+    g = answer(g, ids[0]!, h + 10, 2);
+    g = answer(g, ids[0]!, D(1), 1);
+    g = answer(g, ids[0]!, D(2), 1);
+    expect(derive(g).items.get(ids[0]!)!.harvests).toBe(1);
+    const later = D(2) + 8 * DAY_MS;
+    expect(pickTask(g, derive(g), 1, later, dayOf(later))).toBe(ids[0]);
+  });
+});
+
+describe('короткие фразы и сборка', () => {
+  const assemble = (id: string) => canAssemble(PHRASE_BY_ID.get(id)!);
+  it('фразы из 1–2 плиток (в т.ч. «Dzień dobry.») не годятся для сборки, из ≥3 плиток — годятся', () => {
+    expect(canAssemble(PHRASE_BY_ID.get('p.dzien_dobry')!)).toBe(false);
+    expect(canAssemble(PHRASE_BY_ID.get('p.dobry_wieczor')!)).toBe(false);
+    const long = PHRASES.find((p) => p.tiles_pl.length >= 3 && p.tiles_ru.length >= 3)!;
+    expect(canAssemble(long)).toBe(true);
+  });
+  it('игры 3 и 4 берут только длинные фразы; игры 1 и 2 — слова и короткие фразы', () => {
+    const long = PHRASES.find((p) => canAssemble(p))!;
+    let g = garden(['w.dzien_dobry', 'p.dzien_dobry', long.id]);
+    const st = derive(g);
+    g = syncSlots(g, st, T0);
+    for (const m of [3, 4] as const) expect(pickTask(g, derive(g), m, T0, dayOf(T0), { assemble })).toBe(long.id);
+    const only = garden(['p.dzien_dobry']);
+    expect(pickTask(only, derive(only), 3, T0, dayOf(T0), { assemble })).toBeNull();
+    expect(pickTask(only, derive(only), 4, T0, dayOf(T0), { assemble })).toBeNull();
+    expect(pickTask(only, derive(only), 1, T0, dayOf(T0), { assemble })).toBe('p.dzien_dobry');
+    const seen = new Set<string>();
+    let g2 = g;
+    let t = T0;
+    for (let i = 0; i < 4; i++) {
+      const id = pickTask(g2, derive(g2), (i % 2 ? 2 : 1) as GameMode, t, dayOf(t), { assemble, recent: [...seen] })!;
+      seen.add(id);
+      g2 = answer(g2, id, ++t, 1);
+    }
+    expect(seen.has(long.id)).toBe(false);
+  });
+  it('задание 1/2 по короткой фразе: выбор из фраз, у куста — ввод с пунктуацией не по делу', () => {
+    const db = { word: (id: string) => WORD_BY_ID.get(id), phrase: (id: string) => PHRASE_BY_ID.get(id), words: WORDS, phrases: PHRASES };
+    const q1 = makeQuestion(1, 'p.dzien_dobry', db, seeded(2))!;
+    if (q1.kind !== 'choice') throw new Error('choice');
+    expect(q1.prompt).toBe('Dzień dobry.');
+    expect(q1.options).toHaveLength(4);
+    expect(new Set(q1.options).size).toBe(4);
+    expect(grade(q1, PHRASE_BY_ID.get('p.dzien_dobry')!.ru).ok).toBe(true);
+    const q2 = makeQuestion(2, 'p.dzien_dobry', db, seeded(2), true)!;
+    expect(q2.kind).toBe('type');
+    expect(grade(q2, 'dzien dobry').ok).toBe(true);
   });
 });

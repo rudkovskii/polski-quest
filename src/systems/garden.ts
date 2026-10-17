@@ -95,6 +95,8 @@ export interface ItemState {
   firstHarvestDay: number | null;
   lastAnswer: number | null;
   answers: number;
+  /** Весь опыт, набранный этим растением (для частичного зачёта на полоске, пока оно не выращено). */
+  xp: number;
 }
 
 export interface GardenState {
@@ -151,6 +153,7 @@ function plantItem(st: GardenState, e: PlantEntry): void {
     firstHarvestDay: null,
     lastAnswer: null,
     answers: 0,
+    xp: 0,
   });
 }
 
@@ -174,9 +177,11 @@ export function applyAnswer(st: GardenState, a: AnswerEntry): Outcome {
       it.lastHarvest = a.t;
       xp += XP.stage;
       st.xp += xp;
+      it.xp += xp;
       return { kind: 'harvest', xp, from, to: null, rejar: true };
     }
     st.xp += xp;
+    it.xp += xp;
     return { kind: 'water', xp, from, to: from };
   }
   it.drops++;
@@ -209,6 +214,7 @@ export function applyAnswer(st: GardenState, a: AnswerEntry): Outcome {
     xp += it.phrase ? XP.phrase : XP.word;
   }
   st.xp += xp;
+  it.xp += xp;
   return { kind, xp, from, to };
 }
 
@@ -324,40 +330,116 @@ export function canProgress(it: ItemState, side: Side, day: number, now: number)
 
 const STAGE_RANK: Record<string, number> = { seed: 0, sprout: 1, bush: 2 };
 
+export interface PickOpts {
+  /** Последние показанные id (самые свежие в конце): их не повторяем, пока есть из чего выбрать. */
+  recent?: readonly string[];
+  /** Можно ли собрать фразу из плиток (игры 3 и 4). Остальные фразы растут через игры 1 и 2 как слова. По умолчанию все. */
+  assemble?: (id: string) => boolean;
+}
+
+/** Сколько заданий подряд одно растение не повторяется: min(5, в пуле − 1). */
+export const repeatGap = (pool: number): number => Math.max(0, Math.min(5, pool - 1));
+
+/** Ответов по растениям за календарный день `day` (журнал дописывается по времени, идём с конца). */
+export function answersOnDay(g: GardenSave, day: number): Map<string, number> {
+  const out = new Map<string, number>();
+  for (let i = g.log.length - 1; i >= 0; i--) {
+    const a = g.log[i]!;
+    if (a.day < day) break;
+    if (a.day === day) out.set(a.id, (out.get(a.id) ?? 0) + 1);
+  }
+  return out;
+}
+
 /**
- * Следующее задание мини-игры из посаженного на грядках: перезревшие → ближе к урожаю (из тех, кому ответ сегодня
- * поможет) → давно не отвечал → новые; потом все остальные по давности. Подряд одно и то же не даёт, если есть выбор.
+ * Следующее задание мини-игры из посаженного на грядках. Игры 1 и 2 берут слова и «короткие» фразы (их не собрать из плиток),
+ * игры 3 и 4 — фразы, пригодные для сборки.
+ * Порядок: перезревшие → у кого сегодня меньше ответов (так проходим всех по кругу) → тем, кому ответ сегодня поможет →
+ * ближе к урожаю → давно не отвечал. Одно и то же растение не раньше, чем через `repeatGap` заданий.
  */
-export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: number, day: number, lastId: string | null = null): string | null {
-  const kind = modeKind(mode);
+export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: number, day: number, opts: PickOpts = {}): string | null {
   const side = sideOf(mode);
-  const pool = [...st.items.values()].filter((it) => (kind === 'phrase') === it.phrase && (g.slots[it.id] !== undefined || isOverripe(it, now)) && (it.stage !== null || isOverripe(it, now)));
+  const assemble = opts.assemble ?? (() => true);
+  const pool = [...st.items.values()].filter((it) => {
+    if (!(g.slots[it.id] !== undefined || isOverripe(it, now)) || !(it.stage !== null || isOverripe(it, now))) return false;
+    if (mode <= 2) return !it.phrase || !assemble(it.id);
+    return it.phrase && assemble(it.id);
+  });
   if (!pool.length) return null;
+  const today = answersOnDay(g, day);
+  const gap = repeatGap(pool.length);
+  const banned = new Set(gap > 0 ? (opts.recent ?? []).slice(-gap) : []);
   const key = (it: ItemState): number[] => {
     const over = isOverripe(it, now);
-    const group = over ? 0 : canProgress(it, side, day, now) ? 1 : 2;
-    const fresh = it.answers === 0 ? 1 : 0;
-    // Кому ответ сегодня не поможет, тех просто по кругу: кто давно не отвечал — первым.
-    const progress = group !== 1 ? 0 : (STAGE_RANK[it.stage ?? 'seed'] ?? 0) * 100 + it.days.size * 10 + it.drops;
-    return [group, fresh, -progress, it.lastAnswer ?? 0, g.slots[it.id] ?? 0];
+    const helps = over || canProgress(it, side, day, now);
+    const progress = helps ? (STAGE_RANK[it.stage ?? 'seed'] ?? 0) * 100 + it.days.size * 10 + it.drops : 0;
+    return [over ? 0 : 1, today.get(it.id) ?? 0, helps ? 0 : 1, it.answers === 0 ? 0 : 1, -progress, it.lastAnswer ?? 0, g.slots[it.id] ?? 0];
   };
   const sorted = pool
+    .filter((it) => !banned.has(it.id))
     .map((it) => ({ it, k: key(it) }))
     .sort((a, b) => {
       for (let i = 0; i < a.k.length; i++) if (a.k[i] !== b.k[i]) return a.k[i]! - b.k[i]!;
       return 0;
     });
-  const pick = sorted.find((x) => x.it.id !== lastId) ?? sorted[0]!;
-  return pick.it.id;
+  return (sorted[0]?.it ?? pool[0]!).id;
 }
 
-/** Уровень по выращенному: A0 → A0.5 (400 слов) → A0.8 (800) → A1 (вся база слов и фраз). */
-export function levelOf(words: number, phrases: number, totalWords: number, totalPhrases: number): { level: string; ratio: number } {
+/** Подуровни A0: порог по выращенным словам. Дальше A0.5 → A0.8 (800) → A1 (вся база слов и фраз). */
+export const SUBLEVELS: readonly (readonly [string, number])[] = [
+  ['A0', 0],
+  ['A0.1', 25],
+  ['A0.2', 50],
+  ['A0.3', 100],
+  ['A0.4', 200],
+  ['A0.5', 400],
+  ['A0.8', 800],
+];
+/** Частичный зачёт за растение, которое ещё не выращено: опыт/PARTIAL_XP, но не больше PARTIAL_CAP слова. */
+export const PARTIAL_XP = 6;
+export const PARTIAL_CAP = 0.9;
+
+/** Сколько «долей слова» набрали растущие растения (слова и фразы отдельно): полоска двигается с первых ответов. */
+export function partialUnits(st: GardenState): { words: number; phrases: number } {
+  const out = { words: 0, phrases: 0 };
+  for (const it of st.items.values()) {
+    if (it.harvests > 0) continue;
+    const u = Math.min(PARTIAL_CAP, it.xp / PARTIAL_XP);
+    if (it.phrase) out.phrases += u;
+    else out.words += u;
+  }
+  return out;
+}
+
+export interface LevelInfo {
+  level: string;
+  /** 0..1 внутри подуровня (выращенное + частичный зачёт, до 1 не доходит, пока порог не взят). */
+  ratio: number;
+  /** До следующего подуровня: его имя и сколько слов (на последнем шаге — слов и фраз) выращивать. null — A1. */
+  next: { level: string; words: number } | null;
+}
+
+/**
+ * Уровень по выращенному: A0 → A0.1 (25 слов) → A0.2 (50) → A0.3 (100) → A0.4 (200) → A0.5 (400) → A0.8 (800) → A1 (вся база).
+ * Название уровня — только по выращенному (A1 требует базы); полоска внутри подуровня смешанная: выращенное + частичный зачёт.
+ */
+export function levelOf(words: number, phrases: number, totalWords: number, totalPhrases: number, partial: { words: number; phrases: number } = { words: 0, phrases: 0 }): LevelInfo {
+  if (words >= totalWords && phrases >= totalPhrases) return { level: 'A1', ratio: 1, next: null };
+  const last = SUBLEVELS.length - 1;
+  let i = 0;
+  while (i < last && words >= SUBLEVELS[i + 1]![1]) i++;
+  const [level, lo] = SUBLEVELS[i]!;
+  if (i < last) {
+    const [nextLevel, hi] = SUBLEVELS[i + 1]!;
+    const units = words + partial.words;
+    let ratio = Math.min(0.99, Math.max(0, (units - lo) / (hi - lo)));
+    if (units > lo) ratio = Math.max(ratio, 0.03);
+    return { level, ratio, next: { level: nextLevel, words: hi - words } };
+  }
   const all = totalWords + totalPhrases;
-  if (words >= totalWords && phrases >= totalPhrases) return { level: 'A1', ratio: 1 };
-  if (words >= 800) return { level: 'A0.8', ratio: Math.min(1, (words + phrases - 800) / Math.max(1, all - 800)) };
-  if (words >= 400) return { level: 'A0.5', ratio: (words - 400) / 400 };
-  return { level: 'A0', ratio: words / 400 };
+  const units = words + phrases + partial.words + partial.phrases;
+  const ratio = Math.min(0.99, Math.max(0, (units - lo) / Math.max(1, all - lo)));
+  return { level, ratio, next: { level: 'A1', words: Math.max(0, totalWords - words) + Math.max(0, totalPhrases - phrases) } };
 }
 
 /** Нормализация раздела сохранения (мусор отбрасывается). */
