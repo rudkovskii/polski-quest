@@ -17,6 +17,8 @@ import {
   nextText,
   pickTask,
   plant,
+  progressText,
+  ripeSoon,
   sideOf,
   stageOf,
   statusOf,
@@ -46,12 +48,18 @@ export interface AnswerOut {
   tr: string;
   note?: string;
   act: FarmAct;
+  /** Что осталось этому растению после ответа («до урожая: ещё 1 день»). */
+  progress: string;
+  /** Сколько растений созреет завтра (сегодня уже засчитано, завтра последний день). */
+  tomorrow: number;
 }
 
 export interface Farm extends FarmApi {
   /** Следующее задание мини-игры (и `farm:focus` для героя). */
   next(mode: GameMode, only?: string): Question | null;
   answer(q: Question, given: string | readonly string[]): AnswerOut;
+  /** Скоро урожай: сегодня одним верным ответом и завтра. */
+  ripeSoon(): { today: number; tomorrow: number };
   /** Режим для «Повторить сейчас»: тот, что продвинет растение. */
   reviewMode(id: string): GameMode;
   plants(): PlantView[];
@@ -117,12 +125,13 @@ export function createFarm(d: FarmDeps): Farm {
     const p = PHRASE_BY_ID.get(pid);
     if (!p) return [];
     const now = d.now();
+    // P2a: фраза открывается, когда все её слова хотя бы ростки (раньше — кусты).
     return p.words.filter((w) => {
       if (!WORD_BY_ID.has(w)) return false;
       const it = st.items.get(w);
       if (!it) return true;
       if (it.harvests > 0) return false;
-      return (STAGE_RANK[stageOf(it, now) ?? 'seed'] ?? 0) < 2;
+      return (STAGE_RANK[stageOf(it, now) ?? 'seed'] ?? 0) < STAGE_RANK.sprout!;
     });
   };
 
@@ -138,7 +147,7 @@ export function createFarm(d: FarmDeps): Farm {
       drops: it?.drops ?? 0,
       sides: { pr: it?.sides.pr ?? false, rp: it?.sides.rp ?? false },
       days: it?.days.size ?? 0,
-      next: nextText(it, now),
+      next: nextText(it, now, today()),
       harvests: it?.harvests ?? 0,
       dueAt: it ? dueAt(it) : null,
       slot: g.slots[id] ?? null,
@@ -213,7 +222,8 @@ export function createFarm(d: FarmDeps): Farm {
       const it = st.items.get(id);
       const stage = it ? stageOf(it, now) : null;
       const typed = mode === 2 && (stage === 'bush' || stage === 'overripe');
-      const q = makeQuestion(mode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: WORDS, phrases: PHRASES }, rand, typed);
+      const made = makeQuestion(mode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: WORDS, phrases: PHRASES }, rand, typed);
+      const q = made && { ...made, progress: progressText(it, now, today()) };
       const slot = g.slots[id];
       const cell = slot !== undefined ? PLOT_CELLS[slot] : undefined;
       d.bus.emit('farm:focus', { id, tile: cell ? [cell[0], cell[1]] : null, label: plOf(id) });
@@ -244,8 +254,10 @@ export function createFarm(d: FarmDeps): Farm {
       changed();
       const c = content(q.id);
       const note = r.verdict === 'diacritics' ? 'Засчитано, но проверь польские буквы' : r.verdict === 'ortho' || r.verdict === 'typo' ? 'Засчитано, но есть ошибка в написании' : undefined;
-      return { ok: r.ok, correct: r.correct, ...c, ...(note ? { note } : {}), act };
+      const day = today();
+      return { ok: r.ok, correct: r.correct, ...c, ...(note ? { note } : {}), act, progress: progressText(st.items.get(q.id), now, day), tomorrow: ripeSoon(st, day).tomorrow };
     },
+    ripeSoon: () => ripeSoon(st, today()),
     reviewMode(id) {
       const it = st.items.get(id);
       if (isPhraseId(id) && assemble(id)) return it && !it.sides.rp ? 3 : it && !it.sides.pr ? 4 : 3;

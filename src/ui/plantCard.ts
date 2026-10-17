@@ -1,4 +1,4 @@
-// Карточка растения на грядке: слово, стадия, капли, стороны, дни и что нужно дальше. «Повторить сейчас» зовёт мини-игру.
+// Карточка растения на грядке: слово, стадия, капли, стороны, дни и что осталось до урожая (P2a: «До урожая: ещё 1 день»). «Повторить сейчас» зовёт мини-игру.
 import type { Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import type { FarmApi } from '../types/farm';
@@ -57,7 +57,7 @@ export function mountPlantCard(parent: HTMLElement, api: FarmApi, opts: PlantCar
         row('RU → PL', ok(i.sides.rp)),
         row('Дни с верными ответами', `${i.days} из 3`),
       ),
-      el('div', { class: 'pc-next', 'data-next': '' }, el('b', {}, 'Что нужно дальше: '), i.next || 'ничего, всё идёт как надо'),
+      el('div', { class: 'pc-next', 'data-next': '' }, el('b', {}, '🌱 '), i.next || 'Всё идёт как надо'),
       el(
         'div',
         { class: 'pc-btns' },
