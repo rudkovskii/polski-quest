@@ -327,8 +327,13 @@ export class LocationModel {
    * Тап в точку мира (в клетках, дробные): сначала видимая часть интерактивного спрайта (верх стола, доски, полки —
    * над их клетками коллизии), передний (ниже на экране) побеждает; потом клетки объектов и растений; потом дверь.
    */
-  targetAtPoint(x: number, y: number): string | null {
+  targetAtPoint(x: number, y: number, o: { doorZone?: boolean } = {}): string | null {
     const tile: Xy = [Math.floor(x), Math.floor(y)];
+    // Указатель первых шагов висит над дверью, то есть над клеткой подхода (коврик): тап по ней выводит сквозь дверь.
+    if (o.doorZone) {
+      const door = this.objects.find((e) => e.kind === 'exit' && e.at[0] === tile[0] && Math.abs(e.at[1] - tile[1]) === 1 && this.passable(tile[0], tile[1]));
+      if (door) return door.key;
+    }
     let best: WorldObject | null = null;
     for (const o of this.objects) {
       if (!o.use || o.kind !== 'prop' || o.src.type !== 'prop') continue;

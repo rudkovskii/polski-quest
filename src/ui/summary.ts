@@ -3,9 +3,11 @@ import type { Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import type { FarmApi } from '../types/farm';
 import { el } from './dom';
+import { TIP_CSS, type Tips } from './glossary';
 import { createPanel, nav } from './panel';
 
 const css = `
+${TIP_CSS}
 .sum { display: flex; flex-direction: column; gap: 10px; }
 .sum-hero { display: flex; gap: 10px; }
 .sum-big { flex: 1 1 0; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; padding: 10px; text-align: center; }
@@ -31,7 +33,7 @@ export interface SummaryScreen {
 
 const plural = (n: number): string => (n % 10 === 1 && n % 100 !== 11 ? 'слово' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'слова' : 'слов');
 
-export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>): SummaryScreen {
+export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips): SummaryScreen {
   const panel = createPanel({ title: '', bus });
   const content = el('div', { class: 'sum' });
   const closeBtn = el('button', { type: 'button', class: 'pq-btn', 'data-done': '', ...nav('done', 'v', 'done'), onclick: () => panel.close() }, 'Закрыть');
@@ -75,6 +77,7 @@ export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEve
         row('В мешке', s.bag),
         row('Ответов сегодня', s.answersToday),
       ),
+      ...[tips?.note('jar'), tips?.note('bag')].filter((n): n is HTMLElement => !!n),
     );
   }
 
@@ -82,6 +85,7 @@ export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEve
   panel.onClose(() => {
     off?.();
     off = null;
+    tips?.commit();
   });
   const show = (k: 'bin' | 'bed'): void => {
     kind = k;

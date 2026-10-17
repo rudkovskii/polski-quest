@@ -5,7 +5,8 @@ import type { BusEvents } from '../types/bus';
 import type { Phrase, Word } from '../types/content';
 import type { FarmApi, ItemInfo } from '../types/farm';
 import { el } from './dom';
-import { createPanel, nav, STAGE_RU } from './panel';
+import { STAGE_INFO, TIP_CSS, type Tips } from './glossary';
+import { createPanel, nav } from './panel';
 import { iconKeyOf, stageIcon, STAGE_ICON_CSS } from './stageIcon';
 
 type Tab = 'words' | 'phrases';
@@ -22,6 +23,9 @@ const GENDER: Record<NonNullable<Word['gender']>, string> = { m: 'м. р.', f: '
 
 const css = `
 ${STAGE_ICON_CSS}
+${TIP_CSS}
+.dict-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; opacity: .85; align-items: center; }
+.dict-legend span { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
 .dict { display: flex; flex-direction: column; gap: 10px; }
 .dict-tabs, .dict-filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .dict-tabs .pq-btn { flex: 1 1 0; font-size: 17px; }
@@ -78,7 +82,7 @@ interface Entry {
   fru: string;
 }
 
-export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>): DictionaryScreen {
+export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips): DictionaryScreen {
   const panel = createPanel({ title: 'Słownik · Словарь', wide: true, bus });
   const mkEntries = (xs: readonly (Word | Phrase)[]): Entry[] => xs.map((x) => ({ id: x.id, pl: x.pl, ru: x.ru, topic: x.topic, fpl: fold(x.pl), fru: fold(x.ru) }));
   const entries: Record<Tab, Entry[]> = { words: mkEntries(api.words), phrases: mkEntries(api.phrases) };
@@ -112,6 +116,15 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   );
   const bulk = el('button', { type: 'button', class: 'pq-btn small', 'data-bulk': '', hidden: true, ...nav('filters', 'h', 'bulk'), onclick: () => plantTopic() });
   const topicsCol = el('div', { class: 'dict-topics' });
+  // Легенда стадий: значок и русская подпись («кустик» вместо жаргона «куст»).
+  const legend = el(
+    'div',
+    { class: 'dict-legend', 'data-legend': '' },
+    ...(['seed', 'sprout', 'bush', 'ripe', 'overripe'] as const).map((st) => {
+      const stIco = stageIcon(STAGE_INFO[st].icon, import.meta.env.BASE_URL);
+      return el('span', { title: STAGE_INFO[st].hint, 'data-stage': st }, stIco, STAGE_INFO[st].ru);
+    }),
+  );
   const listCol = el('div', { class: 'dict-list' });
   const cardCol = el('div', { class: 'dict-card', 'data-card': '' });
   const note = el('span', { role: 'status', 'data-note': '' });
@@ -123,6 +136,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
       { class: 'dict' },
       el('div', { class: 'dict-tabs' }, ...tabBtns),
       el('div', { class: 'dict-tools' }, search, el('div', { class: 'dict-filters' }, ...filterBtns, bulk)),
+      legend,
       el('div', { class: 'dict-cols' }, topicsCol, el('div', {}, listCol), el('div', {}, cardCol)),
     ),
   );
@@ -167,6 +181,8 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   function renderTabs(): void {
     for (const b of tabBtns) b.classList.toggle('on', b.getAttribute('data-tab') === tab);
     for (const b of filterBtns) b.classList.toggle('on', b.getAttribute('data-filter') === filter);
+    // Чип темы подсвечивается по выбранной теме (раньше оставался на «Все»).
+    for (const b of topicsCol.querySelectorAll<HTMLElement>('.dict-topic')) b.classList.toggle('on', b.getAttribute('data-topic') === topic);
   }
 
   function renderTopics(): void {
@@ -214,19 +230,23 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     listCol.replaceChildren(...rows);
   }
 
-  function statusLine(i: ItemInfo, lock: boolean): string {
-    if (lock) return 'Закрыто: фраза откроется позже.';
+  /** Подпись стадии: значок и русское слово. */
+  const stageLabel = (st: NonNullable<ItemInfo['stage']>): HTMLElement =>
+    el('span', { class: 'stg', 'data-stage-label': st }, stageIcon(STAGE_INFO[st].icon, import.meta.env.BASE_URL), ` ${STAGE_INFO[st].ru}`);
+
+  function statusLine(i: ItemInfo, lock: boolean): (Node | string)[] {
+    if (lock) return ['Закрыто: фраза откроется позже.'];
     switch (i.status) {
       case 'new':
-        return 'Не посажено.';
+        return ['Не посажено.'];
       case 'bag':
-        return 'В мешке: ждёт свободную грядку.';
+        return ['В мешке: ждёт свободную грядку.'];
       case 'growing':
         return i.stage === 'overripe'
-          ? 'На грядке: перезрело, вернулось повторить.'
-          : `На грядке: ${i.stage ? STAGE_RU[i.stage] : 'растёт'}, капель 💧${i.drops}.${i.next ? ` Дальше: ${i.next}.` : ''}`;
+          ? ['На грядке: ', stageLabel('overripe'), '. Вернулось повторить.']
+          : ['На грядке: ', i.stage ? stageLabel(i.stage) : 'растёт', `, капель 💧${i.drops}.${i.next ? ` Дальше: ${i.next}.` : ''}`];
       case 'grown':
-        return `В банке${i.harvests ? ` (собрано раз: ${i.harvests})` : ''}.`;
+        return [`В банке${i.harvests ? ` (собрано раз: ${i.harvests})` : ''}.`];
     }
   }
 
@@ -259,7 +279,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
         el(
           'div',
           { class: 'lock', 'data-lock': '' },
-          '🔒 Откроется, когда эти слова станут кустом:',
+          '🔒 Откроется, когда эти слова вырастут до стадии «кустик»:',
           el(
             'ul',
             {},
@@ -271,7 +291,10 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
         ),
       );
     }
-    kids.push(el('div', { class: 'status', 'data-status': '' }, statusLine(i, lock)));
+    kids.push(el('div', { class: 'status', 'data-status': '' }, ...statusLine(i, lock)));
+    const tipId = i.status === 'bag' ? 'bag' : i.status === 'grown' ? 'jar' : null;
+    const tip = tipId ? tips?.note(tipId) : null;
+    if (tip) kids.push(tip);
     if (i.status === 'new') {
       kids.push(
         el('button', { type: 'button', class: 'pq-btn', 'data-plant': '', disabled: lock, ...nav('card', 'v', 'plant'), onclick: () => plantOne(id) }, 'Posadź · Посадить'),
@@ -311,6 +334,8 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   function plantOne(id: string): void {
     const r = api.plant([id]);
     say(r.bag > 0 ? 'В мешке: грядки заняты' : r.planted > 0 ? 'Посажено на грядку' : 'Уже посажено');
+    const bagTip = r.bag > 0 ? tips?.note('bag') : null;
+    if (bagTip) note.append(' ', bagTip);
     renderAll();
   }
 
@@ -319,6 +344,10 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     if (!ids.length) return;
     const r = api.plant(ids);
     say(`Посажено: ${r.planted}${r.bag > 0 ? `, в мешке (грядки заняты): ${r.bag}` : ''}`);
+    // Тема остаётся выбранной; фильтр «Не посажено» после посадки пуст, поэтому возвращаем «Все».
+    if (filter === 'new') filter = 'all';
+    const bagTip = r.bag > 0 ? tips?.note('bag') : null;
+    if (bagTip) note.append(' ', bagTip);
     renderAll();
   }
 
@@ -327,6 +356,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   panel.onClose(() => {
     off?.();
     off = null;
+    tips?.commit();
   });
 
   return {

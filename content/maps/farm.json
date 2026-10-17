@@ -154,7 +154,8 @@
     2,
     1
    ],
-   "shadow": 28
+   "shadow": 28,
+   "face": "left"
   },
   {
    "type": "prop",

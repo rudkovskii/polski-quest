@@ -23,6 +23,7 @@ import { mountSummary } from './ui/summary';
 import { mountDpad } from './ui/dpad';
 import { mountHints } from './ui/hints';
 import { mountGuide, type GuideStage } from './ui/hintsGuide';
+import { createTips } from './ui/glossary';
 import { mountHud } from './ui/hud';
 import { mountSettings } from './ui/settings';
 import { mountUpdateToast } from './ui/updateToast';
@@ -137,9 +138,11 @@ async function main(): Promise<void> {
     say: (id) => farm.say(id),
   });
   const board = mountBoard(overlay, { counts: () => (farm.refresh(), farm.counts()), onPick: (mode) => game.start(mode) });
-  const dictionary = mountDictionary(overlay, farm);
-  const pantry = mountPantry(overlay, farm);
-  const summary = mountSummary(overlay, farm);
+  // Пояснения «банка» и «мешок»: один раз, при первом показе (флаги `tip:*` в `Save.hints`).
+  const tips = createTips({ seen: hasHint, mark: addHint });
+  const dictionary = mountDictionary(overlay, farm, undefined, tips);
+  const pantry = mountPantry(overlay, farm, undefined, tips);
+  const summary = mountSummary(overlay, farm, undefined, tips);
   const plantCard = mountPlantCard(overlay, farm, { onReview: (id) => game.start(farm.reviewMode(id), id) });
   bus.on('world:interact', ({ use, id }) => {
     if (game.isOpen) return;
@@ -189,11 +192,28 @@ async function main(): Promise<void> {
   });
   bus.on('world:location', ({ controls }) => input.router.setMapControls(controls));
 
-  // Новая сборка: service worker уже новый — на старте перезагрузка сразу, в игре тост «Есть обновление».
-  const startedAt = Date.now();
+  // Новая сборка: service worker уже новый. Нет открытых экранов — тихая перезагрузка (прогресс дописан), иначе заметный тост.
   const reload = (): void => void reloadForUpdate(() => store.flush());
   bus.on('app:reload', reload);
-  const needReload = (): void => (updateAction({ started: Date.now() - startedAt > 3000, lastReloadAt: lastReloadAt(), now: Date.now() }) === 'reload' ? reload() : bus.emit('app:update', {}));
+  let screenOpen = false;
+  let updatePending = false;
+  const needReload = (): void => {
+    updatePending = true;
+    const busy = screenOpen || game.isOpen;
+    if (updateAction({ busy, lastReloadAt: lastReloadAt(), now: Date.now() }) === 'reload') reload();
+    else bus.emit('app:update', {});
+  };
+  // Экраны закрылись, а обновление ждёт: спросить политику снова.
+  const retryUpdate = (): void => {
+    if (updatePending && !screenOpen && !game.isOpen) needReload();
+  };
+  bus.on('world:input', ({ enabled }) => {
+    screenOpen = !enabled;
+    if (enabled) setTimeout(retryUpdate, 0);
+  });
+  bus.on('farm:auto', ({ on }) => {
+    if (!on) setTimeout(retryUpdate, 0);
+  });
   registerPwa({ onNeedReload: needReload });
   // Страница из старого кэша (HTTP-кэш index.html, встроенный браузер без SW): версия с сервера без кэша.
   watchVersion({ base: import.meta.env.BASE_URL, local: __BUILD_ID__, isStale: staleBuild, onStale: needReload });

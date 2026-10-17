@@ -8,12 +8,32 @@ export const PLANT_LABEL_MS = 2500;
 export class LabelGate {
   private key = '';
   private since = 0;
+  /** Ждём первую цель после выхода из экрана/мини-игры/старта: её подпись не показываем, пока герой не отойдёт и не вернётся. */
+  private armed = false;
+  private muted = '';
+
+  /** Сбросить подпись (закрылся экран, вышли из мини-игры, сцена началась): растение, у которого герой стоит сейчас, молчит. */
+  arm(): void {
+    this.key = '';
+    this.muted = '';
+    this.armed = true;
+  }
 
   /** `key` — что подписываем сейчас (null — ничего), `sticky` — держать без таймера. true = показывать. */
   show(key: string | null, now: number, sticky = false): boolean {
     if (!key) {
       this.key = '';
+      this.muted = '';
+      this.armed = false;
       return false;
+    }
+    if (sticky) this.armed = false;
+    else {
+      if (this.armed) {
+        this.armed = false;
+        this.muted = key;
+      }
+      if (key === this.muted) return false;
     }
     if (key !== this.key) {
       this.key = key;

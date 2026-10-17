@@ -167,7 +167,7 @@ export class World extends Phaser.Scene {
     const tx = Math.floor(p.x / T);
     const ty = Math.floor(p.y / T);
     if (tx < 0 || ty < 0 || tx >= this.model.parsed.w || ty >= this.model.parsed.h) return null;
-    const target = this.model.targetAtPoint(p.x / T, p.y / T);
+    const target = this.model.targetAtPoint(p.x / T, p.y / T, { doorZone: guideGoal !== null });
     return target ? { tile: [tx, ty], target } : { tile: [tx, ty] };
   }
 

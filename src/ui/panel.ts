@@ -1,6 +1,7 @@
 // Общая модалка экранов фермы (Słownik, Spiżarnia, коробка, кровать, карточка растения) в стиле меню Stardew.
 // Пока открыта: мир не принимает ввод (`world:input`), Esc/«✕»/тап мимо закрывают, стрелки ходят по `[data-nav]`,
 // Enter/Пробел нажимает текущий. Одновременно открыта одна панель.
+import { STAGE_INFO } from './glossary';
 import { bus as globalBus, type Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import type { Stage } from '../types/farm';
@@ -36,7 +37,7 @@ ${THEME_CSS}
 `;
 
 /** Стадия по-русски. */
-export const STAGE_RU: Record<Stage, string> = { seed: 'семя', sprout: 'росток', bush: 'куст', ripe: 'спелое', overripe: 'перезрело' };
+export const STAGE_RU: Record<Stage, string> = { seed: STAGE_INFO.seed.ru, sprout: STAGE_INFO.sprout.ru, bush: STAGE_INFO.bush.ru, ripe: STAGE_INFO.ripe.ru, overripe: STAGE_INFO.overripe.ru };
 
 /** Атрибуты навигационного элемента: `key` помогает вернуть фокус после перерисовки; `group` — для прыжков стрелками между блоками. */
 export function nav(group = '', axis: 'v' | 'h' = 'v', key = ''): Record<string, string> {

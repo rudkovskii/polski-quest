@@ -20,8 +20,8 @@ ${THEME_CSS}
   background: var(--pq-cream); color: var(--pq-ink); border: 2px solid var(--pq-ink); border-radius: 8px; box-shadow: 0 2px 0 var(--pq-ink); text-align: center;
   font: 700 14px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
 .pq-guide::after { content: ''; position: absolute; left: 50%; bottom: -7px; margin-left: -6px; border: 6px solid transparent; border-bottom: 0; border-top-color: var(--pq-ink); }
-.pq-guide-arrow { position: fixed; z-index: 33; pointer-events: none; width: 0; height: 0; margin: -12px 0 0 -11px; border: 11px solid transparent; border-bottom: 0;
-  border-top: 16px solid var(--pq-accent); filter: drop-shadow(0 2px 0 var(--pq-ink)); transform-origin: 50% 50%; }
+.pq-guide-arrow { position: fixed; z-index: 33; pointer-events: none; width: 0; height: 0; margin: -16px 0 0 -15px; border: 15px solid transparent; border-bottom: 0;
+  border-top: 22px solid var(--pq-accent); filter: drop-shadow(0 2px 0 var(--pq-ink)); transform-origin: 50% 50%; }
 .pq-guide-arrow[data-bob] { animation: pq-guide-bob .9s ease-in-out infinite; }
 .pq-guide[hidden], .pq-guide-arrow[hidden] { display: none; }
 @keyframes pq-guide-bob { 0%, 100% { translate: 0 -6px; } 50% { translate: 0 0; } }
@@ -39,8 +39,23 @@ export interface Guide {
   dispose(): void;
 }
 
-/** Стрелка у героя смотрит на цель, если цель за краем экрана или далеко; рядом с видимой целью — прыгает над ней. */
-const ARROW_GAP = 46;
+/** Отступы края экрана для стрелки-компаса: сверху HUD, снизу d-pad. */
+const EDGE = 28;
+const EDGE_TOP = 84;
+const EDGE_BOTTOM = 150;
+
+/** Точка, где луч из (x, y) в направлении (dx, dy) выходит из прямоугольника `box` (точка внутри него). */
+export function edgePoint(x: number, y: number, dx: number, dy: number, box: { l: number; r: number; t: number; b: number }): { x: number; y: number } {
+  const cx = Math.min(Math.max(x, box.l), box.r);
+  const cy = Math.min(Math.max(y, box.t), box.b);
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len;
+  const uy = dy / len;
+  const tx = ux > 0 ? (box.r - cx) / ux : ux < 0 ? (box.l - cx) / ux : Infinity;
+  const ty = uy > 0 ? (box.b - cy) / uy : uy < 0 ? (box.t - cy) / uy : Infinity;
+  const k = Math.min(tx, ty);
+  return { x: cx + ux * k, y: cy + uy * k };
+}
 
 export function mountGuide(parent: HTMLElement, deps: GuideDeps, bus: Bus<BusEvents> = globalBus): Guide {
   const bubble = el('div', { class: 'pq-guide', role: 'status', hidden: true, 'data-guide': '' });
@@ -67,7 +82,7 @@ export function mountGuide(parent: HTMLElement, deps: GuideDeps, bus: Bus<BusEve
     const vh = typeof innerHeight === 'number' && innerHeight > 0 ? innerHeight : p.target.y + 100;
     bubble.style.left = `${Math.round(Math.min(Math.max(p.hero.x, half + 6), vw - half - 6))}px`;
     bubble.style.top = `${Math.round(Math.max(p.hero.y - 8, (r.height || 30) + 6))}px`;
-    const onScreen = p.target.x > 16 && p.target.x < vw - 16 && p.target.y > 40 && p.target.y < vh - 16;
+    const onScreen = p.target.x > 16 && p.target.x < vw - 16 && p.target.y > 60 && p.target.y < vh - 110;
     arrow.hidden = false;
     if (onScreen) {
       arrow.dataset.bob = '';
@@ -76,11 +91,14 @@ export function mountGuide(parent: HTMLElement, deps: GuideDeps, bus: Bus<BusEve
       arrow.style.transform = '';
     } else {
       delete arrow.dataset.bob;
-      const dx = p.target.x - p.hero.x;
-      const dy = p.target.y - (p.hero.y + 20);
-      const len = Math.hypot(dx, dy) || 1;
-      arrow.style.left = `${Math.round(p.hero.x + (dx / len) * ARROW_GAP)}px`;
-      arrow.style.top = `${Math.round(p.hero.y + 20 + (dy / len) * ARROW_GAP)}px`;
+      // Цель за кадром: стрелка стоит у края экрана на луче от героя к цели (не у героя), смотрит на цель.
+      const hx = p.hero.x;
+      const hy = p.hero.y + 20;
+      const dx = p.target.x - hx;
+      const dy = p.target.y - hy;
+      const pos = edgePoint(hx, hy, dx, dy, { l: EDGE, r: vw - EDGE, t: EDGE_TOP, b: vh - EDGE_BOTTOM });
+      arrow.style.left = `${Math.round(pos.x)}px`;
+      arrow.style.top = `${Math.round(pos.y)}px`;
       // Треугольник смотрит вниз (0°): поворот к цели.
       arrow.style.transform = `rotate(${Math.round((Math.atan2(dy, dx) * 180) / Math.PI - 90)}deg)`;
     }
