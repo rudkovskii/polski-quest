@@ -237,7 +237,7 @@ export class LocationModel {
   }
 
   /**
-   * Автобег: дойти до клетки рядом с `target` (лучше снизу — герой смотрит вверх на грядку) и встать. Ввод игрока при этом
+   * Автобег: дойти до клетки рядом с `target` (лучше сбоку: высокий спрайт героя не закрывает растение) и встать. Ввод игрока при этом
    * выключен (мини-игра). Возвращает false, если уже стоит рядом (или дойти некуда).
    */
   walkNear(target: Xy, extra: readonly Rect[] = []): boolean {
@@ -248,15 +248,16 @@ export class LocationModel {
     const rects: Rect[] = extra.length ? [...extra] : [[target[0], target[1], 1, 1]];
     const here = this.from();
     const prefer: Xy[] = [];
-    if (!extra.length) for (const d of ['down', 'left', 'right', 'up'] as Dir[]) prefer.push([target[0] + DELTA[d][0], target[1] + DELTA[d][1]]);
+    if (!extra.length) for (const d of ['left', 'right', 'down', 'up'] as Dir[]) prefer.push([target[0] + DELTA[d][0], target[1] + DELTA[d][1]]);
     const goals = (prefer.length ? prefer : around(rects)).filter(([x, y]) => this.walkGrid().passable(x, y));
     if (goals.some((g) => eq(g, here))) {
       this.path = [];
       return false;
     }
-    // Растение: снизу, если туда можно дойти; иначе любая соседняя. Объект (коробка): ближайшая клетка рядом.
-    if (!extra.length) for (const g of goals) {
-      const r = findPath(this.walkGrid(), here, g);
+    // Растение: ближайшая клетка сбоку, если туда можно дойти; иначе любая соседняя. Объект (коробка): ближайшая рядом.
+    const side = extra.length ? [] : goals.filter((g) => g[1] === target[1]);
+    if (side.length) {
+      const r = findPathToAny(this.walkGrid(), here, side, target);
       if (r.exact && r.path.length) {
         this.path = r.path;
         return true;

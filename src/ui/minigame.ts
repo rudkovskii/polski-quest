@@ -227,6 +227,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     else if (q.kind === 'type') renderType();
     else renderTiles(q);
     if (q.kind !== 'type') setFocus(0);
+    reportHeight();
     requestAnimationFrame(reportHeight);
   };
 
