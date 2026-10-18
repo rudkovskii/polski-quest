@@ -1,13 +1,13 @@
 // Задания «Hymn i symbole»: чистая логика (без DOM), по просьбе движка (`Want`) строит задание, `check` проверяет ответ.
-// Гимн: gap (uzupełnij), next (co dalej), mean/gloss (co znaczy), order (kolejność строк/куплетов), tiles (ułóż wers), line (выбор строки по переводу),
-// karaoke (допой строку по словам). Символы: q (вопрос-шаблон), whose (czyj symbol), tiles, order (Lech), flag и godlo (сборка тап-тап).
+// Гимн (решение Шэфа 18.10: знать текст, перевод только справкой): gap (uzupełnij), next (co dalej), order (kolejność строк/куплетов),
+// tiles (ułóż następny wers по предыдущей строке), karaoke (допой строку по словам). Видов mean/gloss/line у строк больше нет. Символы: q (вопрос-шаблон), whose (czyj symbol), tiles, order (Lech), flag и godlo (сборка тап-тап).
 import type { GameCheck, GameCtx, GameTask, PolskaUnit, Want } from '../../types/polska';
 import { distractUnits, sameTiles, shuffle, wordsOf } from '../kit';
 import { parseMelody, type Note } from './melody';
 
 export type HymnMode = 'choice' | 'tiles' | 'order' | 'karaoke' | 'flag' | 'godlo';
 /** Тип задания внутри режима (для тестов и подсказок). */
-export type HymnKind = 'gap' | 'next' | 'mean' | 'gloss' | 'line' | 'q' | 'whose' | 'tiles' | 'order-lines' | 'order-stanzas' | 'order-lech' | 'karaoke' | 'flag' | 'godlo';
+export type HymnKind = 'gap' | 'next' | 'mean' | 'q' | 'whose' | 'tiles' | 'order-lines' | 'order-stanzas' | 'order-lech' | 'karaoke' | 'flag' | 'godlo';
 
 export interface KaraokeStep {
   /** Слово, которое надо выбрать (в написании строки). */
@@ -37,6 +37,8 @@ export interface HymnTask extends GameTask {
   parts?: Record<string, string[]>;
   /** Полный польский текст, который показать как «правильно». */
   full: string;
+  /** Справка после ответа: старые слова строки с переводом («pono — говорят»). Не спрашивается. */
+  fact?: string;
 }
 
 const VERSES = ['s1', 's2', 's3', 's4'] as const;
@@ -136,11 +138,24 @@ function hymnLineTask(ctx: GameCtx, u: PolskaUnit, want: Want): HymnTask | null 
   const st = stanzaOf(u.id);
   const mate = lines.filter((x) => stanzaOf(x.id) === st);
   const full = u.pl;
+  const fact = d.gloss.map((g) => `${g.pl} — ${cleanGloss(g.ru)}`).join(' · ');
+  const withFact = (t: HymnTask | null): HymnTask | null => (t && fact ? { ...t, fact } : t);
 
   const gap = (): HymnTask | null => {
     if (!d.gap || d.gap.options.length < 2) return null;
     const opts = d.gap.options.includes(d.gap.word) ? d.gap.options : [d.gap.word, ...d.gap.options];
-    return { ...base(u, 'A', false), mode: 'choice', kind: 'gap', prompt: gapText(u.pl, d.gap.word), lang: 'pl', hint: `Uzupełnij · ${u.ru}`, options: shuffle(opts, rand), answer: d.gap.word, full };
+    return { ...base(u, 'A', false), mode: 'choice', kind: 'gap', prompt: gapText(u.pl, d.gap.word), lang: 'pl', hint: 'Uzupełnij · Вставь пропущенное слово', options: shuffle(opts, rand), answer: d.gap.word, full };
+  };
+  /** Пропуск в любом слове строки (≥ 3 букв), варианты из лишних слов строки и слов гимна: запас, если в данных пропуска нет. */
+  const autoGap = (): HymnTask | null => {
+    const cand = d.tiles.filter((w) => w.replace(/[^\p{L}]/gu, '').length >= 3);
+    if (!cand.length) return null;
+    const word = pickOf(cand, rand);
+    const near = others(d.distract, [word], 2, rand);
+    const rest = others(lines.flatMap((x) => lineData(x).tiles), [word, ...near, ...d.tiles], 2 - near.length, rand);
+    const opts = [word, ...near, ...rest];
+    if (opts.length < 3) return null;
+    return { ...base(u, 'A', false), mode: 'choice', kind: 'gap', prompt: gapText(u.pl, word), lang: 'pl', hint: 'Uzupełnij · Вставь пропущенное слово', options: shuffle(opts, rand), answer: word, full };
   };
   const next = (): HymnTask | null => {
     const nid = nextLineId(u.id);
@@ -150,19 +165,6 @@ function hymnLineTask(ctx: GameCtx, u: PolskaUnit, want: Want): HymnTask | null 
     const rest = others(lines.map((x) => x.pl), [u.pl, nu.pl, ...near], 2 - near.length, rand);
     const opts = shuffle([nu.pl, ...near, ...rest], rand);
     return { ...base(u, 'A', false), mode: 'choice', kind: 'next', prompt: u.pl, lang: 'pl', hint: 'Co dalej? Какая строка идёт следом', options: opts, answer: nu.pl, full: nu.pl };
-  };
-  const mean = (): HymnTask => {
-    const wrong = distractUnits(u, lines, 'ru', rand, 2);
-    return { ...base(u, 'A', false), mode: 'choice', kind: 'mean', prompt: u.pl, lang: 'pl', hint: 'Co to znaczy? Что это значит', options: shuffle([u.ru, ...wrong], rand), answer: u.ru, full };
-  };
-  const gloss = (): HymnTask | null => {
-    const g = d.gloss[0] ? pickOf(d.gloss, rand) : null;
-    if (!g) return null;
-    const right = cleanGloss(g.ru);
-    const pool = lines.flatMap((x) => lineData(x).gloss.map((y) => cleanGloss(y.ru)));
-    const wrong = others(pool, [right], 2, rand);
-    if (wrong.length < 2) return null;
-    return { ...base(u, 'A', false), mode: 'choice', kind: 'gloss', prompt: `„${g.pl}”`, lang: 'pl', hint: `Co znaczy to słowo? (${u.pl})`, options: shuffle([right, ...wrong], rand), answer: right, full };
   };
   const orderLines = (): HymnTask | null => {
     if (mate.length < 3 || !mate.every((x) => ['sprout', 'up'].includes(lineStage(ctx, x.id)))) return null;
@@ -176,25 +178,30 @@ function hymnLineTask(ctx: GameCtx, u: PolskaUnit, want: Want): HymnTask | null 
     return { ...base(u, 'A', false), mode: 'order', kind: 'order-stanzas', prompt: 'Kolejność zwrotek', lang: 'pl', hint: 'Расставь куплеты по порядку (между ними — припев). Показана первая строка куплета', options: scramble(firsts, rand), answer: firsts, full: firsts.join(' · ') };
   };
 
+  /** Опора строки: предыдущая строка по-польски (как в песне); у начала гимна — «Początek hymnu». */
+  const prev = ((): PolskaUnit | undefined => {
+    const pid = prevLineId(u.id, 's1');
+    return pid ? ctx.unit(pid) : undefined;
+  })();
+  const cue = prev ? `… ${prev.pl}` : 'Początek hymnu';
+  const cueHint = (self: boolean): string => (prev ? `${self ? 'Ułóż następny wers sam' : 'Ułóż następny wers'} · Собери следующую строку${self ? ' сам' : ''}` : `${self ? 'Ułóż pierwszy wers sam' : 'Ułóż pierwszy wers'} · Собери первую строку гимна`);
+  const tilesTask = (side: 'A' | 'B', self: boolean): HymnTask => {
+    const pool = shuffle([...d.tiles, ...others(d.distract, d.tiles, self ? 2 : 1, rand)], rand);
+    return { ...base(u, side, self), mode: 'tiles', kind: 'tiles', prompt: cue, lang: 'pl', hint: cueHint(self), options: pool, answer: d.tiles, full };
+  };
+
   if (want.side === 'A') {
-    const menu: (() => HymnTask | null)[] = want.stage === 'seed' ? [gap, mean, gloss, gap, next] : [next, gap, orderLines, mean, gloss, orderStanzas, next];
+    // Решение Шэфа 18.10: гимн надо знать текстом, перевод — только справка после ответа. Заданий «что значит» и «строка по переводу» нет.
+    const menu: (() => HymnTask | null)[] = want.stage === 'seed' ? [gap, autoGap, next, gap] : [next, gap, orderLines, autoGap, orderStanzas, next];
     for (let i = 0; i < 8; i++) {
       const t = pickOf(menu, rand)();
-      if (t) return t;
+      if (t) return withFact(t);
     }
-    return gap() ?? mean();
+    return withFact(gap() ?? next() ?? autoGap() ?? tilesTask('A', false));
   }
 
-  // B: вспомнить и собрать. Без «сам» — плитки с переводом или выбор польской строки; «сам» — караоке или плитки без подсказок.
-  const tilesTask = (self: boolean): HymnTask => {
-    const pool = shuffle([...d.tiles, ...others(d.distract, d.tiles, 2, rand)], rand);
-    return { ...base(u, 'B', self), mode: 'tiles', kind: 'tiles', prompt: u.ru, lang: 'ru', hint: self ? 'Ułóż wers sam · Собери строку сам' : 'Ułóż wers · Собери строку', options: pool, answer: d.tiles, full };
-  };
-  const lineTask = (): HymnTask => {
-    const wrong = distractUnits(u, lines, 'pl', rand, 2);
-    return { ...base(u, 'B', false), mode: 'choice', kind: 'line', prompt: u.ru, lang: 'ru', hint: 'Wybierz wers · Выбери строку по-польски', options: shuffle([u.pl, ...wrong], rand), answer: u.pl, full };
-  };
-  if (!want.self) return rand() < 0.3 ? lineTask() : tilesTask(false);
+  // B: вспомнить и собрать по предыдущей строке (как в песне). Без «сам» — плитки с одним лишним словом; «сам» — караоке или плитки с лишними.
+  if (!want.self) return withFact(tilesTask('B', false));
 
   const mel = parseMelody(ctx.doc);
   const notes = mel.lines.get(u.id);
@@ -210,11 +217,12 @@ function hymnLineTask(ctx: GameCtx, u: PolskaUnit, want: Want): HymnTask | null 
     const pu = pid ? ctx.unit(pid) : undefined;
     const pn = pid ? mel.lines.get(pid) : undefined;
     return {
-      ...base(u, 'B', true), mode: 'karaoke', kind: 'karaoke', prompt: u.ru, lang: 'ru', hint: 'Karaoke · Допой строку: слова по одному', options: [], answer: d.tiles, full,
+      ...(fact ? { fact } : {}),
+      ...base(u, 'B', true), mode: 'karaoke', kind: 'karaoke', prompt: cue, lang: 'pl', hint: prev ? 'Karaoke · Допой следующую строку по словам' : 'Karaoke · Спой первую строку по словам', options: [], answer: d.tiles, full,
       steps, notes, bpm: mel.bpm, ...(pu && pn ? { ctxNotes: pn, ctxText: pu.pl } : {}),
     };
   }
-  return tilesTask(true);
+  return withFact(tilesTask('B', true));
 }
 
 function stanzaRu(ctx: GameCtx, id: string): string {
@@ -310,6 +318,11 @@ function hymnFallback(ctx: GameCtx, u: PolskaUnit, want: Want): HymnTask {
 const asWords = (answer: unknown): string[] | null => (Array.isArray(answer) ? answer.map(String) : null);
 
 export function checkTask(task: HymnTask, answer: unknown): GameCheck {
+  const r = checkRaw(task, answer);
+  return task.fact ? { ...r, note: task.fact } : r;
+}
+
+function checkRaw(task: HymnTask, answer: unknown): GameCheck {
   const full = task.full;
   switch (task.mode) {
     case 'choice':

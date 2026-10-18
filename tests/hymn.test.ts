@@ -200,9 +200,28 @@ describe('каждая единица: задание на все виды пр�
     });
   }
 
-  it('охват видов: пропуск, что дальше, значение, глосса, порядок строк и куплетов, плитки, выбор строки, караоке; символы: вопрос, чей, флаг, герб, легенда', () => {
-    const want: HymnKind[] = ['gap', 'next', 'mean', 'gloss', 'order-lines', 'order-stanzas', 'tiles', 'line', 'karaoke', 'q', 'whose', 'flag', 'godlo', 'order-lech'];
+  it('охват видов: пропуск, что дальше, порядок строк и куплетов, плитки, караоке; символы: вопрос, чей, флаг, герб, легенда', () => {
+    const want: HymnKind[] = ['gap', 'next', 'order-lines', 'order-stanzas', 'tiles', 'karaoke', 'q', 'whose', 'flag', 'godlo', 'order-lech'];
     expect([...seen].sort()).toEqual(expect.arrayContaining(want.sort()));
+  });
+
+  it('решение Шэфа 18.10: у строк гимна нет заданий на перевод (ни в вопросе, ни в вариантах), перевод — справкой после ответа', () => {
+    for (const bush of [false, true]) {
+      const s = mkPolska(bush);
+      for (const u of s.p.units('hymn').filter((x) => x.kind === 'hymn')) {
+        for (const w of WANTS) {
+          for (let seed = 1; seed <= 6; seed++) {
+            const ctx = ctxOf(s, seed * 31);
+            const t = makeTask(ctx, { ...w, id: u.id })!;
+            expect(['mean', 'gloss', 'line'], `${u.id} ${t.kind}`).not.toContain(t.kind);
+            expect(t.lang, `${u.id} ${t.kind}`).toBe('pl');
+            expect(t.prompt, u.id).not.toBe(u.ru);
+            expect(t.options, u.id).not.toContain(u.ru);
+            if (Array.isArray(u.raw.gloss) && u.raw.gloss.length) expect(game.check(t, solve(t), ctx).note, u.id).toBeTruthy();
+          }
+        }
+      }
+    }
   });
 
   it('«Что дальше»: верный ответ — следующая строка, дистракторы из гимна; у ref.4 такого задания нет', () => {
