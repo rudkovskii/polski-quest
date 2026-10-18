@@ -295,17 +295,30 @@ export function nextText(it: ItemState | undefined, now: number, day?: number): 
 /**
  * Скоро урожай: `today` — созреет сегодня одним верным ответом (куст, дни набраны с учётом сегодняшнего, по-польски был);
  * `tomorrow` — сегодня уже засчитан и завтра будет последний нужный день.
+ * `soon` (F5b) — растущие, которым после сегодняшнего зачёта до урожая остаётся один день, но которые пока не куст с
+ * польской стороной (в `today` и `tomorrow` не вошли): утром второго дня «сегодня созреет 0» не должно быть единственной новостью.
  */
-export function ripeSoon(st: GardenState, day: number): { today: number; tomorrow: number } {
+export function ripeSoon(st: GardenState, day: number): { today: number; tomorrow: number; soon: number } {
   let today = 0;
   let tomorrow = 0;
+  let soon = 0;
   for (const it of st.items.values()) {
-    if (it.stage !== 'bush' || !it.rpOk) continue;
+    if (it.stage === null) continue;
     const has = it.days.has(day);
-    if (it.days.size + (has ? 0 : 1) >= HARVEST_DAYS) today++;
-    else if (has && it.days.size + 1 >= HARVEST_DAYS) tomorrow++;
+    const days = it.days.size + (has ? 0 : 1);
+    if (it.stage === 'bush' && it.rpOk) {
+      if (days >= HARVEST_DAYS) {
+        today++;
+        continue;
+      }
+      if (has && it.days.size + 1 >= HARVEST_DAYS) {
+        tomorrow++;
+        continue;
+      }
+    }
+    if (days >= HARVEST_DAYS - 1) soon++;
   }
-  return { today, tomorrow };
+  return { today, tomorrow, soon };
 }
 
 /** Посадить: новые id в конец журнала посадок (уже посаженное пропускается). */
@@ -383,6 +396,8 @@ export interface PickOpts {
   reverse?: boolean;
   /** Это «редкое» задание: взять растение из-за пределов рабочего набора (каждое FOCUS_EVERY-е). */
   outside?: boolean;
+  /** Растения на паузе (игры 3 и 4 с одной-двумя фразами, F5b): их не берём вовсе, даже если больше брать нечего (тогда null). */
+  exclude?: ReadonlySet<string>;
 }
 
 /** Сколько заданий подряд одно растение не повторяется (P3a: было 5; при 5 очередь вынужденно крутит ≥ 6 растений и не концентрируется). */
@@ -514,13 +529,13 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
     ];
   };
   const sorted = pool
-    .filter((it) => !banned.has(it.id))
+    .filter((it) => !banned.has(it.id) && !opts.exclude?.has(it.id))
     .map((it) => ({ it, k: key(it) }))
     .sort((a, b) => {
       for (let i = 0; i < a.k.length; i++) if (a.k[i] !== b.k[i]) return a.k[i]! - b.k[i]!;
       return 0;
     });
-  return (sorted[0]?.it ?? pool[0]!).id;
+  return (sorted[0]?.it ?? pool.find((it) => !opts.exclude?.has(it.id)))?.id ?? null;
 }
 
 /** Подуровни A0: порог по выращенным словам. Дальше A0.5 → A0.8 (800) → A1 (вся база слов и фраз). */

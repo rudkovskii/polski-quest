@@ -2,7 +2,7 @@
 // с кнопкой «Na pole!». Раз в день: показанный день пишет склейка (`mark`, флаг `morning:<день>` в `Save.hints`).
 // Пока открыт экран или мини-игра, карточка ждёт: `world:input {enabled:true}` спросит снова.
 import { bus as globalBus, type Bus } from '../systems/bus';
-import { morningAction, type Recap } from '../systems/daygoal';
+import { morningAction, morningRipeLines, type Recap } from '../systems/daygoal';
 import type { BusEvents } from '../types/bus';
 import { el } from './dom';
 import { createPanel, nav } from './panel';
@@ -15,6 +15,8 @@ export interface MorningDeps {
   recap(): Recap | null;
   /** Сколько растений созреет сегодня одним верным ответом. */
   ripeToday(): number;
+  /** Растущих, которым до урожая остаётся день (`ripeSoon().soon`): показываются, когда сегодня созревать нечему. */
+  ripeSoon?(): number;
   /** Последний день, для которого утро уже было; null — не было. */
   seenDay(): number | null;
   /** Запомнить, что утро этого дня прошло. */
@@ -52,11 +54,12 @@ export function mountMorning(parent: HTMLElement, d: MorningDeps): Morning {
     if (act === 'none') return;
     d.mark(day);
     if (act !== 'show' || !recap) return;
-    const soon = d.ripeToday();
+    const r = morningRipeLines(d.ripeToday(), d.ripeSoon?.() ?? 0);
     text.replaceChildren(
       el('div', {}, el('b', {}, `${recap.label}:`), ` выращено ${recap.grown}, полито ${recap.watered}`),
-      el('div', {}, el('b', {}, 'Сегодня созреет:'), ` ${soon}`),
+      el('div', {}, el('b', {}, r.label), r.value),
     );
+    if (r.extra) text.append(el('div', { class: 'pq-morning-soon', 'data-soon': '' }, r.extra));
     panel.open();
     panel.focus('go');
   };

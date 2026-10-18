@@ -15,6 +15,7 @@ import { exportFileName, exportSave, importSave, type Save } from './systems/sav
 import { staleBuild, updateAction } from './systems/update';
 import type { BusEvents } from './types/bus';
 import { mountAudioToast } from './ui/audioToast';
+import { mountAssembleGap } from './ui/assembleGap';
 import { mountBoard } from './ui/board';
 import { mountDictionary } from './ui/dictionary';
 import { mountFloats } from './ui/float';
@@ -126,7 +127,10 @@ async function main(): Promise<void> {
   };
   mountHud(overlay, {
     onSettings: () => settings.open(),
-    goal: () => ({ watered: wateredOn(farm.garden.log, dayNow()), tomorrow: farm.ripeSoon().tomorrow }),
+    goal: () => {
+      const r = farm.ripeSoon();
+      return { watered: wateredOn(farm.garden.log, dayNow()), tomorrow: r.tomorrow, soon: r.soon };
+    },
     onGoal: () => {
       if (!game.isOpen) summary.openBed();
     },
@@ -144,12 +148,30 @@ async function main(): Promise<void> {
       const g = store.save.garden;
       if (!hasHint('guide:desk') && g.planted.length === 0) return 'desk';
       if (!hasHint('guide:board') && g.log.length === 0) return 'board';
+      // Играл и вырастил всё: на грядках пусто и нет ждущих в мешке. «Огород пуст · Посади ещё слов за столом» гаснет после посадки (F5b).
+      if (g.planted.length > 0 && g.log.length > 0) {
+        const s = farm.stats();
+        if (s.growing === 0 && s.bag === 0) return 'replant';
+      }
       return null;
     },
-    done: (stage) => addHint(`guide:${stage}`),
+    done: (stage) => {
+      if (stage !== 'replant') addHint(`guide:${stage}`);
+    },
+  });
+  // Игры 3 и 4 с одной-двумя фразами: после ответа фраза отдыхает, а панель предлагает посадить ещё (F5b).
+  const gapCard = mountAssembleGap(overlay, {
+    gap: (mode) => farm.gap(mode),
+    plant: (ids) => farm.plant(ids),
+    restart: (mode) => game.start(mode),
+    exit: () => game.stop(),
   });
   const game = mountMinigame(overlay, {
-    next: (mode, only) => farm.next(mode, only),
+    next: (mode, only) => {
+      const q = farm.next(mode, only);
+      if (!q && !only) queueMicrotask(() => gapCard.check(mode));
+      return q;
+    },
     answer: (q, given) => farm.answer(q, given),
     say: (id) => farm.say(id),
   });
@@ -166,6 +188,7 @@ async function main(): Promise<void> {
     today: dayNow,
     recap: () => recapBefore(farm.garden.log, farm.state.grownByDay, dayNow()),
     ripeToday: () => farm.ripeSoon().today,
+    ripeSoon: () => farm.ripeSoon().soon,
     seenDay: () => {
       const h = store.save.hints.find((x) => x.startsWith(MORNING));
       return h ? Number(h.slice(MORNING.length)) : null;

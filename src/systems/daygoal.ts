@@ -8,6 +8,8 @@ export interface DayGoal {
   watered: number;
   /** Растений, которые созреют завтра (`ripeSoon().tomorrow`). */
   tomorrow: number;
+  /** Растущих, которым после сегодняшнего зачёта остаётся один день до урожая (`ripeSoon().soon`, F5b). */
+  soon?: number;
 }
 
 /** Итог прошлой игры для утренней карточки. */
@@ -34,9 +36,22 @@ export function recapBefore(log: readonly Pick<AnswerEntry, 'day' | 'ok'>[], gro
   return { label: last === today - 1 ? 'Вчера' : 'В прошлый раз', day: last, grown: grownByDay.get(last) ?? 0, watered: wateredOn(log, last) };
 }
 
-/** Текст плашки HUD: «Сегодня: полито 8 · созреет завтра 5». */
+/**
+ * Текст плашки HUD: «Сегодня: полито 8 · созреет завтра 5». Завтра ничего не созреет, но к урожаю идут растения
+ * (им остаётся день): «Сегодня: полито 8 · к урожаю идут 10» (F5b: утром второго дня «ноль» не демотивирует).
+ */
 export function goalText(g: DayGoal): string {
-  return `Сегодня: полито ${g.watered}${g.tomorrow > 0 ? ` · созреет завтра ${g.tomorrow}` : ''}`;
+  const tail = g.tomorrow > 0 ? ` · созреет завтра ${g.tomorrow}` : g.soon && g.soon > 0 ? ` · к урожаю идут ${g.soon}` : '';
+  return `Сегодня: полито ${g.watered}${tail}`;
+}
+
+/**
+ * Строки утренней карточки про урожай. Сегодня есть что собирать — «Сегодня созреет: K». Иначе, если растения идут к урожаю
+ * (`soon`), честное «ноль» дополняется надеждой: «Сегодня созреет: 0 · к завтрашнему урожаю идут N: поливай сегодня».
+ */
+export function morningRipeLines(today: number, soon: number): { label: string; value: string; extra?: string } {
+  if (today > 0 || soon <= 0) return { label: 'Сегодня созреет:', value: ` ${today}` };
+  return { label: 'Сегодня созреет:', value: ` 0`, extra: `К урожаю идут ${soon}: поливай сегодня, и завтра они созреют` };
 }
 
 /** Нужна ли утренняя карточка: первый заход в новый день (флаг `seen` — последний показанный день) и есть что вспомнить. */

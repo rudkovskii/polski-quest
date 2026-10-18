@@ -113,6 +113,8 @@ export interface LocationOptions {
 
 /** Пикселей в клетке: для перевода размера спрайта в клетки. */
 const TILE_PX = 16;
+/** Сколько раз можно перепланировать подход к объекту, если герой остановился не рядом с ним. */
+const APPROACH_RETRIES = 2;
 
 const eq = (a: Xy, b: Xy): boolean => a[0] === b[0] && a[1] === b[1];
 const manhattan = (a: Xy, b: Xy): number => Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
@@ -200,6 +202,8 @@ export class LocationModel {
   private bumped = false;
   private path: Xy[] = [];
   private pending: string | null = null;
+  /** Сколько раз тап по объекту перепланировал подход, не дойдя до объекта. */
+  private retries = 0;
   private actionQueued = false;
   private exited = false;
   private out: WorldEvent[] = [];
@@ -565,7 +569,16 @@ export class LocationModel {
       if (o && this.near(o)) {
         this.faceTo(o);
         this.fire(o, 'tap');
+        this.retries = 0;
+        return false;
       }
+      // Пришли, но не к объекту (путь оборвался, клетку подхода занял кто-то на пути): заново к ближайшей клетке подхода, не молча (F5b).
+      if (o && o.use && this.retries < APPROACH_RETRIES) {
+        this.retries++;
+        this.planApproach(o);
+        return this.next();
+      }
+      this.retries = 0;
       return false;
     }
     if (this.actionQueued) {
@@ -631,6 +644,12 @@ export class LocationModel {
       return;
     }
     if (!o.use) return;
+    this.retries = 0;
+    this.planApproach(o);
+  }
+
+  /** Путь к клетке подхода объекта (лицо, потом любая вокруг); `pending` — после прихода слать `interact`. */
+  private planApproach(o: WorldObject): void {
     const here = this.from();
     const grid = this.walkGrid();
     const free = (c: Xy): boolean => grid.passable(c[0], c[1]) || eq(c, here);

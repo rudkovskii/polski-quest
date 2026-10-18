@@ -58,12 +58,17 @@ export interface AnswerOut {
   tomorrow: number;
 }
 
+/** Фраз в пуле сборки меньше этого — одну и ту же не крутим (F5b). */
+export const ASSEMBLE_POOL_MIN = 3;
+/** На сколько заданий (ответов в любой игре) фраза уходит на паузу после ответа, если в пуле сборки мало фраз. */
+export const PAUSE_TASKS = 3;
+
 export interface Farm extends FarmApi {
   /** Следующее задание мини-игры (и `farm:focus` для героя). */
   next(mode: GameMode, only?: string): Question | null;
   answer(q: Question, given: string | readonly string[]): AnswerOut;
   /** Скоро урожай: сегодня одним верным ответом и завтра. */
-  ripeSoon(): { today: number; tomorrow: number };
+  ripeSoon(): { today: number; tomorrow: number; soon: number };
   /** Режим для «Повторить сейчас»: тот, что продвинет растение. */
   reviewMode(id: string): GameMode;
   plants(): PlantView[];
@@ -71,6 +76,11 @@ export interface Farm extends FarmApi {
   counts(): { words: number; phrases: number; assemble: number };
   /** Пересчитать раскладку (время идёт: перезревшие возвращаются) и разослать грядки и опыт. */
   refresh(): void;
+  /**
+   * Игры 3 и 4: все фразы сборки на паузе (в пуле меньше `ASSEMBLE_POOL_MIN`, каждая только что отвечена), задание не выдаётся.
+   * Тогда панель предлагает посадить ещё (`hint`) или выйти. null — задание есть, или сборке нечего (фраз на грядках нет), или игра 1/2.
+   */
+  gap(mode: GameMode): { hint: PhraseHint | null } | null;
   /** Ближайшая ещё не посаженная фраза для сборки и что ей нужно (null — таких нет). */
   phraseHint(): PhraseHint | null;
   readonly garden: GardenSave;
@@ -89,6 +99,10 @@ export function createFarm(d: FarmDeps): Farm {
   let sinceReverse = REVERSE_EVERY - 1;
   /** Заданий выдано (P3a: каждое FOCUS_EVERY-е берётся из-за пределов рабочего набора). */
   let issued = 0;
+  /** Ответов дано (любая игра): отсчёт паузы фраз сборки. */
+  let answered = 0;
+  /** Фраза сборки → после какого числа ответов она снова в очереди (пока в пуле сборки < ASSEMBLE_POOL_MIN). */
+  const pausedUntil = new Map<string, number>();
   const listeners = new Set<() => void>();
 
   const today = (): number => {
@@ -97,12 +111,21 @@ export function createFarm(d: FarmDeps): Farm {
   };
 
   const grownWords = (): number => [...st.items.values()].filter((it) => !it.phrase && it.harvests > 0).length;
+  const growingWords = (): number => [...st.items.values()].filter((it) => !it.phrase && it.harvests === 0 && it.stage !== null).length;
   const grownPhrases = (): number => [...st.items.values()].filter((it) => it.phrase && it.harvests > 0).length;
   const level = (): LevelInfo => levelOf(grownWords(), grownPhrases(), WORDS.length, PHRASES.length, partialUnits(st));
   /** Фраза для сборки из плиток (иначе растёт в играх 1 и 2 как слово). */
   const assemble = (id: string): boolean => {
     const p = PHRASE_BY_ID.get(id);
     return !!p && canAssemble(p);
+  };
+
+  /** Фразы сборки на паузе: только пока их в пуле мало. */
+  const pausedAssemble = (): Set<string> => {
+    const out = new Set<string>();
+    if (farm.counts().assemble >= ASSEMBLE_POOL_MIN) return out;
+    for (const [id, until] of pausedUntil) if (until > answered) out.add(id);
+    return out;
   };
 
   const plants = (): PlantView[] => {
@@ -124,7 +147,7 @@ export function createFarm(d: FarmDeps): Farm {
   };
   const emitXp = (gain = 0, up = false): void => {
     const l = level();
-    d.bus.emit('hud:xp', { level: l.level, ratio: l.ratio, xp: st.xp, next: l.next, ...(gain ? { gain } : {}), ...(up ? { up } : {}) });
+    d.bus.emit('hud:xp', { level: l.level, ratio: l.ratio, xp: st.xp, next: l.next, growing: growingWords(), ...(gain ? { gain } : {}), ...(up ? { up } : {}) });
   };
   const changed = (): void => {
     d.save(g);
@@ -225,7 +248,8 @@ export function createFarm(d: FarmDeps): Farm {
       // «Наоборот» не в первые REVERSE_AFTER ответов: сначала привычная сторона (P3a).
       const canReverse = !only && mode <= 2 && sinceReverse >= REVERSE_EVERY - 1 && g.log.length >= REVERSE_AFTER;
       const outside = !only && ++issued % FOCUS_EVERY === 0;
-      const id = only ?? pickTask(g, st, mode, now, today(), { recent, assemble, reverse: canReverse, outside });
+      const exclude = !only && mode >= 3 ? pausedAssemble() : undefined;
+      const id = only ?? pickTask(g, st, mode, now, today(), { recent, assemble, reverse: canReverse, outside, ...(exclude?.size ? { exclude } : {}) });
       if (!id) {
         d.bus.emit('farm:focus', { id: null, tile: null, label: '' });
         return null;
@@ -256,6 +280,9 @@ export function createFarm(d: FarmDeps): Farm {
       const cell = slot !== undefined ? PLOT_CELLS[slot] : undefined;
       const e: AnswerEntry = { t: now, day: today(), id: q.id, side: sideOf(q.mode), ok: r.ok, mode: q.mode };
       g = { ...g, log: [...g.log, e] };
+      answered++;
+      // Игры 3 и 4 с одной-двумя фразами: ответленная фраза отдыхает 3 ответа, а не крутится по кругу (F5b).
+      if (q.mode >= 3 && farm.counts().assemble < ASSEMBLE_POOL_MIN) pausedUntil.set(q.id, answered + PAUSE_TASKS);
       const o = applyAnswer(st, e);
       g = syncSlots(g, st, now);
       const act: FarmAct = {
@@ -294,10 +321,19 @@ export function createFarm(d: FarmDeps): Farm {
       for (const p of plants()) p.phrase ? (phrases++, assemble(p.id) && long++) : words++;
       return { words, phrases, assemble: long };
     },
+    gap(mode) {
+      if (mode < 3) return null;
+      const n = farm.counts().assemble;
+      if (n === 0 || n >= ASSEMBLE_POOL_MIN) return null;
+      const paused = pausedAssemble();
+      const free = plants().some((p) => p.phrase && assemble(p.id) && !paused.has(p.id));
+      return free ? null : { hint: farm.phraseHint() };
+    },
     phraseHint() {
       let best: { p: (typeof PHRASES)[number]; miss: string[]; fresh: number } | null = null;
       for (const p of PHRASES) {
-        if (!canAssemble(p) || st.items.has(p.id)) continue;
+        // Только фразы сборки (≥ 3 плиток), не равные слову («Nie ma za co.» = слово «nie ma za co»: сборка не тренируется, F5b).
+        if (!canAssemble(p) || st.items.has(p.id) || equalsWord(p)) continue;
         const miss = missingWords(p.id);
         const fresh = miss.filter((w) => !st.items.has(w)).length;
         if (!best || miss.length < best.miss.length || (miss.length === best.miss.length && fresh < best.fresh)) best = { p, miss, fresh };
@@ -308,7 +344,8 @@ export function createFarm(d: FarmDeps): Farm {
         id: best.p.id,
         pl: best.p.pl,
         ru: best.p.ru,
-        need: best.miss.map(label),
+        // Одно слово не стоит в обеих строках: «Нужно» — ещё не посаженные, «Уже растут» — посаженные, но не ростки.
+        need: best.miss.filter((w) => !st.items.has(w)).map(label),
         growing: best.miss.filter((w) => st.items.has(w)).map(label),
         toPlant: best.miss.length ? best.miss.filter((w) => !st.items.has(w)) : [best.p.id],
         ready: best.miss.length === 0,
@@ -332,6 +369,16 @@ export function createFarm(d: FarmDeps): Farm {
     },
   };
   return farm;
+}
+
+const normPl = (s: string): string => s.toLowerCase().replace(/[.!?,;:…«»"']/g, '').replace(/\s+/g, ' ').trim();
+/** Фраза совпадает с одним из своих слов (то же написание): отдельной фразы тут нет, слово уже есть в базе. */
+function equalsWord(p: { pl: string; words: readonly string[] }): boolean {
+  const k = normPl(p.pl);
+  return p.words.some((w) => {
+    const x = WORD_BY_ID.get(w);
+    return !!x && normPl(x.pl) === k;
+  });
 }
 
 /** Игра 2 спрашивает ввод (экранная клавиатура), а не выбор: кустик, перезревшее или «почти кустик» (росток, обе стороны отвечены). */

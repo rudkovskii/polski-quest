@@ -56,8 +56,9 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(): void
       box.append(el('div', { style: 'font-weight:700' }, `Ближайшая фраза: «${hint.pl}»`), el('div', { class: 'pq-muted' }, hint.ru));
       if (hint.ready) box.append(el('div', {}, 'Её слова уже подросли: посади фразу, и сборка откроется.'));
       else {
-        box.append(el('div', { class: 'board-need' }, `Нужно: ${hint.need.join(', ')}`));
-        if (hint.growing.length) box.append(el('div', { class: 'pq-muted' }, `Уже растут: ${hint.growing.join(', ')}`));
+        // Одно слово — в одной строке: что осталось посадить и что уже растёт (подрастёт до ростка).
+        if (hint.need.length) box.append(el('div', { class: 'board-need' }, `Нужно: ${hint.need.join(', ')}`));
+        if (hint.growing.length) box.append(el('div', { class: 'pq-muted board-growing' }, `Уже растут: ${hint.growing.join(', ')}`));
       }
       if (hint.toPlant.length && deps.plant) {
         const ids = hint.toPlant;

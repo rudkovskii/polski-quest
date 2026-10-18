@@ -45,7 +45,7 @@ export function wordsRu(n: number): string {
 export interface Hud {
   root: HTMLElement;
   gear: HTMLButtonElement;
-  setXp(level: string, ratio: number, next?: { level: string; words: number } | null): void;
+  setXp(level: string, ratio: number, next?: { level: string; words: number } | null, growing?: number): void;
   dispose(): void;
 }
 
@@ -79,18 +79,19 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
     if (document.visibilityState === 'visible') paintGoal();
   };
   document.addEventListener('visibilitychange', onVisible);
-  const setXp = (level: string, ratio: number, next?: { level: string; words: number } | null): void => {
+  const setXp = (level: string, ratio: number, next?: { level: string; words: number } | null, growing = 0): void => {
     const r = Math.max(0, Math.min(1, ratio));
     lvl.textContent = level;
     // Подсказка у полоски: сколько слов вырастить до следующего подуровня (нет поля — молчим, null — A1 достигнут).
     if (next === undefined) nextEl.textContent = '';
-    else nextEl.textContent = next ? `до ${next.level}: ${next.words} ${wordsRu(next.words)}` : 'A1 достигнут';
+    // «до A0.1: 25 слов · уже растут 11»: полоска идёт по частичному зачёту, а число слов — по выращенным; без второй части два дня «не двигается» (F5b).
+    else nextEl.textContent = next ? `до ${next.level}: ${next.words} ${wordsRu(next.words)}${growing > 0 ? ` · уже растут ${growing}` : ''}` : 'A1 достигнут';
     bar.setAttribute('aria-valuetext', nextEl.textContent || `${Math.round(r * 100)}%`);
     fill.style.width = `${Math.round(r * 100)}%`;
     bar.setAttribute('aria-valuenow', String(Math.round(r * 100)));
   };
-  const off = bus.on('hud:xp', ({ level, ratio, gain, up, next }) => {
-    setXp(level, ratio, next);
+  const off = bus.on('hud:xp', ({ level, ratio, gain, up, next, growing }) => {
+    setXp(level, ratio, next, growing);
     paintGoal();
     if (gain && gain > 0) {
       const g = el('span', { class: 'pq-xp-gain', 'data-xp-gain': '' }, `+${gain}`);
