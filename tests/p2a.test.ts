@@ -59,10 +59,11 @@ describe('P2a: очередь ведёт к урожаю', () => {
     }
   });
 
-  it('только игра 2 (или только игра 1): 19 слов, 3 дня по 20 ответов → не меньше 8 урожаев за счёт заданий «наоборот»', () => {
+  it('только игра 2 (или только игра 1): 19 слов, 3 дня по 20 ответов → не меньше 6 урожаев за счёт заданий «наоборот»', () => {
+    // P3a: «наоборот» открывается позже (после 10 ответов и двух ответов слова в его стороне), поэтому в одной игре чуть медленнее.
     for (const seed of [1, 2, 3]) {
-      expect(play(() => 2, 20, seed)).toBeGreaterThanOrEqual(8);
-      expect(play(() => 1, 20, seed)).toBeGreaterThanOrEqual(8);
+      expect(play(() => 2, 20, seed)).toBeGreaterThanOrEqual(6);
+      expect(play(() => 1, 20, seed)).toBeGreaterThanOrEqual(6);
     }
   });
 
@@ -89,6 +90,12 @@ describe('P2a: очередь ведёт к урожаю', () => {
     const t = setup();
     t.farm.plant(['w.kot']);
     for (let i = 0; i < 2; i++) {
+      const q = t.farm.next(2, 'w.kot')!;
+      t.farm.answer(q, q.answer);
+    }
+    // P3a: в первые 10 ответов «наоборот» не бывает.
+    expect(t.farm.next(2)!.reverse).toBeUndefined();
+    for (let i = 0; i < 8; i++) {
       const q = t.farm.next(2, 'w.kot')!;
       t.farm.answer(q, q.answer);
     }

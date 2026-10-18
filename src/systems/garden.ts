@@ -90,6 +90,8 @@ export interface ItemState {
   sides: Record<Side, boolean>;
   days: Set<number>;
   rpOk: boolean;
+  /** Ответов по сторонам (с польского / по-польски) (P3a: «наоборот» не раньше двух ответов в прямой стороне). */
+  sideAns: Record<Side, number>;
   harvests: number;
   lastHarvest: number | null;
   firstHarvestDay: number | null;
@@ -148,6 +150,7 @@ function plantItem(st: GardenState, e: PlantEntry): void {
     sides: { pr: false, rp: false },
     days: new Set(),
     rpOk: false,
+    sideAns: { pr: 0, rp: 0 },
     harvests: 0,
     lastHarvest: null,
     firstHarvestDay: null,
@@ -163,6 +166,7 @@ export function applyAnswer(st: GardenState, a: AnswerEntry): Outcome {
   if (!it) return { kind: 'none', xp: 0, from: null, to: null };
   it.lastAnswer = a.t;
   it.answers++;
+  it.sideAns[a.side]++;
   st.answersByDay.set(a.day, (st.answersByDay.get(a.day) ?? 0) + 1);
   const from = stageOf(it, a.t);
   if (!a.ok) {
@@ -377,10 +381,14 @@ export interface PickOpts {
   assemble?: (id: string) => boolean;
   /** Можно дать задание «наоборот» (игры 1 и 2): тогда нужда в другой стороне тоже поднимает слово в очереди. */
   reverse?: boolean;
+  /** Это «редкое» задание: взять растение из-за пределов рабочего набора (каждое FOCUS_EVERY-е). */
+  outside?: boolean;
 }
 
-/** Сколько заданий подряд одно растение не повторяется: min(5, в пуле − 1). */
-export const repeatGap = (pool: number): number => Math.max(0, Math.min(5, pool - 1));
+/** Сколько заданий подряд одно растение не повторяется (P3a: было 5; при 5 очередь вынужденно крутит ≥ 6 растений и не концентрируется). */
+export const REPEAT_GAP = 3;
+/** Сколько заданий подряд одно растение не повторяется: min(REPEAT_GAP, в пуле − 1). */
+export const repeatGap = (pool: number): number => Math.max(0, Math.min(REPEAT_GAP, pool - 1));
 
 /** Ответов по растениям за календарный день `day` (журнал дописывается по времени, идём с конца). */
 export function answersOnDay(g: GardenSave, day: number): Map<string, number> {
@@ -399,6 +407,7 @@ export function answersOnDay(g: GardenSave, day: number): Map<string, number> {
 export function wantsReverse(it: ItemState, mode: GameMode, day: number, now: number): boolean {
   if (mode > 2 || it.stage === null || isOverripe(it, now)) return false;
   const side = sideOf(mode);
+  if (it.sideAns[side] < REVERSE_MIN_DIRECT) return false;
   const other: Side = side === 'pr' ? 'rp' : 'pr';
   if (harvestsNow(it, side, day)) return false;
   if (harvestsNow(it, other, day)) return true;
@@ -407,6 +416,20 @@ export function wantsReverse(it: ItemState, mode: GameMode, day: number, now: nu
 
 /** Задание «наоборот» не чаще, чем каждое REVERSE_EVERY-е. */
 export const REVERSE_EVERY = 3;
+/** «Наоборот» не раньше, чем у слова столько верных ответов в прямой стороне игры (P3a). */
+export const REVERSE_MIN_DIRECT = 2;
+/** «Наоборот» не в первые столько заданий за всё время (первый день: новичку сначала нужна привычная сторона). */
+export const REVERSE_AFTER = 10;
+/** Рабочий набор очереди: столько ближайших к урожаю растений получают почти все задания (P3a). */
+export const FOCUS_SIZE = 8;
+/** Из скольких заданий одно берётся из-за пределов рабочего набора. */
+export const FOCUS_EVERY = 5;
+
+/** На сегодня больше нечего дать: ни стадии, ни зачёта дня (куст уже засчитан сегодня и с «по-польски»). Уходит в конец очереди. */
+export function settledToday(it: ItemState, day: number, now: number): boolean {
+  if (it.stage !== 'bush' || isOverripe(it, now)) return false;
+  return !(['pr', 'rp'] as Side[]).some((s) => canProgress(it, s, day, now) || harvestsNow(it, s, day));
+}
 
 /** Верный ответ в эту сторону сейчас соберёт урожай. */
 export function harvestsNow(it: ItemState, side: Side, day: number): boolean {
@@ -448,15 +471,33 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
   const banned = new Set(gap > 0 ? (opts.recent ?? []).slice(-gap) : []);
   const other: Side = side === 'pr' ? 'rp' : 'pr';
   const rev = !!opts.reverse && mode <= 2;
+  // «Наоборот» только растениям, у которых уже есть 2 верных ответа в прямой стороне игры.
+  const revFor = (it: ItemState): boolean => rev && it.sideAns[side] >= REVERSE_MIN_DIRECT;
+  const progressOf = (it: ItemState): number => (STAGE_RANK[it.stage ?? 'seed'] ?? 0) * 100 + it.days.size * 10 + it.drops;
+  // Рабочий набор (P3a): FOCUS_SIZE ближайших к урожаю растений, которым сегодня ещё есть что дать; порядок устойчивый (по посадке).
+  const focus = new Set(
+    pool
+      .filter((it) => it.stage !== null && !settledToday(it, day, now))
+      .sort((a, b) => progressOf(b) - progressOf(a) || b.answers - a.answers || a.plantedAt - b.plantedAt || (g.slots[a.id] ?? 0) - (g.slots[b.id] ?? 0))
+      .slice(0, FOCUS_SIZE)
+      .map((it) => it.id),
+  );
   const key = (it: ItemState): number[] => {
     const over = isOverripe(it, now);
-    const helps = over || canProgress(it, side, day, now) || (rev && canProgress(it, other, day, now));
-    const progress = (STAGE_RANK[it.stage ?? 'seed'] ?? 0) * 100 + it.days.size * 10 + it.drops;
+    const r = revFor(it);
+    const helps = over || canProgress(it, side, day, now) || (r && canProgress(it, other, day, now));
+    const progress = progressOf(it);
     const day0 = !over && needsDay(it, day);
-    const side0 = !over && !day0 && (needsSide(it, side) || (rev && needsSide(it, other)));
+    const side0 = !over && !day0 && (needsSide(it, side) || (r && needsSide(it, other)));
+    const inFocus = focus.has(it.id);
     return [
+      // Созревшее на сегодня (зачёт дня есть, до урожая нужен только следующий день) — в самый конец.
+      settledToday(it, day, now) ? 1 : 0,
       over ? 0 : 1,
-      !over && (harvestsNow(it, side, day) || (rev && harvestsNow(it, other, day))) ? 0 : 1,
+      !over && (harvestsNow(it, side, day) || (r && harvestsNow(it, other, day))) ? 0 : 1,
+      // Рабочий набор вперёд; для «редкого» задания (каждое FOCUS_EVERY-е) — наоборот, остальные вперёд, ближние к урожаю раньше.
+      opts.outside ? (inFocus ? 1 : 0) : inFocus ? 0 : 1,
+      opts.outside && !inFocus ? -progress : 0,
       day0 ? 0 : 1,
       side0 ? 0 : 1,
       day0 || side0 ? -progress : 0,

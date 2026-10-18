@@ -79,31 +79,22 @@ describe('ферма: фасад', () => {
     expect(last.next).toEqual({ level: 'A0.1', words: 25 });
   });
 
-  it('очередь: за 17 ответов проходят все 19 посаженных, одно слово не чаще раза в 6 заданий', () => {
+  it('очередь (P3a): 19 посаженных, очередь концентрируется на рабочем наборе, слово не чаще раза в 4 задания', () => {
     const s = setup();
     const f = s.farm;
-    const ids = f.words.slice(0, 19).map((w) => w.id);
-    f.plant(ids);
+    f.plant(f.words.slice(0, 19).map((w) => w.id));
     const seen: string[] = [];
-    // P2a: каждое 3-е задание может быть «наоборот» (слову с одним поливом нужна другая сторона); свои задания идут по кругу.
-    const own: string[] = [];
-    while (own.length < 19) {
-      const q = f.next(1)!;
-      seen.push(q.id);
-      if (!q.reverse) own.push(q.id);
-      f.answer(q, q.kind === 'choice' ? q.answer : '');
-    }
-    expect(new Set(own).size).toBe(19);
-    expect(seen.length).toBeLessThanOrEqual(29);
-    // 19 верных ответов уже заметно двигают полоску A0 → A0.1, хотя выращенного ещё нет
-    expect(f.stats()).toMatchObject({ level: 'A0', grownWords: 0 });
-    expect(f.stats().ratio).toBeGreaterThan(0.1);
-    // и дальше второй круг не повторяет слова встык
     for (let i = 0; i < 40; i++) {
       const q = f.next(i % 2 ? 2 : 1)!;
       seen.push(q.id);
       f.answer(q, q.kind === 'choice' ? q.answer : q.kind === 'type' ? q.answer : '');
     }
-    for (let i = 5; i < seen.length; i++) expect(seen.slice(i - 5, i)).not.toContain(seen[i]);
+    for (let i = 3; i < seen.length; i++) expect(seen.slice(i - 3, i)).not.toContain(seen[i]);
+    // Первые 19 заданий не размазаны по всем 19: рабочий набор (до 8) и по одному «редкому» из 5.
+    expect(new Set(seen.slice(0, 19)).size).toBeLessThanOrEqual(13);
+    expect(new Set(seen.slice(0, 19)).size).toBeGreaterThanOrEqual(8);
+    // ответы двигают полоску A0, хотя выращенного ещё нет
+    expect(f.stats()).toMatchObject({ level: 'A0', grownWords: 0 });
+    expect(f.stats().ratio).toBeGreaterThan(0.1);
   });
 });
