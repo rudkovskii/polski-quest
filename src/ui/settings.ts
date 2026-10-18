@@ -1,4 +1,4 @@
-// Настройки: звук, экспорт и импорт сохранения файлом, сброс (с автоэкспортом перед стиранием).
+// Настройки: звук, громкость эффектов, экспорт и импорт сохранения файлом, сброс (с автоэкспортом перед стиранием).
 // Пока панель открыта, мир не принимает ввод (`world:input`), Esc закрывает.
 import { bus as globalBus, type Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
@@ -17,6 +17,10 @@ ${THEME_CSS}
 .pq-card .pq-btn { width: 100%; }
 .pq-toggle[aria-pressed=true] { background: #5a8f3e; }
 .pq-toggle:disabled { opacity: .6; cursor: default; }
+.pq-vol { display: flex; align-items: center; gap: 10px; }
+.pq-vol input { flex: 1 1 auto; min-width: 0; accent-color: var(--pq-wood); }
+.pq-vol input:disabled { opacity: .5; }
+.pq-vol output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; }
 .pq-card .ver { font-size: 11px; opacity: .55; text-align: center; user-select: text; -webkit-user-select: text; }
 .pq-card .ver:empty { display: none; }
 `;
@@ -25,6 +29,9 @@ export interface SettingsDeps {
   bus?: Bus<BusEvents>;
   getSound(): boolean;
   setSound(on: boolean): void;
+  /** Громкость эффектов, 0–100 %. */
+  getSfxVolume?(): number;
+  setSfxVolume?(v: number): void;
   /** Скачать сохранение файлом (возвращает имя файла). */
   exportSave(): string;
   /** Импорт: текст файла → сообщение для игрока; ok = сохранение принято (страница перезагрузится). */
@@ -63,6 +70,22 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     deps.setSound(!deps.getSound());
     paintSound();
   };
+  // Громкость эффектов: при `?mute=1` слайдер виден, но неактивен.
+  const vol = el('input', { type: 'range', min: '0', max: '100', step: '5', 'aria-label': 'Громкость эффектов', 'data-sfx-volume': '' });
+  const volOut = el('output', { 'data-sfx-volume-out': '' });
+  const paintVol = (): void => {
+    const v = Math.round(deps.getSfxVolume?.() ?? 60);
+    vol.value = String(v);
+    volOut.textContent = `${v}%`;
+    vol.disabled = !!deps.muted || !deps.setSfxVolume;
+    if (deps.muted) vol.title = 'Звук выключен ссылкой (?mute=1)';
+  };
+  vol.addEventListener('input', () => {
+    if (vol.disabled) return;
+    const v = Math.min(100, Math.max(0, Number(vol.value) || 0));
+    deps.setSfxVolume?.(v);
+    volOut.textContent = `${v}%`;
+  });
   const file = el('input', { type: 'file', accept: 'application/json,.json', hidden: true });
   file.onchange = async () => {
     const f = file.files?.[0];
@@ -89,6 +112,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     { class: 'pq-card', role: 'dialog', 'aria-label': 'Настройки' },
     el('h2', {}, 'Настройки'),
     el('div', { class: 'row' }, el('span', {}, 'Звук'), sound),
+    el('label', { class: 'pq-vol' }, el('span', {}, 'Громкость эффектов'), vol, volOut),
     el('button', { type: 'button', class: 'pq-btn', 'data-export': '', onclick: () => (note.textContent = `Сохранено: ${deps.exportSave()}`) }, 'Экспорт сохранения'),
     el('button', { type: 'button', class: 'pq-btn', 'data-import': '', onclick: () => file.click() }, 'Импорт сохранения'),
     file,
@@ -115,6 +139,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
       reset.disabled = false;
       note.textContent = '';
       paintSound();
+      paintVol();
       root.hidden = false;
       bus.emit('world:input', { enabled: false });
     },

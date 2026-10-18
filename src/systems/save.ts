@@ -16,7 +16,12 @@ export interface Position {
 export interface Settings {
   /** Озвучка включена. */
   sound: boolean;
+  /** Громкость эффектов (шаги, урожай, ответы), 0–100 %. По умолчанию SFX_VOLUME_DEFAULT. */
+  sfxVolume: number;
 }
+
+/** Громкость эффектов по умолчанию, %. */
+export const SFX_VOLUME_DEFAULT = 60;
 
 export interface Save {
   v: number;
@@ -31,7 +36,7 @@ export interface Save {
 }
 
 export function newSave(now: number): Save {
-  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true }, garden: newGarden(), hints: [] };
+  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT }, garden: newGarden(), hints: [] };
 }
 
 const DIRS: readonly Dir[] = ['up', 'down', 'left', 'right'];
@@ -54,7 +59,7 @@ export function normalizeSave(raw: unknown): Save | null {
     created: isNum(r.created) ? r.created : 0,
     updated: isNum(r.updated) ? r.updated : 0,
     position,
-    settings: { sound: st.sound !== false },
+    settings: { sound: st.sound !== false, sfxVolume: isNum(st.sfxVolume) ? Math.min(100, Math.max(0, Math.round(st.sfxVolume))) : SFX_VOLUME_DEFAULT },
     garden: normalizeGarden(r.garden),
     hints: Array.isArray(r.hints) ? [...new Set(r.hints.filter((h): h is string => typeof h === 'string'))].slice(0, 32) : [],
   };

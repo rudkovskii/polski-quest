@@ -74,7 +74,7 @@ async function main(): Promise<void> {
   if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
   else {
     connectAudio(gatedAudioBus(bus, () => store.save.settings.sound));
-    connectSfx(bus, () => store.save.settings.sound, undefined, { mute });
+    connectSfx(bus, () => store.save.settings.sound, undefined, { mute, volume: () => store.save.settings.sfxVolume / 100 });
   }
   mountAudioToast(overlay);
   mountUpdateToast(overlay);
@@ -88,6 +88,8 @@ async function main(): Promise<void> {
       if (!on) bus.emit('audio:stop', {});
       store.update((s) => ({ ...s, settings: { ...s.settings, sound: on } }), Date.now());
     },
+    getSfxVolume: () => store.save.settings.sfxVolume,
+    setSfxVolume: (v) => store.update((s) => ({ ...s, settings: { ...s.settings, sfxVolume: v } }), Date.now()),
     exportSave: () => {
       const name = exportFileName(Date.now(), new Date().getTimezoneOffset());
       download(name, exportSave(store.save));

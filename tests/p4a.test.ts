@@ -8,6 +8,8 @@ import { canProgress, DAY_MS, dayOf, harvestsNow, isOverripe, newGarden, sideOf,
 import type { Question } from '../src/systems/quiz';
 import type { GameMode } from '../src/types/farm';
 import { mountGuide } from '../src/ui/hintsGuide';
+import { mountSettings } from '../src/ui/settings';
+import { newSave, normalizeSave, SFX_VOLUME_DEFAULT } from '../src/systems/save';
 import { mountDictionary, TOPIC_QUICK } from '../src/ui/dictionary';
 import { mountMinigame, optSizeClass } from '../src/ui/minigame';
 import { LocationModel, STEP_MS } from '../src/world/location';
@@ -219,5 +221,38 @@ describe('очередь: «напиши сам» и повторы', () => {
       });
     }
     expect(useless / total).toBeLessThan(0.02);
+  });
+});
+
+describe('настройки: громкость эффектов', () => {
+  const deps = (muted: boolean, set = vi.fn()) => ({
+    bus: testBus(), muted, getSound: () => true, setSound: () => {}, getSfxVolume: () => 60, setSfxVolume: set,
+    exportSave: () => '', importSave: async () => ({ ok: true, message: '' }), reset: async () => {},
+  });
+
+  it('по умолчанию 60 %, старое сохранение без поля получает 60, мусор обрезается в 0–100', () => {
+    expect(SFX_VOLUME_DEFAULT).toBe(60);
+    expect(newSave(1).settings.sfxVolume).toBe(60);
+    expect(normalizeSave({ v: 2, created: 1, updated: 2, position: null, settings: { sound: true } })!.settings.sfxVolume).toBe(60);
+    expect(normalizeSave({ v: 2, created: 1, updated: 2, position: null, settings: { sfxVolume: 250 } })!.settings.sfxVolume).toBe(100);
+  });
+
+  it('слайдер 0–100 меняет громкость; при ?mute=1 виден, но неактивен', () => {
+    const root = document.createElement('div');
+    const set = vi.fn();
+    const p = mountSettings(root, deps(false, set));
+    p.open();
+    const vol = root.querySelector<HTMLInputElement>('[data-sfx-volume]')!;
+    expect([vol.min, vol.max, vol.value, vol.disabled]).toEqual(['0', '100', '60', false]);
+    vol.value = '35';
+    vol.dispatchEvent(new Event('input'));
+    expect(set).toHaveBeenCalledWith(35);
+    expect(root.querySelector('[data-sfx-volume-out]')!.textContent).toBe('35%');
+    const muted = document.createElement('div');
+    const pm = mountSettings(muted, deps(true));
+    pm.open();
+    const mv = muted.querySelector<HTMLInputElement>('[data-sfx-volume]')!;
+    expect(mv.hidden).toBe(false);
+    expect(mv.disabled).toBe(true);
   });
 });
