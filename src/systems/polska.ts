@@ -27,7 +27,7 @@ import {
 } from './garden';
 import { polskaScale, type PolskaScale } from './polskaScale';
 import { V2, unitsOfGame, type V2Content } from './v2content';
-import { plotMap, plotViews, type PlotRef } from './zagroda';
+import { entryFrames, plotMap, plotViews, type PlotRef } from './zagroda';
 
 export interface PolskaSave {
   garden: GardenSave;
@@ -162,7 +162,10 @@ export function createPolska(d: PolskaDeps): Polska {
   const xp = (): number => st.xp + scale().bonusXp;
   const emit = (gain = 0, up = false): void => {
     if (!d.bus) return;
-    d.bus.emit('polska:plots', { views: plotViews(content.units, st.items, d.now(), refs) });
+    const t = d.now();
+    // Местная дата из часов игры (для мачты в праздники и сезонной доски).
+    const local = new Date(t - d.tz(t) * 60_000);
+    d.bus.emit('polska:plots', { views: plotViews(content.units, st.items, t, refs), entries: entryFrames(content.units, st.items, local.getUTCMonth() + 1, local.getUTCDate()) });
     const s = scale();
     d.bus.emit('polska:scale', { sub: s.sub, of: s.of, pl: s.pl, ru: s.ru, ratio: s.ratio, pct: s.pct, xp: st.xp + s.bonusXp, ...(gain ? { gain } : {}), ...(up ? { up } : {}) });
   };

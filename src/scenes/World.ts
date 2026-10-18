@@ -6,7 +6,7 @@ import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap, PropObject } from '../types/map';
 import { frameFor, tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
 import { FarmLayer } from './farmLayer';
-import { ZagrodaLayer } from './zagrodaLayer';
+import { ZagrodaLayer, applyEntries } from './zagrodaLayer';
 import { pickZoom } from '../world/camera';
 import { LocationModel, type Actor, type WorldEvent } from '../world/location';
 import { PositionGate } from '../world/positionGate';
@@ -155,6 +155,9 @@ export class World extends Phaser.Scene {
     this.zagroda = this.mapDef.id === 'zagroda' ? new ZagrodaLayer({ scene: this, model: this.model, sprites: this.sprites, props: this.propSprites, toScreen: (x, y) => this.toScreen(x, y) }) : null;
     const offGoto = bus.on('world:goto', () => setTimeout(() => this.runGoto(), 0));
     const offPolska = bus.on('polska:auto', () => this.polskaToZagroda());
+    // Точки входа v2 (карта, календарь, мачта, сезонная доска) — кадр по прогрессу.
+    applyEntries(this.propSprites, this.sprites);
+    const offEntries = bus.on('polska:plots', ({ entries }) => entries && applyEntries(this.propSprites, this.sprites, entries));
     const offAuto = bus.on('farm:auto', ({ on, bottom }) => {
       this.panelBottom = on ? bottom : 0;
       this.layout();
@@ -178,6 +181,7 @@ export class World extends Phaser.Scene {
       offAuto();
       offGoto();
       offPolska();
+      offEntries();
       this.farm?.dispose();
       this.farm = null;
       this.zagroda?.dispose();
@@ -483,6 +487,7 @@ export class World extends Phaser.Scene {
       s.setOrigin(0.5, 1);
       s.setDepth(src.depth === 'floor' ? 1.5 : src.depth === 'wall' ? 2 : 10 + bottom);
       if (src.shadow) this.placeShadow(cx, bottom - 1, src.shadow, 2.5);
+      s.setData('sprite', src.sprite);
       this.propSprites.set(o.key, s);
     }
   }

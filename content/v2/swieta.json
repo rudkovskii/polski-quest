@@ -1,127 +1,2629 @@
 {
- "version": 1,
  "meta": {
-  "fixture": true,
-  "note": "Минимальная фикстура ядра v2 по схеме ФЕРМА_v2.md §7. Заменяется копией Игра/data/v2/ без правок."
+  "authored_by": "ai",
+  "date": "2026-10-18",
+  "status": "draft",
+  "note": "Собрал ИИ (методист) по ФЕРМА_v2.md §5. Польский текст не вычитан носителем; free/shops пересверять раз в год.",
+  "seasons": "метеорологические: zima 12-2, wiosna 3-5, lato 6-8, jesień 9-11",
+  "weekday_free_note": "free = ustawowo wolny od pracy; shops: open / closed / short (do 14:00) / partial (по дням)",
+  "to_verify": [
+   "Wigilia: wolna od 2025, sklepy do 14:00",
+   "Zielone Świątki i Niedziela Palmowa: niedziela bez handlu",
+   "daty Dnia Babci/Dziadka 21-22.01",
+   "dekoracje 2-3.05 vs 1-3.05"
+  ]
+ },
+ "tasks": {
+  "what": {
+   "pl": "Co to za święto?",
+   "ru": "Что это за праздник?",
+   "uses": [
+    "clue",
+    "distract"
+   ],
+   "options": 4,
+   "rule": "показать предмет из clue; варианты = праздник + 3 из distract"
+  },
+  "basket": {
+   "pl": "Spakuj koszyk",
+   "ru": "Собери корзинку",
+   "uses": [
+    "basket.in",
+    "basket.out"
+   ],
+   "rule": "взять все in и ни одного out; запасной ввод тап-тап"
+  },
+  "table": {
+   "pl": "Nakryj stół",
+   "ru": "Накрой стол",
+   "uses": [
+    "table.in",
+    "table.out"
+   ],
+   "rule": "как basket, сцена стола"
+  },
+  "when": {
+   "pl": "Kiedy?",
+   "ru": "Когда?",
+   "uses": [
+    "months",
+    "season",
+    "weekday"
+   ],
+   "rule": "месяц из 4 или сезон (zimą, wiosną, latem, jesienią); для подвижных weekday"
+  },
+  "wish": {
+   "pl": "Życzenia",
+   "ru": "Пожелание",
+   "uses": [
+    "wish",
+    "wish_alt"
+   ],
+   "rule": "ситуация -> собрать пожелание из tiles_pl + distract_pl"
+  },
+  "shops": {
+   "pl": "Sklepy otwarte?",
+   "ru": "Магазины открыты?",
+   "uses": [
+    "shops_q",
+    "shops"
+   ],
+   "q": "{say}: sklepy są otwarte czy zamknięte?",
+   "answers": {
+    "open": "otwarte",
+    "closed": "zamknięte",
+    "short": "otwarte do czternastej",
+    "partial": "по дням, см. shops_q"
+   }
+  }
+ },
+ "easter": {
+  "2026": "2026-04-05",
+  "2027": "2027-03-28",
+  "2028": "2028-04-16",
+  "2029": "2029-04-01",
+  "2030": "2030-04-21"
  },
  "units": [
   {
-   "id": "hol.wszyscy",
+   "id": "hol.nowy_rok",
    "kind": "holiday",
-   "pl": "Wszystkich Świętych",
-   "ru": "День всех святых",
-   "tr": "",
+   "pl": "Sylwester i Nowy Rok",
+   "ru": "Канун Нового года и Новый год",
+   "tr": "сылвэ́стэр и но́вы рок",
    "when": {
-    "day": 1,
-    "month": 11
-   },
-   "season": "jesień",
-   "free": true,
-   "shops": "closed",
-   "checked": "2026-10-18",
-   "customs": [
-    {
-     "pl": "Na Wszystkich Świętych zapalamy znicze na grobach.",
-     "ru": "На День всех святых зажигаем лампадки на могилах."
+    "day": 31,
+    "month": 12,
+    "until": {
+     "day": 1,
+     "month": 1
     }
-   ],
-   "words": [
-    "sw.znicz",
-    "sw.chryzantema"
-   ],
-   "item": "item_znicz",
-   "band": 1
-  },
-  {
-   "id": "hol.wigilia",
-   "kind": "holiday",
-   "pl": "Wigilia",
-   "ru": "Сочельник",
-   "tr": "",
-   "when": {
-    "day": 24,
-    "month": 12
    },
    "season": "zima",
+   "months": [
+    12,
+    1
+   ],
    "free": true,
-   "shops": "closed",
+   "shops": "open",
    "checked": "2026-10-18",
+   "free_note": {
+    "pl": "Sylwester (31.12) to zwykły dzień, wolne jest tylko 1 stycznia.",
+    "ru": "31.12 обычный день, выходной только 1 января."
+   },
+   "shops_note": {
+    "pl": "31 grudnia sklepy są otwarte (często krócej), 1 stycznia zamknięte.",
+    "ru": "31.12 магазины открыты (часто короче), 1.01 закрыты."
+   },
    "customs": [
     {
-     "pl": "W Wigilię dzielimy się opłatkiem.",
-     "ru": "В Сочельник делимся облаткой."
+     "pl": "W sylwestra czekamy na północ i oglądamy fajerwerki.",
+     "ru": "В канун Нового года ждём полночи и смотрим фейерверки.",
+     "tiles_pl": [
+      "W",
+      "sylwestra",
+      "czekamy",
+      "na",
+      "północ",
+      "i",
+      "oglądamy",
+      "fajerwerki"
+     ],
+     "distract_pl": [
+      "północy",
+      "fajerwerk"
+     ]
+    },
+    {
+     "pl": "O północy pijemy szampana.",
+     "ru": "В полночь пьём шампанское.",
+     "tiles_pl": [
+      "O",
+      "północy",
+      "pijemy",
+      "szampana"
+     ],
+     "distract_pl": [
+      "szampan",
+      "pije"
+     ]
+    },
+    {
+     "pl": "Pierwszego stycznia sklepy są zamknięte.",
+     "ru": "Первого января магазины закрыты.",
+     "tiles_pl": [
+      "Pierwszego",
+      "stycznia",
+      "sklepy",
+      "są",
+      "zamknięte"
+     ],
+     "distract_pl": [
+      "pierwszy",
+      "zamknięty"
+     ]
     }
    ],
    "words": [
-    "sw.oplatek",
-    "sw.karp",
-    "sw.choinka"
+    "sw.sylwester",
+    "sw.fajerwerki",
+    "sw.szampan",
+    "w.polnoc"
    ],
+   "clue": [
+    "sw.fajerwerki",
+    "sw.szampan"
+   ],
+   "distract": [
+    "hol.wigilia",
+    "hol.wiosna",
+    "hol.trzech_kroli"
+   ],
+   "item": "item_fajerwerk",
    "wish": {
-    "pl": "Wesołych Świąt!",
-    "ru": "Весёлых праздников!"
-   },
-   "basket": {
-    "in": [
-     "sw.oplatek",
-     "sw.karp"
+    "situation": {
+     "pl": "Jest północ. Zaczyna się nowy rok.",
+     "ru": "Полночь. Начинается новый год."
+    },
+    "pl": "Szczęśliwego Nowego Roku!",
+    "ru": "С Новым годом! (Счастливого Нового года!)",
+    "tiles_pl": [
+     "Szczęśliwego",
+     "Nowego",
+     "Roku"
     ],
-    "out": [
-     "sw.paczek"
+    "distract_pl": [
+     "Szczęśliwy",
+     "Nowy"
     ]
    },
-   "item": "item_oplatek",
-   "band": 1
+   "say": "trzydziestego pierwszego grudnia",
+   "shops_q": [
+    {
+     "say": "trzydziestego pierwszego grudnia",
+     "shops": "open"
+    },
+    {
+     "say": "pierwszego stycznia",
+     "shops": "closed"
+    }
+   ]
   },
   {
-   "id": "hol.wielkanoc",
+   "id": "hol.trzech_kroli",
    "kind": "holiday",
-   "pl": "Wielkanoc",
-   "ru": "Пасха",
-   "tr": "",
+   "pl": "Święto Trzech Króli",
+   "ru": "Богоявление (день Трёх королей)",
+   "tr": "щфе́нто тшэх кру́ли",
    "when": {
-    "rule": "easter",
-    "offset": 0
+    "day": 6,
+    "month": 1
    },
-   "season": "wiosna",
+   "season": "zima",
+   "months": [
+    1
+   ],
    "free": true,
    "shops": "closed",
    "checked": "2026-10-18",
    "customs": [
     {
-     "pl": "Święcimy koszyczek.",
-     "ru": "Освящаем корзинку."
+     "pl": "Szóstego stycznia w Warszawie jest orszak Trzech Króli.",
+     "ru": "Шестого января в Варшаве проходит шествие Трёх королей.",
+     "tiles_pl": [
+      "Szóstego",
+      "stycznia",
+      "w",
+      "Warszawie",
+      "jest",
+      "orszak",
+      "Trzech",
+      "Króli"
+     ],
+     "distract_pl": [
+      "szósty",
+      "orszaku"
+     ]
+    },
+    {
+     "pl": "Na drzwiach piszemy kredą K+M+B.",
+     "ru": "На дверях пишем мелом K+M+B.",
+     "tiles_pl": [
+      "Na",
+      "drzwiach",
+      "piszemy",
+      "kredą",
+      "K+M+B"
+     ],
+     "distract_pl": [
+      "kreda",
+      "drzwi"
+     ]
     }
    ],
-   "wish": {
-    "pl": "Smacznego jajka!",
-    "ru": "Приятного яйца!"
+   "words": [
+    "sw.trzej_krolowie",
+    "sw.orszak",
+    "sw.kreda",
+    "w.drzwi"
+   ],
+   "clue": [
+    "sw.kreda",
+    "sw.orszak"
+   ],
+   "distract": [
+    "hol.nowy_rok",
+    "hol.wigilia",
+    "hol.mikolajki"
+   ],
+   "item": "item_kreda",
+   "wish": null,
+   "say": "szóstego stycznia",
+   "shops_q": [
+    {
+     "say": "szóstego stycznia",
+     "shops": "closed"
+    }
+   ]
+  },
+  {
+   "id": "hol.babcia",
+   "kind": "holiday",
+   "pl": "Dzień Babci i Dziadka",
+   "ru": "День бабушки и дедушки",
+   "tr": "джень ба́пчи и джя́тка",
+   "when": {
+    "day": 21,
+    "month": 1,
+    "until": {
+     "day": 22,
+     "month": 1
+    }
    },
-   "band": 1
+   "season": "zima",
+   "months": [
+    1
+   ],
+   "free": false,
+   "shops": "open",
+   "checked": "2026-10-18",
+   "note": {
+    "pl": "21 stycznia Dzień Babci, 22 stycznia Dzień Dziadka.",
+    "ru": "21 января День бабушки, 22 января День дедушки."
+   },
+   "customs": [
+    {
+     "pl": "Dwudziestego pierwszego stycznia obchodzimy Dzień Babci.",
+     "ru": "Двадцать первого января отмечаем День бабушки.",
+     "tiles_pl": [
+      "Dwudziestego",
+      "pierwszego",
+      "stycznia",
+      "obchodzimy",
+      "Dzień",
+      "Babci"
+     ],
+     "distract_pl": [
+      "dwudziesty",
+      "Dnia"
+     ]
+    },
+    {
+     "pl": "Wnuki robią babci laurki.",
+     "ru": "Внуки делают бабушке открытки.",
+     "tiles_pl": [
+      "Wnuki",
+      "robią",
+      "babci",
+      "laurki"
+     ],
+     "distract_pl": [
+      "wnuk",
+      "laurka"
+     ]
+    },
+    {
+     "pl": "Dajemy babci kwiaty.",
+     "ru": "Дарим бабушке цветы.",
+     "tiles_pl": [
+      "Dajemy",
+      "babci",
+      "kwiaty"
+     ],
+     "distract_pl": [
+      "babcia",
+      "kwiat"
+     ]
+    }
+   ],
+   "words": [
+    "sw.laurka",
+    "w.babcia",
+    "w.dziadek",
+    "w.wnuk",
+    "w.kwiat"
+   ],
+   "clue": [
+    "sw.laurka",
+    "w.kwiat"
+   ],
+   "distract": [
+    "hol.matka",
+    "hol.dziecko",
+    "hol.imieniny"
+   ],
+   "item": "item_laurka",
+   "wish": {
+    "situation": {
+     "pl": "Dzisiaj jest Dzień Babci.",
+     "ru": "Сегодня День бабушки."
+    },
+    "pl": "Wszystkiego najlepszego, babciu!",
+    "ru": "Всего самого лучшего, бабушка!",
+    "tiles_pl": [
+     "Wszystkiego",
+     "najlepszego",
+     "babciu"
+    ],
+    "distract_pl": [
+     "babcia",
+     "babci"
+    ]
+   },
+   "say": "dwudziestego pierwszego stycznia"
   },
   {
    "id": "hol.tlusty",
    "kind": "holiday",
    "pl": "Tłusty czwartek",
    "ru": "Жирный четверг",
-   "tr": "",
+   "tr": "тўу́сты чфа́ртэк",
    "when": {
     "rule": "easter",
     "offset": -52
    },
    "season": "zima",
+   "months": [
+    2
+   ],
    "free": false,
+   "shops": "open",
    "checked": "2026-10-18",
+   "weekday": "czwartek",
+   "note": {
+    "pl": "Ostatni czwartek przed Wielkim Postem.",
+    "ru": "Последний четверг перед Великим постом."
+   },
    "customs": [
     {
      "pl": "W tłusty czwartek jemy pączki.",
-     "ru": "В жирный четверг едим пончики."
+     "ru": "В жирный четверг едим пончики.",
+     "tiles_pl": [
+      "W",
+      "tłusty",
+      "czwartek",
+      "jemy",
+      "pączki"
+     ],
+     "distract_pl": [
+      "pączek",
+      "jedzą"
+     ]
+    },
+    {
+     "pl": "W cukierni jest długa kolejka.",
+     "ru": "В кондитерской длинная очередь.",
+     "tiles_pl": [
+      "W",
+      "cukierni",
+      "jest",
+      "długa",
+      "kolejka"
+     ],
+     "distract_pl": [
+      "kolejki",
+      "długi"
+     ]
+    },
+    {
+     "pl": "Jemy też faworki.",
+     "ru": "Едим ещё и хворост.",
+     "tiles_pl": [
+      "Jemy",
+      "też",
+      "faworki"
+     ],
+     "distract_pl": [
+      "faworek",
+      "jedzą"
+     ]
     }
    ],
    "words": [
-    "sw.paczek"
+    "sw.paczek",
+    "sw.faworki",
+    "w.ciasto"
    ],
-   "band": 1
+   "clue": [
+    "sw.paczek",
+    "sw.faworki"
+   ],
+   "distract": [
+    "hol.wielkanoc",
+    "hol.imieniny",
+    "hol.dziecko"
+   ],
+   "item": "item_paczek",
+   "wish": null,
+   "dates": {
+    "2026": "2026-02-12",
+    "2027": "2027-02-04",
+    "2028": "2028-02-24",
+    "2029": "2029-02-08",
+    "2030": "2030-02-28"
+   }
+  },
+  {
+   "id": "hol.wiosna",
+   "kind": "holiday",
+   "pl": "Pierwszy dzień wiosny, topienie Marzanny",
+   "ru": "Первый день весны, проводы зимы (топят Марзанну)",
+   "tr": "пе́рфшы джень вёсны  топе́нье мажа́нны",
+   "when": {
+    "day": 21,
+    "month": 3
+   },
+   "season": "wiosna",
+   "months": [
+    3
+   ],
+   "free": false,
+   "shops": "open",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "Dwudziestego pierwszego marca topimy Marzannę.",
+     "ru": "Двадцать первого марта топим Марзанну.",
+     "tiles_pl": [
+      "Dwudziestego",
+      "pierwszego",
+      "marca",
+      "topimy",
+      "Marzannę"
+     ],
+     "distract_pl": [
+      "marzec",
+      "Marzanna"
+     ]
+    },
+    {
+     "pl": "Marzanna to kukła ze słomy.",
+     "ru": "Марзанна — это чучело из соломы.",
+     "tiles_pl": [
+      "Marzanna",
+      "to",
+      "kukła",
+      "ze",
+      "słomy"
+     ],
+     "distract_pl": [
+      "z",
+      "słoma"
+     ]
+    },
+    {
+     "pl": "Kukłę wrzucamy do rzeki.",
+     "ru": "Чучело бросаем в реку.",
+     "tiles_pl": [
+      "Kukłę",
+      "wrzucamy",
+      "do",
+      "rzeki"
+     ],
+     "distract_pl": [
+      "kukła",
+      "rzeka"
+     ]
+    }
+   ],
+   "words": [
+    "sw.marzanna",
+    "sw.kukla",
+    "w.rzeka",
+    "w.wiosna"
+   ],
+   "clue": [
+    "sw.marzanna",
+    "sw.kukla"
+   ],
+   "distract": [
+    "hol.kupala",
+    "hol.lany",
+    "hol.dziecko"
+   ],
+   "item": "item_marzanna",
+   "wish": null,
+   "say": "dwudziestego pierwszego marca",
+   "shops_q": [
+    {
+     "say": "dwudziestego pierwszego marca",
+     "shops": "open"
+    }
+   ]
+  },
+  {
+   "id": "hol.palmowa",
+   "kind": "holiday",
+   "pl": "Niedziela Palmowa",
+   "ru": "Вербное воскресенье",
+   "tr": "ньедже́ла палмо́ва",
+   "when": {
+    "rule": "easter",
+    "offset": -7
+   },
+   "season": "wiosna",
+   "months": [
+    3,
+    4
+   ],
+   "free": false,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "weekday": "niedziela",
+   "shops_note": {
+    "pl": "Niedziela bez handlu: sklepy są zamknięte.",
+    "ru": "Воскресенье без торговли: магазины закрыты."
+   },
+   "customs": [
+    {
+     "pl": "W Niedzielę Palmową niesiemy palmy do kościoła.",
+     "ru": "В Вербное воскресенье несём пальмы в костёл.",
+     "tiles_pl": [
+      "W",
+      "Niedzielę",
+      "Palmową",
+      "niesiemy",
+      "palmy",
+      "do",
+      "kościoła"
+     ],
+     "distract_pl": [
+      "palma",
+      "kościele"
+     ]
+    },
+    {
+     "pl": "Palma jest z suchych kwiatów i gałązek.",
+     "ru": "Пальма сделана из сухих цветов и веточек.",
+     "tiles_pl": [
+      "Palma",
+      "jest",
+      "z",
+      "suchych",
+      "kwiatów",
+      "i",
+      "gałązek"
+     ],
+     "distract_pl": [
+      "suche",
+      "gałązki"
+     ]
+    }
+   ],
+   "words": [
+    "sw.palma",
+    "sw.galazka",
+    "w.kosciol"
+   ],
+   "clue": [
+    "sw.palma",
+    "sw.galazka"
+   ],
+   "distract": [
+    "hol.wielkanoc",
+    "hol.zielone",
+    "hol.boze_cialo"
+   ],
+   "item": "item_palma",
+   "wish": null,
+   "dates": {
+    "2026": "2026-03-29",
+    "2027": "2027-03-21",
+    "2028": "2028-04-09",
+    "2029": "2029-03-25",
+    "2030": "2030-04-14"
+   },
+   "shops_q": [
+    {
+     "say": null,
+     "shops": "closed"
+    }
+   ]
+  },
+  {
+   "id": "hol.wielkanoc",
+   "kind": "holiday",
+   "pl": "Wielkanoc",
+   "ru": "Пасха",
+   "tr": "велка́ноц",
+   "when": {
+    "rule": "easter",
+    "offset": 0
+   },
+   "season": "wiosna",
+   "months": [
+    3,
+    4
+   ],
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "weekday": "niedziela",
+   "basket": {
+    "title": {
+     "pl": "Spakuj koszyk",
+     "ru": "Собери пасхальную корзинку"
+    },
+    "in": [
+     "sw.pisanka",
+     "w.chleb",
+     "w.sol",
+     "sw.biala_kielbasa",
+     "sw.baranek",
+     "sw.chrzan"
+    ],
+    "out": [
+     "sw.karp",
+     "sw.choinka",
+     "sw.znicz"
+    ]
+   },
+   "shops_note": {
+    "pl": "Wielka Sobota: sklepy do czternastej. Niedziela i poniedziałek wielkanocny: zamknięte.",
+    "ru": "Великая суббота: магазины до 14:00. Воскресенье и понедельник Пасхи: закрыты."
+   },
+   "customs": [
+    {
+     "pl": "W Wielką Sobotę święcimy jedzenie w koszyczku.",
+     "ru": "В Великую субботу освящаем еду в корзиночке.",
+     "tiles_pl": [
+      "W",
+      "Wielką",
+      "Sobotę",
+      "święcimy",
+      "jedzenie",
+      "w",
+      "koszyczku"
+     ],
+     "distract_pl": [
+      "święconka",
+      "koszyczka"
+     ]
+    },
+    {
+     "pl": "W koszyczku są jajka, chleb, sól, kiełbasa i chrzan.",
+     "ru": "В корзиночке яйца, хлеб, соль, колбаса и хрен.",
+     "tiles_pl": [
+      "W",
+      "koszyczku",
+      "są",
+      "jajka",
+      "chleb",
+      "sól",
+      "kiełbasa",
+      "i",
+      "chrzan"
+     ],
+     "distract_pl": [
+      "jajko",
+      "chleba"
+     ]
+    },
+    {
+     "pl": "Na Wielkanoc jemy żurek z jajkiem.",
+     "ru": "На Пасху едим журек с яйцом.",
+     "tiles_pl": [
+      "Na",
+      "Wielkanoc",
+      "jemy",
+      "żurek",
+      "z",
+      "jajkiem"
+     ],
+     "distract_pl": [
+      "żurku",
+      "jajko"
+     ]
+    },
+    {
+     "pl": "Dzielimy się jajkiem i składamy życzenia.",
+     "ru": "Делимся яйцом и поздравляем друг друга.",
+     "tiles_pl": [
+      "Dzielimy",
+      "się",
+      "jajkiem",
+      "i",
+      "składamy",
+      "życzenia"
+     ],
+     "distract_pl": [
+      "jajko",
+      "życzeń"
+     ]
+    }
+   ],
+   "words": [
+    "sw.wielkanoc",
+    "sw.swieconka",
+    "sw.koszyczek",
+    "sw.pisanka",
+    "sw.baranek",
+    "sw.zurek",
+    "sw.babka",
+    "sw.chrzan",
+    "sw.biala_kielbasa",
+    "w.jajko",
+    "w.chleb",
+    "w.sol",
+    "sw.dzielic_sie"
+   ],
+   "clue": [
+    "sw.pisanka",
+    "sw.baranek"
+   ],
+   "distract": [
+    "hol.boze_narodzenie",
+    "hol.palmowa",
+    "hol.wszyscy"
+   ],
+   "item": "item_pisanka",
+   "wish": {
+    "situation": {
+     "pl": "Jest Wielkanoc. Spotykasz sąsiadkę na schodach.",
+     "ru": "Пасха. Ты встречаешь соседку на лестнице."
+    },
+    "pl": "Wesołych Świąt!",
+    "ru": "Весёлых праздников!",
+    "tiles_pl": [
+     "Wesołych",
+     "Świąt"
+    ],
+    "distract_pl": [
+     "Wesoły",
+     "Święta"
+    ]
+   },
+   "wish_alt": {
+    "situation": {
+     "pl": "Śniadanie wielkanocne. Ktoś dzieli się z tobą jajkiem.",
+     "ru": "Пасхальный завтрак. Кто-то делится с тобой яйцом."
+    },
+    "pl": "Smacznego jajka!",
+    "ru": "Приятного аппетита (с яйцом)!",
+    "tiles_pl": [
+     "Smacznego",
+     "jajka"
+    ],
+    "distract_pl": [
+     "Smaczne",
+     "jajko"
+    ]
+   },
+   "dates": {
+    "2026": "2026-04-05",
+    "2027": "2027-03-28",
+    "2028": "2028-04-16",
+    "2029": "2029-04-01",
+    "2030": "2030-04-21"
+   },
+   "shops_q": [
+    {
+     "say": null,
+     "shops": "closed"
+    }
+   ]
+  },
+  {
+   "id": "hol.lany",
+   "kind": "holiday",
+   "pl": "Lany poniedziałek, śmigus-dyngus",
+   "ru": "«Облитый» понедельник (смигус-дынгус)",
+   "tr": "ла́ны поньеджя́ўэк  щми́гус-ды́нгус",
+   "when": {
+    "rule": "easter",
+    "offset": 1
+   },
+   "season": "wiosna",
+   "months": [
+    3,
+    4
+   ],
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "weekday": "poniedziałek",
+   "customs": [
+    {
+     "pl": "W lany poniedziałek oblewamy się wodą.",
+     "ru": "В облитый понедельник обливаемся водой.",
+     "tiles_pl": [
+      "W",
+      "lany",
+      "poniedziałek",
+      "oblewamy",
+      "się",
+      "wodą"
+     ],
+     "distract_pl": [
+      "oblewać",
+      "woda"
+     ]
+    },
+    {
+     "pl": "Rano ktoś może oblać cię wodą.",
+     "ru": "Утром кто-то может облить тебя водой.",
+     "tiles_pl": [
+      "Rano",
+      "ktoś",
+      "może",
+      "oblać",
+      "cię",
+      "wodą"
+     ],
+     "distract_pl": [
+      "oblewa",
+      "woda"
+     ]
+    }
+   ],
+   "words": [
+    "sw.lany_poniedzialek",
+    "sw.oblewac_sie",
+    "w.woda"
+   ],
+   "clue": [
+    "sw.lany_poniedzialek",
+    "w.woda"
+   ],
+   "distract": [
+    "hol.wielkanoc",
+    "hol.wiosna",
+    "hol.kupala"
+   ],
+   "item": "item_wiaderko",
+   "wish": null,
+   "dates": {
+    "2026": "2026-04-06",
+    "2027": "2027-03-29",
+    "2028": "2028-04-17",
+    "2029": "2029-04-02",
+    "2030": "2030-04-22"
+   },
+   "shops_q": [
+    {
+     "say": null,
+     "shops": "closed"
+    }
+   ]
+  },
+  {
+   "id": "hol.zielone",
+   "kind": "holiday",
+   "pl": "Zielone Świątki",
+   "ru": "Зелёные святки (Пятидесятница)",
+   "tr": "жело́нэ щфёнтки",
+   "when": {
+    "rule": "easter",
+    "offset": 49
+   },
+   "season": "wiosna",
+   "months": [
+    5,
+    6
+   ],
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "weekday": "niedziela",
+   "customs": [
+    {
+     "pl": "Zielone Świątki są siedem tygodni po Wielkanocy.",
+     "ru": "Зелёные святки — через семь недель после Пасхи.",
+     "tiles_pl": [
+      "Zielone",
+      "Świątki",
+      "są",
+      "siedem",
+      "tygodni",
+      "po",
+      "Wielkanocy"
+     ],
+     "distract_pl": [
+      "tydzień",
+      "Wielkanoc"
+     ]
+    },
+    {
+     "pl": "W domu stawiamy zielone gałązki.",
+     "ru": "Дома ставим зелёные веточки.",
+     "tiles_pl": [
+      "W",
+      "domu",
+      "stawiamy",
+      "zielone",
+      "gałązki"
+     ],
+     "distract_pl": [
+      "gałązka",
+      "zielony"
+     ]
+    }
+   ],
+   "words": [
+    "sw.galazka",
+    "sw.wielkanoc"
+   ],
+   "clue": [
+    "sw.galazka"
+   ],
+   "distract": [
+    "hol.wielkanoc",
+    "hol.palmowa",
+    "hol.boze_cialo"
+   ],
+   "item": "item_galazka",
+   "wish": null,
+   "dates": {
+    "2026": "2026-05-24",
+    "2027": "2027-05-16",
+    "2028": "2028-06-04",
+    "2029": "2029-05-20",
+    "2030": "2030-06-09"
+   },
+   "shops_q": [
+    {
+     "say": null,
+     "shops": "closed"
+    }
+   ]
+  },
+  {
+   "id": "hol.majowka",
+   "kind": "holiday",
+   "pl": "Majówka",
+   "ru": "Майские праздники (1-3 мая)",
+   "tr": "маю́фка",
+   "when": {
+    "day": 1,
+    "month": 5,
+    "until": {
+     "day": 3,
+     "month": 5
+    }
+   },
+   "season": "wiosna",
+   "months": [
+    5
+   ],
+   "free": true,
+   "shops": "partial",
+   "checked": "2026-10-18",
+   "free_note": {
+    "pl": "Wolne są 1 i 3 maja; 2 maja to zwykły dzień (dlatego majówka).",
+    "ru": "Выходные 1 и 3 мая; 2 мая обычный день (отсюда «majówka»)."
+   },
+   "shops_note": {
+    "pl": "1 i 3 maja sklepy są zamknięte, 2 maja otwarte.",
+    "ru": "1 и 3 мая магазины закрыты, 2 мая открыты."
+   },
+   "shops_q": [
+    {
+     "say": "pierwszego maja",
+     "shops": "closed"
+    },
+    {
+     "say": "drugiego maja",
+     "shops": "open"
+    },
+    {
+     "say": "trzeciego maja",
+     "shops": "closed"
+    }
+   ],
+   "customs": [
+    {
+     "pl": "Od pierwszego do trzeciego maja mamy majówkę.",
+     "ru": "С первого по третье мая у нас майские выходные.",
+     "tiles_pl": [
+      "Od",
+      "pierwszego",
+      "do",
+      "trzeciego",
+      "maja",
+      "mamy",
+      "majówkę"
+     ],
+     "distract_pl": [
+      "majówka",
+      "trzeci"
+     ]
+    },
+    {
+     "pl": "Na majówkę jedziemy za miasto i robimy grill.",
+     "ru": "На майские выезжаем за город и жарим на гриле.",
+     "tiles_pl": [
+      "Na",
+      "majówkę",
+      "jedziemy",
+      "za",
+      "miasto",
+      "i",
+      "robimy",
+      "grill"
+     ],
+     "distract_pl": [
+      "miasta",
+      "grilla"
+     ]
+    },
+    {
+     "pl": "Drugiego maja wywieszamy flagę.",
+     "ru": "Второго мая вывешиваем флаг.",
+     "tiles_pl": [
+      "Drugiego",
+      "maja",
+      "wywieszamy",
+      "flagę"
+     ],
+     "distract_pl": [
+      "flaga",
+      "drugi"
+     ]
+    }
+   ],
+   "words": [
+    "sw.majowka",
+    "sw.grill",
+    "sw.flaga"
+   ],
+   "clue": [
+    "sw.flaga",
+    "sw.grill"
+   ],
+   "distract": [
+    "hol.matka",
+    "hol.dziecko",
+    "hol.zielna"
+   ],
+   "item": "item_flaga",
+   "wish": null,
+   "say": "pierwszego maja"
+  },
+  {
+   "id": "hol.matka",
+   "kind": "holiday",
+   "pl": "Dzień Matki",
+   "ru": "День матери",
+   "tr": "джень ма́тки",
+   "when": {
+    "day": 26,
+    "month": 5
+   },
+   "season": "wiosna",
+   "months": [
+    5
+   ],
+   "free": false,
+   "shops": "open",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "Dwudziestego szóstego maja obchodzimy Dzień Matki.",
+     "ru": "Двадцать шестого мая отмечаем День матери.",
+     "tiles_pl": [
+      "Dwudziestego",
+      "szóstego",
+      "maja",
+      "obchodzimy",
+      "Dzień",
+      "Matki"
+     ],
+     "distract_pl": [
+      "dwudziesty",
+      "Dnia"
+     ]
+    },
+    {
+     "pl": "Dajemy mamie kwiaty.",
+     "ru": "Дарим маме цветы.",
+     "tiles_pl": [
+      "Dajemy",
+      "mamie",
+      "kwiaty"
+     ],
+     "distract_pl": [
+      "mama",
+      "kwiat"
+     ]
+    },
+    {
+     "pl": "Dzieci robią mamie laurkę.",
+     "ru": "Дети делают маме открытку.",
+     "tiles_pl": [
+      "Dzieci",
+      "robią",
+      "mamie",
+      "laurkę"
+     ],
+     "distract_pl": [
+      "dziecko",
+      "laurki"
+     ]
+    }
+   ],
+   "words": [
+    "w.mama",
+    "w.kwiat",
+    "sw.laurka"
+   ],
+   "clue": [
+    "w.kwiat",
+    "sw.laurka"
+   ],
+   "distract": [
+    "hol.babcia",
+    "hol.dziecko",
+    "hol.imieniny"
+   ],
+   "item": "item_bukiet",
+   "wish": {
+    "situation": {
+     "pl": "Dzisiaj jest Dzień Matki.",
+     "ru": "Сегодня День матери."
+    },
+    "pl": "Wszystkiego najlepszego, mamo!",
+    "ru": "Всего самого лучшего, мама!",
+    "tiles_pl": [
+     "Wszystkiego",
+     "najlepszego",
+     "mamo"
+    ],
+    "distract_pl": [
+     "mama",
+     "mamy"
+    ]
+   },
+   "say": "dwudziestego szóstego maja",
+   "shops_q": [
+    {
+     "say": "dwudziestego szóstego maja",
+     "shops": "open"
+    }
+   ]
+  },
+  {
+   "id": "hol.dziecko",
+   "kind": "holiday",
+   "pl": "Dzień Dziecka",
+   "ru": "День защиты детей (День ребёнка)",
+   "tr": "джень дже́цка",
+   "when": {
+    "day": 1,
+    "month": 6
+   },
+   "season": "lato",
+   "months": [
+    6
+   ],
+   "free": false,
+   "shops": "open",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "Pierwszego czerwca dzieci dostają prezenty.",
+     "ru": "Первого июня дети получают подарки.",
+     "tiles_pl": [
+      "Pierwszego",
+      "czerwca",
+      "dzieci",
+      "dostają",
+      "prezenty"
+     ],
+     "distract_pl": [
+      "pierwszy",
+      "dziecko"
+     ]
+    },
+    {
+     "pl": "Jemy lody w parku.",
+     "ru": "Едим мороженое в парке.",
+     "tiles_pl": [
+      "Jemy",
+      "lody",
+      "w",
+      "parku"
+     ],
+     "distract_pl": [
+      "lód",
+      "park"
+     ]
+    }
+   ],
+   "words": [
+    "w.dziecko",
+    "w.prezent",
+    "w.lody"
+   ],
+   "clue": [
+    "w.lody",
+    "w.prezent"
+   ],
+   "distract": [
+    "hol.mikolajki",
+    "hol.matka",
+    "hol.babcia"
+   ],
+   "item": "item_lody",
+   "wish": null,
+   "say": "pierwszego czerwca",
+   "shops_q": [
+    {
+     "say": "pierwszego czerwca",
+     "shops": "open"
+    }
+   ]
+  },
+  {
+   "id": "hol.boze_cialo",
+   "kind": "holiday",
+   "pl": "Boże Ciało",
+   "ru": "Божье Тело (Тело Христово)",
+   "tr": "бо́жэ ча́ўо",
+   "when": {
+    "rule": "easter",
+    "offset": 60
+   },
+   "season": "lato",
+   "months": [
+    5,
+    6
+   ],
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "weekday": "czwartek",
+   "note": {
+    "pl": "Zawsze w czwartek, 60 dni po Wielkanocy.",
+    "ru": "Всегда в четверг, через 60 дней после Пасхи."
+   },
+   "customs": [
+    {
+     "pl": "W Boże Ciało ulicami miasta idzie procesja.",
+     "ru": "В Божье Тело по улицам города идёт процессия.",
+     "tiles_pl": [
+      "W",
+      "Boże",
+      "Ciało",
+      "ulicami",
+      "miasta",
+      "idzie",
+      "procesja"
+     ],
+     "distract_pl": [
+      "procesje",
+      "ulicy"
+     ]
+    },
+    {
+     "pl": "Dzieci sypią płatki kwiatów na ulicę.",
+     "ru": "Дети сыплют лепестки цветов на улицу.",
+     "tiles_pl": [
+      "Dzieci",
+      "sypią",
+      "płatki",
+      "kwiatów",
+      "na",
+      "ulicę"
+     ],
+     "distract_pl": [
+      "kwiaty",
+      "płatek"
+     ]
+    },
+    {
+     "pl": "Na ulicach stoją ołtarze.",
+     "ru": "На улицах стоят алтари.",
+     "tiles_pl": [
+      "Na",
+      "ulicach",
+      "stoją",
+      "ołtarze"
+     ],
+     "distract_pl": [
+      "ołtarz",
+      "ulica"
+     ]
+    }
+   ],
+   "words": [
+    "sw.procesja",
+    "sw.oltarz",
+    "sw.platek"
+   ],
+   "clue": [
+    "sw.procesja",
+    "sw.platek"
+   ],
+   "distract": [
+    "hol.zielna",
+    "hol.wszyscy",
+    "hol.palmowa"
+   ],
+   "item": "item_platki",
+   "wish": null,
+   "dates": {
+    "2026": "2026-06-04",
+    "2027": "2027-05-27",
+    "2028": "2028-06-15",
+    "2029": "2029-05-31",
+    "2030": "2030-06-20"
+   },
+   "shops_q": [
+    {
+     "say": null,
+     "shops": "closed"
+    }
+   ]
+  },
+  {
+   "id": "hol.kupala",
+   "kind": "holiday",
+   "pl": "Noc Kupały (Noc Świętojańska)",
+   "ru": "Ночь Купалы (ночь на Ивана Купалу)",
+   "tr": "ноц купа́ўы  ноц щфентоя́ньска ",
+   "when": {
+    "day": 23,
+    "month": 6,
+    "until": {
+     "day": 24,
+     "month": 6
+    }
+   },
+   "season": "lato",
+   "months": [
+    6
+   ],
+   "free": false,
+   "shops": "open",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "W noc świętojańską po wodzie płyną wianki.",
+     "ru": "В ночь на Ивана Купалу по воде плывут венки.",
+     "tiles_pl": [
+      "W",
+      "noc",
+      "świętojańską",
+      "po",
+      "wodzie",
+      "płyną",
+      "wianki"
+     ],
+     "distract_pl": [
+      "wianek",
+      "woda"
+     ]
+    },
+    {
+     "pl": "Nad rzeką jest ognisko i muzyka.",
+     "ru": "У реки костёр и музыка.",
+     "tiles_pl": [
+      "Nad",
+      "rzeką",
+      "jest",
+      "ognisko",
+      "i",
+      "muzyka"
+     ],
+     "distract_pl": [
+      "rzeka",
+      "ogniska"
+     ]
+    }
+   ],
+   "words": [
+    "sw.wianek",
+    "sw.ognisko",
+    "w.rzeka"
+   ],
+   "clue": [
+    "sw.wianek",
+    "sw.ognisko"
+   ],
+   "distract": [
+    "hol.wiosna",
+    "hol.zielna",
+    "hol.andrzejki"
+   ],
+   "item": "item_wianek",
+   "wish": null,
+   "say": "dwudziestego trzeciego czerwca"
+  },
+  {
+   "id": "hol.zielna",
+   "kind": "holiday",
+   "pl": "Matki Boskiej Zielnej",
+   "ru": "Успение Богородицы (праздник трав)",
+   "tr": "ма́тки бо́скей же́лнэй",
+   "when": {
+    "day": 15,
+    "month": 8
+   },
+   "season": "lato",
+   "months": [
+    8
+   ],
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "note": {
+    "pl": "To także Święto Wojska Polskiego (15 sierpnia).",
+    "ru": "15 августа также День Войска Польского."
+   },
+   "customs": [
+    {
+     "pl": "Piętnastego sierpnia święcimy bukiety z ziół i kwiatów.",
+     "ru": "Пятнадцатого августа освящаем букеты из трав и цветов.",
+     "tiles_pl": [
+      "Piętnastego",
+      "sierpnia",
+      "święcimy",
+      "bukiety",
+      "z",
+      "ziół",
+      "i",
+      "kwiatów"
+     ],
+     "distract_pl": [
+      "piętnasty",
+      "zioła"
+     ]
+    },
+    {
+     "pl": "Bukiet niesiemy do kościoła.",
+     "ru": "Букет несём в костёл.",
+     "tiles_pl": [
+      "Bukiet",
+      "niesiemy",
+      "do",
+      "kościoła"
+     ],
+     "distract_pl": [
+      "bukiety",
+      "kościół"
+     ]
+    },
+    {
+     "pl": "Piętnastego sierpnia sklepy są zamknięte.",
+     "ru": "Пятнадцатого августа магазины закрыты.",
+     "tiles_pl": [
+      "Piętnastego",
+      "sierpnia",
+      "sklepy",
+      "są",
+      "zamknięte"
+     ],
+     "distract_pl": [
+      "piętnasty",
+      "zamknięty"
+     ]
+    }
+   ],
+   "words": [
+    "sw.bukiet",
+    "sw.ziola",
+    "w.kwiat",
+    "w.kosciol"
+   ],
+   "clue": [
+    "sw.bukiet",
+    "sw.ziola"
+   ],
+   "distract": [
+    "hol.boze_cialo",
+    "hol.palmowa",
+    "hol.kupala"
+   ],
+   "item": "item_bukiet_ziol",
+   "wish": null,
+   "say": "piętnastego sierpnia",
+   "shops_q": [
+    {
+     "say": "piętnastego sierpnia",
+     "shops": "closed"
+    }
+   ]
+  },
+  {
+   "id": "hol.wszyscy",
+   "kind": "holiday",
+   "pl": "Wszystkich Świętych",
+   "ru": "День Всех Святых",
+   "tr": "фшы́стких щфе́нтых",
+   "when": {
+    "day": 1,
+    "month": 11
+   },
+   "season": "jesień",
+   "months": [
+    11
+   ],
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "basket": {
+    "title": {
+     "pl": "Spakuj torbę na cmentarz",
+     "ru": "Собери сумку на кладбище"
+    },
+    "in": [
+     "sw.znicz",
+     "sw.chryzantema",
+     "w.kwiat"
+    ],
+    "out": [
+     "sw.pisanka",
+     "sw.choinka",
+     "sw.grill"
+    ]
+   },
+   "customs": [
+    {
+     "pl": "Pierwszego listopada idziemy na cmentarz.",
+     "ru": "Первого ноября идём на кладбище.",
+     "tiles_pl": [
+      "Pierwszego",
+      "listopada",
+      "idziemy",
+      "na",
+      "cmentarz"
+     ],
+     "distract_pl": [
+      "pierwszy",
+      "cmentarza"
+     ]
+    },
+    {
+     "pl": "Na grobach zapalamy znicze.",
+     "ru": "На могилах зажигаем знич-свечи.",
+     "tiles_pl": [
+      "Na",
+      "grobach",
+      "zapalamy",
+      "znicze"
+     ],
+     "distract_pl": [
+      "grób",
+      "znicz"
+     ]
+    },
+    {
+     "pl": "Na groby kładziemy chryzantemy.",
+     "ru": "На могилы кладём хризантемы.",
+     "tiles_pl": [
+      "Na",
+      "groby",
+      "kładziemy",
+      "chryzantemy"
+     ],
+     "distract_pl": [
+      "grobie",
+      "chryzantema"
+     ]
+    },
+    {
+     "pl": "Pierwszego listopada sklepy są zamknięte.",
+     "ru": "Первого ноября магазины закрыты.",
+     "tiles_pl": [
+      "Pierwszego",
+      "listopada",
+      "sklepy",
+      "są",
+      "zamknięte"
+     ],
+     "distract_pl": [
+      "pierwszy",
+      "zamknięty"
+     ]
+    }
+   ],
+   "words": [
+    "sw.znicz",
+    "sw.chryzantema",
+    "sw.cmentarz",
+    "sw.grob"
+   ],
+   "clue": [
+    "sw.znicz",
+    "sw.chryzantema"
+   ],
+   "distract": [
+    "hol.zaduszki",
+    "hol.wigilia",
+    "hol.wielkanoc"
+   ],
+   "item": "item_znicz",
+   "wish": null,
+   "say": "pierwszego listopada",
+   "shops_q": [
+    {
+     "say": "pierwszego listopada",
+     "shops": "closed"
+    }
+   ]
+  },
+  {
+   "id": "hol.zaduszki",
+   "kind": "holiday",
+   "pl": "Zaduszki",
+   "ru": "Задушки (день поминовения усопших)",
+   "tr": "заду́шки",
+   "when": {
+    "day": 2,
+    "month": 11
+   },
+   "season": "jesień",
+   "months": [
+    11
+   ],
+   "free": false,
+   "shops": "open",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "Drugiego listopada wspominamy zmarłych.",
+     "ru": "Второго ноября вспоминаем умерших.",
+     "tiles_pl": [
+      "Drugiego",
+      "listopada",
+      "wspominamy",
+      "zmarłych"
+     ],
+     "distract_pl": [
+      "drugi",
+      "zmarły"
+     ]
+    },
+    {
+     "pl": "Odwiedzamy groby rodziny.",
+     "ru": "Навещаем могилы семьи.",
+     "tiles_pl": [
+      "Odwiedzamy",
+      "groby",
+      "rodziny"
+     ],
+     "distract_pl": [
+      "grób",
+      "rodzina"
+     ]
+    },
+    {
+     "pl": "Wieczorem na cmentarzu świecą znicze.",
+     "ru": "Вечером на кладбище горят знич-свечи.",
+     "tiles_pl": [
+      "Wieczorem",
+      "na",
+      "cmentarzu",
+      "świecą",
+      "znicze"
+     ],
+     "distract_pl": [
+      "cmentarz",
+      "zniczy"
+     ]
+    }
+   ],
+   "words": [
+    "sw.znicz",
+    "sw.cmentarz",
+    "sw.grob",
+    "w.rodzina"
+   ],
+   "clue": [
+    "sw.chryzantema",
+    "sw.cmentarz"
+   ],
+   "distract": [
+    "hol.wszyscy",
+    "hol.andrzejki",
+    "hol.wigilia"
+   ],
+   "item": "item_chryzantema",
+   "wish": null,
+   "say": "drugiego listopada",
+   "shops_q": [
+    {
+     "say": "drugiego listopada",
+     "shops": "open"
+    }
+   ]
+  },
+  {
+   "id": "hol.andrzejki",
+   "kind": "holiday",
+   "pl": "Andrzejki",
+   "ru": "Андрэйки (вечер гаданий)",
+   "tr": "анджэ́йки",
+   "when": {
+    "day": 29,
+    "month": 11,
+    "until": {
+     "day": 30,
+     "month": 11
+    }
+   },
+   "season": "jesień",
+   "months": [
+    11
+   ],
+   "free": false,
+   "shops": "open",
+   "checked": "2026-10-18",
+   "basket": {
+    "title": {
+     "pl": "Spakuj wróżby",
+     "ru": "Собери всё для гаданий"
+    },
+    "in": [
+     "sw.wosk",
+     "w.klucz",
+     "w.woda",
+     "w.but"
+    ],
+    "out": [
+     "sw.choinka",
+     "sw.pisanka",
+     "sw.znicz"
+    ]
+   },
+   "customs": [
+    {
+     "pl": "W andrzejki robimy wróżby.",
+     "ru": "На Андрэйки делаем гадания.",
+     "tiles_pl": [
+      "W",
+      "andrzejki",
+      "robimy",
+      "wróżby"
+     ],
+     "distract_pl": [
+      "wróżba",
+      "robią"
+     ]
+    },
+    {
+     "pl": "Lejemy wosk przez klucz do wody.",
+     "ru": "Льём воск через ключ в воду.",
+     "tiles_pl": [
+      "Lejemy",
+      "wosk",
+      "przez",
+      "klucz",
+      "do",
+      "wody"
+     ],
+     "distract_pl": [
+      "wosku",
+      "klucze"
+     ]
+    },
+    {
+     "pl": "Buty ustawiamy po kolei do drzwi.",
+     "ru": "Ботинки ставим по очереди к двери.",
+     "tiles_pl": [
+      "Buty",
+      "ustawiamy",
+      "po",
+      "kolei",
+      "do",
+      "drzwi"
+     ],
+     "distract_pl": [
+      "but",
+      "drzwiach"
+     ]
+    }
+   ],
+   "words": [
+    "sw.andrzejki",
+    "sw.wrozba",
+    "sw.wosk",
+    "w.klucz",
+    "w.but"
+   ],
+   "clue": [
+    "sw.wosk",
+    "w.klucz"
+   ],
+   "distract": [
+    "hol.mikolajki",
+    "hol.kupala",
+    "hol.imieniny"
+   ],
+   "item": "item_klucz_wosk",
+   "wish": null,
+   "say": "dwudziestego dziewiątego listopada"
+  },
+  {
+   "id": "hol.mikolajki",
+   "kind": "holiday",
+   "pl": "Mikołajki",
+   "ru": "Николайки (6 декабря)",
+   "tr": "микоўа́йки",
+   "when": {
+    "day": 6,
+    "month": 12
+   },
+   "season": "zima",
+   "months": [
+    12
+   ],
+   "free": false,
+   "shops": "open",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "Szóstego grudnia Mikołaj przynosi prezenty.",
+     "ru": "Шестого декабря Николай приносит подарки.",
+     "tiles_pl": [
+      "Szóstego",
+      "grudnia",
+      "Mikołaj",
+      "przynosi",
+      "prezenty"
+     ],
+     "distract_pl": [
+      "szósty",
+      "prezent"
+     ]
+    },
+    {
+     "pl": "Prezent jest w bucie albo pod poduszką.",
+     "ru": "Подарок лежит в ботинке или под подушкой.",
+     "tiles_pl": [
+      "Prezent",
+      "jest",
+      "w",
+      "bucie",
+      "albo",
+      "pod",
+      "poduszką"
+     ],
+     "distract_pl": [
+      "but",
+      "poduszce"
+     ]
+    }
+   ],
+   "words": [
+    "sw.mikolaj",
+    "sw.mikolajki",
+    "w.prezent",
+    "w.but"
+   ],
+   "clue": [
+    "w.but",
+    "w.prezent"
+   ],
+   "distract": [
+    "hol.boze_narodzenie",
+    "hol.dziecko",
+    "hol.wigilia"
+   ],
+   "item": "item_but_prezent",
+   "wish": {
+    "situation": {
+     "pl": "Jest szósty grudnia.",
+     "ru": "Шестое декабря."
+    },
+    "pl": "Wesołych Mikołajek!",
+    "ru": "Весёлых Николаек!",
+    "tiles_pl": [
+     "Wesołych",
+     "Mikołajek"
+    ],
+    "distract_pl": [
+     "Wesoły",
+     "Mikołaj"
+    ]
+   },
+   "say": "szóstego grudnia",
+   "shops_q": [
+    {
+     "say": "szóstego grudnia",
+     "shops": "open"
+    }
+   ]
+  },
+  {
+   "id": "hol.wigilia",
+   "kind": "holiday",
+   "pl": "Wigilia",
+   "ru": "Сочельник (24 декабря)",
+   "tr": "виги́ля",
+   "when": {
+    "day": 24,
+    "month": 12
+   },
+   "season": "zima",
+   "months": [
+    12
+   ],
+   "free": true,
+   "shops": "short",
+   "checked": "2026-10-18",
+   "table": {
+    "title": {
+     "pl": "Nakryj stół",
+     "ru": "Накрой сочельничный стол"
+    },
+    "in": [
+     "sw.obrus",
+     "sw.sianko",
+     "sw.oplatek",
+     "sw.puste_nakrycie",
+     "w.barszcz",
+     "sw.uszka",
+     "sw.karp",
+     "w.pierogi"
+    ],
+    "out": [
+     "sw.paczek",
+     "sw.grill",
+     "sw.pisanka",
+     "sw.zurek"
+    ]
+   },
+   "free_note": {
+    "pl": "Wigilia jest dniem wolnym od pracy od 2025 roku.",
+    "ru": "Сочельник нерабочий день с 2025 года."
+   },
+   "shops_note": {
+    "pl": "W Wigilię sklepy są otwarte do czternastej.",
+    "ru": "В Сочельник магазины открыты до 14:00."
+   },
+   "customs": [
+    {
+     "pl": "W Wigilię dzielimy się opłatkiem.",
+     "ru": "В Сочельник делимся облаткой.",
+     "tiles_pl": [
+      "W",
+      "Wigilię",
+      "dzielimy",
+      "się",
+      "opłatkiem"
+     ],
+     "distract_pl": [
+      "opłatek",
+      "dzielić"
+     ]
+    },
+    {
+     "pl": "Kolację zaczynamy gdy zobaczymy pierwszą gwiazdkę.",
+     "ru": "Ужин начинаем, когда увидим первую звёздочку.",
+     "tiles_pl": [
+      "Kolację",
+      "zaczynamy",
+      "gdy",
+      "zobaczymy",
+      "pierwszą",
+      "gwiazdkę"
+     ],
+     "distract_pl": [
+      "pierwsza",
+      "gwiazdka"
+     ]
+    },
+    {
+     "pl": "Pod obrusem kładziemy sianko.",
+     "ru": "Под скатерть кладём сено.",
+     "tiles_pl": [
+      "Pod",
+      "obrusem",
+      "kładziemy",
+      "sianko"
+     ],
+     "distract_pl": [
+      "obrus",
+      "sianka"
+     ]
+    },
+    {
+     "pl": "Na stole stoi puste nakrycie dla gościa.",
+     "ru": "На столе стоит пустой прибор для гостя.",
+     "tiles_pl": [
+      "Na",
+      "stole",
+      "stoi",
+      "puste",
+      "nakrycie",
+      "dla",
+      "gościa"
+     ],
+     "distract_pl": [
+      "stół",
+      "gość"
+     ]
+    },
+    {
+     "pl": "Jest dwanaście potraw bez mięsa.",
+     "ru": "Двенадцать блюд без мяса.",
+     "tiles_pl": [
+      "Jest",
+      "dwanaście",
+      "potraw",
+      "bez",
+      "mięsa"
+     ],
+     "distract_pl": [
+      "dwunasty",
+      "mięso"
+     ]
+    },
+    {
+     "pl": "Jemy barszcz z uszkami, karpia i pierogi.",
+     "ru": "Едим борщ с ушками, карпа и вареники.",
+     "tiles_pl": [
+      "Jemy",
+      "barszcz",
+      "z",
+      "uszkami",
+      "karpia",
+      "i",
+      "pierogi"
+     ],
+     "distract_pl": [
+      "karp",
+      "pieróg"
+     ]
+    },
+    {
+     "pl": "Po kolacji śpiewamy kolędy i otwieramy prezenty.",
+     "ru": "После ужина поём колядки и открываем подарки.",
+     "tiles_pl": [
+      "Po",
+      "kolacji",
+      "śpiewamy",
+      "kolędy",
+      "i",
+      "otwieramy",
+      "prezenty"
+     ],
+     "distract_pl": [
+      "kolęda",
+      "prezent"
+     ]
+    },
+    {
+     "pl": "O północy idziemy na pasterkę.",
+     "ru": "В полночь идём на пастерку.",
+     "tiles_pl": [
+      "O",
+      "północy",
+      "idziemy",
+      "na",
+      "pasterkę"
+     ],
+     "distract_pl": [
+      "północ",
+      "pasterka"
+     ]
+    }
+   ],
+   "words": [
+    "sw.wigilia",
+    "sw.oplatek",
+    "sw.pierwsza_gwiazdka",
+    "sw.sianko",
+    "sw.obrus",
+    "sw.puste_nakrycie",
+    "sw.karp",
+    "sw.uszka",
+    "sw.kompot_z_suszu",
+    "w.barszcz",
+    "w.pierogi",
+    "sw.choinka",
+    "sw.koleda",
+    "sw.pasterka",
+    "w.prezent"
+   ],
+   "clue": [
+    "sw.oplatek",
+    "sw.karp"
+   ],
+   "distract": [
+    "hol.boze_narodzenie",
+    "hol.wielkanoc",
+    "hol.wszyscy"
+   ],
+   "item": "item_oplatek",
+   "wish": {
+    "situation": {
+     "pl": "Jest Wigilia. Dzielisz się opłatkiem z sąsiadką.",
+     "ru": "Сочельник. Ты делишься облаткой с соседкой."
+    },
+    "pl": "Wesołych Świąt!",
+    "ru": "Весёлых праздников!",
+    "tiles_pl": [
+     "Wesołych",
+     "Świąt"
+    ],
+    "distract_pl": [
+     "Wesoły",
+     "Święta"
+    ]
+   },
+   "say": "dwudziestego czwartego grudnia",
+   "shops_q": [
+    {
+     "say": "dwudziestego czwartego grudnia",
+     "shops": "short"
+    }
+   ]
+  },
+  {
+   "id": "hol.boze_narodzenie",
+   "kind": "holiday",
+   "pl": "Boże Narodzenie",
+   "ru": "Рождество (25-26 декабря)",
+   "tr": "бо́жэ народзэ́нье",
+   "when": {
+    "day": 25,
+    "month": 12,
+    "until": {
+     "day": 26,
+     "month": 12
+    }
+   },
+   "season": "zima",
+   "months": [
+    12
+   ],
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "Dwudziestego piątego i dwudziestego szóstego grudnia nie pracujemy.",
+     "ru": "Двадцать пятого и двадцать шестого декабря не работаем.",
+     "tiles_pl": [
+      "Dwudziestego",
+      "piątego",
+      "i",
+      "dwudziestego",
+      "szóstego",
+      "grudnia",
+      "nie",
+      "pracujemy"
+     ],
+     "distract_pl": [
+      "dwudziesty",
+      "pracujesz"
+     ]
+    },
+    {
+     "pl": "Rodzina jest razem przy stole.",
+     "ru": "Семья вместе за столом.",
+     "tiles_pl": [
+      "Rodzina",
+      "jest",
+      "razem",
+      "przy",
+      "stole"
+     ],
+     "distract_pl": [
+      "rodziny",
+      "stół"
+     ]
+    },
+    {
+     "pl": "Kolędnicy chodzą z gwiazdą i śpiewają kolędy.",
+     "ru": "Колядующие ходят со звездой и поют колядки.",
+     "tiles_pl": [
+      "Kolędnicy",
+      "chodzą",
+      "z",
+      "gwiazdą",
+      "i",
+      "śpiewają",
+      "kolędy"
+     ],
+     "distract_pl": [
+      "kolędnik",
+      "gwiazda"
+     ]
+    },
+    {
+     "pl": "Drugi dzień świąt też jest wolny.",
+     "ru": "Второй день праздников тоже выходной.",
+     "tiles_pl": [
+      "Drugi",
+      "dzień",
+      "świąt",
+      "też",
+      "jest",
+      "wolny"
+     ],
+     "distract_pl": [
+      "drugiego",
+      "wolne"
+     ]
+    },
+    {
+     "pl": "Dwudziestego piątego grudnia sklepy są zamknięte.",
+     "ru": "Двадцать пятого декабря магазины закрыты.",
+     "tiles_pl": [
+      "Dwudziestego",
+      "piątego",
+      "grudnia",
+      "sklepy",
+      "są",
+      "zamknięte"
+     ],
+     "distract_pl": [
+      "dwudziesty",
+      "zamknięty"
+     ]
+    }
+   ],
+   "words": [
+    "sw.boze_narodzenie",
+    "sw.koleda",
+    "sw.kolednik",
+    "sw.choinka",
+    "w.rodzina",
+    "w.gwiazda"
+   ],
+   "clue": [
+    "sw.kolednik",
+    "sw.choinka"
+   ],
+   "distract": [
+    "hol.wigilia",
+    "hol.wielkanoc",
+    "hol.nowy_rok"
+   ],
+   "item": "item_kolednik_gwiazda",
+   "wish": {
+    "situation": {
+     "pl": "Jest Boże Narodzenie. Dzwonisz do rodziny.",
+     "ru": "Рождество. Ты звонишь семье."
+    },
+    "pl": "Wesołych Świąt!",
+    "ru": "Весёлых праздников!",
+    "tiles_pl": [
+     "Wesołych",
+     "Świąt"
+    ],
+    "distract_pl": [
+     "Wesoły",
+     "Święta"
+    ]
+   },
+   "say": "dwudziestego piątego grudnia",
+   "shops_q": [
+    {
+     "say": "dwudziestego piątego grudnia",
+     "shops": "closed"
+    },
+    {
+     "say": "dwudziestego szóstego grudnia",
+     "shops": "closed"
+    }
+   ]
+  },
+  {
+   "id": "hol.imieniny",
+   "kind": "holiday",
+   "pl": "Imieniny i urodziny",
+   "ru": "Именины и день рождения",
+   "tr": "имени́ны и уроджи́ны",
+   "when": {
+    "rule": "personal"
+   },
+   "season": null,
+   "months": [],
+   "free": false,
+   "shops": "open",
+   "checked": "2026-10-18",
+   "note": {
+    "pl": "Imieniny są ważniejsze niż w Rosji: dostajemy życzenia i kwiaty.",
+    "ru": "Именины в Польше значат больше, чем в России: поздравляют, дарят цветы."
+   },
+   "customs": [
+    {
+     "pl": "Imieniny są w dzień twojego imienia.",
+     "ru": "Именины — в день твоего имени (по календарю).",
+     "tiles_pl": [
+      "Imieniny",
+      "są",
+      "w",
+      "dzień",
+      "twojego",
+      "imienia"
+     ],
+     "distract_pl": [
+      "imię",
+      "dnia"
+     ]
+    },
+    {
+     "pl": "Dajemy kwiaty i życzenia.",
+     "ru": "Дарим цветы и поздравления.",
+     "tiles_pl": [
+      "Dajemy",
+      "kwiaty",
+      "i",
+      "życzenia"
+     ],
+     "distract_pl": [
+      "kwiat",
+      "życzenie"
+     ]
+    },
+    {
+     "pl": "Na urodziny jemy tort.",
+     "ru": "На день рождения едим торт.",
+     "tiles_pl": [
+      "Na",
+      "urodziny",
+      "jemy",
+      "tort"
+     ],
+     "distract_pl": [
+      "torty",
+      "urodzin"
+     ]
+    },
+    {
+     "pl": "Śpiewamy sto lat.",
+     "ru": "Поём «Сто лет».",
+     "tiles_pl": [
+      "Śpiewamy",
+      "sto",
+      "lat"
+     ],
+     "distract_pl": [
+      "śpiewają",
+      "lata"
+     ]
+    }
+   ],
+   "words": [
+    "w.imieniny",
+    "w.urodziny",
+    "sw.tort",
+    "sw.zyczenia",
+    "sw.sto_lat"
+   ],
+   "clue": [
+    "sw.tort",
+    "w.kwiat"
+   ],
+   "distract": [
+    "hol.babcia",
+    "hol.matka",
+    "hol.dziecko"
+   ],
+   "item": "item_tort",
+   "wish": {
+    "situation": {
+     "pl": "Twoja sąsiadka ma imieniny.",
+     "ru": "У твоей соседки именины."
+    },
+    "pl": "Wszystkiego najlepszego!",
+    "ru": "Всего самого лучшего!",
+    "tiles_pl": [
+     "Wszystkiego",
+     "najlepszego"
+    ],
+    "distract_pl": [
+     "Wszystko",
+     "najlepsze"
+    ]
+   },
+   "wish_alt": {
+    "situation": {
+     "pl": "Wszyscy śpiewają przy torcie.",
+     "ru": "Все поют над тортом."
+    },
+    "pl": "Sto lat!",
+    "ru": "Сто лет!",
+    "tiles_pl": [
+     "Sto",
+     "lat"
+    ],
+    "distract_pl": [
+     "stu",
+     "lata"
+    ]
+   }
+  }
+ ],
+ "decor": [
+  {
+   "id": "dec.znicze",
+   "for": "hol.wszyscy",
+   "window": {
+    "rule": "fixed",
+    "from": "11-01",
+    "to": "11-02"
+   },
+   "where": "farm",
+   "sprite": "znicz"
+  },
+  {
+   "id": "dec.flagi_maj",
+   "for": "hol.majowka",
+   "window": {
+    "rule": "fixed",
+    "from": "05-02",
+    "to": "05-03"
+   },
+   "where": "home",
+   "sprite": "flaga"
+  },
+  {
+   "id": "dec.flagi_listopad",
+   "for": "date.niepodleglosc",
+   "window": {
+    "rule": "fixed",
+    "from": "11-11",
+    "to": "11-11"
+   },
+   "where": "home",
+   "sprite": "flaga"
+  },
+  {
+   "id": "dec.but_mikolajki",
+   "for": "hol.mikolajki",
+   "window": {
+    "rule": "fixed",
+    "from": "12-06",
+    "to": "12-06"
+   },
+   "where": "door",
+   "sprite": "but_prezent"
+  },
+  {
+   "id": "dec.choinka",
+   "for": "hol.wigilia",
+   "window": {
+    "rule": "fixed",
+    "from": "12-24",
+    "to": "01-06"
+   },
+   "where": "home",
+   "sprite": "choinka"
+  },
+  {
+   "id": "dec.fajerwerki",
+   "for": "hol.nowy_rok",
+   "window": {
+    "rule": "fixed",
+    "from": "12-31",
+    "to": "01-01"
+   },
+   "where": "farm",
+   "sprite": "fajerwerk"
+  },
+  {
+   "id": "dec.kreda_drzwi",
+   "for": "hol.trzech_kroli",
+   "window": {
+    "rule": "fixed",
+    "from": "01-06",
+    "to": "01-06"
+   },
+   "where": "door",
+   "sprite": "kreda_kmb"
+  },
+  {
+   "id": "dec.marzanna",
+   "for": "hol.wiosna",
+   "window": {
+    "rule": "fixed",
+    "from": "03-21",
+    "to": "03-21"
+   },
+   "where": "river",
+   "sprite": "marzanna"
+  },
+  {
+   "id": "dec.wianek",
+   "for": "hol.kupala",
+   "window": {
+    "rule": "fixed",
+    "from": "06-23",
+    "to": "06-24"
+   },
+   "where": "well",
+   "sprite": "wianek"
+  },
+  {
+   "id": "dec.bukiet_zielny",
+   "for": "hol.zielna",
+   "window": {
+    "rule": "fixed",
+    "from": "08-15",
+    "to": "08-15"
+   },
+   "where": "home",
+   "sprite": "bukiet_ziol"
+  },
+  {
+   "id": "dec.pisanki",
+   "for": "hol.wielkanoc",
+   "window": {
+    "rule": "easter",
+    "from": -1,
+    "to": 1
+   },
+   "where": "table",
+   "sprite": "pisanka"
+  },
+  {
+   "id": "dec.palma",
+   "for": "hol.palmowa",
+   "window": {
+    "rule": "easter",
+    "from": -7,
+    "to": -1
+   },
+   "where": "home",
+   "sprite": "palma"
+  },
+  {
+   "id": "dec.paczki",
+   "for": "hol.tlusty",
+   "window": {
+    "rule": "easter",
+    "from": -52,
+    "to": -52
+   },
+   "where": "table",
+   "sprite": "paczek"
+  },
+  {
+   "id": "dec.galazki",
+   "for": "hol.zielone",
+   "window": {
+    "rule": "easter",
+    "from": 49,
+    "to": 49
+   },
+   "where": "home",
+   "sprite": "galazka"
   }
  ]
 }

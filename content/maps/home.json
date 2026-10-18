@@ -165,7 +165,7 @@
    "id": "map",
    "use": "map",
    "label": "Mapa Polski · Карта Польши",
-   "sprite": "window",
+   "sprite": "w2_wallmap",
    "at": [
     1,
     1
@@ -181,7 +181,7 @@
    "id": "calendar",
    "use": "calendar",
    "label": "Kalendarz · Памятные даты",
-   "sprite": "window",
+   "sprite": "w2_calendar",
    "at": [
     7,
     1

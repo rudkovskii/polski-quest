@@ -192,7 +192,7 @@
    "id": "mast",
    "use": "mast",
    "label": "Maszt · Гимн и символы",
-   "sprite": "radio",
+   "sprite": "w2_mast",
    "at": [
     11,
     4
@@ -208,7 +208,7 @@
    "id": "seasonBoard",
    "use": "seasonBoard",
    "label": "Tablica sezonowa · Праздники",
-   "sprite": "board",
+   "sprite": "w2_season_board",
    "at": [
     24,
     8

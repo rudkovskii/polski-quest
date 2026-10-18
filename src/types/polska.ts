@@ -132,4 +132,6 @@ export interface PlotView {
   pct: number;
   /** Самая продвинутая стадия среди растущих (null — ничего не растёт). */
   best: Stage | null;
+  /** Группа объекта (`voi:mazowieckie`, `stanza:s1`, `month:5`, `season:zima`): по ней сцена выбирает вид (цвет цветка по сезону). */
+  group: string;
 }

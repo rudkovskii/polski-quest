@@ -86,8 +86,8 @@ export interface BusEvents {
   'audio:unlock': Record<string, never>;
   'audio:blocked': Record<string, never>;
   'audio:state': { state: AudioState; via?: AudioVia; text?: string; id?: string };
-  /** v2: вид объектов участков Zagroda по прогрессу (шлёт `systems/polska.ts` при любом изменении и при входе в Zagroda). */
-  'polska:plots': { views: PlotView[] };
+  /** v2: вид объектов участков Zagroda по прогрессу (шлёт `systems/polska.ts` при любом изменении и при входе в Zagroda); `entries` — кадры точек входа (`map`, `calendar`, `mast`, `seasonBoard`) по прогрессу. */
+  'polska:plots': { views: PlotView[]; entries?: Record<string, number> };
   /** v2: шкала «Wiedza o Polsce» для `ui/polskaHud.ts`: подуровень 0…10, доля внутри, доля всех единиц, опыт v2; `gain` — «+N», `up` — новый подуровень. */
   'polska:scale': { sub: number; of: number; pl: string; ru: string; ratio: number; pct: number; xp: number; gain?: number; up?: boolean };
   /** v2: ответ в игре о Польше (для автобега в Zagroda: полив, рост, урожай у объекта `obj`). */
