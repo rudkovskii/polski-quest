@@ -5,7 +5,8 @@ import { BG_COLOR, World, type WorldStart } from './scenes/World';
 import { backupDue, shouldRemind, withMark } from './systems/backup';
 import { bus, type Bus } from './systems/bus';
 import { createFarm } from './systems/farm';
-import { connectAudio } from './systems/platform/audio';
+import { audioContext, connectAudio } from './systems/platform/audio';
+import { createMusicPlayer } from './systems/platform/music';
 import { createClock } from './systems/platform/clock';
 import { connectSfx } from './systems/platform/sfx';
 import { recapBefore, wateredOn } from './systems/daygoal';
@@ -30,6 +31,8 @@ import { mountHints } from './ui/hints';
 import { mountGuide, type GuideStage } from './ui/hintsGuide';
 import { createTips } from './ui/glossary';
 import { mountHud } from './ui/hud';
+import { mountRadio } from './ui/radio';
+import { mountMusicHud } from './ui/radioHud';
 import { mountSettings } from './ui/settings';
 import { mountUpdateToast } from './ui/updateToast';
 
@@ -78,6 +81,17 @@ async function main(): Promise<void> {
     connectAudio(gatedAudioBus(bus, () => store.save.settings.sound));
     connectSfx(bus, () => store.save.settings.sound, undefined, { mute, volume: () => store.save.settings.sfxVolume / 100 });
   }
+  // Музыка (V11b): плеер HTMLAudio, по умолчанию выключена; `?mute=1` — аудио не создаётся, переключатели работают.
+  const music = createMusicPlayer({
+    mute,
+    base: import.meta.env.BASE_URL,
+    get: () => store.save.settings.music,
+    set: (m) => store.update((s) => ({ ...s, settings: { ...s.settings, music: m } }), Date.now()),
+    ctxOf: audioContext,
+  });
+  bus.on('world:location', ({ id }) => music.setLocation(id));
+  // Мини-игра открыта: музыка тише.
+  bus.on('farm:auto', ({ on }) => music.setDuck(on));
   mountAudioToast(overlay);
   mountUpdateToast(overlay);
 
@@ -90,6 +104,7 @@ async function main(): Promise<void> {
       if (!on) bus.emit('audio:stop', {});
       store.update((s) => ({ ...s, settings: { ...s.settings, sound: on } }), Date.now());
     },
+    music,
     getSfxVolume: () => store.save.settings.sfxVolume,
     setSfxVolume: (v) => store.update((s) => ({ ...s, settings: { ...s.settings, sfxVolume: v } }), Date.now()),
     lastSaved: () => store.lastSavedAt ?? store.save.updated,
@@ -139,6 +154,8 @@ async function main(): Promise<void> {
       if (!game.isOpen) summary.openBed();
     },
   });
+  mountMusicHud(overlay, music);
+  const radio = mountRadio(overlay, music);
   mountFloats(overlay);
   // Надёжное сохранение (V11a): галочка в углу после записи огорода, тост при сбое записи (хранилище само повторяет), раз в 7 дней — напоминание скачать копию.
   let shownGarden = store.save.garden;
@@ -228,6 +245,7 @@ async function main(): Promise<void> {
     if (use === 'desk') dictionary.open();
     else if (use === 'shelf') pantry.open();
     else if (use === 'bed') summary.openBed();
+    else if (use === 'radio') radio.open();
     else if (use === 'bin') summary.openBin();
     else if (use === 'board') board.open();
     else if (use === 'plant') plantCard.open(id);
@@ -298,7 +316,7 @@ async function main(): Promise<void> {
   // Страница из старого кэша (HTTP-кэш index.html, встроенный браузер без SW): версия с сервера без кэша.
   watchVersion({ base: import.meta.env.BASE_URL, local: __BUILD_ID__, isStale: staleBuild, onStale: needReload });
 
-  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock };
+  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock, music };
 }
 
 void main();

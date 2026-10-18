@@ -77,8 +77,8 @@ describe('карты: форма и ссылки', () => {
     }
   });
 
-  it('пять интерактивных объектов: стол, доска, коробка, полка, кровать; к каждому можно подойти', () => {
-    const uses: Record<string, string> = { home: 'bed,desk,shelf', farm: 'bin,board' };
+  it('интерактивные объекты: стол, доска, коробка, полка, кровать, радио; к каждому можно подойти', () => {
+    const uses: Record<string, string> = { home: 'bed,desk,radio,shelf', farm: 'bin,board' };
     for (const [id, list] of Object.entries(uses)) {
       const map = getMap(id);
       const found = map.objects.filter((o): o is PropObject => o.type === 'prop' && !!o.use).map((o) => o.use);

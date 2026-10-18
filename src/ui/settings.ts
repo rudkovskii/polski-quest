@@ -1,6 +1,7 @@
 // Настройки: звук, громкость эффектов, экспорт и импорт сохранения файлом, сброс (с автоэкспортом перед стиранием).
 // Пока панель открыта, мир не принимает ввод (`world:input`), Esc закрывает.
 import { bus as globalBus, type Bus } from '../systems/bus';
+import { TRACKS, type MusicControl } from '../systems/musicSettings';
 import type { BusEvents } from '../types/bus';
 import { el } from './dom';
 import { THEME_CSS } from './theme';
@@ -21,6 +22,7 @@ ${THEME_CSS}
 .pq-vol input { flex: 1 1 auto; min-width: 0; accent-color: var(--pq-wood); }
 .pq-vol input:disabled { opacity: .5; }
 .pq-vol output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; }
+.pq-select { flex: 1 1 auto; min-width: 0; font: 600 15px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; color: var(--pq-ink); background: #fffaf0; border: 2px solid var(--pq-ink); border-radius: 6px; padding: 8px; }
 .pq-card .ver { font-size: 11px; opacity: .55; text-align: center; user-select: text; -webkit-user-select: text; }
 .pq-card .ver:empty { display: none; }
 `;
@@ -38,6 +40,8 @@ export interface SettingsDeps {
   importSave(text: string): Promise<{ ok: boolean; message: string }>;
   /** Сброс: автоэкспорт, стирание, перезагрузка. */
   reset(): Promise<void>;
+  /** Музыка (V11b): вкл/выкл, трек, громкость. С `?mute=1` переключатели работают, но аудио нет. */
+  music?: MusicControl;
   /** Когда сохранение последний раз записано (мс); null — пока не писали. Показывается как «Последнее сохранение: ЧЧ:ММ». */
   lastSaved?(): number | null;
   /** Копию давно не скачивали (раз в 7 дней): в панели подсказка у «Экспорта». */
@@ -97,6 +101,27 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     deps.setSfxVolume?.(v);
     volOut.textContent = `${v}%`;
   });
+  // Музыка: вкл/выкл, выбор трека, громкость (V11b). Состояние — в плеере (`deps.music`), сюда приходит через onChange.
+  const music = deps.music;
+  const mPower = el('button', { type: 'button', class: 'pq-btn pq-toggle', 'data-music-power': '', onclick: () => music?.toggle() });
+  const mTrack = el('select', { class: 'pq-select', 'aria-label': 'Трек', 'data-music-track': '' });
+  for (const t of TRACKS) mTrack.append(el('option', { value: t.id }, `${t.pl} · ${t.ru}`));
+  mTrack.addEventListener('change', () => music?.select(mTrack.value));
+  const mVol = el('input', { type: 'range', min: '0', max: '100', step: '5', 'aria-label': 'Громкость музыки', 'data-music-volume': '' });
+  const mVolOut = el('output', { 'data-music-volume-out': '' });
+  mVol.addEventListener('input', () => music?.setVolume(Number(mVol.value) || 0));
+  const paintMusic = (): void => {
+    if (!music) return;
+    const v = music.view();
+    mPower.setAttribute('aria-pressed', String(v.on));
+    mPower.textContent = v.on ? 'Вкл' : 'Выкл';
+    mTrack.value = v.track;
+    mVol.value = String(v.volume);
+    mVolOut.textContent = `${v.volume}%`;
+  };
+  const musicRows = music ? [el('div', { class: 'row' }, el('span', {}, 'Музыка'), mPower), el('div', { class: 'row' }, mTrack), el('label', { class: 'pq-vol' }, el('span', {}, 'Громкость музыки'), mVol, mVolOut)] : [];
+  const offMusic = music?.onChange(paintMusic);
+  paintMusic();
   const file = el('input', { type: 'file', accept: 'application/json,.json', hidden: true });
   file.onchange = async () => {
     const f = file.files?.[0];
@@ -124,6 +149,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     el('h2', {}, 'Настройки'),
     el('div', { class: 'row' }, el('span', {}, 'Звук'), sound),
     el('label', { class: 'pq-vol' }, el('span', {}, 'Громкость эффектов'), vol, volOut),
+    ...musicRows,
     savedLine,
     el('button', { type: 'button', class: 'pq-btn', 'data-export': '', onclick: () => (note.textContent = `Сохранено: ${deps.exportSave()}`) }, 'Экспорт сохранения'),
     el('button', { type: 'button', class: 'pq-btn', 'data-import': '', onclick: () => file.click() }, 'Импорт сохранения'),
@@ -153,6 +179,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
       paintSaved();
       paintSound();
       paintVol();
+      paintMusic();
       root.hidden = false;
       bus.emit('world:input', { enabled: false });
     },
@@ -167,6 +194,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     },
     dispose() {
       offIntent();
+      offMusic?.();
       root.remove();
     },
   };

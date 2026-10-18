@@ -100,7 +100,7 @@ describe('сохранение: позиция', () => {
 
 describe('сохранение: экспорт и импорт', () => {
   it('круг: экспорт → импорт даёт то же сохранение', () => {
-    const s = { ...newSave(NOW), position: { map: 'home' as const, x: 3, y: 4, facing: 'down' as const }, settings: { sound: false, sfxVolume: 60 } };
+    const s = { ...newSave(NOW), position: { map: 'home' as const, x: 3, y: 4, facing: 'down' as const }, settings: { ...newSave(NOW).settings, sound: false, sfxVolume: 60 } };
     const r = importSave(exportSave(s));
     expect(r).toEqual({ ok: true, save: s });
   });

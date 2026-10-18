@@ -6,11 +6,11 @@ import { el } from './dom';
 export const ATLAS_SIZE = { w: 256, h: 368 } as const;
 export type IconKey = 'icon_seed' | 'icon_sprout' | 'icon_bush' | 'icon_ripe' | 'icon_overripe';
 export const ICON_FRAMES: Record<IconKey, readonly [number, number]> = {
-  icon_seed: [217, 255],
-  icon_sprout: [235, 255],
-  icon_bush: [163, 255],
-  icon_ripe: [199, 255],
-  icon_overripe: [181, 255],
+  icon_seed: [235, 255],
+  icon_sprout: [1, 273],
+  icon_bush: [181, 255],
+  icon_ripe: [217, 255],
+  icon_overripe: [199, 255],
 };
 
 export const STAGE_ICON_CSS = `
