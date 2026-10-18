@@ -1,5 +1,6 @@
 // Раунды мини-игры (V11a): по 10 заданий, потом итог в стиле Stardew («Ещё раунд» / «Закончить»). Лимита на число раундов нет.
 // Здесь счёт раунда (чистая часть) и карточка итога; шапку «3 / 10» и переходы ведёт `ui/minigame.ts`.
+import { SUB_COUNT, growthText } from '../systems/xp';
 import { el } from './dom';
 
 /** Заданий в одном раунде. */
@@ -10,6 +11,8 @@ export interface RoundAnswer {
   ok: boolean;
   /** Действие героя: полив, рост, урожай, промах; `xp` — опыт за ответ. */
   act?: { kind: 'water' | 'grow' | 'harvest' | 'miss'; xp: number };
+  /** Путь к A1 до и после ответа (позиция в подуровнях) и звание после ответа. */
+  path?: { from: number; to: number; sub: number; pl: string };
 }
 
 export interface RoundStats {
@@ -23,6 +26,8 @@ export interface RoundStats {
   harvested: number;
   xp: number;
   bestStreak: number;
+  /** Путь к A1: позиция до первого и после последнего ответа раунда, звание и номер подуровня сейчас. */
+  path?: { from: number; to: number; sub: number; pl: string };
 }
 
 /** Счётчик раунда: `add` на каждый ответ, `done` — раунд набрал `ROUND_SIZE`. */
@@ -43,6 +48,7 @@ export class Round {
     const s = this.s;
     s.total++;
     s.xp += r.act?.xp ?? 0;
+    if (r.path) s.path = { from: s.path?.from ?? r.path.from, to: r.path.to, sub: r.path.sub, pl: r.path.pl };
     if (r.ok) {
       s.correct++;
       this.streak++;
@@ -72,6 +78,8 @@ export const roundCss = `
 .pq-round dt::after { content: ''; flex: 1 1 auto; border-bottom: 2px dotted rgba(42, 20, 24, .35); transform: translateY(-3px); }
 .pq-round dd { margin: 0; font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
 .pq-round .xp dd { color: #4a6b2a; }
+.pq-round .way { margin-top: 6px; padding: 6px 8px; text-align: center; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; font-size: 15px; font-weight: 700; }
+.pq-round .way b { color: #4a6b2a; }
 /* Узко: итог в две колонки и без подзаголовка, чтобы все 6 строк влезали в панель без прокрутки. */
 @media (max-width: 520px) { .pq-round h3 { font-size: 18px; } .pq-round .sub { display: none; } .pq-round dl { grid-template-columns: 1fr auto 1fr auto; column-gap: 8px; row-gap: 8px; font-size: 14px; } }
 `;
@@ -95,5 +103,14 @@ export function renderRoundSummary(n: number, s: Readonly<RoundStats>): HTMLElem
       ...row('Опыт', `+${s.xp}`, 'xp'),
       ...row('Лучшая серия', String(s.bestStreak)),
     ),
+    wayLine(s.path),
   );
+}
+
+/** Строка пути: «Kiełek · 2/20 · +0,4 подуровня» (рост раунда — только если он есть). */
+function wayLine(p: RoundStats['path']): HTMLElement | null {
+  if (!p) return null;
+  const where = p.sub > SUB_COUNT ? p.pl : `${p.pl} · ${p.sub}/${SUB_COUNT}`;
+  const grow = growthText(p.to - p.from);
+  return el('div', { class: 'way', 'data-round-way': '' }, where, grow ? ' · ' : '', grow ? el('b', {}, grow) : null);
 }

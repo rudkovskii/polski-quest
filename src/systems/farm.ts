@@ -11,9 +11,6 @@ import {
   dayOf,
   derive,
   dueAt,
-  levelOf,
-  partialUnits,
-  type LevelInfo,
   nextText,
   pickTask,
   plant,
@@ -32,6 +29,7 @@ import {
   type GardenState,
 } from './garden';
 import { canAssemble, grade, makeQuestion, type Question } from './quiz';
+import { BASE, SUB_COUNT, THRESHOLDS, pathOf, pointsOf, type PathInfo } from './xp';
 
 export interface FarmDeps {
   bus: Bus<BusEvents>;
@@ -113,7 +111,9 @@ export function createFarm(d: FarmDeps): Farm {
   const grownWords = (): number => [...st.items.values()].filter((it) => !it.phrase && it.harvests > 0).length;
   const growingWords = (): number => [...st.items.values()].filter((it) => !it.phrase && it.harvests === 0 && it.stage !== null).length;
   const grownPhrases = (): number => [...st.items.values()].filter((it) => it.phrase && it.harvests > 0).length;
-  const level = (): LevelInfo => levelOf(grownWords(), grownPhrases(), WORDS.length, PHRASES.length, partialUnits(st));
+  const path = (): PathInfo => pathOf(pointsOf(st.items.values()));
+  /** Позиция на пути при запуске фермы: от неё считается рост за сессию («+0,4 подуровня»). */
+  const pos0 = path().pos;
   /** Фраза для сборки из плиток (иначе растёт в играх 1 и 2 как слово). */
   const assemble = (id: string): boolean => {
     const p = PHRASE_BY_ID.get(id);
@@ -146,8 +146,20 @@ export function createFarm(d: FarmDeps): Farm {
     d.bus.emit('farm:plants', { plants: plants(), cells: PLOT_CELLS.slice(0, TIER_CAP[g.tier]).map((c) => [c[0], c[1]]) });
   };
   const emitXp = (gain = 0, up = false): void => {
-    const l = level();
-    d.bus.emit('hud:xp', { level: l.level, ratio: l.ratio, xp: st.xp, next: l.next, growing: growingWords(), ...(gain ? { gain } : {}), ...(up ? { up } : {}) });
+    const l = path();
+    d.bus.emit('hud:xp', {
+      level: l.pl,
+      ratio: l.ratio,
+      sub: l.sub,
+      of: SUB_COUNT,
+      pct: l.pct,
+      pos: l.pos,
+      toNext: l.toNext,
+      xp: st.xp,
+      growing: growingWords(),
+      ...(gain ? { gain } : {}),
+      ...(up ? { up } : {}),
+    });
   };
   const changed = (): void => {
     d.save(g);
@@ -212,14 +224,17 @@ export function createFarm(d: FarmDeps): Farm {
       return { planted: onPlot, bag: r.added.length - onPlot, skipped: ids.length - r.added.length };
     },
     stats(): FarmStats {
-      const l = level();
+      const l = path();
       const day = today();
       const items = [...st.items.values()];
       return {
         xp: st.xp,
-        level: l.level,
+        level: l.pl,
         ratio: l.ratio,
-        next: l.next,
+        path: l,
+        base: BASE,
+        thresholds: THRESHOLDS,
+        sessionGain: Math.max(0, l.pos - pos0),
         grownToday: st.grownByDay.get(day) ?? 0,
         grownTotal: items.filter((it) => it.harvests > 0).length,
         grownWords: grownWords(),
@@ -275,7 +290,7 @@ export function createFarm(d: FarmDeps): Farm {
     answer(q, given) {
       const now = d.now();
       const r = grade(q, given);
-      const lvl0 = level().level;
+      const p0 = path();
       const slot = g.slots[q.id];
       const cell = slot !== undefined ? PLOT_CELLS[slot] : undefined;
       const e: AnswerEntry = { t: now, day: today(), id: q.id, side: sideOf(q.mode), ok: r.ok, mode: q.mode };
@@ -294,14 +309,14 @@ export function createFarm(d: FarmDeps): Farm {
       };
       d.bus.emit('farm:act', act);
       emitPlants();
-      const lvl1 = level().level;
-      emitXp(o.xp, lvl1 !== lvl0);
-      if (lvl1 !== lvl0) d.bus.emit('audio:play', { text: `Brawo! Poziom ${lvl1}.`, queue: true });
+      const p1 = path();
+      emitXp(o.xp, p1.sub > p0.sub);
+      if (p1.sub > p0.sub) d.bus.emit('audio:play', { text: `Brawo! ${p1.pl}.`, queue: true });
       changed();
       const c = content(q.id);
       const note = r.verdict === 'diacritics' ? 'Засчитано, но проверь польские буквы' : r.verdict === 'ortho' || r.verdict === 'typo' ? 'Засчитано, но есть ошибка в написании' : undefined;
       const day = today();
-      return { ok: r.ok, correct: r.correct, ...c, ...(note ? { note } : {}), act, progress: progressText(st.items.get(q.id), now, day), tomorrow: ripeSoon(st, day).tomorrow };
+      return { ok: r.ok, correct: r.correct, ...c, ...(note ? { note } : {}), act, path: { from: p0.pos, to: p1.pos, sub: p1.sub, pl: p1.pl }, progress: progressText(st.items.get(q.id), now, day), tomorrow: ripeSoon(st, day).tomorrow };
     },
     ripeSoon: () => ripeSoon(st, today()),
     reviewMode(id) {

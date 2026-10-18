@@ -359,20 +359,20 @@ describe('F5b: «созреет 0» и «до A0.1»', () => {
     expect(text).toContain('К урожаю идут 3');
   });
 
-  it('«до A0.1: 25 слов · уже растут N»: растущие слова из фермы доходят до подсказки полоски', () => {
+  it('HUD «до A1: N%»: растущие слова из фермы двигают долю пути, число растущих — в подсказке', () => {
     const s = setup();
     const root = document.createElement('div');
     document.body.append(root);
     mountHud(root, { bus: s.bus, onSettings: () => {} });
     const next = () => root.querySelector('[data-xp-next]')!.textContent;
+    const tip = () => root.querySelector<HTMLElement>('[data-xp]')!.title;
     s.farm.refresh();
-    expect(next()).toBe('до A0.1: 25 слов');
+    expect(next()).toBe('до A1: 0%');
     s.farm.plant(['w.dzien_dobry', 'w.kot', 'w.pies']);
     s.farm.refresh();
-    expect(next()).toBe('до A0.1: 25 слов · уже растут 3');
-    answerAll(s, 'w.kot', 1);
-    expect(next()).toBe('до A0.1: 25 слов · уже растут 3');
-    s.bus.emit('hud:xp', { level: 'A0', ratio: 0.1, next: { level: 'A0.1', words: 14 }, growing: 11 });
-    expect(next()).toBe('до A0.1: 14 слов · уже растут 11');
+    expect(tip()).toContain('уже растут 3');
+    s.bus.emit('hud:xp', { level: 'Kiełek', ratio: 0.1, sub: 2, of: 20, pct: 0.0149, toNext: 14, growing: 11 });
+    expect(next()).toBe('до A1: 1%');
+    expect(tip()).toBe('До следующего подуровня: 14 оч. · уже растут 11');
   });
 });

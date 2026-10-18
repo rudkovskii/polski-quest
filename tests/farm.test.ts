@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createFarm } from '../src/systems/farm';
 import { DAY_MS, newGarden, type GardenSave } from '../src/systems/garden';
+import type { BusEvents } from '../src/types/bus';
 import type { FarmAct } from '../src/types/farm';
 import { seeded, testBus } from './helpers';
 
@@ -62,21 +63,22 @@ describe('ферма: фасад', () => {
     expect(r).toMatchObject({ ok: false, correct: 'Здравствуйте.', act: { kind: 'miss' } });
   });
 
-  it('полоска опыта двигается с первых ответов, hud:xp несёт подуровень и «сколько до следующего»', () => {
+  it('полоска опыта двигается с первых ответов, hud:xp несёт подуровень, долю пути и «сколько до следующего»', () => {
     const s = setup();
     const f = s.farm;
     const ids = ['w.dzien_dobry', 'w.dobry_wieczor', 'w.dobranoc', 'w.do_widzenia', 'w.prosze'].filter((id) => f.word(id));
     f.plant(ids);
-    const ev: { level: string; ratio: number; next?: { level: string; words: number } | null }[] = [];
+    const ev: BusEvents['hud:xp'][] = [];
     s.bus.on('hud:xp', (x) => ev.push(x));
-    expect(f.stats()).toMatchObject({ level: 'A0', ratio: 0, next: { level: 'A0.1', words: 25 } });
+    expect(f.stats()).toMatchObject({ level: 'Ziemia', ratio: 0 });
+    expect(f.stats().path).toMatchObject({ sub: 0, nextPl: 'Ziarenko' });
     solve(f, 1);
     solve(f, 1);
     solve(f, 1);
     const last = ev.at(-1)!;
-    expect(last.level).toBe('A0');
-    expect(last.ratio).toBeGreaterThanOrEqual(0.03);
-    expect(last.next).toEqual({ level: 'A0.1', words: 25 });
+    expect(last).toMatchObject({ sub: 0, of: 20 });
+    expect(last.ratio).toBeGreaterThan(0);
+    expect(last.toNext).toBeGreaterThan(0);
   });
 
   it('очередь (P3a): 19 посаженных, очередь концентрируется на рабочем наборе, слово не чаще раза в 4 задания', () => {
@@ -94,7 +96,7 @@ describe('ферма: фасад', () => {
     expect(new Set(seen.slice(0, 19)).size).toBeLessThanOrEqual(13);
     expect(new Set(seen.slice(0, 19)).size).toBeGreaterThanOrEqual(8);
     // ответы двигают полоску A0, хотя выращенного ещё нет
-    expect(f.stats()).toMatchObject({ level: 'A0', grownWords: 0 });
+    expect(f.stats()).toMatchObject({ grownWords: 0 });
     expect(f.stats().ratio).toBeGreaterThan(0.1);
   });
 });

@@ -1,5 +1,6 @@
 // Ферма F-03: что видят экраны (словарь, банки, коробка, кровать, карточка растения) и мир (грядки, автобег).
 // Чистая модель — src/systems/garden.ts; склейка с хранилищем и шиной — src/main.ts (FarmApi).
+import type { Base, PathInfo } from '../systems/xp';
 import type { Phrase, Topic, Word } from './content';
 
 /** Стадия растения. ripe — созрело (миг перед тем, как герой сорвёт); overripe — вернулось из банки повторить. */
@@ -36,10 +37,16 @@ export interface ItemInfo {
 export interface FarmStats {
   xp: number;
   level: string;
-  /** 0..1 внутри текущего подуровня (выращенное + частичный зачёт за растущее). */
+  /** 0..1 внутри текущего подуровня (выращенное + частичный зачёт за растущее). Название — польское звание. */
   ratio: number;
-  /** До следующего подуровня: имя и сколько слов (на последнем шаге слов и фраз) выращивать. null — A1. */
-  next: { level: string; words: number } | null;
+  /** Путь к A1: подуровень 0…20 (21 — A1), очки, пороги (V11c). */
+  path: PathInfo;
+  /** Состав базы A1 (слов, фраз, фраз сборки) и очки пути. */
+  base: Base;
+  /** Пороги подуровней 1…20 в очках. */
+  thresholds: readonly number[];
+  /** Сколько подуровней набрано с запуска фермы (непрерывно, 0,4 = 40 % подуровня). */
+  sessionGain: number;
   grownToday: number;
   grownTotal: number;
   grownWords: number;

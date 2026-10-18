@@ -8,11 +8,9 @@ import {
   applyAnswer,
   dayOf,
   derive,
-  levelOf,
   newGarden,
   nextText,
   normalizeGarden,
-  partialUnits,
   pickTask,
   plant,
   stageOf,
@@ -168,42 +166,6 @@ describe('выбор задания', () => {
     expect(pickTask(g, derive(g), 1, T0 + 5, dayOf(T0))).toBe('w.pies');
     expect(pickTask(g, derive(g), 1, T0 + 5, dayOf(T0), { recent: ['w.pies'] })).not.toBe('w.pies');
     expect(pickTask(newGarden(), derive(newGarden()), 1, T0, 0)).toBeNull();
-  });
-});
-
-describe('уровень', () => {
-  it('A0 → A0.5 (400) → A0.8 (800) → A1 (вся база)', () => {
-    expect(levelOf(0, 0, 1167, 398)).toEqual({ level: 'A0', ratio: 0, next: { level: 'A0.1', words: 25 } });
-    expect(levelOf(300, 0, 1167, 398).ratio).toBeCloseTo(0.5);
-    expect(levelOf(400, 0, 1167, 398).level).toBe('A0.5');
-    expect(levelOf(800, 10, 1167, 398).level).toBe('A0.8');
-    expect(levelOf(1167, 397, 1167, 398).level).toBe('A0.8');
-    expect(levelOf(1167, 398, 1167, 398)).toEqual({ level: 'A1', ratio: 1, next: null });
-  });
-  it('подуровни A0.1…A0.4: 25 / 50 / 100 / 200 выращенных слов, полоска внутри подуровня', () => {
-    const lv = (w: number) => levelOf(w, 0, 1167, 398).level;
-    expect([24, 25, 49, 50, 99, 100, 199, 200, 399].map(lv)).toEqual(['A0', 'A0.1', 'A0.1', 'A0.2', 'A0.2', 'A0.3', 'A0.3', 'A0.4', 'A0.4']);
-    expect(levelOf(75, 0, 1167, 398)).toMatchObject({ level: 'A0.2', next: { level: 'A0.3', words: 25 } });
-    expect(levelOf(75, 0, 1167, 398).ratio).toBeCloseTo(0.5);
-  });
-  it('частичный зачёт двигает полоску, но не меняет уровень и не перескакивает порог', () => {
-    const p = levelOf(0, 0, 1167, 398, { words: 5, phrases: 0 });
-    expect(p.level).toBe('A0');
-    expect(p.ratio).toBeCloseTo(5 / 25);
-    const cap = levelOf(24, 0, 1167, 398, { words: 10, phrases: 0 });
-    expect(cap.level).toBe('A0');
-    expect(cap.ratio).toBeLessThan(1);
-    // первый ответ уже заметен
-    expect(levelOf(0, 0, 1167, 398, { words: 0.1, phrases: 0 }).ratio).toBeGreaterThanOrEqual(0.03);
-  });
-  it('частичный зачёт растений: опыт/6, не больше 0,9 на растение, выращенные не считаются', () => {
-    let g = garden(['w.kot', 'w.pies']);
-    for (let i = 0; i < 4; i++) g = answer(g, 'w.kot', T0 + i, 1);
-    g = answer(g, 'w.pies', T0 + 9, 1);
-    const u = partialUnits(derive(g));
-    expect(u.phrases).toBe(0);
-    expect(u.words).toBeGreaterThan(0.1);
-    expect(u.words).toBeLessThanOrEqual(1.8);
   });
 });
 

@@ -163,19 +163,23 @@ describe('мелочи', () => {
   });
 });
 
-describe('HUD: сколько до следующего подуровня', () => {
-  it('у полоски опыта «до A0.1: 25 слов», склонение, A1 достигнут', async () => {
+describe('HUD: подуровень и путь к A1 (V11c)', () => {
+  it('«Kiełek · 7/20», «до A1: 12%», A1 достигнут, тап открывает путь', async () => {
     const { mountHud, wordsRu } = await import('../src/ui/hud');
     const bus = testBus();
     const root = document.createElement('div');
-    mountHud(root, { bus, onSettings: () => {} });
+    let taps = 0;
+    mountHud(root, { bus, onSettings: () => {}, onLevel: () => taps++ });
     const next = () => root.querySelector('[data-xp-next]')!.textContent;
-    bus.emit('hud:xp', { level: 'A0', ratio: 0.2, next: { level: 'A0.1', words: 25 } });
-    expect(next()).toBe('до A0.1: 25 слов');
-    bus.emit('hud:xp', { level: 'A0', ratio: 0.9, next: { level: 'A0.1', words: 1 } });
-    expect(next()).toBe('до A0.1: 1 слово');
-    bus.emit('hud:xp', { level: 'A0.9', ratio: 1, next: null });
+    const name = () => root.querySelector('[data-xp-level]')!.textContent;
+    bus.emit('hud:xp', { level: 'Kiełek', ratio: 0.2, sub: 7, of: 20, pct: 0.129, toNext: 12 });
+    expect(name()).toBe('Kiełek · 7/20');
+    expect(next()).toBe('до A1: 12%');
+    bus.emit('hud:xp', { level: 'Rolnik A1', ratio: 1, sub: 21, of: 20, pct: 1, toNext: null });
+    expect(name()).toBe('Rolnik A1');
     expect(next()).toBe('A1 достигнут');
+    root.querySelector<HTMLElement>('[data-xp]')!.click();
+    expect(taps).toBe(1);
     expect([wordsRu(2), wordsRu(11), wordsRu(22), wordsRu(105)]).toEqual(['слова', 'слов', 'слова', 'слов']);
   });
 });

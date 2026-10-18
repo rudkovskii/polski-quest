@@ -29,6 +29,8 @@ export interface AnswerResult {
   tomorrow?: number;
   /** Действие героя по ответу (для итога раунда: полито, выросло, собрано, опыт). */
   act?: { kind: 'water' | 'grow' | 'harvest' | 'miss'; xp: number };
+  /** Путь к A1 до и после ответа (позиция в подуровнях) и звание после ответа — для строки итога раунда. */
+  path?: { from: number; to: number; sub: number; pl: string };
 }
 
 export interface MinigameDeps {

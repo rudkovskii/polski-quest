@@ -49,8 +49,8 @@ export interface BusEvents {
   'world:location': { id: string; controls: MapControls };
   /** Герой остановился: склейка пишет позицию в сохранение. */
   'world:position': { location: string; x: number; y: number; facing: Dir };
-  /** Опыт и уровень для HUD. `ratio` — доля пути внутри подуровня A0.x; `next` — следующий подуровень и сколько слов до него (null — A1); `growing` — сколько слов растёт (ещё не выращены); `xp` — всего очков; `gain` — сколько пришло сейчас («+N»); `up` — новый уровень (вспышка). */
-  'hud:xp': { level: string; ratio: number; xp?: number; gain?: number; up?: boolean; next?: { level: string; words: number } | null; growing?: number };
+  /** Опыт и путь к A1 для HUD (V11c). `level` — польское звание подуровня; `sub` — номер 0…20 (21 — A1), `of` — подуровней всего (20); `ratio` — доля внутри подуровня; `pct` — доля пути до A1; `toNext` — очков до следующего подуровня (null — A1); `growing` — сколько слов растёт; `xp` — всего очков опыта; `gain` — «+N» за ответ; `up` — новый подуровень (вспышка, карточка, звук). */
+  'hud:xp': { level: string; ratio: number; sub?: number; of?: number; pct?: number; pos?: number; toNext?: number | null; xp?: number; gain?: number; up?: boolean; growing?: number };
   /** Грядки фермы: растения и вскопанные клетки (шлёт склейка при любом изменении и при входе на ферму). */
   'farm:plants': { plants: PlantView[]; cells: [number, number][] };
   /** Мини-игра открыта (герой бегает сам) или закрыта. `bottom` — высота панели вопроса снизу, CSS px. */

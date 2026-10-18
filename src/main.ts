@@ -26,6 +26,7 @@ import { mountMorning } from './ui/morning';
 import { mountPantry } from './ui/pantry';
 import { mountPlantCard } from './ui/plantCard';
 import { mountSummary } from './ui/summary';
+import { mountLevelUp, mountPath } from './ui/levelUp';
 import { mountDpad } from './ui/dpad';
 import { mountHints } from './ui/hints';
 import { mountGuide, type GuideStage } from './ui/hintsGuide';
@@ -153,7 +154,11 @@ async function main(): Promise<void> {
     onGoal: () => {
       if (!game.isOpen) summary.openBed();
     },
+    onLevel: () => {
+      if (!game.isOpen) pathScreen.open();
+    },
   });
+  mountLevelUp(overlay);
   mountMusicHud(overlay, music);
   const radio = mountRadio(overlay, music);
   mountFloats(overlay);
@@ -225,7 +230,8 @@ async function main(): Promise<void> {
   const tips = createTips({ seen: hasHint, mark: addHint });
   const dictionary = mountDictionary(overlay, farm, undefined, tips);
   const pantry = mountPantry(overlay, farm, undefined, tips);
-  const summary = mountSummary(overlay, farm, undefined, tips);
+  const pathScreen = mountPath(overlay, farm);
+  const summary = mountSummary(overlay, farm, undefined, tips, () => pathScreen.open());
   const plantCard = mountPlantCard(overlay, farm, { onReview: (id) => game.start(farm.reviewMode(id), id) });
   // Утро: первый вход в новый день — карточка «Вчера: …». День, для которого утро уже было, лежит одним флагом `morning:<день>` в `Save.hints`.
   const MORNING = 'morning:';

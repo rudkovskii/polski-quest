@@ -5,6 +5,7 @@ import type { FarmApi } from '../types/farm';
 import { el } from './dom';
 import { TIP_CSS, type Tips } from './glossary';
 import { createPanel, nav } from './panel';
+import { SUB_COUNT, growthText } from '../systems/xp';
 
 const css = `
 ${TIP_CSS}
@@ -31,9 +32,8 @@ export interface SummaryScreen {
   readonly isOpen: boolean;
 }
 
-const plural = (n: number): string => (n % 10 === 1 && n % 100 !== 11 ? 'слово' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'слова' : 'слов');
 
-export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips): SummaryScreen {
+export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips, onPath?: () => void): SummaryScreen {
   const panel = createPanel({ title: '', bus });
   const content = el('div', { class: 'sum' });
   const closeBtn = el('button', { type: 'button', class: 'pq-btn', 'data-done': '', ...nav('done', 'v', 'done'), onclick: () => panel.close() }, 'Закрыть');
@@ -58,15 +58,18 @@ export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEve
       return;
     }
     panel.setTitle('Łóżko · Итог');
+    const p = s.path;
     const pct = Math.max(0, Math.min(100, Math.round(s.ratio * 100)));
+    const grow = growthText(s.sessionGain);
     content.replaceChildren(
       hero(s.grownToday, s.grownTotal),
       el(
         'div',
         { class: 'sum-level' },
-        el('div', { class: 'top' }, el('span', { class: 'lvl', 'data-level': '' }, s.level), el('span', {}, `${s.xp} опыта`)),
+        el('div', { class: 'top' }, el('span', { class: 'lvl', 'data-level': '' }, p.a1 ? p.pl : `${p.icon} ${s.level} · ${p.sub}/${SUB_COUNT}`), el('span', { 'data-session-gain': '' }, grow ? `${grow} за сессию` : `${s.xp} опыта`)),
         el('div', { class: 'sum-bar', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, el('i', { style: `width:${pct}%` })),
-        el('div', { class: 'sum-hint', style: 'margin-top:4px' }, s.next ? `${pct}% пути до ${s.next.level}: вырастить ещё ${s.next.words} ${plural(s.next.words)}` : 'Уровень A1: вся база выращена'),
+        el('div', { class: 'sum-hint', style: 'margin-top:4px', 'data-level-hint': '' }, p.a1 ? 'Уровень A1: вся база выращена' : `До A1: ${Math.floor(p.pct * 100)}% · до «${p.nextPl}» ещё ${p.toNext} оч.`),
+        onPath ? el('button', { type: 'button', class: 'pq-btn small', style: 'margin-top:8px', 'data-open-path': '', ...nav('path', 'v', 'path'), onclick: () => (panel.close(), onPath()) }, 'Путь к A1') : null,
       ),
       el(
         'div',

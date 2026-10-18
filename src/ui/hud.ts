@@ -1,4 +1,4 @@
-// HUD: полоска опыта-заглушка «A0» в левом углу и кнопка настроек в правом. Опыт приходит событием `hud:xp` (F-03).
+// HUD: подуровень пути к A1 («Kiełek · 7/20», полоска внутри подуровня, «до A1: 12%») в левом углу и кнопка настроек в правом. Опыт приходит событием `hud:xp` (F-03).
 import { bus as globalBus, type Bus } from '../systems/bus';
 import { goalText, type DayGoal } from '../systems/daygoal';
 import type { BusEvents } from '../types/bus';
@@ -13,11 +13,13 @@ ${THEME_CSS}
 .pq-hud > * { pointer-events: auto; }
 .pq-xp { display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 6px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); border-radius: 8px;
   box-shadow: 0 3px 0 var(--pq-ink); color: var(--pq-cream); font: 700 15px/1 -apple-system, BlinkMacSystemFont, sans-serif; }
-.pq-xp-lvl { min-width: 30px; text-align: center; padding: 4px 6px; background: var(--pq-accent); color: var(--pq-ink); border-radius: 4px; }
+.pq-xp-lvl { white-space: nowrap; line-height: 1.1; }
+.pq-xp-lvl b { color: var(--pq-accent); font-weight: 800; }
+.pq-xp { cursor: pointer; touch-action: manipulation; text-align: left; margin: 0; }
 .pq-xp-col { display: flex; flex-direction: column; gap: 3px; }
 .pq-xp-next { font: 600 11px/1 -apple-system, BlinkMacSystemFont, sans-serif; opacity: .85; white-space: nowrap; }
 .pq-xp-next:empty { display: none; }
-.pq-xp-bar { position: relative; width: 84px; height: 10px; background: #2a1418; border-radius: 3px; overflow: hidden; }
+.pq-xp-bar { position: relative; width: 104px; height: 10px; background: #2a1418; border-radius: 3px; overflow: hidden; }
 .pq-xp-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--pq-leaf); box-shadow: inset 0 2px 0 rgba(255,255,255,.35); }
 .pq-xp { position: relative; }
 .pq-xp-gain { position: absolute; left: 100%; top: 4px; margin-left: 6px; color: #f2d552; font: 800 15px/1 -apple-system, sans-serif; text-shadow: 0 2px 0 var(--pq-ink);
@@ -55,7 +57,7 @@ export function wordsRu(n: number): string {
 export interface Hud {
   root: HTMLElement;
   gear: HTMLButtonElement;
-  setXp(level: string, ratio: number, next?: { level: string; words: number } | null, growing?: number): void;
+  setXp(ev: BusEvents['hud:xp']): void;
   /** Галочка «сохранено» на 1 с. */
   flashSaved(): void;
   /** Сбой записи: тост «Не сохранилось, повторяю» (true) или убрать (false). */
@@ -72,6 +74,8 @@ export interface HudOptions {
   goal?: () => DayGoal | null;
   /** Тап по плашке цели (открыть итог дня). */
   onGoal?: () => void;
+  /** Тап по подуровню («Путь к A1»). */
+  onLevel?: () => void;
 }
 
 /** Сколько горит галочка «сохранено», мс. */
@@ -80,11 +84,11 @@ export const SAVE_ERROR_TEXT = 'Не сохранилось, повторяю';
 
 export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
   const bus = o.bus ?? globalBus;
-  const lvl = el('span', { class: 'pq-xp-lvl', 'data-xp-level': '' }, 'A0');
+  const lvl = el('span', { class: 'pq-xp-lvl', 'data-xp-level': '' }, 'Ziemia');
   const fill = el('span', { class: 'pq-xp-fill', style: 'width: 0%' });
-  const bar = el('span', { class: 'pq-xp-bar', role: 'progressbar', 'aria-label': 'Опыт', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': 0 }, fill);
+  const bar = el('span', { class: 'pq-xp-bar', role: 'progressbar', 'aria-label': 'Подуровень', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': 0 }, fill);
   const nextEl = el('span', { class: 'pq-xp-next', 'data-xp-next': '' });
-  const xp = el('div', { class: 'pq-xp' }, lvl, el('span', { class: 'pq-xp-col' }, bar, nextEl));
+  const xp = el('button', { type: 'button', class: 'pq-xp', 'aria-label': 'Путь к A1', 'data-xp': '', onclick: () => o.onLevel?.() }, el('span', { class: 'pq-xp-col' }, lvl, bar, nextEl));
   const gear = el('button', { type: 'button', class: 'pq-btn pq-gear', 'aria-label': 'Настройки', onclick: () => o.onSettings() }, '⚙');
   const goalEl = el('button', { type: 'button', class: 'pq-goal', 'data-goal': '', hidden: true, onclick: () => o.onGoal?.() });
   const saved = el('span', { class: 'pq-saved', 'data-saved': '', 'aria-hidden': 'true' }, '✓');
@@ -112,19 +116,22 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
     if (document.visibilityState === 'visible') paintGoal();
   };
   document.addEventListener('visibilitychange', onVisible);
-  const setXp = (level: string, ratio: number, next?: { level: string; words: number } | null, growing = 0): void => {
-    const r = Math.max(0, Math.min(1, ratio));
-    lvl.textContent = level;
-    // Подсказка у полоски: сколько слов вырастить до следующего подуровня (нет поля — молчим, null — A1 достигнут).
-    if (next === undefined) nextEl.textContent = '';
-    // «до A0.1: 25 слов · уже растут 11»: полоска идёт по частичному зачёту, а число слов — по выращенным; без второй части два дня «не двигается» (F5b).
-    else nextEl.textContent = next ? `до ${next.level}: ${next.words} ${wordsRu(next.words)}${growing > 0 ? ` · уже растут ${growing}` : ''}` : 'A1 достигнут';
-    bar.setAttribute('aria-valuetext', nextEl.textContent || `${Math.round(r * 100)}%`);
+  const setXp = (ev: BusEvents['hud:xp']): void => {
+    const r = Math.max(0, Math.min(1, ev.ratio));
+    lvl.replaceChildren();
+    if (ev.sub !== undefined && ev.of !== undefined && ev.sub <= ev.of) lvl.append(`${ev.level} · `, el('b', {}, `${ev.sub}/${ev.of}`));
+    else lvl.textContent = ev.level;
+    // «до A1: 12%»: доля всей базы (слово 1, фраза сборки 2, растущее частично); нет поля — молчим.
+    if (ev.pct === undefined) nextEl.textContent = '';
+    else nextEl.textContent = ev.pct >= 1 ? 'A1 достигнут' : `до A1: ${Math.floor(ev.pct * 100)}%`;
+    xp.title = ev.toNext != null ? `До следующего подуровня: ${ev.toNext} оч.${ev.growing ? ` · уже растут ${ev.growing}` : ''}` : '';
+    bar.setAttribute('aria-valuetext', `${lvl.textContent}. ${nextEl.textContent}`);
     fill.style.width = `${Math.round(r * 100)}%`;
     bar.setAttribute('aria-valuenow', String(Math.round(r * 100)));
   };
-  const off = bus.on('hud:xp', ({ level, ratio, gain, up, next, growing }) => {
-    setXp(level, ratio, next, growing);
+  const off = bus.on('hud:xp', (ev) => {
+    const { level, gain, up } = ev;
+    setXp(ev);
     paintGoal();
     if (gain && gain > 0) {
       const g = el('span', { class: 'pq-xp-gain', 'data-xp-gain': '' }, `+${gain}`);
@@ -135,7 +142,7 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
       xp.classList.remove('flash');
       void xp.offsetWidth;
       xp.classList.add('flash');
-      xp.title = `Новый уровень: ${level}`;
+      xp.title = `Новый подуровень: ${level}`;
     }
   });
   return {

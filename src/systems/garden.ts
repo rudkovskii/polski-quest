@@ -538,63 +538,6 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
   return (sorted[0]?.it ?? pool.find((it) => !opts.exclude?.has(it.id)))?.id ?? null;
 }
 
-/** Подуровни A0: порог по выращенным словам. Дальше A0.5 → A0.8 (800) → A1 (вся база слов и фраз). */
-export const SUBLEVELS: readonly (readonly [string, number])[] = [
-  ['A0', 0],
-  ['A0.1', 25],
-  ['A0.2', 50],
-  ['A0.3', 100],
-  ['A0.4', 200],
-  ['A0.5', 400],
-  ['A0.8', 800],
-];
-/** Частичный зачёт за растение, которое ещё не выращено: опыт/PARTIAL_XP, но не больше PARTIAL_CAP слова. */
-export const PARTIAL_XP = 6;
-export const PARTIAL_CAP = 0.9;
-
-/** Сколько «долей слова» набрали растущие растения (слова и фразы отдельно): полоска двигается с первых ответов. */
-export function partialUnits(st: GardenState): { words: number; phrases: number } {
-  const out = { words: 0, phrases: 0 };
-  for (const it of st.items.values()) {
-    if (it.harvests > 0) continue;
-    const u = Math.min(PARTIAL_CAP, it.xp / PARTIAL_XP);
-    if (it.phrase) out.phrases += u;
-    else out.words += u;
-  }
-  return out;
-}
-
-export interface LevelInfo {
-  level: string;
-  /** 0..1 внутри подуровня (выращенное + частичный зачёт, до 1 не доходит, пока порог не взят). */
-  ratio: number;
-  /** До следующего подуровня: его имя и сколько слов (на последнем шаге — слов и фраз) выращивать. null — A1. */
-  next: { level: string; words: number } | null;
-}
-
-/**
- * Уровень по выращенному: A0 → A0.1 (25 слов) → A0.2 (50) → A0.3 (100) → A0.4 (200) → A0.5 (400) → A0.8 (800) → A1 (вся база).
- * Название уровня — только по выращенному (A1 требует базы); полоска внутри подуровня смешанная: выращенное + частичный зачёт.
- */
-export function levelOf(words: number, phrases: number, totalWords: number, totalPhrases: number, partial: { words: number; phrases: number } = { words: 0, phrases: 0 }): LevelInfo {
-  if (words >= totalWords && phrases >= totalPhrases) return { level: 'A1', ratio: 1, next: null };
-  const last = SUBLEVELS.length - 1;
-  let i = 0;
-  while (i < last && words >= SUBLEVELS[i + 1]![1]) i++;
-  const [level, lo] = SUBLEVELS[i]!;
-  if (i < last) {
-    const [nextLevel, hi] = SUBLEVELS[i + 1]!;
-    const units = words + partial.words;
-    let ratio = Math.min(0.99, Math.max(0, (units - lo) / (hi - lo)));
-    if (units > lo) ratio = Math.max(ratio, 0.03);
-    return { level, ratio, next: { level: nextLevel, words: hi - words } };
-  }
-  const all = totalWords + totalPhrases;
-  const units = words + phrases + partial.words + partial.phrases;
-  const ratio = Math.min(0.99, Math.max(0, (units - lo) / Math.max(1, all - lo)));
-  return { level, ratio, next: { level: 'A1', words: Math.max(0, totalWords - words) + Math.max(0, totalPhrases - phrases) } };
-}
-
 /** Нормализация раздела сохранения (мусор отбрасывается). */
 export function normalizeGarden(raw: unknown): GardenSave {
   const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
