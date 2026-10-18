@@ -6,6 +6,7 @@
 //   • отметка последней авто-перезагрузки — в sessionStorage (защита от петли).
 
 const GUARD_KEY = 'pq-sw-reload-at';
+const GUARD_FROM_KEY = 'pq-sw-reload-from';
 const CHECK_EVERY_MS = 30 * 60_000;
 
 export interface PwaOptions {
@@ -23,13 +24,23 @@ export function lastReloadAt(): number | null {
   }
 }
 
+/** Из какой сборки была последняя авто-перезагрузка (null — не знаем). */
+export function lastReloadFrom(): string | null {
+  try {
+    return sessionStorage.getItem(GUARD_FROM_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Перезагрузить страницу ради новой сборки: сначала дописать прогресс в базу (`flush`), потом reload.
  * Прогресс не теряется: журнал уже в IndexedDB, в памяти только отложенная запись (debounce).
  */
-export async function reloadForUpdate(flush?: () => Promise<void> | void, o: { now?: number; reload?: () => void } = {}): Promise<void> {
+export async function reloadForUpdate(flush?: () => Promise<void> | void, o: { now?: number; from?: string; reload?: () => void } = {}): Promise<void> {
   try {
     sessionStorage.setItem(GUARD_KEY, String(o.now ?? Date.now()));
+    if (o.from) sessionStorage.setItem(GUARD_FROM_KEY, o.from);
   } catch {
     // приватный режим: без защиты от петли (политика и так перезагружает только на титуле)
   }

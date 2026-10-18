@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { workboxOptions } from '../tools/lib/pwa';
 import { RELOAD_GUARD_MS, updateAction } from '../src/systems/update';
-import { lastReloadAt, reloadForUpdate } from '../src/systems/platform/pwa';
+import { lastReloadAt, lastReloadFrom, reloadForUpdate } from '../src/systems/platform/pwa';
 import { mountUpdateToast } from '../src/ui/updateToast';
 import { testBus } from './helpers';
 
@@ -15,6 +15,16 @@ describe('политика обновления', () => {
     expect(updateAction({ busy: true, lastReloadAt: null, now: 1_000_000 })).toBe('toast');
     expect(updateAction({ busy: false, lastReloadAt: 1_000_000 - 5_000, now: 1_000_000 })).toBe('toast');
     expect(updateAction({ busy: false, lastReloadAt: 1_000_000 - RELOAD_GUARD_MS - 1, now: 1_000_000 })).toBe('reload');
+  });
+
+  it('P3b: одна ступень — промежуточная сборка после перезагрузки обновляется сразу, петля из той же сборки — тост', () => {
+    const base = { busy: false, lastReloadAt: 1_000_000 - 5_000, now: 1_000_000 };
+    // перезагрузились из 1132bf0 и получили a2977c5, а на сервере уже новее: без второго тоста
+    expect(updateAction({ ...base, lastReloadFrom: '1132bf0', local: 'a2977c5' })).toBe('reload');
+    // перезагрузка ничего не дала (сборка та же): защита от петли
+    expect(updateAction({ ...base, lastReloadFrom: 'a2977c5', local: 'a2977c5' })).toBe('toast');
+    // открыт экран: всегда тост (потом тихая перезагрузка, когда экран закроется)
+    expect(updateAction({ ...base, busy: true, lastReloadFrom: '1132bf0', local: 'a2977c5' })).toBe('toast');
   });
 
   it('перезагрузка: сначала flush прогресса, потом reload; отметка от петли в sessionStorage', async () => {
@@ -34,9 +44,11 @@ describe('политика обновления', () => {
     const order2: string[] = [];
     await reloadForUpdate(() => Promise.reject(new Error('idb')), { reload: () => order2.push('reload') }).catch(() => undefined);
     expect(order2).toEqual(['reload']);
+    await reloadForUpdate(undefined, { now: 5, from: 'abc1234', reload: () => undefined });
+    expect(lastReloadFrom()).toBe('abc1234');
   });
 
-  it('тост «Есть обновление»: один, кнопка «Обновить» шлёт app:reload', () => {
+  it('тост «Новая версия · Обновить»: один, кнопка «Обновить» шлёт app:reload', () => {
     const root = document.createElement('div');
     document.body.append(root);
     const bus = testBus();
@@ -46,7 +58,7 @@ describe('политика обновления', () => {
     bus.emit('app:update', {});
     bus.emit('app:update', {});
     expect(root.querySelectorAll('[data-update]')).toHaveLength(1);
-    expect(root.querySelector('[data-update] span')?.textContent).toContain('Есть новая версия');
+    expect(root.querySelector('[data-update] span')?.textContent).toContain('Новая версия');
     const b = root.querySelector<HTMLButtonElement>('[data-update] button')!;
     expect(b.textContent).toContain('Обновить');
     b.click();

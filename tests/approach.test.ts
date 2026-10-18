@@ -99,7 +99,7 @@ describe('тап по видимой части спрайта', () => {
     const h = at('home', 'from_farm');
     expect(h.targetAtPoint(8.6, 2.4)).toBe('prop:desk');
     expect(h.targetAtPoint(5.5, 1.5)).toBe('prop:shelf');
-    expect(h.targetAtPoint(1.5, 2.2)).toBe('prop:bed');
+    expect(h.targetAtPoint(3.5, 2.2)).toBe('prop:bed');
     expect(h.targetAtPoint(6.5, 6.5)).toBeNull();
     const f = at('farm', 'house_door');
     expect(f.targetAtPoint(12.4, 8.3)).toBe('prop:board');

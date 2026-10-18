@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { Question } from '../src/systems/quiz';
-import { mountMinigame } from '../src/ui/minigame';
+import { mountMinigame, NEXT_DELAY_MS } from '../src/ui/minigame';
 import { testBus } from './helpers';
 
 const Q: Question = { mode: 1, id: 'w.kot', kind: 'choice', prompt: 'kot', promptLang: 'pl', options: ['собака', 'кот', 'дом', 'мама'], answer: 'кот' };
@@ -36,6 +36,7 @@ describe('мини-игра', () => {
 
 describe('панель мини-игры', () => {
   it('кнопки действий закреплены в полосе внизу, а не в прокручиваемой бумаге; «Dalej» на том же месте', () => {
+    vi.useFakeTimers();
     const root = document.createElement('div');
     const g = mountMinigame(root, {
       bus: testBus(),
@@ -55,7 +56,87 @@ describe('панель мини-игры', () => {
     const css = root.querySelector('style')!.textContent!;
     expect(css).toMatch(/\.pq-game-box[^}]*\bheight: clamp\(/);
     expect(css).toMatch(/\.pq-game-foot[^}]*flex: 0 0 auto/);
+    vi.advanceTimersByTime(NEXT_DELAY_MS);
     root.querySelector<HTMLElement>('[data-next]')!.click();
     expect(foot.querySelector('[data-next]')).toBeNull();
+    vi.useRealTimers();
+  });
+});
+
+describe('P3b: панель мини-игры', () => {
+  const mk = (q: Question, answered: unknown[] = []) => {
+    const root = document.createElement('div');
+    const bus = testBus();
+    let n = 0;
+    const g = mountMinigame(root, {
+      bus,
+      next: () => ((n += 1), q),
+      answer: (_q, a) => (answered.push(a), { ok: false, correct: 'x', pl: 'x', ru: 'x', tr: 'x' }),
+      say: () => {},
+    });
+    return { root, bus, g, count: () => n };
+  };
+
+  it('«Dalej» не нажимается первые 300 мс: двойной тап не пропускает задание', () => {
+    vi.useFakeTimers();
+    const { root, bus, g, count } = mk(Q);
+    g.start(1);
+    root.querySelector<HTMLElement>('[data-opt="собака"]')!.click();
+    const dalej = root.querySelector<HTMLElement>('[data-next]')!;
+    dalej.click();
+    bus.emit('input:intent', { type: 'interact', to: 'ui', source: 'keyboard' });
+    expect(count()).toBe(1);
+    expect(root.querySelector('[data-feedback]')).not.toBeNull();
+    vi.advanceTimersByTime(NEXT_DELAY_MS);
+    dalej.click();
+    expect(count()).toBe(2);
+    expect(root.querySelector('[data-feedback]')).toBeNull();
+    vi.useRealTimers();
+  });
+
+  it('пустой ответ не отправляется: «Sprawdź» неактивна, пока в поле пусто или пробелы', () => {
+    const given: unknown[] = [];
+    const { root, g } = mk({ mode: 2, id: 'w.kot', kind: 'type', prompt: 'кот', promptLang: 'ru', answer: 'kot' } as Question, given);
+    g.start(2);
+    const check = root.querySelector<HTMLButtonElement>('[data-check]')!;
+    const input = root.querySelector<HTMLInputElement>('[data-type]')!;
+    expect(check.disabled).toBe(true);
+    check.click();
+    input.value = '  ';
+    input.dispatchEvent(new Event('input'));
+    expect(check.disabled).toBe(true);
+    input.value = 'kot';
+    input.dispatchEvent(new Event('input'));
+    expect(check.disabled).toBe(false);
+    input.value = '';
+    input.dispatchEvent(new Event('input'));
+    expect(check.disabled).toBe(true);
+    expect(given).toEqual([]);
+  });
+
+  it('пустая сборка не отправляется', () => {
+    const given: unknown[] = [];
+    const { root, g, bus } = mk({ mode: 3, id: 'p.a', kind: 'tiles', prompt: 'a b c', promptLang: 'ru', tiles: ['a', 'b', 'c'], answer: ['a', 'b', 'c'] } as unknown as Question, given);
+    g.start(3);
+    const check = root.querySelector<HTMLButtonElement>('[data-check]')!;
+    expect(check.disabled).toBe(true);
+    check.click();
+    bus.emit('input:intent', { type: 'interact', to: 'ui', source: 'keyboard' });
+    expect(given).toEqual([]);
+    root.querySelector<HTMLElement>('[data-tile="a"]')!.click();
+    expect(root.querySelector<HTMLButtonElement>('[data-check]')!.disabled).toBe(false);
+  });
+
+  it('блок вопроса фиксированной высоты; слова в вариантах не рвутся по слогам', () => {
+    const { root, g } = mk({ ...Q, options: ['присаживайтесь', 'кот', 'дом', 'сверхъестественнопротивоположный'] } as Question);
+    g.start(1);
+    const css = root.querySelector('style')!.textContent!;
+    expect(css).toMatch(/\.pq-qblock\s*\{[^}]*\bheight: \d+px/);
+    expect(css).toMatch(/\.pq-opt \.t\s*\{[^}]*hyphens: none[^}]*word-break: normal/);
+    expect(root.querySelector('[data-qblock] [data-prompt]')).not.toBeNull();
+    const opts = [...root.querySelectorAll('.pq-opt')];
+    expect(opts[0]!.classList.contains('long')).toBe(true);
+    expect(opts[1]!.classList.contains('long')).toBe(false);
+    expect(opts[3]!.classList.contains('xlong')).toBe(true);
   });
 });

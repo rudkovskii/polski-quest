@@ -7,7 +7,7 @@ import { createFarm } from './systems/farm';
 import { connectAudio } from './systems/platform/audio';
 import { createClock } from './systems/platform/clock';
 import { connectSfx } from './systems/platform/sfx';
-import { lastReloadAt, registerPwa, reloadForUpdate, watchVersion } from './systems/platform/pwa';
+import { lastReloadAt, lastReloadFrom, registerPwa, reloadForUpdate, watchVersion } from './systems/platform/pwa';
 import { GameStorage, memoryKV, parseProfile } from './systems/platform/storage';
 import { exportFileName, exportSave, importSave, type Save } from './systems/save';
 import { staleBuild, updateAction } from './systems/update';
@@ -193,14 +193,14 @@ async function main(): Promise<void> {
   bus.on('world:location', ({ controls }) => input.router.setMapControls(controls));
 
   // Новая сборка: service worker уже новый. Нет открытых экранов — тихая перезагрузка (прогресс дописан), иначе заметный тост.
-  const reload = (): void => void reloadForUpdate(() => store.flush());
+  const reload = (): void => void reloadForUpdate(() => store.flush(), { from: __BUILD_ID__ });
   bus.on('app:reload', reload);
   let screenOpen = false;
   let updatePending = false;
   const needReload = (): void => {
     updatePending = true;
     const busy = screenOpen || game.isOpen;
-    if (updateAction({ busy, lastReloadAt: lastReloadAt(), now: Date.now() }) === 'reload') reload();
+    if (updateAction({ busy, lastReloadAt: lastReloadAt(), now: Date.now(), lastReloadFrom: lastReloadFrom(), local: __BUILD_ID__ }) === 'reload') reload();
     else bus.emit('app:update', {});
   };
   // Экраны закрылись, а обновление ждёт: спросить политику снова.

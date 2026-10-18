@@ -119,6 +119,17 @@ describe('карты: форма и ссылки', () => {
     expect([3, 4]).toContain(pickZoom(1440, 900, home.size[0] * 16, home.size[1] * 16));
   });
 
+  it('P3b: кровать видна целиком при спавне на iPhone (дом zoom 3, камера у героя)', async () => {
+    const home = getMap('home');
+    const bed = home.objects.find((o) => o.type === 'prop' && o.id === 'bed') as { at: [number, number]; size: [number, number] };
+    const spawn = home.spawns.default!;
+    const viewW = 375 / 3;
+    const mw = home.size[0] * 16;
+    const cx = Math.min(Math.max(Math.round((spawn[0] + 0.5) * 16), viewW / 2), mw - viewW / 2);
+    expect(bed.at[0] * 16).toBeGreaterThanOrEqual(cx - viewW / 2);
+    expect((bed.at[0] + bed.size[0]) * 16).toBeLessThanOrEqual(cx + viewW / 2);
+  });
+
   it('кадры автотайлов: фрейм находится для каждой клетки', () => {
     const farm = getMap('farm');
     const parsed = parseAscii(farm);

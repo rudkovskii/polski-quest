@@ -27,9 +27,11 @@ ${TIP_CSS}
 .dict-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; opacity: .85; align-items: center; }
 .dict-legend span { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
 .dict { display: flex; flex-direction: column; gap: 10px; }
+.dict-head { position: sticky; top: -12px; z-index: 3; margin: -12px -12px 0; padding: 12px 12px 8px; background: var(--pq-cream); display: flex; flex-direction: column; gap: 8px; border-bottom: 2px solid var(--pq-wood-dark); }
+.dict-scope { font-size: 13px; opacity: .8; padding: 0 2px 4px; }
+.dict-cols.nocard { grid-template-columns: 150px minmax(0, 1fr); }
 .dict-tabs, .dict-filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .dict-tabs .pq-btn { flex: 1 1 0; font-size: 17px; }
-.dict-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .dict-search { flex: 1 1 180px; min-width: 0; font-family: inherit; font-size: 16px; padding: 9px 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fffaf0; color: var(--pq-ink); box-sizing: border-box; }
 .dict-cols { display: grid; grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1.1fr); gap: 10px; height: min(58vh, 520px); }
 .dict-cols > div { overflow-y: auto; overflow-x: hidden; min-height: 0; }
@@ -105,6 +107,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   search.addEventListener('input', () => {
     query = search.value;
     limit = PAGE;
+    renderTabs();
     renderList();
     renderBulk();
     panel.syncFocus();
@@ -127,6 +130,8 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   );
   const listCol = el('div', { class: 'dict-list' });
   const cardCol = el('div', { class: 'dict-card', 'data-card': '' });
+  const cardWrap = el('div', { hidden: true }, cardCol);
+  const cols = el('div', { class: 'dict-cols nocard', 'data-cols': '' }, topicsCol, el('div', {}, listCol), cardWrap);
   const note = el('span', { role: 'status', 'data-note': '' });
   panel.footer.append(note);
   panel.body.append(
@@ -134,10 +139,10 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     el(
       'div',
       { class: 'dict' },
-      el('div', { class: 'dict-tabs' }, ...tabBtns),
-      el('div', { class: 'dict-tools' }, search, el('div', { class: 'dict-filters' }, ...filterBtns, bulk)),
+      el('div', { class: 'dict-head' }, el('div', { class: 'dict-tabs' }, ...tabBtns), search),
+      el('div', { class: 'dict-filters' }, ...filterBtns, bulk),
       legend,
-      el('div', { class: 'dict-cols' }, topicsCol, el('div', {}, listCol), el('div', {}, cardCol)),
+      cols,
     ),
   );
   parent.append(panel.root);
@@ -157,17 +162,19 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   const locked = (id: string): boolean => tab === 'phrases' && info(id).status === 'new' && api.missingWords(id).length > 0;
   const group = (i: ItemInfo): Filter => (i.status === 'new' ? 'new' : i.status === 'grown' ? 'grown' : 'growing');
 
+  /** Тема в деле: пока вводят поиск, чип темы не режет выдачу (поиск по всем темам). */
+  const topicNow = (): string => (query.trim() ? '' : topic);
   const matches = (): Entry[] => {
     const q = fold(query.trim());
     return entries[tab].filter((e) => {
-      if (topic && e.topic !== topic) return false;
+      if (topicNow() && e.topic !== topicNow()) return false;
       if (q && !e.fpl.includes(q) && !e.fru.includes(q)) return false;
       if (filter !== 'all' && group(info(e.id)) !== filter) return false;
       return true;
     });
   };
   /** Что сажает «Посадить всю тему»: новые элементы темы на текущей вкладке (фразы — только доступные). */
-  const plantable = (): string[] => (topic ? entries[tab].filter((e) => e.topic === topic && info(e.id).status === 'new' && !locked(e.id)).map((e) => e.id) : []);
+  const plantable = (): string[] => (topicNow() ? entries[tab].filter((e) => e.topic === topicNow() && info(e.id).status === 'new' && !locked(e.id)).map((e) => e.id) : []);
 
   // ---- отрисовка
   /** Значок стадии: семя, росток, куст, урожай (в банке), перезревшее; в мешке — тусклое семя. */
@@ -182,14 +189,14 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     for (const b of tabBtns) b.classList.toggle('on', b.getAttribute('data-tab') === tab);
     for (const b of filterBtns) b.classList.toggle('on', b.getAttribute('data-filter') === filter);
     // Чип темы подсвечивается по выбранной теме (раньше оставался на «Все»).
-    for (const b of topicsCol.querySelectorAll<HTMLElement>('.dict-topic')) b.classList.toggle('on', b.getAttribute('data-topic') === topic);
+    for (const b of topicsCol.querySelectorAll<HTMLElement>('.dict-topic')) b.classList.toggle('on', b.getAttribute('data-topic') === topicNow());
   }
 
   function renderTopics(): void {
     const mk = (id: string, pl: string, ru?: string): HTMLButtonElement =>
       el(
         'button',
-        { type: 'button', class: topic === id ? 'dict-topic on' : 'dict-topic', 'data-topic': id, ...nav('topics', 'v', `topic:${id}`), onclick: () => ((topic = id), (limit = PAGE), say(''), renderAll()) },
+        { type: 'button', class: topicNow() === id ? 'dict-topic on' : 'dict-topic', 'data-topic': id, ...nav('topics', 'v', `topic:${id}`), onclick: () => ((topic = id), (query = ''), (search.value = ''), (limit = PAGE), say(''), renderAll()) },
         pl,
         ru ? el('small', {}, ru) : null,
       );
@@ -222,6 +229,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
       ),
     );
     if (!rows.length) rows.push(el('div', { class: 'dict-empty' }, query || filter !== 'all' ? 'Ничего не найдено' : 'Здесь пока пусто'));
+    if (query.trim() && topic) rows.unshift(el('div', { class: 'dict-scope', 'data-scope': '' }, 'Поиск по всем темам'));
     if (all.length > shown.length) {
       rows.push(
         el('button', { type: 'button', class: 'pq-btn small dict-more', 'data-more': '', ...nav('rows', 'v', 'more'), onclick: () => ((limit += PAGE), renderList(), panel.syncFocus()) }, `Показать ещё (${all.length - shown.length})`),
@@ -255,8 +263,11 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     const w = id ? api.word(id) : undefined;
     const p = id && !w ? api.phrase(id) : undefined;
     const item = w ?? p;
+    // Пустую карточку не показываем: пока ничего не выбрано, колонка скрыта (список занимает её место).
+    cardWrap.hidden = !item;
+    cols.classList.toggle('nocard', !item);
     if (!id || !item) {
-      cardCol.replaceChildren(el('div', { class: 'dict-empty' }, 'Выбери слово из списка, и здесь появится карточка.'));
+      cardCol.replaceChildren();
       return;
     }
     const i = info(id);
@@ -317,7 +328,11 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     say('');
     for (const r of listCol.querySelectorAll<HTMLElement>('.dict-row')) r.classList.toggle('sel', r.getAttribute('data-id') === id);
     renderCard();
-    if (typeof cardCol.scrollIntoView === 'function') cardCol.scrollIntoView({ block: 'nearest' });
+    // Шапка (вкладки и поиск) прилипает сверху: карточка прокручивается под неё, а не уводит шапку из кадра.
+    if (typeof cardCol.scrollIntoView === 'function') {
+      cardCol.style.scrollMarginTop = `${(search.parentElement?.offsetHeight ?? 0) + 8}px`;
+      cardCol.scrollIntoView({ block: 'nearest' });
+    }
   }
 
   function setTab(t: Tab): void {

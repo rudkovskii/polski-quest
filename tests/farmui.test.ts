@@ -103,6 +103,35 @@ describe('Słownik', () => {
     expect(rows(root)).toEqual(['w.ser']);
   });
 
+  it('P3b: поиск идёт по всем темам, активный чип темы не режет выдачу; выбор темы сбрасывает поиск', () => {
+    const { root, bus } = setup();
+    mountDictionary(root, fakeApi().api, bus).open();
+    root.querySelector<HTMLElement>('[data-topic="zwierzeta"]')!.click();
+    expect(rows(root)).toEqual(['w.kot', 'w.zolw', 'w.pies']);
+    type(root, 'chleb');
+    expect(rows(root)).toEqual(['w.chleb']);
+    expect(root.querySelector('[data-scope]')?.textContent).toBe('Поиск по всем темам');
+    expect(root.querySelector('.dict-topic.on')?.getAttribute('data-topic')).toBe('');
+    root.querySelector<HTMLElement>('[data-topic="jedzenie"]')!.click();
+    expect(root.querySelector<HTMLInputElement>('[data-search]')!.value).toBe('');
+    expect(rows(root)).toEqual(['w.chleb', 'w.ser', 'w.woda']);
+  });
+
+  it('P3b: пустая карточка не показывается; шапка (вкладки и поиск) закреплена сверху', () => {
+    const { root, bus } = setup();
+    mountDictionary(root, fakeApi().api, bus).open();
+    const card = root.querySelector<HTMLElement>('[data-card]')!;
+    expect(card.parentElement!.hidden).toBe(true);
+    expect(card.textContent).toBe('');
+    expect(root.textContent).not.toContain('Выбери слово из списка');
+    root.querySelector<HTMLElement>('[data-id="w.pies"]')!.click();
+    expect(card.parentElement!.hidden).toBe(false);
+    const head = root.querySelector('.dict-head')!;
+    expect(head.querySelector('[data-search]')).not.toBeNull();
+    expect(head.querySelector('[data-tab="words"]')).not.toBeNull();
+    expect([...root.querySelectorAll('style')].map((x) => x.textContent).join('')).toMatch(/\.dict-head\s*\{[^}]*position: sticky/);
+  });
+
   it('кнопка «Посадить» сажает выбранное слово и пишет результат', () => {
     const { root, bus } = setup();
     const { api, plant } = fakeApi();
