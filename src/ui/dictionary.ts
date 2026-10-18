@@ -28,11 +28,17 @@ ${TIP_CSS}
 .dict-legend span { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
 .dict { display: flex; flex-direction: column; gap: 10px; }
 /* B1 (тест 4): вкладки и поиск в одну строку, высота шапки ≈ 60 px (≤ 90 на iPhone); поле не растягивается по высоте. */
-.dict-head { position: sticky; top: -12px; z-index: 3; margin: -12px -12px 0; padding: 10px 12px 8px; background: var(--pq-cream); display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 8px; border-bottom: 2px solid var(--pq-wood-dark); max-height: 90px; box-sizing: border-box; }
+.dict-head { position: sticky; top: -12px; z-index: 3; margin: -12px -12px 0; padding: 10px 12px 8px; background: var(--pq-cream); display: flex; flex-direction: column; gap: 6px; border-bottom: 2px solid var(--pq-wood-dark); max-height: 120px; box-sizing: border-box; }
+/* F5a: в липкой шапке три ряда: вкладки с поиском, чипы тем (телефон), кнопки посадки темы. */
+.dict-headrow { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 8px; }
+.dict-bulkrow { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.dict-bulkrow::-webkit-scrollbar { display: none; }
+.dict-bulkrow[hidden], .dict-bulkrow:not(:has(:not([hidden]))) { display: none; }
+.dict-bulkrow .pq-btn { flex: 0 0 auto; white-space: nowrap; }
 .dict-scope { font-size: 13px; opacity: .8; padding: 0 2px 4px; }
 .dict-cols.nocard { grid-template-columns: 150px minmax(0, 1fr); }
 .dict-tabs, .dict-filters { display: flex; flex-wrap: wrap; gap: 8px; }
-.dict-head .dict-tabs { flex: 0 0 auto; flex-wrap: nowrap; gap: 6px; }
+.dict-headrow .dict-tabs { flex: 0 0 auto; flex-wrap: nowrap; gap: 6px; }
 .dict-tabs .pq-btn { flex: 0 0 auto; font-size: 16px; height: 40px; padding: 0 12px; }
 .dict-search { flex: 1 1 auto; align-self: center; height: 40px; min-height: 40px; max-height: 40px; line-height: 20px; width: auto; min-width: 0; font-family: inherit; font-size: 16px; padding: 0 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fffaf0; color: var(--pq-ink); box-sizing: border-box; }
 .dict-cols { display: grid; grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1.1fr); gap: 10px; height: min(58vh, 520px); }
@@ -60,19 +66,45 @@ ${TIP_CSS}
 .dict-card .lock ul { margin: 4px 0 0; padding-left: 18px; }
 .dict-card .status { font-size: 14px; }
 .dict-card .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+/* F5a: место под «Посадить» занято всегда: после посадки кнопка уходит, а высота карточки не меняется. */
+.dict-card .plant-slot { min-height: 46px; display: flex; align-items: center; }
+.dict-card .plant-slot .done { font-size: 14px; opacity: .75; }
 .dict-more { align-self: stretch; margin-top: 4px; }
 @media (max-width: 640px) {
   .dict-cols { display: block; height: auto; }
   .dict-cols > div { overflow: visible; }
-  .dict-topics { flex-direction: row; overflow-x: auto !important; padding-bottom: 6px; margin-bottom: 8px; }
-  .dict-topic { flex: 0 0 auto; white-space: nowrap; }
-  /* Телефон: строка слова в одну линию (польское, перевод мельче с многоточием, значок) — в списке видно ≥ 8 слов. */
-  .dict-list { max-height: max(46dvh, 360px); overflow-y: auto !important; margin-bottom: 10px; gap: 3px; }
+  /* F5a: чипы тем — в липкой шапке, одна строка с горизонтальной прокруткой. */
+  .dict-head .dict-topics { flex-direction: row; overflow-x: auto !important; gap: 6px; padding: 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .dict-head .dict-topics::-webkit-scrollbar { display: none; }
+  .dict-head .dict-topic { flex: 0 0 auto; white-space: nowrap; padding: 3px 10px; height: 30px; font-size: 14px; box-sizing: border-box; display: flex; align-items: center; }
+  .dict-head .dict-topic small { display: none; }
+  .dict-head { padding: 5px 12px; gap: 4px; }
+  .dict-head .dict-tabs .pq-btn, .dict-head .dict-search { height: 36px; min-height: 36px; max-height: 36px; }
+  .dict-bulkrow .pq-btn.small { padding: 4px 9px; font-size: 13px; height: 30px; box-sizing: border-box; }
+  .dict-legend { display: none; }
+  /* Телефон: строка слова в одну линию (польское, перевод мельче с многоточием, значок). Список листает сама панель:
+     карточка слова прилипает к низу и не сдвигает строки (F5a), поэтому у строк отступ под шапку и карточку. */
+  .dict-list { margin-bottom: 10px; gap: 3px; }
+  .dict-row { scroll-margin-top: 130px; scroll-margin-bottom: 240px; }
+  .dict-cardwrap { position: sticky; bottom: -4px; z-index: 2; }
+  .dict-cardwrap .dict-card { height: 230px; box-sizing: border-box; overflow-y: auto; box-shadow: 0 -6px 8px -4px rgba(42, 20, 24, .25); padding: 10px; gap: 6px; }
+  /* Главное сверху: слово, перевод, озвучка и «Посадить» видны без прокрутки карточки; подробности ниже. */
+  .dict-card > * { order: 3; }
+  .dict-card > .big, .dict-card > .ru, .dict-card > .tr { order: 0; }
+  .dict-card > .btns { order: 1; }
+  .dict-card > .plant-slot { order: 2; }
+  .dict-card .big { font-size: 24px; }
+  .dict-card .ru { font-size: 17px; }
   .dict-row { grid-template-columns: auto minmax(0, 1fr) auto; padding: 4px 8px; min-height: 40px; box-sizing: border-box; }
   .dict-row .pl { font-size: 17px; overflow-wrap: break-word; hyphens: none; }
   .dict-row .ru { grid-column: 2; grid-row: 1; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .dict-row .st { grid-row: 1; grid-column: 3; min-width: 28px; min-height: 28px; }
-  .dict-filters .pq-btn { flex: 1 1 auto; }
+  /* Высота строки фиксирована: значок стадии (32 px) не раздувает её, когда слово посадили. */
+  .dict-row { height: 40px; }
+  .dict-row .st { grid-row: 1; grid-column: 3; width: 32px; min-width: 32px; height: 28px; min-height: 0; overflow: visible; }
+  .dict-filters { gap: 4px; flex-wrap: nowrap; }
+  .dict-filters .pq-btn { flex: 1 1 auto; min-width: 0; padding: 6px 3px; font-size: 12px; white-space: nowrap; }
+  /* Подпись внизу («Посажено…») занимает место всегда: появление строки не сдвигает карточку. */
+  .pq-foot[data-dict][hidden] { display: block !important; visibility: hidden; box-sizing: border-box; min-height: 26px; }
 }
 `;
 
@@ -100,6 +132,7 @@ interface Entry {
 
 export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips): DictionaryScreen {
   const panel = createPanel({ title: 'Słownik · Словарь', wide: true, bus });
+  panel.footer.setAttribute('data-dict', '');
   const rankOf = (x: Word | Phrase, i: number): number => ('freq' in x ? x.freq * 1e5 + x.order : x.level * 1e5 + i);
   const mkEntries = (xs: readonly (Word | Phrase)[]): Entry[] =>
     xs.map((x, i) => ({ id: x.id, rank: rankOf(x, i), pl: x.pl, ru: x.ru, topic: x.topic, fpl: fold(x.pl), fru: fold(x.ru) }));
@@ -134,8 +167,9 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     el('button', { type: 'button', class: 'pq-btn small', 'data-filter': f, ...nav('filters', 'h', `filter:${f}`), onclick: () => ((filter = f), (limit = PAGE), renderAll()) }, label),
   );
   // Тема больше TOPIC_SOFT_MAX: первая кнопка сажает 7 самых частых, вторая — всю тему.
-  const bulk = el('button', { type: 'button', class: 'pq-btn small', 'data-bulk': '', hidden: true, ...nav('filters', 'h', 'bulk'), onclick: () => plantTopic(true) });
-  const bulkAll = el('button', { type: 'button', class: 'pq-btn small', 'data-bulk-all': '', hidden: true, ...nav('filters', 'h', 'bulk-all'), onclick: () => plantTopic(false) });
+  const bulk = el('button', { type: 'button', class: 'pq-btn small', 'data-bulk': '', hidden: true, ...nav('bulk', 'h', 'bulk'), onclick: () => plantTopic(true) });
+  const bulkAll = el('button', { type: 'button', class: 'pq-btn small', 'data-bulk-all': '', hidden: true, ...nav('bulk', 'h', 'bulk-all'), onclick: () => plantTopic(false) });
+  const bulkRow = el('div', { class: 'dict-bulkrow', 'data-bulkrow': '' }, bulk, bulkAll);
   const topicsCol = el('div', { class: 'dict-topics' });
   // Легенда стадий: значок и русская подпись («кустик» вместо жаргона «куст»).
   const legend = el(
@@ -148,17 +182,27 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   );
   const listCol = el('div', { class: 'dict-list' });
   const cardCol = el('div', { class: 'dict-card', 'data-card': '' });
-  const cardWrap = el('div', { hidden: true }, cardCol);
+  const cardWrap = el('div', { class: 'dict-cardwrap', hidden: true }, cardCol);
   const cols = el('div', { class: 'dict-cols nocard', 'data-cols': '' }, topicsCol, el('div', {}, listCol), cardWrap);
   const note = el('span', { role: 'status', 'data-note': '' });
+  // Липкая шапка: вкладки и поиск, на телефоне ещё чипы тем, и кнопки «Посадить 7 / Всю тему».
+  const head = el('div', { class: 'dict-head', 'data-head': '' }, el('div', { class: 'dict-headrow' }, el('div', { class: 'dict-tabs' }, ...tabBtns), search), bulkRow);
+  const mql = typeof window !== 'undefined' && typeof window.matchMedia === 'function' ? window.matchMedia('(max-width: 640px)') : null;
+  /** Телефон: чипы тем живут в липкой шапке; шире — слева от списка. */
+  const placeTopics = (): void => {
+    if (mql?.matches) head.insertBefore(topicsCol, bulkRow);
+    else cols.prepend(topicsCol);
+  };
+  mql?.addEventListener?.('change', placeTopics);
+  placeTopics();
   panel.footer.append(note);
   panel.body.append(
     el('style', {}, css),
     el(
       'div',
       { class: 'dict' },
-      el('div', { class: 'dict-head' }, el('div', { class: 'dict-tabs' }, ...tabBtns), search),
-      el('div', { class: 'dict-filters' }, ...filterBtns, bulk, bulkAll),
+      head,
+      el('div', { class: 'dict-filters' }, ...filterBtns),
       legend,
       cols,
     ),
@@ -237,10 +281,24 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     bulkAll.textContent = `Всю тему (${n})`;
   }
 
+  /** Какие слова сейчас нарисованы в списке (id через пробел) и с каким предисловием: если не изменились, строки не пересобираем. */
+  let listSig = '';
   function renderList(): void {
     infoOf.clear();
     const all = matches();
     const shown = all.slice(0, limit);
+    // F5a: посадка (и любое изменение стадии) меняет только значок своей строки: список не пересобирается, не прыгает,
+    // тап по соседнему слову попадает в то слово, по которому тапнули.
+    const sig = `${shown.map((e) => e.id).join(' ')}|${all.length - shown.length}|${query.trim() && topic ? 's' : ''}`;
+    if (sig === listSig && shown.length) {
+      for (const r of listCol.querySelectorAll<HTMLElement>('.dict-row')) {
+        const id = r.getAttribute('data-id')!;
+        r.classList.toggle('sel', id === selected);
+        r.querySelector('.st')?.replaceChildren(statusIcon(id));
+      }
+      return;
+    }
+    listSig = sig;
     const rows: HTMLElement[] = shown.map((e) =>
       el(
         'button',
@@ -287,6 +345,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   }
 
   function renderCard(): void {
+    cardCol.scrollTop = 0;
     const id = selected;
     const w = id ? api.word(id) : undefined;
     const p = id && !w ? api.phrase(id) : undefined;
@@ -334,11 +393,16 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     const tipId = i.status === 'bag' ? 'bag' : i.status === 'grown' ? 'jar' : null;
     const tip = tipId ? tips?.note(tipId) : null;
     if (tip) kids.push(tip);
-    if (i.status === 'new') {
-      kids.push(
-        el('button', { type: 'button', class: 'pq-btn', 'data-plant': '', disabled: lock, ...nav('card', 'v', 'plant'), onclick: () => plantOne(id) }, 'Posadź · Посадить'),
-      );
-    }
+    // Место под кнопку занято всегда: после посадки на её месте строка того же размера, карточка не меняет высоту.
+    kids.push(
+      el(
+        'div',
+        { class: 'plant-slot', 'data-plant-slot': '' },
+        i.status === 'new'
+          ? el('button', { type: 'button', class: 'pq-btn', 'data-plant': '', disabled: lock, ...nav('card', 'v', 'plant'), onclick: () => plantOne(id) }, 'Posadź · Посадить')
+          : el('span', { class: 'done', 'data-planted': '' }, i.status === 'grown' ? '✓ Уже в банке' : '✓ Посажено'),
+      ),
+    );
     cardCol.replaceChildren(...kids);
   }
 
@@ -356,9 +420,10 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     say('');
     for (const r of listCol.querySelectorAll<HTMLElement>('.dict-row')) r.classList.toggle('sel', r.getAttribute('data-id') === id);
     renderCard();
-    // Шапка (вкладки и поиск) прилипает сверху: карточка прокручивается под неё, а не уводит шапку из кадра.
-    if (typeof cardCol.scrollIntoView === 'function') {
-      cardCol.style.scrollMarginTop = `${(search.parentElement?.offsetHeight ?? 0) + 8}px`;
+    // Телефон: карточка прилипает к низу панели, прокручивать ничего не нужно (список не должен ехать под пальцем).
+    // Шире: колонки со своей прокруткой; шапка прилипает сверху, карточка прокручивается под неё.
+    if (!mql?.matches && typeof cardCol.scrollIntoView === 'function') {
+      cardCol.style.scrollMarginTop = `${(head.offsetHeight ?? 0) + 8}px`;
       cardCol.scrollIntoView({ block: 'nearest' });
     }
   }
@@ -380,6 +445,8 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     const bagTip = r.bag > 0 ? tips?.note('bag') : null;
     if (bagTip) note.append(' ', bagTip);
     renderAll();
+    // Кнопка «Посадить» исчезла: фокус на строку слова, а не на соседнюю «▶ медленно» (на тач-устройствах рамки нет, см. panel.ts).
+    if (listCol.querySelector(`[data-nav="row:${id}"]`)) panel.focus(`row:${id}`);
   }
 
   function plantTopic(quick: boolean): void {
