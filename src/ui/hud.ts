@@ -1,5 +1,6 @@
 // HUD: полоска опыта-заглушка «A0» в левом углу и кнопка настроек в правом. Опыт приходит событием `hud:xp` (F-03).
 import { bus as globalBus, type Bus } from '../systems/bus';
+import { goalText, type DayGoal } from '../systems/daygoal';
 import type { BusEvents } from '../types/bus';
 import { el } from './dom';
 import { THEME_CSS } from './theme';
@@ -24,6 +25,10 @@ ${THEME_CSS}
 @keyframes pq-gain { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-18px); } }
 .pq-xp.flash { animation: pq-flash 1.6s ease-out; }
 @keyframes pq-flash { 0%, 30%, 60% { background: #f2d552; color: var(--pq-ink); transform: scale(1.12); } 15%, 45%, 100% { background: var(--pq-wood-dark); transform: scale(1); } }
+.pq-left { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.pq-goal { max-width: calc(100vw - 80px); padding: 5px 9px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); border-radius: 8px; box-shadow: 0 3px 0 var(--pq-ink);
+  color: var(--pq-cream); font: 700 12px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; text-align: left; touch-action: manipulation; }
+.pq-goal[hidden] { display: none; }
 .pq-gear { width: 44px; height: 44px; padding: 0; font-size: 22px; line-height: 40px; text-align: center; }
 `;
 
@@ -44,7 +49,16 @@ export interface Hud {
   dispose(): void;
 }
 
-export function mountHud(parent: HTMLElement, o: { onSettings(): void; bus?: Bus<BusEvents> }): Hud {
+export interface HudOptions {
+  onSettings(): void;
+  bus?: Bus<BusEvents>;
+  /** Цель дня («Сегодня: полито N · созреет завтра M»); нет — плашки нет. Читается заново на каждый `hud:xp` и при возврате на вкладку. */
+  goal?: () => DayGoal | null;
+  /** Тап по плашке цели (открыть итог дня). */
+  onGoal?: () => void;
+}
+
+export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
   const bus = o.bus ?? globalBus;
   const lvl = el('span', { class: 'pq-xp-lvl', 'data-xp-level': '' }, 'A0');
   const fill = el('span', { class: 'pq-xp-fill', style: 'width: 0%' });
@@ -52,8 +66,19 @@ export function mountHud(parent: HTMLElement, o: { onSettings(): void; bus?: Bus
   const nextEl = el('span', { class: 'pq-xp-next', 'data-xp-next': '' });
   const xp = el('div', { class: 'pq-xp' }, lvl, el('span', { class: 'pq-xp-col' }, bar, nextEl));
   const gear = el('button', { type: 'button', class: 'pq-btn pq-gear', 'aria-label': 'Настройки', onclick: () => o.onSettings() }, '⚙');
-  const root = el('div', { class: 'pq-hud' }, el('style', {}, css), xp, gear);
+  const goalEl = el('button', { type: 'button', class: 'pq-goal', 'data-goal': '', hidden: true, onclick: () => o.onGoal?.() });
+  const root = el('div', { class: 'pq-hud' }, el('style', {}, css), el('div', { class: 'pq-left' }, xp, goalEl), gear);
   parent.append(root);
+  const paintGoal = (): void => {
+    const g = o.goal?.() ?? null;
+    goalEl.hidden = !g;
+    if (g) goalEl.textContent = goalText(g);
+  };
+  paintGoal();
+  const onVisible = (): void => {
+    if (document.visibilityState === 'visible') paintGoal();
+  };
+  document.addEventListener('visibilitychange', onVisible);
   const setXp = (level: string, ratio: number, next?: { level: string; words: number } | null): void => {
     const r = Math.max(0, Math.min(1, ratio));
     lvl.textContent = level;
@@ -66,6 +91,7 @@ export function mountHud(parent: HTMLElement, o: { onSettings(): void; bus?: Bus
   };
   const off = bus.on('hud:xp', ({ level, ratio, gain, up, next }) => {
     setXp(level, ratio, next);
+    paintGoal();
     if (gain && gain > 0) {
       const g = el('span', { class: 'pq-xp-gain', 'data-xp-gain': '' }, `+${gain}`);
       xp.append(g);
@@ -84,6 +110,7 @@ export function mountHud(parent: HTMLElement, o: { onSettings(): void; bus?: Bus
     setXp,
     dispose() {
       off();
+      document.removeEventListener('visibilitychange', onVisible);
       root.remove();
     },
   };

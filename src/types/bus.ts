@@ -35,6 +35,9 @@ export interface WorldInteract {
   facing: Dir;
 }
 
+/** Звуки действий (`systems/platform/sfx.ts`): шаги, полив, урожай, ответ, окна. */
+export type SfxName = 'step_grass' | 'step_wood' | 'water' | 'pick' | 'plim' | 'correct' | 'wrong' | 'grow' | 'open' | 'close';
+
 export interface BusEvents {
   /** Мир принимает ввод (оверлей закрыт) или нет (открыт экран F-03: герой встаёт, ввод идёт в оверлей). */
   'world:input': { enabled: boolean };
@@ -58,6 +61,8 @@ export interface BusEvents {
   'farm:act': FarmAct;
   /** Всплывающая надпись над точкой мира (экранные CSS px): «+10», подпись растения. */
   'fx:float': { x: number; y: number; text: string; kind: 'xp' | 'miss' | 'info' };
+  /** Звук действия мира (шаг героя, плеск, срыв, «плим» в коробке): играет `systems/platform/sfx.ts`, если звук включён. */
+  'fx:sfx': { name: SfxName };
   /** Подпись над растением у героя (экранные CSS px); null — спрятать. */
   'fx:label': { text: string; x: number; y: number } | null;
   /** Герой стоит у объекта, с которым сработает A (над ним рисуется «A»): `x`,`y` — точка над объектом в экранных CSS px; null — отошёл или экран открыт. */

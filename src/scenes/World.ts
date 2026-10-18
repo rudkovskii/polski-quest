@@ -473,6 +473,8 @@ export class World extends Phaser.Scene {
         this.bump = { dir: ev.dir, until: time + 120 };
         break;
       case 'step':
+        // Шаг героя: доски в доме, трава на ферме (звук играет sfx.ts; в `?mute=1` он не подключён).
+        bus.emit('fx:sfx', { name: this.mapDef.id === 'home' ? 'step_wood' : 'step_grass' });
         break;
     }
   }

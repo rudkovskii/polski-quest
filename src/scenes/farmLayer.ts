@@ -36,6 +36,8 @@ interface Job {
   act: FarmAct;
   phase: 'walk' | 'work' | 'carry' | 'throw';
   until: number;
+  /** Смена стадии (`grow`) уже показана. */
+  evolved?: boolean;
 }
 
 /** Столько действий героя ждут в очереди; лишние поливы схлопываются. */
@@ -50,6 +52,8 @@ export class FarmLayer {
   auto = false;
   private plants = new Map<string, { view: PlantView; spr: Phaser.GameObjects.Sprite | Phaser.GameObjects.Graphics; wet: Phaser.GameObjects.GameObject | null }>();
   private pendingHarvest = new Set<string>();
+  /** Растения, у которых смена стадии ждёт, пока герой дойдёт и польёт (спрайт меняется на глазах, с искрами). */
+  private deferred = new Set<string>();
   private queue: FarmAct[] = [];
   private job: Job | null = null;
   private focus: { id: string; tile: Xy; label: string } | null = null;
@@ -137,6 +141,12 @@ export class FarmLayer {
         cur.view = view;
         continue;
       }
+      // Новая стадия от «grow»-ответа: пока герой не польёт, на грядке старый спрайт (см. `evolve`).
+      if (cur && cur.view.stage !== view.stage && cur.view.tile[0] === v.tile[0] && cur.view.tile[1] === v.tile[1] && this.growPending(v.id)) {
+        this.deferred.add(v.id);
+        continue;
+      }
+      this.deferred.delete(v.id);
       cur?.spr.destroy();
       cur?.wet?.destroy();
       const wf = this.frame('soil_wet');
@@ -145,6 +155,7 @@ export class FarmLayer {
     }
     for (const [id, p] of this.plants) {
       if (seen.has(id) || this.pendingHarvest.has(id)) continue;
+      this.deferred.delete(id);
       p.spr.destroy();
       p.wet?.destroy();
       this.plants.delete(id);
@@ -177,8 +188,78 @@ export class FarmLayer {
         m.walkNear(this.focus.tile);
       } else if (!m.busy) m.faceTile(this.focus.tile);
     }
+    // Очередь доиграна, а смена стадии не показана (герой не дошёл, лишний полив схлопнулся): меняем спрайт без показа.
+    if (this.deferred.size && !this.job && !this.queue.length) for (const id of [...this.deferred]) this.rebuild(id, false);
     this.syncItem();
     this.drawLabel(time);
+  }
+
+  private growPending(id: string): boolean {
+    const j = this.job;
+    return this.queue.some((a) => a.id === id && a.kind === 'grow' && a.tile) || (!!j && j.act.id === id && j.act.kind === 'grow' && !!j.act.tile && (j.phase === 'walk' || (j.phase === 'work' && !j.evolved)));
+  }
+
+  /** Пересобрать растение по текущему виду; `show` — подрос на глазах: вырос на кадр и искры. */
+  private rebuild(id: string, show: boolean, k = 1): void {
+    this.deferred.delete(id);
+    const p = this.plants.get(id);
+    const v = this.views.find((x) => x.id === id);
+    if (!p || !v) return;
+    const view = { ...v, stage: this.pendingHarvest.has(id) ? ('ripe' as const) : v.stage };
+    p.spr.destroy();
+    p.wet?.destroy();
+    const wf = this.frame('soil_wet');
+    p.wet = v.drops > 0 && wf ? this.h.scene.add.image(v.tile[0] * T + T / 2, v.tile[1] * T + T, ATLAS, wf).setOrigin(0.5, 1).setDepth(1.2) : null;
+    p.view = view;
+    p.spr = this.makePlant(view);
+    if (!show) return;
+    bus.emit('fx:sfx', { name: 'grow' });
+    const spr = p.spr;
+    if (spr instanceof Phaser.GameObjects.Sprite) {
+      spr.setScale(0.55);
+      this.h.scene.tweens.add({ targets: spr, scaleX: 1, scaleY: 1, duration: 340 / k, ease: 'Back.easeOut' });
+    }
+    this.burst(view.tile[0] * T + T / 2, view.tile[1] * T + 4, 6, 11, k);
+  }
+
+  /** Искры (кадр `fx_spark`) вокруг точки мира. */
+  private burst(cx: number, cy: number, n: number, r: number, k: number, delay = 0): void {
+    const s = this.h.scene;
+    const f = this.frame('fx_spark');
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + 0.4;
+      const o = f ? s.add.sprite(cx, cy, ATLAS, f).setOrigin(0.5, 0.5) : s.add.rectangle(cx, cy, 2, 2, 0xf2d552);
+      o.setDepth(20_000);
+      s.tweens.add({ targets: o, x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r * 0.8 - 4, alpha: 0, delay: delay / k, duration: 440 / k, ease: 'Quad.easeOut', onComplete: () => o.destroy() });
+    }
+  }
+
+  /** Верный ответ: растение подпрыгивает (вытянулось и сели обратно), вверх летят листики. */
+  private bounce(id: string, k: number, delay = 0): void {
+    const p = this.plants.get(id);
+    if (!p || !(p.spr instanceof Phaser.GameObjects.Sprite)) return;
+    const spr = p.spr;
+    const s = this.h.scene;
+    s.tweens.killTweensOf(spr);
+    spr.setScale(1).setAngle(0);
+    s.tweens.add({ targets: spr, scaleY: 1.24, scaleX: 0.9, yoyo: true, duration: 120 / k, delay: delay / k, ease: 'Sine.easeOut', onComplete: () => spr.setScale(1) });
+    const cx = p.view.tile[0] * T + T / 2;
+    const top = p.view.tile[1] * T + 6;
+    for (let i = 0; i < 3; i++) {
+      const o = s.add.rectangle(cx - 3 + i * 3, top, 2, 2, 0x8cc455).setDepth(20_000);
+      s.tweens.add({ targets: o, y: top - 9 - i * 2, x: o.x + (i - 1) * 3, alpha: 0, delay: (delay + 60 + i * 50) / k, duration: 420 / k, onComplete: () => o.destroy() });
+    }
+  }
+
+  /** Неверный ответ: растение дрожит на месте. */
+  private shake(id: string, k: number): void {
+    const p = this.plants.get(id);
+    if (!p || !(p.spr instanceof Phaser.GameObjects.Sprite)) return;
+    const spr = p.spr;
+    const x0 = p.view.tile[0] * T + T / 2;
+    this.h.scene.tweens.killTweensOf(spr);
+    spr.setX(x0);
+    this.h.scene.tweens.add({ targets: spr, x: x0 + 1.5, yoyo: true, repeat: 2, duration: 45 / k, onComplete: () => spr.setX(x0) });
   }
 
   private markRipe(id: string): void {
@@ -223,6 +304,8 @@ export class FarmLayer {
           return;
         }
         // Сорвал: растение исчезает с грядки, герой несёт урожай в коробку.
+        bus.emit('fx:sfx', { name: 'pick' });
+        if (j.act.tile) this.burst(j.act.tile[0] * T + T / 2, j.act.tile[1] * T + 4, 6, 10, k);
         this.pendingHarvest.delete(j.act.id);
         const p = this.plants.get(j.act.id);
         if (p && !this.views.some((v) => v.id === j.act.id)) {
@@ -239,7 +322,12 @@ export class FarmLayer {
         this.carrying = true;
         const phrase = j.act.id.startsWith('p.');
         const f = this.frame(phrase ? 'item_crop_phrase' : 'item_crop') ?? this.frame(phrase ? 'crop_ripe_phrase' : 'crop_ripe');
-        if (f) this.item = this.h.scene.add.sprite(0, 0, ATLAS, f).setOrigin(0.5, 1);
+        if (f) {
+          // Плод поднимается над головой: появляется «с хлопком».
+          const it = this.h.scene.add.sprite(0, 0, ATLAS, f).setOrigin(0.5, 1).setScale(0.4);
+          this.item = it;
+          this.h.scene.tweens.add({ targets: it, scaleX: 1, scaleY: 1, duration: 260 / k, ease: 'Back.easeOut' });
+        }
         const bin = m.object('prop:bin');
         if (bin) m.walkNear(bin.at, bin.rects);
         j.phase = 'carry';
@@ -252,39 +340,69 @@ export class FarmLayer {
         this.heroAction = 'throw';
         j.phase = 'throw';
         j.until = time + 450 / k;
+        const xp = j.act.xp;
+        // Плод влетает в коробку: «плим», свечение, искры и «+N».
+        const landed = (): void => {
+          if (!bin) return;
+          bus.emit('fx:sfx', { name: 'plim' });
+          this.float([bin.at[0] + 0.5, bin.at[1] - 1], `+${xp}`, 'xp');
+          this.glow((bin.at[0] + bin.size[0] / 2) * T, (bin.at[1] + 1) * T - 8, k);
+        };
         if (this.item && bin) {
           const it = this.item;
           this.item = null;
-          this.h.scene.tweens.add({
+          const s = this.h.scene;
+          // Короткий подброс, потом полёт вниз в коробку.
+          s.tweens.add({
             targets: it,
-            x: (bin.at[0] + bin.size[0] / 2) * T,
-            y: (bin.at[1] + 1) * T - 8,
-            duration: 380 / k,
-            ease: 'Quad.easeIn',
-            onComplete: () => it.destroy(),
+            y: it.y - 9,
+            duration: 130 / k,
+            ease: 'Sine.easeOut',
+            onComplete: () =>
+              s.tweens.add({
+                targets: it,
+                x: (bin.at[0] + bin.size[0] / 2) * T,
+                y: (bin.at[1] + 1) * T - 8,
+                scaleX: 0.7,
+                scaleY: 0.7,
+                duration: 260 / k,
+                ease: 'Quad.easeIn',
+                onComplete: () => {
+                  it.destroy();
+                  landed();
+                },
+              }),
           });
-        }
+        } else landed();
         this.carrying = false;
         return;
       }
       case 'throw': {
         if (time < j.until) return;
         this.heroAction = null;
-        const bin = m.object('prop:bin');
-        if (bin) this.float([bin.at[0] + 0.5, bin.at[1] - 1], `+${j.act.xp}`, 'xp');
         this.job = null;
         return;
       }
     }
   }
 
-  /** Капли полива, искры удобрения. */
+  /** Свечение коробки при попадании плода: жёлтый овал, расходится и гаснет, и искры. */
+  private glow(x: number, y: number, k: number): void {
+    const s = this.h.scene;
+    const e = s.add.ellipse(x, y, 22, 10, 0xf2d552, 0.6).setDepth(19_999);
+    s.tweens.add({ targets: e, alpha: 0, scaleX: 1.7, scaleY: 1.7, duration: 460 / k, ease: 'Quad.easeOut', onComplete: () => e.destroy() });
+    this.burst(x, y - 2, 6, 12, k);
+  }
+
+  /** Капли полива, искры удобрения; растение отзывается: подрастает, дрожит при промахе, подпрыгивает при урожае. */
   private fx(act: FarmAct, k: number): void {
     if (!act.tile) return;
     const s = this.h.scene;
     const cx = act.tile[0] * T + T / 2;
     const top = act.tile[1] * T + 2;
+    if (act.kind === 'miss') this.shake(act.id, k);
     if (act.kind === 'water' || act.kind === 'grow') {
+      bus.emit('fx:sfx', { name: 'water' });
       const f = this.frame('fx_drop');
       for (let i = 0; i < 3; i++) {
         const x = cx - 4 + i * 4;
@@ -292,16 +410,17 @@ export class FarmLayer {
         o.setDepth(20_000);
         s.tweens.add({ targets: o, y: top + 8, alpha: 0.2, delay: (i * 90) / k, duration: 320 / k, onComplete: () => o.destroy() });
       }
+      // Капли долетели: растение подросло (смена спрайта и искры при новой стадии, иначе подпрыгнуло).
+      if (act.kind === 'grow') {
+        const j = this.job;
+        s.time.delayedCall(300 / k, () => {
+          if (j) j.evolved = true;
+          this.rebuild(act.id, true, k);
+        });
+      } else this.bounce(act.id, k, 280);
     }
-    if (act.kind === 'grow' || act.kind === 'harvest') {
-      const f = this.frame('fx_spark');
-      for (let i = 0; i < 4; i++) {
-        const a = (i / 4) * Math.PI * 2 + 0.4;
-        const o = f ? s.add.sprite(cx, top + 6, ATLAS, f).setOrigin(0.5, 0.5) : s.add.rectangle(cx, top + 6, 2, 2, 0xf2d552);
-        o.setDepth(20_000);
-        s.tweens.add({ targets: o, x: cx + Math.cos(a) * 9, y: top + 6 + Math.sin(a) * 7 - 4, alpha: 0, delay: (250 + i * 40) / k, duration: 420 / k, onComplete: () => o.destroy() });
-      }
-    }
+    if (act.kind === 'harvest') this.bounce(act.id, k);
+    if (act.kind === 'grow' || act.kind === 'harvest') this.burst(cx, top + 6, 4, 9, k, 250);
   }
 
   private float(tile: Xy, text: string, kind: 'xp' | 'miss' | 'info'): void {
