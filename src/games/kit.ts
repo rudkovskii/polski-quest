@@ -70,8 +70,12 @@ export function choice(panel: GamePanel, options: readonly string[], answer?: st
   return grid;
 }
 
-/** Сборка из плиток: набор сверху, плитки снизу, «Сбросить» и «Sprawdź» в подвале. Отдаёт массив плиток в `panel.submit`. */
-export function tiles(panel: GamePanel, pool: readonly string[]): HTMLElement {
+/**
+ * Сборка из плиток: набор сверху, плитки снизу, «Сбросить» и «Sprawdź» в подвале. Отдаёт массив плиток в `panel.submit`.
+ * Тап по плитке из набора озвучивает её целиком (`panel.say`, новая плитка прерывает прежнюю), если плитки польские (`lang: 'pl'`,
+ * по умолчанию); русские плитки молчат. Возврат плитки из собранного ряда — без звука.
+ */
+export function tiles(panel: GamePanel, pool: readonly string[], lang: 'pl' | 'ru' = 'pl'): HTMLElement {
   let built: number[] = [];
   const row = el('div', { class: 'pq-built', 'data-built': '' });
   const box = el('div', { class: 'pq-pool' });
@@ -81,7 +85,7 @@ export function tiles(panel: GamePanel, pool: readonly string[]): HTMLElement {
     row.replaceChildren(...built.map((ti, k) => el('button', { type: 'button', class: 'pq-btn pq-tile', 'data-nav': '', onclick: () => ((built = built.filter((_, j) => j !== k)), paint()) }, pool[ti]!)));
     box.replaceChildren(
       ...pool.map((t, i) =>
-        el('button', { type: 'button', class: 'pq-btn pq-tile', 'data-nav': '', 'data-opt': t, 'data-tile': t, disabled: built.includes(i), onclick: () => !built.includes(i) && ((built = [...built, i]), paint()) }, t),
+        el('button', { type: 'button', class: 'pq-btn pq-tile', 'data-nav': '', 'data-opt': t, 'data-tile': t, disabled: built.includes(i), onclick: () => !built.includes(i) && ((built = [...built, i]), paint(), lang === 'pl' && panel.say(t)) }, t),
       ),
     );
     check.disabled = built.length === 0;
