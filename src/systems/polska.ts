@@ -190,6 +190,7 @@ export function createPolska(d: PolskaDeps): Polska {
       selfOk: it?.selfOk ?? false,
       days: it?.days.size ?? 0,
       harvests: it?.harvests ?? 0,
+      answers: it?.answers ?? 0,
       next: unitProgress(it, now, today()),
     };
   };

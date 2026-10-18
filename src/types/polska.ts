@@ -42,6 +42,8 @@ export interface UnitInfo {
   selfOk: boolean;
   days: number;
   harvests: number;
+  /** Сколько ответов (верных и нет) уже дано по единице: 0 — игрок её ещё не встречал. Необязательно, чтобы чужие фейки не ломались. */
+  answers?: number;
   /** «ещё 1 полив до ростка», «нужно сказать самому»… */
   next: string;
 }
@@ -130,6 +132,12 @@ export interface PolskaGame<T extends GameTask = GameTask> {
   check(task: T, answer: unknown, ctx: GameCtx): GameCheck;
   /** Строка в итоге раунда («Najbliższe święto: Wigilia za 3 dni»); null — без строки. */
   summaryLine?(ctx: GameCtx): string | null;
+  /**
+   * Экран выбора до раунда (колесо праздников, `layout: 'full'`). Игра рисует его в `panel.body`/`panel.foot` и зовёт `begin(id, size)`:
+   * движок досаживает единицу и ведёт раунд из `size` заданий про неё одну (`nextTask` получает `want.id` = `id`). После итога раунда
+   * «К колесу» возвращает на этот экран. Без `hub` раунд начинается сразу и идёт по 10 заданий из разных единиц.
+   */
+  hub?(panel: GamePanel, ctx: GameCtx, begin: (id: string, size: number) => void): void;
 }
 
 /** Вид объекта на участке Zagroda по прогрессу (для сцены). */

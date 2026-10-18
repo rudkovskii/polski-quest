@@ -329,10 +329,10 @@ describe('движок раунда v2', () => {
     const autos: string[] = [];
     s.bus.on('polska:auto', (a) => autos.push(`${a.on}:${a.layout}:${a.plot ?? ''}`));
     const ui = mountPolskaGame(root, { bus: s.bus, games: GAMES, polska: s.p, now: () => NOW, rand: seeded(5), say: () => {} });
-    ui.start('swieta');
+    ui.start('hymn');
     expect(ui.isOpen).toBe(true);
-    expect(autos[0]).toBe('true:panel:klumba');
-    expect(focus.some((o) => o?.startsWith('klumba_'))).toBe(true);
+    expect(autos[0]).toBe('true:panel:pasieka');
+    expect(focus.some((o) => o?.startsWith('hive_'))).toBe(true);
     vi.useFakeTimers();
     for (let i = 0; i < ROUND_SIZE; i++) {
       expect(ui.task, `задание ${i + 1}`).toBeTruthy();

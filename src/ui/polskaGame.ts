@@ -119,6 +119,10 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   let open = false;
   let game: PolskaGame | null = null;
   let only: string | undefined;
+  /** Игры с экраном выбора (`PolskaGame.hub`): единица текущего раунда, длина раунда и «сейчас идёт экран выбора». */
+  let focus: string | undefined;
+  let limit = ROUND_SIZE;
+  let hubOn = false;
   let task: GameTask | null = null;
   let answered = false;
   let summaryOpen = false;
@@ -157,9 +161,9 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     if (kbNav) list[focusIdx]!.classList.add('is-focus');
   };
   const paintRound = (): void => {
-    roundNo.hidden = !!only;
-    const shown = summaryOpen ? round.count : Math.min(ROUND_SIZE, round.count + (answered ? 0 : 1));
-    roundNo.textContent = `${shown} / ${ROUND_SIZE}`;
+    roundNo.hidden = !!only || hubOn;
+    const shown = summaryOpen ? round.count : Math.min(limit, round.count + (answered ? 0 : 1));
+    roundNo.textContent = `${shown} / ${limit}`;
   };
   const reportHeight = (): void => {
     if (!open || !game) return;
@@ -232,12 +236,13 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     const ctx = ctxOf(game);
     if (!only) deps.polska.autoPlant(game.id, game.pool(ctx));
     const skip = new Set<string>();
+    const one = only ?? focus;
     for (let i = 0; i < 6 && !task; i++) {
-      const want = deps.polska.pick(game.id, { recent, ...(only ? { only } : {}), exclude: skip });
+      const want = deps.polska.pick(game.id, { recent, ...(one ? { only: one } : {}), exclude: skip });
       if (!want) break;
       task = game.nextTask(ctx, want);
       if (!task) skip.add(want.id);
-      if (only) break;
+      if (one) break;
     }
     paintRound();
     if (!task) {
@@ -261,7 +266,48 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     clearTimers();
     if (!open || !game) return;
     if (only && answered) return api.stop();
-    if (!only && round.done) return showSummary();
+    if (!only && round.count >= limit) return showSummary();
+    render();
+  };
+
+  /** Экран выбора перед раундом (игры с `hub`): игра рисует его сама и зовёт `begin`. */
+  const showHub = (): void => {
+    clearTimers();
+    hubOn = true;
+    focus = undefined;
+    limit = ROUND_SIZE;
+    answered = false;
+    summaryOpen = false;
+    task = null;
+    focusIdx = -1;
+    paper.classList.remove('ok', 'bad');
+    paper.replaceChildren();
+    foot.replaceChildren();
+    fb.hidden = true;
+    fb.replaceChildren();
+    box.style.removeProperty('height');
+    if (!game?.hub) return;
+    const ctx = ctxOf(game);
+    deps.polska.autoPlant(game.id, game.pool(ctx));
+    paintRound();
+    game.hub(panel, ctx, begin);
+    setFocus(0);
+    root.classList.toggle('kb', kbNav);
+    bus.emit('polska:focus', { id: null, obj: null, label: '' });
+    requestAnimationFrame(reportHeight);
+  };
+
+  /** Раунд из `size` заданий про одну единицу (её досаживаем, если ещё не растёт). */
+  const begin = (id: string, size: number): void => {
+    if (!open || !game || !hubOn) return;
+    deps.polska.plant([id]);
+    hubOn = false;
+    focus = id;
+    limit = Math.max(1, Math.trunc(size));
+    if (round.count > 0) roundN++;
+    round.reset();
+    scaleFrom = scaleTo = null;
+    recent.length = 0;
     render();
   };
 
@@ -286,7 +332,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     const line = game?.summaryLine?.(ctxOf(game));
     if (line) card.append(el('div', { class: 'way2', 'data-round-line': '' }, line));
     paper.replaceChildren(card);
-    const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, 'Ещё раунд');
+    const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, game?.hub ? 'К колесу' : 'Ещё раунд');
     const end = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-end': '', onclick: () => api.stop() }, 'Закончить');
     foot.replaceChildren(more, end);
     paintRound();
@@ -297,6 +343,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
 
   const nextRound = (): void => {
     if (!open || !summaryOpen) return;
+    if (game?.hub) return showHub();
     round.reset();
     roundN++;
     scaleFrom = scaleTo = null;
@@ -359,6 +406,9 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
         scaleFrom = scaleTo = null;
         recent.length = 0;
         grownObjs = [];
+        focus = undefined;
+        limit = ROUND_SIZE;
+        hubOn = false;
       }
       title.replaceChildren(el('span', {}, g.title.ru), el('small', {}, g.title.pl));
       root.classList.toggle('full', g.layout === 'full');
@@ -370,7 +420,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
         bus.emit('world:input', { enabled: false });
       }
       bus.emit('polska:auto', { on: true, game: g.id, layout: g.layout, plot: g.plot });
-      render();
+      if (g.hub && !onlyId) showHub();
+      else render();
     },
     stop(go = false) {
       if (!open) return;
@@ -381,6 +432,9 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       const g = game;
       if (g?.layout === 'full' && grownObjs.length) bus.emit('polska:tour', { plot: g.plot, objs: [...grownObjs], ...(go ? { go: true } : {}) });
       grownObjs = [];
+      focus = undefined;
+      limit = ROUND_SIZE;
+      hubOn = false;
       game = null;
       task = null;
       bus.emit('polska:focus', { id: null, obj: null, label: '' });
