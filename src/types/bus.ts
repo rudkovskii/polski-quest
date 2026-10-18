@@ -11,7 +11,7 @@ export type AudioVia = 'file' | 'webspeech' | 'none';
 export type AudioState = 'idle' | 'playing' | 'blocked' | 'none';
 
 /** Объекты, с которыми можно что-то сделать (`use` в content/maps/*.json). Логику каждого делает F-03. */
-export type UseKind = 'desk' | 'board' | 'bin' | 'shelf' | 'bed' | 'plant';
+export type UseKind = 'desk' | 'board' | 'bin' | 'shelf' | 'bed' | 'plant' | 'radio';
 
 /**
  * КОНТРАКТ ДЛЯ F-03. Игрок нажал A рядом с интерактивным объектом или тапнул по нему (мир сам подошёл).
@@ -20,7 +20,7 @@ export type UseKind = 'desk' | 'board' | 'bin' | 'shelf' | 'bed' | 'plant';
 export interface WorldInteract {
   /** id карты: `home` или `farm`. */
   location: string;
-  /** Что за объект: desk (Słownik), board (выбор мини-игры), bin (коробка урожая), shelf (банки), bed (кровать). */
+  /** Что за объект: desk (Słownik), board (выбор мини-игры), bin (коробка урожая), shelf (банки), bed (кровать), radio (радио с музыкой). */
   use: UseKind | (string & {});
   /** Он же id объекта на карте (у этих пяти совпадает с `use`). */
   id: string;

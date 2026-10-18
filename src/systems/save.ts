@@ -2,6 +2,7 @@
 // Чистые функции без браузера. v2 (F-03): огород — посадки, журнал ответов, раскладка по грядкам (systems/garden.ts).
 import type { Dir } from '../types/input';
 import { newGarden, normalizeGarden, type GardenSave } from './garden';
+import { MUSIC_DEFAULT, normalizeMusic, type MusicSettings } from './musicSettings';
 
 export const SAVE_V = 2;
 const APP = 'polski-quest-farm';
@@ -18,6 +19,8 @@ export interface Settings {
   sound: boolean;
   /** Громкость эффектов (шаги, урожай, ответы), 0–100 %. По умолчанию SFX_VOLUME_DEFAULT. */
   sfxVolume: number;
+  /** Музыка (V11b): вкл/выкл, громкость, трек, повтор. По умолчанию выключена. */
+  music: MusicSettings;
 }
 
 /** Громкость эффектов по умолчанию, %. */
@@ -36,7 +39,7 @@ export interface Save {
 }
 
 export function newSave(now: number): Save {
-  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT }, garden: newGarden(), hints: [] };
+  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT, music: { ...MUSIC_DEFAULT } }, garden: newGarden(), hints: [] };
 }
 
 const DIRS: readonly Dir[] = ['up', 'down', 'left', 'right'];
@@ -59,7 +62,7 @@ export function normalizeSave(raw: unknown): Save | null {
     created: isNum(r.created) ? r.created : 0,
     updated: isNum(r.updated) ? r.updated : 0,
     position,
-    settings: { sound: st.sound !== false, sfxVolume: isNum(st.sfxVolume) ? Math.min(100, Math.max(0, Math.round(st.sfxVolume))) : SFX_VOLUME_DEFAULT },
+    settings: { sound: st.sound !== false, sfxVolume: isNum(st.sfxVolume) ? Math.min(100, Math.max(0, Math.round(st.sfxVolume))) : SFX_VOLUME_DEFAULT, music: normalizeMusic(st.music) },
     garden: normalizeGarden(r.garden),
     hints: Array.isArray(r.hints) ? [...new Set(r.hints.filter((h): h is string => typeof h === 'string'))].slice(0, 32) : [],
   };

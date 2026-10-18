@@ -215,6 +215,28 @@ def window() -> None:
     single('window', c.render(ring=False), anchor=[8, 15])
 
 
+def radio() -> None:
+    """Ламповое радио на тумбе (16×32): арка корпуса, решётка динамика, стеклянная шкала с золотой стрелкой, ручки; тумба с дверцей."""
+    parts = {'cab': P('wood', r=2, g='cab'), 'door': P('plank', r=2, g='door'), 'body': P('wood_dark', r=3, g='body'),
+             'grille': P('rug2', r=2, g='grille'), 'dial': P('glass', r=2, g='dial'), 'knob': P('cream', r=1, g='knob'),
+             'gold': P('gold', flat=3), 'leg': P('wood_dark', r=1, g='leg')}
+    c = Cv(16, 32, parts)
+    c.rect(2, 29, 2, 3, 'leg'); c.rect(12, 29, 2, 3, 'leg')
+    c.rect(1, 19, 14, 11, 'cab')
+    c.rect(3, 21, 10, 7, 'door')
+    c.dot(11, 24, 'gold.3')
+    c.rect(1, 8, 14, 11, 'body')
+    c.ell(8, 9, 7, 3.2, 'body')
+    c.rect(3, 10, 5, 7, 'grille')
+    for y in (11, 13, 15):
+        c.hline(3, 8, y, 'rug2.1')
+    c.ell(11.5, 11.5, 2.4, 2.4, 'dial')
+    c.dot(11, 11, 'white'); c.dot(12, 12, 'gold.3')
+    c.dot(10, 15, 'cream.3'); c.dot(13, 15, 'cream.3')
+    c.dots([5, 6, 8, 5, 11, 5], 'gold.3')
+    single('radio', c.render(), anchor=[8, 31])
+
+
 def build() -> None:
     tree('tree', 3)
     tree('tree2', 11, ('leaf2', 'leaf'))
@@ -224,4 +246,4 @@ def build() -> None:
     flower('flower_yellow', 'petal_yellow', 2)
     flower('flower_white', 'petal_white', 3)
     rock('rock')
-    house(); well(); bin_(); board(); shelf(); bed(); desk(); rug(); window()
+    house(); well(); bin_(); board(); shelf(); bed(); desk(); radio(); rug(); window()

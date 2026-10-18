@@ -145,6 +145,22 @@
    "shadow": 28
   },
   {
+   "type": "prop",
+   "id": "radio",
+   "use": "radio",
+   "label": "Radio·Радио",
+   "sprite": "radio",
+   "at": [
+    7,
+    2
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 0
+  },
+  {
    "type": "exit",
    "at": [
     6,

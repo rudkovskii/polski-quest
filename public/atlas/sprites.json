@@ -633,6 +633,20 @@
   ],
   "anims": {}
  },
+ "radio": {
+  "size": [
+   16,
+   32
+  ],
+  "anchor": [
+   8,
+   31
+  ],
+  "frames": [
+   "radio/0"
+  ],
+  "anims": {}
+ },
  "rock": {
   "size": [
    16,
