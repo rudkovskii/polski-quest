@@ -40,6 +40,7 @@ ART = ROOT / 'art'
 OUT = ROOT / 'public' / 'atlas'
 T = 16  # тайл и кратность кадров
 PAD = 1  # extrude вокруг кадра
+LATE_PREFIXES = ('w2_', 'geo_', 't2_')  # спрайты v2: порядок упаковки после всех прочих
 
 RGBA = tuple[int, int, int, int]
 
@@ -232,7 +233,9 @@ def extrude_paste(dst: Image.Image, src: Image.Image, x: int, y: int) -> None:
 def pack_custom(sprites: dict[str, SpriteDef]) -> tuple[Image.Image, dict, dict]:
     """Полочная упаковка всех кадров (по убыванию высоты). Возвращает PNG, atlas JSON hash и sprites.json."""
     items = [(s.id, i, f) for s in sprites.values() for i, f in enumerate(s.frames)]
-    items.sort(key=lambda t: (-t[2].height, t[0], t[1]))
+    # Новые спрайты v2 пакуются после старых: координаты старых кадров не двигаются (ui/stageIcon.ts хранит их числами).
+    late = lambda sid: sid.startswith(LATE_PREFIXES)  # noqa: E731
+    items.sort(key=lambda t: (late(t[0]), -t[2].height, t[0], t[1]))
     width = 256
     x = y = 0
     shelf = 0
@@ -472,6 +475,10 @@ def check() -> int:
     pngs = sorted(OUT.glob('*.png'))
     for p in pngs:
         errs += check_png(p, pal, p.relative_to(ROOT).as_posix())
+    # Большие картинки карт (tools/art_map.py): только цвета палитры, альфа 0/255, размер кратен 16
+    maps = sorted((ROOT / 'public' / 'maps-art').glob('*.png')) if (ROOT / 'public' / 'maps-art').exists() else []
+    for p in maps:
+        errs += check_png(p, pal, p.relative_to(ROOT).as_posix())
     # Кадры атласов: имена и кратность 16
     for jp in sorted(OUT.glob('*.json')):
         d = json.loads(jp.read_text('utf8'))
@@ -503,7 +510,7 @@ def check() -> int:
         for e in errs:
             print(f'  {e}', file=sys.stderr)
         return 1
-    print(f'sprites --check: ок ({len(pal.rgbs)} цветов палитры, {len(pngs)} PNG)')
+    print(f'sprites --check: ок ({len(pal.rgbs)} цветов палитры, {len(pngs)} PNG атласа, {len(maps)} PNG карт)')
     return 0
 
 
