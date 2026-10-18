@@ -179,6 +179,7 @@ export class FarmLayer {
   update(time: number): void {
     const m = this.h.model;
     m.speed = this.auto || this.job ? this.speed() : 1;
+    m.leash = this.auto || this.job !== null; // кот бежит рядом, своими делами не занят
     if (!this.job && this.queue.length) this.start(this.queue.shift()!, time);
     if (this.job) this.advance(time);
     else if (this.auto && this.focus && !m.busy) {
