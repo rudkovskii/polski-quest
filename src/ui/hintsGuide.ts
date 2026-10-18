@@ -49,6 +49,8 @@ export interface Guide {
 const EDGE = 28;
 const EDGE_TOP = 84;
 const EDGE_BOTTOM = 150;
+/** Низ плашек HUD на телефоне, px: пузырь указателя держится ниже. */
+const HUD_BOTTOM = 106;
 
 /** Точка, где луч из (x, y) в направлении (dx, dy) выходит из прямоугольника `box` (точка внутри него). */
 export function edgePoint(x: number, y: number, dx: number, dy: number, box: { l: number; r: number; t: number; b: number }): { x: number; y: number } {
@@ -96,7 +98,8 @@ export function mountGuide(parent: HTMLElement, deps: GuideDeps, bus: Bus<BusEve
     const vw = typeof innerWidth === 'number' && innerWidth > 0 ? innerWidth : p.hero.x + half;
     const vh = typeof innerHeight === 'number' && innerHeight > 0 ? innerHeight : p.target.y + 100;
     bubble.style.left = `${Math.round(Math.min(Math.max(p.hero.x, half + 6), vw - half - 6))}px`;
-    bubble.style.top = `${Math.round(Math.max(p.hero.y - 8, (r.height || 30) + 6))}px`;
+    // Не залезать на плашки HUD сверху (опыт, «Сегодня», шкала Polska): низ пузыря не выше HUD_BOTTOM.
+    bubble.style.top = `${Math.round(Math.max(p.hero.y - 8, (r.height || 30) + HUD_BOTTOM))}px`;
     const onScreen = p.target.x > 16 && p.target.x < vw - 16 && p.target.y > 60 && p.target.y < vh - 110;
     arrow.hidden = false;
     if (onScreen) {
@@ -150,6 +153,8 @@ export function mountGuide(parent: HTMLElement, deps: GuideDeps, bus: Bus<BusEve
       paint();
     }),
     bus.on('farm:plants', resync),
+    // Смена карты: «Огород пуст» говорит про грядки слов — в Zagroda (игры о Польше) он не нужен.
+    bus.on('world:location', resync),
     // Экран или мини-игра закрылись: мог измениться и огород без `farm:plants` (посадка в словаре), и этап.
     bus.on('world:input', ({ enabled }) => {
       if (enabled) resync();

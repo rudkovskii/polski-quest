@@ -206,6 +206,11 @@ async function main(): Promise<void> {
     if (!hasHint(h)) store.update((s: Save) => ({ ...s, hints: [...s.hints, h] }), Date.now());
   };
   mountHints(overlay, { seen: hasHint, mark: addHint });
+  // Где герой: указатель «Огород пуст» про грядки слов не показываем в Zagroda (там растут игры о Польше).
+  let where = '';
+  bus.on('world:location', ({ id }) => {
+    where = id;
+  });
   // Первые шаги: к столу (до первого открытия словаря), потом к доске (до первой мини-игры). Игрок, который уже сажал
   // слова или отвечал, указателя не видит.
   mountGuide(overlay, {
@@ -214,7 +219,7 @@ async function main(): Promise<void> {
       if (!hasHint('guide:desk') && g.planted.length === 0) return 'desk';
       if (!hasHint('guide:board') && g.log.length === 0) return 'board';
       // Играл и вырастил всё: на грядках пусто и нет ждущих в мешке. «Огород пуст · Посади ещё слов за столом» гаснет после посадки (F5b).
-      if (g.planted.length > 0 && g.log.length > 0) {
+      if (g.planted.length > 0 && g.log.length > 0 && where !== 'zagroda') {
         const s = farm.stats();
         if (s.growing === 0 && s.bag === 0) return 'replant';
       }
