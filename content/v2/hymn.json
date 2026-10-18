@@ -1,0 +1,215 @@
+{
+ "version": 1,
+ "meta": {
+  "fixture": true,
+  "note": "Минимальная фикстура ядра v2 по схеме ФЕРМА_v2.md §7. Заменяется копией Игра/data/v2/ без правок."
+ },
+ "title": "Mazurek Dąbrowskiego",
+ "author": "Józef Wybicki",
+ "year": 1797,
+ "order": [
+  "s1",
+  "ref",
+  "s2",
+  "ref",
+  "s3",
+  "ref",
+  "s4",
+  "ref"
+ ],
+ "drillSeed": [
+  "hymn.s1.1",
+  "hymn.s1.2",
+  "hymn.s1.3",
+  "hymn.s1.4"
+ ],
+ "lines": [
+  {
+   "id": "hymn.s1.1",
+   "kind": "hymn",
+   "type": "line",
+   "stanza": "s1",
+   "n": 1,
+   "pl": "Jeszcze Polska nie zginęła,",
+   "ru": "Ещё Польша не погибла,",
+   "tr": "",
+   "tiles": [
+    "Jeszcze",
+    "Polska",
+    "nie",
+    "zginęła"
+   ],
+   "distract": [],
+   "gloss": [],
+   "band": 1
+  },
+  {
+   "id": "hymn.s1.2",
+   "kind": "hymn",
+   "type": "line",
+   "stanza": "s1",
+   "n": 2,
+   "pl": "kiedy my żyjemy.",
+   "ru": "пока мы живы.",
+   "tr": "",
+   "tiles": [
+    "kiedy",
+    "my",
+    "żyjemy"
+   ],
+   "distract": [],
+   "gloss": [],
+   "band": 1
+  },
+  {
+   "id": "hymn.s1.3",
+   "kind": "hymn",
+   "type": "line",
+   "stanza": "s1",
+   "n": 3,
+   "pl": "Co nam obca przemoc wzięła,",
+   "ru": "Что у нас чужая сила отняла,",
+   "tr": "",
+   "tiles": [
+    "Co",
+    "nam",
+    "obca",
+    "przemoc",
+    "wzięła"
+   ],
+   "distract": [],
+   "gloss": [],
+   "band": 1
+  },
+  {
+   "id": "hymn.s1.4",
+   "kind": "hymn",
+   "type": "line",
+   "stanza": "s1",
+   "n": 4,
+   "pl": "szablą odbierzemy.",
+   "ru": "саблей вернём.",
+   "tr": "",
+   "tiles": [
+    "szablą",
+    "odbierzemy"
+   ],
+   "distract": [],
+   "gloss": [],
+   "band": 1
+  },
+  {
+   "id": "hymn.ref.5",
+   "kind": "hymn",
+   "type": "line",
+   "stanza": "ref",
+   "n": 5,
+   "pl": "Marsz, marsz, Dąbrowski,",
+   "ru": "Марш, марш, Домбровский,",
+   "tr": "",
+   "tiles": [
+    "Marsz",
+    "marsz",
+    "Dąbrowski"
+   ],
+   "distract": [],
+   "gloss": [],
+   "band": 1
+  },
+  {
+   "id": "hymn.ref.6",
+   "kind": "hymn",
+   "type": "line",
+   "stanza": "ref",
+   "n": 6,
+   "pl": "z ziemi włoskiej do Polski.",
+   "ru": "с итальянской земли в Польшу.",
+   "tr": "",
+   "tiles": [
+    "z",
+    "ziemi",
+    "włoskiej",
+    "do",
+    "Polski"
+   ],
+   "distract": [],
+   "gloss": [],
+   "band": 1
+  },
+  {
+   "id": "hymn.ref.7",
+   "kind": "hymn",
+   "type": "line",
+   "stanza": "ref",
+   "n": 7,
+   "pl": "Za twoim przewodem",
+   "ru": "Под твоим началом",
+   "tr": "",
+   "tiles": [
+    "Za",
+    "twoim",
+    "przewodem"
+   ],
+   "distract": [],
+   "gloss": [],
+   "band": 1
+  },
+  {
+   "id": "hymn.ref.8",
+   "kind": "hymn",
+   "type": "line",
+   "stanza": "ref",
+   "n": 8,
+   "pl": "złączym się z narodem.",
+   "ru": "соединимся с народом.",
+   "tr": "",
+   "tiles": [
+    "złączym",
+    "się",
+    "z",
+    "narodem"
+   ],
+   "distract": [],
+   "gloss": [],
+   "band": 1
+  }
+ ],
+ "melody": [],
+ "symbols": [
+  {
+   "id": "symbol.godlo",
+   "kind": "symbol",
+   "type": "build",
+   "pl": "Godło Polski to biały orzeł w złotej koronie na czerwonym tle.",
+   "ru": "Герб Польши: белый орёл в золотой короне на красном поле.",
+   "tr": "",
+   "build": {
+    "field": "czerwone",
+    "eagle": "biały",
+    "crown": "złota"
+   },
+   "band": 1,
+   "src": "Miso №1"
+  },
+  {
+   "id": "symbol.barwy",
+   "kind": "symbol",
+   "type": "choice",
+   "pl": "Barwy narodowe to biały i czerwony.",
+   "ru": "Национальные цвета — белый и красный.",
+   "tr": "",
+   "band": 1,
+   "src": "Miso"
+  },
+  {
+   "id": "symbol.hymn_autor",
+   "kind": "symbol",
+   "type": "choice",
+   "pl": "Słowa hymnu napisał Józef Wybicki w 1797 roku.",
+   "ru": "Слова гимна написал Юзеф Выбицкий в 1797 году.",
+   "tr": "",
+   "band": 1,
+   "src": "Miso"
+  }
+ ]
+}

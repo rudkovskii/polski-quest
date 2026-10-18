@@ -1,0 +1,1097 @@
+{
+ "id": "zagroda",
+ "name": "Zagroda",
+ "size": [
+  30,
+  23
+ ],
+ "defaultGround": "g",
+ "legend": {
+  "g": {
+   "tile": "grass"
+  },
+  "G": {
+   "tile": "grass",
+   "solid": true
+  },
+  "p": {
+   "tile": "path",
+   "auto": true
+  },
+  "s": {
+   "tile": "soil",
+   "auto": true
+  }
+ },
+ "layers": {
+  "ground": [
+   "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+   "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+   "GggggggggggggggggggggggggggggG",
+   "GggggggggggggggpgggggggggggggG",
+   "GggggggggggggggpgggggggggggggG",
+   "GggggggggggggggpgggggggggggggG",
+   "GggggggggggggggpgssgssgssgssgG",
+   "GggggggggggggggpgggggggggggggG",
+   "GggggggggggggggpgssgssgssgssgG",
+   "GggggggggggggggpgggggggggggggG",
+   "GggggggggggggggpgssgssgssgssgG",
+   "GggggggggggggggpgggggggggggggG",
+   "GggggggggggggggpgggggggggggggG",
+   "GggggggggggggggpgggggggggggggG",
+   "GggggggggggggggpgggggggggggggG",
+   "ppppppppppppppppppppppppppppgG",
+   "GggggggggggggggggggggggggggggG",
+   "GggggggggggggggggggggggggggggG",
+   "GggggggggggggggggggggggggggggG",
+   "GggggggggggggggggggggggggggggG",
+   "GggggggggggggggggggggggggggggG",
+   "GggggggggggggggggggggggggggggG",
+   "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG"
+  ]
+ },
+ "spawns": {
+  "default": [
+   1,
+   15,
+   "right"
+  ],
+  "from_farm": [
+   1,
+   15,
+   "right"
+  ],
+  "sad": [
+   7,
+   15,
+   "up"
+  ],
+  "pasieka": [
+   15,
+   5,
+   "right"
+  ],
+  "miesiace": [
+   15,
+   9,
+   "right"
+  ],
+  "klumba": [
+   12,
+   15,
+   "down"
+  ]
+ },
+ "objects": [
+  {
+   "type": "prop",
+   "id": "sad_zachodniopomorskie",
+   "use": "zplot",
+   "label": "Sad · zachodniopomorskie",
+   "sprite": "tree",
+   "at": [
+    2,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_pomorskie",
+   "use": "zplot",
+   "label": "Sad · pomorskie",
+   "sprite": "tree2",
+   "at": [
+    5,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_warminsko-mazurskie",
+   "use": "zplot",
+   "label": "Sad · warminsko-mazurskie",
+   "sprite": "tree",
+   "at": [
+    8,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_podlaskie",
+   "use": "zplot",
+   "label": "Sad · podlaskie",
+   "sprite": "tree2",
+   "at": [
+    11,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_lubuskie",
+   "use": "zplot",
+   "label": "Sad · lubuskie",
+   "sprite": "tree2",
+   "at": [
+    2,
+    6
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_wielkopolskie",
+   "use": "zplot",
+   "label": "Sad · wielkopolskie",
+   "sprite": "tree",
+   "at": [
+    5,
+    6
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_kujawsko-pomorskie",
+   "use": "zplot",
+   "label": "Sad · kujawsko-pomorskie",
+   "sprite": "tree2",
+   "at": [
+    8,
+    6
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_mazowieckie",
+   "use": "zplot",
+   "label": "Sad · mazowieckie",
+   "sprite": "tree",
+   "at": [
+    11,
+    6
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_dolnoslaskie",
+   "use": "zplot",
+   "label": "Sad · dolnoslaskie",
+   "sprite": "tree",
+   "at": [
+    2,
+    9
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_lodzkie",
+   "use": "zplot",
+   "label": "Sad · lodzkie",
+   "sprite": "tree2",
+   "at": [
+    5,
+    9
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_swietokrzyskie",
+   "use": "zplot",
+   "label": "Sad · swietokrzyskie",
+   "sprite": "tree",
+   "at": [
+    8,
+    9
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_lubelskie",
+   "use": "zplot",
+   "label": "Sad · lubelskie",
+   "sprite": "tree2",
+   "at": [
+    11,
+    9
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_opolskie",
+   "use": "zplot",
+   "label": "Sad · opolskie",
+   "sprite": "tree2",
+   "at": [
+    2,
+    12
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_slaskie",
+   "use": "zplot",
+   "label": "Sad · slaskie",
+   "sprite": "tree",
+   "at": [
+    5,
+    12
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_malopolskie",
+   "use": "zplot",
+   "label": "Sad · malopolskie",
+   "sprite": "tree2",
+   "at": [
+    8,
+    12
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "sad_podkarpackie",
+   "use": "zplot",
+   "label": "Sad · podkarpackie",
+   "sprite": "tree",
+   "at": [
+    11,
+    12
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22,
+   "face": "down"
+  },
+  {
+   "type": "prop",
+   "id": "hive_s1",
+   "use": "zplot",
+   "label": "Pasieka · ul s1",
+   "sprite": "bin",
+   "at": [
+    17,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 14
+  },
+  {
+   "type": "prop",
+   "id": "hive_ref",
+   "use": "zplot",
+   "label": "Pasieka · ul ref",
+   "sprite": "bin",
+   "at": [
+    19,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 14
+  },
+  {
+   "type": "prop",
+   "id": "hive_s2",
+   "use": "zplot",
+   "label": "Pasieka · ul s2",
+   "sprite": "bin",
+   "at": [
+    21,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 14
+  },
+  {
+   "type": "prop",
+   "id": "hive_s3",
+   "use": "zplot",
+   "label": "Pasieka · ul s3",
+   "sprite": "bin",
+   "at": [
+    23,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 14
+  },
+  {
+   "type": "prop",
+   "id": "hive_s4",
+   "use": "zplot",
+   "label": "Pasieka · ul s4",
+   "sprite": "bin",
+   "at": [
+    25,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 14
+  },
+  {
+   "type": "prop",
+   "id": "bed_1",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 1",
+   "sprite": "crop_seed",
+   "at": [
+    17,
+    6
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_2",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 2",
+   "sprite": "crop_seed",
+   "at": [
+    20,
+    6
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_3",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 3",
+   "sprite": "crop_seed",
+   "at": [
+    23,
+    6
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_4",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 4",
+   "sprite": "crop_seed",
+   "at": [
+    26,
+    6
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_5",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 5",
+   "sprite": "crop_seed",
+   "at": [
+    17,
+    8
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_6",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 6",
+   "sprite": "crop_seed",
+   "at": [
+    20,
+    8
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_7",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 7",
+   "sprite": "crop_seed",
+   "at": [
+    23,
+    8
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_8",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 8",
+   "sprite": "crop_seed",
+   "at": [
+    26,
+    8
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_9",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 9",
+   "sprite": "crop_seed",
+   "at": [
+    17,
+    10
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_10",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 10",
+   "sprite": "crop_seed",
+   "at": [
+    20,
+    10
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_11",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 11",
+   "sprite": "crop_seed",
+   "at": [
+    23,
+    10
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "bed_12",
+   "use": "zplot",
+   "label": "Ogród miesięcy · 12",
+   "sprite": "crop_seed",
+   "at": [
+    26,
+    10
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_0",
+   "use": "zplot",
+   "label": "Klumba · 1",
+   "sprite": "flower_white",
+   "at": [
+    3,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_1",
+   "use": "zplot",
+   "label": "Klumba · 2",
+   "sprite": "flower_white",
+   "at": [
+    5,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_2",
+   "use": "zplot",
+   "label": "Klumba · 3",
+   "sprite": "flower_white",
+   "at": [
+    7,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_3",
+   "use": "zplot",
+   "label": "Klumba · 4",
+   "sprite": "flower_white",
+   "at": [
+    9,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_4",
+   "use": "zplot",
+   "label": "Klumba · 5",
+   "sprite": "flower_white",
+   "at": [
+    11,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_5",
+   "use": "zplot",
+   "label": "Klumba · 6",
+   "sprite": "flower_white",
+   "at": [
+    13,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_6",
+   "use": "zplot",
+   "label": "Klumba · 7",
+   "sprite": "flower_white",
+   "at": [
+    15,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_7",
+   "use": "zplot",
+   "label": "Klumba · 8",
+   "sprite": "flower_white",
+   "at": [
+    17,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_8",
+   "use": "zplot",
+   "label": "Klumba · 9",
+   "sprite": "flower_white",
+   "at": [
+    19,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_9",
+   "use": "zplot",
+   "label": "Klumba · 10",
+   "sprite": "flower_white",
+   "at": [
+    21,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_10",
+   "use": "zplot",
+   "label": "Klumba · 11",
+   "sprite": "flower_white",
+   "at": [
+    23,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_11",
+   "use": "zplot",
+   "label": "Klumba · 12",
+   "sprite": "flower_white",
+   "at": [
+    25,
+    18
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_12",
+   "use": "zplot",
+   "label": "Klumba · 13",
+   "sprite": "flower_white",
+   "at": [
+    4,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_13",
+   "use": "zplot",
+   "label": "Klumba · 14",
+   "sprite": "flower_white",
+   "at": [
+    6,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_14",
+   "use": "zplot",
+   "label": "Klumba · 15",
+   "sprite": "flower_white",
+   "at": [
+    8,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_15",
+   "use": "zplot",
+   "label": "Klumba · 16",
+   "sprite": "flower_white",
+   "at": [
+    10,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_16",
+   "use": "zplot",
+   "label": "Klumba · 17",
+   "sprite": "flower_white",
+   "at": [
+    12,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_17",
+   "use": "zplot",
+   "label": "Klumba · 18",
+   "sprite": "flower_white",
+   "at": [
+    14,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_18",
+   "use": "zplot",
+   "label": "Klumba · 19",
+   "sprite": "flower_white",
+   "at": [
+    16,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_19",
+   "use": "zplot",
+   "label": "Klumba · 20",
+   "sprite": "flower_white",
+   "at": [
+    18,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "klumba_20",
+   "use": "zplot",
+   "label": "Klumba · 21",
+   "sprite": "flower_white",
+   "at": [
+    20,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "exit",
+   "at": [
+    0,
+    15
+   ],
+   "to": "farm",
+   "spawn": "from_zagroda"
+  },
+  {
+   "type": "prop",
+   "id": "edge_t1",
+   "sprite": "tree2",
+   "at": [
+    1,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "edge_t4",
+   "sprite": "tree",
+   "at": [
+    4,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "edge_t7",
+   "sprite": "tree2",
+   "at": [
+    7,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "edge_t10",
+   "sprite": "tree",
+   "at": [
+    10,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "edge_t13",
+   "sprite": "tree2",
+   "at": [
+    13,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "edge_t16",
+   "sprite": "tree",
+   "at": [
+    16,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "edge_t19",
+   "sprite": "tree2",
+   "at": [
+    19,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "edge_t22",
+   "sprite": "tree",
+   "at": [
+    22,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "edge_t25",
+   "sprite": "tree2",
+   "at": [
+    25,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "edge_t28",
+   "sprite": "tree",
+   "at": [
+    28,
+    22
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 22
+  },
+  {
+   "type": "prop",
+   "id": "well_z",
+   "sprite": "well",
+   "at": [
+    26,
+    11
+   ],
+   "size": [
+    2,
+    1
+   ],
+   "shadow": 26
+  }
+ ]
+}

@@ -1,0 +1,127 @@
+{
+ "version": 1,
+ "meta": {
+  "fixture": true,
+  "note": "Минимальная фикстура ядра v2 по схеме ФЕРМА_v2.md §7. Заменяется копией Игра/data/v2/ без правок."
+ },
+ "units": [
+  {
+   "id": "hol.wszyscy",
+   "kind": "holiday",
+   "pl": "Wszystkich Świętych",
+   "ru": "День всех святых",
+   "tr": "",
+   "when": {
+    "day": 1,
+    "month": 11
+   },
+   "season": "jesień",
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "Na Wszystkich Świętych zapalamy znicze na grobach.",
+     "ru": "На День всех святых зажигаем лампадки на могилах."
+    }
+   ],
+   "words": [
+    "sw.znicz",
+    "sw.chryzantema"
+   ],
+   "item": "item_znicz",
+   "band": 1
+  },
+  {
+   "id": "hol.wigilia",
+   "kind": "holiday",
+   "pl": "Wigilia",
+   "ru": "Сочельник",
+   "tr": "",
+   "when": {
+    "day": 24,
+    "month": 12
+   },
+   "season": "zima",
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "W Wigilię dzielimy się opłatkiem.",
+     "ru": "В Сочельник делимся облаткой."
+    }
+   ],
+   "words": [
+    "sw.oplatek",
+    "sw.karp",
+    "sw.choinka"
+   ],
+   "wish": {
+    "pl": "Wesołych Świąt!",
+    "ru": "Весёлых праздников!"
+   },
+   "basket": {
+    "in": [
+     "sw.oplatek",
+     "sw.karp"
+    ],
+    "out": [
+     "sw.paczek"
+    ]
+   },
+   "item": "item_oplatek",
+   "band": 1
+  },
+  {
+   "id": "hol.wielkanoc",
+   "kind": "holiday",
+   "pl": "Wielkanoc",
+   "ru": "Пасха",
+   "tr": "",
+   "when": {
+    "rule": "easter",
+    "offset": 0
+   },
+   "season": "wiosna",
+   "free": true,
+   "shops": "closed",
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "Święcimy koszyczek.",
+     "ru": "Освящаем корзинку."
+    }
+   ],
+   "wish": {
+    "pl": "Smacznego jajka!",
+    "ru": "Приятного яйца!"
+   },
+   "band": 1
+  },
+  {
+   "id": "hol.tlusty",
+   "kind": "holiday",
+   "pl": "Tłusty czwartek",
+   "ru": "Жирный четверг",
+   "tr": "",
+   "when": {
+    "rule": "easter",
+    "offset": -52
+   },
+   "season": "zima",
+   "free": false,
+   "checked": "2026-10-18",
+   "customs": [
+    {
+     "pl": "W tłusty czwartek jemy pączki.",
+     "ru": "В жирный четверг едим пончики."
+    }
+   ],
+   "words": [
+    "sw.paczek"
+   ],
+   "band": 1
+  }
+ ]
+}

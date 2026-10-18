@@ -5,6 +5,10 @@ import { BG_COLOR, World, type WorldStart } from './scenes/World';
 import { backupDue, shouldRemind, withMark } from './systems/backup';
 import { bus, type Bus } from './systems/bus';
 import { createFarm } from './systems/farm';
+import { GAMES, GAME_BY_ENTRY, GAME_BY_ID } from './games/registry';
+import { createPolska } from './systems/polska';
+import { PLOT_NAME } from './systems/zagroda';
+import type { PolskaEntry, PolskaGameId } from './types/polska';
 import { audioContext, connectAudio } from './systems/platform/audio';
 import { createMusicPlayer } from './systems/platform/music';
 import { createClock } from './systems/platform/clock';
@@ -36,6 +40,9 @@ import { mountRadio } from './ui/radio';
 import { mountMusicHud } from './ui/radioHud';
 import { mountSettings } from './ui/settings';
 import { mountUpdateToast } from './ui/updateToast';
+import { mountPolskaGame } from './ui/polskaGame';
+import { mountPolskaHud } from './ui/polskaHud';
+import { mountPolskaPlot } from './ui/polskaPlot';
 
 const params = new URLSearchParams(location.search);
 // `?dev=<id>`: dev-режим (`window.__pq`) и отдельный профиль сохранения `polski-farm-<id>` (тесты не трогают игру Шэфа).
@@ -225,7 +232,51 @@ async function main(): Promise<void> {
     answer: (q, given) => farm.answer(q, given),
     say: (id) => farm.say(id),
   });
-  const board = mountBoard(overlay, { counts: () => (farm.refresh(), farm.counts()), onPick: (mode) => game.start(mode), phraseHint: () => farm.phraseHint(), plant: (ids) => farm.plant(ids) });
+  // v2 «Игры о Польше»: свой огород (`Save.polska`), движок раундов, игры из `src/games/<id>/`, шкала «Wiedza o Polsce».
+  const polska = createPolska({
+    bus,
+    load: () => store.save.polska,
+    save: (p) => store.update((s: Save) => ({ ...s, polska: p }), clock.now()),
+    now: () => clock.now(),
+    tz: (t) => new Date(t).getTimezoneOffset(),
+  });
+  const polskaGame = mountPolskaGame(overlay, {
+    games: GAMES,
+    polska,
+    now: () => clock.now(),
+    say: (text, slow) => bus.emit('audio:play', { text, ...(slow ? { slow } : {}) }),
+  });
+  const playPolska = (id: PolskaGameId, only?: string): void => {
+    if (!game.isOpen) polskaGame.start(id, only);
+  };
+  const polskaPlot = mountPolskaPlot(overlay, {
+    polska,
+    play: playPolska,
+    gameOf: (obj) => (obj.startsWith('sad_') ? 'geo' : obj.startsWith('hive_') ? 'hymn' : obj.startsWith('bed_') ? 'daty' : obj.startsWith('klumba_') ? 'swieta' : null),
+  });
+  const board = mountBoard(overlay, {
+    counts: () => (farm.refresh(), farm.counts()),
+    onPick: (mode) => game.start(mode),
+    phraseHint: () => farm.phraseHint(),
+    plant: (ids) => farm.plant(ids),
+    polska: {
+      games: () =>
+        GAMES.map((g) => {
+          const p = polska.progress(g.id);
+          return { id: g.id, title: g.title, desc: g.desc, progress: `выращено ${p.grown} из ${p.units}, растёт ${p.growing}`, where: `${PLOT_NAME[g.plot].pl} ${p.objDone}/${p.objTotal}` };
+        }),
+      scale: () => {
+        const s = polska.scale();
+        return `${s.pl} · ${s.sub}/${s.of} · выращено ${s.grown} из ${s.total}`;
+      },
+      go: (id) => {
+        const g = GAME_BY_ID.get(id as PolskaGameId);
+        if (g) bus.emit('world:goto', { use: g.entry });
+      },
+      play: (id) => playPolska(id as PolskaGameId),
+    },
+  });
+  mountPolskaHud(overlay, { onTap: () => !game.isOpen && !polskaGame.isOpen && board.open('polska') });
   // Пояснения «банка» и «мешок»: один раз, при первом показе (флаги `tip:*` в `Save.hints`).
   const tips = createTips({ seen: hasHint, mark: addHint });
   const dictionary = mountDictionary(overlay, farm, undefined, tips);
@@ -247,7 +298,11 @@ async function main(): Promise<void> {
     mark: (day) => store.update((s: Save) => ({ ...s, hints: [...s.hints.filter((x) => !x.startsWith(MORNING)), `${MORNING}${day}`] }), Date.now()),
   });
   bus.on('world:interact', ({ use, id }) => {
-    if (game.isOpen) return;
+    if (game.isOpen || polskaGame.isOpen) return;
+    // v2: точки входа (карта и календарь в доме, мачта и сезонная доска на ферме) и объекты участков Zagroda.
+    const entry = GAME_BY_ENTRY.get(use as PolskaEntry);
+    if (entry) return polskaGame.start(entry.id);
+    if (use === 'zplot') return polskaPlot.open(id);
     if (use === 'desk') dictionary.open();
     else if (use === 'shelf') pantry.open();
     else if (use === 'bed') summary.openBed();
@@ -258,8 +313,10 @@ async function main(): Promise<void> {
   });
   bus.on('world:location', ({ id }) => {
     if (id === 'farm') farm.refresh();
+    if (id === 'zagroda') polska.refresh();
   });
   farm.refresh();
+  polska.refresh();
 
   // Позиция героя и поворот: пишем, когда он остановился. Время — те же часы, что у огорода: при `?now=+1d` метка
   // `updated` не откатывается назад, и аварийная копия при уходе со страницы не проигрывает старой записи (B3).
@@ -303,13 +360,13 @@ async function main(): Promise<void> {
   let updatePending = false;
   const needReload = (): void => {
     updatePending = true;
-    const busy = screenOpen || game.isOpen;
+    const busy = screenOpen || game.isOpen || polskaGame.isOpen;
     if (updateAction({ busy, lastReloadAt: lastReloadAt(), now: Date.now(), lastReloadFrom: lastReloadFrom(), local: __BUILD_ID__ }) === 'reload') reload();
     else bus.emit('app:update', {});
   };
   // Экраны закрылись, а обновление ждёт: спросить политику снова.
   const retryUpdate = (): void => {
-    if (updatePending && !screenOpen && !game.isOpen) needReload();
+    if (updatePending && !screenOpen && !game.isOpen && !polskaGame.isOpen) needReload();
   };
   bus.on('world:input', ({ enabled }) => {
     screenOpen = !enabled;
@@ -322,7 +379,7 @@ async function main(): Promise<void> {
   // Страница из старого кэша (HTTP-кэш index.html, встроенный браузер без SW): версия с сервера без кэша.
   watchVersion({ base: import.meta.env.BASE_URL, local: __BUILD_ID__, isStale: staleBuild, onStale: needReload });
 
-  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock, music };
+  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock, music, polska, polskaGame };
 }
 
 void main();

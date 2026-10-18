@@ -4,7 +4,7 @@ import { dirname, join, normalize } from 'node:path';
 import ts from 'typescript';
 import { isMain, listFiles, ROOT } from './lib/files';
 
-type Layer = 'systems' | 'platform' | 'world' | 'ui' | 'input' | 'types' | 'root';
+type Layer = 'systems' | 'platform' | 'world' | 'ui' | 'input' | 'types' | 'games' | 'root';
 
 export function layerOf(path: string): Layer {
   if (path.startsWith('src/systems/platform/')) return 'platform';
@@ -13,18 +13,22 @@ export function layerOf(path: string): Layer {
   if (path.startsWith('src/ui/')) return 'ui';
   if (path.startsWith('src/input/')) return 'input';
   if (path.startsWith('src/types/')) return 'types';
+  // v2: игры о Польше (`src/games/<id>/`): DOM-экраны поверх чистой модели; их собирает только main.ts.
+  if (path.startsWith('src/games/')) return 'games';
   return 'root';
 }
 
 /** Слой → слои, которые ему запрещено импортировать. `phaser` — пакет. */
 const FORBIDDEN: Record<Layer, (Layer | 'phaser')[]> = {
-  systems: ['phaser', 'platform', 'world', 'ui', 'input', 'root'],
-  platform: ['phaser', 'world', 'ui', 'input', 'root'],
-  world: ['ui', 'root'],
-  ui: ['phaser', 'world', 'root'],
+  systems: ['phaser', 'platform', 'world', 'ui', 'input', 'games', 'root'],
+  platform: ['phaser', 'world', 'ui', 'input', 'games', 'root'],
+  world: ['ui', 'games', 'root'],
+  ui: ['phaser', 'world', 'games', 'root'],
   // Ввод (ТЗ §2.1): читает DOM-события и шлёт intents в bus, сцены и экраны не знает.
-  input: ['phaser', 'platform', 'world', 'ui', 'root'],
-  types: ['phaser', 'platform', 'world', 'ui', 'input', 'root'],
+  input: ['phaser', 'platform', 'world', 'ui', 'games', 'root'],
+  types: ['phaser', 'platform', 'world', 'ui', 'input', 'games', 'root'],
+  // Игры v2: чистая модель (systems), DOM-хелперы (ui), типы. Без Phaser, адаптеров браузера, мира, ввода.
+  games: ['phaser', 'platform', 'world', 'input', 'root'],
   root: [],
 };
 

@@ -41,7 +41,7 @@
    "GggggpgggggggggggggggggggggG",
    "GggggpgggggggggggggggggpgggG",
    "GggggpgggggggggggggggggpgggG",
-   "GggggppppppppppppppppppppggG",
+   "Gggggppppppppppppppppppppppp",
    "GggggggggggggggppggggggggggG",
    "GggggggggggggggggggggggggggG",
    "GggggggggggggggggggggggggggG",
@@ -94,6 +94,11 @@
    5,
    6,
    "down"
+  ],
+  "from_zagroda": [
+   26,
+   10,
+   "left"
   ]
  },
  "objects": [
@@ -166,6 +171,47 @@
    "at": [
     12,
     9
+   ],
+   "size": [
+    2,
+    1
+   ],
+   "shadow": 28
+  },
+  {
+   "type": "exit",
+   "at": [
+    27,
+    10
+   ],
+   "to": "zagroda",
+   "spawn": "from_farm"
+  },
+  {
+   "type": "prop",
+   "id": "mast",
+   "use": "mast",
+   "label": "Maszt · Гимн и символы",
+   "sprite": "radio",
+   "at": [
+    11,
+    4
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "shadow": 12
+  },
+  {
+   "type": "prop",
+   "id": "seasonBoard",
+   "use": "seasonBoard",
+   "label": "Tablica sezonowa · Праздники",
+   "sprite": "board",
+   "at": [
+    24,
+    8
    ],
    "size": [
     2,
@@ -857,7 +903,10 @@
    "type": "prop",
    "id": "tree_in0",
    "sprite": "tree",
-   "at": [26, 15],
+   "at": [
+    26,
+    15
+   ],
    "size": [
     1,
     1
@@ -868,7 +917,10 @@
    "type": "prop",
    "id": "tree_in1",
    "sprite": "tree2",
-   "at": [26, 18],
+   "at": [
+    26,
+    18
+   ],
    "size": [
     1,
     1
@@ -963,7 +1015,10 @@
    "type": "prop",
    "id": "bush4",
    "sprite": "bush",
-   "at": [8, 11],
+   "at": [
+    8,
+    11
+   ],
    "size": [
     1,
     1
@@ -1086,7 +1141,10 @@
    "type": "prop",
    "id": "flower7",
    "sprite": "flower_yellow",
-   "at": [22, 20],
+   "at": [
+    22,
+    20
+   ],
    "size": [
     1,
     1
@@ -1097,7 +1155,10 @@
    "type": "prop",
    "id": "flower8",
    "sprite": "flower_white",
-   "at": [25, 20],
+   "at": [
+    25,
+    20
+   ],
    "size": [
     1,
     1

@@ -3,8 +3,10 @@
 import type { Dir } from '../types/input';
 import { newGarden, normalizeGarden, type GardenSave } from './garden';
 import { MUSIC_DEFAULT, normalizeMusic, type MusicSettings } from './musicSettings';
+import { newPolskaSave, normalizePolska, type PolskaSave } from './polska';
 
-export const SAVE_V = 2;
+/** v3 (ФЕРМА_v2): раздел `polska` — огород игр о Польше. v2 → v3 без потерь: старое сохранение получает пустой `polska`. */
+export const SAVE_V = 3;
 const APP = 'polski-quest-farm';
 
 export interface Position {
@@ -34,12 +36,14 @@ export interface Save {
   settings: Settings;
   /** Огород: посадки, журнал ответов (только дописывается), грядки. Опыт и стадии выводятся из него. */
   garden: GardenSave;
+  /** v3: огород игр о Польше (единицы geo/hymn/symbol/date/holiday), отдельно от огорода слов. */
+  polska: PolskaSave;
   /** Подсказки-пузыри, которые уже показаны (по `use` объекта: desk, board, bin). Каждая показывается один раз. */
   hints: string[];
 }
 
 export function newSave(now: number): Save {
-  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT, music: { ...MUSIC_DEFAULT } }, garden: newGarden(), hints: [] };
+  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT, music: { ...MUSIC_DEFAULT } }, garden: newGarden(), polska: newPolskaSave(), hints: [] };
 }
 
 const DIRS: readonly Dir[] = ['up', 'down', 'left', 'right'];
@@ -58,12 +62,14 @@ export function normalizeSave(raw: unknown): Save | null {
       : null;
   const st = (r.settings ?? {}) as Record<string, unknown>;
   return {
-    v: Math.min(r.v, SAVE_V),
+    // После нормализации форма текущая (v2 → v3: пустой `polska`), версия — текущая.
+    v: SAVE_V,
     created: isNum(r.created) ? r.created : 0,
     updated: isNum(r.updated) ? r.updated : 0,
     position,
     settings: { sound: st.sound !== false, sfxVolume: isNum(st.sfxVolume) ? Math.min(100, Math.max(0, Math.round(st.sfxVolume))) : SFX_VOLUME_DEFAULT, music: normalizeMusic(st.music) },
     garden: normalizeGarden(r.garden),
+    polska: normalizePolska(r.polska),
     hints: Array.isArray(r.hints) ? [...new Set(r.hints.filter((h): h is string => typeof h === 'string'))].slice(0, 32) : [],
   };
 }

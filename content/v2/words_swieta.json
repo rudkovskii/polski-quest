@@ -1,0 +1,62 @@
+{
+ "version": 1,
+ "meta": {
+  "fixture": true,
+  "note": "Минимальная фикстура ядра v2 по схеме ФЕРМА_v2.md §7. Заменяется копией Игра/data/v2/ без правок."
+ },
+ "topic": {
+  "id": "swieta",
+  "pl": "Święta i zwyczaje",
+  "ru": "Праздники и обычаи"
+ },
+ "words": [
+  {
+   "id": "sw.oplatek",
+   "pl": "opłatek",
+   "ru": "облатка",
+   "tr": "опўа́тэк",
+   "pos": "noun",
+   "gender": "m"
+  },
+  {
+   "id": "sw.karp",
+   "pl": "karp",
+   "ru": "карп",
+   "tr": "карп",
+   "pos": "noun",
+   "gender": "m"
+  },
+  {
+   "id": "sw.choinka",
+   "pl": "choinka",
+   "ru": "ёлка",
+   "tr": "хои́нка",
+   "pos": "noun",
+   "gender": "f"
+  },
+  {
+   "id": "sw.znicz",
+   "pl": "znicz",
+   "ru": "лампадка",
+   "tr": "знич",
+   "pos": "noun",
+   "gender": "m"
+  },
+  {
+   "id": "sw.chryzantema",
+   "pl": "chryzantema",
+   "ru": "хризантема",
+   "tr": "хрызанте́ма",
+   "pos": "noun",
+   "gender": "f"
+  },
+  {
+   "id": "sw.paczek",
+   "pl": "pączek",
+   "ru": "пончик",
+   "tr": "по́нчэк",
+   "pos": "noun",
+   "gender": "m"
+  }
+ ]
+}

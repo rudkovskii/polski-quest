@@ -1,0 +1,290 @@
+{
+ "version": 1,
+ "meta": {
+  "fixture": true,
+  "note": "Минимальная фикстура ядра v2 по схеме ФЕРМА_v2.md §7. Заменяется копией Игра/data/v2/ без правок."
+ },
+ "projection": {
+  "lat": [
+   49.0,
+   54.9
+  ],
+  "lon": [
+   14.1,
+   24.2
+  ],
+  "w": 192,
+  "h": 176
+ },
+ "units": [
+  {
+   "id": "geo.city.warszawa",
+   "kind": "geo",
+   "type": "city",
+   "pl": "Warszawa",
+   "ru": "Варшава",
+   "tr": "варша́ва",
+   "forms": {
+    "loc": "w Warszawie",
+    "gen": "z Warszawy"
+   },
+   "region": "geo.voi.mazowieckie",
+   "water": [
+    "geo.river.wisla"
+   ],
+   "pos": [
+    52.23,
+    21.01
+   ],
+   "side": "wschód",
+   "facts": [
+    {
+     "pl": "Warszawa leży nad Wisłą.",
+     "ru": "Варшава стоит на Висле."
+    }
+   ],
+   "tiles": {
+    "pl": [
+     "Warszawa",
+     "leży",
+     "nad",
+     "Wisłą"
+    ],
+    "distract": [
+     "Wisła",
+     "Wiśle"
+    ]
+   },
+   "band": 1,
+   "src": "OSM",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "geo.city.krakow",
+   "kind": "geo",
+   "type": "city",
+   "pl": "Kraków",
+   "ru": "Краков",
+   "tr": "кра́куф",
+   "forms": {
+    "loc": "w Krakowie",
+    "gen": "z Krakowa"
+   },
+   "region": "geo.voi.malopolskie",
+   "water": [
+    "geo.river.wisla"
+   ],
+   "pos": [
+    50.06,
+    19.94
+   ],
+   "side": "południe",
+   "facts": [
+    {
+     "pl": "Kraków leży nad Wisłą.",
+     "ru": "Краков стоит на Висле."
+    }
+   ],
+   "tiles": {
+    "pl": [
+     "Kraków",
+     "leży",
+     "nad",
+     "Wisłą"
+    ],
+    "distract": [
+     "Wisła",
+     "Wiśle"
+    ]
+   },
+   "band": 1,
+   "src": "OSM",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "geo.city.wroclaw",
+   "kind": "geo",
+   "type": "city",
+   "pl": "Wrocław",
+   "ru": "Вроцлав",
+   "tr": "вро́цўаф",
+   "forms": {
+    "loc": "we Wrocławiu",
+    "gen": "z Wrocławia"
+   },
+   "region": "geo.voi.dolnoslaskie",
+   "water": [
+    "geo.river.odra"
+   ],
+   "pos": [
+    51.11,
+    17.03
+   ],
+   "side": "zachód",
+   "facts": [
+    {
+     "pl": "Wrocław leży nad Odrą.",
+     "ru": "Вроцлав стоит на Одре."
+    }
+   ],
+   "tiles": {
+    "pl": [
+     "Wrocław",
+     "leży",
+     "nad",
+     "Odrą"
+    ],
+    "distract": [
+     "Odra",
+     "Odrze"
+    ]
+   },
+   "band": 1,
+   "src": "OSM",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "geo.city.gdansk",
+   "kind": "geo",
+   "type": "city",
+   "pl": "Gdańsk",
+   "ru": "Гданьск",
+   "tr": "гда́ньск",
+   "forms": {
+    "loc": "w Gdańsku",
+    "gen": "z Gdańska"
+   },
+   "region": "geo.voi.pomorskie",
+   "water": [
+    "geo.river.motlawa"
+   ],
+   "pos": [
+    54.35,
+    18.65
+   ],
+   "side": "północ",
+   "facts": [
+    {
+     "pl": "Gdańsk leży na północy Polski.",
+     "ru": "Гданьск на севере Польши."
+    }
+   ],
+   "tiles": {
+    "pl": [
+     "Gdańsk",
+     "leży",
+     "na",
+     "północy"
+    ],
+    "distract": [
+     "północ",
+     "południu"
+    ]
+   },
+   "band": 1,
+   "src": "OSM",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "geo.river.wisla",
+   "kind": "geo",
+   "type": "river",
+   "pl": "Wisła",
+   "ru": "Висла",
+   "tr": "ви́сўа",
+   "forms": {
+    "ins": "nad Wisłą"
+   },
+   "region": "geo.voi.mazowieckie",
+   "facts": [
+    {
+     "pl": "Wisła to najdłuższa rzeka Polski.",
+     "ru": "Висла — самая длинная река Польши."
+    }
+   ],
+   "band": 1,
+   "src": "geografia.json:geo_wisla",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "geo.river.odra",
+   "kind": "geo",
+   "type": "river",
+   "pl": "Odra",
+   "ru": "Одра",
+   "tr": "о́дра",
+   "forms": {
+    "ins": "nad Odrą"
+   },
+   "region": "geo.voi.dolnoslaskie",
+   "facts": [],
+   "band": 1,
+   "src": "OSM",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "geo.nb.niemcy",
+   "kind": "geo",
+   "type": "neighbour",
+   "pl": "Niemcy",
+   "ru": "Германия",
+   "tr": "нье́мцы",
+   "dir": "na zachodzie",
+   "forms": {
+    "ins": "z Niemcami",
+    "gen": "z Niemiec",
+    "loc": "w Niemczech"
+   },
+   "region": [
+    "geo.voi.zachodniopomorskie",
+    "geo.voi.lubuskie",
+    "geo.voi.dolnoslaskie"
+   ],
+   "facts": [
+    {
+     "pl": "Na zachodzie Polska graniczy z Niemcami.",
+     "ru": "На западе Польша граничит с Германией."
+    }
+   ],
+   "band": 1,
+   "src": "Miso",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "geo.voi.mazowieckie",
+   "kind": "geo",
+   "type": "voivodeship",
+   "pl": "mazowieckie",
+   "ru": "Мазовецкое воеводство",
+   "tr": "мазове́цкье",
+   "capital": "geo.city.warszawa",
+   "facts": [],
+   "band": 2,
+   "src": "OSM",
+   "checked": "2026-10-18"
+  }
+ ],
+ "rivers": [
+  {
+   "id": "geo.river.wisla",
+   "path": [
+    [
+     49.6,
+     18.9
+    ],
+    [
+     50.06,
+     19.94
+    ],
+    [
+     52.23,
+     21.01
+    ],
+    [
+     54.35,
+     18.95
+    ]
+   ]
+  }
+ ]
+}

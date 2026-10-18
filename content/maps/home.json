@@ -161,6 +161,38 @@
    "shadow": 0
   },
   {
+   "type": "prop",
+   "id": "map",
+   "use": "map",
+   "label": "Mapa Polski · Карта Польши",
+   "sprite": "window",
+   "at": [
+    1,
+    1
+   ],
+   "size": [
+    2,
+    1
+   ],
+   "depth": "wall"
+  },
+  {
+   "type": "prop",
+   "id": "calendar",
+   "use": "calendar",
+   "label": "Kalendarz · Памятные даты",
+   "sprite": "window",
+   "at": [
+    7,
+    1
+   ],
+   "size": [
+    2,
+    1
+   ],
+   "depth": "wall"
+  },
+  {
    "type": "exit",
    "at": [
     6,
