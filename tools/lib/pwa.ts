@@ -26,6 +26,15 @@ export function workboxOptions() {
           expiration: { maxEntries: 4000 },
         },
       },
+      {
+        // Картины праздников (`public/swieta/*.jpg`, ~1,5 МБ, игра «Święta»): в precache не входят, кэшируются при первом показе.
+        urlPattern: ({ url }: { url: URL }) => url.pathname.includes('/swieta/') && url.pathname.endsWith('.jpg'),
+        handler: 'CacheFirst' as const,
+        options: {
+          cacheName: 'pq-swieta',
+          expiration: { maxEntries: 40 },
+        },
+      },
     ],
   };
 }

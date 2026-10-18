@@ -42,7 +42,7 @@ export interface Span {
   movable: boolean;
 }
 
-interface When {
+export interface When {
   day?: number;
   month?: number;
   until?: { day: number; month: number };
@@ -52,9 +52,8 @@ interface When {
 
 const whenOf = (u: PolskaUnit): When => (u.raw.when && typeof u.raw.when === 'object' ? (u.raw.when as When) : {});
 
-/** Даты праздника в году `y` (для зимних диапазонов «31.12–1.01» конец уходит в следующий год). null — у праздника нет даты (imieniny). */
-export function spanIn(u: PolskaUnit, y: number): Span | null {
-  const w = whenOf(u);
+/** Даты по описанию `when` в году `y` (для зимних диапазонов «31.12–1.01» конец уходит в следующий год). null — даты нет (imieniny). */
+export function spanOfWhen(w: When, y: number): Span | null {
   if (w.rule === 'easter' && typeof w.offset === 'number') {
     const n = easterDay(y) + w.offset;
     return { start: n, end: n, movable: true };
@@ -71,16 +70,29 @@ export function spanIn(u: PolskaUnit, y: number): Span | null {
   return null;
 }
 
-/** Ближайшее вхождение праздника: идёт сегодня или будет позже (`end >= today`), самое раннее. */
-export function nextSpan(u: PolskaUnit, today: number): Span | null {
+/** Даты праздника в году `y`. */
+export const spanIn = (u: PolskaUnit, y: number): Span | null => spanOfWhen(whenOf(u), y);
+
+/** Ближайшее вхождение по `when`: идёт сегодня или будет позже (`end >= today`), самое раннее. */
+export function nextSpanOfWhen(w: When, today: number): Span | null {
   const y = ymdOf(today).y;
   let best: Span | null = null;
   for (const yy of [y - 1, y, y + 1]) {
-    const s = spanIn(u, yy);
+    const s = spanOfWhen(w, yy);
     if (s && s.end >= today && (!best || s.start < best.start)) best = s;
   }
   return best;
 }
+
+/** Ближайшее вхождение праздника. */
+export const nextSpan = (u: PolskaUnit, today: number): Span | null => nextSpanOfWhen(whenOf(u), today);
+
+/** День года (1…366) для номера дня. */
+export const dayOfYear = (n: number): number => {
+  const { y } = ymdOf(n);
+  return n - dayNo(y, 1, 1) + 1;
+};
+export const daysInYear = (y: number): number => dayNo(y + 1, 1, 1) - dayNo(y, 1, 1);
 
 export interface Upcoming {
   unit: PolskaUnit;

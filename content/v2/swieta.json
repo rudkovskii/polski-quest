@@ -11,7 +11,8 @@
    "Zielone Świątki i Niedziela Palmowa: niedziela bez handlu",
    "daty Dnia Babci/Dziadka 21-22.01",
    "dekoracje 2-3.05 vs 1-3.05"
-  ]
+  ],
+  "wheel": "wheel: колесо праздников из ПМЖ/Собес/swieta-kolo (даты, тип, справка RU/PL, фраза, картины Wikimedia Commons: автор и лицензия в credit). Ключ unit — праздник игры, по которому идут вопросы; null — только справка."
  },
  "tasks": {
   "what": {
@@ -2468,6 +2469,736 @@
      "lata"
     ]
    }
+  }
+ ],
+ "wheel": [
+  {
+   "id": "nowy-rok",
+   "unit": "hol.nowy_rok",
+   "when": {
+    "day": 1,
+    "month": 1
+   },
+   "class": "state",
+   "class2": "rel",
+   "off": true,
+   "pl": "Nowy Rok",
+   "ru": "Новый год",
+   "img": "nowy-rok.jpg",
+   "credit": {
+    "author": "Alina Zienowicz Ala z",
+    "license": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:POL_Warsaw_New_Year_2009_(2).JPG",
+    "title": "POL Warsaw New Year 2009 (2)"
+   },
+   "intro": {
+    "ru": [
+     "Польша перешла на григорианский календарь в 1582 году, при короле Стефане Батории, одной из первых в Европе. С тех пор год начинается 1 января.",
+     "Ночь перед ним называется Sylwester, по имени папы Сильвестра I, который умер 31 декабря 335 года. Для церкви 1 января тоже праздник: торжество Святой Богородицы Марии.",
+     "Выходной закреплён законом о нерабочих днях 1951 года, который действует до сих пор."
+    ],
+    "pl": [
+     "Polska przyjęła kalendarz gregoriański w 1582 roku, za króla Stefana Batorego, jako jeden z pierwszych krajów w Europie.",
+     "Noc przed Nowym Rokiem to Sylwester. Nazwa pochodzi od papieża Sylwestra I, który zmarł 31 grudnia 335 roku. Dla Kościoła 1 stycznia to uroczystość Świętej Bożej Rodzicielki Maryi.",
+     "Dzień wolny od pracy wynika z ustawy z 1951 roku."
+    ]
+   }
+  },
+  {
+   "id": "trzech-kroli",
+   "unit": "hol.trzech_kroli",
+   "when": {
+    "day": 6,
+    "month": 1
+   },
+   "class": "rel",
+   "off": true,
+   "pl": "Trzech Króli",
+   "ru": "Богоявление, День трёх королей",
+   "img": "trzech-kroli.jpg",
+   "credit": {
+    "author": "Piotr Drabik from Poland",
+    "license": "CC BY 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Orszak_na_Rynku_G%C5%82%C3%B3wnym_(8435331872).jpg",
+    "title": "Orszak na Rynku Głównym (8435331872)"
+   },
+   "intro": {
+    "ru": [
+     "Церковь вспоминает, как три мудреца с Востока пришли поклониться младенцу Иисусу и принесли золото, ладан и миро.",
+     "В этот день поляки пишут мелом над дверью K+M+B и год. Буквы читают как имена Каспар, Мельхиор, Бальтазар или как латинское «Христос да благословит этот дом».",
+     "При ПНР в 1960 году праздник перестал быть выходным. Выходной вернули в 2011 году. Сейчас в этот день по улицам сотен городов идёт Orszak Trzech Króli, костюмированное шествие."
+    ],
+    "pl": [
+     "Kościół wspomina trzech mędrców ze Wschodu, którzy przynieśli Jezusowi złoto, kadzidło i mirrę.",
+     "Na drzwiach pisze się kredą K+M+B i rok. Litery to imiona Kacper, Melchior, Baltazar albo łacińskie „Niech Chrystus błogosławi ten dom”.",
+     "W 1960 roku święto przestało być dniem wolnym. Wróciło jako dzień wolny w 2011 roku. Dziś w wielu miastach idzie Orszak Trzech Króli."
+    ]
+   },
+   "phrase": {
+    "pl": "Święto Trzech Króli obchodzimy 6 stycznia. Trzej Królowie to Kacper, Melchior i Baltazar.",
+    "tr": "щвенто тшех круля обходжимы шустэго стычнья. тшэй крулёве то кацпер, мельхёр и бальтазар.",
+    "ru": "Праздник Трёх Королей отмечаем 6 января. Три короля — это Каспар, Мельхиор и Бальтазар."
+   }
+  },
+  {
+   "id": "babcia",
+   "unit": "hol.babcia",
+   "class": "folk",
+   "off": false
+  },
+  {
+   "id": "tlusty",
+   "unit": "hol.tlusty",
+   "when": {
+    "rule": "easter",
+    "offset": -52
+   },
+   "class": "folk",
+   "off": false,
+   "pl": "Tłusty czwartek",
+   "ru": "Жирный четверг",
+   "img": "tlusty.jpg",
+   "credit": {
+    "author": "Magic Madzik from Lodz, Poland",
+    "license": "CC BY 2.0",
+    "page": "https://commons.wikimedia.org/wiki/File:P%C4%85czki_for_Fat_Thursday.jpg",
+    "title": "Pączki for Fat Thursday"
+   },
+   "intro": {
+    "ru": [
+     "Последний четверг карнавала перед Великим постом. В этот день едят пончики-pączki и хворост-faworki, очереди в кондитерские стоят с утра.",
+     "Старые пончики делали из хлебного теста с салом. Сладкие, с розовым вареньем, появились позже.",
+     "Выходным день не является, но по объёму продаж в кондитерских это главный день года."
+    ],
+    "pl": [
+     "To ostatni czwartek karnawału przed Wielkim Postem. Je się pączki i faworki, a przed cukierniami stoją kolejki.",
+     "Dawniej pączki robiono z ciasta chlebowego ze słoniną. Słodkie pączki z konfiturą różaną pojawiły się później.",
+     "To nie jest dzień wolny od pracy."
+    ]
+   },
+   "phrase": {
+    "pl": "W tłusty czwartek je się pączki i faworki.",
+    "tr": "в тусты чвартэк е щэ пончки и фаворки.",
+    "ru": "В жирный четверг едят пончики и хворост."
+   }
+  },
+  {
+   "id": "popielec",
+   "unit": null,
+   "when": {
+    "rule": "easter",
+    "offset": -46
+   },
+   "class": "rel",
+   "off": false,
+   "pl": "Środa Popielcowa",
+   "ru": "Пепельная среда",
+   "img": "popielec.jpg",
+   "credit": {
+    "author": "Julian Fałat",
+    "license": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Fa%C5%82at_Julian,_Popielec.jpg",
+    "title": "Ash Wednesday"
+   },
+   "intro": {
+    "ru": [
+     "Начало Великого поста, сорока дней перед Пасхой без учёта воскресений. Священник посыпает головы верующих пеплом и говорит «Помни, что ты прах».",
+     "Пепел получают, сжигая вербные «пальмы» прошлого года.",
+     "На картинке «Popielec» Юлиана Фалата, польского художника XIX века."
+    ],
+    "pl": [
+     "To początek Wielkiego Postu, czterdziestu dni przed Wielkanocą bez niedziel. Ksiądz posypuje głowy wiernych popiołem.",
+     "Popiół robi się ze spalonych palm z poprzedniego roku.",
+     "Na obrazie „Popielec” Juliana Fałata."
+    ]
+   },
+   "phrase": {
+    "pl": "Środa Popielcowa to początek Wielkiego Postu. Ksiądz posypuje głowy wiernych popiołem.",
+    "tr": "щьрода попельцова то почёнтэк вельке́го посту. ксёндз посыпуе гуовы верных попёуэм.",
+    "ru": "Пепельная среда — начало Великого поста. Священник посыпает головы верующих пеплом."
+   }
+  },
+  {
+   "id": "palmowa",
+   "unit": "hol.palmowa",
+   "when": {
+    "rule": "easter",
+    "offset": -7
+   },
+   "class": "rel",
+   "off": false,
+   "pl": "Niedziela Palmowa",
+   "ru": "Вербное воскресенье",
+   "img": "palmowa.jpg",
+   "credit": {
+    "author": "Krzysztof Popławski",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Lipnica_Murowana,_Niedziela_Palmowa_2025,_Konkurs_Palm_Wielkanocnych,_KsP_245.jpg",
+    "title": "Lipnica Murowana, Niedziela Palmowa 2025, Konkurs Palm Wielkanocnych, KsP 245"
+   },
+   "intro": {
+    "ru": [
+     "Воскресенье за неделю до Пасхи, в память о въезде Иисуса в Иерусалим, когда толпа встречала его пальмовыми ветвями.",
+     "В Польше пальмы делают сами: из вербы, сухих цветов, трав и цветной бумаги. В деревне Липница-Мурована с 1958 года проходит конкурс пальм, самые высокие бывают больше 30 метров.",
+     "Освящённую пальму хранят дома весь год, а потом из неё делают пепел к Пепельной среде."
+    ],
+    "pl": [
+     "Niedziela tydzień przed Wielkanocą. Wspomina wjazd Jezusa do Jerozolimy.",
+     "Palmy robi się z wierzby, suchych kwiatów i kolorowego papieru. W Lipnicy Murowanej od 1958 roku jest konkurs palm. Najwyższe mają ponad 30 metrów.",
+     "Poświęconą palmę trzyma się w domu przez cały rok."
+    ]
+   },
+   "phrase": {
+    "pl": "Niedziela Palmowa to święto na tydzień przed Wielkanocą. Wierni przynoszą do kościoła kolorowe palmy.",
+    "tr": "недзеля пальмова то щвенто на тыдзень пшэд вельканоцон. верни пшыношон до кощьцёуа колёровэ пальмы.",
+    "ru": "Вербное воскресенье — праздник за неделю до Пасхи. Верующие приносят в костёл разноцветные пальмы."
+   }
+  },
+  {
+   "id": "wiosna",
+   "unit": "hol.wiosna",
+   "class": "folk",
+   "off": false
+  },
+  {
+   "id": "wielkanoc",
+   "unit": "hol.wielkanoc",
+   "when": {
+    "rule": "easter",
+    "offset": 0
+   },
+   "class": "rel",
+   "off": true,
+   "pl": "Wielkanoc",
+   "ru": "Пасха",
+   "img": "wielkanoc.jpg",
+   "credit": {
+    "author": "Anwar2",
+    "license": "CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Pisanki_1_.jpg",
+    "title": "Pisanki 1 "
+   },
+   "intro": {
+    "ru": [
+     "Главный праздник церковного года: воскресение Христа. Дату по правилу Никейского собора 325 года считают от первого весеннего полнолуния, поэтому Пасха плавает между 22 марта и 25 апреля.",
+     "В субботу несут в костёл святить корзинку święconka: яйца, хлеб, соль, колбасу, хрен, барашка из сахара. В воскресенье утром с этой еды начинается праздничный завтрак, к нему подают żurek и белую колбасу.",
+     "От даты Пасхи зависят Пепельная среда, Вербное воскресенье, Пятидесятница и Божье Тело."
+    ],
+    "pl": [
+     "To najważniejsze święto chrześcijan: zmartwychwstanie Chrystusa. Datę liczy się od pierwszej wiosennej pełni Księżyca, dlatego Wielkanoc wypada między 22 marca a 25 kwietnia.",
+     "W sobotę święci się w kościele koszyczek: jajka, chleb, sól, kiełbasę, chrzan i baranka z cukru. W niedzielę rano jest uroczyste śniadanie z żurkiem i białą kiełbasą.",
+     "Od daty Wielkanocy zależą inne święta ruchome."
+    ]
+   },
+   "phrase": {
+    "pl": "Najważniejsze święta katolickie to Boże Narodzenie (25–26 grudnia) i Wielkanoc.",
+    "tr": "найважнейшэ щвента католицке то божэ народзэнe (двуджестэго пёнтэго и двуджестэго шустэго груднья) и вельканоц.",
+    "ru": "Главные католические праздники — Рождество (25–26 декабря) и Пасха."
+   }
+  },
+  {
+   "id": "lany",
+   "unit": "hol.lany",
+   "when": {
+    "rule": "easter",
+    "offset": 1
+   },
+   "class": "rel",
+   "class2": "folk",
+   "off": true,
+   "pl": "Lany poniedziałek",
+   "ru": "Обливальный понедельник",
+   "img": "lany.jpg",
+   "credit": {
+    "author": "Silar",
+    "license": "CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Zz06_smigus_dyngus_sanok_2010.JPG",
+    "title": "Zz06 smigus dyngus sanok 2010"
+   },
+   "intro": {
+    "ru": [
+     "Второй день Пасхи, выходной. В народе его зовут lany poniedziałek, потому что все обливают друг друга водой. Обычай называется śmigus-dyngus.",
+     "Раньше это были два обычая: śmigus, когда стегали вербой, и dyngus, когда ходили по домам и получали за поздравления яйца.",
+     "Есть версия, что обливание напоминает о крещении: князь Мешко I принял крещение в Страстную субботу 966 года."
+    ],
+    "pl": [
+     "To drugi dzień Wielkanocy, dzień wolny. Wszyscy polewają się wodą. Ten zwyczaj to śmigus-dyngus.",
+     "Dawniej były to dwa zwyczaje: śmigus, czyli smaganie wierzbą, i dyngus, czyli chodzenie po domach po jajka.",
+     "Według jednej wersji polewanie wodą przypomina chrzest Mieszka I w 966 roku."
+    ]
+   },
+   "phrase": {
+    "pl": "Święconka to koszyczek z jedzeniem, który święci się w kościele. Śmigus-dyngus to polewanie się wodą w poniedziałek wielkanocny.",
+    "tr": "щвенцонка то кошычэк з едзэнем, ктуры щвенчи щэ в кощьцеле. щмигус-дынгус то полеванe щэ водон в понедзяуэк вельканоцны.",
+    "ru": "Święconka — корзинка с едой, которую святят в костёле. Śmigus-dyngus — обливание водой в пасхальный понедельник."
+   }
+  },
+  {
+   "id": "1-maja",
+   "unit": "hol.majowka",
+   "when": {
+    "day": 1,
+    "month": 5
+   },
+   "class": "state",
+   "off": true,
+   "pl": "Święto Pracy",
+   "ru": "Праздник труда",
+   "img": "1-maja.jpg",
+   "pic": false,
+   "credit": {
+    "author": "Jan Van de Vel",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Signing_ceremony_of_the_accession_treaty_of_the_New_Member_States_of_the_EU_(P-009815_00-17).jpg",
+    "title": "Signing ceremony of the accession treaty of the New Member States of the EU (P-009815 00-17)"
+   },
+   "intro": {
+    "ru": [
+     "Государственный выходной с 1950 года. При ПНР в этот день проходили обязательные первомайские шествия.",
+     "У даты есть второе значение: 1 мая 2004 года Польша вместе с ещё девятью странами вступила в Европейский союз. На фото подписание договора о вступлении в Афинах в 2003 году.",
+     "Вместе со 2 и 3 мая получается «majówka», длинные майские выходные."
+    ],
+    "pl": [
+     "Święto państwowe od 1950 roku. W PRL-u odbywały się obowiązkowe pochody pierwszomajowe.",
+     "1 maja 2004 roku Polska weszła do Unii Europejskiej razem z dziewięcioma innymi krajami. Na zdjęciu podpisanie traktatu w Atenach w 2003 roku.",
+     "Razem z 2 i 3 maja to majówka, długi weekend."
+    ]
+   },
+   "phrase": {
+    "pl": "Polska wstąpiła do Unii Europejskiej 1 maja 2004 roku.",
+    "tr": "польска фстомпиуа до унии эуропейскей перфшэго мая два тыщёнцэ чвартэго року.",
+    "ru": "Польша вступила в Евросоюз 1 мая 2004 года."
+   }
+  },
+  {
+   "id": "2-maja",
+   "unit": "hol.majowka",
+   "when": {
+    "day": 2,
+    "month": 5
+   },
+   "class": "state",
+   "off": false,
+   "pl": "Dzień Flagi",
+   "ru": "День флага",
+   "img": "2-maja.jpg",
+   "pic": false,
+   "credit": {
+    "author": "Radek Kucharski",
+    "license": "CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Polish_Flag_Day_in_Warsaw.jpg",
+    "title": "Polish Flag Day in Warsaw"
+   },
+   "intro": {
+    "ru": [
+     "День флага Республики Польша введён законом в 2004 году. С 2002 года в тот же день отмечают День Полонии и поляков за границей.",
+     "Дату связывают с 2 мая 1945 года, когда польские солдаты подняли бело-красный флаг на Колонне Победы в Берлине.",
+     "Выходным день не является, но многие берут его отпуском, чтобы соединить 1 и 3 мая."
+    ],
+    "pl": [
+     "Dzień Flagi Rzeczypospolitej Polskiej obchodzi się od 2004 roku. Od 2002 roku tego dnia jest też Dzień Polonii i Polaków za Granicą.",
+     "2 maja 1945 roku polscy żołnierze zawiesili biało-czerwoną flagę na Kolumnie Zwycięstwa w Berlinie.",
+     "To nie jest dzień wolny od pracy."
+    ]
+   },
+   "phrase": {
+    "pl": "2 maja obchodzimy Dzień Flagi oraz Dzień Polonii i Polaków za Granicą.",
+    "tr": "другего мая обходжимы джень флаги ораз джень полёнии и полякуф за границон.",
+    "ru": "2 мая отмечаем День флага и День Полонии и поляков за границей."
+   }
+  },
+  {
+   "id": "3-maja",
+   "unit": "hol.majowka",
+   "when": {
+    "day": 3,
+    "month": 5
+   },
+   "class": "state",
+   "class2": "rel",
+   "off": true,
+   "pl": "Święto Konstytucji 3 Maja",
+   "ru": "День Конституции 3 мая",
+   "img": "3-maja.jpg",
+   "pic": false,
+   "credit": {
+    "author": "Jan Matejko",
+    "license": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Konstytucja_3_Maja.jpg",
+    "title": "Constitution of May 3, 1791label QS:Lit,\"Costituzione del 3 maggio 1791\"label QS:Lhu,\"1791. május 3-"
+   },
+   "intro": {
+    "ru": [
+     "3 мая 1791 года Четырёхлетний сейм при короле Станиславе Августе Понятовском принял конституцию. Она стала первой в Европе и второй в мире после американской 1787 года.",
+     "Конституция отменила liberum veto и сделала трон наследственным. Продержалась она год: соседние державы ответили войной и разделами Польши.",
+     "При ПНР праздновать 3 мая запрещали, в 1951 году праздник отменили. Восстановлен в 1990 году. Для церкви это ещё и праздник Богородицы Королевы Польши. На картине Ян Матейко, 1891 год."
+    ],
+    "pl": [
+     "3 maja 1791 roku Sejm Czteroletni za króla Stanisława Augusta Poniatowskiego uchwalił konstytucję. To pierwsza konstytucja w Europie i druga na świecie.",
+     "Konstytucja zniosła liberum veto. Przetrwała tylko rok, potem przyszły rozbiory.",
+     "W PRL-u święto zniesiono w 1951 roku. Wróciło w 1990 roku. Tego dnia jest też święto Najświętszej Maryi Panny Królowej Polski. Obraz Jana Matejki z 1891 roku."
+    ]
+   },
+   "phrase": {
+    "pl": "Konstytucja 3 maja z 1791 roku to pierwsza konstytucja w Europie i druga na świecie.",
+    "tr": "конституцья тшечего мая з тыщонц щедэмсэт джевеньджещёнтэго перфшэго року то перфша конституцья в эуропе и друга на щьвече.",
+    "ru": "Конституция 3 мая 1791 года — первая конституция в Европе и вторая в мире."
+   }
+  },
+  {
+   "id": "zielone",
+   "unit": "hol.zielone",
+   "when": {
+    "rule": "easter",
+    "offset": 49
+   },
+   "class": "rel",
+   "class2": "folk",
+   "off": true,
+   "pl": "Zielone Świątki",
+   "ru": "Пятидесятница, Троица",
+   "img": "zielone.jpg",
+   "credit": {
+    "author": "Tadeusz Rudzki",
+    "license": "CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:POL_Zielone_%C5%9Awi%C4%85tki_na_Urzeczu_2017_01.jpg",
+    "title": "POL Zielone Świątki na Urzeczu 2017 01"
+   },
+   "intro": {
+    "ru": [
+     "На пятидесятый день после Пасхи церковь вспоминает сошествие Святого Духа на апостолов. Официальное название Zesłanie Ducha Świętego.",
+     "Народное название «Зелёные праздники» пошло от обычая украшать дома и дворы ветками берёзы, аира и клёна.",
+     "Праздник всегда приходится на воскресенье, поэтому отдельного выходного не даёт."
+    ],
+    "pl": [
+     "Pięćdziesiąt dni po Wielkanocy Kościół wspomina Zesłanie Ducha Świętego na apostołów.",
+     "Nazwa Zielone Świątki pochodzi od zwyczaju dekorowania domów zielonymi gałązkami brzozy i tataraku.",
+     "Święto zawsze wypada w niedzielę."
+    ]
+   }
+  },
+  {
+   "id": "matka",
+   "unit": "hol.matka",
+   "class": "folk",
+   "off": false
+  },
+  {
+   "id": "boze-cialo",
+   "unit": "hol.boze_cialo",
+   "when": {
+    "rule": "easter",
+    "offset": 60
+   },
+   "class": "rel",
+   "off": true,
+   "pl": "Boże Ciało",
+   "ru": "Праздник Тела и Крови Христовых",
+   "img": "boze-cialo.jpg",
+   "credit": {
+    "author": "Amudena Rutkowska",
+    "license": "CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Bo%C5%BCe_Cia%C5%82o_w_%C5%81owiczu_2019_5.jpg",
+    "title": "Boże Ciało w Łowiczu 2019 5"
+   },
+   "intro": {
+    "ru": [
+     "Праздник установил папа Урбан IV в 1264 году. В Польше его впервые отметили в 1320 году в Краковском епископстве.",
+     "После мессы прихожане идут крестным ходом по улицам к четырём алтарям, украшенным цветами и берёзовыми ветками. Дети бросают перед процессией лепестки.",
+     "Самая известная процессия идёт в Ловиче, там участники надевают полосатые народные костюмы. Праздник всегда в четверг, через 60 дней после Пасхи, поэтому выпадает на конец мая или июнь."
+    ],
+    "pl": [
+     "Święto ustanowił papież Urban IV w 1264 roku. W Polsce obchodzono je pierwszy raz w 1320 roku w diecezji krakowskiej.",
+     "Po mszy wierni idą w procesji do czterech ołtarzy. Dzieci sypią kwiaty.",
+     "Najbardziej znana procesja jest w Łowiczu, w strojach ludowych. Boże Ciało jest zawsze w czwartek, 60 dni po Wielkanocy."
+    ]
+   }
+  },
+  {
+   "id": "dziecko",
+   "unit": "hol.dziecko",
+   "class": "folk",
+   "off": false
+  },
+  {
+   "id": "kupala",
+   "unit": "hol.kupala",
+   "class": "folk",
+   "off": false
+  },
+  {
+   "id": "1-sierpnia",
+   "unit": null,
+   "when": {
+    "day": 1,
+    "month": 8
+   },
+   "class": "state",
+   "off": false,
+   "pl": "Rocznica Powstania Warszawskiego",
+   "ru": "Годовщина Варшавского восстания",
+   "img": "1-sierpnia.jpg",
+   "credit": {
+    "author": "nieznany/unknown",
+    "license": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Powstanie_warszawskie_Barykada_przez_Aleje_Jerozolimskie.jpg",
+    "title": "Powstanie warszawskie Barykada przez Aleje Jerozolimskie"
+   },
+   "intro": {
+    "ru": [
+     "1 августа 1944 года Армия Крайова подняла в Варшаве восстание против немецкой оккупации. Бои шли 63 дня, до 3 октября.",
+     "Погибли около 200 тысяч человек, большинство из них мирные жители. После капитуляции немцы выселили жителей и почти полностью разрушили город.",
+     "С 2009 года это Национальный день памяти. В 17:00, в «Час W», на минуту включают сирены, и Варшава останавливается: машины, трамваи, пешеходы."
+    ],
+    "pl": [
+     "1 sierpnia 1944 roku Armia Krajowa rozpoczęła w Warszawie powstanie przeciwko Niemcom. Walki trwały 63 dni.",
+     "Zginęło około 200 tysięcy osób, głównie cywilów. Po upadku powstania Niemcy prawie całkowicie zniszczyli miasto.",
+     "Od 2009 roku to Narodowy Dzień Pamięci. O 17:00, w Godzinie W, wyją syreny i Warszawa się zatrzymuje."
+    ]
+   },
+   "phrase": {
+    "pl": "Powstanie warszawskie to był zryw przeciwko Niemcom. Wybuchło 1 sierpnia 1944 roku i trwało 63 dni. Niestety zakończyło się klęską — miasto zostało zniszczone. Byłem w Muzeum Powstania Warszawskiego i zrobiło to na mnie ogromne wrażenie.",
+    "tr": "повстанe варшавске то был зрыв пшецифко немцом. выбухуо перфшэго щерпнья тыщонц джевеньцьсэт чтэрджестэго чвартэго року и трвауо шэщьджесёнт тшы дни. нестэты закончыуо щэ клёнскон — място зостауо знищчонэ. былэм в музэум повстаня варшавскего и зробиуо то на мне огромнэ вражэнe.",
+    "ru": "Варшавское восстание — это порыв против немцев. Оно вспыхнуло 1 августа 1944 года и длилось 63 дня. К сожалению, оно закончилось поражением — город был разрушен. Я был в Музее Варшавского восстания, и это произвело на меня огромное впечатление."
+   }
+  },
+  {
+   "id": "15-sierpnia",
+   "unit": "hol.zielna",
+   "when": {
+    "day": 15,
+    "month": 8
+   },
+   "class": "state",
+   "class2": "rel",
+   "off": true,
+   "pl": "Święto Wojska Polskiego · Wniebowzięcie NMP",
+   "ru": "День Войска Польского и Успение Богородицы",
+   "img": "15-sierpnia.jpg",
+   "pic": false,
+   "credit": {
+    "author": "Wojciech Kossak",
+    "license": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Kossak_-_Battle_of_Warsaw_1920.JPG",
+    "title": "Kossak - Battle of Warsaw 1920"
+   },
+   "intro": {
+    "ru": [
+     "В этот день совпадают два праздника. Церковь отмечает Вознесение Девы Марии. Государство отмечает День Войска Польского в память о Варшавской битве 1920 года.",
+     "В августе 1920 года польская армия остановила под Варшавой наступление большевиков, бои шли с 13 по 25 августа. Победу назвали «Чудом на Висле», в том числе потому, что перелом пришёлся на церковный праздник.",
+     "День армии установили в 1923 году. При ПНР его перенесли на 12 октября, на 15 августа праздник вернули в 1992 году. Картина Войцеха Коссака."
+    ],
+    "pl": [
+     "Tego dnia są dwa święta: kościelne Wniebowzięcie Najświętszej Maryi Panny i państwowe Święto Wojska Polskiego.",
+     "W sierpniu 1920 roku Polacy pokonali bolszewików pod Warszawą. To zwycięstwo nazywa się Cudem nad Wisłą.",
+     "Święto Wojska ustanowiono w 1923 roku. W PRL-u przeniesiono je na 12 października, a w 1992 roku wróciło na 15 sierpnia. Obraz Wojciecha Kossaka."
+    ]
+   },
+   "phrase": {
+    "pl": "Bitwa Warszawska to zwycięstwo Polski nad bolszewicką Rosją w 1920 roku, zwane Cudem nad Wisłą.",
+    "tr": "битва варшавска то звыченьство польски над большевицкон росьён в тыщонц джевеньцьсэт двуджестым року, зване цудэм над висуон.",
+    "ru": "Варшавская битва — победа Польши над большевистской Россией в 1920 году, названная Чудом на Висле."
+   }
+  },
+  {
+   "id": "1-listopada",
+   "unit": "hol.wszyscy",
+   "when": {
+    "day": 1,
+    "month": 11
+   },
+   "class": "rel",
+   "off": true,
+   "pl": "Wszystkich Świętych",
+   "ru": "День всех святых",
+   "img": "1-listopada.jpg",
+   "credit": {
+    "author": "Marek Ślusarczyk (Tupungato) Photo portfolio",
+    "license": "CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File:029_All_Saints_Day_in_Poland_-_Wszystkich_%C5%9Awi%C4%99tych,_znicze_na_cmentarzu_wieczorem.jpg",
+    "title": "029 All Saints Day in Poland - Wszystkich Świętych, znicze na cmentarzu wieczorem"
+   },
+   "intro": {
+    "ru": [
+     "Праздник всех святых, в том числе неизвестных. Для всей церкви его ввёл папа Григорий IV в 835 году.",
+     "В Польше в этот день вся страна едет на кладбища к родным. На могилы ставят znicze, свечи в стеклянных колпаках. Вечером кладбища светятся тысячами огней.",
+     "Следующий день, 2 ноября, называется Zaduszki, день поминовения усопших. Он не выходной."
+    ],
+    "pl": [
+     "To święto wszystkich świętych, także nieznanych. Papież Grzegorz IV wprowadził je dla całego Kościoła w 835 roku.",
+     "Polacy jadą na cmentarze do bliskich i zapalają znicze. Wieczorem cmentarze świecą tysiącami światełek.",
+     "2 listopada to Zaduszki, dzień pamięci o zmarłych."
+    ]
+   },
+   "phrase": {
+    "pl": "1 listopada obchodzi się Wszystkich Świętych. Ludzie odwiedzają groby i zapalają znicze.",
+    "tr": "перфшэго листопада обходжи щэ фшыстких щвентых. людже одведзайон гробы и запаляйон зничэ.",
+    "ru": "1 ноября отмечают День всех святых. Люди посещают могилы и зажигают поминальные свечи."
+   }
+  },
+  {
+   "id": "zaduszki",
+   "unit": "hol.zaduszki",
+   "class": "rel",
+   "off": false
+  },
+  {
+   "id": "11-listopada",
+   "unit": null,
+   "when": {
+    "day": 11,
+    "month": 11
+   },
+   "class": "state",
+   "off": true,
+   "pl": "Narodowe Święto Niepodległości",
+   "ru": "День независимости",
+   "img": "11-listopada.jpg",
+   "credit": {
+    "author": "K. Pęcherski (based on note on photo)",
+    "license": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Pilsudski_1910_1920_LOC_hec_14263_restored.jpg",
+    "title": "Pilsudski 1910 1920 LOC hec 14263 restored"
+   },
+   "intro": {
+    "ru": [
+     "123 года Польши не было на карте: в 1795 году её поделили Россия, Пруссия и Австрия.",
+     "10 ноября 1918 года Юзеф Пилсудский вернулся в Варшаву из немецкой тюрьмы в Магдебурге. 11 ноября Регентский совет передал ему командование армией. В тот же день в Компьене подписали перемирие, закончившее Первую мировую войну.",
+     "Праздник ввели законом в 1937 году. При ПНР его отменили, восстановили в 1989 году. Сейчас в этот день в Варшаве проходят парад и большие шествия."
+    ],
+    "pl": [
+     "Przez 123 lata Polski nie było na mapie. W 1795 roku podzieliły ją Rosja, Prusy i Austria.",
+     "10 listopada 1918 roku Józef Piłsudski wrócił do Warszawy z Magdeburga. 11 listopada Rada Regencyjna przekazała mu dowództwo nad wojskiem.",
+     "Święto ustanowiono w 1937 roku. W PRL-u go nie obchodzono, wróciło w 1989 roku."
+    ]
+   },
+   "phrase": {
+    "pl": "Józef Piłsudski to twórca Legionów Polskich i pierwszy marszałek Polski. 11 listopada 1918 roku Polska odzyskała niepodległość.",
+    "tr": "юзэф пиусудски то тфурца легёнуф польских и перфшы маршауэк польски. едэнастэго листопада тыщонц джевеньцьсэт ощемнастэго року польска одзыскауа неподлеглощьчь.",
+    "ru": "Юзеф Пилсудский — создатель Польских легионов и первый маршал Польши. 11 ноября 1918 года Польша вернула независимость."
+   }
+  },
+  {
+   "id": "andrzejki",
+   "unit": "hol.andrzejki",
+   "when": {
+    "day": 29,
+    "month": 11
+   },
+   "class": "folk",
+   "off": false,
+   "pl": "Andrzejki",
+   "ru": "Анджейки",
+   "img": "andrzejki.jpg",
+   "credit": {
+    "author": "Henryk Siemiradzki",
+    "license": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Siemiradzki_Noc-Andrzeja_1867.jpg",
+    "title": "St. Andrew's Nightlabel QS:Len,\"St. Andrew's Night\"label QS:Lpl,\"Noc św. Andrzeja - Wróżbita\"label Q"
+   },
+   "intro": {
+    "ru": [
+     "Вечер гаданий накануне дня святого апостола Андрея, 30 ноября. Раньше гадали только девушки, о будущем муже. Для парней были Katarzynki, 24 ноября.",
+     "Главное гадание: горячий воск льют через бородку ключа в холодную воду, а потом по тени застывшей фигуры на стене угадывают будущее.",
+     "Ещё ставят в ряд туфли от стены к двери: чья первой дойдёт до порога, та первой выйдет замуж. На картине «Ночь Андрея» Генрика Семирадского, 1867 год."
+    ],
+    "pl": [
+     "To wieczór wróżb przed dniem świętego Andrzeja, 30 listopada. Dawniej wróżyły tylko dziewczyny, o przyszłym mężu.",
+     "Najważniejsza wróżba to lanie wosku przez klucz do zimnej wody. Potem patrzy się na cień na ścianie.",
+     "Ustawia się też buty od ściany do drzwi. Obraz Henryka Siemiradzkiego „Noc Andrzeja” z 1867 roku."
+    ]
+   },
+   "phrase": {
+    "pl": "Andrzejki to wieczór wróżb z 29 na 30 listopada. Najbardziej znana wróżba to lanie wosku przez klucz.",
+    "tr": "анджейки то вечур вружп з двуджестэго джевёнтэго на тшыджестэго листопада. найбарджей знана вружба то лянe воску пшэз ключ.",
+    "ru": "Анджейки — вечер гаданий с 29 на 30 ноября. Самое известное гадание — лить воск через ключ."
+   }
+  },
+  {
+   "id": "mikolajki",
+   "unit": "hol.mikolajki",
+   "class": "folk",
+   "class2": "rel",
+   "off": false
+  },
+  {
+   "id": "wigilia",
+   "unit": "hol.wigilia",
+   "when": {
+    "day": 24,
+    "month": 12
+   },
+   "class": "rel",
+   "class2": "folk",
+   "off": true,
+   "pl": "Wigilia",
+   "ru": "Сочельник",
+   "img": "wigilia.jpg",
+   "credit": {
+    "author": "Jacek Malczewski",
+    "license": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Malczewski_wigilia_na_syberii.jpg",
+    "title": "Christmas Eve in Siberia"
+   },
+   "intro": {
+    "ru": [
+     "Главный семейный вечер года. Ужин начинают, когда на небе появится первая звезда, в память о Вифлеемской звезде.",
+     "Перед едой все делятся облатками, тонкими белыми вафлями, и желают друг другу добра. На столе 12 постных блюд: борщ с ушками, карп, вареники, кутья. Одно место оставляют свободным для неожиданного гостя, под скатерть кладут сено.",
+     "С 2025 года Сочельник в Польше официальный выходной. На картине «Сочельник в Сибири» Яцека Мальчевского: польские ссыльные встречают праздник вдали от дома."
+    ],
+    "pl": [
+     "To najważniejszy rodzinny wieczór w roku. Kolację zaczyna się, gdy na niebie pojawi się pierwsza gwiazdka.",
+     "Przed kolacją dzieli się opłatkiem i składa życzenia. Na stole jest 12 postnych potraw. Jedno miejsce zostaje puste dla niespodziewanego gościa.",
+     "Od 2025 roku Wigilia jest dniem wolnym od pracy. Obraz Jacka Malczewskiego „Wigilia na Syberii”."
+    ]
+   },
+   "phrase": {
+    "pl": "Wigilia to uroczysta kolacja 24 grudnia. Rodzina czeka na pierwszą gwiazdkę, żeby zacząć kolację.",
+    "tr": "вигиля то урочыста колячья двуджестэго чвартэго груднья. роджина чэка на перфшон гвяздкэ, жэбы зачёнчь колячье.",
+    "ru": "Сочельник — торжественный ужин 24 декабря. Семья ждёт первую звёздочку, чтобы начать ужин."
+   }
+  },
+  {
+   "id": "boze-narodzenie",
+   "unit": "hol.boze_narodzenie",
+   "when": {
+    "day": 25,
+    "month": 12
+   },
+   "class": "rel",
+   "off": true,
+   "pl": "Boże Narodzenie",
+   "ru": "Рождество",
+   "img": "boze-narodzenie.jpg",
+   "credit": {
+    "author": "JagaKRA",
+    "license": "CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Szopka_krakowska_Gillert_Tadeusz_2019.jpg",
+    "title": "Szopka krakowska Gillert Tadeusz 2019"
+   },
+   "intro": {
+    "ru": [
+     "Рождество отмечают два дня, 25 и 26 декабря, оба выходные. Второй день посвящён святому Стефану, первому мученику.",
+     "В полночь с 24 на 25 декабря идёт месса Pasterka, «пастушья». Все праздники поют колядки. Самую известную, «Bóg się rodzi», написал Францишек Карпинский в 1792 году.",
+     "В Кракове с 1937 года проходит конкурс szopki, рождественских вертепов в виде краковских костёлов. С 2018 года этот обычай в списке нематериального наследия ЮНЕСКО."
+    ],
+    "pl": [
+     "Boże Narodzenie trwa dwa dni, 25 i 26 grudnia. Drugi dzień to święto świętego Szczepana.",
+     "O północy jest Pasterka. Śpiewa się kolędy, najbardziej znana to „Bóg się rodzi” Franciszka Karpińskiego.",
+     "Szopki krakowskie są od 2018 roku na liście UNESCO."
+    ]
+   },
+   "phrase": {
+    "pl": "Kolędy to pieśni bożonarodzeniowe. Najbardziej znana polska kolęda to „Bóg się rodzi”.",
+    "tr": "колэнды то пещьни божонародзэнёвэ. найбарджей знана польска колэнда то «бук щэ роджи».",
+    "ru": "Колядки — рождественские песни. Самая известная польская колядка — «Бог рождается»."
+   }
+  },
+  {
+   "id": "imieniny",
+   "unit": "hol.imieniny",
+   "class": "folk",
+   "off": false
   }
  ],
  "decor": [

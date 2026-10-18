@@ -75,6 +75,12 @@ describe('политика обновления', () => {
     // Опции Workbox вынесены в tools/lib/pwa.ts (тот же конфиг уходит в сборку).
     expect(cfg).toMatch(/workbox: workboxOptions\(\)/);
     expect(workboxOptions()).toMatchObject({ skipWaiting: true, clientsClaim: true });
+    // Картины праздников — runtime-кэш, а не precache (jpg нет в globPatterns).
+    const opts = workboxOptions();
+    expect(opts.globPatterns.join(' ')).not.toMatch(/jpg/);
+    const swieta = opts.runtimeCaching.find((r) => r.options.cacheName === 'pq-swieta')!;
+    expect(swieta.urlPattern({ url: new URL('https://x/polski-quest/swieta/wigilia.jpg') })).toBe(true);
+    expect(swieta.urlPattern({ url: new URL('https://x/polski-quest/audio/a.m4a') })).toBe(false);
     expect(readFileSync('src/main.ts', 'utf8')).toMatch(/registerPwa\(/);
   });
 });

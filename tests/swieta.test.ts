@@ -1,13 +1,23 @@
 // @vitest-environment happy-dom
-// Игра «Święta»: календарь и Пасха, ближайший праздник по дате, задания (что за праздник, когда, магазины, корзинка, стол,
-// пожелания), проверка ответов, рисование в панели и совпадение иконок с атласом.
-import { describe, expect, it } from 'vitest';
+// Игра «Święta»: календарь и Пасха, ближайший праздник по дате, колесо года (узлы, позиции дат, «сегодня», ближайший), карточка знакомства
+// (только в первый раз и до вопросов), раунд про один праздник, задания (что за праздник, когда, магазины, корзинка, стол, пожелания),
+// проверка ответов, рисование в панели и совпадение иконок с атласом.
+import { existsSync } from 'node:fs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import atlas from '../public/atlas/custom.json';
-import { dateChoices, game, maskedCustoms, packSpec, packTask, shopsQuestions, shopsTask, whatTask, whenTask, wishTask, customTilesTask, type SwTask } from '../src/games/swieta';
+import { customChoiceTask, dateChoices, game, maskedCustoms, packSpec, packTask, shopsQuestions, shopsTask, whatTask, whenTask, wishTask, customTilesTask, type SwTask } from '../src/games/swieta';
 import { dayNo, easterDay, fmtSpan, inDays, nearestHoliday, nextSpan, seasonalOrder, shortName, spanIn, upcoming, ymdOf } from '../src/games/swieta/calendar';
 import { ATLAS_SIZE, FRAMES, WORD_EMOJI, WORD_FRAME, WORD_ICON, itemWord } from '../src/games/swieta/icons';
 import { plantIconFrame } from '../src/ui/atlasIcon';
 import { GAMES } from '../src/games/registry';
+import { forgetSelection, renderHub, nodeItem } from '../src/games/swieta/hub';
+import { buildRound, clearSession, slotsOf, startSession, takeTask } from '../src/games/swieta/plan';
+import { boldRuns, isFirst, sentences, shopsLine, shortIntro, shownCustoms } from '../src/games/swieta/story';
+import { CLASSES, MARK_UNITS, TRACKS, markerOfUnit, parseWheel, placeMarkers, todayAngle, growthOf, type Marker, type WheelNode } from '../src/games/swieta/wheel';
+import { createPolska, newPolskaSave, type PolskaSave } from '../src/systems/polska';
+import { mountPolskaGame, NEXT_DELAY_MS } from '../src/ui/polskaGame';
+import { ROUND_SIZE } from '../src/ui/roundSummary';
+import { testBus } from './helpers';
 import { V2, unitsOfGame } from '../src/systems/v2content';
 import type { GameCtx, GamePanel, PolskaUnit, UnitInfo, Want } from '../src/types/polska';
 import { seeded } from './helpers';
@@ -28,6 +38,11 @@ const ctxAt = (y: number, m: number, d: number, seed = 1): GameCtx => ({
 });
 const TODAY = ctxAt(2026, 10, 18);
 const day = (y: number, m: number, d: number): number => dayNo(y, m, d);
+
+beforeEach(() => {
+  clearSession();
+  forgetSelection();
+});
 
 function mkPanel(layout: 'panel' | 'full' = 'panel') {
   const sent: unknown[] = [];
@@ -103,16 +118,12 @@ describe('ближайший праздник по реальной дате', (
     expect([...days].sort((a, b) => a - b)).toEqual(days);
   });
 
-  it('строка «Najbliższe święto: … za N dni»: баннер у ближайшего праздника, в итоге раунда — всегда', () => {
+  it('строка «Najbliższe święto: … za N dni» в итоге раунда; на заданиях баннера нет (он на колесе)', () => {
     for (const side of ['A', 'B'] as const) {
       const t = game.nextTask(TODAY, { id: 'hol.wszyscy', side, self: false, stage: 'seed' })!;
-      const { panel } = mkPanel();
+      const { panel } = mkPanel('full');
       game.render(t, panel, TODAY);
-      expect(panel.body.querySelector('[data-nearest]')?.textContent).toBe('Najbliższe święto: Wszystkich Świętych za 14 dni');
-      const t2 = game.nextTask(TODAY, { id: 'hol.zaduszki', side, self: false, stage: 'seed' })!;
-      const p2 = mkPanel().panel;
-      game.render(t2, p2, TODAY);
-      expect(p2.body.querySelector('[data-nearest]')).toBeNull();
+      expect(panel.body.querySelector('[data-nearest]')).toBeNull();
     }
     expect(game.summaryLine!(TODAY)).toBe('Najbliższe święto: Wszystkich Świętych za 14 dni');
   });
@@ -382,7 +393,8 @@ describe('контракт игры: сторона A/B и self', () => {
   it('реестр берёт нашу игру: id, вход, участок, layout panel', () => {
     const g = GAMES.find((x) => x.id === 'swieta')!;
     expect(g).toBe(game as unknown);
-    expect([g.entry, g.plot, g.layout, [...g.kinds]]).toEqual(['seasonBoard', 'klumba', 'panel', ['holiday']]);
+    expect([g.entry, g.plot, g.layout, [...g.kinds]]).toEqual(['seasonBoard', 'klumba', 'full', ['holiday']]);
+    expect(typeof g.hub).toBe('function');
   });
 });
 
@@ -391,6 +403,374 @@ describe('иконки и атлас', () => {
     const a = atlas as unknown as { frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>; meta: { size: { w: number; h: number } } };
     expect(a.meta.size).toEqual(ATLAS_SIZE);
     for (const [k, f] of Object.entries(FRAMES)) expect(a.frames[k]!.frame, k).toMatchObject(f);
+  });
+});
+
+// ---------- колесо года ----------
+
+const NODES = parseWheel(doc, UNITS);
+const NODE = (id: string): WheelNode => NODES.find((n) => n.id === id)!;
+const placeAt = (y: number, m: number, d: number) => placeMarkers(NODES, UNITS, { y, m, d });
+const iso = (n: number): string => {
+  const x = ymdOf(n);
+  return `${x.y}-${String(x.m).padStart(2, '0')}-${String(x.d).padStart(2, '0')}`;
+};
+
+describe('данные колеса: 19 праздников колеса + праздники игры', () => {
+  it('19 узлов из колеса, у каждого картина с автором и лицензией, файл лежит в public/swieta, справка RU и PL', () => {
+    const wheel = NODES.filter((n) => n.img);
+    expect(wheel.length).toBe(19);
+    for (const n of wheel) {
+      expect(existsSync(`public/swieta/${n.img}`), n.id).toBe(true);
+      expect(n.credit?.author, n.id).toBeTruthy();
+      expect(n.credit?.license, n.id).toBeTruthy();
+      expect(n.credit?.page, n.id).toMatch(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
+      expect(n.intro?.ru.length, n.id).toBeGreaterThan(0);
+      expect(n.intro?.pl.length, n.id).toBeGreaterThan(0);
+      expect(CLASSES).toContain(n.cls);
+    }
+  });
+
+  it('все 22 праздника игры достижимы с колеса, id единиц не потеряны; без пары в колесе — только справка', () => {
+    const covered = new Set(NODES.map((n) => n.unit).filter(Boolean));
+    for (const u of UNITS) expect(covered.has(u.id), u.id).toBe(true);
+    expect(UNITS.length).toBe(22);
+    expect(NODES.filter((n) => !n.unit).map((n) => n.id).sort()).toEqual(['1-sierpnia', '11-listopada', 'popielec']);
+    // Три майских дня колеса идут одной единицей majówka; картина не про неё.
+    expect(['1-maja', '2-maja', '3-maja'].map((id) => [NODE(id).unit, NODE(id).pic])).toEqual([['hol.majowka', false], ['hol.majowka', false], ['hol.majowka', false]]);
+    expect(NODE('15-sierpnia').unit).toBe('hol.zielna');
+    expect(NODE('1-listopada').pic).toBe(true);
+  });
+
+  it('значок есть у каждого узла: кадр атласа или мини-предмет', () => {
+    for (const n of NODES) {
+      const id = nodeItem(n, n.unit ? BY_ID.get(n.unit)! : null);
+      expect(WORD_FRAME[id] ?? (WORD_ICON[id] && plantIconFrame(WORD_ICON[id])), `${n.id}: ${id}`).toBeTruthy();
+    }
+  });
+});
+
+describe('колесо: позиции дат, «сегодня», ближайший', () => {
+  it('26 датированных значков и «Imieniny» без даты; Новый год наверху, угол по дню года', () => {
+    const { placed, undated } = placeAt(2026, 10, 18);
+    expect(placed.length).toBe(26);
+    expect(undated.map((n) => n.unit)).toEqual(['hol.imieniny']);
+    const m = (id: string): Marker => placed.find((x) => x.node.id === id)!;
+    expect(m('nowy-rok').angle).toBeCloseTo((0.5 / 365) * 360, 5);
+    expect(m('1-listopada').doy).toBe(305);
+    expect(m('1-listopada').angle).toBeCloseTo((304.5 / 365) * 360, 5);
+    expect(m('wigilia').angle).toBeGreaterThan(m('11-listopada').angle);
+    // Високосный год: 1 ноября — 306-й день из 366.
+    const leap = placeAt(2028, 10, 18).placed.find((x) => x.node.id === '1-listopada')!;
+    expect(leap.doy).toBe(306);
+    expect(leap.angle).toBeCloseTo((305.5 / 366) * 360, 5);
+  });
+
+  it('подвижные праздники сдвигаются с Пасхой: в 2027 Wielkanoc 28.03, в 2028 — 16.04', () => {
+    const e27 = placeAt(2027, 1, 10).placed.find((x) => x.node.id === 'wielkanoc')!;
+    const e28 = placeAt(2028, 1, 10).placed.find((x) => x.node.id === 'wielkanoc')!;
+    expect(iso(e27.span!.start)).toBe('2027-03-28');
+    expect(iso(e28.span!.start)).toBe('2028-04-16');
+    expect(e28.angle).toBeGreaterThan(e27.angle);
+    expect(placeAt(2027, 1, 10).placed.find((x) => x.node.id === 'tlusty')!.span!.start).toBe(easterDay(2027) - 52);
+  });
+
+  it('стрелка «сегодня» по дню года', () => {
+    expect(todayAngle({ y: 2026, m: 1, d: 1 })).toBeCloseTo((0.5 / 365) * 360, 5);
+    expect(todayAngle({ y: 2026, m: 10, d: 18 })).toBeCloseTo((290.5 / 365) * 360, 5);
+    expect(todayAngle({ y: 2028, m: 12, d: 31 })).toBeCloseTo((365.5 / 366) * 360, 5);
+  });
+
+  it('ближайший: 18.10 — Wszystkich Świętych через 14 дней; 2 мая — majówka идёт, метка 2 мая; после Рождества — Новый год', () => {
+    const near = markerOfUnit(placeAt(2026, 10, 18).placed, 'hol.wszyscy')!;
+    expect(near.days).toBe(14);
+    expect(markerOfUnit(placeAt(2027, 5, 2).placed, 'hol.majowka')!.node.id).toBe('2-maja');
+    expect(markerOfUnit(placeAt(2027, 5, 2).placed, 'hol.majowka')!.days).toBe(0);
+    expect(markerOfUnit(placeAt(2026, 12, 28).placed, 'hol.nowy_rok')!.days).toBeLessThanOrEqual(4);
+  });
+
+  it('значки не налезают друг на друга и сидят на дорожках внутри кольца месяцев', () => {
+    for (const [y, m, d] of [[2026, 10, 18], [2027, 3, 29], [2028, 4, 16], [2029, 1, 1]] as const) {
+      const { placed } = placeAt(y, m, d);
+      let min = Infinity;
+      for (let i = 0; i < placed.length; i++) {
+        expect(TRACKS).toContain(placed[i]!.r);
+        expect(Math.hypot(placed[i]!.x, placed[i]!.y)).toBeCloseTo(placed[i]!.r, 5);
+        for (let j = i + 1; j < placed.length; j++) min = Math.min(min, Math.hypot(placed[i]!.x - placed[j]!.x, placed[i]!.y - placed[j]!.y));
+      }
+      expect(min, `${y}-${m}-${d}`).toBeGreaterThan(MARK_UNITS * 0.8);
+    }
+  });
+});
+
+// ---------- справка и первый раз ----------
+
+describe('справка знакомства', () => {
+  it('2–4 предложения; польские слова латиницей жирным, римские цифры нет', () => {
+    for (const n of NODES) {
+      if (!n.intro) continue;
+      const k = sentences([shortIntro(n.intro.ru)]).length;
+      expect(k, n.id).toBeGreaterThanOrEqual(2);
+      expect(k, n.id).toBeLessThanOrEqual(4);
+    }
+    const runs = boldRuns('Ночь называется Sylwester, по имени папы Сильвестра I. Урбан IV. Час W. Крест K+M+B над дверью');
+    expect(runs.filter((r) => r.b).map((r) => r.t)).toEqual(['Sylwester', 'K+M+B']);
+    expect(boldRuns('просто по-русски')).toEqual([{ t: 'просто по-русски', b: false }]);
+  });
+
+  it('магазины строкой: из заметки данных, иначе из shops; первый раз — нет ответов по единице', () => {
+    expect(shopsLine(U('wigilia'))!.ru).toMatch(/14:00/);
+    expect(shopsLine(U('wszyscy'))!.pl).toBe('Sklepy są zamknięte.');
+    expect(isFirst({ ...TODAY.info('hol.wszyscy'), answers: 0 })).toBe(true);
+    expect(isFirst({ ...TODAY.info('hol.wszyscy'), answers: 1 })).toBe(false);
+    expect(isFirst({ ...TODAY.info('hol.wszyscy'), sides: { A: true, B: false }, answers: undefined })).toBe(false);
+    expect(growthOf({ ...TODAY.info('hol.wszyscy'), planted: true, stage: 'sprout' })).toBe('sprout');
+    expect(growthOf({ ...TODAY.info('hol.wszyscy'), harvests: 1 })).toBe('ripe');
+  });
+});
+
+describe('раунд про один праздник', () => {
+  it('3–6 заданий, все про этот праздник, решаются и рисуются; в раунде есть задание «сам»', () => {
+    for (const u of UNITS) {
+      const node = NODES.find((n) => n.unit === u.id && n.pic) ?? NODES.find((n) => n.unit === u.id)!;
+      for (const first of [true, false]) {
+        for (let seed = 1; seed <= 4; seed++) {
+          const ctx = ctxAt(2026, 10, 18, seed);
+          const tasks = buildRound(ctx, u, node, first);
+          expect(tasks.length, `${u.id} ${first}`).toBeGreaterThanOrEqual(3);
+          expect(tasks.length).toBeLessThanOrEqual(6);
+          expect(tasks.every((t) => t.id === u.id)).toBe(true);
+          expect(tasks.some((t) => t.self), `${u.id}: нет «сам»`).toBe(true);
+          expect(tasks.some((t) => t.side === 'A') && tasks.some((t) => t.side === 'B')).toBe(true);
+          for (const t of tasks) {
+            expect(game.check(t, solve(t), ctx).ok, `${u.id} ${t.kind}/${t.variant}`).toBe(true);
+            const { panel } = mkPanel('full');
+            game.render(t, panel, ctx);
+            expect(panel.body.querySelector('[data-q]')).toBeTruthy();
+          }
+        }
+      }
+    }
+  });
+
+  it('первый раз: картина (или предмет) → когда → обычай из карточки; обычаи и пожелание — те, что показаны', () => {
+    const u = U('wszyscy');
+    const tasks = buildRound(TODAY, u, NODE('1-listopada'), true);
+    expect(tasks.map((t) => `${t.kind}/${t.variant}`).slice(0, 3)).toEqual(['what/pic', 'when/date', 'custom/custom']);
+    expect(tasks[0]!.pic).toMatchObject({ img: '1-listopada.jpg' });
+    const customs = (u.raw.customs as { pl: string }[]).slice(0, 3).map((c) => c.pl);
+    expect(customs).toContain(tasks[2]!.answer);
+    expect(tasks[tasks.length - 1]!.self).toBe(true);
+    // Без картины (картина про соседний праздник) — по предмету.
+    const maj = buildRound(TODAY, U('majowka'), NODE('1-maja'), true);
+    expect(maj[0]!.variant).toBe('clue');
+    expect(shownCustoms(u)).toEqual([0, 1, 2]);
+  });
+
+  it('позже: картина, предмет, обычай или дата + обычай + «вспомнить» + «сам»; слотов хватает каждому празднику', () => {
+    for (const u of UNITS) {
+      const node = NODES.find((n) => n.unit === u.id) ?? null;
+      expect(slotsOf(TODAY, u, node).length, u.id).toBeGreaterThanOrEqual(5);
+    }
+  });
+
+  it('очередь раунда: задания по одному, потом обычное по просьбе движка', () => {
+    const tasks = buildRound(TODAY, U('wszyscy'), NODE('1-listopada'), true);
+    startSession('hol.wszyscy', tasks);
+    expect(takeTask('hol.zaduszki')).toBeNull();
+    const got = tasks.map(() => game.nextTask(TODAY, { id: 'hol.wszyscy', side: 'A', self: false, stage: 'seed' })!);
+    expect(got.map((t) => `${t.kind}/${t.variant}`)).toEqual(tasks.map((t) => `${t.kind}/${t.variant}`));
+    expect(game.nextTask(TODAY, { id: 'hol.wszyscy', side: 'A', self: false, stage: 'seed' })!.kind).toBe('what');
+  });
+
+  it('обычай «по-русски → по-польски»: верное предложение среди четырёх разных, подпись и проверка', () => {
+    for (const u of UNITS) {
+      const t = customChoiceTaskOf(u);
+      expect(t.options!.length, u.id).toBeGreaterThanOrEqual(3);
+      expect(new Set(t.options).size).toBe(t.options!.length);
+      expect(t.options).toContain(t.answer);
+      expect(t.qLang).toBe('ru');
+      expect(game.check(t, t.answer, TODAY).ok).toBe(true);
+      expect(game.check(t, t.options!.find((o) => o !== t.answer), TODAY).ok).toBe(false);
+    }
+  });
+});
+
+const customChoiceTaskOf = (u: PolskaUnit): SwTask => customChoiceTask(TODAY, u)!;
+
+// ---------- экран колеса и движок ----------
+
+function mkHub(ctx: GameCtx = TODAY, answers = 0) {
+  const begun: [string, number][] = [];
+  const body = document.createElement('div');
+  const foot = document.createElement('div');
+  const spoken: string[] = [];
+  const panel: GamePanel = { body, foot, layout: 'full', submit: () => {}, say: (t) => spoken.push(t), rand: seeded(2) };
+  const c: GameCtx = { ...ctx, info: (id) => ({ ...ctx.info(id), answers }) };
+  renderHub(panel, c, (id, size) => begun.push([id, size]));
+  return { body, foot, begun, spoken, panel };
+}
+
+describe('экран колеса', () => {
+  it('рисует 12 месяцев, стрелку «сегодня», значки; ближайший подсвечен и выбран по умолчанию', () => {
+    const { body } = mkHub();
+    expect(body.querySelectorAll('svg text').length).toBeGreaterThanOrEqual(12);
+    expect(body.querySelector('[data-today-label]')!.textContent).toBe('dziś 18.10');
+    expect(body.querySelector('[data-hand]')).toBeTruthy();
+    expect(body.querySelectorAll('.sw-mk').length).toBe(26);
+    expect(body.querySelector('.sw-mk.near')!.getAttribute('data-node')).toBe('1-listopada');
+    expect(body.querySelector('.sw-mk.sel')!.getAttribute('data-node')).toBe('1-listopada');
+    expect(body.querySelector('[data-nearest-text]')!.textContent).toBe('Najbliższe święto: Wszystkich Świętych za 14 dni');
+    expect(body.querySelector('[data-sel-name]')!.textContent).toBe('Wszystkich Świętych');
+    expect(body.querySelector('[data-undated]')).toBeTruthy();
+    // тип праздника цветом
+    const cls = (id: string): string => body.querySelector<HTMLElement>(`[data-node="${id}"]`)!.getAttribute('data-class')!;
+    expect([cls('3-maja'), cls('1-listopada'), cls('andrzejki')]).toEqual(['state', 'rel', 'folk']);
+  });
+
+  it('по умолчанию — ближайший из ещё не выращенных', () => {
+    const grown = (id: string) => ({ ...TODAY.info(id), harvests: id === 'hol.wszyscy' ? 1 : 0, planted: true });
+    const { body } = mkHub({ ...TODAY, info: grown });
+    expect(body.querySelector('.sw-mk.sel')!.getAttribute('data-node')).toBe('zaduszki');
+    expect(body.querySelector('.sw-mk.near')!.getAttribute('data-node')).toBe('1-listopada');
+  });
+
+  it('тап по значку выбирает праздник; у праздника без единицы нет вопросов, только справка', () => {
+    const { body, foot } = mkHub(TODAY, 3);
+    body.querySelector<HTMLElement>('[data-node="andrzejki"]')!.click();
+    expect(body.querySelector('[data-sel-name]')!.textContent).toBe('Andrzejki');
+    expect(foot.querySelector('[data-play]')).toBeTruthy();
+    body.querySelector<HTMLElement>('[data-node="popielec"]')!.click();
+    expect(body.querySelector('[data-sel-name]')!.textContent).toBe('Środa Popielcowa');
+    expect(foot.querySelector('[data-play]')).toBeNull();
+    expect(foot.querySelector('[data-info]')).toBeTruthy();
+  });
+
+  it('первый раз: кнопка «Poznaj», карточка с картиной, подписью автора, справкой, обычаями и пожеланием — до всяких вопросов', () => {
+    const { body, foot, begun, spoken } = mkHub(TODAY, 0);
+    expect(foot.querySelector('[data-play]')).toBeNull();
+    foot.querySelector<HTMLElement>('[data-poznaj]')!.click();
+    expect(begun).toEqual([]);
+    const card = body.querySelector('[data-card="intro"]')!;
+    expect(card).toBeTruthy();
+    expect(card.querySelector('[data-pic="1-listopada.jpg"]')).toBeTruthy();
+    expect(card.querySelector('[data-credit]')!.textContent).toMatch(/© Marek Ślusarczyk.*CC BY 3\.0/);
+    expect(card.querySelector('[data-credit] a')!.getAttribute('href')).toMatch(/commons\.wikimedia\.org/);
+    expect(card.querySelector('[data-card-name]')!.textContent).toBe('Wszystkich Świętych');
+    expect(card.querySelector('[data-intro] b')!.textContent).toBe('znicze');
+    expect(card.querySelectorAll('[data-customs] .sw-row').length).toBe(3);
+    expect(card.querySelector('[data-shops]')).toBeTruthy();
+    expect(card.querySelector('[data-intro-pl]')).toBeTruthy();
+    card.querySelector<HTMLElement>('[data-intro-pl] [data-say]')!.click();
+    expect(spoken.length).toBe(1);
+    expect(spoken[0]).toMatch(/święto wszystkich świętych/i);
+    foot.querySelector<HTMLElement>('[data-start]')!.click();
+    expect(begun.length).toBe(1);
+    expect(begun[0]![0]).toBe('hol.wszyscy');
+    expect(begun[0]![1]).toBeGreaterThanOrEqual(3);
+    expect(begun[0]![1]).toBeLessThanOrEqual(6);
+    // раунд собран заранее, первый вопрос — по картине из карточки
+    expect((game.nextTask(TODAY, { id: 'hol.wszyscy', side: 'A', self: false, stage: 'seed' }) as SwTask).variant).toBe('pic');
+  });
+
+  it('не первый раз: карточки нет, «Graj» сразу начинает раунд; справка открывается кнопкой «ℹ» и возвращает к колесу', () => {
+    const { body, foot, begun } = mkHub(TODAY, 5);
+    expect(foot.querySelector('[data-poznaj]')).toBeNull();
+    foot.querySelector<HTMLElement>('[data-info]')!.click();
+    expect(body.querySelector('[data-card="info"]')).toBeTruthy();
+    expect(body.querySelector('[data-phrase]')).toBeTruthy();
+    expect(begun).toEqual([]);
+    foot.querySelector<HTMLElement>('[data-back]')!.click();
+    expect(body.querySelector('[data-wheel]')).toBeTruthy();
+    foot.querySelector<HTMLElement>('[data-play]')!.click();
+    expect(begun.length).toBe(1);
+    expect(body.querySelector('[data-card]')).toBeNull();
+  });
+
+  it('праздник без картины (значок вместо неё) тоже открывает карточку', () => {
+    const { body, foot } = mkHub(TODAY, 0);
+    body.querySelector<HTMLElement>('[data-node="mikolajki"]')!.click();
+    foot.querySelector<HTMLElement>('[data-poznaj]')!.click();
+    const card = body.querySelector('[data-card="intro"]')!;
+    expect(card.querySelector('[data-pic]')).toBeNull();
+    expect(card.querySelector('[data-customs]')).toBeTruthy();
+    expect(card.querySelector('[data-wish]')).toBeTruthy();
+  });
+});
+
+function mkEngine() {
+  let t = Date.UTC(2026, 9, 18, 9, 0);
+  let save: PolskaSave = newPolskaSave();
+  const bus = testBus();
+  const p = createPolska({ bus, load: () => save, save: (x) => (save = x), now: () => t, tz: () => 0 });
+  const root = document.createElement('div');
+  const ui = mountPolskaGame(root, { bus, games: GAMES, polska: p, now: () => t, rand: seeded(5), say: () => {} });
+  return { p, bus, root, ui, get save() { return save; } };
+}
+
+describe('игра: колесо → знакомство → раунд про один праздник → колесо', () => {
+  it('открытие даёт колесо, а не задание; карточка только в первый раз; раунд короткий и только про этот праздник', () => {
+    const e = mkEngine();
+    const autos: string[] = [];
+    e.bus.on('polska:auto', (a) => autos.push(`${a.on}:${a.layout}:${a.plot ?? ''}`));
+    e.ui.start('swieta');
+    expect(autos[0]).toBe('true:full:klumba');
+    expect(e.ui.task).toBeNull();
+    expect(e.root.querySelector('[data-hub] [data-wheel]')).toBeTruthy();
+    expect(e.root.querySelector('[data-round-no]')!.hasAttribute('hidden')).toBe(true);
+    e.root.querySelector<HTMLElement>('[data-poznaj]')!.click();
+    expect(e.root.querySelector('[data-card="intro"]')).toBeTruthy();
+    expect(e.ui.task).toBeNull();
+    expect(e.save.garden.log.length).toBe(0);
+    e.root.querySelector<HTMLElement>('[data-start]')!.click();
+    expect(e.ui.task).toBeTruthy();
+    expect(e.p.info('hol.wszyscy').planted).toBe(true);
+    vi.useFakeTimers();
+    let n = 0;
+    const kinds: string[] = [];
+    while (e.ui.task && !e.root.querySelector('[data-round-summary]')) {
+      const t = e.ui.task as SwTask;
+      expect(t.id).toBe('hol.wszyscy');
+      kinds.push(`${t.kind}/${t.variant}`);
+      expect(e.root.querySelector('[data-round-no]')!.textContent).toMatch(new RegExp(`^${n + 1} / \\d$`));
+      e.ui.submit(solve(t));
+      vi.advanceTimersByTime(NEXT_DELAY_MS + 10);
+      e.root.querySelector<HTMLButtonElement>('[data-next]')!.click();
+      n++;
+    }
+    vi.useRealTimers();
+    expect(n).toBeGreaterThanOrEqual(3);
+    expect(n).toBeLessThanOrEqual(6);
+    expect(n).toBeLessThan(ROUND_SIZE);
+    expect(kinds.slice(0, 3)).toEqual(['what/pic', 'when/date', 'custom/custom']);
+    expect(e.save.garden.log.length).toBe(n);
+    expect(e.save.garden.log.every((a) => a.id === 'hol.wszyscy')).toBe(true);
+    // итог: «К колесу»
+    const more = e.root.querySelector<HTMLButtonElement>('[data-more]')!;
+    expect(more.textContent).toBe('К колесу');
+    more.click();
+    expect(e.root.querySelector('[data-wheel]')).toBeTruthy();
+    expect(e.root.querySelector('.sw-mk.sel')!.getAttribute('data-node')).toBe('1-listopada');
+    expect(['seed', 'sprout', 'bush']).toContain(e.root.querySelector('.sw-mk.sel')!.getAttribute('data-growth'));
+    // второй раз: карточки нет, раунд сразу
+    expect(e.root.querySelector('[data-poznaj]')).toBeNull();
+    e.root.querySelector<HTMLElement>('[data-play]')!.click();
+    expect((e.ui.task as SwTask).id).toBe('hol.wszyscy');
+    expect(e.root.querySelector('[data-card]')).toBeNull();
+    e.ui.stop();
+    expect(e.ui.isOpen).toBe(false);
+  });
+
+  it('раунд про выбранный на колесе праздник; остальные не трогаются', () => {
+    const e = mkEngine();
+    e.ui.start('swieta');
+    e.root.querySelector<HTMLElement>('[data-node="wigilia"]')!.click();
+    e.root.querySelector<HTMLElement>('[data-poznaj]')!.click();
+    e.root.querySelector<HTMLElement>('[data-start]')!.click();
+    expect((e.ui.task as SwTask).id).toBe('hol.wigilia');
+    e.ui.submit('неверно');
+    expect(e.save.garden.log.map((a) => a.id)).toEqual(['hol.wigilia']);
+    e.ui.stop();
   });
 });
 
