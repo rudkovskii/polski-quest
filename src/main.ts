@@ -277,7 +277,8 @@ async function main(): Promise<void> {
       games: () =>
         GAMES.map((g) => {
           const p = polska.progress(g.id);
-          return { id: g.id, title: g.title, desc: g.desc, progress: `выращено ${p.grown} из ${p.units}, растёт ${p.growing}`, where: `${PLOT_NAME[g.plot].pl} ${p.objDone}/${p.objTotal}` };
+          const bar = polska.scale().games[g.id];
+          return { id: g.id, title: g.title, desc: g.desc, progress: `выращено ${p.grown} из ${p.units}, растёт ${p.growing}`, where: `${PLOT_NAME[g.plot].pl} ${p.objDone}/${p.objTotal}`, pct: bar?.pct ?? 0, medal: bar?.medal ?? 0 };
         }),
       scale: () => {
         const s = polska.scale();

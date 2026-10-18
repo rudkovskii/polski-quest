@@ -22,7 +22,7 @@ export interface BoardDeps {
 
 /** Вкладка «Polska»: строка игры, «Idź» и «Graj tu». */
 export interface BoardPolska {
-  games(): { id: string; title: { pl: string; ru: string }; desc: string; progress: string; where: string }[];
+  games(): { id: string; title: { pl: string; ru: string }; desc: string; progress: string; where: string; pct?: number; medal?: number }[];
   /** Шкала «Wiedza o Polsce» одной строкой («Gość · 2/10 · выращено 12 из 150»). */
   scale(): string;
   go(id: string): void;
@@ -60,6 +60,14 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(tab?: B
         el('div', { style: 'font-size:18px;font-weight:800' }, `${g.title.ru} `, el('small', { class: 'board-pl', style: 'font-size:12px;font-weight:600;opacity:.65;white-space:nowrap' }, g.title.pl)),
         el('div', { style: 'font-weight:500;font-size:14px;opacity:.85' }, g.desc),
         el('div', { class: 'pq-muted', 'data-progress': '', style: 'font-size:13px' }, `${g.progress} · ${g.where}`),
+        g.pct === undefined
+          ? null
+          : el(
+              'div',
+              { style: 'display:flex;align-items:center;gap:6px' },
+              el('div', { 'data-bar': g.id, style: 'flex:1;height:8px;border:2px solid var(--pq-ink);border-radius:5px;background:#fffaf0;overflow:hidden' }, el('div', { style: `height:100%;width:${Math.round(Math.min(1, Math.max(0, g.pct)) * 100)}%;background:var(--pq-leaf)` })),
+              el('span', { style: 'font-size:12px;font-weight:700;min-width:36px;text-align:right' }, g.medal === 100 ? '★ 100%' : g.medal === 50 ? '★ 50%+' : `${Math.round(g.pct * 100)}%`),
+            ),
         el(
           'div',
           { style: 'display:flex;gap:6px' },
