@@ -165,7 +165,7 @@ describe('Słownik', () => {
     expect(rows(root)).toEqual(['p.mam_kota', 'p.jem_chleb']);
     expect(root.querySelector('[data-id="p.mam_kota"] .st')?.textContent).toBe('🔒');
     root.querySelector<HTMLElement>('[data-id="p.mam_kota"]')!.click();
-    expect(root.querySelector('[data-lock]')?.textContent).toContain('Откроется, когда эти слова вырастут до стадии «кустик»');
+    expect(root.querySelector('[data-lock]')?.textContent).toContain('Откроется, когда эти слова подрастут до ростка');
     expect(root.querySelector('[data-lock]')?.textContent).toContain('kot — кот');
     expect(root.querySelector<HTMLButtonElement>('[data-plant]')!.disabled).toBe(true);
   });

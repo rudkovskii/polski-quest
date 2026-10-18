@@ -290,7 +290,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
         el(
           'div',
           { class: 'lock', 'data-lock': '' },
-          '🔒 Откроется, когда эти слова вырастут до стадии «кустик»:',
+          '🔒 Откроется, когда эти слова подрастут до ростка:',
           el(
             'ul',
             {},
