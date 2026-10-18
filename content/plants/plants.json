@@ -1,0 +1,823 @@
+{
+ "_": "Варианты растений и плоды. Кадры variant: sprout/bush/ripe/base; \"base\" — куст под мини-предмет (чашелистики), иконку ставят в slot. Семечко общее: crop_seed проекта.",
+ "variants": [
+  {
+   "id": "v00",
+   "n": 0,
+   "name": "куст круглый",
+   "kind": "round",
+   "sheet": "plant_v00",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    20
+   ],
+   "flower": "petal_pink",
+   "top": {
+    "bush": [
+     8,
+     20
+    ],
+    "ripe": [
+     8,
+     14
+    ],
+    "base": [
+     8,
+     14
+    ]
+   },
+   "slot": [
+    0,
+    0
+   ]
+  },
+  {
+   "id": "v01",
+   "n": 1,
+   "name": "травяной пучок",
+   "kind": "tuft",
+   "sheet": "plant_v01",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    19
+   ],
+   "flower": "petal_yellow",
+   "top": {
+    "bush": [
+     8,
+     19.5
+    ],
+    "ripe": [
+     8,
+     16.05
+    ],
+    "base": [
+     8,
+     16.05
+    ]
+   },
+   "slot": [
+    0,
+    2
+   ]
+  },
+  {
+   "id": "v02",
+   "n": 2,
+   "name": "папоротник",
+   "kind": "fern",
+   "sheet": "plant_v02",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    16
+   ],
+   "flower": "petal_white",
+   "top": {
+    "bush": [
+     8,
+     16
+    ],
+    "ripe": [
+     8,
+     8
+    ],
+    "base": [
+     8,
+     8
+    ]
+   },
+   "slot": [
+    0,
+    -6
+   ]
+  },
+  {
+   "id": "v03",
+   "n": 3,
+   "name": "клевер",
+   "kind": "clover",
+   "sheet": "plant_v03",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    22
+   ],
+   "flower": "petal_white",
+   "top": {
+    "bush": [
+     8,
+     23
+    ],
+    "ripe": [
+     8,
+     20
+    ],
+    "base": [
+     8,
+     20
+    ]
+   },
+   "slot": [
+    0,
+    6
+   ]
+  },
+  {
+   "id": "v04",
+   "n": 4,
+   "name": "кукурузный стебель",
+   "kind": "corn",
+   "sheet": "plant_v04",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    16
+   ],
+   "flower": "petal_yellow",
+   "top": {
+    "bush": [
+     8,
+     17
+    ],
+    "ripe": [
+     8,
+     7
+    ],
+    "base": [
+     8,
+     7
+    ]
+   },
+   "slot": [
+    0,
+    -7
+   ]
+  },
+  {
+   "id": "v05",
+   "n": 5,
+   "name": "розетка",
+   "kind": "rosette",
+   "sheet": "plant_v05",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    22
+   ],
+   "flower": "petal_pink",
+   "top": {
+    "bush": [
+     8,
+     22.6
+    ],
+    "ripe": [
+     8,
+     20.4
+    ],
+    "base": [
+     8,
+     20.4
+    ]
+   },
+   "slot": [
+    0,
+    6
+   ]
+  },
+  {
+   "id": "v06",
+   "n": 6,
+   "name": "агава",
+   "kind": "spiky",
+   "sheet": "plant_v06",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    22
+   ],
+   "flower": "petal_orange",
+   "top": {
+    "bush": [
+     8,
+     22
+    ],
+    "ripe": [
+     8,
+     16
+    ],
+    "base": [
+     8,
+     16
+    ]
+   },
+   "slot": [
+    0,
+    2
+   ]
+  },
+  {
+   "id": "v07",
+   "n": 7,
+   "name": "лоза",
+   "kind": "vine",
+   "sheet": "plant_v07",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    18
+   ],
+   "flower": "petal_purple",
+   "top": {
+    "bush": [
+     8.5,
+     19
+    ],
+    "ripe": [
+     8.5,
+     10
+    ],
+    "base": [
+     8.5,
+     10
+    ]
+   },
+   "slot": [
+    0,
+    -4
+   ]
+  },
+  {
+   "id": "v08",
+   "n": 8,
+   "name": "саженец",
+   "kind": "tree",
+   "sheet": "plant_v08",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    16
+   ],
+   "flower": "petal_white",
+   "top": {
+    "bush": [
+     8,
+     17
+    ],
+    "ripe": [
+     8,
+     8
+    ],
+    "base": [
+     8,
+     8
+    ]
+   },
+   "slot": [
+    0,
+    -6
+   ]
+  },
+  {
+   "id": "v09",
+   "n": 9,
+   "name": "камыш",
+   "kind": "reed",
+   "sheet": "plant_v09",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    18
+   ],
+   "flower": "cattail",
+   "top": {
+    "bush": [
+     8,
+     19
+    ],
+    "ripe": [
+     8,
+     7
+    ],
+    "base": [
+     8,
+     7
+    ]
+   },
+   "slot": [
+    0,
+    -7
+   ]
+  },
+  {
+   "id": "v10",
+   "n": 10,
+   "name": "лаванда",
+   "kind": "lavender",
+   "sheet": "plant_v10",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    18
+   ],
+   "flower": "petal_purple",
+   "top": {
+    "bush": [
+     8,
+     19
+    ],
+    "ripe": [
+     8,
+     11
+    ],
+    "base": [
+     8,
+     11
+    ]
+   },
+   "slot": [
+    0,
+    -3
+   ]
+  },
+  {
+   "id": "v11",
+   "n": 11,
+   "name": "ромашка",
+   "kind": "daisy",
+   "sheet": "plant_v11",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    20
+   ],
+   "flower": "petal_white",
+   "top": {
+    "bush": [
+     8,
+     20
+    ],
+    "ripe": [
+     8,
+     14
+    ],
+    "base": [
+     8,
+     14
+    ]
+   },
+   "slot": [
+    0,
+    0
+   ]
+  },
+  {
+   "id": "v12",
+   "n": 12,
+   "name": "хоста",
+   "kind": "hosta",
+   "sheet": "plant_v12",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    22
+   ],
+   "flower": "petal_purple",
+   "top": {
+    "bush": [
+     8,
+     22.5
+    ],
+    "ripe": [
+     8,
+     20.5
+    ],
+    "base": [
+     8,
+     20.5
+    ]
+   },
+   "slot": [
+    0,
+    6
+   ]
+  },
+  {
+   "id": "v13",
+   "n": 13,
+   "name": "мята",
+   "kind": "mint",
+   "sheet": "plant_v13",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    18
+   ],
+   "flower": "petal_white",
+   "top": {
+    "bush": [
+     8,
+     19
+    ],
+    "ripe": [
+     8,
+     15
+    ],
+    "base": [
+     8,
+     15
+    ]
+   },
+   "slot": [
+    0,
+    1
+   ]
+  },
+  {
+   "id": "v14",
+   "n": 14,
+   "name": "мак",
+   "kind": "poppy",
+   "sheet": "plant_v14",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    18
+   ],
+   "flower": "petal_red",
+   "top": {
+    "bush": [
+     8,
+     19
+    ],
+    "ripe": [
+     8,
+     11
+    ],
+    "base": [
+     8,
+     11
+    ]
+   },
+   "slot": [
+    0,
+    -3
+   ]
+  },
+  {
+   "id": "v15",
+   "n": 15,
+   "name": "подсолнух",
+   "kind": "sunflower",
+   "sheet": "plant_v15",
+   "size": [
+    16,
+    32
+   ],
+   "anchor": [
+    8,
+    31
+   ],
+   "frames": {
+    "sprout": 0,
+    "bush": 1,
+    "ripe": 2,
+    "base": 3
+   },
+   "bud": [
+    8,
+    16
+   ],
+   "flower": "petal_yellow",
+   "top": {
+    "bush": [
+     8,
+     17
+    ],
+    "ripe": [
+     8,
+     6
+    ],
+    "base": [
+     8,
+     6
+    ]
+   },
+   "slot": [
+    0,
+    -8
+   ]
+  }
+ ],
+ "fruits": [
+  {
+   "id": "strawberry",
+   "sheet": "plant_fruits_1",
+   "frame": 0,
+   "ru": "клубника",
+   "color": "red"
+  },
+  {
+   "id": "tomato",
+   "sheet": "plant_fruits_1",
+   "frame": 1,
+   "ru": "помидор",
+   "color": "red"
+  },
+  {
+   "id": "lemon",
+   "sheet": "plant_fruits_1",
+   "frame": 2,
+   "ru": "лимон",
+   "color": "yellow"
+  },
+  {
+   "id": "corn",
+   "sheet": "plant_fruits_1",
+   "frame": 3,
+   "ru": "кукуруза",
+   "color": "yellow"
+  },
+  {
+   "id": "cucumber",
+   "sheet": "plant_fruits_1",
+   "frame": 4,
+   "ru": "огурец",
+   "color": "green"
+  },
+  {
+   "id": "blueberry",
+   "sheet": "plant_fruits_1",
+   "frame": 5,
+   "ru": "черника",
+   "color": "blue"
+  },
+  {
+   "id": "blackberry",
+   "sheet": "plant_fruits_1",
+   "frame": 6,
+   "ru": "ежевика",
+   "color": "black"
+  },
+  {
+   "id": "raspberry",
+   "sheet": "plant_fruits_1",
+   "frame": 7,
+   "ru": "малина",
+   "color": "pink"
+  },
+  {
+   "id": "eggplant",
+   "sheet": "plant_fruits_1",
+   "frame": 8,
+   "ru": "баклажан",
+   "color": "purple"
+  },
+  {
+   "id": "plum",
+   "sheet": "plant_fruits_1",
+   "frame": 9,
+   "ru": "слива",
+   "color": "purple"
+  },
+  {
+   "id": "carrot",
+   "sheet": "plant_fruits_1",
+   "frame": 10,
+   "ru": "морковь",
+   "color": "orange"
+  },
+  {
+   "id": "pumpkin",
+   "sheet": "plant_fruits_2",
+   "frame": 0,
+   "ru": "тыква",
+   "color": "orange"
+  },
+  {
+   "id": "cauliflower",
+   "sheet": "plant_fruits_2",
+   "frame": 1,
+   "ru": "цветная капуста",
+   "color": "white"
+  },
+  {
+   "id": "radish",
+   "sheet": "plant_fruits_2",
+   "frame": 2,
+   "ru": "редис",
+   "color": "pink"
+  },
+  {
+   "id": "potato",
+   "sheet": "plant_fruits_2",
+   "frame": 3,
+   "ru": "картофель",
+   "color": "brown"
+  },
+  {
+   "id": "mushroom",
+   "sheet": "plant_fruits_2",
+   "frame": 4,
+   "ru": "вёшенка",
+   "color": "gray"
+  }
+ ]
+}

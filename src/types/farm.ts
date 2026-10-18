@@ -92,6 +92,14 @@ export interface FarmApi {
   onChange(fn: () => void): () => void;
 }
 
+/** Вид растения (`systems/plantLook.ts`): мини-предмет на кусте, плод цвета, куст-вариант; фразы и единицы v2 — прежние спрайты. */
+export type PlantLook =
+  | { type: 'object'; icon: string; variant: number }
+  | { type: 'color'; fruit: string; variant: number }
+  | { type: 'plant'; variant: number }
+  | { type: 'phrase' }
+  | { type: 'unit' };
+
 /** Растение на грядке для мира. */
 export interface PlantView {
   slot: number;
@@ -102,6 +110,8 @@ export interface PlantView {
   stage: Stage;
   drops: number;
   phrase: boolean;
+  /** Вид по слову (нет — прежние общие спрайты). */
+  look?: PlantLook;
 }
 
 /** Действие героя во время мини-игры (очередь автобега). */

@@ -28,6 +28,7 @@ import {
   type GardenSave,
   type GardenState,
 } from './garden';
+import { lookOf } from './plantLook';
 import { canAssemble, grade, makeQuestion, type Question } from './quiz';
 import { BASE, SUB_COUNT, THRESHOLDS, pathOf, pointsOf, type PathInfo } from './xp';
 
@@ -139,7 +140,7 @@ export function createFarm(d: FarmDeps): Farm {
       if (!it || !cell) continue;
       const stage = stageOf(it, now);
       if (!stage) continue;
-      out.push({ slot, tile: [cell[0], cell[1]], id, label: plOf(id), stage, drops: it.drops, phrase: it.phrase });
+      out.push({ slot, tile: [cell[0], cell[1]], id, label: plOf(id), stage, drops: it.drops, phrase: it.phrase, look: lookOf(id, WORD_BY_ID.get(id)) });
     }
     return out.sort((a, b) => a.slot - b.slot);
   };
