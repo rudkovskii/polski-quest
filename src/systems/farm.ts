@@ -1,9 +1,10 @@
 // Ферма целиком: модель огорода + база A1 + шина. Реализует FarmApi для экранов и даёт мини-игре задания и ответы.
 // Хранилище, часы и озвучку подставляет склейка (main.ts): здесь нет браузера.
 import type { BusEvents } from '../types/bus';
-import type { FarmAct, FarmApi, FarmStats, GameMode, ItemInfo, PhraseHint, PlantView } from '../types/farm';
+import type { CustomAdd, CustomApi, FarmAct, FarmApi, FarmStats, GameMode, ItemInfo, PhraseHint, PlantView } from '../types/farm';
 import type { Bus } from './bus';
-import { ALL_WORDS, PHRASES, PHRASE_BY_ID, TOPICS, WORD_BY_ID, isA1, isPhraseId, plOf } from './content';
+import { ALL_WORDS, BASE_WORDS, PHRASES, PHRASE_BY_ID, TOPICS, WORD_BY_ID, isA1, isPhraseId, plOf, setCustomWords } from './content';
+import { CUSTOM_LIMIT, MAX_EX, MAX_PL, MAX_RU, baseMatches, cleanLine, customId, forgetItem, isCustomId, normalizeCustom, type CustomWord } from './customWords';
 import {
   PLOT_CELLS,
   TIER_CAP,
@@ -40,6 +41,8 @@ export interface FarmDeps {
   tz(t: number): number;
   say(id: string, slow?: boolean): void;
   rand?: () => number;
+  /** Свои слова (`Save.custom`). Нет — своих слов не бывает (тесты). */
+  customs?: { load(): CustomWord[]; save(list: CustomWord[]): void };
 }
 
 export interface AnswerOut {
@@ -90,6 +93,11 @@ const STAGE_RANK: Record<string, number> = { seed: 0, sprout: 1, bush: 2, overri
 export function createFarm(d: FarmDeps): Farm {
   const rand = d.rand ?? Math.random;
   let g: GardenSave = d.load();
+  // Свои слова: в реестр содержимого до первого расчёта (иначе их растения остались бы без слова).
+  let customs: CustomWord[] = normalizeCustom(d.customs?.load());
+  setCustomWords(customs);
+  // Растения своих слов, которых нет в сохранении (битый импорт): убираем, чтобы задание не вышло без слова.
+  for (const id of new Set([...g.planted.map((p) => p.id), ...g.log.map((a) => a.id)])) if (isCustomId(id) && !WORD_BY_ID.has(id)) g = forgetItem(g, id);
   let st: GardenState = derive(g);
   /** Последние показанные id: основа правила «не повторять чаще, чем раз в N заданий». */
   const recent: string[] = [];
@@ -206,7 +214,66 @@ export function createFarm(d: FarmDeps): Farm {
     return w ? { pl: w.pl, ru: w.ru, tr: w.tr } : { pl: id, ru: '', tr: '' };
   };
 
+  const custom: CustomApi = {
+    list: () => ALL_WORDS.filter((w) => isCustomId(w.id)),
+    add(input): CustomAdd {
+      const pl = cleanLine(input.pl, MAX_PL);
+      const ru = cleanLine(input.ru, MAX_RU);
+      if (!pl || !ru) return { ok: false, reason: 'empty' };
+      const id = customId(pl, ru, customs);
+      if (customs.some((c) => c.id === id)) return { ok: true, id, existed: true };
+      if (customs.length >= CUSTOM_LIMIT) return { ok: false, reason: 'limit' };
+      const exPl = cleanLine(input.ex?.pl, MAX_EX);
+      const c: CustomWord = {
+        id,
+        pl,
+        ru,
+        pos: input.pos ?? (pl.includes(' ') ? 'phrase' : 'noun'),
+        ...(input.gender ? { gender: input.gender } : {}),
+        ...(exPl ? { ex: { pl: exPl, ru: cleanLine(input.ex?.ru, MAX_EX) } } : {}),
+        added: d.now(),
+      };
+      saveCustoms([...customs, c]);
+      return { ok: true, id, existed: false };
+    },
+    update(id, patch) {
+      const c = customs.find((x) => x.id === id);
+      if (!c) return false;
+      const pl = patch.pl === undefined ? c.pl : cleanLine(patch.pl, MAX_PL);
+      const ru = patch.ru === undefined ? c.ru : cleanLine(patch.ru, MAX_RU);
+      if (!pl || !ru) return false;
+      const exPl = patch.ex === undefined ? (c.ex?.pl ?? '') : cleanLine(patch.ex?.pl, MAX_EX);
+      const exRu = patch.ex === undefined ? (c.ex?.ru ?? '') : cleanLine(patch.ex?.ru, MAX_EX);
+      const { ex: _drop, ...rest } = c;
+      saveCustoms(customs.map((x) => (x.id === id ? { ...rest, pl, ru, ...(exPl ? { ex: { pl: exPl, ru: exRu } } : {}) } : x)));
+      return true;
+    },
+    remove(id) {
+      if (!customs.some((x) => x.id === id)) return false;
+      const now = d.now();
+      const left = forgetItem(g, id);
+      st = derive(left);
+      g = syncSlots(left, st, now);
+      customs = customs.filter((x) => x.id !== id);
+      setCustomWords(customs);
+      d.customs?.save(customs);
+      emitPlants();
+      emitXp();
+      changed();
+      return true;
+    },
+    base: (...ru) => baseMatches(BASE_WORDS, ...ru),
+  };
+  /** Записать список своих слов: реестр содержимого, сохранение, оповестить экраны. */
+  function saveCustoms(list: CustomWord[]): void {
+    customs = list;
+    setCustomWords(customs);
+    d.customs?.save(customs);
+    for (const fn of [...listeners]) fn();
+  }
+
   const farm: Farm = {
+    custom,
     words: ALL_WORDS,
     phrases: PHRASES,
     topics: TOPICS,

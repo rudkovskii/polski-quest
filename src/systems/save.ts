@@ -1,6 +1,7 @@
 // Модель сохранения «Фермы»: одна запись (позиция героя, настройки) плюс экспорт и импорт файлом.
 // Чистые функции без браузера. v2 (F-03): огород — посадки, журнал ответов, раскладка по грядкам (systems/garden.ts).
 import type { Dir } from '../types/input';
+import { normalizeCustom, type CustomWord } from './customWords';
 import { newGarden, normalizeGarden, type GardenSave } from './garden';
 import { MUSIC_DEFAULT, normalizeMusic, type MusicSettings } from './musicSettings';
 import { newPolskaSave, normalizePolska, type PolskaSave } from './polska';
@@ -38,12 +39,14 @@ export interface Save {
   garden: GardenSave;
   /** v3: огород игр о Польше (единицы geo/hymn/symbol/date/holiday), отдельно от огорода слов. */
   polska: PolskaSave;
+  /** Свои слова («Moje słowa», `w.custom.<хеш>`): растут в `garden` как обычные, в путь к A1 не входят. Старые сохранения читаются как пустой список. */
+  custom: CustomWord[];
   /** Подсказки-пузыри, которые уже показаны (по `use` объекта: desk, board, bin). Каждая показывается один раз. */
   hints: string[];
 }
 
 export function newSave(now: number): Save {
-  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT, music: { ...MUSIC_DEFAULT } }, garden: newGarden(), polska: newPolskaSave(), hints: [] };
+  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT, music: { ...MUSIC_DEFAULT } }, garden: newGarden(), polska: newPolskaSave(), custom: [], hints: [] };
 }
 
 const DIRS: readonly Dir[] = ['up', 'down', 'left', 'right'];
@@ -70,6 +73,7 @@ export function normalizeSave(raw: unknown): Save | null {
     settings: { sound: st.sound !== false, sfxVolume: isNum(st.sfxVolume) ? Math.min(100, Math.max(0, Math.round(st.sfxVolume))) : SFX_VOLUME_DEFAULT, music: normalizeMusic(st.music) },
     garden: normalizeGarden(r.garden),
     polska: normalizePolska(r.polska),
+    custom: normalizeCustom(r.custom),
     hints: Array.isArray(r.hints) ? [...new Set(r.hints.filter((h): h is string => typeof h === 'string'))].slice(0, 32) : [],
   };
 }
