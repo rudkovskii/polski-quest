@@ -73,6 +73,17 @@ export function crc32(s: string): number {
 
 const stem = (tok: string): string => tok.slice(0, Math.max(3, tok.length - 2));
 
+/** Основа русской подписи мини-предмета → иконка (только однословные подписи без «(категория)»; первая выигрывает). */
+const ICON_BY_RU: ReadonlyMap<string, string> = (() => {
+  const m = new Map<string, string>();
+  for (const [name, meta] of Object.entries(ICONS)) {
+    const ru = (meta as IconMeta & { ru?: string }).ru ?? '';
+    if (name.startsWith('cat_') || ru.includes('(')) continue;
+    for (const alt of ru.split('/').map((x) => x.trim().toLowerCase())) if (/^[а-яё-]{4,}$/.test(alt) && !m.has(stem(alt))) m.set(stem(alt), name);
+  }
+  return m;
+})();
+
 function ruTokens(ru: string): string[] {
   const clean = ru.toLowerCase().replace(/\([^)]*\)/g, ' ');
   return clean.split(/[^а-яёa-z-]+/).filter((t) => t.length >= 3);
@@ -109,6 +120,11 @@ export function resolveWord(id: string, w: LookWord): PlantLook {
   if (lemma) return obj(lemma);
   for (const t of ruTokens(ru).slice(0, 2)) {
     const hit = Object.hasOwn(RULES.ru_stems, stem(t)) ? RULES.ru_stems[stem(t)] : undefined;
+    if (hit) return obj(hit);
+  }
+  // Свои слова Шэфа: перевод совпал с подписью мини-предмета («пельмени» → dumpling «пельмени / вареники»).
+  for (const t of ruTokens(ru).slice(0, 2)) {
+    const hit = ICON_BY_RU.get(stem(t));
     if (hit) return obj(hit);
   }
   const byTopic = w.topic ? RULES.topic_category[w.topic] : undefined;

@@ -219,3 +219,12 @@ describe('строка итога Daty', () => {
     expect(nearestDateLine(ctx(2026, 12, 20))).toMatch(/^Najbliższa data: \d+\.0[1-3] /);
   });
 });
+
+describe('свои слова × вид растения', () => {
+  it('«пельмени» растёт пельменем (подпись мини-предмета), «вдохновение» — общим предметом; в банке тот же значок', async () => {
+    const { lookOf, framesOf } = await import('../src/systems/plantLook');
+    expect(lookOf('w.custom.x1', { pl: 'pielmienie', ru: 'пельмени', pos: 'noun' })).toMatchObject({ type: 'object', icon: 'dumpling' });
+    expect(lookOf('w.custom.x2', { pl: 'inspiracja', ru: 'вдохновение', pos: 'noun' })).toMatchObject({ type: 'object', icon: 'cat_misc' });
+    expect(framesOf(lookOf('w.custom.x1', { pl: 'pielmienie', ru: 'пельмени', pos: 'noun' })).held).toBe(plantIconFrame('dumpling'));
+  });
+});

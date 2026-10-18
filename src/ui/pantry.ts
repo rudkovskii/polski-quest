@@ -1,5 +1,7 @@
 // Spiżarnia · Кладовая: полка с банками по темам. Банка наполнена по доле собранного, тап открывает слова темы.
 import type { Bus } from '../systems/bus';
+import { framesOf, lookOf } from '../systems/plantLook';
+import { atlasIcon } from './atlasIcon';
 import type { BusEvents } from '../types/bus';
 import type { FarmApi } from '../types/farm';
 import { el } from './dom';
@@ -24,6 +26,7 @@ ${TIP_CSS}
 .pantry-list { display: flex; flex-direction: column; gap: 5px; }
 .pantry-item { display: flex; align-items: center; gap: 8px; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 6px; padding: 6px 8px; }
 .pantry-item .txt { flex: 1 1 auto; min-width: 0; }
+.pantry-item .pq-aico { margin: -2px 0; }
 .pantry-item .pl { font-size: 19px; font-weight: 700; overflow-wrap: anywhere; }
 .pantry-item .ru { font-size: 14px; opacity: .8; overflow-wrap: anywhere; }
 .pantry-item .over { font-size: 12px; color: #a8453a; font-weight: 600; }
@@ -34,6 +37,13 @@ export interface PantryScreen {
   open(): void;
   close(): void;
   readonly isOpen: boolean;
+}
+
+/** Мини-предмет слова в банке (тот же, что рос на кусте: машинка, ягода); у куста и фразы — ничего. */
+function itemIcon(id: string, item: { pl: string; ru?: string; pos?: string; topic?: string } | undefined): HTMLElement | null {
+  if (!item) return null;
+  const held = framesOf(lookOf(id, item)).held;
+  return held ? atlasIcon(held, 2) : null;
 }
 
 export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips): PantryScreen {
@@ -102,6 +112,7 @@ export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEven
       return el(
         'div',
         { class: 'pantry-item', 'data-id': id },
+        itemIcon(id, item),
         el('div', { class: 'txt' }, el('div', { class: 'pl' }, item?.pl ?? id), el('div', { class: 'ru' }, item?.ru ?? ''), over ? el('div', { class: 'over' }, 'перезрело, на грядке') : null),
         el('button', { type: 'button', class: 'pq-btn small', 'aria-label': 'Озвучить', ...nav('items', 'v', `say:${id}`), onclick: () => api.say(id) }, '▶'),
       );

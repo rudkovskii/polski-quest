@@ -208,6 +208,13 @@ export function createCustomPane(o: CustomPaneOpts): CustomPane {
     const say1 = el('button', { type: 'button', class: 'pq-btn small', 'data-cw-say': '', 'aria-label': 'Озвучить', ...nav('cw', 'v', 'cw:say'), onclick: () => api.say(id) }, '▶');
     input.value = '';
     draw(say([el('strong', {}, '✓ '), el('strong', { 'data-cw-done': id }, pl), ` — ${ru}. ${line} `, say1], 'cw-msg ok'), el('div', { class: 'cw-lead' }, 'Напиши следующее слово.'));
+    focusAsk();
+  }
+
+  /** «Напиши следующее слово»: курсор обратно в поле (с клавиатурой; на касании — нет, чтобы экранная клавиатура не выскакивала сама). */
+  function focusAsk(): void {
+    if (root.closest('.pq-panel')?.classList.contains('touch')) return;
+    input.focus({ preventScroll: true });
   }
 
   // ---- поиск
@@ -252,6 +259,7 @@ export function createCustomPane(o: CustomPaneOpts): CustomPane {
   function showBase(w: Word, line: string): void {
     draw(say([el('strong', {}, '✓ '), el('strong', { 'data-cw-done': w.id }, w.pl), ` — ${w.ru}. ${line} `], 'cw-msg ok'), el('div', { class: 'cw-lead' }, 'Напиши следующее слово.'));
     input.value = '';
+    focusAsk();
   }
 
   const manualBtn = (label: string, init: FormInit): HTMLElement =>
