@@ -8,6 +8,8 @@ import { V2 } from '../src/systems/v2content';
 import { getMap, withDecor } from '../src/world/maps';
 import type { BusEvents } from '../src/types/bus';
 import type { GameTask, PolskaGame } from '../src/types/polska';
+import type { Question } from '../src/systems/quiz';
+import { mountMinigame, NEXT_DELAY_MS } from '../src/ui/minigame';
 import { AUTO_NEXT_MS, mountPolskaGame } from '../src/ui/polskaGame';
 import { ROUND_SIZE } from '../src/ui/roundSummary';
 import { seeded, testBus } from './helpers';
@@ -167,5 +169,26 @@ describe('украшения мира к датам (swieta.json:decor)', () => 
     const nov1 = withDecor(farm, new Set(on(2026, 11, 1)));
     expect(nov1.objects.filter((o) => o.type === 'prop' && o.decor === 'dec.znicze')).toHaveLength(3);
     expect(withDecor(getMap('home'), new Set(on(2026, 12, 25))).objects.some((o) => o.type === 'prop' && o.id === 'decor_choinka')).toBe(true);
+  });
+});
+
+describe('мини-игры v1: поливать нечего посреди раунда', () => {
+  it('после 3 ответов вопросы кончились: итог раунда «3 / 3» с подсказкой, а не пустой лист «10 / 10»', () => {
+    vi.useFakeTimers();
+    const bus = testBus();
+    const root = document.createElement('div');
+    let left = 3;
+    const q: Question = { mode: 1, id: 'w.kot', kind: 'choice', prompt: 'kot', promptLang: 'pl', options: ['собака', 'кот', 'дом', 'мама'], answer: 'кот' };
+    const g = mountMinigame(root, { bus, next: () => (left-- > 0 ? q : null), answer: () => ({ ok: true, correct: 'кот', pl: 'kot', ru: 'кот', tr: 'кот', act: { kind: 'water', xp: 1 } }), say: () => {} });
+    g.start(1);
+    for (let i = 0; i < 3; i++) {
+      root.querySelector<HTMLElement>('[data-opt="кот"]')!.click();
+      vi.advanceTimersByTime(NEXT_DELAY_MS + 1);
+      root.querySelector<HTMLElement>('[data-next]')?.click();
+    }
+    expect(root.querySelector('[data-round-summary]')).not.toBeNull();
+    expect(root.querySelector('[data-sum-note]')).not.toBeNull();
+    expect(root.querySelector('[data-round-no]')!.textContent).toBe(`3 / ${ROUND_SIZE}`);
+    g.stop();
   });
 });

@@ -150,7 +150,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   };
   const paintRound = (): void => {
     roundNo.hidden = !!only;
-    const shown = summaryOpen ? ROUND_SIZE : Math.min(ROUND_SIZE, round.count + (answered ? 0 : 1));
+    const shown = summaryOpen ? round.count : Math.min(ROUND_SIZE, round.count + (answered ? 0 : 1));
     roundNo.textContent = `${shown} / ${ROUND_SIZE}`;
   };
   const reportHeight = (): void => {

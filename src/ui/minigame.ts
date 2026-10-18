@@ -219,7 +219,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   /** «3 / 10»: номер текущего задания; после ответа остаётся тем же. В одиночном повторе растения счётчика нет. */
   const paintRound = (): void => {
     roundNo.hidden = !!only;
-    const shown = summaryOpen ? ROUND_SIZE : Math.min(ROUND_SIZE, round.count + (answered ? 0 : 1));
+    const shown = summaryOpen ? round.count : Math.min(ROUND_SIZE, round.count + (answered ? 0 : 1));
     roundNo.textContent = `${shown} / ${ROUND_SIZE}`;
   };
   const reportHeight = (): void => {
@@ -403,17 +403,24 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       return;
     }
     q = deps.next(mode, only);
+    // Поливать больше нечего, а ответы в раунде уже были: итог раунда вместо пустого «Пока нечего поливать» со счётчиком «10 / 10».
+    if (!q && !only && round.count > 0) {
+      showSummary('Сегодня в этой игре больше нечего поливать · посади ещё слов в словаре дома');
+      return;
+    }
     render();
   };
 
-  const showSummary = (): void => {
+  const showSummary = (note?: string): void => {
     clearTimer();
     detachKb();
     summaryOpen = true;
     answered = true;
     q = null;
     paper.classList.remove('ok', 'bad');
-    paper.replaceChildren(renderRoundSummary(roundN, round.stats));
+    const card = renderRoundSummary(roundN, round.stats);
+    if (note) card.append(el('div', { class: 'pq-sum-note', 'data-sum-note': '', style: 'margin-top:8px;font-size:14px;font-weight:600;text-align:center' }, note));
+    paper.replaceChildren(card);
     paper.scrollTop = 0;
     rev.hidden = true;
     const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, 'Ещё раунд');
