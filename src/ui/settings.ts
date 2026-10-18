@@ -38,6 +38,10 @@ export interface SettingsDeps {
   importSave(text: string): Promise<{ ok: boolean; message: string }>;
   /** Сброс: автоэкспорт, стирание, перезагрузка. */
   reset(): Promise<void>;
+  /** Когда сохранение последний раз записано (мс); null — пока не писали. Показывается как «Последнее сохранение: ЧЧ:ММ». */
+  lastSaved?(): number | null;
+  /** Копию давно не скачивали (раз в 7 дней): в панели подсказка у «Экспорта». */
+  backupDue?(): boolean;
   /** Звук выключен ссылкой (`?mute=1`): переключатель показывает «Выкл» и не работает. */
   muted?: boolean;
   /** Версия сборки (`0.2.0+abc1234`) и профиль (`?dev=<id>`) — мелко внизу панели. */
@@ -55,6 +59,13 @@ export interface SettingsPanel {
 export function mountSettings(parent: HTMLElement, deps: SettingsDeps): SettingsPanel {
   const bus = deps.bus ?? globalBus;
   const note = el('div', { class: 'note', 'data-note': '', role: 'status' });
+  const savedLine = el('div', { class: 'note', 'data-last-saved': '' });
+  const paintSaved = (): void => {
+    const t = deps.lastSaved?.() ?? null;
+    const hhmm = t === null ? '—' : new Date(t).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    savedLine.textContent = `Последнее сохранение: ${hhmm}`;
+    if (deps.backupDue?.()) note.textContent = 'Копию не скачивали больше недели: нажми «Экспорт сохранения».';
+  };
   const sound = el('button', { type: 'button', class: 'pq-btn pq-toggle', 'aria-pressed': String(deps.getSound()) });
   const paintSound = (): void => {
     const on = !deps.muted && deps.getSound();
@@ -113,6 +124,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     el('h2', {}, 'Настройки'),
     el('div', { class: 'row' }, el('span', {}, 'Звук'), sound),
     el('label', { class: 'pq-vol' }, el('span', {}, 'Громкость эффектов'), vol, volOut),
+    savedLine,
     el('button', { type: 'button', class: 'pq-btn', 'data-export': '', onclick: () => (note.textContent = `Сохранено: ${deps.exportSave()}`) }, 'Экспорт сохранения'),
     el('button', { type: 'button', class: 'pq-btn', 'data-import': '', onclick: () => file.click() }, 'Импорт сохранения'),
     file,
@@ -138,6 +150,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
       reset.textContent = 'Сбросить игру';
       reset.disabled = false;
       note.textContent = '';
+      paintSaved();
       paintSound();
       paintVol();
       root.hidden = false;
