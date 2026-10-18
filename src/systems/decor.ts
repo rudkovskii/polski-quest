@@ -5,7 +5,8 @@ export interface DecorDef {
   id: string;
   /** Праздник или дата, к которой украшение (для подписи и тестов). */
   for: string;
-  window: { rule: 'fixed'; from: string; to: string } | { rule: 'easter'; from: number; to: number };
+  /** Окно дат из поля `window` данных: фиксированное «MM-DD → MM-DD» или дни от Пасхи. */
+  span: { rule: 'fixed'; from: string; to: string } | { rule: 'easter'; from: number; to: number };
   where: string;
   sprite: string;
 }
@@ -40,7 +41,7 @@ const mmdd = (s: string): [number, number] => {
 /** Активно ли украшение в этот день. Окно «12-24 → 01-06» переходит через Новый год. */
 export function decorActive(def: DecorDef, y: number, m: number, d: number): boolean {
   const today = dayNum(y, m, d);
-  const w = def.window;
+  const w = def.span;
   if (w.rule === 'easter') {
     const e = easterNum(y);
     return today >= e + w.from && today <= e + w.to;
@@ -59,10 +60,10 @@ export function parseDecor(raw: unknown): DecorDef[] {
   const out: DecorDef[] = [];
   for (const x of raw) {
     const o = x as Record<string, unknown>;
-    const w = (o.window ?? {}) as Record<string, unknown>;
+    const w = (o['window'] ?? {}) as Record<string, unknown>;
     if (typeof o.id !== 'string' || typeof o.sprite !== 'string') continue;
-    if (w.rule === 'easter' && typeof w.from === 'number' && typeof w.to === 'number') out.push({ id: o.id, for: String(o.for ?? ''), where: String(o.where ?? ''), sprite: o.sprite, window: { rule: 'easter', from: w.from, to: w.to } });
-    else if (w.rule === 'fixed' && typeof w.from === 'string' && typeof w.to === 'string') out.push({ id: o.id, for: String(o.for ?? ''), where: String(o.where ?? ''), sprite: o.sprite, window: { rule: 'fixed', from: w.from, to: w.to } });
+    if (w.rule === 'easter' && typeof w.from === 'number' && typeof w.to === 'number') out.push({ id: o.id, for: String(o.for ?? ''), where: String(o.where ?? ''), sprite: o.sprite, span: { rule: 'easter', from: w.from, to: w.to } });
+    else if (w.rule === 'fixed' && typeof w.from === 'string' && typeof w.to === 'string') out.push({ id: o.id, for: String(o.for ?? ''), where: String(o.where ?? ''), sprite: o.sprite, span: { rule: 'fixed', from: w.from, to: w.to } });
   }
   return out;
 }
