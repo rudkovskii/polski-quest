@@ -42,6 +42,24 @@ const css = `
 .hy-pick.sel { background: #f2dcae; outline: 3px solid var(--pq-accent); outline-offset: -1px; }
 .hy-pick .sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--pq-ink); flex: 0 0 auto; }
 .hy-shield { flex: 0 0 auto; }
+@media (max-width: 520px), (max-height: 860px) {
+  .hy-flagbox { gap: 8px; align-items: flex-start; }
+  .hy-flag { width: 72px; height: 45px; }
+  .hy-shield { width: 52px; height: 61px; }
+  .hy-rows { flex: 1 1 100%; gap: 4px; }
+  .hy-row { display: grid; grid-template-columns: 44px repeat(var(--n, 4), minmax(0, 1fr)); gap: 4px; }
+  .hy-row .lbl { font-size: 12px; }
+  .hy-pick { justify-content: center; gap: 4px; padding: 6px 3px; font-size: 13px; min-width: 0; overflow: hidden; white-space: nowrap; }
+  .hy-row[data-n="4"] .hy-pick { flex-direction: column; gap: 2px; padding: 3px 2px; font-size: 12px; }
+  .hy-strip { height: 50px; }
+  .hy-wrap { gap: 6px; }
+  .hy-bar { flex-wrap: nowrap; gap: 6px; }
+  .hy-bar .pq-btn { flex: 0 0 auto; padding: 4px 8px; }
+  .hy-bar .hy-quiet { flex: 1 1 auto; min-width: 0; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hy-wrap .pq-opts.three { grid-auto-rows: 46px; }
+  .hy-slots { min-height: 34px; }
+  .hy-slot { font-size: 16px; padding: 3px 8px; }
+}
 `;
 
 const COLOR: Record<string, string> = {
@@ -183,7 +201,7 @@ function renderKaraoke(task: HymnTask, panel: GamePanel): void {
 const rowsOf = (wrap: HTMLElement, defs: { key: string; label: string; options: string[] }[], sel: Record<string, string>, onChange: () => void): void => {
   const box = el('div', { class: 'hy-rows' });
   for (const d of defs) {
-    const row = el('div', { class: 'hy-row', 'data-row': d.key }, el('span', { class: 'lbl' }, d.label));
+    const row = el('div', { class: 'hy-row', 'data-row': d.key, 'data-n': String(d.options.length), style: `--n:${d.options.length}` }, el('span', { class: 'lbl' }, d.label));
     for (const o of d.options) {
       const b = el(
         'button',

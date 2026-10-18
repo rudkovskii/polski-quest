@@ -53,6 +53,17 @@ bus.on('polska:plots', (p) => {
   if (p.entries) entries = p.entries;
 });
 
+/** Обход после игры во весь экран (ТЗ v2 §1): не больше стольких объектов и столько мс; ручной ввод прерывает. */
+export const TOUR_MAX = 4;
+export const TOUR_MS = 5000;
+/** Отложенный обход: ждёт входа героя в Zagroda (переживает смену сцены). */
+let tour: string[] = [];
+bus.on('polska:tour', ({ objs }) => {
+  tour = [...new Set(objs)].slice(0, TOUR_MAX);
+});
+/** Есть ли отложенный обход (для «Na pole!»: сцена ведёт героя к калитке). */
+export const tourPending = (): boolean => tour.length > 0;
+
 const frameOf = (sprites: Sprites, name: string, i: number): string | null => {
   const f = sprites[name]?.frames;
   return f?.length ? (f[Math.max(0, Math.min(i, f.length - 1))] ?? null) : null;
@@ -82,6 +93,8 @@ export class ZagrodaLayer {
   private walked = '';
   /** Подсолнухи на грядках месяцев (до 3 на грядку, по числу посаженных дат). */
   private flowers = new Map<string, Phaser.GameObjects.Image[]>();
+  /** Идёт обход: к какому объекту идём и когда обход кончится (время сцены). */
+  private touring: { obj: string; until: number } | null = null;
 
   constructor(private h: ZagrodaHost) {
     this.apply(views);
@@ -92,7 +105,13 @@ export class ZagrodaLayer {
   }
 
   get auto(): boolean {
-    return auto;
+    return auto || !!this.touring;
+  }
+
+  /** Игрок сам пошёл: обход прерывается (оставшееся не «поливаем»). */
+  cancelTour(): void {
+    tour = [];
+    this.touring = null;
   }
 
   dispose(): void {
@@ -145,6 +164,19 @@ export class ZagrodaLayer {
     this.flowers.set(v.obj, list);
   }
 
+  /** Искры над объектом (кадр `fx_spark`); у тихого урожая — нет. */
+  private burst(s: Phaser.GameObjects.Sprite): void {
+    const f = this.frame('fx_spark');
+    const cx = s.x;
+    const cy = s.y - s.displayHeight * s.originY + 6;
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 + 0.4;
+      const o = f ? this.h.scene.add.sprite(cx, cy, ATLAS, f) : this.h.scene.add.rectangle(cx, cy, 2, 2, 0xf2d552);
+      o.setDepth(20_000);
+      this.h.scene.tweens.add({ targets: o, x: cx + Math.cos(a) * 12, y: cy + Math.sin(a) * 9 - 4, alpha: 0, duration: 460, ease: 'Quad.easeOut', onComplete: () => o.destroy() });
+    }
+  }
+
   private act(a: BusEvents['polska:act']): void {
     if (!a.obj) return;
     const o = this.h.model.object(`prop:${a.obj}`);
@@ -156,15 +188,20 @@ export class ZagrodaLayer {
       return;
     }
     if (a.xp > 0) bus.emit('fx:float', { x: p.x, y: p.y, text: `+${a.xp}`, kind: 'xp' });
-    if (a.kind !== 'water') bus.emit('fx:sfx', { name: a.kind === 'harvest' ? 'plim' : 'grow' });
-    else bus.emit('fx:sfx', { name: 'water' });
+    // Тяжёлые даты (`harvest: quiet` в daty.json): без «плим» и искр, только тихий полив.
+    if (a.kind === 'water' || a.quiet) bus.emit('fx:sfx', { name: 'water' });
+    else {
+      bus.emit('fx:sfx', { name: a.kind === 'harvest' ? 'plim' : 'grow' });
+      this.burst(s);
+    }
     const y0 = s.y;
     this.h.scene.tweens.add({ targets: s, y: y0 - 2, duration: 90, yoyo: true, onComplete: () => s.setY(y0) });
   }
 
   /** Автобег: во время игры (нижняя панель) герой идёт к объекту текущего задания и смотрит на него. */
-  update(): void {
+  update(time = 0): void {
     const m = this.h.model;
+    if (!auto && this.tourStep(time)) return;
     m.speed = auto ? 1.5 : 1;
     if (!auto || !focus.obj || m.busy) return;
     const o = m.object(`prop:${focus.obj}`);
@@ -174,5 +211,46 @@ export class ZagrodaLayer {
       this.walked = key;
       m.walkNear(o.at, o.rects.length ? o.rects : [[o.at[0], o.at[1], o.size[0], o.size[1]]]);
     } else m.faceTile(o.at);
+  }
+
+  /** Отложенный обход: герой по очереди подходит к подросшим объектам и «поливает» их (искры, звук). true — обход идёт. */
+  private tourStep(time: number): boolean {
+    const m = this.h.model;
+    if (!this.touring && !tour.length) return false;
+    if (this.touring && time > this.touring.until) {
+      this.cancelTour();
+      return false;
+    }
+    if (m.busy) return true;
+    if (this.touring?.obj) {
+      // Дошли: полить и к следующему.
+      const done = this.touring.obj;
+      const o = m.object(`prop:${done}`);
+      const sp = this.h.props.get(`prop:${done}`);
+      if (o) m.faceTile(o.at);
+      if (sp) {
+        bus.emit('fx:sfx', { name: 'water' });
+        this.burst(sp);
+        const y0 = sp.y;
+        this.h.scene.tweens.add({ targets: sp, y: y0 - 2, duration: 90, yoyo: true, onComplete: () => sp.setY(y0) });
+      }
+      this.touring = { obj: '', until: this.touring.until };
+      return true;
+    }
+    const next = tour.shift();
+    if (!next) {
+      this.touring = null;
+      return false;
+    }
+    const o = m.object(`prop:${next}`);
+    const until = this.touring?.until ?? time + TOUR_MS;
+    if (!o) {
+      this.touring = { obj: '', until };
+      return true;
+    }
+    m.speed = 1.5;
+    m.walkNear(o.at, o.rects.length ? o.rects : [[o.at[0], o.at[1], o.size[0], o.size[1]]]);
+    this.touring = { obj: next, until };
+    return true;
   }
 }

@@ -36,6 +36,8 @@ const TILES_H = 210;
 /** Запас на строку результата движка (`.fb`), которая появляется под листом после ответа. */
 const FB_H = 100;
 const SIDE_W = 262;
+/** Сколько зелёный флажок виден после анимации, прежде чем движок листает дальше. */
+export const SUCCESS_SHOW_MS = 800;
 
 /** Порядок посадки: по полосам, внутри полосы виды чередуются (город, река, сосед, гора…), чтобы первые 8 семян были разными. */
 export function geoPool(ctx: GameCtx): readonly string[] {
@@ -112,7 +114,9 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
   const celebrate = (ok: boolean, at: Pt = here): void => {
     if (map.scale === 0) return;
     map.reveal(task.reveal);
-    map.plant(at, ok);
+    // Верный ответ: движок ждёт, пока герой добежит и зелёный флажок постоит ~0,8 с (иначе следующее задание его закрывает).
+    const ms = map.plant(at, ok);
+    if (ok) panel.hold?.(ms + SUCCESS_SHOW_MS);
   };
   const wrapped: GamePanel = {
     body: panel.body,
@@ -137,6 +141,7 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
         map.plant(p, ok, () => {
           map.reveal(task.reveal);
           panel.submit(p);
+          if (ok) panel.hold?.(SUCCESS_SHOW_MS);
         });
       };
       map.onPick = (p) => {

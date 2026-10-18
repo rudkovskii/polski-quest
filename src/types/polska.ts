@@ -80,6 +80,8 @@ export interface GamePanel {
   submit(answer: unknown): void;
   say(text: string, slow?: boolean): void;
   rand(): number;
+  /** Задержать автопереход после верного ответа хотя бы на `ms` (в игре ещё идёт анимация: флажок, обводка). Звать после `submit`. */
+  hold?(ms: number): void;
 }
 
 /** Контекст игры: её единицы, состояние, часы (реальная дата для «сегодня» и сезона). */
@@ -117,6 +119,8 @@ export interface PolskaGame<T extends GameTask = GameTask> {
   nextTask(ctx: GameCtx, want: Want): T | null;
   render(task: T, panel: GamePanel, ctx: GameCtx): void;
   check(task: T, answer: unknown, ctx: GameCtx): GameCheck;
+  /** Строка в итоге раунда («Najbliższe święto: Wigilia za 3 dni»); null — без строки. */
+  summaryLine?(ctx: GameCtx): string | null;
 }
 
 /** Вид объекта на участке Zagroda по прогрессу (для сцены). */

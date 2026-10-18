@@ -60,6 +60,11 @@ let polskaGo: string | null = null;
 bus.on('world:goto', ({ use }) => {
   pendingGoto = use;
 });
+/** «Na pole!» после игры во весь экран: герой сам идёт в Zagroda (через двери), там обход (`ZagrodaLayer`). */
+const TOUR_GOTO = '@zagroda';
+bus.on('polska:tour', ({ go }) => {
+  if (go) pendingGoto = TOUR_GOTO;
+});
 bus.on('polska:auto', ({ on, layout, plot }) => {
   polskaGo = on && layout === 'panel' ? (plot ?? 'from_farm') : null;
 });
@@ -154,6 +159,7 @@ export class World extends Phaser.Scene {
     this.farm = this.mapDef.id === 'farm' ? new FarmLayer({ scene: this, model: this.model, sprites: this.sprites, hero: this.hero, soil: (c) => this.soil(c), toScreen: (x, y) => this.toScreen(x, y), inputOn: () => this.inputOn }) : null;
     this.zagroda = this.mapDef.id === 'zagroda' ? new ZagrodaLayer({ scene: this, model: this.model, sprites: this.sprites, props: this.propSprites, toScreen: (x, y) => this.toScreen(x, y) }) : null;
     const offGoto = bus.on('world:goto', () => setTimeout(() => this.runGoto(), 0));
+    const offTour = bus.on('polska:tour', ({ go }) => go && setTimeout(() => this.runGoto(), 0));
     const offPolska = bus.on('polska:auto', () => this.polskaToZagroda());
     // Точки входа v2 (карта, календарь, мачта, сезонная доска) — кадр по прогрессу.
     applyEntries(this.propSprites, this.sprites);
@@ -180,6 +186,7 @@ export class World extends Phaser.Scene {
       offInput();
       offAuto();
       offGoto();
+      offTour();
       offPolska();
       offEntries();
       this.farm?.dispose();
@@ -206,7 +213,12 @@ export class World extends Phaser.Scene {
   private runGoto(): void {
     const use = pendingGoto;
     if (!use || this.leaving || !this.inputOn) return;
-    const r = routeTo(this.mapDef.id, use);
+    // «Na pole!»: только дойти до Zagroda (там обход), объект не открывать.
+    if (use === TOUR_GOTO && this.mapDef.id === 'zagroda') {
+      pendingGoto = null;
+      return;
+    }
+    const r = routeTo(this.mapDef.id, use === TOUR_GOTO ? 'zplot' : use);
     if (!r) {
       pendingGoto = null;
       return;
@@ -259,7 +271,7 @@ export class World extends Phaser.Scene {
   override update(time: number, delta: number): void {
     if (this.leaving) return;
     this.farm?.update(time);
-    this.zagroda?.update();
+    this.zagroda?.update(time);
     for (const ev of this.model.update(Math.min(delta, 100))) this.onWorldEvent(ev, time);
     // Герой стоит (после ходьбы, автобега мини-игры, доигрыша очереди): новая клетка или поворот — в сохранение (B3).
     const busy = this.model.busy || !!this.farm?.blocking || !!this.zagroda?.auto;
@@ -511,7 +523,10 @@ export class World extends Phaser.Scene {
   private onIntent(i: RoutedIntent): void {
     if (i.to !== 'world' || this.leaving || !this.inputOn || this.farm?.blocking) return;
     // Игрок сам пошёл — «Idź» отменяется.
-    if (i.type === 'move' || i.type === 'goto') pendingGoto = null;
+    if (i.type === 'move' || i.type === 'goto') {
+      pendingGoto = null;
+      this.zagroda?.cancelTour();
+    }
     this.model.intent(i);
   }
 

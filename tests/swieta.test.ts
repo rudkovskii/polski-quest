@@ -102,13 +102,18 @@ describe('ближайший праздник по реальной дате', (
     expect([...days].sort((a, b) => a - b)).toEqual(days);
   });
 
-  it('строка «Najbliższe święto: … za N dni» на каждом задании', () => {
+  it('строка «Najbliższe święto: … za N dni»: баннер у ближайшего праздника, в итоге раунда — всегда', () => {
     for (const side of ['A', 'B'] as const) {
-      const t = game.nextTask(TODAY, { id: 'hol.zaduszki', side, self: false, stage: 'seed' })!;
+      const t = game.nextTask(TODAY, { id: 'hol.wszyscy', side, self: false, stage: 'seed' })!;
       const { panel } = mkPanel();
       game.render(t, panel, TODAY);
       expect(panel.body.querySelector('[data-nearest]')?.textContent).toBe('Najbliższe święto: Wszystkich Świętych za 14 dni');
+      const t2 = game.nextTask(TODAY, { id: 'hol.zaduszki', side, self: false, stage: 'seed' })!;
+      const p2 = mkPanel().panel;
+      game.render(t2, p2, TODAY);
+      expect(p2.body.querySelector('[data-nearest]')).toBeNull();
     }
+    expect(game.summaryLine!(TODAY)).toBe('Najbliższe święto: Wszystkich Świętych za 14 dni');
   });
 });
 

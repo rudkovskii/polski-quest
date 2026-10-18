@@ -90,8 +90,10 @@ export interface BusEvents {
   'polska:plots': { views: PlotView[]; entries?: Record<string, number> };
   /** v2: шкала «Wiedza o Polsce» для `ui/polskaHud.ts`: подуровень 0…10, доля внутри, доля всех единиц, опыт v2; `gain` — «+N», `up` — новый подуровень. */
   'polska:scale': { sub: number; of: number; pl: string; ru: string; ratio: number; pct: number; xp: number; gain?: number; up?: boolean };
-  /** v2: ответ в игре о Польше (для автобега в Zagroda: полив, рост, урожай у объекта `obj`). */
-  'polska:act': { kind: 'water' | 'grow' | 'harvest' | 'miss'; id: string; label: string; obj: string | null; xp: number };
+  /** v2: ответ в игре о Польше (для автобега в Zagroda: полив, рост, урожай у объекта `obj`). `quiet` — тихий урожай (тяжёлые даты: без «плим» и искр). */
+  'polska:act': { kind: 'water' | 'grow' | 'harvest' | 'miss'; id: string; label: string; obj: string | null; xp: number; quiet?: boolean };
+  /** v2: отложенный обход после игры во весь экран (карта, календарь): при входе в Zagroda герой сам «поливает» подросшие объекты (≤ 5 с, ручной ввод прерывает); `go` — идти туда сейчас («Na pole!»). */
+  'polska:tour': { plot: ZPlot; objs: string[]; go?: boolean };
   /** v2: текущее задание игры о Польше: герой бежит к объекту `obj` в Zagroda (null — стоит). */
   'polska:focus': { id: string | null; obj: string | null; label: string };
   /** v2: игра о Польше открыта/закрыта. `layout: panel` — нижняя панель (мир сверху, герой уходит в Zagroda); `full` — весь экран, мир не трогаем. */

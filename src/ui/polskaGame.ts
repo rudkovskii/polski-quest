@@ -25,7 +25,8 @@ export interface PolskaGameDeps {
 
 export interface PolskaGameUi {
   start(game: PolskaGameId, only?: string): void;
-  stop(): void;
+  /** Закрыть. `go` — «Na pole!»: после игры во весь экран герой сразу идёт в Zagroda (`polska:tour`). */
+  stop(go?: boolean): void;
   readonly isOpen: boolean;
   readonly game: PolskaGameId | null;
   readonly task: GameTask | null;
@@ -47,7 +48,7 @@ ${roundCss}
 .pq-pg.full { top: 0; padding-top: calc(env(safe-area-inset-top) + 8px); background: rgba(42, 20, 24, .55); }
 .pq-pg[hidden] { display: none; }
 .pq-pg .box { pointer-events: auto; width: min(720px, 100%); box-sizing: border-box; background: var(--pq-wood); border: 3px solid var(--pq-ink); border-radius: 12px;
-  box-shadow: 0 4px 0 var(--pq-ink), inset 0 0 0 2px var(--pq-wood-dark); padding: 6px 8px 8px; height: clamp(250px, 56dvh, 420px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; }
+  box-shadow: 0 4px 0 var(--pq-ink), inset 0 0 0 2px var(--pq-wood-dark); padding: 6px 8px 8px; height: clamp(250px, max(58dvh, 100dvh - 260px), 450px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; }
 .pq-pg.full .box { width: min(960px, 100%); height: 100%; max-height: none; }
 .pq-pg .head { flex: 0 0 auto; min-height: 38px; display: flex; align-items: center; gap: 8px; color: var(--pq-cream); padding: 0 2px 6px; font-weight: 700; font-size: 14px; }
 .pq-pg .title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -62,6 +63,8 @@ ${roundCss}
 .pq-pg .fb .big { font-size: 19px; font-weight: 800; overflow-wrap: break-word; }
 .pq-pg .fb .lbl { font-size: 13px; font-weight: 600; opacity: .75; margin-right: 4px; }
 .pq-pg .fb .sub { opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pq-pg .fb .note { font-size: 13px; opacity: .85; overflow-wrap: break-word; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
+.pq-pg .way2.go { display: block; width: 100%; cursor: pointer; font: inherit; font-weight: 700; color: var(--pq-ink); }
 .pq-pg .foot { flex: 0 0 auto; display: flex; gap: 8px; min-height: 46px; padding-top: 8px; }
 .pq-pg .foot .pq-btn { flex: 1 1 auto; }
 .pq-pg .foot .pq-btn.wait { opacity: .5; }
@@ -82,6 +85,7 @@ ${roundCss}
 .pq-pg .way2 { margin-top: 6px; padding: 6px 8px; text-align: center; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; font-size: 15px; font-weight: 700; }
 .pq-pg .way2 b { color: #4a6b2a; }
 @media (max-width: 520px) { .pq-pg .title small, .pq-pg .exit-lbl { display: none; } .pq-pg .pq-q { font-size: 19px; } .pq-pg .pq-opts { grid-auto-rows: 58px; } .pq-pg .paper { padding: 8px; } }
+@media (max-width: 520px), (max-height: 860px) { .pq-pg .pq-tile { font-size: 15px; padding: 6px 8px; } .pq-pg .pq-built { min-height: 38px; padding: 4px; gap: 5px; } .pq-pg .pq-pool { gap: 5px; } .pq-pg .pq-progress { margin-bottom: 4px; } .pq-pg .pq-q-hint { margin-bottom: 6px; } .pq-pg .pq-q { font-size: 18px; } }
 `;
 
 /** Локальная дата по часам игры. */
@@ -121,6 +125,10 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   /** Позиция на шкале «Wiedza o Polsce» до первого ответа раунда. */
   let scaleFrom: number | null = null;
   let scaleTo: { pos: number; sub: number; pl: string } | null = null;
+  /** Когда сработает автопереход после верного ответа (мс, `performance.now`); `panel.hold` его отодвигает. */
+  let autoAt = 0;
+  /** Игра во весь экран: объекты Zagroda, которые подросли за открытие (обход после выхода, `polska:tour`). */
+  let grownObjs: string[] = [];
 
   const ctxOf = (g: PolskaGame): GameCtx => ({
     units: deps.polska.units(g.id),
@@ -165,6 +173,15 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     submit: (answer) => api.submit(answer),
     say: (text, slow) => deps.say(text, slow),
     rand,
+    hold: (ms) => {
+      if (!timer || !answered || summaryOpen) return;
+      const now = performance.now();
+      const at = Math.max(autoAt, now + ms);
+      if (at <= autoAt) return;
+      clearTimeout(timer);
+      autoAt = at;
+      timer = setTimeout(advance, at - now);
+    },
   };
 
   const empty = (text: string, hint: string): void => {
@@ -234,13 +251,18 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     card.append(el('div', { class: 'way2', 'data-round-polska': '' }, `Wiedza o Polsce: ${s.pl} · ${s.sub}/${s.of}`, grow ? ' · ' : '', grow ? el('b', {}, grow) : null));
     // Карта и календарь закрывают мир: рост участка виден отложенно — строка «В саду подросло: N · Na pole!».
     const grew = round.stats.grew + round.stats.harvested;
-    if (game && game.layout === 'full' && grew > 0) card.append(el('div', { class: 'way2', 'data-round-plot': '' }, `${PLOT_NAME[game.plot].ru}: подросло ${grew} · Na pole!`));
+    if (game && game.layout === 'full' && grew > 0 && grownObjs.length) {
+      // «Na pole!»: закрыть игру, герой сам идёт в Zagroda и обходит подросшее.
+      card.append(el('button', { type: 'button', class: 'pq-btn way2 go', 'data-nav': '', 'data-round-plot': '', onclick: () => api.stop(true) }, `${PLOT_NAME[game.plot].ru}: подросло ${grew} · `, el('b', {}, 'Na pole! →')));
+    } else if (game && game.layout === 'full' && grew > 0) card.append(el('div', { class: 'way2', 'data-round-plot': '' }, `${PLOT_NAME[game.plot].ru}: подросло ${grew}`));
+    const line = game?.summaryLine?.(ctxOf(game));
+    if (line) card.append(el('div', { class: 'way2', 'data-round-line': '' }, line));
     paper.replaceChildren(card);
     const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, 'Ещё раунд');
     const end = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-end': '', onclick: () => api.stop() }, 'Закончить');
     foot.replaceChildren(more, end);
     paintRound();
-    setFocus(0);
+    setFocus(navs().indexOf(more));
     bus.emit('polska:focus', { id: null, obj: null, label: '' });
     requestAnimationFrame(reportHeight);
   };
@@ -308,6 +330,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
         roundN = 1;
         scaleFrom = scaleTo = null;
         recent.length = 0;
+        grownObjs = [];
       }
       title.replaceChildren(el('span', {}, g.title.ru), el('small', {}, g.title.pl));
       root.classList.toggle('full', g.layout === 'full');
@@ -321,13 +344,15 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       bus.emit('polska:auto', { on: true, game: g.id, layout: g.layout, plot: g.plot });
       render();
     },
-    stop() {
+    stop(go = false) {
       if (!open) return;
       clearTimers();
       open = false;
       summaryOpen = false;
       root.hidden = true;
       const g = game;
+      if (g?.layout === 'full' && grownObjs.length) bus.emit('polska:tour', { plot: g.plot, objs: [...grownObjs], ...(go ? { go: true } : {}) });
+      grownObjs = [];
       game = null;
       task = null;
       bus.emit('polska:focus', { id: null, obj: null, label: '' });
@@ -345,6 +370,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       if (scaleFrom === null) scaleFrom = out.scale.from;
       scaleTo = { pos: out.scale.to, sub: out.scale.sub, pl: out.scale.pl };
       round.add({ ok: r.ok, act: out.act });
+      if (game.layout === 'full' && out.obj && (out.act.kind === 'grow' || out.act.kind === 'harvest') && !grownObjs.includes(out.obj)) grownObjs.push(out.obj);
       paintRound();
       paper.classList.add(r.ok ? 'ok' : 'bad');
       const u = deps.polska.unit(task.id);
@@ -353,7 +379,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
         el('div', { class: 'sub' }, [u?.ru, u?.tr].filter(Boolean).join(' · ')),
         el('div', { class: 'pq-progress', 'data-progress-after': '' }, `🌱 ${out.progress.charAt(0).toUpperCase()}${out.progress.slice(1)}`),
       );
-      if (r.note) fb.append(el('div', { class: 'sub pq-muted' }, r.note));
+      if (r.note) fb.append(el('div', { class: 'note', 'data-note': '' }, r.note));
       fb.dataset.feedback = r.ok ? 'ok' : 'bad';
       fb.hidden = false;
       // Озвучка после ответа (верного и неверного): название или фраза по-польски.
@@ -368,7 +394,10 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       }, NEXT_DELAY_MS);
       foot.replaceChildren(dalej);
       setFocus(navs().indexOf(dalej));
-      if (r.ok) timer = setTimeout(advance, AUTO_NEXT_MS);
+      if (r.ok) {
+        autoAt = performance.now() + AUTO_NEXT_MS;
+        timer = setTimeout(advance, AUTO_NEXT_MS);
+      }
       requestAnimationFrame(reportHeight);
     },
     get isOpen() {

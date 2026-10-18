@@ -362,11 +362,39 @@ const css = `
 .pq-pg .sw-pack .sw-card.miss { background: #f2dcae; outline: 3px dashed var(--pq-leaf); outline-offset: -3px; }
 .pq-pg .sw-count { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; font-size: 14px; font-weight: 700; }
 .pq-pg .sw-count .sw-ico.emoji { width: 22px; height: 22px; font-size: 18px; line-height: 22px; }
+.pq-pg .sw-near .sw-ico { transform: scale(.75); margin: -4px -2px; }
+@media (max-width: 720px), (max-height: 860px) {
+  .pq-pg .sw-near { margin-bottom: 6px; font-size: 13px; }
+  .pq-pg .sw-clue { margin: 0 0 8px; gap: 8px; }
+  .pq-pg .sw-clue .sw-card { min-height: 54px; display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto auto; align-content: center; column-gap: 6px; text-align: left; justify-items: start; }
+  .pq-pg .sw-clue .sw-card .sw-box { height: 40px; width: 40px; grid-row: span 2; align-self: center; }
+  .pq-pg .sw-clue .sw-ico.emoji { width: 36px; height: 36px; font-size: 30px; line-height: 36px; }
+  .pq-pg .sw-clue .sw-box .sw-ico:not(.emoji) { transform: scale(.75); }
+  .pq-pg .sw-clue .sw-card .sw-pl { font-size: 16px; }
+  .pq-pg .sw-big { font-size: 19px; margin: 0 0 8px; padding: 5px 8px; }
+  .pq-pg .sw-card { min-height: 66px; }
+  .pq-pg .sw-pack { grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 4px; }
+  .pq-pg .sw-pack .sw-card { min-height: 52px; padding: 1px 2px 2px; gap: 0; }
+  .pq-pg .sw-count { margin-bottom: 4px; }
+  .pq-pg .sw-pack .sw-card .sw-box { height: 26px; }
+  .pq-pg .sw-pack .sw-card .sw-box .sw-ico:not(.emoji) { transform: scale(.8); }
+  .pq-pg .sw-pack .sw-card .sw-box .sw-ico.emoji { width: 26px; height: 26px; font-size: 22px; line-height: 26px; }
+  .pq-pg .sw-pack .sw-card .sw-pl { font-size: 12px; line-height: 1.05; }
+  .pq-pg .sw-pack .sw-card .sw-ru { font-size: 10px; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
 `;
 
-function banner(ctx: GameCtx): HTMLElement {
+/** «Najbliższe święto: Wigilia za 3 dni» (итог раунда, баннер). */
+export function nearestLine(ctx: GameCtx): string | null {
+  const near = nearestHoliday(ctx.units, ctx.date());
+  return near ? `Najbliższe święto: ${shortName(near.unit)} ${inDays(near.days)}` : null;
+}
+
+/** Баннер над заданием — только у самого ближайшего праздника (сезон): на остальных заданиях он съедал место под варианты. */
+function banner(ctx: GameCtx, id: string): HTMLElement | null {
   const date = ctx.date();
   const near = nearestHoliday(ctx.units, date);
+  if (!near || near.unit.id !== id) return null;
   const board = frameIcon(`w2_season_board/${seasonFrame(date.m)}`, 1);
   const text = near
     ? el('span', { 'data-nearest-text': '' }, 'Najbliższe święto: ', el('b', {}, shortName(near.unit)), ` ${inDays(near.days)}`)
@@ -439,7 +467,9 @@ export const game: PolskaGame<SwTask> = {
   },
 
   render(task, panel, ctx) {
-    panel.body.append(el('style', {}, css), banner(ctx));
+    const b = banner(ctx, task.id);
+    panel.body.append(el('style', {}, css));
+    if (b) panel.body.append(b);
     switch (task.kind) {
       case 'what': {
         prompt(panel, task.q, task.hint, task.qLang);
@@ -462,6 +492,8 @@ export const game: PolskaGame<SwTask> = {
         return;
     }
   },
+
+  summaryLine: nearestLine,
 
   check(task, answer): GameCheck {
     const say = task.say;

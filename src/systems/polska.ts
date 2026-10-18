@@ -285,7 +285,7 @@ export function createPolska(d: PolskaDeps): Polska {
       const act: PolskaAct = { kind: o.kind === 'none' ? 'water' : o.kind, xp: o.xp + (s1.bonusXp - s0.bonusXp) };
       const ref = refs.get(t.id);
       const u = content.byId.get(t.id);
-      d.bus?.emit('polska:act', { kind: act.kind, id: t.id, label: u?.pl ?? t.id, obj: ref?.obj ?? null, xp: act.xp });
+      d.bus?.emit('polska:act', { kind: act.kind, id: t.id, label: u?.pl ?? t.id, obj: ref?.obj ?? null, xp: act.xp, ...(u?.raw.harvest === 'quiet' ? { quiet: true } : {}) });
       emit(act.xp, s1.sub > s0.sub);
       return { ok, act, progress: unitProgress(st.items.get(t.id), now, day), scale: { from: s0.pos, to: s1.pos, sub: s1.sub, pl: s1.pl }, obj: ref?.obj ?? null };
     },

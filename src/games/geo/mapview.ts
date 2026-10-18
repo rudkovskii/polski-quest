@@ -39,7 +39,8 @@ export interface MapView {
   zoomOut(): void;
   unlock(): void;
   /** Герой бежит к `p`, втыкает флажок (зелёный, если `ok`), потом `done`. */
-  plant(p: Pt, ok: boolean, done?: () => void): void;
+  /** Герой бежит и втыкает флажок; возвращает, сколько мс до конца анимации (флажок уже стоит и качнулся). */
+  plant(p: Pt, ok: boolean, done?: () => void): number;
   /** После ответа: подсветить единицы золотом, подписать, показать булавки. */
   reveal(ids: readonly string[]): void;
   moveCursor(dx: number, dy: number): void;
@@ -465,9 +466,10 @@ export function createMap(o: MapOptions): MapView {
         job = null;
         flags.push({ p, ok, t0: 0 });
         queueMicrotask(() => done?.());
-        return;
+        return 0;
       }
       start();
+      return Math.round((dur + PLANT_T + WOBBLE_T) * 1000);
     },
     reveal(ids) {
       for (const id of ids) reveals.add(id);
