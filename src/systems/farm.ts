@@ -238,7 +238,9 @@ export function createFarm(d: FarmDeps): Farm {
       const reverse = canReverse && !!it && wantsReverse(it, mode, today(), now);
       if (!only) sinceReverse = reverse ? 0 : sinceReverse + 1;
       const qmode: GameMode = reverse ? (mode === 1 ? 2 : 1) : mode;
-      const typed = !reverse && mode === 2 && (stage === 'bush' || stage === 'overripe');
+      // «Напиши сам» (игра 2): кустик и перезревшее, а ещё росток с ответами в обе стороны — этот ответ сделает его кустиком.
+      // Без последнего ввод почти не встречался: игра 1 раньше засчитывает кустикам день, и в игру 2 они не попадают (P4a).
+      const typed = !reverse && mode === 2 && isTypedStage(it, stage);
       const made = makeQuestion(qmode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: WORDS, phrases: PHRASES }, rand, typed);
       const q = made && { ...made, progress: progressText(it, now, today()), ...(reverse ? { reverse: true } : {}) };
       const slot = g.slots[id];
@@ -330,4 +332,10 @@ export function createFarm(d: FarmDeps): Farm {
     },
   };
   return farm;
+}
+
+/** Игра 2 спрашивает ввод (экранная клавиатура), а не выбор: кустик, перезревшее или «почти кустик» (росток, обе стороны отвечены). */
+export function isTypedStage(it: { stage: string | null; sides: { pr: boolean; rp: boolean } } | undefined, stage: string | null): boolean {
+  if (stage === 'bush' || stage === 'overripe') return true;
+  return stage === 'sprout' && !!it && it.sides.pr && it.sides.rp;
 }

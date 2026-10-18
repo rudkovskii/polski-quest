@@ -66,9 +66,18 @@ export function mountGuide(parent: HTMLElement, deps: GuideDeps, bus: Bus<BusEve
   let atGoal = false;
   let last: BusEvents['fx:guide'] = null;
 
+  let arrowKey = '';
+  /** Сообщить миру, где стрелка (центр треугольника): тап по ней ведёт к цели, а не в клетку под ней (B2). */
+  const tellArrow = (p: { x: number; y: number } | null): void => {
+    const key = p ? `${Math.round(p.x)},${Math.round(p.y)}` : '';
+    if (key === arrowKey) return;
+    arrowKey = key;
+    bus.emit('guide:arrow', p);
+  };
   const hide = (): void => {
     bubble.hidden = true;
     arrow.hidden = true;
+    tellArrow(null);
   };
   const paint = (): void => {
     const p = last;
@@ -89,6 +98,8 @@ export function mountGuide(parent: HTMLElement, deps: GuideDeps, bus: Bus<BusEve
       arrow.style.left = `${Math.round(p.target.x)}px`;
       arrow.style.top = `${Math.round(p.target.y - 4)}px`;
       arrow.style.transform = '';
+      // Треугольник 30×15 над точкой (margin -16px) и качается на 6 px вверх.
+      tellArrow({ x: p.target.x, y: p.target.y - 4 - 12 });
     } else {
       delete arrow.dataset.bob;
       // Цель за кадром: стрелка стоит у края экрана на луче от героя к цели (не у героя), смотрит на цель.
@@ -101,6 +112,7 @@ export function mountGuide(parent: HTMLElement, deps: GuideDeps, bus: Bus<BusEve
       arrow.style.top = `${Math.round(pos.y)}px`;
       // Треугольник смотрит вниз (0°): поворот к цели.
       arrow.style.transform = `rotate(${Math.round((Math.atan2(dy, dx) * 180) / Math.PI - 90)}deg)`;
+      tellArrow({ x: pos.x, y: pos.y - 8 });
     }
   };
   const setStage = (s: GuideStage | null): void => {

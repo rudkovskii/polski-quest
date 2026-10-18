@@ -158,9 +158,10 @@ async function main(): Promise<void> {
   });
   farm.refresh();
 
-  // Позиция героя и поворот: пишем, когда он остановился.
+  // Позиция героя и поворот: пишем, когда он остановился. Время — те же часы, что у огорода: при `?now=+1d` метка
+  // `updated` не откатывается назад, и аварийная копия при уходе со страницы не проигрывает старой записи (B3).
   bus.on('world:position', ({ location: map, x, y, facing }) => {
-    store.update((s: Save) => ({ ...s, position: { map, x, y, facing } }), Date.now());
+    store.update((s: Save) => ({ ...s, position: { map, x, y, facing } }), clock.now());
   });
 
   const start: WorldStart = save.position ? { map: save.position.map, spawn: [save.position.x, save.position.y], facing: save.position.facing } : {};

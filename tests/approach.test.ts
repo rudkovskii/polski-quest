@@ -138,8 +138,11 @@ describe('тап по двери', () => {
     }
   });
 
-  it('стена рядом с дверью — не дверь', () => {
+  it('P4a: стена и крыша дома — дверь (раньше герой уходил за дом), трава рядом — нет', () => {
     const m = at('farm', 'house_door');
-    expect(m.targetAtPoint(3.5, 5.5)).toBeNull();
+    expect(m.targetAtPoint(3.5, 5.5)).toBe('exit:5,5');
+    expect(m.targetAtPoint(7.5, 2.2)).toBe('exit:5,5');
+    expect(m.targetAtPoint(2.5, 5.5)).toBeNull();
+    expect(m.targetAtPoint(5.5, 6.5)).toBeNull();
   });
 });

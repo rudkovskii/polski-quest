@@ -65,6 +65,8 @@ export interface BusEvents {
   /** Первые шаги новичка (`ui/hintsGuide.ts`): к какому объекту вести героя (`desk`, `board`); null — указатель погас. */
   'guide:goal': { use: string | null };
   /** Где на экране герой и цель указателя (CSS px); `via: 'door'` — цель на другой карте, указываем на дверь. null — спрятать. */
+  /** Где сейчас стрелка указателя первых шагов (экранные CSS px центра, null — скрыта): тап по ней = тап по её цели. */
+  'guide:arrow': { x: number; y: number } | null;
   'fx:guide': { hero: { x: number; y: number }; target: { x: number; y: number }; via: 'object' | 'door' } | null;
   /** Озвучить польскую строку. `id` — запись манифеста, `text` — запасной текст, `slow` — медленно. */
   'audio:play': { id?: string; text?: string; slow?: boolean; voice?: string; queue?: boolean; done?: (via: AudioVia) => void };

@@ -490,9 +490,13 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
     const day0 = !over && needsDay(it, day);
     const side0 = !over && !day0 && (needsSide(it, side) || (r && needsSide(it, other)));
     const inFocus = focus.has(it.id);
+    // Ответу в этой игре сегодня нечего дать (ни стадии, ни зачёта дня): в конец, даже если растение в рабочем наборе
+    // (P4a: `Dobranoc` 3 раза за 18 заданий без пользы).
+    const useless = !helps && !harvestsNow(it, side, day) && !(r && harvestsNow(it, other, day)) && it.days.has(day);
     return [
       // Созревшее на сегодня (зачёт дня есть, до урожая нужен только следующий день) — в самый конец.
       settledToday(it, day, now) ? 1 : 0,
+      useless ? 1 : 0,
       over ? 0 : 1,
       !over && (harvestsNow(it, side, day) || (r && harvestsNow(it, other, day))) ? 0 : 1,
       // Рабочий набор вперёд; для «редкого» задания (каждое FOCUS_EVERY-е) — наоборот, остальные вперёд, ближние к урожаю раньше.

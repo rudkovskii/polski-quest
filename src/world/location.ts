@@ -348,7 +348,35 @@ export class LocationModel {
     // Растение в клетке важнее края чужого спрайта: грядки плотные.
     const plant = this.plants.find((o) => hitRects(o).some((r) => inRect(r, tile)));
     if (plant) return plant.key;
-    return best?.key ?? this.targetAt(tile);
+    return best?.key ?? this.targetAt(tile) ?? this.doorInProp(x, y, !!o.doorZone)?.key ?? null;
+  }
+
+  /**
+   * Тап по зданию с дверью (дом на ферме: стена, крыша) = дверь. При указателе первых шагов (`doorZone`) зона тянется
+   * на полторы клетки над крышей: стрелка висит над дверью и при мелком зуме заходит выше спрайта (B2, тест 4).
+   */
+  private doorInProp(x: number, y: number, zone: boolean): WorldObject | undefined {
+    for (const o of this.objects) {
+      if (o.use || o.kind !== 'prop' || o.src.type !== 'prop') continue;
+      const door = this.objects.find(
+        (e) => e.kind === 'exit' && e.at[0] >= o.at[0] && e.at[0] < o.at[0] + o.size[0] && e.at[1] >= o.at[1] && e.at[1] < o.at[1] + o.size[1],
+      );
+      if (!door) continue;
+      const px = this.spriteSize?.(o.src.sprite);
+      const sw = px ? px[0] / TILE_PX : o.size[0];
+      const sh = px ? px[1] / TILE_PX : o.size[1];
+      const cx = o.at[0] + o.size[0] / 2;
+      const bottom = o.at[1] + o.size[1];
+      const top = bottom - sh - (zone ? 1.5 : 0);
+      if (x >= cx - sw / 2 && x < cx + sw / 2 && y >= top && y < bottom) return door;
+    }
+    return undefined;
+  }
+
+  /** Цель указателя первых шагов на этой карте: объект с `use === goal` или дверь (к нему ведёт выход). */
+  guideTarget(goal: string): string | null {
+    const prop = this.objects.find((o) => o.kind === 'prop' && o.use === goal);
+    return (prop ?? this.objects.find((o) => o.kind === 'exit'))?.key ?? null;
   }
 
   /** Дверь под пальцем: клетка выхода или до двух непроходимых клеток стены прямо над ней или под ней (спрайт двери выше клетки). */

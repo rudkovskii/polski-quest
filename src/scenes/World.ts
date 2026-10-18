@@ -8,6 +8,7 @@ import { frameFor, tileLayers, type TilesetMeta, type Xy } from '../world/ascii'
 import { FarmLayer } from './farmLayer';
 import { pickZoom } from '../world/camera';
 import { LocationModel, type Actor, type WorldEvent } from '../world/location';
+import { PositionGate } from '../world/positionGate';
 import { getMap, resolveSpawn, START } from '../world/maps';
 
 // Сцена мира: карта, герой, кот, объекты. Логика в world/location.ts; сцена рисует и переводит события модели в шину.
@@ -46,6 +47,14 @@ bus.on('input:dpad', ({ visible }) => {
   for (const fn of watchers) fn();
 });
 
+/** Стрелка указателя на экране (CSS px, `guide:arrow` из ui/hintsGuide.ts). */
+let guideArrow: { x: number; y: number } | null = null;
+bus.on('guide:arrow', (p) => {
+  guideArrow = p;
+});
+/** Радиус попадания по стрелке указателя, CSS px (палец шире треугольника 30×15). */
+const ARROW_HIT = 30;
+
 /** Цель указателя первых шагов (`guide:goal` из ui/hintsGuide.ts): переживает перезапуск сцены при смене карты. */
 let guideGoal: string | null = null;
 bus.on('guide:goal', ({ use }) => {
@@ -79,7 +88,7 @@ export class World extends Phaser.Scene {
   private bump: { dir: Dir; until: number } | null = null;
   private start0: WorldStart = {};
   private leaving = false;
-  private wasMoving = false;
+  private readonly posGate = new PositionGate();
   private inputOn = true;
   private insets = { top: HUD_TOP_INSET, bottom: 0 };
   private cam0: { zoom: number; mw: number; mh: number; fitsW: boolean; fitsH: boolean } | null = null;
@@ -100,7 +109,7 @@ export class World extends Phaser.Scene {
     this.catSprite = null;
     this.catShadow = null;
     this.bump = null;
-    this.wasMoving = false;
+    this.posGate.reset();
     this.markerKey = '';
     this.nearKey = '';
     this.guideKey = '';
@@ -156,8 +165,8 @@ export class World extends Phaser.Scene {
     });
     this.cameras.main.fadeIn(150, 46, 91, 59);
     bus.emit('world:location', { id: this.mapDef.id, controls: 'walk' });
-    const [x, y] = this.model.player.tile;
-    bus.emit('world:position', { location: this.mapDef.id, x, y, facing: this.model.player.facing });
+    const start = this.posGate.tick(false, this.mapDef.id, this.model.player.tile, this.model.player.facing);
+    if (start) bus.emit('world:position', start);
   }
 
   /** Экранные CSS-пиксели канваса → клетка и объект под пальцем (для PointerSource). */
@@ -167,6 +176,15 @@ export class World extends Phaser.Scene {
     const tx = Math.floor(p.x / T);
     const ty = Math.floor(p.y / T);
     if (tx < 0 || ty < 0 || tx >= this.model.parsed.w || ty >= this.model.parsed.h) return null;
+    // Тап по стрелке указателя = тап по её цели (стол, доска или дверь), где бы стрелка ни висела (B2).
+    if (guideGoal && guideArrow) {
+      const r = this.game.canvas.getBoundingClientRect();
+      if (Math.hypot(r.left + x - guideArrow.x, r.top + y - guideArrow.y) <= ARROW_HIT) {
+        const key = this.model.guideTarget(guideGoal);
+        const o = key ? this.model.object(key) : undefined;
+        if (key && o) return { tile: [o.at[0], o.at[1]], target: key };
+      }
+    }
     const target = this.model.targetAtPoint(p.x / T, p.y / T, { doorZone: guideGoal !== null });
     return target ? { tile: [tx, ty], target } : { tile: [tx, ty] };
   }
@@ -190,12 +208,10 @@ export class World extends Phaser.Scene {
     if (this.leaving) return;
     this.farm?.update(time);
     for (const ev of this.model.update(Math.min(delta, 100))) this.onWorldEvent(ev, time);
-    const moving = this.model.moving;
-    if (this.wasMoving && !moving && !this.leaving) {
-      const [x, y] = this.model.player.tile;
-      bus.emit('world:position', { location: this.mapDef.id, x, y, facing: this.model.player.facing });
-    }
-    this.wasMoving = moving;
+    // Герой стоит (после ходьбы, автобега мини-игры, доигрыша очереди): новая клетка или поворот — в сохранение (B3).
+    const busy = this.model.busy || !!this.farm?.blocking;
+    const pos = this.posGate.tick(busy, this.mapDef.id, this.model.player.tile, this.model.player.facing);
+    if (pos) bus.emit('world:position', pos);
     this.syncHero(time);
     this.syncCat();
     this.updateCamera();

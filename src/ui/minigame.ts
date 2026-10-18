@@ -50,7 +50,9 @@ const css = `
 ${THEME_CSS}
 .pq-game { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: flex; justify-content: center; pointer-events: none;
   padding: 0 calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 8px);
-  font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); }
+  font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); hyphens: none; -webkit-hyphens: none; }
+/* P4a (B4): ни заголовок, ни слова в панели не рвутся по слогам. */
+.pq-game * { hyphens: none; -webkit-hyphens: none; }
 .pq-game[hidden] { display: none; }
 .pq-game-box { pointer-events: auto; width: min(720px, 100%); box-sizing: border-box; background: var(--pq-wood); border: 3px solid var(--pq-ink); border-radius: 12px;
   box-shadow: 0 4px 0 var(--pq-ink), inset 0 0 0 2px var(--pq-wood-dark); padding: 6px 8px 8px; height: clamp(250px, 56dvh, 400px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; }
@@ -63,7 +65,7 @@ ${THEME_CSS}
 .pq-game-foot .pq-btn.wait { opacity: .5; }
 .pq-game-paper.ok { background: #d6efc0; }
 .pq-game-paper.bad { background: #f6d7cc; }
-.pq-q { font-size: 24px; font-weight: 800; margin: 0 0 4px; overflow-wrap: anywhere; }
+.pq-q { font-size: 24px; font-weight: 800; margin: 0 0 4px; overflow-wrap: break-word; }
 .pq-q-hint { font-size: 13px; opacity: .7; margin-bottom: 8px; }
 .pq-progress { font-size: 13px; margin: -4px 0 8px; color: #4a6b2a; font-weight: 600; }
 .pq-fb .pq-progress { margin: 4px 0 0; }
@@ -82,8 +84,9 @@ ${THEME_CSS}
 .pq-game .pq-opt { display: flex; align-items: center; gap: 4px; box-sizing: border-box; height: 100%; text-align: left; color: var(--pq-ink); background: #fffaf0; font-size: 17px; line-height: 1.15; padding: 8px 10px; overflow: hidden; }
 .pq-game .pq-opt .n { flex: 0 0 auto; min-width: 18px; opacity: .5; font-size: 13px; }
 .pq-game .pq-opt .t { flex: 1 1 auto; min-width: 0; hyphens: none; word-break: normal; overflow-wrap: break-word; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
-.pq-game .pq-opt.long .t { font-size: 14px; }
-.pq-game .pq-opt.xlong .t { font-size: 12px; overflow-wrap: anywhere; }
+.pq-game .pq-opt.long .t { font-size: 15px; }
+.pq-game .pq-opt.xlong .t { font-size: 13px; }
+.pq-game .pq-opt.xxlong .t { font-size: 11px; overflow-wrap: anywhere; }
 .pq-game .pq-opt.right { background: #8cc66a; }
 .pq-game .pq-opt.wrong { background: #e88e7c; }
 .pq-built { min-height: 44px; display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 2px dashed var(--pq-wood); border-radius: 6px; margin-bottom: 8px; background: #fffaf0; }
@@ -94,8 +97,21 @@ ${THEME_CSS}
 .pq-fb { margin-top: 8px; font-size: 15px; }
 .pq-fb .big { font-size: 20px; font-weight: 800; }
 .pq-game .is-focus { outline: 3px solid var(--pq-accent); outline-offset: 1px; }
-@media (max-width: 520px) { .pq-q { font-size: 20px; } .pq-qblock { height: 92px; } .pq-opts { grid-auto-rows: 64px; } .pq-game .pq-opt { padding: 6px 7px; font-size: 15px; } .pq-game-paper { padding: 8px; } }
+@media (max-width: 520px) { .pq-q { font-size: 20px; } .pq-qblock { height: 92px; } .pq-opts { grid-auto-rows: 64px; } .pq-game .pq-opt { padding: 6px 7px; font-size: 15px; } .pq-game-paper { padding: 8px; }
+  .pq-game .pq-opt .n { min-width: 12px; }
+  .pq-game .pq-opt.long .t { font-size: 14px; } .pq-game .pq-opt.xlong .t { font-size: 12px; } .pq-game .pq-opt.xxlong .t { font-size: 10.5px; }
+  /* Узко: польская подпись режима не влезает и режет русское название — прячем её (B4). */
+  .pq-game-title small { display: none; } }
 `;
+
+/**
+ * Кегль варианта по самому длинному слову (B4: «присаживайтесь» рвалось как «присаживайтес/ь» в двухколонной сетке на iPhone):
+ * 9–11 букв — `long`, 12–15 — `xlong`, длиннее — `xxlong` (только там посимвольный перенос).
+ */
+export function optSizeClass(text: string): '' | ' long' | ' xlong' | ' xxlong' {
+  const maxWord = Math.max(...text.split(/\s+/).map((w) => w.length));
+  return maxWord > 15 ? ' xxlong' : maxWord > 11 ? ' xlong' : maxWord > 8 ? ' long' : '';
+}
 
 /** Строка прогресса растения с большой буквы. */
 const progressLine = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
@@ -180,7 +196,12 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     paper.append(fb);
     for (const b of box.querySelectorAll<HTMLButtonElement>('.pq-opt, .pq-tile, [data-check], [data-reset]')) b.disabled = true;
     foot.replaceChildren(dalej);
-    if (typeof fb.scrollIntoView === 'function') fb.scrollIntoView({ block: 'nearest' });
+    // Итоговая строка видна целиком (B5): прокручиваем только лист, не страницу (scrollIntoView сдвигал шапку листа).
+    const toEnd = (): void => {
+      paper.scrollTop = paper.scrollHeight;
+    };
+    toEnd();
+    requestAnimationFrame(toEnd);
     detachKb();
     const input = paper.querySelector<HTMLInputElement>('.pq-type');
     if (input) input.disabled = true;
@@ -201,8 +222,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     const grid = el('div', { class: 'pq-opts' });
     qq.options.forEach((o, i) => {
       // Слово не рвём по слогам: длинное уменьшаем в кегле, посимвольный перенос только для совсем длинных.
-      const maxWord = Math.max(...o.split(/\s+/).map((w) => w.length));
-      const sizeCls = maxWord > 15 ? ' xlong' : maxWord > 10 ? ' long' : '';
+      const sizeCls = optSizeClass(o);
       const b = el('button', { type: 'button', class: `pq-btn pq-opt${sizeCls}`, 'data-nav': '', 'data-opt': o, onclick: () => pick(i) }, el('span', { class: 'n' }, `${i + 1}`), el('span', { class: 't' }, o));
       grid.append(b);
     });
@@ -278,7 +298,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     rev.hidden = !q.reverse;
     const hint: Record<GameMode, string> = {
       1: 'Выбери перевод',
-      2: q.kind === 'type' ? 'Напиши по-польски (кустик: уже без подсказок)' : 'Выбери польское слово',
+      2: q.kind === 'type' ? 'Напиши по-польски сам, без вариантов' : 'Выбери польское слово',
       3: 'Собери фразу по-польски',
       4: 'Собери фразу по-русски',
     };

@@ -135,8 +135,11 @@ describe('P3b: панель мини-игры', () => {
     expect(css).toMatch(/\.pq-opt \.t\s*\{[^}]*hyphens: none[^}]*word-break: normal/);
     expect(root.querySelector('[data-qblock] [data-prompt]')).not.toBeNull();
     const opts = [...root.querySelectorAll('.pq-opt')];
-    expect(opts[0]!.classList.contains('long')).toBe(true);
+    // P4a (B4): «присаживайтесь» (14 букв) — мельче, чем просто длинное, и без посимвольного переноса.
+    expect(opts[0]!.classList.contains('xlong')).toBe(true);
     expect(opts[1]!.classList.contains('long')).toBe(false);
-    expect(opts[3]!.classList.contains('xlong')).toBe(true);
+    expect(opts[3]!.classList.contains('xxlong')).toBe(true);
+    expect(css).toMatch(/\.pq-game \* \{[^}]*hyphens: none/);
+    expect(css).not.toMatch(/\.pq-opt\.xlong \.t \{[^}]*anywhere/);
   });
 });

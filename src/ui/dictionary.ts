@@ -27,12 +27,14 @@ ${TIP_CSS}
 .dict-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; opacity: .85; align-items: center; }
 .dict-legend span { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
 .dict { display: flex; flex-direction: column; gap: 10px; }
-.dict-head { position: sticky; top: -12px; z-index: 3; margin: -12px -12px 0; padding: 12px 12px 8px; background: var(--pq-cream); display: flex; flex-direction: column; gap: 8px; border-bottom: 2px solid var(--pq-wood-dark); }
+/* B1 (тест 4): вкладки и поиск в одну строку, высота шапки ≈ 60 px (≤ 90 на iPhone); поле не растягивается по высоте. */
+.dict-head { position: sticky; top: -12px; z-index: 3; margin: -12px -12px 0; padding: 10px 12px 8px; background: var(--pq-cream); display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 8px; border-bottom: 2px solid var(--pq-wood-dark); max-height: 90px; box-sizing: border-box; }
 .dict-scope { font-size: 13px; opacity: .8; padding: 0 2px 4px; }
 .dict-cols.nocard { grid-template-columns: 150px minmax(0, 1fr); }
 .dict-tabs, .dict-filters { display: flex; flex-wrap: wrap; gap: 8px; }
-.dict-tabs .pq-btn { flex: 1 1 0; font-size: 17px; }
-.dict-search { flex: 1 1 180px; min-width: 0; font-family: inherit; font-size: 16px; padding: 9px 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fffaf0; color: var(--pq-ink); box-sizing: border-box; }
+.dict-head .dict-tabs { flex: 0 0 auto; flex-wrap: nowrap; gap: 6px; }
+.dict-tabs .pq-btn { flex: 0 0 auto; font-size: 16px; height: 40px; padding: 0 12px; }
+.dict-search { flex: 1 1 auto; align-self: center; height: 40px; min-height: 40px; max-height: 40px; line-height: 20px; width: auto; min-width: 0; font-family: inherit; font-size: 16px; padding: 0 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fffaf0; color: var(--pq-ink); box-sizing: border-box; }
 .dict-cols { display: grid; grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1.1fr); gap: 10px; height: min(58vh, 520px); }
 .dict-cols > div { overflow-y: auto; overflow-x: hidden; min-height: 0; }
 .dict-topics { display: flex; flex-direction: column; gap: 4px; }
@@ -64,7 +66,12 @@ ${TIP_CSS}
   .dict-cols > div { overflow: visible; }
   .dict-topics { flex-direction: row; overflow-x: auto !important; padding-bottom: 6px; margin-bottom: 8px; }
   .dict-topic { flex: 0 0 auto; white-space: nowrap; }
-  .dict-list { max-height: 38dvh; overflow-y: auto !important; margin-bottom: 10px; }
+  /* Телефон: строка слова в одну линию (польское, перевод мельче с многоточием, значок) — в списке видно ≥ 8 слов. */
+  .dict-list { max-height: max(46dvh, 360px); overflow-y: auto !important; margin-bottom: 10px; gap: 3px; }
+  .dict-row { grid-template-columns: auto minmax(0, 1fr) auto; padding: 4px 8px; min-height: 40px; box-sizing: border-box; }
+  .dict-row .pl { font-size: 17px; overflow-wrap: break-word; hyphens: none; }
+  .dict-row .ru { grid-column: 2; grid-row: 1; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dict-row .st { grid-row: 1; grid-column: 3; min-width: 28px; min-height: 28px; }
   .dict-filters .pq-btn { flex: 1 1 auto; }
 }
 `;
@@ -75,8 +82,15 @@ export interface DictionaryScreen {
   readonly isOpen: boolean;
 }
 
+/** Тема больше этого — мягкий выбор «Посадить 7 (быстрее урожай)» / «Всю тему (N)» (P4a: целая тема не даёт урожаев). */
+export const TOPIC_SOFT_MAX = 8;
+/** Сколько слов сажает быстрая кнопка: первые по частоте. */
+export const TOPIC_QUICK = 7;
+
 interface Entry {
   id: string;
+  /** Ранг частоты (меньше — чаще): freq, потом порядок в базе. Фразы — по уровню. */
+  rank: number;
   pl: string;
   ru: string;
   topic: string;
@@ -86,7 +100,9 @@ interface Entry {
 
 export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips): DictionaryScreen {
   const panel = createPanel({ title: 'Słownik · Словарь', wide: true, bus });
-  const mkEntries = (xs: readonly (Word | Phrase)[]): Entry[] => xs.map((x) => ({ id: x.id, pl: x.pl, ru: x.ru, topic: x.topic, fpl: fold(x.pl), fru: fold(x.ru) }));
+  const rankOf = (x: Word | Phrase, i: number): number => ('freq' in x ? x.freq * 1e5 + x.order : x.level * 1e5 + i);
+  const mkEntries = (xs: readonly (Word | Phrase)[]): Entry[] =>
+    xs.map((x, i) => ({ id: x.id, rank: rankOf(x, i), pl: x.pl, ru: x.ru, topic: x.topic, fpl: fold(x.pl), fru: fold(x.ru) }));
   const entries: Record<Tab, Entry[]> = { words: mkEntries(api.words), phrases: mkEntries(api.phrases) };
   const topicsOf = (tab: Tab) => {
     const used = new Set(entries[tab].map((e) => e.topic));
@@ -117,7 +133,9 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   const filterBtns = FILTERS.map(([f, label]) =>
     el('button', { type: 'button', class: 'pq-btn small', 'data-filter': f, ...nav('filters', 'h', `filter:${f}`), onclick: () => ((filter = f), (limit = PAGE), renderAll()) }, label),
   );
-  const bulk = el('button', { type: 'button', class: 'pq-btn small', 'data-bulk': '', hidden: true, ...nav('filters', 'h', 'bulk'), onclick: () => plantTopic() });
+  // Тема больше TOPIC_SOFT_MAX: первая кнопка сажает 7 самых частых, вторая — всю тему.
+  const bulk = el('button', { type: 'button', class: 'pq-btn small', 'data-bulk': '', hidden: true, ...nav('filters', 'h', 'bulk'), onclick: () => plantTopic(true) });
+  const bulkAll = el('button', { type: 'button', class: 'pq-btn small', 'data-bulk-all': '', hidden: true, ...nav('filters', 'h', 'bulk-all'), onclick: () => plantTopic(false) });
   const topicsCol = el('div', { class: 'dict-topics' });
   // Легенда стадий: значок и русская подпись («кустик» вместо жаргона «куст»).
   const legend = el(
@@ -140,7 +158,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
       'div',
       { class: 'dict' },
       el('div', { class: 'dict-head' }, el('div', { class: 'dict-tabs' }, ...tabBtns), search),
-      el('div', { class: 'dict-filters' }, ...filterBtns, bulk),
+      el('div', { class: 'dict-filters' }, ...filterBtns, bulk, bulkAll),
       legend,
       cols,
     ),
@@ -174,7 +192,14 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     });
   };
   /** Что сажает «Посадить всю тему»: новые элементы темы на текущей вкладке (фразы — только доступные). */
-  const plantable = (): string[] => (topicNow() ? entries[tab].filter((e) => e.topic === topicNow() && info(e.id).status === 'new' && !locked(e.id)).map((e) => e.id) : []);
+  /** Новые (и доступные) слова выбранной темы, частые первыми. */
+  const plantable = (): string[] =>
+    topicNow()
+      ? entries[tab]
+          .filter((e) => e.topic === topicNow() && info(e.id).status === 'new' && !locked(e.id))
+          .sort((a, b) => a.rank - b.rank)
+          .map((e) => e.id)
+      : [];
 
   // ---- отрисовка
   /** Значок стадии: семя, росток, куст, урожай (в банке), перезревшее; в мешке — тусклое семя. */
@@ -205,8 +230,11 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
 
   function renderBulk(): void {
     const n = plantable().length;
+    const soft = n > TOPIC_SOFT_MAX;
     bulk.hidden = n === 0;
-    bulk.textContent = `Посадить всю тему (${n})`;
+    bulk.textContent = soft ? `Посадить ${TOPIC_QUICK} (быстрее урожай)` : `Посадить всю тему (${n})`;
+    bulkAll.hidden = !soft;
+    bulkAll.textContent = `Всю тему (${n})`;
   }
 
   function renderList(): void {
@@ -354,8 +382,9 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     renderAll();
   }
 
-  function plantTopic(): void {
-    const ids = plantable();
+  function plantTopic(quick: boolean): void {
+    const all = plantable();
+    const ids = quick && all.length > TOPIC_SOFT_MAX ? all.slice(0, TOPIC_QUICK) : all;
     if (!ids.length) return;
     const r = api.plant(ids);
     say(`Посажено: ${r.planted}${r.bag > 0 ? `, в мешке (грядки заняты): ${r.bag}` : ''}`);
