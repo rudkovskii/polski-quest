@@ -189,6 +189,33 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     focusIdx = (i + list.length) % list.length;
     if (kbNav) list[focusIdx]!.classList.add('is-focus');
   };
+  /**
+   * Стрелки ходят по сетке вариантов 2×2 (`.pq-opts`, 2 колонки): вверх/вниз — через строку, влево/вправо — соседний.
+   * Вне сетки (кнопки снизу, итог раунда) — по порядку, как раньше. Первое нажатие без фокуса ставит на первый вариант.
+   */
+  const OPT_COLS = 2;
+  const moveTarget = (dir: 'up' | 'down' | 'left' | 'right'): number => {
+    const list = navs();
+    if (focusIdx < 0 || focusIdx >= list.length) return 0;
+    const back = dir === 'left' || dir === 'up';
+    const cur = list[focusIdx]!;
+    const grid = cur.closest('.pq-opts');
+    if (!grid) return focusIdx + (back ? -1 : 1);
+    const cells = list.filter((n) => n.closest('.pq-opts') === grid);
+    const k = cells.indexOf(cur);
+    const col = k % OPT_COLS;
+    let t = k;
+    if (dir === 'left') t = col > 0 ? k - 1 : k;
+    else if (dir === 'right') t = col < OPT_COLS - 1 && k + 1 < cells.length ? k + 1 : k;
+    else if (dir === 'up') t = k - OPT_COLS >= 0 ? k - OPT_COLS : k;
+    else t = k + OPT_COLS < cells.length ? k + OPT_COLS : k;
+    // Вниз из нижнего ряда сетки — к кнопкам под ней («Выйти», «Dalej»), вверх из них — обратно в сетку.
+    if (t === k && dir === 'down') {
+      const after = list.findIndex((n, j) => j > list.indexOf(cells[cells.length - 1]!) && !n.closest('.pq-opts'));
+      if (after >= 0) return after;
+    }
+    return list.indexOf(cells[t]!);
+  };
   /** «3 / 10»: номер текущего задания; после ответа остаётся тем же. В одиночном повторе растения счётчика нет. */
   const paintRound = (): void => {
     roundNo.hidden = !!only;
@@ -425,9 +452,13 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         return;
       case 'move':
         if (!i.held) return;
-        kbNav = true;
-        root.classList.add('kb');
-        setFocus(focusIdx + (i.dir === 'left' || i.dir === 'up' ? -1 : 1));
+        {
+          // Первое нажатие стрелки только показывает рамку там, где фокус (обычно первый вариант), а не сдвигает её.
+          const first = !kbNav;
+          kbNav = true;
+          root.classList.add('kb');
+          setFocus(first && focusIdx >= 0 ? focusIdx : moveTarget(i.dir));
+        }
         return;
       case 'interact': {
         if (summaryOpen) {

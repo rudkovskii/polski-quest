@@ -24,8 +24,9 @@ import art_crops  # noqa: E402
 import art_hero  # noqa: E402
 import art_props  # noqa: E402
 import art_tiles  # noqa: E402
+import art_world2  # noqa: E402
 
-MODULES = [art_hero, art_cat, art_props, art_tiles, art_crops]
+MODULES = [art_hero, art_cat, art_props, art_tiles, art_crops, art_world2]
 
 
 def preview(path: Path, scale: int = 6) -> None:

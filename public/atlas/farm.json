@@ -5,7 +5,7 @@
  "margin": 1,
  "spacing": 2,
  "columns": 16,
- "count": 51,
+ "count": 91,
  "tiles": {
   "door": {
    "kind": "single",
@@ -34,12 +34,57 @@
     43
    ]
   },
+  "fence2": {
+   "kind": "auto16",
+   "frames": [
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86
+   ]
+  },
   "floor": {
    "kind": "variants",
    "frames": [
     44,
     45,
     46
+   ]
+  },
+  "gate": {
+   "kind": "single",
+   "frames": [
+    87
+   ]
+  },
+  "gate_open": {
+   "kind": "single",
+   "frames": [
+    88
+   ]
+  },
+  "gate_v": {
+   "kind": "single",
+   "frames": [
+    89
+   ]
+  },
+  "gate_v_open": {
+   "kind": "single",
+   "frames": [
+    90
    ]
   },
   "grass": {
@@ -49,6 +94,15 @@
     1,
     2,
     3
+   ]
+  },
+  "grass2": {
+   "kind": "variants",
+   "frames": [
+    51,
+    52,
+    53,
+    54
    ]
   },
   "mat": {
@@ -76,6 +130,27 @@
     17,
     18,
     19
+   ]
+  },
+  "path2": {
+   "kind": "auto16",
+   "frames": [
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70
    ]
   },
   "soil": {

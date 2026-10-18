@@ -169,6 +169,26 @@ describe('F5a: панель мини-игры', () => {
     expect(css).toMatch(/\.pq-game\.kb \.is-focus, \.pq-game :focus-visible \{ outline/);
   });
 
+  it('стрелки ходят по сетке вариантов 2×2: вниз — в нижний ряд той же колонки, а не к следующему по порядку', () => {
+    const { root, bus } = mk(false);
+    const mv = (dir: 'up' | 'down' | 'left' | 'right'): void =>
+      bus.emit('input:intent', { type: 'move', dir, held: true, to: 'ui', source: 'keyboard' });
+    const opts = (): HTMLElement[] => [...root.querySelectorAll<HTMLElement>('.pq-opts [data-nav]')];
+    const at = (): number => opts().findIndex((n) => n.classList.contains('is-focus'));
+    mv('down'); // первое нажатие ставит рамку на первый вариант
+    expect(at()).toBe(0);
+    mv('down');
+    expect(at()).toBe(2);
+    mv('right');
+    expect(at()).toBe(3);
+    mv('up');
+    expect(at()).toBe(1);
+    mv('left');
+    expect(at()).toBe(0);
+    mv('left'); // у края остаётся на месте
+    expect(at()).toBe(0);
+  });
+
   it('тап по варианту без клавиатуры: рамки нет ни у вариантов, ни у «Dalej»', () => {
     const { root } = mk(false);
     root.querySelector<HTMLElement>('[data-opt="собака"]')!.click();

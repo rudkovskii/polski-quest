@@ -8,6 +8,13 @@
     "wall_top": { "sprite": "t_wall_top" },
     "wall_face": { "sprite": "t_wall_face" },
     "door": { "sprite": "t_door" },
-    "mat": { "sprite": "t_mat" }
+    "mat": { "sprite": "t_mat" },
+    "grass2": { "variants": [ {"sprite":"t2_grass","frame":0}, {"sprite":"t2_grass","frame":1}, {"sprite":"t2_grass","frame":2}, {"sprite":"t2_grass","frame":3} ] },
+    "path2": { "sprite": "t2_path", "mask": "auto16" },
+    "fence2": { "sprite": "t2_fence", "mask": "auto16" },
+    "gate": { "sprite": "t2_gate", "frame": 0 },
+    "gate_open": { "sprite": "t2_gate", "frame": 1 },
+    "gate_v": { "sprite": "t2_gate", "frame": 2 },
+    "gate_v_open": { "sprite": "t2_gate", "frame": 3 }
   }
 }
