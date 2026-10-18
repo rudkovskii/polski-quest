@@ -98,9 +98,62 @@ function nextTask(ctx: GameCtx, want: Want): DatyTask | null {
 /** Вопрос: крупная строка и подсказка (как у `kit.prompt`, но внутри верхней строки с листом/годом). */
 const ask = (task: DatyTask): HTMLElement => el('div', { class: 'pq-pg-q txt', 'data-prompt': '' }, el('div', { class: 'pq-q', lang: 'pl' }, task.q), el('div', { class: 'pq-q-hint' }, task.hint));
 
+/** Запас под строку результата движка, которая после ответа встаёт под листом (как `FB_H` у карты). */
+const FB_RESERVE = 92;
+/** Во сколько раз можно увеличить задание, чтобы оно занимало лист, а не плавало в пустом (потолок: страница 480 px → 860). */
+export const MAX_ZOOM = 1.8;
+
+/** Ширина и высота задания при масштабе 1 → наибольший масштаб (шаг 0,05), при котором оно влезает в лист; меньше 1,05 — 1. */
+export function zoomFor(room: { w: number; h: number }, natural: { w: number; h: number }): number {
+  if (!(natural.w > 0) || !(natural.h > 0)) return 1;
+  const k = Math.min(MAX_ZOOM, room.w / natural.w, room.h / natural.h);
+  return k < 1.05 ? 1 : Math.floor(k * 20) / 20;
+}
+
+/** Лист `full` занимает ровно задание: увеличиваем страницу под свободное место и просим движок сжать лист по высоте. */
+function fitToSheet(panel: GamePanel, wrap: HTMLElement): void {
+  const body = panel.body;
+  const place = (room: { w: number; h: number }): number => {
+    wrap.style.zoom = '';
+    const cs = getComputedStyle(body);
+    const num = (v: string): number => parseFloat(v) || 0;
+    const above = wrap.getBoundingClientRect().top - body.getBoundingClientRect().top - body.clientTop - num(cs.paddingTop) + body.scrollTop;
+    const natural = { w: Math.min(480, room.w), h: wrap.offsetHeight };
+    const k = zoomFor({ w: room.w, h: room.h - above - FB_RESERVE }, { w: 480, h: natural.h });
+    // Узкий лист (телефон): страница и так во всю ширину, увеличивать нечего.
+    if (k > 1 && room.w >= 480) wrap.style.zoom = String(k);
+    const last = body.lastElementChild;
+    const after = last && last !== wrap ? last.getBoundingClientRect().bottom - wrap.getBoundingClientRect().bottom : 0;
+    return above + wrap.getBoundingClientRect().height + after + FB_RESERVE;
+  };
+  const run = (): void => {
+    if (!wrap.isConnected) return;
+    panel.fit?.((room) => place(room));
+  };
+  run();
+  const watched = panel.root;
+  if (watched && typeof ResizeObserver !== 'undefined') {
+    let lw = watched.clientWidth;
+    let lh = watched.clientHeight;
+    const ro = new ResizeObserver(() => {
+      if (!wrap.isConnected) return ro.disconnect();
+      if (Math.abs(watched.clientWidth - lw) < 2 && Math.abs(watched.clientHeight - lh) < 2) return;
+      lw = watched.clientWidth;
+      lh = watched.clientHeight;
+      run();
+    });
+    ro.observe(watched);
+  }
+}
+
 function render(task: DatyTask, panel: GamePanel, ctx: GameCtx): void {
   const wrap = el('div', { class: 'dt', 'data-dt': task.mode, 'data-calm': task.calm ? '' : undefined }, el('style', {}, CSS));
   panel.body.append(wrap);
+  draw(task, panel, ctx, wrap);
+  fitToSheet(panel, wrap);
+}
+
+function draw(task: DatyTask, panel: GamePanel, ctx: GameCtx, wrap: HTMLElement): void {
   const sub: GamePanel = { body: wrap, foot: panel.foot, layout: panel.layout, submit: panel.submit, say: panel.say, rand: panel.rand };
   const d = { day: task.day, month: task.month };
   const chip = yearChip(task.year);

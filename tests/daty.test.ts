@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 // Игра Daty: справочники и родительный падеж, сетка месяца, барабаны, режимы заданий, проверка, спокойная подача, раунд в движке.
 import { describe, expect, it, vi } from 'vitest';
-import { datyPool, game, modeFor } from '../src/games/daty';
+import { datyPool, game, modeFor, MAX_ZOOM, zoomFor } from '../src/games/daty';
 import {
   type DatyTask,
   choiceOptions,
@@ -536,5 +536,16 @@ describe('Daty: посадка и движок', () => {
     expect(fb.textContent).toContain(t.mode === 'co' ? 'Święto Niepodległości' : 'jedenastego listopada');
     expect(s.save.garden.log.at(-1)).toMatchObject({ id: 'date.niepodleglosc', ok: false });
     ui.stop();
+  });
+});
+
+describe('лист во весь экран: страница увеличивается под свободное место', () => {
+  it('zoomFor: по ширине и по высоте, потолок, телефон без увеличения', () => {
+    expect(zoomFor({ w: 1176, h: 900 }, { w: 480, h: 400 })).toBe(MAX_ZOOM);
+    expect(zoomFor({ w: 1176, h: 600 }, { w: 480, h: 400 })).toBe(1.5);
+    expect(zoomFor({ w: 700, h: 900 }, { w: 480, h: 400 })).toBe(1.45);
+    expect(zoomFor({ w: 375, h: 640 }, { w: 480, h: 400 })).toBe(1);
+    expect(zoomFor({ w: 1176, h: 410 }, { w: 480, h: 400 })).toBe(1);
+    expect(zoomFor({ w: 0, h: 0 }, { w: 0, h: 0 })).toBe(1);
   });
 });

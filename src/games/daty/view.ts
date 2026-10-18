@@ -59,7 +59,7 @@ export const CSS = `
 .pq-pg .paper:has(.dt[data-calm]).ok { background: #e7e0cf; }
 .pq-pg .paper:has(.dt[data-calm]).bad { background: #ebdcd2; }
 .dt[data-calm] .dt-ring ellipse { animation: none; stroke-dashoffset: 0; stroke: #7a3a34; }
-@media (max-width: 520px) { .pq-pg .dt[data-dt=co] .pq-opts { grid-template-columns: 1fr; } .dt-day, .dt-blank { min-height: 36px; } .dt-day { font-size: 16px; } .dt-leaf { width: 96px; } .dt-leaf .day { font-size: 46px; } .dt-row.far { display: none; } }
+@media (max-width: 520px) { .dt { padding: 0 8px; box-sizing: border-box; } .pq-pg .dt[data-dt=co] .pq-opts { grid-template-columns: 1fr; } .dt-day, .dt-blank { min-height: 36px; } .dt-day { font-size: 16px; } .dt-leaf { width: 96px; } .dt-leaf .day { font-size: 46px; } .dt-row.far { display: none; } }
 `;
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
