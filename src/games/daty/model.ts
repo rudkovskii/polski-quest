@@ -49,7 +49,9 @@ export interface DatyTask extends GameTask {
 
 export const WEEKDAYS = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'niedz.'] as const;
 
-/** Значки памятных дат (поле `icon` в данных) — текстовые глифы, пока нет спрайтов 12×12. */
+/** Значки памятных дат (поле `icon` в данных) — кадры атласа: знич декора, флажок, мини-предметы огорода (та же палитра). */
+export const ICON_FRAME: Record<string, string> = { candle: 'w2_znicz/0', sword: 'castle', flag: 'flag_pl', cross: 'church', eu_star: 'star', dove: 'bird' };
+/** Запасной глиф, если кадра нет. */
 export const ICON_GLYPH: Record<string, string> = { candle: '🕯', sword: '⚔', flag: '⚑', cross: '✝', eu_star: '★', dove: '🕊' };
 export const iconOf = (icon: unknown): string => ICON_GLYPH[String(icon)] ?? '•';
 

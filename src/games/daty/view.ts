@@ -1,7 +1,15 @@
 // Игра 3: Daty — DOM: страница отрывного календаря (сетка месяца), барабаны день/месяц, лист с датой, стили.
 // Весь ввод — click на кнопках (клавиши, стрелки и 1–4 ведёт движок через [data-nav] и [data-opt]); своих keydown/pointerdown нет.
 import { el } from '../../ui/dom';
-import { WEEKDAYS, iconOf, monthGrid, monthRow, sayDate, shiftMonth, spin, type DayMonth } from './model';
+import { ICON_FRAME, WEEKDAYS, iconOf, monthGrid, monthRow, sayDate, shiftMonth, spin, type DayMonth } from './model';
+/** Значок даты в углу клетки: кадр атласа 16×16 (знич, флажок, мини-предмет), без кадра — глиф. */
+function markIcon(icon: string): HTMLElement | string {
+  const name = ICON_FRAME[icon];
+  const frame = name ? (name.includes('/') ? name : plantIconFrame(name)) : null;
+  return (frame ? atlasIcon(frame, 1, 'dt-ico') : null) ?? iconOf(icon);
+}
+
+import { atlasIcon, plantIconFrame } from '../../ui/atlasIcon';
 
 export const CSS = `
 .dt { max-width: 480px; margin: 0 auto; }
@@ -18,7 +26,8 @@ export const CSS = `
 .dt-day.sun { color: #b3322b; }
 .dt-day.today { border-color: var(--pq-wood); box-shadow: inset 0 -4px 0 var(--pq-leaf); }
 .dt-day[disabled] { opacity: 1; cursor: default; }
-.dt-day .dt-mark { position: absolute; right: 2px; top: 1px; font-size: 11px; line-height: 1; }
+.dt-day .dt-mark { position: absolute; right: 1px; top: 1px; font-size: 11px; line-height: 1; z-index: 1; }
+.dt-day .dt-mark .dt-ico { display: block; }
 .dt-grid:not(.reveal) .dt-mark { display: none; }
 .dt-day .dt-ring { position: absolute; inset: -3px; width: calc(100% + 6px); height: calc(100% + 6px); pointer-events: none; }
 .dt-ring ellipse { fill: none; stroke: #c2281f; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; animation: dt-draw .45s steps(9) forwards; }
@@ -127,7 +136,7 @@ export function calendar(o: CalendarOpts): Calendar {
           'button',
           { type: 'button', class: `dt-day${i % 7 === 6 ? ' sun' : ''}${isToday ? ' today' : ''}`, 'data-nav': '', 'data-day': d, 'data-date': `${m}-${d}`, onclick: () => o.onPick(d, month) },
           `${d}`,
-          mark ? el('span', { class: 'dt-mark', 'data-mark': mark.icon }, iconOf(mark.icon)) : null,
+          mark ? el('span', { class: 'dt-mark', 'data-mark': mark.icon }, markIcon(mark.icon)) : null,
         );
       }),
     );

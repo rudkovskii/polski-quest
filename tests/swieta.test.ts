@@ -5,7 +5,8 @@ import { describe, expect, it } from 'vitest';
 import atlas from '../public/atlas/custom.json';
 import { dateChoices, game, maskedCustoms, packSpec, packTask, shopsQuestions, shopsTask, whatTask, whenTask, wishTask, customTilesTask, type SwTask } from '../src/games/swieta';
 import { dayNo, easterDay, fmtSpan, inDays, nearestHoliday, nextSpan, seasonalOrder, shortName, spanIn, upcoming, ymdOf } from '../src/games/swieta/calendar';
-import { ATLAS_SIZE, FRAMES, WORD_EMOJI, WORD_FRAME, itemWord } from '../src/games/swieta/icons';
+import { ATLAS_SIZE, FRAMES, WORD_EMOJI, WORD_FRAME, WORD_ICON, itemWord } from '../src/games/swieta/icons';
+import { plantIconFrame } from '../src/ui/atlasIcon';
 import { GAMES } from '../src/games/registry';
 import { V2, unitsOfGame } from '../src/systems/v2content';
 import type { GameCtx, GamePanel, PolskaUnit, UnitInfo, Want } from '../src/types/polska';
@@ -283,7 +284,7 @@ describe('«Spakuj koszyk» и «Nakryj stół»', () => {
         const w = itemWord(id);
         expect(w.pl, id).not.toMatch(/^\w+\./);
         expect(w.ru, id).toBeTruthy();
-        expect(WORD_FRAME[id] ?? WORD_EMOJI[id], `${id}: ни кадра, ни эмодзи`).toBeTruthy();
+        expect(WORD_FRAME[id] ?? (WORD_ICON[id] && plantIconFrame(WORD_ICON[id])) ?? WORD_EMOJI[id], `${id}: ни кадра, ни мини-предмета`).toBeTruthy();
       }
     }
   });

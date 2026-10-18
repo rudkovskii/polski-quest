@@ -1,9 +1,10 @@
 // Игра «Święta»: DOM-иконки предметов. Где в атласе декора (`public/atlas/custom.png`, кадры `w2_*`) есть подходящий кадр —
-// рисуем его (×scale, пиксели не мылятся); остальным предметам даём эмодзи. Подпись словом всегда рядом (в карточке).
+// рисуем его (×scale, пиксели не мылятся); остальным — мини-предмет огорода (`ui/atlasIcon`), эмодзи только запасом. Подпись словом всегда рядом (в карточке).
 // Координаты кадров сверяет `tests/swieta.test.ts` с `custom.json` (после `npm run sprites` они могут уехать).
 import { WORD_BY_ID } from '../../systems/content';
 import { el } from '../../ui/dom';
 import { ATLAS_SIZE } from '../../ui/stageIcon';
+import { atlasIcon, plantIconFrame } from '../../ui/atlasIcon';
 
 export interface AtlasFrame {
   x: number;
@@ -39,53 +40,56 @@ export const WORD_FRAME: Readonly<Record<string, FrameKey>> = {
   'sw.palma': 'w2_palma/0',
   'sw.chryzantema': 'w2_fl_chrys/2',
   'sw.flaga': 'w2_flag/0',
+  'sw.wosk': 'w2_znicz/0',
 };
 
-/** Слова без кадра в атласе: эмодзи. */
-export const WORD_EMOJI: Readonly<Record<string, string>> = {
-  'sw.fajerwerki': '🎆',
-  'sw.szampan': '🍾',
-  'sw.kreda': '🖍️',
-  'sw.orszak': '👑',
-  'sw.laurka': '💌',
-  'w.kwiat': '🌷',
-  'sw.paczek': '🍩',
-  'sw.faworki': '🥨',
-  'sw.marzanna': '🌾',
-  'sw.kukla': '🎭',
-  'sw.galazka': '🌿',
-  'sw.baranek': '🐑',
-  'w.chleb': '🍞',
-  'w.sol': '🧂',
-  'sw.biala_kielbasa': '🌭',
-  'sw.chrzan': '🥕',
-  'sw.karp': '🐟',
-  'sw.lany_poniedzialek': '💦',
-  'w.woda': '💧',
-  'sw.grill': '🍖',
-  'w.lody': '🍦',
-  'w.prezent': '🎁',
-  'sw.procesja': '🚶',
-  'sw.platek': '🌸',
-  'sw.wianek': '🏵️',
-  'sw.ognisko': '🔥',
-  'sw.bukiet': '💐',
-  'sw.ziola': '🌿',
-  'sw.cmentarz': '🪦',
-  'sw.wosk': '🕯️',
-  'w.klucz': '🔑',
-  'w.but': '👞',
-  'sw.oplatek': '🫓',
-  'sw.obrus': '🧶',
-  'sw.sianko': '🌾',
-  'sw.puste_nakrycie': '🍽️',
-  'w.barszcz': '🍲',
-  'sw.uszka': '🥟',
-  'w.pierogi': '🥟',
-  'sw.zurek': '🥣',
-  'sw.kolednik': '🎤',
-  'sw.tort': '🎂',
+/** Слова без кадра декора: мини-предмет огорода (`content/plants/icons.json`) — та же палитра и пиксель, что у грядок. */
+export const WORD_ICON: Readonly<Record<string, string>> = {
+  'sw.fajerwerki': 'balloon',
+  'sw.szampan': 'wine',
+  'sw.kreda': 'pencil',
+  'sw.orszak': 'people',
+  'sw.laurka': 'letter',
+  'w.kwiat': 'flower',
+  'sw.paczek': 'roll',
+  'sw.faworki': 'cookie',
+  'sw.marzanna': 'grain',
+  'sw.kukla': 'woman',
+  'sw.galazka': 'tree',
+  'sw.baranek': 'sheep',
+  'w.chleb': 'bread',
+  'w.sol': 'salt',
+  'sw.biala_kielbasa': 'sausage',
+  'sw.chrzan': 'carrot',
+  'sw.karp': 'fish',
+  'sw.lany_poniedzialek': 'water',
+  'w.woda': 'water',
+  'sw.grill': 'meat',
+  'w.lody': 'icecream',
+  'w.prezent': 'gift',
+  'sw.procesja': 'church',
+  'sw.platek': 'flower',
+  'sw.wianek': 'tulip',
+  'sw.ognisko': 'sunset',
+  'sw.bukiet': 'flower',
+  'sw.ziola': 'sprout',
+  'sw.cmentarz': 'monument',
+  'w.klucz': 'key',
+  'w.but': 'shoe',
+  'sw.oplatek': 'paper',
+  'sw.obrus': 'towel',
+  'sw.sianko': 'grain',
+  'sw.puste_nakrycie': 'plate',
+  'w.barszcz': 'borscht',
+  'sw.uszka': 'pasta',
+  'w.pierogi': 'dumpling',
+  'sw.zurek': 'soup',
+  'sw.kolednik': 'star',
+  'sw.tort': 'cake',
 };
+
+/** Запас, если у слова нет ни кадра, ни мини-предмета (новое слово в данных): эмодзи. */
+export const WORD_EMOJI: Readonly<Record<string, string>> = {};
 
 const base = (): string => {
   try {
@@ -106,11 +110,14 @@ export function frameIcon(key: FrameKey, scale = 2): HTMLSpanElement {
   });
 }
 
-/** Предмет по id слова: кадр из атласа, иначе эмодзи; на всякий случай — точка. `scale` — для кадров. */
+/** Предмет по id слова: кадр декора, иначе мини-предмет огорода, иначе эмодзи; на всякий случай — точка. `scale` — для кадров. */
 export function itemIcon(id: string, scale = 2): HTMLSpanElement {
   const fk = WORD_FRAME[id];
   // Высокие кадры (ёлка, пальма 16×32) на ступень мельче, чтобы карточки были ровными.
   if (fk) return frameIcon(fk, FRAMES[fk].h > FRAMES[fk].w ? Math.max(1, scale - 1) : scale);
+  const pf = WORD_ICON[id] ? plantIconFrame(WORD_ICON[id]) : null;
+  const pi = pf ? atlasIcon(pf, scale, 'sw-ico') : null;
+  if (pi) return pi;
   return el('span', { class: 'sw-ico emoji', 'data-emoji': id, 'aria-hidden': 'true' }, WORD_EMOJI[id] ?? '•');
 }
 

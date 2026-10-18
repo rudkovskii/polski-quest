@@ -8,6 +8,7 @@ import type { GameCheck, GameCtx, GamePanel, GameTask, PolskaGame, PolskaUnit, W
 import { choice, prompt, sameTiles, shuffle, tiles } from '../kit';
 import { fmtSpan, inDays, dayNo, nearestHoliday, nextSpan, overlaps, seasonFrame, seasonalOrder, shiftSpan, shortName, WEEKDAY_PL, weekdayOf, type Span } from './calendar';
 import { frameIcon, itemIcon, itemWord } from './icons';
+import { atlasIcon, plantIconFrame } from '../../ui/atlasIcon';
 
 export type SwKind = 'what' | 'when' | 'shops' | 'pack' | 'wish';
 export type PackKind = 'basket' | 'bag' | 'table';
@@ -414,7 +415,7 @@ function renderPack(task: SwTask, panel: GamePanel): void {
   const num = el('span', { 'data-count': '' }, '0');
   const strip = el('div', { class: 'sw-count' }, icon, label, ': ', num);
   const paintStrip = (): void => {
-    icon.replaceChildren(task.packKind === 'table' ? el('span', { class: 'sw-ico emoji' }, '🍽️') : frameIcon(sel.size ? 'w2_basket/1' : 'w2_basket/0', 1));
+    icon.replaceChildren((task.packKind === 'table' ? atlasIcon(plantIconFrame('plate') ?? '', 1, 'sw-ico') : null) ?? frameIcon(sel.size ? 'w2_basket/1' : 'w2_basket/0', 1));
     num.textContent = String(sel.size);
   };
   const grid = el('div', { class: 'sw-pack', 'data-pack': '' });

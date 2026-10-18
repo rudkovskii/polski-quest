@@ -2,6 +2,9 @@
 // Контролёр v2 (волна 3): общие хуки движка игр о Польше — пауза на успех (`panel.hold`), строка итога (`summaryLine`),
 // отложенный обход Zagroda после игры во весь экран (`polska:tour`), тихий урожай (`polska:act.quiet`).
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { ICON_FRAME } from '../src/games/daty/model';
+import { WORD_EMOJI, WORD_ICON } from '../src/games/swieta/icons';
+import { atlasFrame, plantIconFrame } from '../src/ui/atlasIcon';
 import { activeDecor, parseDecor } from '../src/systems/decor';
 import { createPolska, newPolskaSave, type PolskaSave } from '../src/systems/polska';
 import { V2 } from '../src/systems/v2content';
@@ -190,5 +193,18 @@ describe('мини-игры v1: поливать нечего посреди р�
     expect(root.querySelector('[data-sum-note]')).not.toBeNull();
     expect(root.querySelector('[data-round-no]')!.textContent).toBe(`3 / ${ROUND_SIZE}`);
     g.stop();
+  });
+});
+
+describe('пиксельные значки вместо эмодзи (Daty, Święta)', () => {
+  it('у каждого значка даты и каждого предмета праздников есть кадр атласа', () => {
+    for (const u of V2.units.filter((x) => x.kind === 'date')) {
+      const name = ICON_FRAME[String(u.raw.icon)];
+      expect(name, u.id).toBeTruthy();
+      const frame = name!.includes('/') ? name! : plantIconFrame(name!);
+      expect(frame && atlasFrame(frame), `${u.id} ${name}`).toBeTruthy();
+    }
+    for (const [id, name] of Object.entries(WORD_ICON)) expect(atlasFrame(plantIconFrame(name) ?? ''), `${id} → ${name}`).toBeTruthy();
+    expect(Object.keys(WORD_EMOJI)).toHaveLength(0);
   });
 });
