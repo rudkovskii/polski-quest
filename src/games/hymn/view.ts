@@ -176,7 +176,10 @@ function renderKaraoke(task: HymnTask, panel: GamePanel): void {
                 if (picked.length === steps.length) {
                   stopMelody();
                   panel.submit([...picked]);
-                } else paint();
+                } else {
+                  panel.say(o);
+                  paint();
+                }
               } else {
                 b.classList.add('wrong');
                 stopMelody();

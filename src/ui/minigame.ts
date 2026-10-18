@@ -310,6 +310,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     const btns = [...paper.querySelectorAll<HTMLButtonElement>('.pq-opt')];
     btns[i]?.classList.add(o === q.answer ? 'right' : 'wrong');
     btns.find((b) => b.dataset.opt === q!.answer)?.classList.add('right');
+    // Польский вариант озвучиваем при выборе; верный голосит `finish` (слово целиком), поэтому дважды не говорим.
+    if (q.promptLang === 'ru' && o !== q.answer) bus.emit('audio:play', { text: o });
     submit(o);
   };
 
@@ -340,6 +342,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     const addTile = (i: number): void => {
       if (answered || built.includes(i)) return;
       built.push(i);
+      // Польская плитка звучит при тапе (новая прерывает прежнюю); русские плитки (игра 4) молчат.
+      if (qq.mode !== 4) bus.emit('audio:play', { text: qq.tiles[i]! });
       paint();
     };
     tileAdder = addTile;
