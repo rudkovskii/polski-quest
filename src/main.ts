@@ -8,6 +8,7 @@ import { createFarm } from './systems/farm';
 import { GAMES, GAME_BY_ENTRY, GAME_BY_ID } from './games/registry';
 import { configureHymnAudio } from './games/hymn';
 import { inDays, nearestHoliday, shortName } from './games/swieta/calendar';
+import { createEntryPoint } from './systems/entryPoint';
 import { createPolska } from './systems/polska';
 import { PLOT_NAME } from './systems/zagroda';
 import { activeDecor, parseDecor } from './systems/decor';
@@ -254,6 +255,13 @@ async function main(): Promise<void> {
     now: () => clock.now(),
     tz: (t) => new Date(t).getTimezoneOffset(),
   });
+  // Точка входа в игру и возврат к ней при выходе (`world:return`); после «Na pole!» — тост «Wróć».
+  const entry = createEntryPoint(bus);
+  // Герой уйдёт в Zagroda или к грядкам; в сохранении остаётся точка входа (вкладку закрыли посреди игры — вернёмся к мачте, а не в сад).
+  entry.onStart((s) => store.update((save: Save) => ({ ...save, position: { map: s.map, x: s.x, y: s.y, facing: s.facing } }), clock.now()));
+  entry.onPending((spot) => {
+    if (spot) hud.toast('Идёшь в сад. Вернуться к месту входа?', { label: '↩ Wróć · Назад', run: () => void entry.back() }, 15_000);
+  });
   const polskaGame = mountPolskaGame(overlay, {
     games: GAMES,
     polska,
@@ -345,6 +353,8 @@ async function main(): Promise<void> {
   // Позиция героя и поворот: пишем, когда он остановился. Время — те же часы, что у огорода: при `?now=+1d` метка
   // `updated` не откатывается назад, и аварийная копия при уходе со страницы не проигрывает старой записи (B3).
   bus.on('world:position', ({ location: map, x, y, facing }) => {
+    // Пока открыта мини-игра, клетка в Zagroda или у грядки точкой возврата не становится: сохранение остаётся на точке входа.
+    if (entry.holding) return;
     store.update((s: Save) => ({ ...s, position: { map, x, y, facing } }), clock.now());
   });
 

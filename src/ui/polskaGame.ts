@@ -38,6 +38,8 @@ export interface PolskaGameUi {
 /** Через сколько после ответа «Dalej» начинает нажиматься; верный ответ листается сам через AUTO_NEXT_MS. */
 export const NEXT_DELAY_MS = 300;
 export const AUTO_NEXT_MS = 900;
+/** Итог раунда: столько мс клавиша действия его не нажимает. */
+export const SUMMARY_GUARD_MS = 400;
 
 const css = `
 ${THEME_CSS}
@@ -68,6 +70,7 @@ ${roundCss}
 .pq-pg .foot { flex: 0 0 auto; display: flex; gap: 8px; min-height: 46px; padding-top: 8px; }
 .pq-pg .foot .pq-btn { flex: 1 1 auto; }
 .pq-pg .foot .pq-btn.wait { opacity: .5; }
+.pq-pg .foot .pq-btn.pq-back { flex: 1.3 1 0; background: #f2d552; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
 .pq-pg .pq-progress { font-size: 13px; margin: 0 0 6px; color: #4a6b2a; font-weight: 600; }
 .pq-pg .pq-q { font-size: 22px; font-weight: 800; margin: 0 0 4px; overflow-wrap: break-word; }
 .pq-pg .pq-q-hint { font-size: 13px; opacity: .7; margin-bottom: 8px; }
@@ -122,6 +125,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   let task: GameTask | null = null;
   let answered = false;
   let summaryOpen = false;
+  /** Когда показан итог (мс, `performance.now`): клавиша действия в первые 400 мс его не нажимает (не промахнуться по «Wróć» на «Dalej»). */
+  let summaryAt = 0;
   let nextReady = true;
   let timer: ReturnType<typeof setTimeout> | null = null;
   let armTimer: ReturnType<typeof setTimeout> | null = null;
@@ -287,10 +292,12 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     if (line) card.append(el('div', { class: 'way2', 'data-round-line': '' }, line));
     paper.replaceChildren(card);
     const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, 'Ещё раунд');
-    const end = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-end': '', onclick: () => api.stop() }, 'Закончить');
-    foot.replaceChildren(more, end);
+    // «Wróć»: выйти и мгновенно вернуться к месту, откуда запустил игру (`systems/entryPoint.ts`); в фокусе по умолчанию.
+    const end = el('button', { type: 'button', class: 'pq-btn pq-back', 'data-nav': '', 'data-end': '', 'data-back-entry': '', onclick: () => api.stop() }, '↩ Wróć · Назад');
+    foot.replaceChildren(end, more);
+    summaryAt = performance.now();
     paintRound();
-    setFocus(navs().indexOf(more));
+    setFocus(navs().indexOf(end));
     bus.emit('polska:focus', { id: null, obj: null, label: '' });
     requestAnimationFrame(reportHeight);
   };
@@ -337,6 +344,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
           setFocus(Math.max(0, focusIdx));
           return;
         }
+        if (summaryOpen && performance.now() - summaryAt < SUMMARY_GUARD_MS) return;
         navs()[focusIdx]?.click();
         return;
       default:

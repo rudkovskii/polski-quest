@@ -69,6 +69,9 @@ bus.on('polska:auto', ({ on, layout, plot }) => {
   polskaGo = on && layout === 'panel' ? (plot ?? 'from_farm') : null;
 });
 
+/** Мини-игра закрыта: куда вернуть героя (`world:return`). Лежит до применения: сцена могла быть посреди перехода через дверь. */
+let pendingReturn: BusEvents['world:return'] | null = null;
+
 /** Радиус попадания по стрелке указателя, CSS px (палец шире треугольника 30×15). */
 const ARROW_HIT = 30;
 
@@ -162,6 +165,11 @@ export class World extends Phaser.Scene {
     const offGoto = bus.on('world:goto', () => setTimeout(() => this.runGoto(), 0));
     const offTour = bus.on('polska:tour', ({ go }) => go && setTimeout(() => this.runGoto(), 0));
     const offPolska = bus.on('polska:auto', () => this.polskaToZagroda());
+    // Возврат к точке входа после игры: сцена дослушивает все обработчики шины (флаги автобега гаснут) и только потом ставит героя.
+    const offReturn = bus.on('world:return', (s) => {
+      pendingReturn = s;
+      setTimeout(() => this.applyReturn(), 0);
+    });
     // Точки входа v2 (карта, календарь, мачта, сезонная доска) — кадр по прогрессу.
     applyEntries(this.propSprites, this.sprites);
     const offEntries = bus.on('polska:plots', ({ entries }) => entries && applyEntries(this.propSprites, this.sprites, entries));
@@ -189,6 +197,7 @@ export class World extends Phaser.Scene {
       offGoto();
       offTour();
       offPolska();
+      offReturn();
       offEntries();
       this.farm?.dispose();
       this.farm = null;
@@ -205,6 +214,22 @@ export class World extends Phaser.Scene {
     // Пришли через дверь по «Idź» — идём дальше; игра о Польше открыта не здесь — в Zagroda.
     if (pendingGoto) this.time.delayedCall(220, () => this.runGoto());
     this.polskaToZagroda();
+    if (pendingReturn) this.applyReturn();
+  }
+
+  /**
+   * Вернуть героя и кота на клетку, откуда запущена игра (`world:return`): та же карта и герой уже стоит там — ничего (игра во весь экран
+   * его не двигала); иначе короткое затемнение и новая карта со спавном на этой клетке (кот появляется рядом, как после двери).
+   */
+  private applyReturn(): void {
+    const s = pendingReturn;
+    if (!s || this.leaving || !this.model) return;
+    pendingReturn = null;
+    pendingGoto = null;
+    const p = this.model.player;
+    const idle = !this.model.busy && !this.farm?.blocking && !this.zagroda?.auto;
+    if (s.map === this.mapDef.id && p.tile[0] === s.x && p.tile[1] === s.y && idle) return;
+    this.go(s.map, [s.x, s.y], s.facing);
   }
 
   /**
@@ -541,7 +566,7 @@ export class World extends Phaser.Scene {
     switch (ev.type) {
       case 'interact': {
         const { type: _t, ...rest } = ev;
-        bus.emit('world:interact', { location: this.mapDef.id, ...rest, tile: [ev.tile[0], ev.tile[1]] });
+        bus.emit('world:interact', { location: this.mapDef.id, ...rest, tile: [ev.tile[0], ev.tile[1]], hero: [ev.hero[0], ev.hero[1]] });
         break;
       }
       case 'exit':
@@ -558,13 +583,13 @@ export class World extends Phaser.Scene {
     }
   }
 
-  private go(map: string, spawn: string): void {
+  private go(map: string, spawn: string | readonly number[], facing?: Dir): void {
     if (this.leaving) return;
     this.leaving = true;
     this.model.halt();
     this.emitGuide();
     const cam = this.cameras.main;
-    cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ map, spawn }));
+    cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ map, spawn, ...(facing ? { facing } : {}) }));
     // force: переход сразу после входа (идёт fadeIn) иначе игнорировался бы, сцена зависла бы в `leaving`.
     cam.fade(150, 46, 91, 59, true);
   }

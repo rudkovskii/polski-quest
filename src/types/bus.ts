@@ -39,6 +39,8 @@ export interface WorldInteract {
   via: 'action' | 'tap';
   /** Куда смотрел герой. */
   facing: Dir;
+  /** Клетка, на которой стоит герой (откуда игра запущена: сюда он вернётся, `systems/entryPoint.ts`). */
+  hero?: [number, number];
 }
 
 /** Звуки действий (`systems/platform/sfx.ts`): шаги, полив, урожай, ответ, окна. */
@@ -98,6 +100,8 @@ export interface BusEvents {
   'polska:focus': { id: string | null; obj: string | null; label: string };
   /** v2: игра о Польше открыта/закрыта. `layout: panel` — нижняя панель (мир сверху, герой уходит в Zagroda); `full` — весь экран, мир не трогаем. */
   'polska:auto': { on: boolean; game: PolskaGameId | null; layout: 'panel' | 'full'; plot?: ZPlot };
+  /** Мини-игра закрыта (или «Wróć» после «Na pole!»): герой и кот возвращаются на клетку, откуда игру запустили, лицом туда же. Сцена гасит экран на 150 мс и ставит героя (карту пересоздаёт, если нужна другая). */
+  'world:return': { map: string; x: number; y: number; facing: Dir };
   /** v2: кнопка «Idź» на доске: герой сам идёт к объекту с этим `use` (через двери, если он на другой карте) и открывает его. */
   'world:goto': { use: string };
   /** Intent после роутера: `to` = мир или оверлей по фокусу. */

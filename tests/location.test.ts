@@ -129,7 +129,7 @@ describe('интерактивные объекты', () => {
   it('A у стола: событие interact с use=desk, id и подписью', () => {
     const m = modelAt('home', [8, 4], 'up');
     send(m, { type: 'interact' });
-    expect(interacts(run(m, 100))).toEqual([{ type: 'interact', id: 'desk', use: 'desk', label: 'Słownik · Словарь', key: 'prop:desk', tile: [8, 3], via: 'action', facing: 'up' }]);
+    expect(interacts(run(m, 100))).toEqual([{ type: 'interact', id: 'desk', use: 'desk', label: 'Słownik · Словарь', key: 'prop:desk', tile: [8, 3], via: 'action', facing: 'up', hero: expect.any(Array) }]);
   });
 
   it('A без объекта рядом ничего не делает', () => {

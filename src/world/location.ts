@@ -62,6 +62,8 @@ export interface InteractEvent {
   tile: Xy;
   via: 'action' | 'tap';
   facing: Dir;
+  /** Клетка героя в момент действия. */
+  hero: Xy;
 }
 export interface ExitEvent {
   type: 'exit';
@@ -694,7 +696,7 @@ export class LocationModel {
 
   private fire(o: WorldObject, via: 'action' | 'tap', tile?: Xy): void {
     if (!o.use) return;
-    this.out.push({ type: 'interact', id: o.id, use: o.use, label: o.label ?? o.use, key: o.key, tile: tile ?? o.at, via, facing: this.player.facing });
+    this.out.push({ type: 'interact', id: o.id, use: o.use, label: o.label ?? o.use, key: o.key, tile: tile ?? o.at, via, facing: this.player.facing, hero: [this.player.tile[0], this.player.tile[1]] });
   }
 
   // ───────────── кот ─────────────

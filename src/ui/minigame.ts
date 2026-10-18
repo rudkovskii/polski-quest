@@ -70,6 +70,7 @@ ${roundCss}
 .pq-game-foot { flex: 0 0 auto; display: flex; gap: 8px; align-items: stretch; min-height: 46px; padding-top: 8px; }
 .pq-game-foot .pq-btn { flex: 1 1 auto; }
 .pq-game-foot .pq-btn.wait { opacity: .5; }
+.pq-game-foot .pq-btn.pq-back { flex: 1.3 1 0; background: #f2d552; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
 .pq-game-paper.ok { background: #d6efc0; }
 .pq-game-paper.bad { background: #f6d7cc; }
 .pq-q { font-size: 24px; font-weight: 800; margin: 0 0 4px; overflow-wrap: break-word; }
@@ -178,6 +179,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   const round = new Round();
   let roundN = 1;
   let summaryOpen = false;
+  let summaryAt = 0;
   let armTimer: ReturnType<typeof setTimeout> | null = null;
 
   const navs = (): HTMLElement[] => [...root.querySelectorAll<HTMLElement>('[data-nav]')].filter((n) => !(n as HTMLButtonElement).disabled);
@@ -424,11 +426,13 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     paper.scrollTop = 0;
     rev.hidden = true;
     const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, 'Ещё раунд');
-    const end = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-end': '', onclick: () => api.stop() }, 'Закончить');
-    foot.replaceChildren(more, end);
+    // «Wróć»: выйти и мгновенно вернуться к месту, откуда запустил игру (`systems/entryPoint.ts`); в фокусе по умолчанию.
+    const end = el('button', { type: 'button', class: 'pq-btn pq-back', 'data-nav': '', 'data-end': '', 'data-back-entry': '', onclick: () => api.stop() }, '↩ Wróć · Назад');
+    foot.replaceChildren(end, more);
+    summaryAt = performance.now();
     paintRound();
     setFocus(0);
-    more.focus({ preventScroll: true });
+    end.focus({ preventScroll: true });
     requestAnimationFrame(reportHeight);
   };
 
@@ -469,7 +473,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         return;
       case 'interact': {
         if (summaryOpen) {
-          navs()[focusIdx]?.click();
+          // Первые 400 мс после итога клавиша действия его не нажимает: не промахнуться по «Wróć» на «Dalej».
+          if (performance.now() - summaryAt >= 400) navs()[focusIdx]?.click();
           return;
         }
         if (answered) {
