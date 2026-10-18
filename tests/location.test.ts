@@ -149,7 +149,7 @@ describe('интерактивные объекты', () => {
 
   it('все пять: bed, desk, shelf дома; bin, board на ферме', () => {
     const cases: [string, string, [number, number], Dir][] = [
-      ['home', 'bed', [1, 4], 'up'],
+      ['home', 'bed', [3, 4], 'up'],
       ['home', 'shelf', [5, 3], 'up'],
       ['home', 'desk', [9, 4], 'up'],
       ['farm', 'bin', [9, 6], 'up'],

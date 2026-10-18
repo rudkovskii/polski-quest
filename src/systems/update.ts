@@ -2,17 +2,26 @@
 // а на экране старый код. Что делать — решает чистая политика, склейка (src/systems/platform/pwa.ts, main.ts)
 // только перезагружает или показывает тост.
 //   • Не открыт ни один экран (меню, мини-игра, словарь, настройки) — тихая перезагрузка: прогресс дописывается в базу.
-//   • Что-то открыто — заметный тост «Есть новая версия · Обновить»; как только экраны закрылись, политика спрашивается снова.
-//   • Только что перезагружались (защита от петли) — тост, а не ещё одна перезагрузка.
+//   • Что-то открыто — один крупный тост «Новая версия · Обновить»; как только экраны закрылись, тихая перезагрузка.
+//   • Защита от петли (P3b): тост вместо второй перезагрузки только если за минуту мы перезагрузились ИЗ ЭТОЙ ЖЕ сборки (перезагрузка
+//     ничего не дала). Пришла ещё более новая сборка (промежуточная → свежая) — перезагружаемся сразу, без второго тоста.
 
 /** Не перезагружаться сами чаще раза в минуту: новая сборка могла прийти дважды подряд. */
 export const RELOAD_GUARD_MS = 60_000;
 
 export type UpdateAction = 'reload' | 'toast';
 
-export function updateAction(o: { busy: boolean; lastReloadAt: number | null; now: number }): UpdateAction {
+export function updateAction(o: {
+  busy: boolean;
+  lastReloadAt: number | null;
+  now: number;
+  /** Сборка, из которой была прошлая авто-перезагрузка, и текущая: разные — прошлая перезагрузка сработала, петли нет. */
+  lastReloadFrom?: string | null;
+  local?: string;
+}): UpdateAction {
   if (o.busy) return 'toast';
-  if (o.lastReloadAt !== null && o.now - o.lastReloadAt >= 0 && o.now - o.lastReloadAt < RELOAD_GUARD_MS) return 'toast';
+  const looped = o.lastReloadFrom == null || o.local == null || o.lastReloadFrom === o.local;
+  if (looped && o.lastReloadAt !== null && o.now - o.lastReloadAt >= 0 && o.now - o.lastReloadAt < RELOAD_GUARD_MS) return 'toast';
   return 'reload';
 }
 
