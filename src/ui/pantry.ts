@@ -54,14 +54,19 @@ export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEven
   panel.body.append(el('style', {}, css), content);
   parent.append(panel.root);
 
-  const total = new Map<string, number>();
-  for (const x of [...api.words, ...api.phrases]) total.set(x.topic, (total.get(x.topic) ?? 0) + 1);
+  /** Сколько всего в каждой теме: считается при показе полки, свои слова («Moje słowa») появляются и удаляются на лету. */
+  const totals = (): Map<string, number> => {
+    const m = new Map<string, number>();
+    for (const x of [...api.words, ...api.phrases]) m.set(x.topic, (m.get(x.topic) ?? 0) + 1);
+    return m;
+  };
   const hue = (idx: number): number => (idx * 47 + 20) % 360;
 
   let current: string | null = null; // открытая банка
 
   function renderShelf(): void {
     const taken = new Map(api.pantry().map((p) => [p.topic, p.ids]));
+    const total = totals();
     const all = [...taken.values()].flat();
     const phrases = all.filter((id) => id.startsWith('p.')).length;
     const jars = api.topics.map((t, idx) => {

@@ -1,15 +1,17 @@
 // Słownik · Словарь: книга на столе дома. Слова и фразы, темы, поиск без диакритики, фильтр по стадии, карточка, посадка.
 import { fold } from '../systems/content';
+import { isCustomId, type RuplDb } from '../systems/customWords';
 import type { Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import type { Phrase, Word } from '../types/content';
 import type { FarmApi, ItemInfo } from '../types/farm';
+import { CUSTOM_CSS, createCustomPane } from './customWord';
 import { el } from './dom';
 import { STAGE_INFO, TIP_CSS, type Tips } from './glossary';
 import { createPanel, nav } from './panel';
 import { iconKeyOf, stageIcon, STAGE_ICON_CSS } from './stageIcon';
 
-type Tab = 'words' | 'phrases';
+type Tab = 'words' | 'phrases' | 'add';
 type Filter = 'all' | 'new' | 'growing' | 'grown';
 
 const PAGE = 200;
@@ -24,6 +26,7 @@ const GENDER: Record<NonNullable<Word['gender']>, string> = { m: 'м. р.', f: '
 const css = `
 ${STAGE_ICON_CSS}
 ${TIP_CSS}
+${CUSTOM_CSS}
 .dict-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; opacity: .85; align-items: center; }
 .dict-legend span { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
 .dict { display: flex; flex-direction: column; gap: 10px; }
@@ -80,6 +83,10 @@ ${TIP_CSS}
   .dict-head .dict-topic small { display: none; }
   .dict-head { padding: 5px 12px; gap: 4px; }
   .dict-head .dict-tabs .pq-btn, .dict-head .dict-search { height: 36px; min-height: 36px; max-height: 36px; }
+  /* Три вкладки («＋ Своё») и поиск в одну строку на 375 px: вкладки уже, поиск не сжимается в щель. */
+  .dict-head .dict-tabs .pq-btn { padding: 0 8px; font-size: 14px; }
+  .dict-headrow { gap: 6px; }
+  .dict-head .dict-search { min-width: 90px; }
   .dict-bulkrow .pq-btn.small { padding: 4px 9px; font-size: 13px; height: 30px; box-sizing: border-box; }
   .dict-legend { display: none; }
   /* Телефон: строка слова в одну линию (польское, перевод мельче с многоточием, значок). Список листает сама панель:
@@ -130,27 +137,43 @@ interface Entry {
   fru: string;
 }
 
-export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips): DictionaryScreen {
+export interface DictionaryExtras {
+  /** Словарь «русский → польский» для вкладки «＋ Своё» (platform/rupl). Нет — только ручной ввод. */
+  loadDict?: () => Promise<RuplDb | null>;
+}
+
+export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>, tips?: Tips, extras: DictionaryExtras = {}): DictionaryScreen {
   const panel = createPanel({ title: 'Słownik · Словарь', wide: true, bus });
   panel.footer.setAttribute('data-dict', '');
   const rankOf = (x: Word | Phrase, i: number): number => ('freq' in x ? x.freq * 1e5 + x.order : x.level * 1e5 + i);
   const mkEntries = (xs: readonly (Word | Phrase)[]): Entry[] =>
     xs.map((x, i) => ({ id: x.id, rank: rankOf(x, i), pl: x.pl, ru: x.ru, topic: x.topic, fpl: fold(x.pl), fru: fold(x.ru) }));
-  const entries: Record<Tab, Entry[]> = { words: mkEntries(api.words), phrases: mkEntries(api.phrases) };
-  const topicsOf = (tab: Tab) => {
-    const used = new Set(entries[tab].map((e) => e.topic));
-    return api.topics.filter((t) => used.has(t.id));
+  const entries: Record<'words' | 'phrases', Entry[]> = { words: mkEntries(api.words), phrases: mkEntries(api.phrases) };
+  /** Свои слова добавляются и меняются на лету: список слов пересобирается, когда их набор изменился. */
+  const customSig = (): string => (api.custom ? api.custom.list().map((w) => `${w.id}:${w.pl}:${w.ru}`).join('|') : '');
+  let seenCustom = customSig();
+  const topicsOf = (t: 'words' | 'phrases') => {
+    const used = new Set(entries[t].map((e) => e.topic));
+    return api.topics.filter((x) => used.has(x.id));
   };
+  /** Вкладка со списком: «＋ Своё» списка не имеет, под ней остаются слова. */
+  const listTab = (): 'words' | 'phrases' => (tab === 'phrases' ? 'phrases' : 'words');
 
   let tab: Tab = 'words';
   let topic = '';
   let filter: Filter = 'all';
   let query = '';
   let selected: string | null = null;
+  /** Слово, на удаление которого ждём подтверждения (растущее своё слово). */
+  let confirmDel: string | null = null;
   let limit = PAGE;
 
-  const tabBtns = (['words', 'phrases'] as Tab[]).map((t) =>
-    el('button', { type: 'button', class: 'pq-btn', 'data-tab': t, ...nav('tabs', 'h', `tab:${t}`), onclick: () => setTab(t) }, t === 'words' ? 'Słowa' : 'Frazy'),
+  const tabBtns = ((api.custom ? ['words', 'phrases', 'add'] : ['words', 'phrases']) as Tab[]).map((t) =>
+    el(
+      'button',
+      { type: 'button', class: 'pq-btn', 'data-tab': t, ...(t === 'add' ? { 'aria-label': 'Своё слово', title: 'Добавить своё слово' } : {}), ...nav('tabs', 'h', `tab:${t}`), onclick: () => setTab(t) },
+      t === 'words' ? 'Słowa' : t === 'phrases' ? 'Frazy' : '＋ Своё',
+    ),
   );
   const search = el('input', { type: 'search', class: 'dict-search', placeholder: 'Поиск: kot, кот, zolw…', 'aria-label': 'Поиск', 'data-search': '', ...nav('search', 'v', 'search'), autocomplete: 'off' });
   search.addEventListener('input', () => {
@@ -184,7 +207,31 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   const cardCol = el('div', { class: 'dict-card', 'data-card': '' });
   const cardWrap = el('div', { class: 'dict-cardwrap', hidden: true }, cardCol);
   const cols = el('div', { class: 'dict-cols nocard', 'data-cols': '' }, topicsCol, el('div', {}, listCol), cardWrap);
+  // «＋ Своё слово»: русское слово → варианты из словаря → правка → посадка (ui/customWord.ts).
+  const pane = api.custom
+    ? createCustomPane({
+        api: api as FarmApi & { custom: NonNullable<FarmApi['custom']> },
+        ...(extras.loadDict ? { loadDict: extras.loadDict } : {}),
+        refocus: (key) => (key ? panel.focus(key) : panel.syncFocus()),
+        onEdited: (id) => {
+          say('Исправлено');
+          tab = 'words';
+          topic = api.word(id)?.topic ?? '';
+          query = '';
+          search.value = '';
+          filter = 'all';
+          limit = PAGE;
+          selected = id;
+          afterCustomChange();
+        },
+        onCancel: () => {
+          tab = 'words';
+          afterCustomChange();
+        },
+      })
+    : null;
   const note = el('span', { role: 'status', 'data-note': '' });
+  const filtersRow = el('div', { class: 'dict-filters' }, ...filterBtns);
   // Липкая шапка: вкладки и поиск, на телефоне ещё чипы тем, и кнопки «Посадить 7 / Всю тему».
   const head = el('div', { class: 'dict-head', 'data-head': '' }, el('div', { class: 'dict-headrow' }, el('div', { class: 'dict-tabs' }, ...tabBtns), search), bulkRow);
   const mql = typeof window !== 'undefined' && typeof window.matchMedia === 'function' ? window.matchMedia('(max-width: 640px)') : null;
@@ -202,9 +249,10 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
       'div',
       { class: 'dict' },
       head,
-      el('div', { class: 'dict-filters' }, ...filterBtns),
+      filtersRow,
       legend,
       cols,
+      pane?.root,
     ),
   );
   parent.append(panel.root);
@@ -228,7 +276,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   const topicNow = (): string => (query.trim() ? '' : topic);
   const matches = (): Entry[] => {
     const q = fold(query.trim());
-    return entries[tab].filter((e) => {
+    return entries[listTab()].filter((e) => {
       if (topicNow() && e.topic !== topicNow()) return false;
       if (q && !e.fpl.includes(q) && !e.fru.includes(q)) return false;
       if (filter !== 'all' && group(info(e.id)) !== filter) return false;
@@ -239,7 +287,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   /** Новые (и доступные) слова выбранной темы, частые первыми. */
   const plantable = (): string[] =>
     topicNow()
-      ? entries[tab]
+      ? entries[listTab()]
           .filter((e) => e.topic === topicNow() && info(e.id).status === 'new' && !locked(e.id))
           .sort((a, b) => a.rank - b.rank)
           .map((e) => e.id)
@@ -269,11 +317,11 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
         pl,
         ru ? el('small', {}, ru) : null,
       );
-    topicsCol.replaceChildren(mk('', 'Все'), ...topicsOf(tab).map((t) => mk(t.id, t.pl, t.ru)));
+    topicsCol.replaceChildren(mk('', 'Все'), ...topicsOf(listTab()).map((t) => mk(t.id, t.pl, t.ru)));
   }
 
   function renderBulk(): void {
-    const n = plantable().length;
+    const n = tab === 'add' ? 0 : plantable().length;
     const soft = n > TOPIC_SOFT_MAX;
     bulk.hidden = n === 0;
     bulk.textContent = soft ? `Посадить ${TOPIC_QUICK} (быстрее урожай)` : `Посадить всю тему (${n})`;
@@ -344,6 +392,50 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     }
   }
 
+  /** Свои слова: «Изменить» и «Удалить» (растущее — с подтверждением, нерастущее — без вопросов). */
+  function customBar(id: string, i: ItemInfo): HTMLElement {
+    if (confirmDel === id) {
+      return el(
+        'div',
+        { class: 'lock', 'data-confirm-del': '' },
+        `${i.status === 'grown' ? 'Слово выучено и лежит в банке.' : 'Слово уже растёт.'} Удалить вместе с прогрессом?`,
+        el(
+          'div',
+          { class: 'btns', style: 'margin-top:6px' },
+          el('button', { type: 'button', class: 'pq-btn small', 'data-del-yes': '', ...nav('card', 'v', 'del-yes'), onclick: () => removeCustom(id) }, 'Да, удалить'),
+          el('button', { type: 'button', class: 'pq-btn small', 'data-del-no': '', ...nav('card', 'v', 'del-no'), onclick: () => ((confirmDel = null), renderCard(), panel.syncFocus()) }, 'Оставить'),
+        ),
+      );
+    }
+    return el(
+      'div',
+      { class: 'btns', 'data-custom-bar': '' },
+      el('button', { type: 'button', class: 'pq-btn small', 'data-edit': '', ...nav('card', 'v', 'edit'), onclick: () => editCustom(id) }, '✎ Изменить'),
+      el('button', { type: 'button', class: 'pq-btn small', 'data-del': '', ...nav('card', 'v', 'del'), onclick: () => askRemove(id) }, '🗑 Удалить'),
+    );
+  }
+  function editCustom(id: string): void {
+    tab = 'add';
+    selected = null;
+    confirmDel = null;
+    pane?.edit(id);
+    renderAll();
+  }
+  function askRemove(id: string): void {
+    // Ещё не посажено: удаляем сразу. Растёт или в банке: сначала спрашиваем.
+    if (info(id).status === 'new') return removeCustom(id);
+    confirmDel = id;
+    renderCard();
+    panel.focus('del-no');
+  }
+  function removeCustom(id: string): void {
+    confirmDel = null;
+    if (selected === id) selected = null;
+    api.custom?.remove(id);
+    say('Слово удалено');
+    afterCustomChange();
+  }
+
   function renderCard(): void {
     cardCol.scrollTop = 0;
     const id = selected;
@@ -393,6 +485,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     const tipId = i.status === 'bag' ? 'bag' : i.status === 'grown' ? 'jar' : null;
     const tip = tipId ? tips?.note(tipId) : null;
     if (tip) kids.push(tip);
+    if (w && api.custom && isCustomId(w.id)) kids.push(customBar(w.id, i));
     // Место под кнопку занято всегда: после посадки на её месте строка того же размера, карточка не меняет высоту.
     kids.push(
       el(
@@ -408,15 +501,41 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
 
   function renderAll(): void {
     renderTabs();
-    renderList();
+    // «＋ Своё слово» заменяет список: поиск, фильтры, легенда и колонки прячутся, живёт только панель добавления.
+    const adding = tab === 'add';
+    for (const n of [search, filtersRow, legend, cols, topicsCol]) n.hidden = adding;
+    if (pane) pane.root.hidden = !adding;
+    if (!adding) {
+      renderList();
+      renderCard();
+    }
     renderBulk();
-    renderCard();
     panel.syncFocus();
+  }
+
+  /** Набор своих слов изменился (добавили, поправили, удалили): список и чипы тем пересобираем. */
+  function syncCustom(): void {
+    const sig = customSig();
+    if (sig === seenCustom) return;
+    seenCustom = sig;
+    entries.words = mkEntries(api.words);
+    if (topic && !topicsOf(listTab()).some((x) => x.id === topic)) topic = '';
+    listSig = '';
+    renderTopics();
+  }
+  function afterCustomChange(): void {
+    syncCustom();
+    renderTopics();
+    listSig = '';
+    renderAll();
+    const row = selected ? listCol.querySelector(`[data-nav="row:${selected}"]`) : null;
+    if (row) panel.focus(`row:${selected}`);
   }
 
   // ---- действия
   function select(id: string): void {
     selected = id;
+    confirmDel = null;
     say('');
     for (const r of listCol.querySelectorAll<HTMLElement>('.dict-row')) r.classList.toggle('sel', r.getAttribute('data-id') === id);
     renderCard();
@@ -431,7 +550,16 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   function setTab(t: Tab): void {
     if (t === tab) return;
     tab = t;
-    if (topic && !topicsOf(tab).some((x) => x.id === topic)) topic = '';
+    if (t === 'add') {
+      selected = null;
+      confirmDel = null;
+      say('');
+      pane?.show();
+      renderAll();
+      pane?.focusInput();
+      return;
+    }
+    if (topic && !topicsOf(listTab()).some((x) => x.id === topic)) topic = '';
     selected = null;
     limit = PAGE;
     say('');
@@ -478,8 +606,13 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
       off?.();
       off = api.onChange(() => {
         if (!panel.isOpen) return;
+        syncCustom();
         renderAll();
       });
+      // Свои слова могли появиться, пока экран был закрыт.
+      if (tab === 'add') tab = 'words';
+      syncCustom();
+      confirmDel = null;
       renderTopics();
       renderAll();
       const first = listCol.querySelector<HTMLElement>('[data-nav]');

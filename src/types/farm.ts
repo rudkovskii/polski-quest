@@ -1,7 +1,8 @@
 // Ферма F-03: что видят экраны (словарь, банки, коробка, кровать, карточка растения) и мир (грядки, автобег).
 // Чистая модель — src/systems/garden.ts; склейка с хранилищем и шиной — src/main.ts (FarmApi).
 import type { Base, PathInfo } from '../systems/xp';
-import type { Phrase, Topic, Word } from './content';
+import type { Gender } from '../systems/customWords';
+import type { Phrase, Pos, Topic, Word } from './content';
 
 /** Стадия растения. ripe — созрело (миг перед тем, как герой сорвёт); overripe — вернулось из банки повторить. */
 export type Stage = 'seed' | 'sprout' | 'bush' | 'ripe' | 'overripe';
@@ -71,6 +72,30 @@ export interface PhraseHint {
   ready: boolean;
 }
 
+/** Что можно сохранить как своё слово (карточка «＋ Своё слово»). Пример — необязательный. */
+export interface CustomInput {
+  pl: string;
+  ru: string;
+  pos?: Pos;
+  gender?: Gender;
+  ex?: { pl: string; ru?: string } | null;
+}
+export type CustomAdd = { ok: true; id: string; existed: boolean } | { ok: false; reason: 'empty' | 'limit' };
+
+/** Свои слова («Moje słowa»): хранятся в `Save.custom`, растут как обычные, в путь к A1 не входят. */
+export interface CustomApi {
+  /** Свои слова, новые первыми. */
+  list(): readonly Word[];
+  /** Сохранить слово (то же польское+русское второй раз не дублируется: existed). Сажает отдельно `FarmApi.plant`. */
+  add(input: CustomInput): CustomAdd;
+  /** Поправить польское, перевод, пример; id не меняется. false — нет такого своего слова. */
+  update(id: string, patch: Partial<Pick<CustomInput, 'pl' | 'ru' | 'ex'>>): boolean;
+  /** Удалить слово и его растение (посадка, ответы, грядка). false — нет такого. */
+  remove(id: string): boolean;
+  /** Слова базы (A1 и тема праздников) с таким русским переводом: «это слово уже есть в базе». */
+  base(...ru: string[]): Word[];
+}
+
 /** Фасад для экранов. Экраны не знают про хранилище: всё через него. */
 export interface FarmApi {
   readonly words: readonly Word[];
@@ -90,6 +115,8 @@ export interface FarmApi {
   say(id: string, slow?: boolean): void;
   /** Подписка на любые изменения фермы. */
   onChange(fn: () => void): () => void;
+  /** Свои слова. Нет — экран «＋ Своё слово» не показывается. */
+  custom?: CustomApi;
 }
 
 /** Вид растения (`systems/plantLook.ts`): мини-предмет на кусте, плод цвета, куст-вариант; фразы и единицы v2 — прежние спрайты. */

@@ -24,6 +24,7 @@ import type { BusEvents } from './types/bus';
 import { mountAudioToast } from './ui/audioToast';
 import { mountAssembleGap } from './ui/assembleGap';
 import { mountBoard } from './ui/board';
+import { createRuplLoader } from './systems/platform/rupl';
 import { mountDictionary } from './ui/dictionary';
 import { mountFloats } from './ui/float';
 import { mountMinigame } from './ui/minigame';
@@ -149,6 +150,8 @@ async function main(): Promise<void> {
     now: () => clock.now(),
     tz: (t) => new Date(t).getTimezoneOffset(),
     say: (id, slow) => bus.emit('audio:play', { id, text: farm.word(id)?.pl ?? farm.phrase(id)?.pl ?? '', ...(slow ? { slow } : {}) }),
+    // Свои слова («Moje słowa»): раздел Save.custom; озвучка — Web Speech pl-PL (в манифесте их нет), при ?mute=1 тишина.
+    customs: { load: () => store.save.custom, save: (custom) => store.update((s: Save) => ({ ...s, custom }), clock.now()) },
   });
   // Цель дня в HUD: «Сегодня: полито N · созреет завтра M» (верные ответы за календарный день + `ripeSoon`), тап открывает итог.
   const dayNow = (): number => {
@@ -282,7 +285,7 @@ async function main(): Promise<void> {
   mountPolskaHud(overlay, { onTap: () => !game.isOpen && !polskaGame.isOpen && board.open('polska') });
   // Пояснения «банка» и «мешок»: один раз, при первом показе (флаги `tip:*` в `Save.hints`).
   const tips = createTips({ seen: hasHint, mark: addHint });
-  const dictionary = mountDictionary(overlay, farm, undefined, tips);
+  const dictionary = mountDictionary(overlay, farm, undefined, tips, { loadDict: createRuplLoader({ url: `${import.meta.env.BASE_URL}dict/rupl.json.gz` }) });
   const pantry = mountPantry(overlay, farm, undefined, tips);
   const pathScreen = mountPath(overlay, farm);
   const summary = mountSummary(overlay, farm, undefined, tips, () => pathScreen.open());
