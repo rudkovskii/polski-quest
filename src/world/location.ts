@@ -5,6 +5,7 @@ import type { LocationMap } from '../types/map';
 import type { Dir, Intent } from '../types/input';
 import { parseAscii, type ParsedMap, type Xy } from './ascii';
 import { findPath, findPathToAny, type Grid } from './pathfind';
+import { CAT_FREE_AFTER_MS, CAT_HOP_MS, CAT_REACT_MAX_MS, CAT_REACT_MIN_MS, CatLife, type LifeHost, type LifeMode, type LifeOrder, type LifePlace } from './catLife';
 
 /** Скорость ходьбы: 4,5 клетки в секунду. */
 export const CELLS_PER_SEC = 4.5;
@@ -94,11 +95,15 @@ export interface Actor {
   step: Step | null;
 }
 
-export type CatMode = 'follow' | 'sit' | 'wash' | 'sleep';
+export type CatMode = LifeMode;
+/** Позы, в которых кот бывает только занятый своими делами (герой стоит). */
+const CAT_FREE_MODES: readonly CatMode[] = ['lie', 'sniff', 'crouch', 'pounce'];
 export interface Cat extends Actor {
   mode: CatMode;
   /** Сколько в текущем режиме, мс. */
   since: number;
+  /** Сидит на заборе (клетка непроходима для героя). */
+  perch?: boolean;
 }
 
 export interface LocationOptions {
@@ -195,6 +200,8 @@ export class LocationModel {
 
   /** Множитель скорости шага (автобег ускоряется, когда действия копятся в очереди). */
   speed = 1;
+  /** Мини-игра (автобег): кот остаётся рядом, как раньше, и своими делами не занят. */
+  leash = false;
   private plants: WorldObject[] = [];
   private heldDir: Dir | null = null;
   /** Короткие нажатия, пришедшие во время шага: до QUEUE_MAX, по порядку. */
@@ -214,6 +221,11 @@ export class LocationModel {
   private trail: Xy[] = [];
   private idleMs = 0;
   private catRestMs = 3000;
+  private readonly life = new CatLife();
+  private readonly lifeHost: LifeHost;
+  /** Герой пошёл: сколько кот уже доигрывает дело и сколько ему отведено, мс. */
+  private reactT = 0;
+  private reactAt = -1;
 
   constructor(map: LocationMap, spawn: Xy, opts: LocationOptions = {}) {
     this.map = map;
@@ -228,6 +240,16 @@ export class LocationModel {
     this.grid = { w, h, passable: (x, y) => this.passable(x, y) };
     this.player = { tile: [spawn[0], spawn[1]], facing: opts.facing ?? 'down', step: null };
     this.trail = [[spawn[0], spawn[1]]];
+    const self = this;
+    this.lifeHost = {
+      rand: () => this.rand(),
+      get hero() {
+        return self.player.tile;
+      },
+      size: [w, h],
+      rest: (c) => this.catGrid().passable(c[0], c[1]) && !this.noRest(c),
+      places: () => this.catPlaces(),
+    };
     this.cat = opts.cat === false ? null : { tile: this.catSpawn(), facing: this.player.facing, step: null, mode: 'follow', since: 0 };
   }
 
@@ -761,28 +783,59 @@ export class LocationModel {
       if (c.step.t < c.step.ms) return;
       c.tile = c.step.to;
       c.step = null;
+      c.perch = !this.passable(c.tile[0], c.tile[1]);
     }
     const bed = this.spot('cat_sleep');
-    if (!this.busy && bed && this.idleMs >= CAT_SLEEP_AFTER_MS && c.mode !== 'sleep' && !eq(c.tile, bed)) c.mode = 'follow'; // пора спать
-    if (this.busy) {
-      if (c.mode !== 'follow') {
-        c.mode = 'follow';
-        c.since = 0;
-      }
-    } else if (c.mode === 'sleep') return;
-    else if (c.mode === 'sit' || c.mode === 'wash') {
-      // Сидит рядом: смотрит на героя, время от времени умывается; мешать начал (клетка стала запретной) — уходит.
-      if (this.noRest(c.tile)) {
+    const sleepNow = !this.busy && !!bed && this.idleMs >= CAT_SLEEP_AFTER_MS;
+    if (sleepNow && c.mode !== 'sleep' && !eq(c.tile, bed!)) {
+      if (this.leaveFree()) return;
+      c.mode = 'follow'; // пора спать
+    }
+    const free = !this.busy && !this.leash && !sleepNow && this.idleMs >= CAT_FREE_AFTER_MS;
+    if (this.busy || this.reactAt >= 0) {
+      // Герой пошёл: дело кот бросает не сразу, а через 0,5–1 с (даже если герой уже остановился); клетка стала запретной — сразу.
+      if (c.mode !== 'follow' || c.perch) {
+        if (!this.noRest(c.tile)) {
+          if (this.reactAt < 0) {
+            this.reactAt = CAT_REACT_MIN_MS + this.rand() * (CAT_REACT_MAX_MS - CAT_REACT_MIN_MS);
+            this.reactT = 0;
+          }
+          this.reactT += dt;
+          if (this.reactT < this.reactAt) return;
+        }
+        this.reactAt = -1;
+        if (this.leaveFree()) return;
         c.mode = 'follow';
         c.since = 0;
       } else {
-        c.facing = dirBetween(c.tile, this.player.tile);
-        if (c.since > this.catRestMs) {
-          c.mode = c.mode === 'sit' ? 'wash' : 'sit';
-          c.since = 0;
-          this.catRestMs = c.mode === 'wash' ? 1800 + this.rand() * 1200 : 3000 + this.rand() * 4000;
-        }
+        this.reactAt = -1;
+        this.life.reset();
+      }
+    }
+    if (!this.busy) {
+      if (free) {
+        this.freeLife(dt);
         return;
+      }
+      if (this.life.active || c.perch || CAT_FREE_MODES.includes(c.mode)) {
+        if (this.leaveFree()) return;
+        if (CAT_FREE_MODES.includes(c.mode)) c.mode = 'follow';
+      }
+      if (c.mode === 'sleep') return;
+      if (c.mode === 'sit' || c.mode === 'wash') {
+        // Сидит рядом: смотрит на героя, время от времени умывается; мешать начал (клетка стала запретной) — уходит.
+        if (this.noRest(c.tile)) {
+          c.mode = 'follow';
+          c.since = 0;
+        } else {
+          c.facing = dirBetween(c.tile, this.player.tile);
+          if (c.since > this.catRestMs) {
+            c.mode = c.mode === 'sit' ? 'wash' : 'sit';
+            c.since = 0;
+            this.catRestMs = c.mode === 'wash' ? 1800 + this.rand() * 1200 : 3000 + this.rand() * 4000;
+          }
+          return;
+        }
       }
     }
     const want = this.catWant();
@@ -799,6 +852,85 @@ export class LocationModel {
     }
     c.facing = dirBetween(c.tile, nxt);
     c.step = { from: c.tile, to: nxt, t: 0, ms: CAT_STEP_MS };
+  }
+
+  /** Бросить свои дела: сброс плана; с забора — прыжок вниз (true, если прыжок начат). */
+  private leaveFree(): boolean {
+    const c = this.cat!;
+    this.life.reset();
+    if (!c.perch) return false;
+    const g = this.catGrid();
+    const down = DIR_ORDER.map((d): Xy => [c.tile[0] + DELTA[d][0], c.tile[1] + DELTA[d][1]]).filter((x) => g.passable(x[0], x[1]));
+    const to = down.find((x) => !this.noRest(x)) ?? down[0];
+    c.mode = 'sit';
+    if (!to) return false;
+    c.facing = dirBetween(c.tile, to);
+    c.step = { from: c.tile, to, t: 0, ms: CAT_HOP_MS };
+    c.mode = 'follow';
+    c.since = 0;
+    return true;
+  }
+
+  /** Герой стоит давно: кот занят своим, в радиусе 3–5 клеток от героя (см. catLife.ts). */
+  private freeLife(dt: number): void {
+    const c = this.cat!;
+    const o: LifeOrder | null = this.life.tick(dt, c.tile, this.lifeHost);
+    if (!o) return;
+    if (o.k === 'pose') {
+      if (c.mode !== o.mode) {
+        c.mode = o.mode;
+        c.since = 0;
+      }
+      if (o.face) c.facing = Array.isArray(o.face) ? dirBetween(c.tile, o.face as Xy) : (o.face as Dir);
+      return;
+    }
+    if (o.k === 'hop') {
+      c.mode = 'sit';
+      c.facing = dirBetween(c.tile, o.cell);
+      c.step = { from: c.tile, to: o.cell, t: 0, ms: CAT_HOP_MS };
+      return;
+    }
+    const res = findPath(this.catGrid(), c.tile, o.cell);
+    const nxt = res.path[0];
+    if (!nxt || !res.exact) {
+      this.life.abort(this.lifeHost.rand);
+      return;
+    }
+    if (c.mode !== 'follow') {
+      c.mode = 'follow';
+      c.since = 0;
+    }
+    c.facing = dirBetween(c.tile, nxt);
+    c.step = { from: c.tile, to: nxt, t: 0, ms: CAT_STEP_MS };
+  }
+
+  /** Места для дел кота: забор, коробка и радио, ковёр, грядки и цветы (нюхать). */
+  private catPlaces(): LifePlace[] {
+    const out: LifePlace[] = [];
+    const g = this.catGrid();
+    const { w, h } = this.parsed;
+    const nbrs = (c: Xy): Xy[] => DIR_ORDER.map((d): Xy => [c[0] + DELTA[d][0], c[1] + DELTA[d][1]]).filter((x) => g.passable(x[0], x[1]));
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        if (this.parsed.deco[y]![x] && this.parsed.solid[y]![x] && !this.solidObj[y]![x]) {
+          const stand = nbrs([x, y]);
+          for (const s of stand) out.push({ kind: 'perch', stand: s, hop: [x, y] });
+        }
+      }
+    for (const o of this.objects) {
+      if (o.kind === 'prop' && (o.use === 'bin' || o.use === 'radio')) {
+        const [x0, y0] = o.at;
+        const [sw, sh] = o.size;
+        for (let y = y0 - 2; y < y0 + sh + 2; y++)
+          for (let x = x0 - 2; x < x0 + sw + 2; x++) if (g.passable(x, y)) out.push({ kind: o.use === 'bin' ? 'box' : 'radio', stand: [x, y], look: [x0, y0] });
+      } else if (o.kind === 'prop' && o.id === 'rug') {
+        for (let y = o.at[1]; y < o.at[1] + o.size[1]; y++) for (let x = o.at[0]; x < o.at[0] + o.size[0]; x++) out.push({ kind: 'rug', stand: [x, y] });
+      } else if (o.kind === 'prop' && o.id.startsWith('flower')) {
+        for (const s of nbrs(o.at)) out.push({ kind: 'sniff', stand: s, look: o.at });
+      }
+    }
+    for (const p of this.plants) for (const s of nbrs(p.at)) out.push({ kind: 'sniff', stand: s, look: p.at });
+    return out;
   }
 
   /** Кот пришёл на место: садится (или спит у кровати). */

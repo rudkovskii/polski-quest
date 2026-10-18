@@ -95,7 +95,21 @@
    "cat/13",
    "cat/14",
    "cat/15",
-   "cat/16"
+   "cat/16",
+   "cat/17",
+   "cat/18",
+   "cat/19",
+   "cat/20",
+   "cat/21",
+   "cat/22",
+   "cat/23",
+   "cat/24",
+   "cat/25",
+   "cat/26",
+   "cat/27",
+   "cat/28",
+   "cat/29",
+   "cat/30"
   ],
   "anims": {
    "idle_down": [
@@ -144,6 +158,36 @@
    "sleep": [
     "cat/15",
     "cat/16"
+   ],
+   "sniff_right": [
+    "cat/17",
+    "cat/18"
+   ],
+   "sniff_left": [
+    "cat/19",
+    "cat/20"
+   ],
+   "crouch_right": [
+    "cat/21",
+    "cat/22"
+   ],
+   "crouch_left": [
+    "cat/23",
+    "cat/24"
+   ],
+   "lie_right": [
+    "cat/25",
+    "cat/26"
+   ],
+   "lie_left": [
+    "cat/27",
+    "cat/28"
+   ],
+   "pounce_right": [
+    "cat/29"
+   ],
+   "pounce_left": [
+    "cat/30"
    ]
   }
  },

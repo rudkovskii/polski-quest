@@ -344,7 +344,7 @@ export class World extends Phaser.Scene {
         if (this.anims.exists(key)) continue;
         const walk = name.startsWith('walk') || name.startsWith('carry_walk');
         const action = name.startsWith('water') || name.startsWith('fert') || name.startsWith('throw');
-        const rate = walk ? 9 : action ? 5 : name === 'wash' ? 3 : name === 'sleep' ? 1.2 : 1;
+        const rate = walk ? 9 : action ? 5 : name === 'wash' ? 3 : name === 'sleep' || name.startsWith('lie') ? 1.2 : name.startsWith('sniff') ? 2.5 : name.startsWith('crouch') ? 3 : 1;
         this.anims.create({ key, frames: frames.map((frame) => ({ key: ATLAS, frame })), frameRate: rate, repeat: -1 });
       }
     }
@@ -520,8 +520,9 @@ export class World extends Phaser.Scene {
     const c = this.model.cat;
     const s = this.catSprite;
     if (!c || !s) return;
-    this.put(s, this.catShadow, c);
-    const key = c.mode === 'follow' ? `cat:${c.step ? 'walk' : 'idle'}_${c.facing}` : `cat:${c.mode}`;
+    this.put(s, this.catShadow, c, 0, c.perch && !c.step ? -4 : 0);
+    const side = c.facing === 'left' ? 'left' : 'right';
+    const key = c.mode === 'follow' ? `cat:${c.step ? 'walk' : 'idle'}_${c.facing}` : ['lie', 'sniff', 'crouch', 'pounce'].includes(c.mode) ? `cat:${c.mode}_${side}` : `cat:${c.mode}`;
     if (s.anims.currentAnim?.key !== key) s.play(key);
   }
 }

@@ -187,7 +187,7 @@ describe('рыжий кот', () => {
 
   it('когда герой стоит, садится рядом: не на клетке героя и не перед его лицом', () => {
     const m = modelAt('farm', [14, 7], 'right');
-    run(m, CAT_SIT_AFTER_MS + 5000);
+    run(m, CAT_SIT_AFTER_MS + 1000); // до 3 с покоя кот держится рядом
     const c = m.cat!;
     expect(['sit', 'wash']).toContain(c.mode);
     expect(c.tile).not.toEqual(m.player.tile);
@@ -216,7 +216,7 @@ describe('рыжий кот', () => {
     expect(m.cat!.tile).toEqual(m.spot('cat_sleep'));
     press(m, 'left');
     release(m, 'left');
-    run(m, 100);
+    run(m, 1100); // кот бросает дело через 0,5–1 с после того, как герой пошёл
     expect(m.cat!.mode).toBe('follow');
   });
 
