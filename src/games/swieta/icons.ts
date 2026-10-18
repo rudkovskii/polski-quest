@@ -3,6 +3,7 @@
 // Координаты кадров сверяет `tests/swieta.test.ts` с `custom.json` (после `npm run sprites` они могут уехать).
 import { WORD_BY_ID } from '../../systems/content';
 import { el } from '../../ui/dom';
+import { ATLAS_SIZE } from '../../ui/stageIcon';
 
 export interface AtlasFrame {
   x: number;
@@ -11,8 +12,8 @@ export interface AtlasFrame {
   h: number;
 }
 
-/** Размер атласа custom.png (`meta.size` в custom.json). */
-export const ATLAS_SIZE = { w: 256, h: 752 } as const;
+/** Размер атласа custom.png — один на игру, из `ui/stageIcon` (его сверяет тест `farmui`). */
+export { ATLAS_SIZE };
 
 export const FRAMES = {
   'w2_pisanki/0': { x: 73, y: 707, w: 16, h: 16 },
