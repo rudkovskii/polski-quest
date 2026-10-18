@@ -7,6 +7,7 @@ import { bus, type Bus } from './systems/bus';
 import { createFarm } from './systems/farm';
 import { GAMES, GAME_BY_ENTRY, GAME_BY_ID } from './games/registry';
 import { configureHymnAudio } from './games/hymn';
+import { inDays, nearestHoliday, shortName } from './games/swieta/calendar';
 import { createPolska } from './systems/polska';
 import { PLOT_NAME } from './systems/zagroda';
 import { activeDecor, parseDecor } from './systems/decor';
@@ -309,6 +310,15 @@ async function main(): Promise<void> {
       return h ? Number(h.slice(MORNING.length)) : null;
     },
     mark: (day) => store.update((s: Save) => ({ ...s, hints: [...s.hints.filter((x) => !x.startsWith(MORNING)), `${MORNING}${day}`] }), Date.now()),
+    // Праздник сегодня или на неделе (Święta) — строкой в утренней карточке; украшение дня, если оно есть.
+    polska: () => {
+      const t = new Date(clock.now());
+      const near = nearestHoliday(polska.units('swieta'), { y: t.getFullYear(), m: t.getMonth() + 1, d: t.getDate() });
+      if (!near || near.days > 7) return null;
+      const deco = (phaser.registry.get('decor') as string[] | undefined) ?? [];
+      const extra = deco.includes('dec.znicze') ? ' · znicze przy ogrodzie' : deco.includes('dec.choinka') ? ' · choinka w domu' : deco.some((x) => x.startsWith('dec.flagi')) ? ' · flagi na domu' : '';
+      return near.days === 0 ? `Dziś w Polsce: ${shortName(near.unit)}${extra}` : `Wkrótce: ${shortName(near.unit)} ${inDays(near.days)}`;
+    },
   });
   bus.on('world:interact', ({ use, id }) => {
     if (game.isOpen || polskaGame.isOpen) return;

@@ -21,6 +21,8 @@ export interface MorningDeps {
   seenDay(): number | null;
   /** Запомнить, что утро этого дня прошло. */
   mark(day: number): void;
+  /** Строка о Польше на сегодня («Dziś: Wszystkich Świętych · znicze przy ogrodzie»), null — без неё. */
+  polska?(): string | null;
   /** Пауза до первой проверки после загрузки мира, мс. */
   delayMs?: number;
 }
@@ -60,6 +62,8 @@ export function mountMorning(parent: HTMLElement, d: MorningDeps): Morning {
       el('div', {}, el('b', {}, r.label), r.value),
     );
     if (r.extra) text.append(el('div', { class: 'pq-morning-soon', 'data-soon': '' }, r.extra));
+    const pl = d.polska?.() ?? null;
+    if (pl) text.append(el('div', { class: 'pq-morning-polska', 'data-morning-polska': '', style: 'padding:6px 8px;background:#fffaf0;border:2px solid var(--pq-wood-dark);border-radius:8px;font-size:15px' }, pl));
     panel.open();
     panel.focus('go');
   };
