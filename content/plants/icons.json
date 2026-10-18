@@ -1,0 +1,2420 @@
+{
+ "_": "Иконки мини-предметов: кадр 16×16 (рисунок 12×12 + контур 1 px, по центру), якорь [8,8]. Фрейм в атласе проекта: \"<sheet>/<frame>\".",
+ "icons": {
+  "cat": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 0,
+   "group": "animals",
+   "tone": "cat",
+   "ru": "кот"
+  },
+  "dog": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 1,
+   "group": "animals",
+   "tone": "fur_brown",
+   "ru": "собака"
+  },
+  "cow": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 2,
+   "group": "animals",
+   "tone": "fur_white",
+   "ru": "корова"
+  },
+  "chicken": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 3,
+   "group": "animals",
+   "tone": "fur_white",
+   "ru": "курица"
+  },
+  "rooster": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 4,
+   "group": "animals",
+   "tone": "autumn",
+   "ru": "петух"
+  },
+  "horse": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 5,
+   "group": "animals",
+   "tone": "fur_brown",
+   "ru": "лошадь"
+  },
+  "pig": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 6,
+   "group": "animals",
+   "tone": "pig",
+   "ru": "свинья"
+  },
+  "sheep": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 7,
+   "group": "animals",
+   "tone": "fur_white",
+   "ru": "овца"
+  },
+  "bird": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 8,
+   "group": "animals",
+   "tone": "bird_blue",
+   "ru": "птица"
+  },
+  "duck": {
+   "sheet": "plant_icons_animals_1",
+   "frame": 9,
+   "group": "animals",
+   "tone": "paint_yellow",
+   "ru": "утка"
+  },
+  "goat": {
+   "sheet": "plant_icons_animals_2",
+   "frame": 0,
+   "group": "animals",
+   "tone": "fur_grey",
+   "ru": "коза"
+  },
+  "bee": {
+   "sheet": "plant_icons_animals_2",
+   "frame": 1,
+   "group": "animals",
+   "tone": "paint_yellow",
+   "ru": "пчела"
+  },
+  "cat_animal": {
+   "sheet": "plant_icons_animals_2",
+   "frame": 2,
+   "group": "animals",
+   "tone": "cloth_brown",
+   "ru": "животное (категория)"
+  },
+  "face": {
+   "sheet": "plant_icons_body_1",
+   "frame": 0,
+   "group": "body",
+   "tone": "skin",
+   "ru": "голова / лицо"
+  },
+  "hand": {
+   "sheet": "plant_icons_body_1",
+   "frame": 1,
+   "group": "body",
+   "tone": "skin",
+   "ru": "рука / палец"
+  },
+  "eye": {
+   "sheet": "plant_icons_body_1",
+   "frame": 2,
+   "group": "body",
+   "tone": "blue_sign",
+   "ru": "глаз"
+  },
+  "ear": {
+   "sheet": "plant_icons_body_1",
+   "frame": 3,
+   "group": "body",
+   "tone": "skin",
+   "ru": "ухо"
+  },
+  "nose": {
+   "sheet": "plant_icons_body_1",
+   "frame": 4,
+   "group": "body",
+   "tone": "skin",
+   "ru": "нос"
+  },
+  "mouth": {
+   "sheet": "plant_icons_body_1",
+   "frame": 5,
+   "group": "body",
+   "tone": "tomato",
+   "ru": "рот / губы"
+  },
+  "tooth": {
+   "sheet": "plant_icons_body_1",
+   "frame": 6,
+   "group": "body",
+   "tone": "paint_white",
+   "ru": "зуб"
+  },
+  "leg": {
+   "sheet": "plant_icons_body_1",
+   "frame": 7,
+   "group": "body",
+   "tone": "skin",
+   "ru": "нога / колено"
+  },
+  "heart": {
+   "sheet": "plant_icons_body_1",
+   "frame": 8,
+   "group": "body",
+   "tone": "tomato",
+   "ru": "сердце / любовь"
+  },
+  "hair": {
+   "sheet": "plant_icons_body_1",
+   "frame": 9,
+   "group": "body",
+   "tone": "hair",
+   "ru": "волосы"
+  },
+  "torso": {
+   "sheet": "plant_icons_body_1",
+   "frame": 10,
+   "group": "body",
+   "tone": "shirt",
+   "ru": "тело / спина / живот"
+  },
+  "blood": {
+   "sheet": "plant_icons_body_1",
+   "frame": 11,
+   "group": "body",
+   "tone": "tomato",
+   "ru": "кровь"
+  },
+  "pill": {
+   "sheet": "plant_icons_body_1",
+   "frame": 12,
+   "group": "body",
+   "tone": "paint_red",
+   "ru": "таблетка"
+  },
+  "medicine": {
+   "sheet": "plant_icons_body_1",
+   "frame": 13,
+   "group": "body",
+   "tone": "cloth_brown",
+   "ru": "лекарство / рецепт"
+  },
+  "thermo": {
+   "sheet": "plant_icons_body_1",
+   "frame": 14,
+   "group": "body",
+   "tone": "tomato",
+   "ru": "температура / жар"
+  },
+  "cross": {
+   "sheet": "plant_icons_body_1",
+   "frame": 15,
+   "group": "body",
+   "tone": "tomato",
+   "ru": "аптека / скорая / больница"
+  },
+  "glasses": {
+   "sheet": "plant_icons_body_1",
+   "frame": 16,
+   "group": "body",
+   "tone": "shade",
+   "ru": "очки"
+  },
+  "sick": {
+   "sheet": "plant_icons_body_1",
+   "frame": 17,
+   "group": "body",
+   "tone": "cabbage",
+   "ru": "болезнь / насморк / кашель"
+  },
+  "allergy": {
+   "sheet": "plant_icons_body_1",
+   "frame": 18,
+   "group": "body",
+   "tone": "sun",
+   "ru": "аллергия"
+  },
+  "cat_food": {
+   "sheet": "plant_icons_cats_1",
+   "frame": 0,
+   "group": "cats",
+   "tone": "apple",
+   "ru": "еда (категория)"
+  },
+  "cat_drink": {
+   "sheet": "plant_icons_cats_1",
+   "frame": 1,
+   "group": "cats",
+   "tone": "glass",
+   "ru": "напитки (категория)"
+  },
+  "cat_transport": {
+   "sheet": "plant_icons_cats_1",
+   "frame": 2,
+   "group": "cats",
+   "tone": "shade",
+   "ru": "транспорт (категория)"
+  },
+  "cat_home": {
+   "sheet": "plant_icons_cats_1",
+   "frame": 3,
+   "group": "cats",
+   "tone": "wall",
+   "ru": "дом (категория)"
+  },
+  "cat_clothes": {
+   "sheet": "plant_icons_cats_1",
+   "frame": 4,
+   "group": "cats",
+   "tone": "cloth_red",
+   "ru": "одежда (категория)"
+  },
+  "cat_body": {
+   "sheet": "plant_icons_cats_1",
+   "frame": 5,
+   "group": "cats",
+   "tone": "skin",
+   "ru": "тело (категория)"
+  },
+  "cat_nature": {
+   "sheet": "plant_icons_cats_1",
+   "frame": 6,
+   "group": "cats",
+   "tone": "leaf",
+   "ru": "природа (категория)"
+  },
+  "cat_city": {
+   "sheet": "plant_icons_cats_1",
+   "frame": 7,
+   "group": "cats",
+   "tone": "tin",
+   "ru": "город (категория)"
+  },
+  "cat_work": {
+   "sheet": "plant_icons_cats_1",
+   "frame": 8,
+   "group": "cats",
+   "tone": "tin",
+   "ru": "работа (категория)"
+  },
+  "cat_time": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 0,
+   "group": "cats",
+   "tone": "paint_red",
+   "ru": "время (категория)"
+  },
+  "cat_people": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 1,
+   "group": "cats",
+   "tone": "cloth_grey",
+   "ru": "люди (категория)"
+  },
+  "cat_school": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 2,
+   "group": "cats",
+   "tone": "book",
+   "ru": "учёба (категория)"
+  },
+  "cat_health": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 3,
+   "group": "cats",
+   "tone": "tomato",
+   "ru": "здоровье (категория)"
+  },
+  "cat_shop": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 4,
+   "group": "cats",
+   "tone": "sack",
+   "ru": "покупки (категория)"
+  },
+  "cat_money": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 5,
+   "group": "cats",
+   "tone": "gold",
+   "ru": "деньги (категория)"
+  },
+  "cat_tech": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 6,
+   "group": "cats",
+   "tone": "shade",
+   "ru": "техника (категория)"
+  },
+  "cat_leisure": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 7,
+   "group": "cats",
+   "tone": "gold",
+   "ru": "досуг (категория)"
+  },
+  "cat_weather": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 8,
+   "group": "cats",
+   "tone": "sun",
+   "ru": "погода (категория)"
+  },
+  "cat_number": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 9,
+   "group": "cats",
+   "tone": "paint_white",
+   "ru": "числа (категория)"
+  },
+  "cat_country": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 10,
+   "group": "cats",
+   "tone": "tomato",
+   "ru": "страны (категория)"
+  },
+  "cat_feeling": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 11,
+   "group": "cats",
+   "tone": "sun",
+   "ru": "чувства (категория)"
+  },
+  "cat_family": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 12,
+   "group": "cats",
+   "tone": "tomato",
+   "ru": "семья (категория)"
+  },
+  "cat_greet": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 13,
+   "group": "cats",
+   "tone": "paint_white",
+   "ru": "приветствия (категория)"
+  },
+  "cat_travel": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 14,
+   "group": "cats",
+   "tone": "paint_red",
+   "ru": "путешествие (категория)"
+  },
+  "cat_language": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 15,
+   "group": "cats",
+   "tone": "cloth_purple",
+   "ru": "язык (категория)"
+  },
+  "cat_misc": {
+   "sheet": "plant_icons_cats_2",
+   "frame": 16,
+   "group": "cats",
+   "tone": "wood",
+   "ru": "вещь (категория)"
+  },
+  "cat_pets": {
+   "sheet": "plant_icons_cats_3",
+   "frame": 0,
+   "group": "cats",
+   "tone": "cat",
+   "ru": "домашнее (категория)"
+  },
+  "church": {
+   "sheet": "plant_icons_city_1",
+   "frame": 0,
+   "group": "city",
+   "tone": "paper",
+   "ru": "церковь"
+  },
+  "shop": {
+   "sheet": "plant_icons_city_1",
+   "frame": 1,
+   "group": "city",
+   "tone": "paint_red",
+   "ru": "магазин"
+  },
+  "school": {
+   "sheet": "plant_icons_city_1",
+   "frame": 2,
+   "group": "city",
+   "tone": "brick",
+   "ru": "школа"
+  },
+  "hospital": {
+   "sheet": "plant_icons_city_1",
+   "frame": 3,
+   "group": "city",
+   "tone": "paint_white",
+   "ru": "больница"
+  },
+  "bank": {
+   "sheet": "plant_icons_city_1",
+   "frame": 4,
+   "group": "city",
+   "tone": "stone",
+   "ru": "банк"
+  },
+  "museum": {
+   "sheet": "plant_icons_city_1",
+   "frame": 5,
+   "group": "city",
+   "tone": "sand",
+   "ru": "музей"
+  },
+  "library": {
+   "sheet": "plant_icons_city_1",
+   "frame": 6,
+   "group": "city",
+   "tone": "book",
+   "ru": "библиотека"
+  },
+  "mailbox": {
+   "sheet": "plant_icons_city_1",
+   "frame": 7,
+   "group": "city",
+   "tone": "paint_red",
+   "ru": "почта"
+  },
+  "cinema": {
+   "sheet": "plant_icons_city_2",
+   "frame": 0,
+   "group": "city",
+   "tone": "cloth_red",
+   "ru": "кино"
+  },
+  "theatre": {
+   "sheet": "plant_icons_city_2",
+   "frame": 1,
+   "group": "city",
+   "tone": "sunflower",
+   "ru": "театр"
+  },
+  "university": {
+   "sheet": "plant_icons_city_2",
+   "frame": 2,
+   "group": "city",
+   "tone": "blazer",
+   "ru": "университет / диплом"
+  },
+  "hotel": {
+   "sheet": "plant_icons_city_2",
+   "frame": 3,
+   "group": "city",
+   "tone": "wall",
+   "ru": "гостиница"
+  },
+  "restaurant": {
+   "sheet": "plant_icons_city_2",
+   "frame": 4,
+   "group": "city",
+   "tone": "tin",
+   "ru": "ресторан"
+  },
+  "bar": {
+   "sheet": "plant_icons_city_2",
+   "frame": 5,
+   "group": "city",
+   "tone": "cloth_purple",
+   "ru": "бар"
+  },
+  "police_badge": {
+   "sheet": "plant_icons_city_2",
+   "frame": 6,
+   "group": "city",
+   "tone": "blue_sign",
+   "ru": "полиция"
+  },
+  "castle": {
+   "sheet": "plant_icons_city_2",
+   "frame": 7,
+   "group": "city",
+   "tone": "stone",
+   "ru": "замок"
+  },
+  "monument": {
+   "sheet": "plant_icons_city_2",
+   "frame": 8,
+   "group": "city",
+   "tone": "stone",
+   "ru": "памятник"
+  },
+  "bench": {
+   "sheet": "plant_icons_city_2",
+   "frame": 9,
+   "group": "city",
+   "tone": "wood",
+   "ru": "скамейка"
+  },
+  "gym": {
+   "sheet": "plant_icons_city_2",
+   "frame": 10,
+   "group": "city",
+   "tone": "tin",
+   "ru": "зал / спорт"
+  },
+  "pool": {
+   "sheet": "plant_icons_city_2",
+   "frame": 11,
+   "group": "city",
+   "tone": "water",
+   "ru": "бассейн"
+  },
+  "market": {
+   "sheet": "plant_icons_city_3",
+   "frame": 0,
+   "group": "city",
+   "tone": "paint_green",
+   "ru": "рынок / супермаркет"
+  },
+  "cart": {
+   "sheet": "plant_icons_city_3",
+   "frame": 1,
+   "group": "city",
+   "tone": "tin",
+   "ru": "корзина / тележка"
+  },
+  "crossroad": {
+   "sheet": "plant_icons_city_3",
+   "frame": 2,
+   "group": "city",
+   "tone": "stone_dark",
+   "ru": "перекрёсток"
+  },
+  "city": {
+   "sheet": "plant_icons_city_3",
+   "frame": 3,
+   "group": "city",
+   "tone": "blanket",
+   "ru": "город / центр"
+  },
+  "village": {
+   "sheet": "plant_icons_city_3",
+   "frame": 4,
+   "group": "city",
+   "tone": "wall",
+   "ru": "деревня"
+  },
+  "atm": {
+   "sheet": "plant_icons_city_3",
+   "frame": 5,
+   "group": "city",
+   "tone": "blue_sign",
+   "ru": "банкомат / обмен"
+  },
+  "tshirt": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 0,
+   "group": "clothes",
+   "tone": "shirt",
+   "ru": "рубашка / футболка / блузка"
+  },
+  "hoodie": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 1,
+   "group": "clothes",
+   "tone": "cloth_grey",
+   "ru": "толстовка / свитер"
+  },
+  "jacket": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 2,
+   "group": "clothes",
+   "tone": "blazer",
+   "ru": "пиджак / куртка / пальто"
+  },
+  "trousers": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 3,
+   "group": "clothes",
+   "tone": "denim",
+   "ru": "брюки / джинсы"
+  },
+  "dress": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 4,
+   "group": "clothes",
+   "tone": "cloth_red",
+   "ru": "платье"
+  },
+  "skirt": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 5,
+   "group": "clothes",
+   "tone": "cloth_purple",
+   "ru": "юбка"
+  },
+  "shoe": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 6,
+   "group": "clothes",
+   "tone": "cloth_brown",
+   "ru": "ботинок"
+  },
+  "hat": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 7,
+   "group": "clothes",
+   "tone": "cloth_red",
+   "ru": "шапка"
+  },
+  "scarf": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 8,
+   "group": "clothes",
+   "tone": "paint_green",
+   "ru": "шарф"
+  },
+  "gloves": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 9,
+   "group": "clothes",
+   "tone": "paint_orange",
+   "ru": "перчатки"
+  },
+  "socks": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 10,
+   "group": "clothes",
+   "tone": "paint_blue",
+   "ru": "носки"
+  },
+  "handbag": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 11,
+   "group": "clothes",
+   "tone": "cloth_red",
+   "ru": "сумка / торба"
+  },
+  "umbrella": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 12,
+   "group": "clothes",
+   "tone": "paint_red",
+   "ru": "зонт"
+  },
+  "belt": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 13,
+   "group": "clothes",
+   "tone": "belt",
+   "ru": "ремень"
+  },
+  "hanger": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 14,
+   "group": "clothes",
+   "tone": "wood",
+   "ru": "одежда"
+  },
+  "wallet": {
+   "sheet": "plant_icons_clothes_1",
+   "frame": 15,
+   "group": "clothes",
+   "tone": "cloth_brown",
+   "ru": "кошелёк"
+  },
+  "flag_pl": {
+   "sheet": "plant_icons_flags_1",
+   "frame": 0,
+   "group": "flags",
+   "tone": "paint_white",
+   "ru": "Польша / поляк"
+  },
+  "flag_ua": {
+   "sheet": "plant_icons_flags_1",
+   "frame": 1,
+   "group": "flags",
+   "tone": "paint_blue",
+   "ru": "Украина"
+  },
+  "flag_ru": {
+   "sheet": "plant_icons_flags_1",
+   "frame": 2,
+   "group": "flags",
+   "tone": "paint_blue",
+   "ru": "Россия / Беларусь"
+  },
+  "flag_de": {
+   "sheet": "plant_icons_flags_1",
+   "frame": 3,
+   "group": "flags",
+   "tone": "cloth_black",
+   "ru": "Германия"
+  },
+  "flag_fr": {
+   "sheet": "plant_icons_flags_1",
+   "frame": 4,
+   "group": "flags",
+   "tone": "paint_blue",
+   "ru": "Франция"
+  },
+  "flag_it": {
+   "sheet": "plant_icons_flags_1",
+   "frame": 5,
+   "group": "flags",
+   "tone": "paint_green",
+   "ru": "Италия"
+  },
+  "flag_es": {
+   "sheet": "plant_icons_flags_1",
+   "frame": 6,
+   "group": "flags",
+   "tone": "paint_red",
+   "ru": "Испания"
+  },
+  "flag_us": {
+   "sheet": "plant_icons_flags_1",
+   "frame": 7,
+   "group": "flags",
+   "tone": "paint_red",
+   "ru": "США / Англия"
+  },
+  "flag_cz": {
+   "sheet": "plant_icons_flags_1",
+   "frame": 8,
+   "group": "flags",
+   "tone": "paint_white",
+   "ru": "Чехия / Литва / страна"
+  },
+  "bread": {
+   "sheet": "plant_icons_food_1",
+   "frame": 0,
+   "group": "food",
+   "tone": "bread",
+   "ru": "хлеб"
+  },
+  "roll": {
+   "sheet": "plant_icons_food_1",
+   "frame": 1,
+   "group": "food",
+   "tone": "bread",
+   "ru": "булочка"
+  },
+  "cheese": {
+   "sheet": "plant_icons_food_1",
+   "frame": 2,
+   "group": "food",
+   "tone": "cheese",
+   "ru": "сыр"
+  },
+  "egg": {
+   "sheet": "plant_icons_food_1",
+   "frame": 3,
+   "group": "food",
+   "tone": "egg",
+   "ru": "яйцо"
+  },
+  "meat": {
+   "sheet": "plant_icons_food_1",
+   "frame": 4,
+   "group": "food",
+   "tone": "meat",
+   "ru": "мясо"
+  },
+  "chicken_leg": {
+   "sheet": "plant_icons_food_1",
+   "frame": 5,
+   "group": "food",
+   "tone": "autumn",
+   "ru": "курица (мясо)"
+  },
+  "sausage": {
+   "sheet": "plant_icons_food_1",
+   "frame": 6,
+   "group": "food",
+   "tone": "sausage",
+   "ru": "колбаса"
+  },
+  "soup": {
+   "sheet": "plant_icons_food_1",
+   "frame": 7,
+   "group": "food",
+   "tone": "autumn",
+   "ru": "суп"
+  },
+  "borscht": {
+   "sheet": "plant_icons_food_1",
+   "frame": 8,
+   "group": "food",
+   "tone": "beet",
+   "ru": "борщ"
+  },
+  "sandwich": {
+   "sheet": "plant_icons_food_1",
+   "frame": 9,
+   "group": "food",
+   "tone": "bread",
+   "ru": "бутерброд"
+  },
+  "onion": {
+   "sheet": "plant_icons_food_1",
+   "frame": 10,
+   "group": "food",
+   "tone": "onion",
+   "ru": "лук"
+  },
+  "apple": {
+   "sheet": "plant_icons_food_1",
+   "frame": 11,
+   "group": "food",
+   "tone": "apple",
+   "ru": "яблоко"
+  },
+  "milk": {
+   "sheet": "plant_icons_food_1",
+   "frame": 12,
+   "group": "food",
+   "tone": "milk",
+   "ru": "молоко"
+  },
+  "cake": {
+   "sheet": "plant_icons_food_1",
+   "frame": 13,
+   "group": "food",
+   "tone": "petal_pink",
+   "ru": "торт / пирог"
+  },
+  "sugar": {
+   "sheet": "plant_icons_food_1",
+   "frame": 14,
+   "group": "food",
+   "tone": "paint_white",
+   "ru": "сахар"
+  },
+  "water": {
+   "sheet": "plant_icons_food_2",
+   "frame": 0,
+   "group": "food",
+   "tone": "glass",
+   "ru": "вода / бутылка"
+  },
+  "coffee": {
+   "sheet": "plant_icons_food_2",
+   "frame": 1,
+   "group": "food",
+   "tone": "coffee",
+   "ru": "кофе"
+  },
+  "tea": {
+   "sheet": "plant_icons_food_2",
+   "frame": 2,
+   "group": "food",
+   "tone": "tea",
+   "ru": "чай"
+  },
+  "pizza": {
+   "sheet": "plant_icons_food_2",
+   "frame": 3,
+   "group": "food",
+   "tone": "cheese",
+   "ru": "пицца"
+  },
+  "fish": {
+   "sheet": "plant_icons_food_2",
+   "frame": 4,
+   "group": "food",
+   "tone": "bird_blue",
+   "ru": "рыба"
+  },
+  "butter": {
+   "sheet": "plant_icons_food_2",
+   "frame": 5,
+   "group": "food",
+   "tone": "cheese",
+   "ru": "масло"
+  },
+  "tomato": {
+   "sheet": "plant_icons_food_2",
+   "frame": 6,
+   "group": "food",
+   "tone": "tomato",
+   "ru": "помидор"
+  },
+  "cucumber": {
+   "sheet": "plant_icons_food_2",
+   "frame": 7,
+   "group": "food",
+   "tone": "cucumber",
+   "ru": "огурец"
+  },
+  "carrot": {
+   "sheet": "plant_icons_food_2",
+   "frame": 8,
+   "group": "food",
+   "tone": "carrot",
+   "ru": "морковь"
+  },
+  "cabbage": {
+   "sheet": "plant_icons_food_2",
+   "frame": 9,
+   "group": "food",
+   "tone": "cabbage",
+   "ru": "капуста"
+  },
+  "pepper": {
+   "sheet": "plant_icons_food_2",
+   "frame": 10,
+   "group": "food",
+   "tone": "paint_orange",
+   "ru": "перец / папрыка"
+  },
+  "lettuce": {
+   "sheet": "plant_icons_food_3",
+   "frame": 0,
+   "group": "food",
+   "tone": "leaf2",
+   "ru": "салат"
+  },
+  "potato": {
+   "sheet": "plant_icons_food_3",
+   "frame": 1,
+   "group": "food",
+   "tone": "potato",
+   "ru": "картофель"
+  },
+  "banana": {
+   "sheet": "plant_icons_food_3",
+   "frame": 2,
+   "group": "food",
+   "tone": "banana",
+   "ru": "банан"
+  },
+  "pear": {
+   "sheet": "plant_icons_food_3",
+   "frame": 3,
+   "group": "food",
+   "tone": "pear",
+   "ru": "груша"
+  },
+  "orange": {
+   "sheet": "plant_icons_food_3",
+   "frame": 4,
+   "group": "food",
+   "tone": "orange",
+   "ru": "апельсин"
+  },
+  "lemon": {
+   "sheet": "plant_icons_food_3",
+   "frame": 5,
+   "group": "food",
+   "tone": "lemon",
+   "ru": "лимон"
+  },
+  "strawberry": {
+   "sheet": "plant_icons_food_3",
+   "frame": 6,
+   "group": "food",
+   "tone": "strawberry",
+   "ru": "клубника"
+  },
+  "yogurt": {
+   "sheet": "plant_icons_food_3",
+   "frame": 7,
+   "group": "food",
+   "tone": "paint_white",
+   "ru": "йогурт / творог"
+  },
+  "icecream": {
+   "sheet": "plant_icons_food_3",
+   "frame": 8,
+   "group": "food",
+   "tone": "petal_pink",
+   "ru": "мороженое"
+  },
+  "chocolate": {
+   "sheet": "plant_icons_food_3",
+   "frame": 9,
+   "group": "food",
+   "tone": "choco",
+   "ru": "шоколад"
+  },
+  "cookie": {
+   "sheet": "plant_icons_food_3",
+   "frame": 10,
+   "group": "food",
+   "tone": "bread",
+   "ru": "печенье"
+  },
+  "honey": {
+   "sheet": "plant_icons_food_4",
+   "frame": 0,
+   "group": "food",
+   "tone": "honey",
+   "ru": "мёд"
+  },
+  "oil": {
+   "sheet": "plant_icons_food_4",
+   "frame": 1,
+   "group": "food",
+   "tone": "cheese",
+   "ru": "масло растительное"
+  },
+  "flour": {
+   "sheet": "plant_icons_food_4",
+   "frame": 2,
+   "group": "food",
+   "tone": "sack",
+   "ru": "мука"
+  },
+  "beer": {
+   "sheet": "plant_icons_food_4",
+   "frame": 3,
+   "group": "food",
+   "tone": "beer",
+   "ru": "пиво"
+  },
+  "wine": {
+   "sheet": "plant_icons_food_4",
+   "frame": 4,
+   "group": "food",
+   "tone": "wine",
+   "ru": "вино"
+  },
+  "juice": {
+   "sheet": "plant_icons_food_4",
+   "frame": 5,
+   "group": "food",
+   "tone": "orange",
+   "ru": "сок / напиток"
+  },
+  "pasta": {
+   "sheet": "plant_icons_food_4",
+   "frame": 6,
+   "group": "food",
+   "tone": "pasta",
+   "ru": "макароны"
+  },
+  "rice": {
+   "sheet": "plant_icons_food_4",
+   "frame": 7,
+   "group": "food",
+   "tone": "paint_white",
+   "ru": "рис / каша"
+  },
+  "dumpling": {
+   "sheet": "plant_icons_food_4",
+   "frame": 8,
+   "group": "food",
+   "tone": "pasta",
+   "ru": "пельмени / вареники"
+  },
+  "pancakes": {
+   "sheet": "plant_icons_food_4",
+   "frame": 9,
+   "group": "food",
+   "tone": "bread",
+   "ru": "блины"
+  },
+  "cutlet": {
+   "sheet": "plant_icons_food_4",
+   "frame": 10,
+   "group": "food",
+   "tone": "bread",
+   "ru": "котлета"
+  },
+  "garlic": {
+   "sheet": "plant_icons_food_4",
+   "frame": 11,
+   "group": "food",
+   "tone": "garlic",
+   "ru": "чеснок"
+  },
+  "beet": {
+   "sheet": "plant_icons_food_4",
+   "frame": 12,
+   "group": "food",
+   "tone": "beet",
+   "ru": "свёкла"
+  },
+  "plum": {
+   "sheet": "plant_icons_food_5",
+   "frame": 0,
+   "group": "food",
+   "tone": "plum",
+   "ru": "слива"
+  },
+  "grapes": {
+   "sheet": "plant_icons_food_5",
+   "frame": 1,
+   "group": "food",
+   "tone": "grape",
+   "ru": "виноград"
+  },
+  "raspberry": {
+   "sheet": "plant_icons_food_5",
+   "frame": 2,
+   "group": "food",
+   "tone": "raspberry",
+   "ru": "малина"
+  },
+  "watermelon": {
+   "sheet": "plant_icons_food_5",
+   "frame": 3,
+   "group": "food",
+   "tone": "watermelon",
+   "ru": "арбуз"
+  },
+  "melon": {
+   "sheet": "plant_icons_food_5",
+   "frame": 4,
+   "group": "food",
+   "tone": "cabbage",
+   "ru": "дыня"
+  },
+  "pumpkin": {
+   "sheet": "plant_icons_food_5",
+   "frame": 5,
+   "group": "food",
+   "tone": "pumpkin",
+   "ru": "тыква"
+  },
+  "nuts": {
+   "sheet": "plant_icons_food_5",
+   "frame": 6,
+   "group": "food",
+   "tone": "nut",
+   "ru": "орехи"
+  },
+  "mushroom": {
+   "sheet": "plant_icons_food_5",
+   "frame": 7,
+   "group": "food",
+   "tone": "tomato",
+   "ru": "грибы"
+  },
+  "jam": {
+   "sheet": "plant_icons_food_5",
+   "frame": 8,
+   "group": "food",
+   "tone": "jam_red",
+   "ru": "джем"
+  },
+  "salt": {
+   "sheet": "plant_icons_food_5",
+   "frame": 9,
+   "group": "food",
+   "tone": "paint_white",
+   "ru": "соль / специи"
+  },
+  "pepper_spice": {
+   "sheet": "plant_icons_food_5",
+   "frame": 10,
+   "group": "food",
+   "tone": "shade",
+   "ru": "перец (специя)"
+  },
+  "jar": {
+   "sheet": "plant_icons_food_6",
+   "frame": 0,
+   "group": "food",
+   "tone": "jar_glass",
+   "ru": "банка"
+  },
+  "can": {
+   "sheet": "plant_icons_food_6",
+   "frame": 1,
+   "group": "food",
+   "tone": "tin",
+   "ru": "жестяная банка"
+  },
+  "bottle": {
+   "sheet": "plant_icons_food_6",
+   "frame": 2,
+   "group": "food",
+   "tone": "jar_glass",
+   "ru": "бутылка"
+  },
+  "menu": {
+   "sheet": "plant_icons_food_6",
+   "frame": 3,
+   "group": "food",
+   "tone": "paper",
+   "ru": "меню"
+  },
+  "receipt": {
+   "sheet": "plant_icons_food_6",
+   "frame": 4,
+   "group": "food",
+   "tone": "paper",
+   "ru": "счёт / чек"
+  },
+  "dish": {
+   "sheet": "plant_icons_food_6",
+   "frame": 5,
+   "group": "food",
+   "tone": "paint_white",
+   "ru": "блюдо"
+  },
+  "grain": {
+   "sheet": "plant_icons_food_6",
+   "frame": 6,
+   "group": "food",
+   "tone": "wheat",
+   "ru": "зерно / пшеница"
+  },
+  "house": {
+   "sheet": "plant_icons_home_1",
+   "frame": 0,
+   "group": "home",
+   "tone": "wall",
+   "ru": "дом"
+  },
+  "flat": {
+   "sheet": "plant_icons_home_1",
+   "frame": 1,
+   "group": "home",
+   "tone": "brick",
+   "ru": "квартира / блок"
+  },
+  "door": {
+   "sheet": "plant_icons_home_1",
+   "frame": 2,
+   "group": "home",
+   "tone": "wood",
+   "ru": "дверь"
+  },
+  "window": {
+   "sheet": "plant_icons_home_1",
+   "frame": 3,
+   "group": "home",
+   "tone": "glass",
+   "ru": "окно"
+  },
+  "key": {
+   "sheet": "plant_icons_home_1",
+   "frame": 4,
+   "group": "home",
+   "tone": "gold",
+   "ru": "ключ"
+  },
+  "table": {
+   "sheet": "plant_icons_home_1",
+   "frame": 5,
+   "group": "home",
+   "tone": "wood",
+   "ru": "стол"
+  },
+  "chair": {
+   "sheet": "plant_icons_home_1",
+   "frame": 6,
+   "group": "home",
+   "tone": "wood",
+   "ru": "стул"
+  },
+  "bed": {
+   "sheet": "plant_icons_home_1",
+   "frame": 7,
+   "group": "home",
+   "tone": "blanket",
+   "ru": "кровать"
+  },
+  "sofa": {
+   "sheet": "plant_icons_home_1",
+   "frame": 8,
+   "group": "home",
+   "tone": "rug",
+   "ru": "диван / кресло"
+  },
+  "wardrobe": {
+   "sheet": "plant_icons_home_1",
+   "frame": 9,
+   "group": "home",
+   "tone": "wood",
+   "ru": "шкаф"
+  },
+  "shelf": {
+   "sheet": "plant_icons_home_1",
+   "frame": 10,
+   "group": "home",
+   "tone": "wood",
+   "ru": "полка"
+  },
+  "lamp": {
+   "sheet": "plant_icons_home_1",
+   "frame": 11,
+   "group": "home",
+   "tone": "sunflower",
+   "ru": "лампа"
+  },
+  "rug": {
+   "sheet": "plant_icons_home_1",
+   "frame": 12,
+   "group": "home",
+   "tone": "rug",
+   "ru": "ковёр"
+  },
+  "tv": {
+   "sheet": "plant_icons_home_1",
+   "frame": 13,
+   "group": "home",
+   "tone": "screen",
+   "ru": "телевизор"
+  },
+  "fridge": {
+   "sheet": "plant_icons_home_2",
+   "frame": 0,
+   "group": "home",
+   "tone": "paint_white",
+   "ru": "холодильник"
+  },
+  "stove": {
+   "sheet": "plant_icons_home_2",
+   "frame": 1,
+   "group": "home",
+   "tone": "tin",
+   "ru": "плита"
+  },
+  "washer": {
+   "sheet": "plant_icons_home_2",
+   "frame": 2,
+   "group": "home",
+   "tone": "paint_white",
+   "ru": "стиральная машина"
+  },
+  "plate": {
+   "sheet": "plant_icons_home_2",
+   "frame": 3,
+   "group": "home",
+   "tone": "paint_white",
+   "ru": "тарелка"
+  },
+  "cup": {
+   "sheet": "plant_icons_home_2",
+   "frame": 4,
+   "group": "home",
+   "tone": "paint_white",
+   "ru": "чашка / кружка"
+  },
+  "glass_water": {
+   "sheet": "plant_icons_home_2",
+   "frame": 5,
+   "group": "home",
+   "tone": "glass",
+   "ru": "стакан"
+  },
+  "fork": {
+   "sheet": "plant_icons_home_2",
+   "frame": 6,
+   "group": "home",
+   "tone": "tin",
+   "ru": "вилка"
+  },
+  "knife": {
+   "sheet": "plant_icons_home_2",
+   "frame": 7,
+   "group": "home",
+   "tone": "tin",
+   "ru": "нож"
+  },
+  "spoon": {
+   "sheet": "plant_icons_home_2",
+   "frame": 8,
+   "group": "home",
+   "tone": "tin",
+   "ru": "ложка"
+  },
+  "pot": {
+   "sheet": "plant_icons_home_2",
+   "frame": 9,
+   "group": "home",
+   "tone": "tin",
+   "ru": "кастрюля"
+  },
+  "pan": {
+   "sheet": "plant_icons_home_2",
+   "frame": 10,
+   "group": "home",
+   "tone": "shade",
+   "ru": "сковорода"
+  },
+  "kettle": {
+   "sheet": "plant_icons_home_2",
+   "frame": 11,
+   "group": "home",
+   "tone": "tin",
+   "ru": "чайник"
+  },
+  "bath": {
+   "sheet": "plant_icons_home_2",
+   "frame": 12,
+   "group": "home",
+   "tone": "paint_white",
+   "ru": "ванна"
+  },
+  "shower": {
+   "sheet": "plant_icons_home_2",
+   "frame": 13,
+   "group": "home",
+   "tone": "tin",
+   "ru": "душ"
+  },
+  "soap": {
+   "sheet": "plant_icons_home_2",
+   "frame": 14,
+   "group": "home",
+   "tone": "petal_pink",
+   "ru": "мыло"
+  },
+  "towel": {
+   "sheet": "plant_icons_home_2",
+   "frame": 15,
+   "group": "home",
+   "tone": "blanket",
+   "ru": "полотенце"
+  },
+  "clock": {
+   "sheet": "plant_icons_home_2",
+   "frame": 16,
+   "group": "home",
+   "tone": "wood",
+   "ru": "часы"
+  },
+  "watch": {
+   "sheet": "plant_icons_home_2",
+   "frame": 17,
+   "group": "home",
+   "tone": "cloth_brown",
+   "ru": "наручные часы"
+  },
+  "bin": {
+   "sheet": "plant_icons_home_2",
+   "frame": 18,
+   "group": "home",
+   "tone": "tin",
+   "ru": "мусор"
+  },
+  "pillow": {
+   "sheet": "plant_icons_home_2",
+   "frame": 19,
+   "group": "home",
+   "tone": "pillow",
+   "ru": "подушка"
+  },
+  "blanket": {
+   "sheet": "plant_icons_home_2",
+   "frame": 20,
+   "group": "home",
+   "tone": "blanket",
+   "ru": "плед"
+  },
+  "stairs": {
+   "sheet": "plant_icons_home_2",
+   "frame": 21,
+   "group": "home",
+   "tone": "stone",
+   "ru": "лестница / этаж"
+  },
+  "elevator": {
+   "sheet": "plant_icons_home_2",
+   "frame": 22,
+   "group": "home",
+   "tone": "tin",
+   "ru": "лифт"
+  },
+  "radiator": {
+   "sheet": "plant_icons_home_2",
+   "frame": 23,
+   "group": "home",
+   "tone": "paint_white",
+   "ru": "отопление"
+  },
+  "bulb": {
+   "sheet": "plant_icons_home_3",
+   "frame": 0,
+   "group": "home",
+   "tone": "light_on",
+   "ru": "свет / лампочка"
+  },
+  "bolt": {
+   "sheet": "plant_icons_home_3",
+   "frame": 1,
+   "group": "home",
+   "tone": "sunflower",
+   "ru": "ток / электричество"
+  },
+  "floor": {
+   "sheet": "plant_icons_home_3",
+   "frame": 2,
+   "group": "home",
+   "tone": "plank",
+   "ru": "пол"
+  },
+  "wall": {
+   "sheet": "plant_icons_home_3",
+   "frame": 3,
+   "group": "home",
+   "tone": "wall",
+   "ru": "стена"
+  },
+  "garage": {
+   "sheet": "plant_icons_home_3",
+   "frame": 4,
+   "group": "home",
+   "tone": "stone",
+   "ru": "гараж"
+  },
+  "balcony": {
+   "sheet": "plant_icons_home_3",
+   "frame": 5,
+   "group": "home",
+   "tone": "wood",
+   "ru": "балкон"
+  },
+  "couch_room": {
+   "sheet": "plant_icons_home_3",
+   "frame": 6,
+   "group": "home",
+   "tone": "wall",
+   "ru": "комната / гостиная"
+  },
+  "sun": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 0,
+   "group": "nature",
+   "tone": "sun",
+   "ru": "солнце"
+  },
+  "rain": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 1,
+   "group": "nature",
+   "tone": "cloud",
+   "ru": "дождь"
+  },
+  "snow": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 2,
+   "group": "nature",
+   "tone": "ice",
+   "ru": "снег / зима"
+  },
+  "cloud": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 3,
+   "group": "nature",
+   "tone": "cloud",
+   "ru": "облако / небо"
+  },
+  "wind": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 4,
+   "group": "nature",
+   "tone": "cloud",
+   "ru": "ветер"
+  },
+  "moon": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 5,
+   "group": "nature",
+   "tone": "moon",
+   "ru": "луна / ночь"
+  },
+  "star": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 6,
+   "group": "nature",
+   "tone": "sunflower",
+   "ru": "звезда"
+  },
+  "tree": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 7,
+   "group": "nature",
+   "tone": "leaf",
+   "ru": "дерево"
+  },
+  "flower": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 8,
+   "group": "nature",
+   "tone": "petal_pink",
+   "ru": "цветок"
+  },
+  "forest": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 9,
+   "group": "nature",
+   "tone": "leaf",
+   "ru": "лес"
+  },
+  "mountain": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 10,
+   "group": "nature",
+   "tone": "stone",
+   "ru": "гора"
+  },
+  "sea": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 11,
+   "group": "nature",
+   "tone": "sea",
+   "ru": "море / озеро / река"
+  },
+  "grass": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 12,
+   "group": "nature",
+   "tone": "leaf",
+   "ru": "трава"
+  },
+  "field": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 13,
+   "group": "nature",
+   "tone": "soil",
+   "ru": "поле / луг"
+  },
+  "storm": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 14,
+   "group": "nature",
+   "tone": "tin",
+   "ru": "гроза"
+  },
+  "sprout": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 15,
+   "group": "nature",
+   "tone": "leaf",
+   "ru": "растение / росток"
+  },
+  "seed": {
+   "sheet": "plant_icons_nature_1",
+   "frame": 16,
+   "group": "nature",
+   "tone": "trunk",
+   "ru": "семя"
+  },
+  "garden": {
+   "sheet": "plant_icons_nature_2",
+   "frame": 0,
+   "group": "nature",
+   "tone": "wood",
+   "ru": "сад / огород"
+  },
+  "well": {
+   "sheet": "plant_icons_nature_2",
+   "frame": 1,
+   "group": "nature",
+   "tone": "stone",
+   "ru": "колодец"
+  },
+  "barn": {
+   "sheet": "plant_icons_nature_2",
+   "frame": 2,
+   "group": "nature",
+   "tone": "roof",
+   "ru": "ферма / хозяйство"
+  },
+  "tractor": {
+   "sheet": "plant_icons_nature_2",
+   "frame": 3,
+   "group": "nature",
+   "tone": "paint_green",
+   "ru": "трактор"
+  },
+  "globe": {
+   "sheet": "plant_icons_nature_2",
+   "frame": 4,
+   "group": "nature",
+   "tone": "sea",
+   "ru": "мир / земля / интернет"
+  },
+  "leaf_autumn": {
+   "sheet": "plant_icons_nature_2",
+   "frame": 5,
+   "group": "nature",
+   "tone": "autumn",
+   "ru": "осень"
+  },
+  "tulip": {
+   "sheet": "plant_icons_nature_2",
+   "frame": 6,
+   "group": "nature",
+   "tone": "petal_pink",
+   "ru": "весна"
+  },
+  "beach": {
+   "sheet": "plant_icons_nature_2",
+   "frame": 7,
+   "group": "nature",
+   "tone": "paint_red",
+   "ru": "каникулы / отпуск / пляж"
+  },
+  "sunrise": {
+   "sheet": "plant_icons_nature_3",
+   "frame": 0,
+   "group": "nature",
+   "tone": "sun",
+   "ru": "утро / ранок"
+  },
+  "sunset": {
+   "sheet": "plant_icons_nature_3",
+   "frame": 1,
+   "group": "nature",
+   "tone": "autumn",
+   "ru": "вечер"
+  },
+  "man": {
+   "sheet": "plant_icons_people_1",
+   "frame": 0,
+   "group": "people",
+   "tone": "shirt",
+   "ru": "мужчина"
+  },
+  "woman": {
+   "sheet": "plant_icons_people_1",
+   "frame": 1,
+   "group": "people",
+   "tone": "cloth_red",
+   "ru": "женщина"
+  },
+  "boy": {
+   "sheet": "plant_icons_people_1",
+   "frame": 2,
+   "group": "people",
+   "tone": "paint_green",
+   "ru": "мальчик"
+  },
+  "girl": {
+   "sheet": "plant_icons_people_1",
+   "frame": 3,
+   "group": "people",
+   "tone": "cloth_purple",
+   "ru": "девочка"
+  },
+  "grandpa": {
+   "sheet": "plant_icons_people_1",
+   "frame": 4,
+   "group": "people",
+   "tone": "cloth_grey",
+   "ru": "дедушка"
+  },
+  "grandma": {
+   "sheet": "plant_icons_people_1",
+   "frame": 5,
+   "group": "people",
+   "tone": "cloth_teal",
+   "ru": "бабушка"
+  },
+  "baby": {
+   "sheet": "plant_icons_people_1",
+   "frame": 6,
+   "group": "people",
+   "tone": "petal_pink",
+   "ru": "ребёнок"
+  },
+  "family": {
+   "sheet": "plant_icons_people_1",
+   "frame": 7,
+   "group": "people",
+   "tone": "cloth_red",
+   "ru": "семья / родители"
+  },
+  "people": {
+   "sheet": "plant_icons_people_1",
+   "frame": 8,
+   "group": "people",
+   "tone": "shirt",
+   "ru": "люди / человек"
+  },
+  "friends": {
+   "sheet": "plant_icons_people_1",
+   "frame": 9,
+   "group": "people",
+   "tone": "paint_blue",
+   "ru": "друг"
+  },
+  "doctor": {
+   "sheet": "plant_icons_people_1",
+   "frame": 10,
+   "group": "people",
+   "tone": "paint_white",
+   "ru": "врач"
+  },
+  "nurse": {
+   "sheet": "plant_icons_people_1",
+   "frame": 11,
+   "group": "people",
+   "tone": "paint_white",
+   "ru": "медсестра"
+  },
+  "cook": {
+   "sheet": "plant_icons_people_1",
+   "frame": 12,
+   "group": "people",
+   "tone": "paint_white",
+   "ru": "повар"
+  },
+  "police": {
+   "sheet": "plant_icons_people_1",
+   "frame": 13,
+   "group": "people",
+   "tone": "paint_blue",
+   "ru": "полицейский"
+  },
+  "teacher": {
+   "sheet": "plant_icons_people_1",
+   "frame": 14,
+   "group": "people",
+   "tone": "cloth_green",
+   "ru": "учитель"
+  },
+  "student": {
+   "sheet": "plant_icons_people_1",
+   "frame": 15,
+   "group": "people",
+   "tone": "cloth_orange",
+   "ru": "студент / ученик"
+  },
+  "farmer": {
+   "sheet": "plant_icons_people_2",
+   "frame": 0,
+   "group": "people",
+   "tone": "denim",
+   "ru": "фермер"
+  },
+  "boss": {
+   "sheet": "plant_icons_people_2",
+   "frame": 1,
+   "group": "people",
+   "tone": "cloth_black",
+   "ru": "начальник / директор"
+  },
+  "worker": {
+   "sheet": "plant_icons_people_2",
+   "frame": 2,
+   "group": "people",
+   "tone": "paint_orange",
+   "ru": "работник / инженер"
+  },
+  "waiter": {
+   "sheet": "plant_icons_people_2",
+   "frame": 3,
+   "group": "people",
+   "tone": "paint_white",
+   "ru": "официант"
+  },
+  "driver": {
+   "sheet": "plant_icons_people_2",
+   "frame": 4,
+   "group": "people",
+   "tone": "cloth_grey",
+   "ru": "водитель"
+  },
+  "tourist": {
+   "sheet": "plant_icons_people_2",
+   "frame": 5,
+   "group": "people",
+   "tone": "paint_yellow",
+   "ru": "турист"
+  },
+  "artist": {
+   "sheet": "plant_icons_people_2",
+   "frame": 6,
+   "group": "people",
+   "tone": "cloth_purple",
+   "ru": "артист / художник"
+  },
+  "car": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 0,
+   "group": "transport",
+   "tone": "paint_red",
+   "ru": "машина"
+  },
+  "taxi": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 1,
+   "group": "transport",
+   "tone": "paint_yellow",
+   "ru": "такси"
+  },
+  "bus": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 2,
+   "group": "transport",
+   "tone": "paint_yellow",
+   "ru": "автобус"
+  },
+  "tram": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 3,
+   "group": "transport",
+   "tone": "paint_red",
+   "ru": "трамвай"
+  },
+  "train": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 4,
+   "group": "transport",
+   "tone": "paint_blue",
+   "ru": "поезд"
+  },
+  "metro": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 5,
+   "group": "transport",
+   "tone": "paint_blue",
+   "ru": "метро"
+  },
+  "plane": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 6,
+   "group": "transport",
+   "tone": "tin",
+   "ru": "самолёт"
+  },
+  "bike": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 7,
+   "group": "transport",
+   "tone": "paint_red",
+   "ru": "велосипед"
+  },
+  "ship": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 8,
+   "group": "transport",
+   "tone": "paint_red",
+   "ru": "корабль"
+  },
+  "bridge": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 9,
+   "group": "transport",
+   "tone": "stone",
+   "ru": "мост"
+  },
+  "traffic_light": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 10,
+   "group": "transport",
+   "tone": "shade",
+   "ru": "светофор"
+  },
+  "ticket": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 11,
+   "group": "transport",
+   "tone": "paint_yellow",
+   "ru": "билет"
+  },
+  "suitcase": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 12,
+   "group": "transport",
+   "tone": "loose",
+   "ru": "чемодан"
+  },
+  "backpack": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 13,
+   "group": "transport",
+   "tone": "cloth_green",
+   "ru": "рюкзак"
+  },
+  "passport": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 14,
+   "group": "transport",
+   "tone": "blue_sign",
+   "ru": "паспорт"
+  },
+  "map": {
+   "sheet": "plant_icons_transport_1",
+   "frame": 15,
+   "group": "transport",
+   "tone": "paper",
+   "ru": "карта"
+  },
+  "road": {
+   "sheet": "plant_icons_transport_2",
+   "frame": 0,
+   "group": "transport",
+   "tone": "stone_dark",
+   "ru": "дорога"
+  },
+  "station": {
+   "sheet": "plant_icons_transport_2",
+   "frame": 1,
+   "group": "transport",
+   "tone": "paint_blue",
+   "ru": "остановка"
+  },
+  "parking": {
+   "sheet": "plant_icons_transport_2",
+   "frame": 2,
+   "group": "transport",
+   "tone": "blue_sign",
+   "ru": "парковка"
+  },
+  "book": {
+   "sheet": "plant_icons_work_1",
+   "frame": 0,
+   "group": "work",
+   "tone": "book",
+   "ru": "книга / словарь"
+  },
+  "notebook": {
+   "sheet": "plant_icons_work_1",
+   "frame": 1,
+   "group": "work",
+   "tone": "blue_sign",
+   "ru": "тетрадь"
+  },
+  "pen": {
+   "sheet": "plant_icons_work_1",
+   "frame": 2,
+   "group": "work",
+   "tone": "ink_blue",
+   "ru": "ручка"
+  },
+  "pencil": {
+   "sheet": "plant_icons_work_1",
+   "frame": 3,
+   "group": "work",
+   "tone": "pencil",
+   "ru": "карандаш"
+  },
+  "paper": {
+   "sheet": "plant_icons_work_1",
+   "frame": 4,
+   "group": "work",
+   "tone": "paper",
+   "ru": "листок / документ / текст"
+  },
+  "letter": {
+   "sheet": "plant_icons_work_1",
+   "frame": 5,
+   "group": "work",
+   "tone": "paper",
+   "ru": "письмо / конверт"
+  },
+  "stamp": {
+   "sheet": "plant_icons_work_1",
+   "frame": 6,
+   "group": "work",
+   "tone": "tomato",
+   "ru": "марка / печать"
+  },
+  "computer": {
+   "sheet": "plant_icons_work_1",
+   "frame": 7,
+   "group": "work",
+   "tone": "tin",
+   "ru": "компьютер / экран / ноутбук"
+  },
+  "phone": {
+   "sheet": "plant_icons_work_1",
+   "frame": 8,
+   "group": "work",
+   "tone": "shade",
+   "ru": "телефон"
+  },
+  "wifi": {
+   "sheet": "plant_icons_work_1",
+   "frame": 9,
+   "group": "work",
+   "tone": "blue_sign",
+   "ru": "wifi / сигнал"
+  },
+  "at": {
+   "sheet": "plant_icons_work_1",
+   "frame": 10,
+   "group": "work",
+   "tone": "blue_sign",
+   "ru": "e-mail / сообщение"
+  },
+  "chat": {
+   "sheet": "plant_icons_work_1",
+   "frame": 11,
+   "group": "work",
+   "tone": "paint_white",
+   "ru": "разговор / слово"
+  },
+  "calendar": {
+   "sheet": "plant_icons_work_1",
+   "frame": 12,
+   "group": "work",
+   "tone": "paint_white",
+   "ru": "календарь / дата / день"
+  },
+  "diploma": {
+   "sheet": "plant_icons_work_1",
+   "frame": 13,
+   "group": "work",
+   "tone": "paper",
+   "ru": "диплом / сертификат"
+  },
+  "blackboard": {
+   "sheet": "plant_icons_work_1",
+   "frame": 14,
+   "group": "work",
+   "tone": "cloth_green",
+   "ru": "доска"
+  },
+  "briefcase": {
+   "sheet": "plant_icons_work_1",
+   "frame": 15,
+   "group": "work",
+   "tone": "cloth_brown",
+   "ru": "работа / портфель / офис"
+  },
+  "coin": {
+   "sheet": "plant_icons_work_1",
+   "frame": 16,
+   "group": "work",
+   "tone": "gold",
+   "ru": "монета / грош"
+  },
+  "banknote": {
+   "sheet": "plant_icons_work_1",
+   "frame": 17,
+   "group": "work",
+   "tone": "paint_green",
+   "ru": "деньги / наличные"
+  },
+  "card": {
+   "sheet": "plant_icons_work_1",
+   "frame": 18,
+   "group": "work",
+   "tone": "blue_sign",
+   "ru": "карта"
+  },
+  "register": {
+   "sheet": "plant_icons_work_1",
+   "frame": 19,
+   "group": "work",
+   "tone": "tin",
+   "ru": "касса"
+  },
+  "wrench": {
+   "sheet": "plant_icons_work_1",
+   "frame": 20,
+   "group": "work",
+   "tone": "tin",
+   "ru": "механик / инструмент"
+  },
+  "folder": {
+   "sheet": "plant_icons_work_1",
+   "frame": 21,
+   "group": "work",
+   "tone": "cheese",
+   "ru": "проект / папка"
+  },
+  "lock": {
+   "sheet": "plant_icons_work_1",
+   "frame": 22,
+   "group": "work",
+   "tone": "gold",
+   "ru": "пароль"
+  },
+  "code": {
+   "sheet": "plant_icons_work_1",
+   "frame": 23,
+   "group": "work",
+   "tone": "shade",
+   "ru": "код / программист"
+  },
+  "app": {
+   "sheet": "plant_icons_work_2",
+   "frame": 0,
+   "group": "work",
+   "tone": "paint_blue",
+   "ru": "приложение"
+  },
+  "battery": {
+   "sheet": "plant_icons_work_2",
+   "frame": 1,
+   "group": "work",
+   "tone": "paint_green",
+   "ru": "батарейка"
+  },
+  "plug": {
+   "sheet": "plant_icons_work_2",
+   "frame": 2,
+   "group": "work",
+   "tone": "tin",
+   "ru": "зарядка"
+  },
+  "camera": {
+   "sheet": "plant_icons_work_2",
+   "frame": 3,
+   "group": "work",
+   "tone": "shade",
+   "ru": "фото"
+  },
+  "gift": {
+   "sheet": "plant_icons_work_2",
+   "frame": 4,
+   "group": "work",
+   "tone": "paint_red",
+   "ru": "подарок"
+  },
+  "package": {
+   "sheet": "plant_icons_work_2",
+   "frame": 5,
+   "group": "work",
+   "tone": "sack",
+   "ru": "пачка / посылка"
+  },
+  "basket": {
+   "sheet": "plant_icons_work_2",
+   "frame": 6,
+   "group": "work",
+   "tone": "wood",
+   "ru": "корзина (плетёная)"
+  },
+  "scale": {
+   "sheet": "plant_icons_work_2",
+   "frame": 7,
+   "group": "work",
+   "tone": "gold",
+   "ru": "вес"
+  },
+  "tag": {
+   "sheet": "plant_icons_work_2",
+   "frame": 8,
+   "group": "work",
+   "tone": "tomato",
+   "ru": "цена / скидка"
+  },
+  "ruler": {
+   "sheet": "plant_icons_work_2",
+   "frame": 9,
+   "group": "work",
+   "tone": "sunflower",
+   "ru": "размер"
+  },
+  "magnifier": {
+   "sheet": "plant_icons_work_2",
+   "frame": 10,
+   "group": "work",
+   "tone": "glass",
+   "ru": "информация / поиск"
+  },
+  "question": {
+   "sheet": "plant_icons_work_2",
+   "frame": 11,
+   "group": "work",
+   "tone": "blue_sign",
+   "ru": "вопрос"
+  },
+  "exclaim": {
+   "sheet": "plant_icons_work_2",
+   "frame": 12,
+   "group": "work",
+   "tone": "tomato",
+   "ru": "внимание"
+  },
+  "check": {
+   "sheet": "plant_icons_work_2",
+   "frame": 13,
+   "group": "work",
+   "tone": "leaf",
+   "ru": "ответ / согласие"
+  },
+  "idea": {
+   "sheet": "plant_icons_work_3",
+   "frame": 0,
+   "group": "work",
+   "tone": "light_on",
+   "ru": "идея / мечта"
+  },
+  "hourglass": {
+   "sheet": "plant_icons_work_3",
+   "frame": 1,
+   "group": "work",
+   "tone": "sand",
+   "ru": "время / минута / секунда"
+  },
+  "ball": {
+   "sheet": "plant_icons_work_3",
+   "frame": 2,
+   "group": "work",
+   "tone": "paint_white",
+   "ru": "мяч / футбол / матч"
+  },
+  "music": {
+   "sheet": "plant_icons_work_3",
+   "frame": 3,
+   "group": "work",
+   "tone": "blanket",
+   "ru": "музыка / песня / концерт"
+  },
+  "guitar": {
+   "sheet": "plant_icons_work_3",
+   "frame": 4,
+   "group": "work",
+   "tone": "wood",
+   "ru": "гитара"
+  },
+  "film": {
+   "sheet": "plant_icons_work_3",
+   "frame": 5,
+   "group": "work",
+   "tone": "shade",
+   "ru": "фильм / сериал"
+  },
+  "gamepad": {
+   "sheet": "plant_icons_work_3",
+   "frame": 6,
+   "group": "work",
+   "tone": "shade",
+   "ru": "игра"
+  },
+  "chess": {
+   "sheet": "plant_icons_work_3",
+   "frame": 7,
+   "group": "work",
+   "tone": "shade",
+   "ru": "шахматы"
+  },
+  "ski": {
+   "sheet": "plant_icons_work_3",
+   "frame": 8,
+   "group": "work",
+   "tone": "paint_red",
+   "ru": "лыжи"
+  },
+  "balloon": {
+   "sheet": "plant_icons_work_3",
+   "frame": 9,
+   "group": "work",
+   "tone": "paint_red",
+   "ru": "вечеринка / день рождения"
+  },
+  "radio": {
+   "sheet": "plant_icons_work_3",
+   "frame": 10,
+   "group": "work",
+   "tone": "wood",
+   "ru": "радио"
+  },
+  "yoga": {
+   "sheet": "plant_icons_work_3",
+   "frame": 11,
+   "group": "work",
+   "tone": "cloth_teal",
+   "ru": "йога"
+  },
+  "dance": {
+   "sheet": "plant_icons_work_3",
+   "frame": 12,
+   "group": "work",
+   "tone": "cloth_purple",
+   "ru": "танец"
+  },
+  "news": {
+   "sheet": "plant_icons_work_3",
+   "frame": 13,
+   "group": "work",
+   "tone": "paper",
+   "ru": "газета"
+  },
+  "palette": {
+   "sheet": "plant_icons_work_4",
+   "frame": 0,
+   "group": "work",
+   "tone": "sand",
+   "ru": "цвет"
+  }
+ }
+}

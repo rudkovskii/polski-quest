@@ -296,7 +296,7 @@ describe('коробка, кровать и карточка растения', 
 
 describe('значки стадий в словаре', () => {
   it('семя, росток, куст, урожай, перезревшее и мешок — разные значки; кадры совпадают с атласом', async () => {
-    const { iconKeyOf, ICON_FRAMES } = await import('../src/ui/stageIcon');
+    const { iconKeyOf, ICON_FRAMES, ATLAS_SIZE } = await import('../src/ui/stageIcon');
     const base = { kind: 'word' as const };
     const keys = [
       iconKeyOf({ ...base, status: 'growing', stage: 'seed' }),
@@ -307,7 +307,12 @@ describe('значки стадий в словаре', () => {
     ];
     expect(new Set(keys).size).toBe(5);
     expect(iconKeyOf({ ...base, status: 'new', stage: null })).toBeNull();
-    const atlas = (await import('../public/atlas/custom.json')).default as unknown as { frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }> };
+    const atlas = (await import('../public/atlas/custom.json')).default as unknown as {
+      frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
+      meta: { size: { w: number; h: number } };
+    };
+    // background-size строится от размера атласа: устаревшая высота растягивает значки.
+    expect(ATLAS_SIZE).toEqual(atlas.meta.size);
     for (const [k, [x, y]] of Object.entries(ICON_FRAMES)) expect(atlas.frames[`${k}/0`]!.frame).toMatchObject({ x, y, w: 16, h: 16 });
   });
   it('в списке у слов на разных стадиях разные значки', () => {

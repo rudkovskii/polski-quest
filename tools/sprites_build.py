@@ -41,6 +41,7 @@ OUT = ROOT / 'public' / 'atlas'
 T = 16  # тайл и кратность кадров
 PAD = 1  # extrude вокруг кадра
 LATE_PREFIXES = ('w2_', 'geo_', 't2_')  # спрайты v2: порядок упаковки после всех прочих
+LAST_PREFIXES = ('plant_',)  # «пёстрый огород» (кусты, плоды, мини-иконки): после v2, координаты прежних кадров не двигаются
 
 RGBA = tuple[int, int, int, int]
 
@@ -234,7 +235,7 @@ def pack_custom(sprites: dict[str, SpriteDef]) -> tuple[Image.Image, dict, dict]
     """Полочная упаковка всех кадров (по убыванию высоты). Возвращает PNG, atlas JSON hash и sprites.json."""
     items = [(s.id, i, f) for s in sprites.values() for i, f in enumerate(s.frames)]
     # Новые спрайты v2 пакуются после старых: координаты старых кадров не двигаются (ui/stageIcon.ts хранит их числами).
-    late = lambda sid: sid.startswith(LATE_PREFIXES)  # noqa: E731
+    late = lambda sid: 2 if sid.startswith(LAST_PREFIXES) else int(sid.startswith(LATE_PREFIXES))  # noqa: E731
     items.sort(key=lambda t: (late(t[0]), -t[2].height, t[0], t[1]))
     width = 256
     x = y = 0

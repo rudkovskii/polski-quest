@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { bus } from '../systems/bus';
+import { framesOf } from '../systems/plantLook';
 import type { FarmAct, PlantView } from '../types/farm';
 import type { Dir } from '../types/input';
 import type { Xy } from '../world/ascii';
@@ -43,6 +44,15 @@ interface Job {
 /** Столько действий героя ждут в очереди; лишние поливы схлопываются. */
 const MAX_QUEUE = 6;
 
+/** Растение на грядке: основной спрайт, предмет урожая поверх него (мини-версия слова) и мокрая земля. */
+interface Plant {
+  view: PlantView;
+  spr: Phaser.GameObjects.Sprite | Phaser.GameObjects.Graphics;
+  /** Мини-предмет на кусте (только урожай слова-существительного): тот же поворот и масштаб, что у `spr`. */
+  ic: Phaser.GameObjects.Sprite | null;
+  wet: Phaser.GameObjects.GameObject | null;
+}
+
 const STAGE_FRAME: Record<string, string> = { seed: 'crop_seed', sprout: 'crop_sprout', bush: 'crop_bush', ripe: 'crop_ripe', overripe: 'crop_overripe' };
 
 export class FarmLayer {
@@ -50,7 +60,7 @@ export class FarmLayer {
   heroAction: string | null = null;
   carrying = false;
   auto = false;
-  private plants = new Map<string, { view: PlantView; spr: Phaser.GameObjects.Sprite | Phaser.GameObjects.Graphics; wet: Phaser.GameObjects.GameObject | null }>();
+  private plants = new Map<string, Plant>();
   private pendingHarvest = new Set<string>();
   /** Растения, у которых смена стадии ждёт, пока герой дойдёт и польёт (спрайт меняется на глазах, с искрами). */
   private deferred = new Set<string>();
@@ -114,18 +124,50 @@ export class FarmLayer {
     return this.h.sprites[name]?.frames[0] ?? null;
   }
 
-  /** Спрайт стадии; нет кадра в атласе (арт ещё не собран) — простая фигура. */
-  private makePlant(v: PlantView): Phaser.GameObjects.Sprite | Phaser.GameObjects.Graphics {
-    const name = v.stage === 'ripe' && v.phrase ? 'crop_ripe_phrase' : STAGE_FRAME[v.stage]!;
-    const f = this.frame(name);
+  /** Кадр атласа по имени `<лист>/<n>` (кусты, плоды и иконки «пёстрого огорода»); нет в атласе — null. */
+  private named(name: string | null | undefined): string | null {
+    if (!name) return null;
+    const [sheet, n] = name.split('/');
+    return this.h.sprites[sheet ?? '']?.frames[Number(n)] ?? null;
+  }
+
+  /**
+   * Спрайт стадии; нет кадра в атласе (арт ещё не собран) — простая фигура. Семечко и перезревшее общие; росток, кустик и урожай
+   * по виду слова (`look`): куст-вариант, плод цвета, у существительного на кусте-основе сидит мини-предмет (`ic`). Фразы и единицы — прежние.
+   */
+  private makePlant(v: PlantView): { spr: Phaser.GameObjects.Sprite | Phaser.GameObjects.Graphics; ic: Phaser.GameObjects.Sprite | null } {
     const x = v.tile[0] * T + T / 2;
     const bottom = v.tile[1] * T + T;
-    if (f) return this.h.scene.add.sprite(x, bottom, ATLAS, f).setOrigin(0.5, 1).setDepth(10 + bottom - 1);
-    const g = this.h.scene.add.graphics().setDepth(10 + bottom - 1);
+    const depth = 10 + bottom - 1;
+    const fr = v.look && !v.phrase ? framesOf(v.look) : null;
+    const own = fr ? (v.stage === 'sprout' ? fr.sprout : v.stage === 'bush' ? fr.bush : v.stage === 'ripe' ? fr.ripe : null) : null;
+    const ownFrame = this.named(own);
+    if (ownFrame) {
+      const spr = this.h.scene.add.sprite(x, bottom, ATLAS, ownFrame).setOrigin(0.5, 1).setDepth(depth);
+      const mini = v.stage === 'ripe' && fr?.icon ? this.named(fr.icon.frame) : null;
+      // Мини-предмет: тот же якорь, что у куста (низ клетки), поэтому подпрыгивание и дрожь общие.
+      const ic = mini && fr?.icon ? this.h.scene.add.sprite(x, bottom, ATLAS, mini).setOrigin((8 - fr.icon.dx) / T, (2 * T - fr.icon.dy) / T).setDepth(depth + 0.1) : null;
+      return { spr, ic };
+    }
+    const name = v.stage === 'ripe' && v.phrase ? 'crop_ripe_phrase' : STAGE_FRAME[v.stage]!;
+    const f = this.frame(name);
+    if (f) return { spr: this.h.scene.add.sprite(x, bottom, ATLAS, f).setOrigin(0.5, 1).setDepth(depth), ic: null };
+    const g = this.h.scene.add.graphics().setDepth(depth);
     const colors: Record<string, number> = { seed: 0x7a4b2c, sprout: 0x7ab44f, bush: 0x4f8a35, ripe: 0xd0492f, overripe: 0xc8a548 };
     const r = v.stage === 'seed' ? 2 : v.stage === 'sprout' ? 3 : 5;
     g.fillStyle(colors[v.stage] ?? 0x4f8a35, 1).fillCircle(x, bottom - 4 - r, r);
-    return g;
+    return { spr: g, ic: null };
+  }
+
+  private destroyPlant(p: Plant): void {
+    p.spr.destroy();
+    p.ic?.destroy();
+    p.wet?.destroy();
+  }
+
+  /** Спрайт и предмет — одним списком (общие твины). */
+  private parts(p: Plant): Phaser.GameObjects.Sprite[] {
+    return [p.spr, p.ic].filter((o): o is Phaser.GameObjects.Sprite => o instanceof Phaser.GameObjects.Sprite);
   }
 
   private setPlants(plants: PlantView[], cells: [number, number][]): void {
@@ -147,17 +189,15 @@ export class FarmLayer {
         continue;
       }
       this.deferred.delete(v.id);
-      cur?.spr.destroy();
-      cur?.wet?.destroy();
+      if (cur) this.destroyPlant(cur);
       const wf = this.frame('soil_wet');
       const wet = v.drops > 0 && wf ? this.h.scene.add.image(v.tile[0] * T + T / 2, v.tile[1] * T + T, ATLAS, wf).setOrigin(0.5, 1).setDepth(1.2) : null;
-      this.plants.set(v.id, { view, spr: this.makePlant(view), wet });
+      this.plants.set(v.id, { view, ...this.makePlant(view), wet });
     }
     for (const [id, p] of this.plants) {
       if (seen.has(id) || this.pendingHarvest.has(id)) continue;
       this.deferred.delete(id);
-      p.spr.destroy();
-      p.wet?.destroy();
+      this.destroyPlant(p);
       this.plants.delete(id);
     }
     this.h.model.setPlants(plants.map((p) => ({ id: p.id, tile: p.tile, label: p.label })));
@@ -207,18 +247,17 @@ export class FarmLayer {
     const v = this.views.find((x) => x.id === id);
     if (!p || !v) return;
     const view = { ...v, stage: this.pendingHarvest.has(id) ? ('ripe' as const) : v.stage };
-    p.spr.destroy();
-    p.wet?.destroy();
+    this.destroyPlant(p);
     const wf = this.frame('soil_wet');
     p.wet = v.drops > 0 && wf ? this.h.scene.add.image(v.tile[0] * T + T / 2, v.tile[1] * T + T, ATLAS, wf).setOrigin(0.5, 1).setDepth(1.2) : null;
     p.view = view;
-    p.spr = this.makePlant(view);
+    Object.assign(p, this.makePlant(view));
     if (!show) return;
     bus.emit('fx:sfx', { name: 'grow' });
-    const spr = p.spr;
-    if (spr instanceof Phaser.GameObjects.Sprite) {
-      spr.setScale(0.55);
-      this.h.scene.tweens.add({ targets: spr, scaleX: 1, scaleY: 1, duration: 340 / k, ease: 'Back.easeOut' });
+    const parts = this.parts(p);
+    if (parts.length) {
+      for (const o of parts) o.setScale(0.55);
+      this.h.scene.tweens.add({ targets: parts, scaleX: 1, scaleY: 1, duration: 340 / k, ease: 'Back.easeOut' });
     }
     this.burst(view.tile[0] * T + T / 2, view.tile[1] * T + 4, 6, 11, k);
   }
@@ -239,11 +278,11 @@ export class FarmLayer {
   private bounce(id: string, k: number, delay = 0): void {
     const p = this.plants.get(id);
     if (!p || !(p.spr instanceof Phaser.GameObjects.Sprite)) return;
-    const spr = p.spr;
+    const parts = this.parts(p);
     const s = this.h.scene;
-    s.tweens.killTweensOf(spr);
-    spr.setScale(1).setAngle(0);
-    s.tweens.add({ targets: spr, scaleY: 1.24, scaleX: 0.9, yoyo: true, duration: 120 / k, delay: delay / k, ease: 'Sine.easeOut', onComplete: () => spr.setScale(1) });
+    s.tweens.killTweensOf(parts);
+    for (const o of parts) o.setScale(1).setAngle(0);
+    s.tweens.add({ targets: parts, scaleY: 1.24, scaleX: 0.9, yoyo: true, duration: 120 / k, delay: delay / k, ease: 'Sine.easeOut', onComplete: () => parts.forEach((o) => o.setScale(1)) });
     const cx = p.view.tile[0] * T + T / 2;
     const top = p.view.tile[1] * T + 6;
     for (let i = 0; i < 3; i++) {
@@ -256,11 +295,11 @@ export class FarmLayer {
   private shake(id: string, k: number): void {
     const p = this.plants.get(id);
     if (!p || !(p.spr instanceof Phaser.GameObjects.Sprite)) return;
-    const spr = p.spr;
+    const parts = this.parts(p);
     const x0 = p.view.tile[0] * T + T / 2;
-    this.h.scene.tweens.killTweensOf(spr);
-    spr.setX(x0);
-    this.h.scene.tweens.add({ targets: spr, x: x0 + 1.5, yoyo: true, repeat: 2, duration: 45 / k, onComplete: () => spr.setX(x0) });
+    this.h.scene.tweens.killTweensOf(parts);
+    for (const o of parts) o.setX(x0);
+    this.h.scene.tweens.add({ targets: parts, x: x0 + 1.5, yoyo: true, repeat: 2, duration: 45 / k, onComplete: () => parts.forEach((o) => o.setX(x0)) });
   }
 
   private markRipe(id: string): void {
@@ -268,9 +307,10 @@ export class FarmLayer {
     const p = this.plants.get(id);
     if (!p) return;
     p.spr.destroy();
+    p.ic?.destroy();
     const v = { ...p.view, stage: 'ripe' as const };
     p.view = v;
-    p.spr = this.makePlant(v);
+    Object.assign(p, this.makePlant(v));
   }
 
   private start(act: FarmAct, time: number): void {
@@ -310,19 +350,21 @@ export class FarmLayer {
         this.pendingHarvest.delete(j.act.id);
         const p = this.plants.get(j.act.id);
         if (p && !this.views.some((v) => v.id === j.act.id)) {
-          p.spr.destroy();
-          p.wet?.destroy();
+          this.destroyPlant(p);
           this.plants.delete(j.act.id);
         } else if (p) {
           // Перезревшее с той же грядки ушло в банку, но запись ещё есть: перерисуем по текущему виду.
           p.spr.destroy();
+          p.ic?.destroy();
           const v = this.views.find((x) => x.id === j.act.id)!;
           p.view = v;
-          p.spr = this.makePlant(v);
+          Object.assign(p, this.makePlant(v));
         }
         this.carrying = true;
         const phrase = j.act.id.startsWith('p.');
-        const f = this.frame(phrase ? 'item_crop_phrase' : 'item_crop') ?? this.frame(phrase ? 'crop_ripe_phrase' : 'crop_ripe');
+        // Плод над головой — тот же мини-предмет (или плод цвета), что рос на кусте; куст-растение и фраза несут общий.
+        const own = p?.view.look && !phrase ? this.named(framesOf(p.view.look).held) : null;
+        const f = own ?? this.frame(phrase ? 'item_crop_phrase' : 'item_crop') ?? this.frame(phrase ? 'crop_ripe_phrase' : 'crop_ripe');
         if (f) {
           // Плод поднимается над головой: появляется «с хлопком».
           const it = this.h.scene.add.sprite(0, 0, ATLAS, f).setOrigin(0.5, 1).setScale(0.4);
