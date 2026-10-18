@@ -3,7 +3,7 @@
 import type { BusEvents } from '../types/bus';
 import type { FarmAct, FarmApi, FarmStats, GameMode, ItemInfo, PhraseHint, PlantView } from '../types/farm';
 import type { Bus } from './bus';
-import { PHRASES, PHRASE_BY_ID, TOPICS, WORDS, WORD_BY_ID, isPhraseId, plOf } from './content';
+import { ALL_WORDS, PHRASES, PHRASE_BY_ID, TOPICS, WORD_BY_ID, isA1, isPhraseId, plOf } from './content';
 import {
   PLOT_CELLS,
   TIER_CAP,
@@ -109,9 +109,11 @@ export function createFarm(d: FarmDeps): Farm {
   };
 
   const grownWords = (): number => [...st.items.values()].filter((it) => !it.phrase && it.harvests > 0).length;
-  const growingWords = (): number => [...st.items.values()].filter((it) => !it.phrase && it.harvests === 0 && it.stage !== null).length;
+  /** Растущие слова базы A1 (подсказка «уже растут N» у полоски пути к A1). */
+  const growingWords = (): number => [...st.items.values()].filter((it) => !it.phrase && isA1(it.id) && it.harvests === 0 && it.stage !== null).length;
   const grownPhrases = (): number => [...st.items.values()].filter((it) => it.phrase && it.harvests > 0).length;
-  const path = (): PathInfo => pathOf(pointsOf(st.items.values()));
+  /** Путь к A1 — только по базе A1: слова темы «Święta i zwyczaje» (v2) в очки не идут. */
+  const path = (): PathInfo => pathOf(pointsOf([...st.items.values()].filter((it) => isA1(it.id))));
   /** Позиция на пути при запуске фермы: от неё считается рост за сессию («+0,4 подуровня»). */
   const pos0 = path().pos;
   /** Фраза для сборки из плиток (иначе растёт в играх 1 и 2 как слово). */
@@ -205,7 +207,7 @@ export function createFarm(d: FarmDeps): Farm {
   };
 
   const farm: Farm = {
-    words: WORDS,
+    words: ALL_WORDS,
     phrases: PHRASES,
     topics: TOPICS,
     word: (id) => WORD_BY_ID.get(id),
@@ -280,7 +282,7 @@ export function createFarm(d: FarmDeps): Farm {
       // «Напиши сам» (игра 2): кустик и перезревшее, а ещё росток с ответами в обе стороны — этот ответ сделает его кустиком.
       // Без последнего ввод почти не встречался: игра 1 раньше засчитывает кустикам день, и в игру 2 они не попадают (P4a).
       const typed = !reverse && mode === 2 && isTypedStage(it, stage);
-      const made = makeQuestion(qmode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: WORDS, phrases: PHRASES }, rand, typed);
+      const made = makeQuestion(qmode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: ALL_WORDS, phrases: PHRASES }, rand, typed);
       const q = made && { ...made, progress: progressText(it, now, today()), ...(reverse ? { reverse: true } : {}) };
       const slot = g.slots[id];
       const cell = slot !== undefined ? PLOT_CELLS[slot] : undefined;

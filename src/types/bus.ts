@@ -1,5 +1,6 @@
 // Полный список событий шины. Связь scenes/world ⇄ ui и склейка main.ts идут только через неё.
 import type { FarmAct, PlantView } from './farm';
+import type { PlotView, PolskaGameId, ZPlot } from './polska';
 import type { DpadSide, Dir, MapControls, RoutedIntent, Source } from './input';
 
 /** Чем прозвучала фраза: файл из манифеста, Web Speech pl-PL или никак (показать текст). */
@@ -11,7 +12,12 @@ export type AudioVia = 'file' | 'webspeech' | 'none';
 export type AudioState = 'idle' | 'playing' | 'blocked' | 'none';
 
 /** Объекты, с которыми можно что-то сделать (`use` в content/maps/*.json). Логику каждого делает F-03. */
-export type UseKind = 'desk' | 'board' | 'bin' | 'shelf' | 'bed' | 'plant' | 'radio';
+export type UseKind = 'desk' | 'board' | 'bin' | 'shelf' | 'bed' | 'plant' | 'radio' | PolskaUse;
+/**
+ * v2: точки входа в игры о Польше (`map`, `calendar` в доме; `mast`, `seasonBoard` на ферме) и объекты участков Zagroda
+ * (`zplot`: яблоня, улей, грядка месяца, место на клумбе; `id` объекта = `sad_<воеводство>`, `hive_<куплет>`, `bed_<месяц>`, `klumba_<n>`).
+ */
+export type PolskaUse = 'map' | 'calendar' | 'mast' | 'seasonBoard' | 'zplot';
 
 /**
  * КОНТРАКТ ДЛЯ F-03. Игрок нажал A рядом с интерактивным объектом или тапнул по нему (мир сам подошёл).
@@ -80,6 +86,18 @@ export interface BusEvents {
   'audio:unlock': Record<string, never>;
   'audio:blocked': Record<string, never>;
   'audio:state': { state: AudioState; via?: AudioVia; text?: string; id?: string };
+  /** v2: вид объектов участков Zagroda по прогрессу (шлёт `systems/polska.ts` при любом изменении и при входе в Zagroda); `entries` — кадры точек входа (`map`, `calendar`, `mast`, `seasonBoard`) по прогрессу. */
+  'polska:plots': { views: PlotView[]; entries?: Record<string, number> };
+  /** v2: шкала «Wiedza o Polsce» для `ui/polskaHud.ts`: подуровень 0…10, доля внутри, доля всех единиц, опыт v2; `gain` — «+N», `up` — новый подуровень. */
+  'polska:scale': { sub: number; of: number; pl: string; ru: string; ratio: number; pct: number; xp: number; gain?: number; up?: boolean };
+  /** v2: ответ в игре о Польше (для автобега в Zagroda: полив, рост, урожай у объекта `obj`). */
+  'polska:act': { kind: 'water' | 'grow' | 'harvest' | 'miss'; id: string; label: string; obj: string | null; xp: number };
+  /** v2: текущее задание игры о Польше: герой бежит к объекту `obj` в Zagroda (null — стоит). */
+  'polska:focus': { id: string | null; obj: string | null; label: string };
+  /** v2: игра о Польше открыта/закрыта. `layout: panel` — нижняя панель (мир сверху, герой уходит в Zagroda); `full` — весь экран, мир не трогаем. */
+  'polska:auto': { on: boolean; game: PolskaGameId | null; layout: 'panel' | 'full'; plot?: ZPlot };
+  /** v2: кнопка «Idź» на доске: герой сам идёт к объекту с этим `use` (через двери, если он на другой карте) и открывает его. */
+  'world:goto': { use: string };
   /** Intent после роутера: `to` = мир или оверлей по фокусу. */
   'input:intent': RoutedIntent;
   'input:source': { source: Source };

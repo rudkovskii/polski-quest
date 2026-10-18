@@ -50,6 +50,8 @@ export const TIER_CAP: readonly number[] = PLOT_TIERS.map((_, i) => {
 export interface PlantEntry {
   t: number;
   id: string;
+  /** v2: посадить сразу этой стадией (строки гимна, выученные в дриле собеса, `drillSeed`): кустик с обеими сторонами. */
+  start?: 'bush';
 }
 
 export interface AnswerEntry {
@@ -60,6 +62,8 @@ export interface AnswerEntry {
   side: Side;
   ok: boolean;
   mode: GameMode;
+  /** v2: задание «сказать/собрать самому» (сторона B без подсказки). Нужно для урожая единиц игр о Польше. */
+  self?: boolean;
 }
 
 export interface GardenSave {
@@ -83,6 +87,12 @@ export function dayOf(t: number, tzOffsetMin = 0): number {
 export interface ItemState {
   id: string;
   phrase: boolean;
+  /** Вид (v2): word, phrase или единица игры о Польше. */
+  kind: PlantKind;
+  /** Для урожая нужен верный ответ «сам» (`AnswerEntry.self`): у единиц игр о Польше. */
+  needSelf: boolean;
+  /** Был верный ответ «сам» (за цикл роста). */
+  selfOk: boolean;
   plantedAt: number;
   /** Стадия роста; null — в банке. */
   stage: 'seed' | 'sprout' | 'bush' | null;
@@ -121,6 +131,22 @@ export interface Outcome {
 
 export const isPhrase = (id: string): boolean => id.startsWith('p.');
 
+/** Вид растения (v2): слово и фраза (v1, тема «Święta i zwyczaje» — тоже слова) и единицы игр о Польше. */
+export type PlantKind = 'word' | 'phrase' | 'geo' | 'hymn' | 'symbol' | 'date' | 'holiday';
+/** Виды единиц игр о Польше (v2): у них своя шкала «Wiedza o Polsce», в путь к A1 они не идут. */
+export const POLSKA_KINDS: readonly PlantKind[] = ['geo', 'hymn', 'symbol', 'date', 'holiday'];
+/** Префикс id → вид: `geo.city.wroclaw`, `hymn.s1.1`, `symbol.godlo`, `date.konstytucja`, `hol.wigilia`; `p.` фраза; остальное (`w.`, `sw.`) слово. */
+export function kindOf(id: string): PlantKind {
+  if (id.startsWith('p.')) return 'phrase';
+  if (id.startsWith('geo.')) return 'geo';
+  if (id.startsWith('hymn.')) return 'hymn';
+  if (id.startsWith('symbol.')) return 'symbol';
+  if (id.startsWith('date.')) return 'date';
+  if (id.startsWith('hol.')) return 'holiday';
+  return 'word';
+}
+export const isPolskaKind = (k: PlantKind): boolean => POLSKA_KINDS.includes(k);
+
 /** Когда собранное вернётся на грядку перезревшим (null — не в банке). */
 export function dueAt(it: ItemState): number | null {
   if (it.stage !== null || it.lastHarvest === null || it.harvests < 1) return null;
@@ -141,15 +167,20 @@ export function stageOf(it: ItemState, now: number): Stage | null {
 
 function plantItem(st: GardenState, e: PlantEntry): void {
   if (st.items.has(e.id)) return;
+  const kind = kindOf(e.id);
+  const bush = e.start === 'bush';
   st.items.set(e.id, {
     id: e.id,
     phrase: isPhrase(e.id),
+    kind,
+    needSelf: isPolskaKind(kind),
+    selfOk: false,
     plantedAt: e.t,
-    stage: 'seed',
+    stage: bush ? 'bush' : 'seed',
     drops: 0,
-    sides: { pr: false, rp: false },
+    sides: { pr: bush, rp: bush },
     days: new Set(),
-    rpOk: false,
+    rpOk: bush,
     sideAns: { pr: 0, rp: 0 },
     harvests: 0,
     lastHarvest: null,
@@ -192,6 +223,7 @@ export function applyAnswer(st: GardenState, a: AnswerEntry): Outcome {
   it.sides[a.side] = true;
   it.days.add(a.day);
   if (a.side === 'rp') it.rpOk = true;
+  if (a.self) it.selfOk = true;
   let kind: Outcome['kind'] = 'water';
   let to: Stage | null = it.stage;
   if (it.stage === 'seed' && it.drops >= SPROUT_DROPS) {
@@ -206,9 +238,10 @@ export function applyAnswer(st: GardenState, a: AnswerEntry): Outcome {
     to = 'bush';
     kind = 'grow';
     xp += XP.stage;
-  } else if (it.stage === 'bush' && it.days.size >= HARVEST_DAYS && it.rpOk) {
+  } else if (it.stage === 'bush' && it.days.size >= HARVEST_DAYS && it.rpOk && (!it.needSelf || it.selfOk)) {
     it.stage = null;
     it.drops = 0;
+    it.selfOk = false;
     it.harvests = 1;
     it.lastHarvest = a.t;
     it.firstHarvestDay = a.day;
@@ -542,11 +575,13 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
 export function normalizeGarden(raw: unknown): GardenSave {
   const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const num = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
-  const planted = Array.isArray(r.planted) ? r.planted.filter((p): p is PlantEntry => !!p && typeof p === 'object' && typeof p.id === 'string' && num(p.t)).map((p) => ({ t: p.t, id: p.id })) : [];
+  const planted = Array.isArray(r.planted)
+    ? r.planted.filter((p): p is PlantEntry => !!p && typeof p === 'object' && typeof p.id === 'string' && num(p.t)).map((p) => (p.start === 'bush' ? { t: p.t, id: p.id, start: 'bush' as const } : { t: p.t, id: p.id }))
+    : [];
   const log = Array.isArray(r.log)
     ? r.log
         .filter((a): a is AnswerEntry => !!a && typeof a === 'object' && typeof a.id === 'string' && num(a.t) && num(a.day) && (a.side === 'pr' || a.side === 'rp') && typeof a.ok === 'boolean' && [1, 2, 3, 4].includes(a.mode))
-        .map((a) => ({ t: a.t, day: a.day, id: a.id, side: a.side, ok: a.ok, mode: a.mode }))
+        .map((a) => ({ t: a.t, day: a.day, id: a.id, side: a.side, ok: a.ok, mode: a.mode, ...(a.self === true ? { self: true } : {}) }))
     : [];
   const slots: Record<string, number> = {};
   if (r.slots && typeof r.slots === 'object') for (const [k, v] of Object.entries(r.slots as Record<string, unknown>)) if (num(v) && v >= 0) slots[k] = Math.trunc(v);

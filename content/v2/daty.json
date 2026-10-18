@@ -1,0 +1,2208 @@
+{
+ "version": 1,
+ "meta": {
+  "game": "Daty",
+  "spec": "Игра/ФЕРМА_v2.md §4 и «Решения Шэфа» пп. 5–6",
+  "checked": "2026-10-18",
+  "authored_by": "ai",
+  "years": "Годы только цифрой (решение Шэфа 5): слов для года в данных нет. year=null у дат, где год не привязан (wykleci, flaga).",
+  "translit": "tr получен генератором data/a1/src/translit.py, ручных правок нет; на вычитку носителем.",
+  "source_discrepancy": "В ПМЖ/Собес/drill/daty.md (строка powstanie-koniec) конец Варшавского восстания указан как 3 октября 1944; верная дата капитуляции — 2 октября 1944. В игре конец восстания не отдельная единица, дата 2.10.1944 упомянута только в note_ru у godzina_w.",
+  "nominal_vs_genitive": "В вопросах «Kiedy…» и «Co…» всегда родительный (trzeciego maja). Именительный (Który jest dzisiaj? trzeci maja) только в ритуале «сегодня»; формы nom/fem/ins ординалов лежат здесь для дистракторов."
+ },
+ "templates": {
+  "kiedy": {
+   "pl": "Kiedy jest {event}? / Kiedy {event_verb}?",
+   "ru": "Когда {событие}?",
+   "kind": "B",
+   "answer": "say (плитки: ordinal gen + month gen)",
+   "task": "tiles"
+  },
+  "co": {
+   "pl": "Co się stało {say}? / Co obchodzimy {say}?",
+   "ru": "Что произошло / что отмечаем {дата}?",
+   "kind": "A",
+   "answer": "pl события, 4 варианта: верный + q.co.wrong_ids",
+   "task": "choice"
+  },
+  "pokaz": {
+   "pl": "Pokaż w kalendarzu: {event}",
+   "ru": "Покажи в календаре: {событие}",
+   "kind": "B",
+   "answer": "день и месяц (тап по сетке)",
+   "task": "calendar"
+  },
+  "dzisiaj": {
+   "pl": "Którego jest dzisiaj? / Który jest dzisiaj?",
+   "ru": "Какое сегодня число?",
+   "answer": "принимаются обе формы: osiemnastego października и osiemnasty października",
+   "task": "tiles",
+   "note": "не единица, ритуал при открытии календаря"
+  },
+  "rozgrzewka": {
+   "pl": "Przeczytaj datę: {d}.{m}",
+   "ru": "Прочитай дату словами",
+   "task": "tiles",
+   "note": "не единица, опыт +1"
+  }
+ },
+ "months": [
+  {
+   "n": 1,
+   "nom": "styczeń",
+   "gen": "stycznia",
+   "loc": "styczniu",
+   "nom_tr": "сты́чэнь",
+   "gen_tr": "сты́чня",
+   "nom_ru": "январь",
+   "gen_ru": "января"
+  },
+  {
+   "n": 2,
+   "nom": "luty",
+   "gen": "lutego",
+   "loc": "lutym",
+   "nom_tr": "лу́ты",
+   "gen_tr": "лутэ́го",
+   "nom_ru": "февраль",
+   "gen_ru": "февраля"
+  },
+  {
+   "n": 3,
+   "nom": "marzec",
+   "gen": "marca",
+   "loc": "marcu",
+   "nom_tr": "ма́жэц",
+   "gen_tr": "ма́рца",
+   "nom_ru": "март",
+   "gen_ru": "марта"
+  },
+  {
+   "n": 4,
+   "nom": "kwiecień",
+   "gen": "kwietnia",
+   "loc": "kwietniu",
+   "nom_tr": "кфе́чень",
+   "gen_tr": "кфе́тня",
+   "nom_ru": "апрель",
+   "gen_ru": "апреля"
+  },
+  {
+   "n": 5,
+   "nom": "maj",
+   "gen": "maja",
+   "loc": "maju",
+   "nom_tr": "май",
+   "gen_tr": "ма́я",
+   "nom_ru": "май",
+   "gen_ru": "мая"
+  },
+  {
+   "n": 6,
+   "nom": "czerwiec",
+   "gen": "czerwca",
+   "loc": "czerwcu",
+   "nom_tr": "чэ́рвец",
+   "gen_tr": "чэ́рфца",
+   "nom_ru": "июнь",
+   "gen_ru": "июня"
+  },
+  {
+   "n": 7,
+   "nom": "lipiec",
+   "gen": "lipca",
+   "loc": "lipcu",
+   "nom_tr": "ли́пец",
+   "gen_tr": "ли́пца",
+   "nom_ru": "июль",
+   "gen_ru": "июля"
+  },
+  {
+   "n": 8,
+   "nom": "sierpień",
+   "gen": "sierpnia",
+   "loc": "sierpniu",
+   "nom_tr": "ще́рпень",
+   "gen_tr": "ще́рпня",
+   "nom_ru": "август",
+   "gen_ru": "августа"
+  },
+  {
+   "n": 9,
+   "nom": "wrzesień",
+   "gen": "września",
+   "loc": "wrześniu",
+   "nom_tr": "вжэ́щень",
+   "gen_tr": "вжэ́щня",
+   "nom_ru": "сентябрь",
+   "gen_ru": "сентября"
+  },
+  {
+   "n": 10,
+   "nom": "październik",
+   "gen": "października",
+   "loc": "październiku",
+   "nom_tr": "пажьдже́рник",
+   "gen_tr": "пажьджерни́ка",
+   "nom_ru": "октябрь",
+   "gen_ru": "октября"
+  },
+  {
+   "n": 11,
+   "nom": "listopad",
+   "gen": "listopada",
+   "loc": "listopadzie",
+   "nom_tr": "листо́пат",
+   "gen_tr": "листопа́да",
+   "nom_ru": "ноябрь",
+   "gen_ru": "ноября"
+  },
+  {
+   "n": 12,
+   "nom": "grudzień",
+   "gen": "grudnia",
+   "loc": "grudniu",
+   "nom_tr": "гру́джень",
+   "gen_tr": "гру́дня",
+   "nom_ru": "декабрь",
+   "gen_ru": "декабря"
+  }
+ ],
+ "ordinals": [
+  {
+   "n": 1,
+   "nom": "pierwszy",
+   "gen": "pierwszego",
+   "fem": "pierwsza",
+   "ins": "pierwszym",
+   "gen_tiles": [
+    "pierwszego"
+   ],
+   "tr": "перфшэ́го",
+   "nom_tr": "пе́рфшы"
+  },
+  {
+   "n": 2,
+   "nom": "drugi",
+   "gen": "drugiego",
+   "fem": "druga",
+   "ins": "drugim",
+   "gen_tiles": [
+    "drugiego"
+   ],
+   "tr": "друге́го",
+   "nom_tr": "дру́ги"
+  },
+  {
+   "n": 3,
+   "nom": "trzeci",
+   "gen": "trzeciego",
+   "fem": "trzecia",
+   "ins": "trzecim",
+   "gen_tiles": [
+    "trzeciego"
+   ],
+   "tr": "тшэче́го",
+   "nom_tr": "тшэ́чи"
+  },
+  {
+   "n": 4,
+   "nom": "czwarty",
+   "gen": "czwartego",
+   "fem": "czwarta",
+   "ins": "czwartym",
+   "gen_tiles": [
+    "czwartego"
+   ],
+   "tr": "чфартэ́го",
+   "nom_tr": "чфа́рты"
+  },
+  {
+   "n": 5,
+   "nom": "piąty",
+   "gen": "piątego",
+   "fem": "piąta",
+   "ins": "piątym",
+   "gen_tiles": [
+    "piątego"
+   ],
+   "tr": "пёнтэ́го",
+   "nom_tr": "пёнты"
+  },
+  {
+   "n": 6,
+   "nom": "szósty",
+   "gen": "szóstego",
+   "fem": "szósta",
+   "ins": "szóstym",
+   "gen_tiles": [
+    "szóstego"
+   ],
+   "tr": "шустэ́го",
+   "nom_tr": "шу́сты"
+  },
+  {
+   "n": 7,
+   "nom": "siódmy",
+   "gen": "siódmego",
+   "fem": "siódma",
+   "ins": "siódmym",
+   "gen_tiles": [
+    "siódmego"
+   ],
+   "tr": "щудмэ́го",
+   "nom_tr": "щу́дмы"
+  },
+  {
+   "n": 8,
+   "nom": "ósmy",
+   "gen": "ósmego",
+   "fem": "ósma",
+   "ins": "ósmym",
+   "gen_tiles": [
+    "ósmego"
+   ],
+   "tr": "усмэ́го",
+   "nom_tr": "у́смы"
+  },
+  {
+   "n": 9,
+   "nom": "dziewiąty",
+   "gen": "dziewiątego",
+   "fem": "dziewiąta",
+   "ins": "dziewiątym",
+   "gen_tiles": [
+    "dziewiątego"
+   ],
+   "tr": "джевёнтэ́го",
+   "nom_tr": "джевёнты"
+  },
+  {
+   "n": 10,
+   "nom": "dziesiąty",
+   "gen": "dziesiątego",
+   "fem": "dziesiąta",
+   "ins": "dziesiątym",
+   "gen_tiles": [
+    "dziesiątego"
+   ],
+   "tr": "джещонтэ́го",
+   "nom_tr": "джещо́нты"
+  },
+  {
+   "n": 11,
+   "nom": "jedenasty",
+   "gen": "jedenastego",
+   "fem": "jedenasta",
+   "ins": "jedenastym",
+   "gen_tiles": [
+    "jedenastego"
+   ],
+   "tr": "едэнастэ́го",
+   "nom_tr": "едэна́сты"
+  },
+  {
+   "n": 12,
+   "nom": "dwunasty",
+   "gen": "dwunastego",
+   "fem": "dwunasta",
+   "ins": "dwunastym",
+   "gen_tiles": [
+    "dwunastego"
+   ],
+   "tr": "двунастэ́го",
+   "nom_tr": "двуна́сты"
+  },
+  {
+   "n": 13,
+   "nom": "trzynasty",
+   "gen": "trzynastego",
+   "fem": "trzynasta",
+   "ins": "trzynastym",
+   "gen_tiles": [
+    "trzynastego"
+   ],
+   "tr": "тшынастэ́го",
+   "nom_tr": "тшына́сты"
+  },
+  {
+   "n": 14,
+   "nom": "czternasty",
+   "gen": "czternastego",
+   "fem": "czternasta",
+   "ins": "czternastym",
+   "gen_tiles": [
+    "czternastego"
+   ],
+   "tr": "чтэрнастэ́го",
+   "nom_tr": "чтэрна́сты"
+  },
+  {
+   "n": 15,
+   "nom": "piętnasty",
+   "gen": "piętnastego",
+   "fem": "piętnasta",
+   "ins": "piętnastym",
+   "gen_tiles": [
+    "piętnastego"
+   ],
+   "tr": "пентнастэ́го",
+   "nom_tr": "пентна́сты"
+  },
+  {
+   "n": 16,
+   "nom": "szesnasty",
+   "gen": "szesnastego",
+   "fem": "szesnasta",
+   "ins": "szesnastym",
+   "gen_tiles": [
+    "szesnastego"
+   ],
+   "tr": "шэснастэ́го",
+   "nom_tr": "шэсна́сты"
+  },
+  {
+   "n": 17,
+   "nom": "siedemnasty",
+   "gen": "siedemnastego",
+   "fem": "siedemnasta",
+   "ins": "siedemnastym",
+   "gen_tiles": [
+    "siedemnastego"
+   ],
+   "tr": "щедэмнастэ́го",
+   "nom_tr": "щедэмна́сты"
+  },
+  {
+   "n": 18,
+   "nom": "osiemnasty",
+   "gen": "osiemnastego",
+   "fem": "osiemnasta",
+   "ins": "osiemnastym",
+   "gen_tiles": [
+    "osiemnastego"
+   ],
+   "tr": "ощемнастэ́го",
+   "nom_tr": "ощемна́сты"
+  },
+  {
+   "n": 19,
+   "nom": "dziewiętnasty",
+   "gen": "dziewiętnastego",
+   "fem": "dziewiętnasta",
+   "ins": "dziewiętnastym",
+   "gen_tiles": [
+    "dziewiętnastego"
+   ],
+   "tr": "джевентнастэ́го",
+   "nom_tr": "джевентна́сты"
+  },
+  {
+   "n": 20,
+   "nom": "dwudziesty",
+   "gen": "dwudziestego",
+   "fem": "dwudziesta",
+   "ins": "dwudziestym",
+   "gen_tiles": [
+    "dwudziestego"
+   ],
+   "tr": "двуджестэ́го",
+   "nom_tr": "двудже́сты"
+  },
+  {
+   "n": 21,
+   "nom": "dwudziesty pierwszy",
+   "gen": "dwudziestego pierwszego",
+   "fem": "dwudziesta pierwsza",
+   "ins": "dwudziestym pierwszym",
+   "gen_tiles": [
+    "dwudziestego",
+    "pierwszego"
+   ],
+   "tr": "двуджестэ́го перфшэ́го",
+   "nom_tr": "двудже́сты пе́рфшы"
+  },
+  {
+   "n": 22,
+   "nom": "dwudziesty drugi",
+   "gen": "dwudziestego drugiego",
+   "fem": "dwudziesta druga",
+   "ins": "dwudziestym drugim",
+   "gen_tiles": [
+    "dwudziestego",
+    "drugiego"
+   ],
+   "tr": "двуджестэ́го друге́го",
+   "nom_tr": "двудже́сты дру́ги"
+  },
+  {
+   "n": 23,
+   "nom": "dwudziesty trzeci",
+   "gen": "dwudziestego trzeciego",
+   "fem": "dwudziesta trzecia",
+   "ins": "dwudziestym trzecim",
+   "gen_tiles": [
+    "dwudziestego",
+    "trzeciego"
+   ],
+   "tr": "двуджестэ́го тшэче́го",
+   "nom_tr": "двудже́сты тшэ́чи"
+  },
+  {
+   "n": 24,
+   "nom": "dwudziesty czwarty",
+   "gen": "dwudziestego czwartego",
+   "fem": "dwudziesta czwarta",
+   "ins": "dwudziestym czwartym",
+   "gen_tiles": [
+    "dwudziestego",
+    "czwartego"
+   ],
+   "tr": "двуджестэ́го чфартэ́го",
+   "nom_tr": "двудже́сты чфа́рты"
+  },
+  {
+   "n": 25,
+   "nom": "dwudziesty piąty",
+   "gen": "dwudziestego piątego",
+   "fem": "dwudziesta piąta",
+   "ins": "dwudziestym piątym",
+   "gen_tiles": [
+    "dwudziestego",
+    "piątego"
+   ],
+   "tr": "двуджестэ́го пёнтэ́го",
+   "nom_tr": "двудже́сты пёнты"
+  },
+  {
+   "n": 26,
+   "nom": "dwudziesty szósty",
+   "gen": "dwudziestego szóstego",
+   "fem": "dwudziesta szósta",
+   "ins": "dwudziestym szóstym",
+   "gen_tiles": [
+    "dwudziestego",
+    "szóstego"
+   ],
+   "tr": "двуджестэ́го шустэ́го",
+   "nom_tr": "двудже́сты шу́сты"
+  },
+  {
+   "n": 27,
+   "nom": "dwudziesty siódmy",
+   "gen": "dwudziestego siódmego",
+   "fem": "dwudziesta siódma",
+   "ins": "dwudziestym siódmym",
+   "gen_tiles": [
+    "dwudziestego",
+    "siódmego"
+   ],
+   "tr": "двуджестэ́го щудмэ́го",
+   "nom_tr": "двудже́сты щу́дмы"
+  },
+  {
+   "n": 28,
+   "nom": "dwudziesty ósmy",
+   "gen": "dwudziestego ósmego",
+   "fem": "dwudziesta ósma",
+   "ins": "dwudziestym ósmym",
+   "gen_tiles": [
+    "dwudziestego",
+    "ósmego"
+   ],
+   "tr": "двуджестэ́го усмэ́го",
+   "nom_tr": "двудже́сты у́смы"
+  },
+  {
+   "n": 29,
+   "nom": "dwudziesty dziewiąty",
+   "gen": "dwudziestego dziewiątego",
+   "fem": "dwudziesta dziewiąta",
+   "ins": "dwudziestym dziewiątym",
+   "gen_tiles": [
+    "dwudziestego",
+    "dziewiątego"
+   ],
+   "tr": "двуджестэ́го джевёнтэ́го",
+   "nom_tr": "двудже́сты джевёнты"
+  },
+  {
+   "n": 30,
+   "nom": "trzydziesty",
+   "gen": "trzydziestego",
+   "fem": "trzydziesta",
+   "ins": "trzydziestym",
+   "gen_tiles": [
+    "trzydziestego"
+   ],
+   "tr": "тшыджестэ́го",
+   "nom_tr": "тшыдже́сты"
+  },
+  {
+   "n": 31,
+   "nom": "trzydziesty pierwszy",
+   "gen": "trzydziestego pierwszego",
+   "fem": "trzydziesta pierwsza",
+   "ins": "trzydziestym pierwszym",
+   "gen_tiles": [
+    "trzydziestego",
+    "pierwszego"
+   ],
+   "tr": "тшыджестэ́го перфшэ́го",
+   "nom_tr": "тшыдже́сты пе́рфшы"
+  }
+ ],
+ "units": [
+  {
+   "id": "date.wykleci",
+   "kind": "date",
+   "type": "observance",
+   "day": 1,
+   "month": 3,
+   "year": null,
+   "pl": "Narodowy Dzień Pamięci Żołnierzy Wyklętych",
+   "ru": "Национальный день памяти «проклятых солдат»",
+   "tr": "народо́вы джень паме́ньчи жоўнье́жы выклэ́нтых",
+   "say": "pierwszego marca",
+   "say_tr": "перфшэ́го ма́рца",
+   "tiles": {
+    "pl": [
+     "pierwszego",
+     "marca"
+    ],
+    "distract": [
+     "pierwszy",
+     "pierwsza",
+     "marzec",
+     "marcu"
+    ]
+   },
+   "note_ru": "Память польских подпольщиков, боровшихся с коммунистической властью после 1945 года. Отмечается с 2011 года.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy jest Narodowy Dzień Pamięci Żołnierzy Wyklętych?",
+     "ru": "Когда Национальный день памяти «проклятых солдат»?",
+     "answer": "pierwszego marca"
+    },
+    "co": {
+     "pl": "Co obchodzimy pierwszego marca?",
+     "ru": "Что мы отмечаем 1 марта?",
+     "answer": "Narodowy Dzień Pamięci Żołnierzy Wyklętych",
+     "wrong_ids": [
+      "date.nato",
+      "date.konstytucja97",
+      "date.smolensk"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Narodowy Dzień Pamięci Żołnierzy Wyklętych",
+     "ru": "Покажи в календаре: Национальный день памяти «проклятых солдат»",
+     "answer": {
+      "day": 1,
+      "month": 3
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 1,
+     "month": 2,
+     "say": "pierwszego lutego"
+    },
+    {
+     "day": 1,
+     "month": 11,
+     "say": "pierwszego listopada"
+    },
+    {
+     "day": 11,
+     "month": 3,
+     "say": "jedenastego marca"
+    }
+   ],
+   "tone": "solemn",
+   "harvest": "quiet",
+   "free": false,
+   "icon": "candle",
+   "band": 1,
+   "src": "daty.md:240; Miso №151",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.nato",
+   "kind": "date",
+   "type": "event",
+   "day": 12,
+   "month": 3,
+   "year": 1999,
+   "pl": "Polska wstąpiła do NATO",
+   "ru": "Польша вступила в НАТО",
+   "tr": "по́лска фстомпи́ўа до на́то",
+   "say": "dwunastego marca",
+   "say_tr": "двунастэ́го ма́рца",
+   "tiles": {
+    "pl": [
+     "dwunastego",
+     "marca"
+    ],
+    "distract": [
+     "dwunasty",
+     "dwunasta",
+     "marzec",
+     "marcu"
+    ]
+   },
+   "note_ru": "Церемония принятия прошла в США. Частая путаница из дриля: 12 марта, а не 23 марта.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy Polska wstąpiła do NATO?",
+     "ru": "Когда Польша вступила в НАТО?",
+     "answer": "dwunastego marca"
+    },
+    "co": {
+     "pl": "Co się stało dwunastego marca?",
+     "ru": "Что произошло 12 марта?",
+     "answer": "Polska wstąpiła do NATO",
+     "wrong_ids": [
+      "date.wykleci",
+      "date.konstytucja97",
+      "date.smolensk"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Polska wstąpiła do NATO",
+     "ru": "Покажи в календаре: Польша вступила в НАТО",
+     "answer": {
+      "day": 12,
+      "month": 3
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 23,
+     "month": 3,
+     "say": "dwudziestego trzeciego marca"
+    },
+    {
+     "day": 12,
+     "month": 4,
+     "say": "dwunastego kwietnia"
+    },
+    {
+     "day": 21,
+     "month": 3,
+     "say": "dwudziestego pierwszego marca"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "sword",
+   "band": 1,
+   "src": "daty.md (12 marca 1999)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.konstytucja97",
+   "kind": "date",
+   "type": "event",
+   "day": 2,
+   "month": 4,
+   "year": 1997,
+   "pl": "Uchwalono obecną Konstytucję",
+   "ru": "Принята действующая Конституция",
+   "tr": "ухфало́но обэ́цноў констыту́це",
+   "say": "drugiego kwietnia",
+   "say_tr": "друге́го кфе́тня",
+   "tiles": {
+    "pl": [
+     "drugiego",
+     "kwietnia"
+    ],
+    "distract": [
+     "drugi",
+     "druga",
+     "kwiecień",
+     "kwietniu"
+    ]
+   },
+   "note_ru": "Национальное собрание приняло Конституцию 2 апреля 1997 года, затем её утвердил референдум. Статья 28 — о гербе, цветах и гимне.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy uchwalono obecną Konstytucję?",
+     "ru": "Когда приняли действующую Конституцию?",
+     "answer": "drugiego kwietnia"
+    },
+    "co": {
+     "pl": "Co się stało drugiego kwietnia?",
+     "ru": "Что произошло 2 апреля?",
+     "answer": "Uchwalono obecną Konstytucję",
+     "wrong_ids": [
+      "date.smolensk",
+      "date.katyn",
+      "date.chrzest"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Uchwalono obecną Konstytucję",
+     "ru": "Покажи в календаре: Принята действующая Конституция",
+     "answer": {
+      "day": 2,
+      "month": 4
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 2,
+     "month": 3,
+     "say": "drugiego marca"
+    },
+    {
+     "day": 2,
+     "month": 6,
+     "say": "drugiego czerwca"
+    },
+    {
+     "day": 12,
+     "month": 4,
+     "say": "dwunastego kwietnia"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "flag",
+   "band": 1,
+   "src": "ФЕРМА_v2.md §4",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.smolensk",
+   "kind": "date",
+   "type": "event",
+   "day": 10,
+   "month": 4,
+   "year": 2010,
+   "pl": "Katastrofa smoleńska",
+   "ru": "Смоленская катастрофа",
+   "tr": "катастро́фа смоле́ньска",
+   "say": "dziesiątego kwietnia",
+   "say_tr": "джещонтэ́го кфе́тня",
+   "tiles": {
+    "pl": [
+     "dziesiątego",
+     "kwietnia"
+    ],
+    "distract": [
+     "dziesiąty",
+     "dziesiąta",
+     "kwiecień",
+     "kwietniu"
+    ]
+   },
+   "note_ru": "Самолёт президента Леха Качиньского разбился под Смоленском по пути на траурные мероприятия в Катыни. Погибли 96 человек.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy była katastrofa smoleńska?",
+     "ru": "Когда была Смоленская катастрофа?",
+     "answer": "dziesiątego kwietnia"
+    },
+    "co": {
+     "pl": "Co się stało dziesiątego kwietnia?",
+     "ru": "Что произошло 10 апреля?",
+     "answer": "Katastrofa smoleńska",
+     "wrong_ids": [
+      "date.katyn",
+      "date.chrzest",
+      "date.konstytucja97"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Katastrofa smoleńska",
+     "ru": "Покажи в календаре: Смоленская катастрофа",
+     "answer": {
+      "day": 10,
+      "month": 4
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 10,
+     "month": 5,
+     "say": "dziesiątego maja"
+    },
+    {
+     "day": 10,
+     "month": 3,
+     "say": "dziesiątego marca"
+    },
+    {
+     "day": 11,
+     "month": 4,
+     "say": "jedenastego kwietnia"
+    }
+   ],
+   "tone": "solemn",
+   "harvest": "quiet",
+   "free": false,
+   "icon": "candle",
+   "band": 1,
+   "src": "daty.md:249; Miso №160",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.katyn",
+   "kind": "date",
+   "type": "observance",
+   "day": 13,
+   "month": 4,
+   "year": 1940,
+   "pl": "Dzień Pamięci Ofiar Zbrodni Katyńskiej",
+   "ru": "День памяти жертв Катынского преступления",
+   "tr": "джень паме́ньчи о́фяр збро́дни каты́ньскей",
+   "say": "trzynastego kwietnia",
+   "say_tr": "тшынастэ́го кфе́тня",
+   "tiles": {
+    "pl": [
+     "trzynastego",
+     "kwietnia"
+    ],
+    "distract": [
+     "trzynasty",
+     "trzynasta",
+     "kwiecień",
+     "kwietniu"
+    ]
+   },
+   "note_ru": "Расстрелы польских офицеров НКВД были весной 1940 года (год в данных); 13 апреля — день, когда в 1943 году объявили об обнаружении могил.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy jest Dzień Pamięci Ofiar Zbrodni Katyńskiej?",
+     "ru": "Когда День памяти жертв Катынского преступления?",
+     "answer": "trzynastego kwietnia"
+    },
+    "co": {
+     "pl": "Co obchodzimy trzynastego kwietnia?",
+     "ru": "Что мы отмечаем 13 апреля?",
+     "answer": "Dzień Pamięci Ofiar Zbrodni Katyńskiej",
+     "wrong_ids": [
+      "date.chrzest",
+      "date.smolensk",
+      "date.getto"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Dzień Pamięci Ofiar Zbrodni Katyńskiej",
+     "ru": "Покажи в календаре: День памяти жертв Катынского преступления",
+     "answer": {
+      "day": 13,
+      "month": 4
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 13,
+     "month": 3,
+     "say": "trzynastego marca"
+    },
+    {
+     "day": 13,
+     "month": 5,
+     "say": "trzynastego maja"
+    },
+    {
+     "day": 3,
+     "month": 4,
+     "say": "trzeciego kwietnia"
+    }
+   ],
+   "tone": "solemn",
+   "harvest": "quiet",
+   "free": false,
+   "icon": "candle",
+   "band": 1,
+   "src": "daty.md:250; Miso №161",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.chrzest",
+   "kind": "date",
+   "type": "observance",
+   "day": 14,
+   "month": 4,
+   "year": 966,
+   "pl": "Święto Chrztu Polski",
+   "ru": "Праздник Крещения Польши",
+   "tr": "щфе́нто хшту по́лски",
+   "say": "czternastego kwietnia",
+   "say_tr": "чтэрнастэ́го кфе́тня",
+   "tiles": {
+    "pl": [
+     "czternastego",
+     "kwietnia"
+    ],
+    "distract": [
+     "czternasty",
+     "czternasta",
+     "kwiecień",
+     "kwietniu"
+    ]
+   },
+   "note_ru": "Князь Мешко I принял крещение в 966 году. Традиционная дата 14 апреля, праздник отмечается с 2019 года.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy jest Święto Chrztu Polski?",
+     "ru": "Когда Праздник Крещения Польши?",
+     "answer": "czternastego kwietnia"
+    },
+    "co": {
+     "pl": "Co obchodzimy czternastego kwietnia?",
+     "ru": "Что мы отмечаем 14 апреля?",
+     "answer": "Święto Chrztu Polski",
+     "wrong_ids": [
+      "date.katyn",
+      "date.smolensk",
+      "date.getto"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Święto Chrztu Polski",
+     "ru": "Покажи в календаре: Праздник Крещения Польши",
+     "answer": {
+      "day": 14,
+      "month": 4
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 14,
+     "month": 3,
+     "say": "czternastego marca"
+    },
+    {
+     "day": 14,
+     "month": 5,
+     "say": "czternastego maja"
+    },
+    {
+     "day": 24,
+     "month": 4,
+     "say": "dwudziestego czwartego kwietnia"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "cross",
+   "band": 1,
+   "src": "daty.md (966); ФЕРМА_v2.md §4",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.getto",
+   "kind": "date",
+   "type": "event",
+   "day": 19,
+   "month": 4,
+   "year": 1943,
+   "pl": "Powstanie w getcie warszawskim",
+   "ru": "Восстание в варшавском гетто",
+   "tr": "пофста́нье ф гэ́тче варша́фским",
+   "say": "dziewiętnastego kwietnia",
+   "say_tr": "джевентнастэ́го кфе́тня",
+   "tiles": {
+    "pl": [
+     "dziewiętnastego",
+     "kwietnia"
+    ],
+    "distract": [
+     "dziewiętnasty",
+     "dziewiętnasta",
+     "kwiecień",
+     "kwietniu"
+    ]
+   },
+   "note_ru": "Восстание начали евреи в Варшавском гетто 19 апреля 1943 года. Знак памяти: жёлтый нарцисс.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy wybuchło powstanie w getcie warszawskim?",
+     "ru": "Когда вспыхнуло восстание в варшавском гетто?",
+     "answer": "dziewiętnastego kwietnia"
+    },
+    "co": {
+     "pl": "Co się stało dziewiętnastego kwietnia?",
+     "ru": "Что произошло 19 апреля?",
+     "answer": "Powstanie w getcie warszawskim",
+     "wrong_ids": [
+      "date.chrzest",
+      "date.katyn",
+      "date.smolensk"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Powstanie w getcie warszawskim",
+     "ru": "Покажи в календаре: Восстание в варшавском гетто",
+     "answer": {
+      "day": 19,
+      "month": 4
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 19,
+     "month": 3,
+     "say": "dziewiętnastego marca"
+    },
+    {
+     "day": 19,
+     "month": 5,
+     "say": "dziewiętnastego maja"
+    },
+    {
+     "day": 9,
+     "month": 4,
+     "say": "dziewiątego kwietnia"
+    }
+   ],
+   "tone": "solemn",
+   "harvest": "quiet",
+   "free": false,
+   "icon": "candle",
+   "band": 1,
+   "src": "daty.md (19 kwietnia 1943)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.ue",
+   "kind": "date",
+   "type": "event",
+   "day": 1,
+   "month": 5,
+   "year": 2004,
+   "pl": "Polska wstąpiła do Unii Europejskiej",
+   "ru": "Польша вступила в Европейский союз",
+   "tr": "по́лска фстомпи́ўа до у́ни эуропэ́йскей",
+   "say": "pierwszego maja",
+   "say_tr": "перфшэ́го ма́я",
+   "tiles": {
+    "pl": [
+     "pierwszego",
+     "maja"
+    ],
+    "distract": [
+     "pierwszy",
+     "pierwsza",
+     "maj",
+     "maju"
+    ]
+   },
+   "note_ru": "Тот же день — Święto Pracy (День труда), выходной. Не путать: 1 мая (ЕС) и 1 августа (восстание).",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy Polska wstąpiła do Unii Europejskiej?",
+     "ru": "Когда Польша вступила в Европейский союз?",
+     "answer": "pierwszego maja"
+    },
+    "co": {
+     "pl": "Co się stało pierwszego maja?",
+     "ru": "Что произошло 1 мая?",
+     "answer": "Polska wstąpiła do Unii Europejskiej",
+     "wrong_ids": [
+      "date.flaga",
+      "date.konstytucja",
+      "date.zwyciestwo"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Polska wstąpiła do Unii Europejskiej",
+     "ru": "Покажи в календаре: Польша вступила в Европейский союз",
+     "answer": {
+      "day": 1,
+      "month": 5
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 1,
+     "month": 8,
+     "say": "pierwszego sierpnia"
+    },
+    {
+     "day": 1,
+     "month": 11,
+     "say": "pierwszego listopada"
+    },
+    {
+     "day": 1,
+     "month": 4,
+     "say": "pierwszego kwietnia"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "eu_star",
+   "band": 1,
+   "src": "daty.md (1 maja 2004)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.flaga",
+   "kind": "date",
+   "type": "observance",
+   "day": 2,
+   "month": 5,
+   "year": null,
+   "pl": "Dzień Flagi i Dzień Polonii",
+   "ru": "День флага и День Полонии",
+   "tr": "джень фла́ги и джень поло́ни",
+   "say": "drugiego maja",
+   "say_tr": "друге́го ма́я",
+   "tiles": {
+    "pl": [
+     "drugiego",
+     "maja"
+    ],
+    "distract": [
+     "drugi",
+     "druga",
+     "maj",
+     "maju"
+    ]
+   },
+   "note_ru": "День государственных символов и польской диаспоры. Флаг вывешивают на домах.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy jest Dzień Flagi?",
+     "ru": "Когда День флага?",
+     "answer": "drugiego maja"
+    },
+    "co": {
+     "pl": "Co obchodzimy drugiego maja?",
+     "ru": "Что мы отмечаем 2 мая?",
+     "answer": "Dzień Flagi i Dzień Polonii",
+     "wrong_ids": [
+      "date.konstytucja",
+      "date.ue",
+      "date.zwyciestwo"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Dzień Flagi i Dzień Polonii",
+     "ru": "Покажи в календаре: День флага и День Полонии",
+     "answer": {
+      "day": 2,
+      "month": 5
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 2,
+     "month": 3,
+     "say": "drugiego marca"
+    },
+    {
+     "day": 2,
+     "month": 6,
+     "say": "drugiego czerwca"
+    },
+    {
+     "day": 12,
+     "month": 5,
+     "say": "dwunastego maja"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "flag",
+   "band": 1,
+   "src": "daty.md (2 maja); Miso №23",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.konstytucja",
+   "kind": "date",
+   "type": "observance",
+   "day": 3,
+   "month": 5,
+   "year": 1791,
+   "pl": "Święto Konstytucji 3 Maja",
+   "ru": "День Конституции 3 мая",
+   "tr": "щфе́нто констыту́ци тшэче́го ма́я",
+   "say": "trzeciego maja",
+   "say_tr": "тшэче́го ма́я",
+   "tiles": {
+    "pl": [
+     "trzeciego",
+     "maja"
+    ],
+    "distract": [
+     "trzeci",
+     "trzecia",
+     "maj",
+     "maju"
+    ]
+   },
+   "note_ru": "Первая в Европе писаная конституция (1791). Выходной.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy obchodzimy Święto Konstytucji?",
+     "ru": "Когда мы отмечаем День Конституции?",
+     "answer": "trzeciego maja"
+    },
+    "co": {
+     "pl": "Co obchodzimy trzeciego maja?",
+     "ru": "Что мы отмечаем 3 мая?",
+     "answer": "Święto Konstytucji 3 Maja",
+     "wrong_ids": [
+      "date.flaga",
+      "date.ue",
+      "date.zwyciestwo"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Święto Konstytucji 3 Maja",
+     "ru": "Покажи в календаре: День Конституции 3 мая",
+     "answer": {
+      "day": 3,
+      "month": 5
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 3,
+     "month": 6,
+     "say": "trzeciego czerwca"
+    },
+    {
+     "day": 3,
+     "month": 4,
+     "say": "trzeciego kwietnia"
+    },
+    {
+     "day": 13,
+     "month": 5,
+     "say": "trzynastego maja"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": true,
+   "icon": "flag",
+   "band": 1,
+   "src": "daty.md (3 maja, 1791)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.zwyciestwo",
+   "kind": "date",
+   "type": "observance",
+   "day": 8,
+   "month": 5,
+   "year": 1945,
+   "pl": "Narodowy Dzień Zwycięstwa",
+   "ru": "Национальный день Победы",
+   "tr": "народо́вы джень звыче́ўстфа",
+   "say": "ósmego maja",
+   "say_tr": "усмэ́го ма́я",
+   "tiles": {
+    "pl": [
+     "ósmego",
+     "maja"
+    ],
+    "distract": [
+     "ósmy",
+     "ósma",
+     "maj",
+     "maju"
+    ]
+   },
+   "note_ru": "Конец Второй мировой войны в Европе, 8 мая 1945.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy jest Narodowy Dzień Zwycięstwa?",
+     "ru": "Когда Национальный день Победы?",
+     "answer": "ósmego maja"
+    },
+    "co": {
+     "pl": "Co obchodzimy ósmego maja?",
+     "ru": "Что мы отмечаем 8 мая?",
+     "answer": "Narodowy Dzień Zwycięstwa",
+     "wrong_ids": [
+      "date.konstytucja",
+      "date.flaga",
+      "date.ue"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Narodowy Dzień Zwycięstwa",
+     "ru": "Покажи в календаре: Национальный день Победы",
+     "answer": {
+      "day": 8,
+      "month": 5
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 8,
+     "month": 6,
+     "say": "ósmego czerwca"
+    },
+    {
+     "day": 8,
+     "month": 3,
+     "say": "ósmego marca"
+    },
+    {
+     "day": 9,
+     "month": 5,
+     "say": "dziewiątego maja"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "dove",
+   "band": 1,
+   "src": "ФЕРМА_v2.md §4",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.wybory",
+   "kind": "date",
+   "type": "event",
+   "day": 4,
+   "month": 6,
+   "year": 1989,
+   "pl": "Pierwsze częściowo wolne wybory",
+   "ru": "Первые частично свободные выборы",
+   "tr": "пе́рфшэ чэнщчо́во во́лнэ выбо́ры",
+   "say": "czwartego czerwca",
+   "say_tr": "чфартэ́го чэ́рфца",
+   "tiles": {
+    "pl": [
+     "czwartego",
+     "czerwca"
+    ],
+    "distract": [
+     "czwarty",
+     "czwarta",
+     "czerwiec",
+     "czerwcu"
+    ]
+   },
+   "note_ru": "После Круглого стола. Начало конца коммунизма в Польше (4 июня 1989).",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy były pierwsze częściowo wolne wybory?",
+     "ru": "Когда были первые частично свободные выборы?",
+     "answer": "czwartego czerwca"
+    },
+    "co": {
+     "pl": "Co się stało czwartego czerwca?",
+     "ru": "Что произошло 4 июня?",
+     "answer": "Pierwsze częściowo wolne wybory",
+     "wrong_ids": [
+      "date.zwyciestwo",
+      "date.konstytucja",
+      "date.flaga"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Pierwsze częściowo wolne wybory",
+     "ru": "Покажи в календаре: Первые частично свободные выборы",
+     "answer": {
+      "day": 4,
+      "month": 6
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 4,
+     "month": 5,
+     "say": "czwartego maja"
+    },
+    {
+     "day": 4,
+     "month": 7,
+     "say": "czwartego lipca"
+    },
+    {
+     "day": 14,
+     "month": 6,
+     "say": "czternastego czerwca"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "flag",
+   "band": 1,
+   "src": "daty.md (4 czerwca 1989)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.wolyn",
+   "kind": "date",
+   "type": "observance",
+   "day": 11,
+   "month": 7,
+   "year": 1943,
+   "pl": "Dzień pamięci ofiar rzezi wołyńskiej",
+   "ru": "День памяти жертв Волынской резни",
+   "tr": "джень паме́ньчи о́фяр жэ́жи воўы́ньскей",
+   "say": "jedenastego lipca",
+   "say_tr": "едэнастэ́го ли́пца",
+   "tiles": {
+    "pl": [
+     "jedenastego",
+     "lipca"
+    ],
+    "distract": [
+     "jedenasty",
+     "jedenasta",
+     "lipiec",
+     "lipcu"
+    ]
+   },
+   "note_ru": "Массовые убийства поляков на Волыни в 1943 году; 11 июля 1943 — «кровавое воскресенье». Тема тяжёлая, подаётся нейтрально.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy jest dzień pamięci ofiar rzezi wołyńskiej?",
+     "ru": "Когда день памяти жертв Волынской резни?",
+     "answer": "jedenastego lipca"
+    },
+    "co": {
+     "pl": "Co obchodzimy jedenastego lipca?",
+     "ru": "Что мы отмечаем 11 июля?",
+     "answer": "Dzień pamięci ofiar rzezi wołyńskiej",
+     "wrong_ids": [
+      "date.grunwald",
+      "date.godzina_w",
+      "date.wojsko"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Dzień pamięci ofiar rzezi wołyńskiej",
+     "ru": "Покажи в календаре: День памяти жертв Волынской резни",
+     "answer": {
+      "day": 11,
+      "month": 7
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 11,
+     "month": 6,
+     "say": "jedenastego czerwca"
+    },
+    {
+     "day": 11,
+     "month": 8,
+     "say": "jedenastego sierpnia"
+    },
+    {
+     "day": 1,
+     "month": 7,
+     "say": "pierwszego lipca"
+    }
+   ],
+   "tone": "solemn",
+   "harvest": "quiet",
+   "free": false,
+   "icon": "candle",
+   "band": 1,
+   "src": "daty.md:264-265; Miso №173",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.grunwald",
+   "kind": "date",
+   "type": "event",
+   "day": 15,
+   "month": 7,
+   "year": 1410,
+   "pl": "Bitwa pod Grunwaldem",
+   "ru": "Грюнвальдская битва",
+   "tr": "би́тфа пот грунва́лдэм",
+   "say": "piętnastego lipca",
+   "say_tr": "пентнастэ́го ли́пца",
+   "tiles": {
+    "pl": [
+     "piętnastego",
+     "lipca"
+    ],
+    "distract": [
+     "piętnasty",
+     "piętnasta",
+     "lipiec",
+     "lipcu"
+    ]
+   },
+   "note_ru": "Победа польско-литовских войск над крестоносцами, 15 июля 1410.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy była bitwa pod Grunwaldem?",
+     "ru": "Когда была Грюнвальдская битва?",
+     "answer": "piętnastego lipca"
+    },
+    "co": {
+     "pl": "Co się stało piętnastego lipca?",
+     "ru": "Что произошло 15 июля?",
+     "answer": "Bitwa pod Grunwaldem",
+     "wrong_ids": [
+      "date.wolyn",
+      "date.godzina_w",
+      "date.wojsko"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Bitwa pod Grunwaldem",
+     "ru": "Покажи в календаре: Грюнвальдская битва",
+     "answer": {
+      "day": 15,
+      "month": 7
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 15,
+     "month": 6,
+     "say": "piętnastego czerwca"
+    },
+    {
+     "day": 15,
+     "month": 9,
+     "say": "piętnastego września"
+    },
+    {
+     "day": 5,
+     "month": 7,
+     "say": "piątego lipca"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "sword",
+   "band": 1,
+   "src": "daty.md:267; Miso",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.godzina_w",
+   "kind": "date",
+   "type": "event",
+   "day": 1,
+   "month": 8,
+   "year": 1944,
+   "pl": "Wybuch powstania warszawskiego",
+   "ru": "Начало Варшавского восстания",
+   "tr": "вы́бух пофста́ня варшафске́го",
+   "say": "pierwszego sierpnia",
+   "say_tr": "перфшэ́го ще́рпня",
+   "tiles": {
+    "pl": [
+     "pierwszego",
+     "sierpnia"
+    ],
+    "distract": [
+     "pierwszy",
+     "pierwsza",
+     "sierpień",
+     "sierpniu"
+    ]
+   },
+   "note_ru": "Godzina W — 17:00. Восстание длилось 63 дня и закончилось капитуляцией 2 октября 1944 года.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy wybuchło powstanie warszawskie?",
+     "ru": "Когда вспыхнуло Варшавское восстание?",
+     "answer": "pierwszego sierpnia"
+    },
+    "co": {
+     "pl": "Co się stało pierwszego sierpnia?",
+     "ru": "Что произошло 1 августа?",
+     "answer": "Wybuch powstania warszawskiego",
+     "wrong_ids": [
+      "date.wojsko",
+      "date.grunwald",
+      "date.wolyn"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Wybuch powstania warszawskiego",
+     "ru": "Покажи в календаре: Начало Варшавского восстания",
+     "answer": {
+      "day": 1,
+      "month": 8
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 1,
+     "month": 5,
+     "say": "pierwszego maja"
+    },
+    {
+     "day": 1,
+     "month": 9,
+     "say": "pierwszego września"
+    },
+    {
+     "day": 11,
+     "month": 8,
+     "say": "jedenastego sierpnia"
+    }
+   ],
+   "tone": "solemn",
+   "harvest": "quiet",
+   "free": false,
+   "icon": "candle",
+   "band": 1,
+   "src": "daty.md (1 sierpnia 1944)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.wojsko",
+   "kind": "date",
+   "type": "observance",
+   "day": 15,
+   "month": 8,
+   "year": 1920,
+   "pl": "Święto Wojska Polskiego",
+   "ru": "День Войска Польского",
+   "tr": "щфе́нто во́йска полске́го",
+   "say": "piętnastego sierpnia",
+   "say_tr": "пентнастэ́го ще́рпня",
+   "tiles": {
+    "pl": [
+     "piętnastego",
+     "sierpnia"
+    ],
+    "distract": [
+     "piętnasty",
+     "piętnasta",
+     "sierpień",
+     "sierpniu"
+    ]
+   },
+   "note_ru": "Память о Варшавской битве 1920 года — «Чуде над Вислой». Выходной; в тот же день церковный праздник Вознесения Марии.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy jest Święto Wojska Polskiego?",
+     "ru": "Когда День Войска Польского?",
+     "answer": "piętnastego sierpnia"
+    },
+    "co": {
+     "pl": "Co obchodzimy piętnastego sierpnia?",
+     "ru": "Что мы отмечаем 15 августа?",
+     "answer": "Święto Wojska Polskiego",
+     "wrong_ids": [
+      "date.godzina_w",
+      "date.sierpien80",
+      "date.wojna"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Święto Wojska Polskiego",
+     "ru": "Покажи в календаре: День Войска Польского",
+     "answer": {
+      "day": 15,
+      "month": 8
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 15,
+     "month": 7,
+     "say": "piętnastego lipca"
+    },
+    {
+     "day": 15,
+     "month": 9,
+     "say": "piętnastego września"
+    },
+    {
+     "day": 5,
+     "month": 8,
+     "say": "piątego sierpnia"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": true,
+   "icon": "sword",
+   "band": 1,
+   "src": "daty.md:257; Miso (15 sierpnia)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.sierpien80",
+   "kind": "date",
+   "type": "event",
+   "day": 31,
+   "month": 8,
+   "year": 1980,
+   "pl": "Porozumienia sierpniowe",
+   "ru": "Августовские соглашения",
+   "tr": "порозуме́ня щерпнёвэ",
+   "say": "trzydziestego pierwszego sierpnia",
+   "say_tr": "тшыджестэ́го перфшэ́го ще́рпня",
+   "tiles": {
+    "pl": [
+     "trzydziestego",
+     "pierwszego",
+     "sierpnia"
+    ],
+    "distract": [
+     "trzydziesty",
+     "pierwsza",
+     "sierpień",
+     "sierpniu"
+    ]
+   },
+   "note_ru": "Соглашения в Гданьске, из которых выросла «Солидарность» (31 августа 1980).",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy podpisano porozumienia sierpniowe?",
+     "ru": "Когда подписали Августовские соглашения?",
+     "answer": "trzydziestego pierwszego sierpnia"
+    },
+    "co": {
+     "pl": "Co się stało trzydziestego pierwszego sierpnia?",
+     "ru": "Что произошло 31 августа?",
+     "answer": "Porozumienia sierpniowe",
+     "wrong_ids": [
+      "date.wojna",
+      "date.wojsko",
+      "date.sowieci"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Porozumienia sierpniowe",
+     "ru": "Покажи в календаре: Августовские соглашения",
+     "answer": {
+      "day": 31,
+      "month": 8
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 31,
+     "month": 7,
+     "say": "trzydziestego pierwszego lipca"
+    },
+    {
+     "day": 30,
+     "month": 8,
+     "say": "trzydziestego sierpnia"
+    },
+    {
+     "day": 31,
+     "month": 10,
+     "say": "trzydziestego pierwszego października"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "flag",
+   "band": 1,
+   "src": "daty.md (1980); ФЕРМА_v2.md §4",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.wojna",
+   "kind": "date",
+   "type": "event",
+   "day": 1,
+   "month": 9,
+   "year": 1939,
+   "pl": "Wybuch drugiej wojny światowej",
+   "ru": "Начало Второй мировой войны",
+   "tr": "вы́бух дру́гей во́йны щфято́вэй",
+   "say": "pierwszego września",
+   "say_tr": "перфшэ́го вжэ́щня",
+   "tiles": {
+    "pl": [
+     "pierwszego",
+     "września"
+    ],
+    "distract": [
+     "pierwszy",
+     "pierwsza",
+     "wrzesień",
+     "wrześniu"
+    ]
+   },
+   "note_ru": "Германия напала на Польшу 1 сентября 1939 года.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy wybuchła druga wojna światowa?",
+     "ru": "Когда началась Вторая мировая война?",
+     "answer": "pierwszego września"
+    },
+    "co": {
+     "pl": "Co się stało pierwszego września?",
+     "ru": "Что произошло 1 сентября?",
+     "answer": "Wybuch drugiej wojny światowej",
+     "wrong_ids": [
+      "date.sierpien80",
+      "date.sowieci",
+      "date.wojsko"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Wybuch drugiej wojny światowej",
+     "ru": "Покажи в календаре: Начало Второй мировой войны",
+     "answer": {
+      "day": 1,
+      "month": 9
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 1,
+     "month": 8,
+     "say": "pierwszego sierpnia"
+    },
+    {
+     "day": 1,
+     "month": 10,
+     "say": "pierwszego października"
+    },
+    {
+     "day": 17,
+     "month": 9,
+     "say": "siedemnastego września"
+    }
+   ],
+   "tone": "solemn",
+   "harvest": "quiet",
+   "free": false,
+   "icon": "candle",
+   "band": 1,
+   "src": "daty.md (1 września 1939)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.sowieci",
+   "kind": "date",
+   "type": "event",
+   "day": 17,
+   "month": 9,
+   "year": 1939,
+   "pl": "Armia Czerwona wkroczyła do Polski",
+   "ru": "Красная армия вошла в Польшу",
+   "tr": "а́рмя чэрво́на фкрочы́ўа до по́лски",
+   "say": "siedemnastego września",
+   "say_tr": "щедэмнастэ́го вжэ́щня",
+   "tiles": {
+    "pl": [
+     "siedemnastego",
+     "września"
+    ],
+    "distract": [
+     "siedemnasty",
+     "siedemnasta",
+     "wrzesień",
+     "wrześniu"
+    ]
+   },
+   "note_ru": "Через 16 дней после нападения Германии. 17 сентября 1939.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy Armia Czerwona wkroczyła do Polski?",
+     "ru": "Когда Красная армия вошла в Польшу?",
+     "answer": "siedemnastego września"
+    },
+    "co": {
+     "pl": "Co się stało siedemnastego września?",
+     "ru": "Что произошло 17 сентября?",
+     "answer": "Armia Czerwona wkroczyła do Polski",
+     "wrong_ids": [
+      "date.wojna",
+      "date.sierpien80",
+      "date.papiez"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Armia Czerwona wkroczyła do Polski",
+     "ru": "Покажи в календаре: Красная армия вошла в Польшу",
+     "answer": {
+      "day": 17,
+      "month": 9
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 17,
+     "month": 8,
+     "say": "siedemnastego sierpnia"
+    },
+    {
+     "day": 17,
+     "month": 10,
+     "say": "siedemnastego października"
+    },
+    {
+     "day": 7,
+     "month": 9,
+     "say": "siódmego września"
+    }
+   ],
+   "tone": "solemn",
+   "harvest": "quiet",
+   "free": false,
+   "icon": "candle",
+   "band": 1,
+   "src": "daty.md:259",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.papiez",
+   "kind": "date",
+   "type": "event",
+   "day": 16,
+   "month": 10,
+   "year": 1978,
+   "pl": "Karol Wojtyła został papieżem",
+   "ru": "Кароль Войтыла стал папой",
+   "tr": "ка́рол войты́ўа зо́стаў папе́жэм",
+   "say": "szesnastego października",
+   "say_tr": "шэснастэ́го пажьджерни́ка",
+   "tiles": {
+    "pl": [
+     "szesnastego",
+     "października"
+    ],
+    "distract": [
+     "szesnasty",
+     "szesnasta",
+     "październik",
+     "październiku"
+    ]
+   },
+   "note_ru": "Иоанн Павел II, первый папа-поляк (16 октября 1978).",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy Karol Wojtyła został papieżem?",
+     "ru": "Когда Кароль Войтыла стал папой?",
+     "answer": "szesnastego października"
+    },
+    "co": {
+     "pl": "Co się stało szesnastego października?",
+     "ru": "Что произошло 16 октября?",
+     "answer": "Karol Wojtyła został papieżem",
+     "wrong_ids": [
+      "date.niepodleglosc",
+      "date.sowieci",
+      "date.wojna"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Karol Wojtyła został papieżem",
+     "ru": "Покажи в календаре: Кароль Войтыла стал папой",
+     "answer": {
+      "day": 16,
+      "month": 10
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 16,
+     "month": 11,
+     "say": "szesnastego listopada"
+    },
+    {
+     "day": 16,
+     "month": 9,
+     "say": "szesnastego września"
+    },
+    {
+     "day": 6,
+     "month": 10,
+     "say": "szóstego października"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": false,
+   "icon": "cross",
+   "band": 1,
+   "src": "daty.md (1978)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.niepodleglosc",
+   "kind": "date",
+   "type": "observance",
+   "day": 11,
+   "month": 11,
+   "year": 1918,
+   "pl": "Święto Niepodległości",
+   "ru": "День Независимости",
+   "tr": "щфе́нто ньеподлегўо́щчи",
+   "say": "jedenastego listopada",
+   "say_tr": "едэнастэ́го листопа́да",
+   "tiles": {
+    "pl": [
+     "jedenastego",
+     "listopada"
+    ],
+    "distract": [
+     "jedenasty",
+     "jedenasta",
+     "listopad",
+     "listopadzie"
+    ]
+   },
+   "note_ru": "Польша вернула независимость в 1918 году после 123 лет разделов. Выходной.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy jest Święto Niepodległości?",
+     "ru": "Когда День Независимости?",
+     "answer": "jedenastego listopada"
+    },
+    "co": {
+     "pl": "Co obchodzimy jedenastego listopada?",
+     "ru": "Что мы отмечаем 11 ноября?",
+     "answer": "Święto Niepodległości",
+     "wrong_ids": [
+      "date.papiez",
+      "date.stan_wojenny",
+      "date.sowieci"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Święto Niepodległości",
+     "ru": "Покажи в календаре: День Независимости",
+     "answer": {
+      "day": 11,
+      "month": 11
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 11,
+     "month": 7,
+     "say": "jedenastego lipca"
+    },
+    {
+     "day": 1,
+     "month": 11,
+     "say": "pierwszego listopada"
+    },
+    {
+     "day": 3,
+     "month": 5,
+     "say": "trzeciego maja"
+    }
+   ],
+   "tone": "neutral",
+   "harvest": "normal",
+   "free": true,
+   "icon": "flag",
+   "band": 1,
+   "src": "daty.md (11 listopada 1918)",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "date.stan_wojenny",
+   "kind": "date",
+   "type": "event",
+   "day": 13,
+   "month": 12,
+   "year": 1981,
+   "pl": "Wprowadzenie stanu wojennego",
+   "ru": "Введение военного положения",
+   "tr": "фпровадзэ́нье ста́ну военнэ́го",
+   "say": "trzynastego grudnia",
+   "say_tr": "тшынастэ́го гру́дня",
+   "tiles": {
+    "pl": [
+     "trzynastego",
+     "grudnia"
+    ],
+    "distract": [
+     "trzynasty",
+     "trzynasta",
+     "grudzień",
+     "grudniu"
+    ]
+   },
+   "note_ru": "Ввёл генерал Ярузельский 13 декабря 1981 года; действовало до 1983.",
+   "q": {
+    "kiedy": {
+     "pl": "Kiedy wprowadzono stan wojenny?",
+     "ru": "Когда ввели военное положение?",
+     "answer": "trzynastego grudnia"
+    },
+    "co": {
+     "pl": "Co się stało trzynastego grudnia?",
+     "ru": "Что произошло 13 декабря?",
+     "answer": "Wprowadzenie stanu wojennego",
+     "wrong_ids": [
+      "date.niepodleglosc",
+      "date.papiez",
+      "date.wykleci"
+     ]
+    },
+    "pokaz": {
+     "pl": "Pokaż w kalendarzu: Wprowadzenie stanu wojennego",
+     "ru": "Покажи в календаре: Введение военного положения",
+     "answer": {
+      "day": 13,
+      "month": 12
+     }
+    }
+   },
+   "wrong_dates": [
+    {
+     "day": 23,
+     "month": 12,
+     "say": "dwudziestego trzeciego grudnia"
+    },
+    {
+     "day": 13,
+     "month": 11,
+     "say": "trzynastego listopada"
+    },
+    {
+     "day": 13,
+     "month": 4,
+     "say": "trzynastego kwietnia"
+    }
+   ],
+   "tone": "solemn",
+   "harvest": "quiet",
+   "free": false,
+   "icon": "candle",
+   "band": 1,
+   "src": "daty.md (13 grudnia 1981)",
+   "checked": "2026-10-18"
+  }
+ ]
+}

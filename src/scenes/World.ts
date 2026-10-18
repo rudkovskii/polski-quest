@@ -6,10 +6,11 @@ import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap, PropObject } from '../types/map';
 import { frameFor, tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
 import { FarmLayer } from './farmLayer';
+import { ZagrodaLayer, applyEntries } from './zagrodaLayer';
 import { pickZoom } from '../world/camera';
 import { LocationModel, type Actor, type WorldEvent } from '../world/location';
 import { PositionGate } from '../world/positionGate';
-import { getMap, resolveSpawn, START } from '../world/maps';
+import { getMap, resolveSpawn, routeTo, START } from '../world/maps';
 
 // Сцена мира: карта, герой, кот, объекты. Логика в world/location.ts; сцена рисует и переводит события модели в шину.
 // Ввод приходит intents через bus (`input:intent`, to = world); тап по карте разбирает PointerSource через tileAt().
@@ -52,6 +53,17 @@ let guideArrow: { x: number; y: number } | null = null;
 bus.on('guide:arrow', (p) => {
   guideArrow = p;
 });
+/** «Idź» с доски (v2): к какому объекту (`use`) герой идёт сам; переживает смену карты (через двери). */
+let pendingGoto: string | null = null;
+/** v2: игра о Польше в нижней панели открылась не в Zagroda — сцена уходит туда (к участку `plot`). */
+let polskaGo: string | null = null;
+bus.on('world:goto', ({ use }) => {
+  pendingGoto = use;
+});
+bus.on('polska:auto', ({ on, layout, plot }) => {
+  polskaGo = on && layout === 'panel' ? (plot ?? 'from_farm') : null;
+});
+
 /** Радиус попадания по стрелке указателя, CSS px (палец шире треугольника 30×15). */
 const ARROW_HIT = 30;
 
@@ -93,6 +105,9 @@ export class World extends Phaser.Scene {
   private insets = { top: HUD_TOP_INSET, bottom: 0 };
   private cam0: { zoom: number; mw: number; mh: number; fitsW: boolean; fitsH: boolean } | null = null;
   private farm: FarmLayer | null = null;
+  private zagroda: ZagrodaLayer | null = null;
+  /** Спрайты объектов карты по ключу `prop:<id>` (слой Zagroda меняет их вид по прогрессу). */
+  private propSprites = new Map<string, Phaser.GameObjects.Sprite>();
   private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
   private tileset: TilesetMeta | null = null;
   private soilKey = '';
@@ -132,10 +147,17 @@ export class World extends Phaser.Scene {
 
     this.createAnims();
     this.buildTiles();
+    this.propSprites.clear();
     this.buildProps();
     this.buildActors();
     this.marker = this.add.graphics().setDepth(10_000);
     this.farm = this.mapDef.id === 'farm' ? new FarmLayer({ scene: this, model: this.model, sprites: this.sprites, hero: this.hero, soil: (c) => this.soil(c), toScreen: (x, y) => this.toScreen(x, y), inputOn: () => this.inputOn }) : null;
+    this.zagroda = this.mapDef.id === 'zagroda' ? new ZagrodaLayer({ scene: this, model: this.model, sprites: this.sprites, props: this.propSprites, toScreen: (x, y) => this.toScreen(x, y) }) : null;
+    const offGoto = bus.on('world:goto', () => setTimeout(() => this.runGoto(), 0));
+    const offPolska = bus.on('polska:auto', () => this.polskaToZagroda());
+    // Точки входа v2 (карта, календарь, мачта, сезонная доска) — кадр по прогрессу.
+    applyEntries(this.propSprites, this.sprites);
+    const offEntries = bus.on('polska:plots', ({ entries }) => entries && applyEntries(this.propSprites, this.sprites, entries));
     const offAuto = bus.on('farm:auto', ({ on, bottom }) => {
       this.panelBottom = on ? bottom : 0;
       this.layout();
@@ -157,8 +179,13 @@ export class World extends Phaser.Scene {
       offIntent();
       offInput();
       offAuto();
+      offGoto();
+      offPolska();
+      offEntries();
       this.farm?.dispose();
       this.farm = null;
+      this.zagroda?.dispose();
+      this.zagroda = null;
       watchers.delete(onDpad);
       this.game.events.off(Phaser.Core.Events.HIDDEN, onHidden);
       this.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
@@ -167,6 +194,31 @@ export class World extends Phaser.Scene {
     bus.emit('world:location', { id: this.mapDef.id, controls: 'walk' });
     const start = this.posGate.tick(false, this.mapDef.id, this.model.player.tile, this.model.player.facing);
     if (start) bus.emit('world:position', start);
+    // Пришли через дверь по «Idź» — идём дальше; игра о Польше открыта не здесь — в Zagroda.
+    if (pendingGoto) this.time.delayedCall(220, () => this.runGoto());
+    this.polskaToZagroda();
+  }
+
+  /**
+   * «Idź» (v2): объект с этим `use` на этой карте — подойти и открыть (как тап по нему); на другой карте — к двери по маршруту
+   * (`routeTo`), дальше продолжит сцена новой карты. Ручной ввод отменяет.
+   */
+  private runGoto(): void {
+    const use = pendingGoto;
+    if (!use || this.leaving || !this.inputOn) return;
+    const r = routeTo(this.mapDef.id, use);
+    if (!r) {
+      pendingGoto = null;
+      return;
+    }
+    if (r.here) pendingGoto = null;
+    this.model.intent({ type: 'interact', target: r.key });
+  }
+
+  /** Игра о Польше в нижней панели: герой уходит в Zagroda (переход шагом через калитку не ждём — экран уже открыт). */
+  private polskaToZagroda(): void {
+    if (!polskaGo || this.leaving || this.mapDef.id === 'zagroda') return;
+    this.go('zagroda', getMap('zagroda').spawns[polskaGo] ? polskaGo : 'from_farm');
   }
 
   /** Экранные CSS-пиксели канваса → клетка и объект под пальцем (для PointerSource). */
@@ -207,9 +259,10 @@ export class World extends Phaser.Scene {
   override update(time: number, delta: number): void {
     if (this.leaving) return;
     this.farm?.update(time);
+    this.zagroda?.update();
     for (const ev of this.model.update(Math.min(delta, 100))) this.onWorldEvent(ev, time);
     // Герой стоит (после ходьбы, автобега мини-игры, доигрыша очереди): новая клетка или поворот — в сохранение (B3).
-    const busy = this.model.busy || !!this.farm?.blocking;
+    const busy = this.model.busy || !!this.farm?.blocking || !!this.zagroda?.auto;
     const pos = this.posGate.tick(busy, this.mapDef.id, this.model.player.tile, this.model.player.facing);
     if (pos) bus.emit('world:position', pos);
     this.syncHero(time);
@@ -434,6 +487,8 @@ export class World extends Phaser.Scene {
       s.setOrigin(0.5, 1);
       s.setDepth(src.depth === 'floor' ? 1.5 : src.depth === 'wall' ? 2 : 10 + bottom);
       if (src.shadow) this.placeShadow(cx, bottom - 1, src.shadow, 2.5);
+      s.setData('sprite', src.sprite);
+      this.propSprites.set(o.key, s);
     }
   }
 
@@ -455,6 +510,8 @@ export class World extends Phaser.Scene {
 
   private onIntent(i: RoutedIntent): void {
     if (i.to !== 'world' || this.leaving || !this.inputOn || this.farm?.blocking) return;
+    // Игрок сам пошёл — «Idź» отменяется.
+    if (i.type === 'move' || i.type === 'goto') pendingGoto = null;
     this.model.intent(i);
   }
 

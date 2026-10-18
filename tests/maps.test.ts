@@ -10,8 +10,8 @@ const tileset = JSON.parse(readFileSync('public/atlas/farm.json', 'utf8')) as Ti
 const sprites = JSON.parse(readFileSync('public/atlas/sprites.json', 'utf8')) as Record<string, { size: [number, number] }>;
 
 describe('карты: форма и ссылки', () => {
-  it('две карты: дом и ферма; старт на ферме', () => {
-    expect(Object.keys(MAPS).sort()).toEqual(['farm', 'home']);
+  it('три карты: дом, ферма и Zagroda (v2); старт на ферме', () => {
+    expect(Object.keys(MAPS).sort()).toEqual(['farm', 'home', 'zagroda']);
     expect(START).toEqual({ map: 'farm', spawn: 'start' });
   });
 
@@ -78,7 +78,8 @@ describe('карты: форма и ссылки', () => {
   });
 
   it('интерактивные объекты: стол, доска, коробка, полка, кровать, радио; к каждому можно подойти', () => {
-    const uses: Record<string, string> = { home: 'bed,desk,radio,shelf', farm: 'bin,board' };
+    // v2: карта Польши и календарь в доме, мачта и сезонная доска на ферме.
+    const uses: Record<string, string> = { home: 'bed,calendar,desk,map,radio,shelf', farm: 'bin,board,mast,seasonBoard' };
     for (const [id, list] of Object.entries(uses)) {
       const map = getMap(id);
       const found = map.objects.filter((o): o is PropObject => o.type === 'prop' && !!o.use).map((o) => o.use);

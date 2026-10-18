@@ -1,0 +1,1297 @@
+[
+ {
+  "id": "sw.oplatek",
+  "pl": "opłatek",
+  "ru": "облатка (тонкая вафля, которой делятся в Сочельник)",
+  "tr": "опўа́тэк",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "opłatki",
+   "gen": "opłatka",
+   "ins": "opłatkiem"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W Wigilię dzielimy się opłatkiem.",
+   "ru": "В Сочельник мы делимся облаткой."
+  },
+  "band": 3,
+  "order": 1
+ },
+ {
+  "id": "sw.wigilia",
+  "pl": "Wigilia",
+  "ru": "Сочельник, канун Рождества (24 декабря)",
+  "tr": "виги́ля",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "acc": "Wigilię",
+   "gen": "Wigilii"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W Wigilię jemy dwanaście potraw.",
+   "ru": "В Сочельник едим двенадцать блюд."
+  },
+  "band": 3,
+  "order": 2
+ },
+ {
+  "id": "sw.pierwsza_gwiazdka",
+  "pl": "pierwsza gwiazdka",
+  "ru": "первая звезда (с неё начинают сочельничный ужин)",
+  "tr": "пе́рфша гвя́стка",
+  "pos": "phrase",
+  "forms": {},
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Czekamy na pierwszą gwiazdkę.",
+   "ru": "Ждём первую звёздочку."
+  },
+  "band": 3,
+  "order": 3
+ },
+ {
+  "id": "sw.sianko",
+  "pl": "sianko",
+  "ru": "сено (его кладут под скатерть в Сочельник)",
+  "tr": "ща́нко",
+  "pos": "noun",
+  "gender": "n",
+  "forms": {
+   "gen": "sianka",
+   "loc": "sianku"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Pod obrusem leży sianko.",
+   "ru": "Под скатертью лежит сено."
+  },
+  "band": 3,
+  "order": 4
+ },
+ {
+  "id": "sw.obrus",
+  "pl": "obrus",
+  "ru": "скатерть",
+  "tr": "о́брус",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "obrusy",
+   "gen": "obrusu",
+   "ins": "obrusem"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Biały obrus leży na stole.",
+   "ru": "Белая скатерть лежит на столе."
+  },
+  "band": 3,
+  "order": 5
+ },
+ {
+  "id": "sw.puste_nakrycie",
+  "pl": "puste nakrycie",
+  "ru": "пустой прибор (для нежданного гостя)",
+  "tr": "пу́стэ накры́че",
+  "pos": "phrase",
+  "forms": {},
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Przy stole jest puste nakrycie.",
+   "ru": "За столом стоит пустой прибор."
+  },
+  "band": 3,
+  "order": 6
+ },
+ {
+  "id": "sw.karp",
+  "pl": "karp",
+  "ru": "карп (главное сочельничное блюдо)",
+  "tr": "карп",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "karpie",
+   "gen": "karpia",
+   "acc": "karpia"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na Wigilię jemy karpia.",
+   "ru": "На Сочельник едим карпа."
+  },
+  "band": 3,
+  "order": 7
+ },
+ {
+  "id": "sw.uszka",
+  "pl": "uszka",
+  "ru": "«ушки» (маленькие пельмешки к борщу)",
+  "tr": "у́шка",
+  "pos": "noun",
+  "gender": "pl",
+  "forms": {
+   "gen": "uszek",
+   "ins": "uszkami"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Barszcz z uszkami to klasyk.",
+   "ru": "Борщ с «ушками» — классика."
+  },
+  "band": 3,
+  "order": 8
+ },
+ {
+  "id": "sw.kompot_z_suszu",
+  "pl": "kompot z suszu",
+  "ru": "компот из сухофруктов (сочельничный напиток)",
+  "tr": "ко́мпот с су́шу",
+  "pos": "phrase",
+  "forms": {},
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Do kolacji pijemy kompot z suszu.",
+   "ru": "К ужину пьём компот из сухофруктов."
+  },
+  "band": 3,
+  "order": 9
+ },
+ {
+  "id": "sw.choinka",
+  "pl": "choinka",
+  "ru": "ёлка (новогодняя, рождественская)",
+  "tr": "хои́нка",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "choinki",
+   "acc": "choinkę",
+   "gen": "choinki"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Ubieramy choinkę w Wigilię.",
+   "ru": "Наряжаем ёлку в Сочельник."
+  },
+  "band": 3,
+  "order": 10
+ },
+ {
+  "id": "sw.koleda",
+  "pl": "kolęda",
+  "ru": "колядка, рождественская песня",
+  "tr": "колэ́нда",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "kolędy",
+   "acc": "kolędę",
+   "gen": "kolędy"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": {
+   "ru": "коляда",
+   "note": "kolęda — рождественская песня; русская «коляда» — старый обряд ряженых"
+  },
+  "ex": {
+   "pl": "Po kolacji śpiewamy kolędy.",
+   "ru": "После ужина поём колядки."
+  },
+  "band": 3,
+  "order": 11
+ },
+ {
+  "id": "sw.kolednik",
+  "pl": "kolędnik",
+  "ru": "колядующий",
+  "tr": "колэ́ндник",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "kolędnicy",
+   "gen": "kolędnika"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Kolędnicy chodzą z gwiazdą.",
+   "ru": "Колядующие ходят со звездой."
+  },
+  "band": 3,
+  "order": 12
+ },
+ {
+  "id": "sw.pasterka",
+  "pl": "pasterka",
+  "ru": "пастерка (полуночная рождественская месса)",
+  "tr": "пастэ́рка",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "acc": "pasterkę",
+   "gen": "pasterki"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "O północy idziemy na pasterkę.",
+   "ru": "В полночь идём на пастерку."
+  },
+  "band": 3,
+  "order": 13
+ },
+ {
+  "id": "sw.boze_narodzenie",
+  "pl": "Boże Narodzenie",
+  "ru": "Рождество (25 декабря)",
+  "tr": "бо́жэ народзэ́нье",
+  "pos": "noun",
+  "gender": "n",
+  "forms": {
+   "gen": "Bożego Narodzenia"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na Boże Narodzenie jedziemy do rodziny.",
+   "ru": "На Рождество едем к семье."
+  },
+  "band": 3,
+  "order": 14
+ },
+ {
+  "id": "sw.mikolaj",
+  "pl": "Mikołaj",
+  "ru": "Николай (святой), Дед Мороз",
+  "tr": "мико́ўай",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "gen": "Mikołaja",
+   "voc": "Mikołaju",
+   "acc": "Mikołaja"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Szóstego grudnia przychodzi Mikołaj.",
+   "ru": "Шестого декабря приходит Николай."
+  },
+  "band": 3,
+  "order": 15
+ },
+ {
+  "id": "sw.mikolajki",
+  "pl": "Mikołajki",
+  "ru": "Николайки (6 декабря, день подарков)",
+  "tr": "микоўа́йки",
+  "pos": "noun",
+  "gender": "pl",
+  "forms": {
+   "gen": "Mikołajek"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na Mikołajki dostaję prezent w bucie.",
+   "ru": "На Николайки я получаю подарок в ботинке."
+  },
+  "band": 3,
+  "order": 16
+ },
+ {
+  "id": "sw.sylwester",
+  "pl": "sylwester",
+  "ru": "Сильвестр, канун Нового года (31 декабря)",
+  "tr": "сылвэ́стэр",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "sylwestry",
+   "gen": "sylwestra",
+   "loc": "sylwestrze"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": {
+   "ru": "Сильвестр",
+   "note": "sylwester — это ночь на 1 января, а не имя"
+  },
+  "ex": {
+   "pl": "W sylwestra czekamy na północ.",
+   "ru": "В канун Нового года ждём полуночи."
+  },
+  "band": 3,
+  "order": 17
+ },
+ {
+  "id": "sw.fajerwerki",
+  "pl": "fajerwerki",
+  "ru": "фейерверк",
+  "tr": "фаервэ́рки",
+  "pos": "noun",
+  "gender": "pl",
+  "forms": {
+   "gen": "fajerwerków"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "O północy są fajerwerki.",
+   "ru": "В полночь фейерверки."
+  },
+  "band": 3,
+  "order": 18
+ },
+ {
+  "id": "sw.szampan",
+  "pl": "szampan",
+  "ru": "шампанское",
+  "tr": "ша́мпан",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "gen": "szampana"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "O północy pijemy szampana.",
+   "ru": "В полночь пьём шампанское."
+  },
+  "band": 3,
+  "order": 19
+ },
+ {
+  "id": "sw.trzej_krolowie",
+  "pl": "Trzej Królowie",
+  "ru": "Три короля (волхвы)",
+  "tr": "тшэй круло́ве",
+  "pos": "noun",
+  "gender": "pl",
+  "forms": {
+   "gen": "Trzech Króli"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Szóstego stycznia jest święto Trzech Króli.",
+   "ru": "Шестого января праздник Трёх королей."
+  },
+  "band": 3,
+  "order": 20
+ },
+ {
+  "id": "sw.orszak",
+  "pl": "orszak",
+  "ru": "шествие",
+  "tr": "о́ршак",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "orszaki",
+   "gen": "orszaku"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W Warszawie jest orszak Trzech Króli.",
+   "ru": "В Варшаве проходит шествие Трёх королей."
+  },
+  "band": 3,
+  "order": 21
+ },
+ {
+  "id": "sw.kreda",
+  "pl": "kreda",
+  "ru": "мел",
+  "tr": "крэ́да",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "acc": "kredę",
+   "gen": "kredy",
+   "ins": "kredą"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na drzwiach piszemy kredą.",
+   "ru": "На дверях пишем мелом."
+  },
+  "band": 3,
+  "order": 22
+ },
+ {
+  "id": "sw.laurka",
+  "pl": "laurka",
+  "ru": "самодельная открытка (детская)",
+  "tr": "лау́рка",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "laurki",
+   "acc": "laurkę",
+   "gen": "laurki"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Wnuczka robi babci laurkę.",
+   "ru": "Внучка делает бабушке открытку."
+  },
+  "band": 3,
+  "order": 23
+ },
+ {
+  "id": "sw.zyczenia",
+  "pl": "życzenia",
+  "ru": "пожелания, поздравления",
+  "tr": "жычэ́ня",
+  "pos": "noun",
+  "gender": "pl",
+  "forms": {
+   "gen": "życzeń",
+   "ins": "życzeniami"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Składam życzenia babci.",
+   "ru": "Я поздравляю бабушку."
+  },
+  "band": 3,
+  "order": 24
+ },
+ {
+  "id": "sw.dzielic_sie",
+  "pl": "dzielić się",
+  "ru": "делиться",
+  "tr": "дже́личь ще",
+  "pos": "verb",
+  "forms": {
+   "1sg": "dzielę",
+   "2sg": "dzielisz",
+   "3sg": "dzieli",
+   "1pl": "dzielimy",
+   "2pl": "dzielicie",
+   "3pl": "dzielą"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Dzielimy się jajkiem.",
+   "ru": "Мы делимся яйцом."
+  },
+  "band": 3,
+  "order": 25
+ },
+ {
+  "id": "sw.sto_lat",
+  "pl": "Sto lat!",
+  "ru": "Многая лета! (поздравление «сто лет жизни»)",
+  "tr": "сто лат ",
+  "pos": "intj",
+  "forms": {},
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Wszyscy śpiewają: sto lat!",
+   "ru": "Все поют: сто лет!"
+  },
+  "band": 3,
+  "order": 26
+ },
+ {
+  "id": "sw.tort",
+  "pl": "tort",
+  "ru": "торт",
+  "tr": "торт",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "torty",
+   "gen": "tortu",
+   "acc": "tort"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na urodziny jemy tort.",
+   "ru": "На день рождения едим торт."
+  },
+  "band": 3,
+  "order": 27
+ },
+ {
+  "id": "sw.paczek",
+  "pl": "pączek",
+  "ru": "пончик (с начинкой, в жирный четверг)",
+  "tr": "по́нчэк",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "pączki",
+   "gen": "pączka"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Zjem jeszcze jednego pączka.",
+   "ru": "Съем ещё одного пончика."
+  },
+  "band": 3,
+  "order": 28
+ },
+ {
+  "id": "sw.faworki",
+  "pl": "faworki",
+  "ru": "хворост (тонкое хрустящее печенье)",
+  "tr": "фаво́рки",
+  "pos": "noun",
+  "gender": "pl",
+  "forms": {
+   "gen": "faworków"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Do kawy są faworki.",
+   "ru": "К кофе подают хворост."
+  },
+  "band": 3,
+  "order": 29
+ },
+ {
+  "id": "sw.marzanna",
+  "pl": "Marzanna",
+  "ru": "Марзанна (соломенное чучело зимы)",
+  "tr": "мажа́нна",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "acc": "Marzannę",
+   "ins": "Marzanną",
+   "gen": "Marzanny"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Topimy Marzannę w rzece.",
+   "ru": "Топим Марзанну в реке."
+  },
+  "band": 3,
+  "order": 30
+ },
+ {
+  "id": "sw.kukla",
+  "pl": "kukła",
+  "ru": "чучело",
+  "tr": "ку́кўа",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "kukły",
+   "acc": "kukłę",
+   "gen": "kukły"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Kukła jest ze słomy.",
+   "ru": "Чучело сделано из соломы."
+  },
+  "band": 3,
+  "order": 31
+ },
+ {
+  "id": "sw.palma",
+  "pl": "palma",
+  "ru": "пальма (вербная: букет из сухоцветов и веточек)",
+  "tr": "па́лма",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "palmy",
+   "acc": "palmę",
+   "gen": "palmy"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": {
+   "ru": "пальма",
+   "note": "palma wielkanocna — букет из сухих цветов и веточек, а не дерево"
+  },
+  "ex": {
+   "pl": "Niesiemy palmę do kościoła.",
+   "ru": "Несём пальму в костёл."
+  },
+  "band": 3,
+  "order": 32
+ },
+ {
+  "id": "sw.galazka",
+  "pl": "gałązka",
+  "ru": "веточка",
+  "tr": "гаўо́ўска",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "gałązki",
+   "acc": "gałązkę",
+   "gen": "gałązki"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W wazonie stoją gałązki.",
+   "ru": "В вазе стоят веточки."
+  },
+  "band": 3,
+  "order": 33
+ },
+ {
+  "id": "sw.wielkanoc",
+  "pl": "Wielkanoc",
+  "ru": "Пасха",
+  "tr": "велка́ноц",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "acc": "Wielkanoc",
+   "gen": "Wielkanocy",
+   "ins": "Wielkanocą"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Wielkanoc jest zawsze w niedzielę.",
+   "ru": "Пасха всегда в воскресенье."
+  },
+  "band": 3,
+  "order": 34
+ },
+ {
+  "id": "sw.swieconka",
+  "pl": "święconka",
+  "ru": "освящение пасхальной корзины; корзинка с едой",
+  "tr": "щфенцо́нка",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "acc": "święconkę",
+   "gen": "święconki",
+   "ins": "święconką"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W sobotę idziemy ze święconką do kościoła.",
+   "ru": "В субботу идём с пасхальной корзинкой в костёл."
+  },
+  "band": 3,
+  "order": 35
+ },
+ {
+  "id": "sw.koszyczek",
+  "pl": "koszyczek",
+  "ru": "корзиночка (пасхальная)",
+  "tr": "кошы́чэк",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "koszyczki",
+   "gen": "koszyczka",
+   "loc": "koszyczku"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W koszyczku są jajka i chleb.",
+   "ru": "В корзиночке яйца и хлеб."
+  },
+  "band": 3,
+  "order": 36
+ },
+ {
+  "id": "sw.pisanka",
+  "pl": "pisanka",
+  "ru": "расписное пасхальное яйцо",
+  "tr": "писа́нка",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "pisanki",
+   "acc": "pisankę",
+   "gen": "pisanki"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Malujemy pisanki.",
+   "ru": "Расписываем пасхальные яйца."
+  },
+  "band": 3,
+  "order": 37
+ },
+ {
+  "id": "sw.baranek",
+  "pl": "baranek",
+  "ru": "барашек (из сахара или масла, на пасхальном столе)",
+  "tr": "бара́нэк",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "baranki",
+   "gen": "baranka"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na stole stoi baranek z cukru.",
+   "ru": "На столе стоит сахарный барашек."
+  },
+  "band": 3,
+  "order": 38
+ },
+ {
+  "id": "sw.zurek",
+  "pl": "żurek",
+  "ru": "журек (кислый суп на закваске, с яйцом)",
+  "tr": "жу́рэк",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "gen": "żurku"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na Wielkanoc jemy żurek z jajkiem.",
+   "ru": "На Пасху едим журек с яйцом."
+  },
+  "band": 3,
+  "order": 39
+ },
+ {
+  "id": "sw.biala_kielbasa",
+  "pl": "biała kiełbasa",
+  "ru": "белая колбаса (пасхальная)",
+  "tr": "бя́ўа кеўба́са",
+  "pos": "phrase",
+  "forms": {},
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W koszyczku jest biała kiełbasa.",
+   "ru": "В корзиночке белая колбаса."
+  },
+  "band": 3,
+  "order": 40
+ },
+ {
+  "id": "sw.chrzan",
+  "pl": "chrzan",
+  "ru": "хрен",
+  "tr": "хшан",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "gen": "chrzanu"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Do jajka dajemy chrzan.",
+   "ru": "К яйцу подаём хрен."
+  },
+  "band": 3,
+  "order": 41
+ },
+ {
+  "id": "sw.babka",
+  "pl": "babka",
+  "ru": "баба (высокий пасхальный кекс)",
+  "tr": "ба́пка",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "babki",
+   "acc": "babkę",
+   "gen": "babki"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": {
+   "ru": "бабка (старуха)",
+   "note": "babka — кекс; в значении «старуха» по-польски грубо"
+  },
+  "ex": {
+   "pl": "Na Wielkanoc jest babka z cytryną.",
+   "ru": "На Пасху подают бабу с лимоном."
+  },
+  "band": 3,
+  "order": 42
+ },
+ {
+  "id": "sw.lany_poniedzialek",
+  "pl": "lany poniedziałek",
+  "ru": "«облитый» понедельник (понедельник после Пасхи)",
+  "tr": "ла́ны поньеджя́ўэк",
+  "pos": "phrase",
+  "forms": {},
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W lany poniedziałek oblewamy się wodą.",
+   "ru": "В облитый понедельник обливаемся водой."
+  },
+  "band": 3,
+  "order": 43
+ },
+ {
+  "id": "sw.oblewac_sie",
+  "pl": "oblewać się",
+  "ru": "обливаться, обливать друг друга",
+  "tr": "обле́вачь ще",
+  "pos": "verb",
+  "forms": {
+   "1sg": "oblewam",
+   "2sg": "oblewasz",
+   "3sg": "oblewa",
+   "1pl": "oblewamy",
+   "2pl": "oblewacie",
+   "3pl": "oblewają"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Dzieci oblewają się wodą.",
+   "ru": "Дети обливают друг друга водой."
+  },
+  "band": 3,
+  "order": 44
+ },
+ {
+  "id": "sw.majowka",
+  "pl": "majówka",
+  "ru": "майские выходные (1-3 мая)",
+  "tr": "маю́фка",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "acc": "majówkę",
+   "ins": "majówką",
+   "gen": "majówki"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na majówkę jedziemy nad jezioro.",
+   "ru": "На майские едем на озеро."
+  },
+  "band": 3,
+  "order": 45
+ },
+ {
+  "id": "sw.grill",
+  "pl": "grill",
+  "ru": "гриль, барбекю",
+  "tr": "грилл",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "gen": "grilla",
+   "loc": "grillu"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Przy grillu jest muzyka.",
+   "ru": "У гриля играет музыка."
+  },
+  "band": 3,
+  "order": 46
+ },
+ {
+  "id": "sw.flaga",
+  "pl": "flaga",
+  "ru": "флаг",
+  "tr": "фла́га",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "flagi",
+   "acc": "flagę",
+   "gen": "flagi"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na domu wisi flaga.",
+   "ru": "На доме висит флаг."
+  },
+  "band": 3,
+  "order": 47
+ },
+ {
+  "id": "sw.procesja",
+  "pl": "procesja",
+  "ru": "процессия, крестный ход",
+  "tr": "процэ́ся",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "procesje",
+   "acc": "procesję",
+   "gen": "procesji"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Ulicą idzie procesja.",
+   "ru": "По улице идёт процессия."
+  },
+  "band": 3,
+  "order": 48
+ },
+ {
+  "id": "sw.oltarz",
+  "pl": "ołtarz",
+  "ru": "алтарь",
+  "tr": "о́ўташ",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "ołtarze",
+   "gen": "ołtarza"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na ulicy stoi ołtarz.",
+   "ru": "На улице стоит алтарь."
+  },
+  "band": 3,
+  "order": 49
+ },
+ {
+  "id": "sw.platek",
+  "pl": "płatek",
+  "ru": "лепесток",
+  "tr": "пўа́тэк",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "płatki",
+   "gen": "płatka",
+   "gen_pl": "płatków"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Dziecko sypie płatki kwiatów.",
+   "ru": "Ребёнок сыплет лепестки цветов."
+  },
+  "band": 3,
+  "order": 50
+ },
+ {
+  "id": "sw.wianek",
+  "pl": "wianek",
+  "ru": "венок (из цветов)",
+  "tr": "вя́нэк",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "wianki",
+   "gen": "wianka",
+   "acc": "wianek"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Wianek płynie po wodzie.",
+   "ru": "Венок плывёт по воде."
+  },
+  "band": 3,
+  "order": 51
+ },
+ {
+  "id": "sw.ognisko",
+  "pl": "ognisko",
+  "ru": "костёр",
+  "tr": "огни́ско",
+  "pos": "noun",
+  "gender": "n",
+  "forms": {
+   "pl": "ogniska",
+   "gen": "ogniska",
+   "loc": "ognisku"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Przy ognisku śpiewamy piosenki.",
+   "ru": "У костра поём песни."
+  },
+  "band": 3,
+  "order": 52
+ },
+ {
+  "id": "sw.ziola",
+  "pl": "zioła",
+  "ru": "травы (лечебные, пряные)",
+  "tr": "жёўа",
+  "pos": "noun",
+  "gender": "pl",
+  "forms": {
+   "gen": "ziół"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W bukiecie są zioła.",
+   "ru": "В букете травы."
+  },
+  "band": 3,
+  "order": 53
+ },
+ {
+  "id": "sw.bukiet",
+  "pl": "bukiet",
+  "ru": "букет",
+  "tr": "бу́кет",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "bukiety",
+   "gen": "bukietu",
+   "acc": "bukiet"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Niosę bukiet do kościoła.",
+   "ru": "Несу букет в костёл."
+  },
+  "band": 3,
+  "order": 54
+ },
+ {
+  "id": "sw.znicz",
+  "pl": "znicz",
+  "ru": "поминальная свеча в стакане (лампада на могилу)",
+  "tr": "знич",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "znicze",
+   "gen": "znicza",
+   "acc": "znicz"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Na grobie stoi znicz.",
+   "ru": "На могиле стоит знич."
+  },
+  "band": 3,
+  "order": 55
+ },
+ {
+  "id": "sw.chryzantema",
+  "pl": "chryzantema",
+  "ru": "хризантема",
+  "tr": "хрызантэ́ма",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "chryzantemy",
+   "acc": "chryzantemę",
+   "gen": "chryzantemy"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Kupuję chryzantemy na cmentarz.",
+   "ru": "Покупаю хризантемы на кладбище."
+  },
+  "band": 3,
+  "order": 56
+ },
+ {
+  "id": "sw.cmentarz",
+  "pl": "cmentarz",
+  "ru": "кладбище",
+  "tr": "цмэ́нташ",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "cmentarze",
+   "gen": "cmentarza",
+   "loc": "cmentarzu"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Pierwszego listopada idziemy na cmentarz.",
+   "ru": "Первого ноября идём на кладбище."
+  },
+  "band": 3,
+  "order": 57
+ },
+ {
+  "id": "sw.grob",
+  "pl": "grób",
+  "ru": "могила",
+  "tr": "груп",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "pl": "groby",
+   "gen": "grobu",
+   "loc": "grobie"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Zapalam znicz na grobie babci.",
+   "ru": "Зажигаю знич на могиле бабушки."
+  },
+  "band": 3,
+  "order": 58
+ },
+ {
+  "id": "sw.andrzejki",
+  "pl": "Andrzejki",
+  "ru": "Андрэйки (вечер гаданий, 29-30 ноября)",
+  "tr": "анджэ́йки",
+  "pos": "noun",
+  "gender": "pl",
+  "forms": {
+   "gen": "Andrzejek"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "W andrzejki robimy wróżby.",
+   "ru": "На Андрэйки мы гадаем."
+  },
+  "band": 3,
+  "order": 59
+ },
+ {
+  "id": "sw.wrozba",
+  "pl": "wróżba",
+  "ru": "гадание, предсказание",
+  "tr": "вру́жба",
+  "pos": "noun",
+  "gender": "f",
+  "forms": {
+   "pl": "wróżby",
+   "acc": "wróżbę",
+   "gen": "wróżby"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Lubię andrzejkowe wróżby.",
+   "ru": "Люблю андрэйковые гадания."
+  },
+  "band": 3,
+  "order": 60
+ },
+ {
+  "id": "sw.wosk",
+  "pl": "wosk",
+  "ru": "воск",
+  "tr": "воск",
+  "pos": "noun",
+  "gender": "m",
+  "forms": {
+   "gen": "wosku"
+  },
+  "topic": "swieta_i_zwyczaje",
+  "freq": 3,
+  "ff": null,
+  "ex": {
+   "pl": "Lejemy wosk przez klucz.",
+   "ru": "Льём воск через ключ."
+  },
+  "band": 3,
+  "order": 61
+ }
+]

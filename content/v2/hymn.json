@@ -1,0 +1,2714 @@
+{
+ "version": 1,
+ "title": "Mazurek Dąbrowskiego",
+ "title_ru": "Мазурка Домбровского",
+ "author": "Józef Wybicki",
+ "year": 1797,
+ "place": "Reggio nell'Emilia",
+ "official": "1927-02-26",
+ "law": "Konstytucja RP 1997, art. 28 ust. 3",
+ "tr_src": "строки гимна: кириллица из drill/gimn.md (как учит Шэф); символы: data/a1/src/translit.py",
+ "text_src": "ПМЖ/Собес/drill/gimn.md (перевод и текст, 4 куплета + припев)",
+ "order": [
+  "s1",
+  "ref",
+  "s2",
+  "ref",
+  "s3",
+  "ref",
+  "s4",
+  "ref"
+ ],
+ "stanzas": [
+  {
+   "id": "s1",
+   "ru": "Куплет 1",
+   "hive": 1,
+   "band": 1
+  },
+  {
+   "id": "ref",
+   "ru": "Припев",
+   "hive": 2,
+   "band": 1
+  },
+  {
+   "id": "s2",
+   "ru": "Куплет 2",
+   "hive": 3,
+   "band": 2
+  },
+  {
+   "id": "s3",
+   "ru": "Куплет 3",
+   "hive": 4,
+   "band": 3
+  },
+  {
+   "id": "s4",
+   "ru": "Куплет 4",
+   "hive": 5,
+   "band": 4
+  }
+ ],
+ "lines": [
+  {
+   "id": "hymn.s1.1",
+   "kind": "hymn",
+   "stanza": "s1",
+   "n": 1,
+   "drillN": 1,
+   "pl": "Jeszcze Polska nie zginęła,",
+   "ru": "Ещё Польша не погибла,",
+   "tr": "е́щэ по́льска не згинэ́ўа",
+   "tiles_pl": [
+    "Jeszcze",
+    "Polska",
+    "nie",
+    "zginęła"
+   ],
+   "distract_pl": [
+    "zginie",
+    "Polski"
+   ],
+   "gloss": [
+    {
+     "pl": "zginęła",
+     "ru": "погибла"
+    }
+   ],
+   "gap": {
+    "word": "zginęła",
+    "options": [
+     "zginęła",
+     "zginie",
+     "żyła"
+    ]
+   },
+   "hive": 1,
+   "band": 1,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s1.2",
+   "kind": "hymn",
+   "stanza": "s1",
+   "n": 2,
+   "drillN": 2,
+   "pl": "kiedy my żyjemy.",
+   "ru": "пока мы живы.",
+   "tr": "ке́ды мы жые́мы",
+   "tiles_pl": [
+    "kiedy",
+    "my",
+    "żyjemy"
+   ],
+   "distract_pl": [
+    "żyją",
+    "żyjecie"
+   ],
+   "gloss": [],
+   "gap": {
+    "word": "żyjemy",
+    "options": [
+     "żyjemy",
+     "żyją",
+     "żyjecie"
+    ]
+   },
+   "hive": 1,
+   "band": 1,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s1.3",
+   "kind": "hymn",
+   "stanza": "s1",
+   "n": 3,
+   "drillN": 3,
+   "pl": "Co nam obca przemoc wzięła,",
+   "ru": "Что у нас чужая сила отняла,",
+   "tr": "цо нам о́бца пшэ́моц вже́ўа",
+   "tiles_pl": [
+    "Co",
+    "nam",
+    "obca",
+    "przemoc",
+    "wzięła"
+   ],
+   "distract_pl": [
+    "wzięli",
+    "obcy"
+   ],
+   "gloss": [
+    {
+     "pl": "przemoc",
+     "ru": "насилие, чужая сила"
+    },
+    {
+     "pl": "wzięła",
+     "ru": "взяла, отняла"
+    }
+   ],
+   "gap": {
+    "word": "wzięła",
+    "options": [
+     "wzięła",
+     "wzięli",
+     "dała"
+    ]
+   },
+   "hive": 1,
+   "band": 1,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s1.4",
+   "kind": "hymn",
+   "stanza": "s1",
+   "n": 4,
+   "drillN": 4,
+   "pl": "szablą odbierzemy.",
+   "ru": "саблей вернём.",
+   "tr": "ша́бльо одбежэ́мы",
+   "tiles_pl": [
+    "szablą",
+    "odbierzemy"
+   ],
+   "distract_pl": [
+    "szablę",
+    "mieczem"
+   ],
+   "gloss": [
+    {
+     "pl": "szablą",
+     "ru": "саблей"
+    },
+    {
+     "pl": "odbierzemy",
+     "ru": "отберём назад, вернём"
+    }
+   ],
+   "gap": {
+    "word": "szablą",
+    "options": [
+     "szablą",
+     "szablę",
+     "mieczem"
+    ]
+   },
+   "hive": 1,
+   "band": 1,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.ref.1",
+   "kind": "hymn",
+   "stanza": "ref",
+   "n": 1,
+   "drillN": 5,
+   "pl": "Marsz, marsz, Dąbrowski,",
+   "ru": "Марш, марш, Домбровский,",
+   "tr": "марш, марш, домбро́вски",
+   "tiles_pl": [
+    "Marsz",
+    "marsz",
+    "Dąbrowski"
+   ],
+   "distract_pl": [
+    "Dąbrowskiego",
+    "Bonaparte"
+   ],
+   "gloss": [],
+   "gap": {
+    "word": "Dąbrowski",
+    "options": [
+     "Dąbrowski",
+     "Bonaparte",
+     "Czarniecki"
+    ]
+   },
+   "hive": 2,
+   "band": 1,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.ref.2",
+   "kind": "hymn",
+   "stanza": "ref",
+   "n": 2,
+   "drillN": 6,
+   "pl": "z ziemi włoskiej do Polski.",
+   "ru": "с итальянской земли в Польшу.",
+   "tr": "з же́ми вло́скей до по́льски",
+   "tiles_pl": [
+    "z",
+    "ziemi",
+    "włoskiej",
+    "do",
+    "Polski"
+   ],
+   "distract_pl": [
+    "ziemia",
+    "Włoch"
+   ],
+   "gloss": [
+    {
+     "pl": "włoskiej",
+     "ru": "итальянской"
+    }
+   ],
+   "gap": {
+    "word": "włoskiej",
+    "options": [
+     "włoskiej",
+     "polskiej",
+     "szwedzkiej"
+    ]
+   },
+   "hive": 2,
+   "band": 1,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.ref.3",
+   "kind": "hymn",
+   "stanza": "ref",
+   "n": 3,
+   "drillN": 7,
+   "pl": "Za twoim przewodem",
+   "ru": "Под твоим началом",
+   "tr": "за тво́им пшэво́дэм",
+   "tiles_pl": [
+    "Za",
+    "twoim",
+    "przewodem"
+   ],
+   "distract_pl": [
+    "twój",
+    "przewód"
+   ],
+   "gloss": [
+    {
+     "pl": "przewodem",
+     "ru": "предводительством, началом"
+    }
+   ],
+   "gap": {
+    "word": "przewodem",
+    "options": [
+     "przewodem",
+     "narodem",
+     "przykładem"
+    ]
+   },
+   "hive": 2,
+   "band": 1,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.ref.4",
+   "kind": "hymn",
+   "stanza": "ref",
+   "n": 4,
+   "drillN": 8,
+   "pl": "złączym się z narodem.",
+   "ru": "соединимся с народом.",
+   "tr": "зло́нчым щэ з наро́дэм",
+   "tiles_pl": [
+    "złączym",
+    "się",
+    "z",
+    "narodem"
+   ],
+   "distract_pl": [
+    "złączymy",
+    "naród"
+   ],
+   "gloss": [
+    {
+     "pl": "złączym",
+     "ru": "= złączymy, соединимся"
+    }
+   ],
+   "gap": {
+    "word": "narodem",
+    "options": [
+     "narodem",
+     "przewodem",
+     "morzem"
+    ]
+   },
+   "hive": 2,
+   "band": 1,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s2.1",
+   "kind": "hymn",
+   "stanza": "s2",
+   "n": 1,
+   "drillN": 9,
+   "pl": "Przejdziem Wisłę, przejdziem Wartę,",
+   "ru": "Перейдём Вислу, перейдём Варту,",
+   "tr": "пше́йджем ви́сўэ, пше́йджем ва́ртэ",
+   "tiles_pl": [
+    "Przejdziem",
+    "Wisłę",
+    "przejdziem",
+    "Wartę"
+   ],
+   "distract_pl": [
+    "Wisła",
+    "przejdziemy"
+   ],
+   "gloss": [
+    {
+     "pl": "przejdziem",
+     "ru": "= przejdziemy, перейдём"
+    }
+   ],
+   "gap": {
+    "word": "Wartę",
+    "options": [
+     "Wartę",
+     "Odrę",
+     "Bug"
+    ]
+   },
+   "hive": 3,
+   "band": 2,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s2.2",
+   "kind": "hymn",
+   "stanza": "s2",
+   "n": 2,
+   "drillN": 10,
+   "pl": "będziem Polakami.",
+   "ru": "будем поляками.",
+   "tr": "бэ́нджем поляка́ми",
+   "tiles_pl": [
+    "będziem",
+    "Polakami"
+   ],
+   "distract_pl": [
+    "będziemy",
+    "Polacy"
+   ],
+   "gloss": [
+    {
+     "pl": "będziem",
+     "ru": "= będziemy, будем"
+    }
+   ],
+   "gap": {
+    "word": "Polakami",
+    "options": [
+     "Polakami",
+     "Polacy",
+     "Niemcami"
+    ]
+   },
+   "hive": 3,
+   "band": 2,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s2.3",
+   "kind": "hymn",
+   "stanza": "s2",
+   "n": 3,
+   "drillN": 11,
+   "pl": "Dał nam przykład Bonaparte,",
+   "ru": "Бонапарт дал нам пример,",
+   "tr": "даў нам пшы́кўад бонапа́ртэ",
+   "tiles_pl": [
+    "Dał",
+    "nam",
+    "przykład",
+    "Bonaparte"
+   ],
+   "distract_pl": [
+    "dała",
+    "przykładem"
+   ],
+   "gloss": [
+    {
+     "pl": "przykład",
+     "ru": "пример"
+    }
+   ],
+   "gap": {
+    "word": "Bonaparte",
+    "options": [
+     "Bonaparte",
+     "Czarniecki",
+     "Wybicki"
+    ]
+   },
+   "hive": 3,
+   "band": 2,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s2.4",
+   "kind": "hymn",
+   "stanza": "s2",
+   "n": 4,
+   "drillN": 12,
+   "pl": "jak zwyciężać mamy.",
+   "ru": "как нам побеждать.",
+   "tr": "як звычэ́нжачь ма́мы",
+   "tiles_pl": [
+    "jak",
+    "zwyciężać",
+    "mamy"
+   ],
+   "distract_pl": [
+    "zwyciężył",
+    "mają"
+   ],
+   "gloss": [
+    {
+     "pl": "zwyciężać",
+     "ru": "побеждать"
+    }
+   ],
+   "gap": {
+    "word": "zwyciężać",
+    "options": [
+     "zwyciężać",
+     "zwyciężył",
+     "przegrać"
+    ]
+   },
+   "hive": 3,
+   "band": 2,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s3.1",
+   "kind": "hymn",
+   "stanza": "s3",
+   "n": 1,
+   "drillN": 13,
+   "pl": "Jak Czarniecki do Poznania",
+   "ru": "Как Чарнецкий к Познани",
+   "tr": "як чарне́цки до позна́ня",
+   "tiles_pl": [
+    "Jak",
+    "Czarniecki",
+    "do",
+    "Poznania"
+   ],
+   "distract_pl": [
+    "Poznań",
+    "Dąbrowski"
+   ],
+   "gloss": [],
+   "gap": {
+    "word": "Poznania",
+    "options": [
+     "Poznania",
+     "Krakowa",
+     "Gdańska"
+    ]
+   },
+   "hive": 4,
+   "band": 3,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s3.2",
+   "kind": "hymn",
+   "stanza": "s3",
+   "n": 2,
+   "drillN": 14,
+   "pl": "po szwedzkim zaborze,",
+   "ru": "после шведского захвата,",
+   "tr": "по шве́дзким забо́жэ",
+   "tiles_pl": [
+    "po",
+    "szwedzkim",
+    "zaborze"
+   ],
+   "distract_pl": [
+    "szwedzki",
+    "zabór"
+   ],
+   "gloss": [
+    {
+     "pl": "zaborze",
+     "ru": "захвате, оккупации"
+    }
+   ],
+   "gap": {
+    "word": "szwedzkim",
+    "options": [
+     "szwedzkim",
+     "niemieckim",
+     "rosyjskim"
+    ]
+   },
+   "hive": 4,
+   "band": 3,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s3.3",
+   "kind": "hymn",
+   "stanza": "s3",
+   "n": 3,
+   "drillN": 15,
+   "pl": "dla ojczyzny ratowania",
+   "ru": "ради спасения отчизны",
+   "tr": "для ойчы́зны ратова́ня",
+   "tiles_pl": [
+    "dla",
+    "ojczyzny",
+    "ratowania"
+   ],
+   "distract_pl": [
+    "ojczyzna",
+    "ratowanie"
+   ],
+   "gloss": [
+    {
+     "pl": "ratowania",
+     "ru": "спасения"
+    }
+   ],
+   "gap": {
+    "word": "ratowania",
+    "options": [
+     "ratowania",
+     "ratowanie",
+     "zwyciężania"
+    ]
+   },
+   "hive": 4,
+   "band": 3,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s3.4",
+   "kind": "hymn",
+   "stanza": "s3",
+   "n": 4,
+   "drillN": 16,
+   "pl": "wrócim się przez morze.",
+   "ru": "вернёмся через море.",
+   "tr": "вру́чим щэ пшэз мо́жэ",
+   "tiles_pl": [
+    "wrócim",
+    "się",
+    "przez",
+    "morze"
+   ],
+   "distract_pl": [
+    "wrócimy",
+    "przed"
+   ],
+   "gloss": [
+    {
+     "pl": "wrócim się",
+     "ru": "= wrócimy się, вернёмся"
+    }
+   ],
+   "gap": {
+    "word": "morze",
+    "options": [
+     "morze",
+     "rzekę",
+     "góry"
+    ]
+   },
+   "hive": 4,
+   "band": 3,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s4.1",
+   "kind": "hymn",
+   "stanza": "s4",
+   "n": 1,
+   "drillN": 17,
+   "pl": "Już tam ojciec do swej Basi",
+   "ru": "Вот уже отец своей Басе",
+   "tr": "юж там о́йчец до свей ба́щи",
+   "tiles_pl": [
+    "Już",
+    "tam",
+    "ojciec",
+    "do",
+    "swej",
+    "Basi"
+   ],
+   "distract_pl": [
+    "swojej",
+    "Basia"
+   ],
+   "gloss": [
+    {
+     "pl": "swej",
+     "ru": "= swojej, своей"
+    }
+   ],
+   "gap": {
+    "word": "Basi",
+    "options": [
+     "Basi",
+     "Basia",
+     "Basię"
+    ]
+   },
+   "hive": 5,
+   "band": 4,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s4.2",
+   "kind": "hymn",
+   "stanza": "s4",
+   "n": 2,
+   "drillN": 18,
+   "pl": "mówi zapłakany:",
+   "ru": "говорит, весь в слезах:",
+   "tr": "му́ви запўака́ны",
+   "tiles_pl": [
+    "mówi",
+    "zapłakany"
+   ],
+   "distract_pl": [
+    "mówią",
+    "zapłakana"
+   ],
+   "gloss": [
+    {
+     "pl": "zapłakany",
+     "ru": "заплаканный"
+    }
+   ],
+   "gap": {
+    "word": "mówi",
+    "options": [
+     "mówi",
+     "mówią",
+     "milczy"
+    ]
+   },
+   "hive": 5,
+   "band": 4,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s4.3",
+   "kind": "hymn",
+   "stanza": "s4",
+   "n": 3,
+   "drillN": 19,
+   "pl": "„Słuchaj jeno, pono nasi",
+   "ru": "«Послушай-ка, кажется, наши",
+   "tr": "сўу́хай е́но, по́но на́щи",
+   "tiles_pl": [
+    "Słuchaj",
+    "jeno",
+    "pono",
+    "nasi"
+   ],
+   "distract_pl": [
+    "słuchał",
+    "nasze"
+   ],
+   "gloss": [
+    {
+     "pl": "jeno",
+     "ru": "= tylko, только, -ка"
+    },
+    {
+     "pl": "pono",
+     "ru": "= podobno, кажется"
+    }
+   ],
+   "gap": {
+    "word": "nasi",
+    "options": [
+     "nasi",
+     "nasze",
+     "wasi"
+    ]
+   },
+   "hive": 5,
+   "band": 4,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "hymn.s4.4",
+   "kind": "hymn",
+   "stanza": "s4",
+   "n": 4,
+   "drillN": 20,
+   "pl": "biją w tarabany”.",
+   "ru": "бьют в барабаны».",
+   "tr": "би́йо в тарабаны",
+   "tiles_pl": [
+    "biją",
+    "w",
+    "tarabany"
+   ],
+   "distract_pl": [
+    "bije",
+    "tarabanów"
+   ],
+   "gloss": [
+    {
+     "pl": "taraban",
+     "ru": "большой военный барабан"
+    }
+   ],
+   "gap": {
+    "word": "tarabany",
+    "options": [
+     "tarabany",
+     "trąbki",
+     "dzwony"
+    ]
+   },
+   "hive": 5,
+   "band": 4,
+   "src": "ПМЖ/Собес/drill/gimn.md",
+   "checked": "2026-10-18"
+  }
+ ],
+ "drillSeed": [
+  "hymn.s1.1",
+  "hymn.s1.2",
+  "hymn.s1.3",
+  "hymn.s1.4"
+ ],
+ "drillSeedInfo": {
+  "source": "ПМЖ/Собес/drill/gimn.md, журнал, запись 16.10: «выучено до строки 4 (куплет 1 закрыт)»; ШТАБ.md и progress.md совпадают",
+  "snapshot": "2026-10-16",
+  "takenAt": "2026-10-18",
+  "learnedThroughDrillN": 4,
+  "note": "позже 16.10 записей по гимну нет; снимок надо обновлять при сборке"
+ },
+ "drillNext": [
+  "hymn.ref.1"
+ ],
+ "drillNextInfo": "строка 5 (hymn.ref.1) взята 16.10, в связке 1-5 без опоры чисто, но не закрыта; строки 6-20 не начаты",
+ "melody": {
+  "key": "F major",
+  "meter": "3/4",
+  "tempo_bpm": 116,
+  "unit": "quarter=1 beat",
+  "pitch": "scientific, Bb = B-flat, R = rest",
+  "source": "Нотная запись мелодии из Ustawa z 31.01.1980 o godle, barwach i hymnie (Dz.U. 1980 nr 7 poz. 18); мелодия анонимная, ок. 1797, общественное достояние. Перенесена с Commons «Mazurek Dąbrowskiego Akordy 01.svg» (CC0), сверена по рендеру 18.10.2026",
+  "note": "Один мотив на все куплеты: строка 1-4 куплета = паттерны v1-v4, строки припева = r1-r4. Каждая строка = 2 такта (6 долей). Слог-в-ноту не размечен, подсветка по строкам",
+  "patterns": {
+   "v1": [
+    [
+     "A4",
+     0.75
+    ],
+    [
+     "Bb4",
+     0.25
+    ],
+    [
+     "C5",
+     1
+    ],
+    [
+     "C5",
+     1
+    ],
+    [
+     "C5",
+     0.75
+    ],
+    [
+     "A4",
+     0.25
+    ],
+    [
+     "D5",
+     0.5
+    ],
+    [
+     "C5",
+     0.5
+    ],
+    [
+     "Bb4",
+     0.5
+    ],
+    [
+     "A4",
+     0.5
+    ]
+   ],
+   "v2": [
+    [
+     "G4",
+     0.75
+    ],
+    [
+     "G4",
+     0.25
+    ],
+    [
+     "C5",
+     1.5
+    ],
+    [
+     "Bb4",
+     0.5
+    ],
+    [
+     "Bb4",
+     1
+    ],
+    [
+     "A4",
+     1
+    ],
+    [
+     "R",
+     1
+    ]
+   ],
+   "v3": [
+    [
+     "A4",
+     0.75
+    ],
+    [
+     "Bb4",
+     0.25
+    ],
+    [
+     "C5",
+     1
+    ],
+    [
+     "C5",
+     1
+    ],
+    [
+     "C5",
+     0.75
+    ],
+    [
+     "A4",
+     0.25
+    ],
+    [
+     "D5",
+     0.5
+    ],
+    [
+     "C5",
+     0.5
+    ],
+    [
+     "Bb4",
+     0.5
+    ],
+    [
+     "A4",
+     0.5
+    ]
+   ],
+   "v4": [
+    [
+     "G4",
+     0.75
+    ],
+    [
+     "G4",
+     0.25
+    ],
+    [
+     "C5",
+     1.5
+    ],
+    [
+     "E4",
+     0.5
+    ],
+    [
+     "G4",
+     1
+    ],
+    [
+     "F4",
+     1
+    ],
+    [
+     "R",
+     1
+    ]
+   ],
+   "r1": [
+    [
+     "G4",
+     1
+    ],
+    [
+     "G4",
+     1.5
+    ],
+    [
+     "Bb4",
+     0.5
+    ],
+    [
+     "Bb4",
+     0.5
+    ],
+    [
+     "A4",
+     0.5
+    ],
+    [
+     "A4",
+     2
+    ]
+   ],
+   "r2": [
+    [
+     "Bb4",
+     0.75
+    ],
+    [
+     "Bb4",
+     0.25
+    ],
+    [
+     "Bb4",
+     1
+    ],
+    [
+     "Bb4",
+     0.5
+    ],
+    [
+     "D5",
+     0.5
+    ],
+    [
+     "D5",
+     1
+    ],
+    [
+     "C5",
+     2
+    ]
+   ],
+   "r3": [
+    [
+     "A4",
+     0.5
+    ],
+    [
+     "C5",
+     0.5
+    ],
+    [
+     "F5",
+     1.5
+    ],
+    [
+     "E5",
+     0.5
+    ],
+    [
+     "E5",
+     0.5
+    ],
+    [
+     "D5",
+     0.5
+    ],
+    [
+     "D5",
+     2
+    ]
+   ],
+   "r4": [
+    [
+     "C5",
+     0.5
+    ],
+    [
+     "C5",
+     0.5
+    ],
+    [
+     "Bb4",
+     1.5
+    ],
+    [
+     "E4",
+     0.5
+    ],
+    [
+     "G4",
+     1
+    ],
+    [
+     "F4",
+     1
+    ],
+    [
+     "R",
+     1
+    ]
+   ]
+  },
+  "lines": [
+   {
+    "line": "hymn.s1.1",
+    "pattern": "v1",
+    "beats": 6,
+    "notes": [
+     [
+      "A4",
+      0.75
+     ],
+     [
+      "Bb4",
+      0.25
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      0.75
+     ],
+     [
+      "A4",
+      0.25
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "A4",
+      0.5
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s1.2",
+    "pattern": "v2",
+    "beats": 6,
+    "notes": [
+     [
+      "G4",
+      0.75
+     ],
+     [
+      "G4",
+      0.25
+     ],
+     [
+      "C5",
+      1.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "Bb4",
+      1
+     ],
+     [
+      "A4",
+      1
+     ],
+     [
+      "R",
+      1
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s1.3",
+    "pattern": "v3",
+    "beats": 6,
+    "notes": [
+     [
+      "A4",
+      0.75
+     ],
+     [
+      "Bb4",
+      0.25
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      0.75
+     ],
+     [
+      "A4",
+      0.25
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "A4",
+      0.5
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s1.4",
+    "pattern": "v4",
+    "beats": 6,
+    "notes": [
+     [
+      "G4",
+      0.75
+     ],
+     [
+      "G4",
+      0.25
+     ],
+     [
+      "C5",
+      1.5
+     ],
+     [
+      "E4",
+      0.5
+     ],
+     [
+      "G4",
+      1
+     ],
+     [
+      "F4",
+      1
+     ],
+     [
+      "R",
+      1
+     ]
+    ]
+   },
+   {
+    "line": "hymn.ref.1",
+    "pattern": "r1",
+    "beats": 6,
+    "notes": [
+     [
+      "G4",
+      1
+     ],
+     [
+      "G4",
+      1.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "A4",
+      0.5
+     ],
+     [
+      "A4",
+      2
+     ]
+    ]
+   },
+   {
+    "line": "hymn.ref.2",
+    "pattern": "r2",
+    "beats": 6,
+    "notes": [
+     [
+      "Bb4",
+      0.75
+     ],
+     [
+      "Bb4",
+      0.25
+     ],
+     [
+      "Bb4",
+      1
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "D5",
+      1
+     ],
+     [
+      "C5",
+      2
+     ]
+    ]
+   },
+   {
+    "line": "hymn.ref.3",
+    "pattern": "r3",
+    "beats": 6,
+    "notes": [
+     [
+      "A4",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "F5",
+      1.5
+     ],
+     [
+      "E5",
+      0.5
+     ],
+     [
+      "E5",
+      0.5
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "D5",
+      2
+     ]
+    ]
+   },
+   {
+    "line": "hymn.ref.4",
+    "pattern": "r4",
+    "beats": 6,
+    "notes": [
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "Bb4",
+      1.5
+     ],
+     [
+      "E4",
+      0.5
+     ],
+     [
+      "G4",
+      1
+     ],
+     [
+      "F4",
+      1
+     ],
+     [
+      "R",
+      1
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s2.1",
+    "pattern": "v1",
+    "beats": 6,
+    "notes": [
+     [
+      "A4",
+      0.75
+     ],
+     [
+      "Bb4",
+      0.25
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      0.75
+     ],
+     [
+      "A4",
+      0.25
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "A4",
+      0.5
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s2.2",
+    "pattern": "v2",
+    "beats": 6,
+    "notes": [
+     [
+      "G4",
+      0.75
+     ],
+     [
+      "G4",
+      0.25
+     ],
+     [
+      "C5",
+      1.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "Bb4",
+      1
+     ],
+     [
+      "A4",
+      1
+     ],
+     [
+      "R",
+      1
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s2.3",
+    "pattern": "v3",
+    "beats": 6,
+    "notes": [
+     [
+      "A4",
+      0.75
+     ],
+     [
+      "Bb4",
+      0.25
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      0.75
+     ],
+     [
+      "A4",
+      0.25
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "A4",
+      0.5
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s2.4",
+    "pattern": "v4",
+    "beats": 6,
+    "notes": [
+     [
+      "G4",
+      0.75
+     ],
+     [
+      "G4",
+      0.25
+     ],
+     [
+      "C5",
+      1.5
+     ],
+     [
+      "E4",
+      0.5
+     ],
+     [
+      "G4",
+      1
+     ],
+     [
+      "F4",
+      1
+     ],
+     [
+      "R",
+      1
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s3.1",
+    "pattern": "v1",
+    "beats": 6,
+    "notes": [
+     [
+      "A4",
+      0.75
+     ],
+     [
+      "Bb4",
+      0.25
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      0.75
+     ],
+     [
+      "A4",
+      0.25
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "A4",
+      0.5
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s3.2",
+    "pattern": "v2",
+    "beats": 6,
+    "notes": [
+     [
+      "G4",
+      0.75
+     ],
+     [
+      "G4",
+      0.25
+     ],
+     [
+      "C5",
+      1.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "Bb4",
+      1
+     ],
+     [
+      "A4",
+      1
+     ],
+     [
+      "R",
+      1
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s3.3",
+    "pattern": "v3",
+    "beats": 6,
+    "notes": [
+     [
+      "A4",
+      0.75
+     ],
+     [
+      "Bb4",
+      0.25
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      0.75
+     ],
+     [
+      "A4",
+      0.25
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "A4",
+      0.5
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s3.4",
+    "pattern": "v4",
+    "beats": 6,
+    "notes": [
+     [
+      "G4",
+      0.75
+     ],
+     [
+      "G4",
+      0.25
+     ],
+     [
+      "C5",
+      1.5
+     ],
+     [
+      "E4",
+      0.5
+     ],
+     [
+      "G4",
+      1
+     ],
+     [
+      "F4",
+      1
+     ],
+     [
+      "R",
+      1
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s4.1",
+    "pattern": "v1",
+    "beats": 6,
+    "notes": [
+     [
+      "A4",
+      0.75
+     ],
+     [
+      "Bb4",
+      0.25
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      0.75
+     ],
+     [
+      "A4",
+      0.25
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "A4",
+      0.5
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s4.2",
+    "pattern": "v2",
+    "beats": 6,
+    "notes": [
+     [
+      "G4",
+      0.75
+     ],
+     [
+      "G4",
+      0.25
+     ],
+     [
+      "C5",
+      1.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "Bb4",
+      1
+     ],
+     [
+      "A4",
+      1
+     ],
+     [
+      "R",
+      1
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s4.3",
+    "pattern": "v3",
+    "beats": 6,
+    "notes": [
+     [
+      "A4",
+      0.75
+     ],
+     [
+      "Bb4",
+      0.25
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      1
+     ],
+     [
+      "C5",
+      0.75
+     ],
+     [
+      "A4",
+      0.25
+     ],
+     [
+      "D5",
+      0.5
+     ],
+     [
+      "C5",
+      0.5
+     ],
+     [
+      "Bb4",
+      0.5
+     ],
+     [
+      "A4",
+      0.5
+     ]
+    ]
+   },
+   {
+    "line": "hymn.s4.4",
+    "pattern": "v4",
+    "beats": 6,
+    "notes": [
+     [
+      "G4",
+      0.75
+     ],
+     [
+      "G4",
+      0.25
+     ],
+     [
+      "C5",
+      1.5
+     ],
+     [
+      "E4",
+      0.5
+     ],
+     [
+      "G4",
+      1
+     ],
+     [
+      "F4",
+      1
+     ],
+     [
+      "R",
+      1
+     ]
+    ]
+   }
+  ]
+ },
+ "symbols": [
+  {
+   "id": "symbol.godlo",
+   "kind": "symbol",
+   "type": "build",
+   "pl": "Godło Polski to biały orzeł w złotej koronie na czerwonym tle.",
+   "ru": "Герб Польши: белый орёл в золотой короне на красном поле.",
+   "tr": "го́дўо по́лски то бя́ўы о́жэў ф зўо́тэй коро́нье на чэрво́ным тле.",
+   "tiles_pl": [
+    "Godło",
+    "Polski",
+    "to",
+    "biały",
+    "orzeł",
+    "w",
+    "złotej",
+    "koronie",
+    "na",
+    "czerwonym",
+    "tle"
+   ],
+   "distract_pl": [
+    "czarny",
+    "niebieskim",
+    "srebrnej"
+   ],
+   "questions": [
+    {
+     "q": "Co jest na godle Polski?",
+     "q_ru": "Что на гербе Польши?",
+     "a": "biały orzeł w złotej koronie",
+     "wrong": [
+      "czarny orzeł w złotej koronie",
+      "biały orzeł bez korony"
+     ]
+    },
+    {
+     "q": "Jakiego koloru jest tło godła?",
+     "q_ru": "Какого цвета фон герба?",
+     "a": "czerwonego",
+     "wrong": [
+      "niebieskiego",
+      "białego"
+     ]
+    },
+    {
+     "q": "Jaką koronę ma orzeł?",
+     "q_ru": "Какая корона у орла?",
+     "a": "złotą",
+     "wrong": [
+      "srebrną",
+      "żadnej"
+     ]
+    }
+   ],
+   "band": 1,
+   "src": "Miso №1; Konstytucja RP art. 28 ust. 1",
+   "checked": "2026-10-18",
+   "build": {
+    "field": "czerwone",
+    "eagle": "biały",
+    "crown": "złota",
+    "fieldOptions": [
+     "czerwone",
+     "niebieskie",
+     "białe"
+    ],
+    "eagleOptions": [
+     "biały",
+     "czarny",
+     "złoty"
+    ],
+    "crownOptions": [
+     "złota",
+     "brak"
+    ]
+   }
+  },
+  {
+   "id": "symbol.barwy",
+   "kind": "symbol",
+   "type": "choice",
+   "pl": "Barwy narodowe Polski to biały i czerwony.",
+   "ru": "Национальные цвета Польши: белый и красный.",
+   "tr": "ба́рвы народо́вэ по́лски то бя́ўы и чэрво́ны.",
+   "tiles_pl": [
+    "Barwy",
+    "narodowe",
+    "Polski",
+    "to",
+    "biały",
+    "i",
+    "czerwony"
+   ],
+   "distract_pl": [
+    "niebieski",
+    "zielony"
+   ],
+   "questions": [
+    {
+     "q": "Jakie są barwy narodowe Polski?",
+     "q_ru": "Какие у Польши национальные цвета?",
+     "a": "biały i czerwony",
+     "wrong": [
+      "biały i niebieski",
+      "czerwony i zielony"
+     ]
+    },
+    {
+     "q": "Jakie są barwy flagi?",
+     "q_ru": "Какие цвета у флага?",
+     "a": "biało-czerwone",
+     "wrong": [
+      "biało-niebieskie",
+      "czerwono-zielone"
+     ]
+    }
+   ],
+   "band": 1,
+   "src": "Miso №2; Konstytucja RP art. 28 ust. 2",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.flaga",
+   "kind": "symbol",
+   "type": "build",
+   "pl": "Flaga Polski jest biało-czerwona: biały na górze, czerwony na dole.",
+   "ru": "Флаг Польши бело-красный: белый сверху, красный снизу.",
+   "tr": "фла́га по́лски ест бя́ўо-чэрво́на: бя́ўы на гу́жэ, чэрво́ны на до́ле.",
+   "tiles_pl": [
+    "Flaga",
+    "Polski",
+    "jest",
+    "biało-czerwona",
+    "biały",
+    "na",
+    "górze",
+    "czerwony",
+    "na",
+    "dole"
+   ],
+   "distract_pl": [
+    "góry",
+    "niebieski"
+   ],
+   "questions": [
+    {
+     "q": "Jaki kolor jest na górze flagi?",
+     "q_ru": "Какой цвет сверху на флаге?",
+     "a": "biały",
+     "wrong": [
+      "czerwony",
+      "niebieski"
+     ]
+    },
+    {
+     "q": "Jaki kolor jest na dole flagi?",
+     "q_ru": "Какой цвет снизу на флаге?",
+     "a": "czerwony",
+     "wrong": [
+      "biały",
+      "zielony"
+     ]
+    },
+    {
+     "q": "Która flaga jest polska?",
+     "q_ru": "Какой флаг польский?",
+     "a": "biały na górze, czerwony na dole",
+     "wrong": [
+      "czerwony na górze, biały na dole (Indonezja, Monako)",
+      "dwa białe pasy"
+     ]
+    }
+   ],
+   "band": 1,
+   "src": "Miso №3",
+   "checked": "2026-10-18",
+   "build": {
+    "top": "biały",
+    "bottom": "czerwony",
+    "distractors": [
+     {
+      "name": "Indonezja",
+      "top": "czerwony",
+      "bottom": "biały"
+     },
+     {
+      "name": "Monako",
+      "top": "czerwony",
+      "bottom": "biały"
+     },
+     {
+      "name": "odwrócona",
+      "top": "czerwony",
+      "bottom": "biały"
+     }
+    ]
+   }
+  },
+  {
+   "id": "symbol.hymn_nazwa",
+   "kind": "symbol",
+   "type": "choice",
+   "pl": "Hymn Polski to Mazurek Dąbrowskiego.",
+   "ru": "Гимн Польши: Мазурка Домбровского.",
+   "tr": "хымн по́лски то мазу́рэк домброфске́го.",
+   "tiles_pl": [
+    "Hymn",
+    "Polski",
+    "to",
+    "Mazurek",
+    "Dąbrowskiego"
+   ],
+   "distract_pl": [
+    "Marsz",
+    "Dąbrowski"
+   ],
+   "questions": [
+    {
+     "q": "Jak nazywa się hymn Polski?",
+     "q_ru": "Как называется гимн Польши?",
+     "a": "Mazurek Dąbrowskiego",
+     "wrong": [
+      "Rota",
+      "Bogurodzica"
+     ]
+    }
+   ],
+   "band": 1,
+   "src": "Miso №4",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.hymn_autor",
+   "kind": "symbol",
+   "type": "choice",
+   "pl": "Słowa hymnu napisał Józef Wybicki w 1797 roku.",
+   "ru": "Слова гимна написал Юзеф Выбицкий в 1797 году.",
+   "tr": "сўо́ва хы́мну напи́саў ю́зэф выби́цки ф 1797 ро́ку.",
+   "tiles_pl": [
+    "Słowa",
+    "hymnu",
+    "napisał",
+    "Józef",
+    "Wybicki",
+    "w",
+    "1797",
+    "roku"
+   ],
+   "distract_pl": [
+    "Dąbrowski",
+    "1927"
+   ],
+   "questions": [
+    {
+     "q": "Kto napisał słowa hymnu?",
+     "q_ru": "Кто написал слова гимна?",
+     "a": "Józef Wybicki",
+     "wrong": [
+      "Jan Henryk Dąbrowski",
+      "Adam Mickiewicz"
+     ]
+    },
+    {
+     "q": "Kiedy powstały słowa hymnu?",
+     "q_ru": "Когда написаны слова гимна?",
+     "a": "w 1797 roku",
+     "wrong": [
+      "w 1927 roku",
+      "w 1791 roku"
+     ]
+    }
+   ],
+   "band": 2,
+   "src": "Miso №4, №181",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.hymn_gdzie",
+   "kind": "symbol",
+   "type": "choice",
+   "pl": "Hymn powstał we Włoszech, w Legionach Polskich.",
+   "ru": "Гимн возник в Италии, в Польских легионах.",
+   "tr": "хымн по́фстаў вэ вўо́шэх, ф легёнах по́лских.",
+   "tiles_pl": [
+    "Hymn",
+    "powstał",
+    "we",
+    "Włoszech",
+    "w",
+    "Legionach",
+    "Polskich"
+   ],
+   "distract_pl": [
+    "Francji",
+    "Polsce"
+   ],
+   "questions": [
+    {
+     "q": "Gdzie powstał hymn?",
+     "q_ru": "Где возник гимн?",
+     "a": "we Włoszech",
+     "wrong": [
+      "we Francji",
+      "w Polsce"
+     ]
+    }
+   ],
+   "band": 2,
+   "src": "drill/gimn.md; Wikipedia: Reggio nell'Emilia, 07.1797",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.hymn_1927",
+   "kind": "symbol",
+   "type": "choice",
+   "pl": "Mazurek Dąbrowskiego jest hymnem od 1927 roku.",
+   "ru": "Мазурка Домбровского — гимн с 1927 года.",
+   "tr": "мазу́рэк домброфске́го ест хы́мнэм от 1927 ро́ку.",
+   "tiles_pl": [
+    "Mazurek",
+    "Dąbrowskiego",
+    "jest",
+    "hymnem",
+    "od",
+    "1927",
+    "roku"
+   ],
+   "distract_pl": [
+    "hymn",
+    "1797"
+   ],
+   "questions": [
+    {
+     "q": "Od kiedy Mazurek Dąbrowskiego jest hymnem?",
+     "q_ru": "С какого года Мазурка — гимн?",
+     "a": "od 1927 roku",
+     "wrong": [
+      "od 1797 roku",
+      "od 1918 roku"
+     ]
+    }
+   ],
+   "band": 2,
+   "src": "drill/gimn.md (26.02.1927)",
+   "checked": "2026-10-18",
+   "date": "1927-02-26"
+  },
+  {
+   "id": "symbol.konstytucja_28",
+   "kind": "symbol",
+   "type": "choice",
+   "pl": "Artykuł 28 Konstytucji z 1997 roku mówi o godle, barwach i hymnie.",
+   "ru": "Статья 28 Конституции 1997 года говорит о гербе, цветах и гимне.",
+   "tr": "арты́куў 28 констыту́ци с 1997 ро́ку му́ви о го́дле, ба́рвах и хы́мнье.",
+   "tiles_pl": [
+    "Artykuł",
+    "28",
+    "Konstytucji",
+    "z",
+    "1997",
+    "roku",
+    "mówi",
+    "o",
+    "godle",
+    "barwach",
+    "i",
+    "hymnie"
+   ],
+   "distract_pl": [
+    "Konstytucja",
+    "1791"
+   ],
+   "questions": [
+    {
+     "q": "O czym mówi artykuł 28 Konstytucji?",
+     "q_ru": "О чём статья 28 Конституции?",
+     "a": "o godle, barwach i hymnie",
+     "wrong": [
+      "o prezydencie i rządzie",
+      "o szkole i wojsku"
+     ]
+    }
+   ],
+   "band": 3,
+   "src": "Konstytucja RP art. 28",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.dzien_flagi",
+   "kind": "symbol",
+   "type": "date",
+   "pl": "Dzień Flagi obchodzimy 2 maja.",
+   "ru": "День флага отмечаем 2 мая.",
+   "tr": "джень фла́ги опходжи́мы 2 ма́я.",
+   "tiles_pl": [
+    "Dzień",
+    "Flagi",
+    "obchodzimy",
+    "2",
+    "maja"
+   ],
+   "distract_pl": [
+    "3",
+    "maj"
+   ],
+   "questions": [
+    {
+     "q": "Kiedy jest Dzień Flagi?",
+     "q_ru": "Когда День флага?",
+     "a": "2 maja",
+     "wrong": [
+      "3 maja",
+      "11 listopada"
+     ]
+    }
+   ],
+   "band": 1,
+   "src": "ФЕРМА_v2 §Daty (date.flaga)",
+   "checked": "2026-10-18",
+   "date": "05-02",
+   "link": "date.flaga"
+  },
+  {
+   "id": "symbol.swieto_3maja",
+   "kind": "symbol",
+   "type": "date",
+   "pl": "Święto Konstytucji 3 Maja obchodzimy 3 maja.",
+   "ru": "Праздник Конституции 3 мая отмечаем 3 мая (Конституция 1791 года).",
+   "tr": "щфе́нто констыту́ци 3 ма́я опходжи́мы 3 ма́я.",
+   "tiles_pl": [
+    "Święto",
+    "Konstytucji",
+    "3",
+    "Maja",
+    "obchodzimy",
+    "3",
+    "maja"
+   ],
+   "distract_pl": [
+    "2",
+    "listopada"
+   ],
+   "questions": [
+    {
+     "q": "Kiedy jest Święto Konstytucji 3 Maja?",
+     "q_ru": "Когда Праздник Конституции 3 мая?",
+     "a": "3 maja",
+     "wrong": [
+      "2 maja",
+      "11 listopada",
+      "1 maja"
+     ]
+    }
+   ],
+   "band": 3,
+   "src": "ФЕРМА_v2 §Daty (date.konstytucja)",
+   "checked": "2026-10-18",
+   "date": "05-03",
+   "link": "date.konstytucja"
+  },
+  {
+   "id": "symbol.postawa",
+   "kind": "symbol",
+   "type": "behavior",
+   "pl": "Podczas hymnu stoimy, a mężczyźni zdejmują czapki.",
+   "ru": "Во время гимна стоим, а мужчины снимают шапки.",
+   "tr": "по́тчас хы́мну стои́мы, а мэўшчы́жьни здэйму́йо ча́пки.",
+   "tiles_pl": [
+    "Podczas",
+    "hymnu",
+    "stoimy",
+    "a",
+    "mężczyźni",
+    "zdejmują",
+    "czapki"
+   ],
+   "distract_pl": [
+    "siedzimy",
+    "zakładają"
+   ],
+   "questions": [
+    {
+     "q": "Co robimy podczas hymnu?",
+     "q_ru": "Что делаем во время гимна?",
+     "a": "stoimy",
+     "wrong": [
+      "siedzimy",
+      "tańczymy"
+     ]
+    }
+   ],
+   "band": 3,
+   "src": "ФЕРМА_v2 §3",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.lech",
+   "kind": "symbol",
+   "type": "order",
+   "pl": "Legenda: Lech zobaczył białego orła w gnieździe i założył Gniezno.",
+   "ru": "Легенда: Лех увидел белого орла в гнезде и основал Гнезно.",
+   "tr": "легэ́нда: лех зоба́чыў бяўэ́го о́рўа ф гнье́жьдже и заўо́жыў гнье́зно.",
+   "tiles_pl": [
+    "Legenda",
+    "Lech",
+    "zobaczył",
+    "białego",
+    "orła",
+    "w",
+    "gnieździe",
+    "i",
+    "założył",
+    "Gniezno"
+   ],
+   "distract_pl": [
+    "biały",
+    "Kraków"
+   ],
+   "questions": [
+    {
+     "q": "Kto zobaczył białego orła w gnieździe?",
+     "q_ru": "Кто увидел белого орла в гнезде?",
+     "a": "Lech",
+     "wrong": [
+      "Czech",
+      "Rus"
+     ]
+    },
+    {
+     "q": "Jakie miasto założył Lech?",
+     "q_ru": "Какой город основал Лех?",
+     "a": "Gniezno",
+     "wrong": [
+      "Kraków",
+      "Poznań"
+     ]
+    }
+   ],
+   "band": 4,
+   "src": "ФЕРМА_v2 §3",
+   "checked": "2026-10-18",
+   "order": [
+    {
+     "pl": "Lech zobaczył białego orła.",
+     "ru": "Лех увидел белого орла."
+    },
+    {
+     "pl": "Lech założył Gniezno.",
+     "ru": "Лех основал Гнезно."
+    },
+    {
+     "pl": "Biały orzeł został godłem Polski.",
+     "ru": "Белый орёл стал гербом Польши."
+    }
+   ]
+  },
+  {
+   "id": "symbol.muzeum",
+   "kind": "symbol",
+   "type": "choice",
+   "pl": "Muzeum Hymnu Narodowego jest w Będominie, w domu Wybickiego.",
+   "ru": "Музей национального гимна находится в Бендомине, в доме Выбицкого.",
+   "tr": "музэ́ум хы́мну народовэ́го ест ф бэндоми́нье, ф до́му выбицке́го.",
+   "tiles_pl": [
+    "Muzeum",
+    "Hymnu",
+    "Narodowego",
+    "jest",
+    "w",
+    "Będominie",
+    "w",
+    "domu",
+    "Wybickiego"
+   ],
+   "distract_pl": [
+    "Gdańsku",
+    "Wybicki"
+   ],
+   "questions": [
+    {
+     "q": "Gdzie jest Muzeum Hymnu Narodowego?",
+     "q_ru": "Где Музей национального гимна?",
+     "a": "w Będominie",
+     "wrong": [
+      "w Gdańsku",
+      "w Krakowie",
+      "w Poznaniu"
+     ]
+    }
+   ],
+   "band": 4,
+   "src": "Miso №25",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.syrenka",
+   "kind": "symbol",
+   "type": "whose",
+   "pl": "Syrenka to herb Warszawy, a nie godło Polski.",
+   "ru": "Сирена — герб Варшавы, а не герб Польши.",
+   "tr": "сырэ́нка то хэрп варша́вы, а нье го́дўо по́лски.",
+   "tiles_pl": [
+    "Syrenka",
+    "to",
+    "herb",
+    "Warszawy",
+    "a",
+    "nie",
+    "godło",
+    "Polski"
+   ],
+   "distract_pl": [
+    "Krakowa",
+    "orzeł"
+   ],
+   "questions": [
+    {
+     "q": "Czyj to symbol: Syrenka?",
+     "q_ru": "Чей это символ: Сирена?",
+     "a": "Warszawy",
+     "wrong": [
+      "Polski",
+      "Krakowa",
+      "Puszczy Białowieskiej"
+     ]
+    }
+   ],
+   "band": 4,
+   "src": "ФЕРМА_v2 §3",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.zubr",
+   "kind": "symbol",
+   "type": "whose",
+   "pl": "Żubr to symbol Puszczy Białowieskiej.",
+   "ru": "Зубр — символ Беловежской пущи.",
+   "tr": "жубр то сы́мбол пу́шчы бяўове́скей.",
+   "tiles_pl": [
+    "Żubr",
+    "to",
+    "symbol",
+    "Puszczy",
+    "Białowieskiej"
+   ],
+   "distract_pl": [
+    "Puszcza",
+    "Tatr"
+   ],
+   "questions": [
+    {
+     "q": "Czyj to symbol: żubr?",
+     "q_ru": "Чей это символ: зубр?",
+     "a": "Puszczy Białowieskiej",
+     "wrong": [
+      "Warszawy",
+      "Krakowa",
+      "Polski"
+     ]
+    }
+   ],
+   "band": 5,
+   "src": "ФЕРМА_v2 §3",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.kto_dabrowski",
+   "kind": "symbol",
+   "type": "person",
+   "pl": "Jan Henryk Dąbrowski był generałem Legionów Polskich we Włoszech.",
+   "ru": "Ян Генрик Домбровский был генералом Польских легионов в Италии.",
+   "tr": "ян хэ́нрык домбро́фски быў гэнэра́ўэм легёнуф по́лских вэ вўо́шэх.",
+   "tiles_pl": [
+    "Jan",
+    "Henryk",
+    "Dąbrowski",
+    "był",
+    "generałem",
+    "Legionów",
+    "Polskich",
+    "we",
+    "Włoszech"
+   ],
+   "distract_pl": [
+    "generał",
+    "Francji"
+   ],
+   "questions": [
+    {
+     "q": "Kim był Dąbrowski?",
+     "q_ru": "Кем был Домбровский?",
+     "a": "generałem",
+     "wrong": [
+      "królem",
+      "poetą"
+     ]
+    }
+   ],
+   "band": 2,
+   "src": "drill/gimn.md; Miso №22",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.kto_napoleon",
+   "kind": "symbol",
+   "type": "person",
+   "pl": "Napoleon Bonaparte dał Polakom przykład, jak zwyciężać.",
+   "ru": "Наполеон Бонапарт дал полякам пример, как побеждать.",
+   "tr": "наполе́он бонапа́ртэ даў пола́ком пшы́кўат, як звыче́ўжачь.",
+   "tiles_pl": [
+    "Napoleon",
+    "Bonaparte",
+    "dał",
+    "Polakom",
+    "przykład",
+    "jak",
+    "zwyciężać"
+   ],
+   "distract_pl": [
+    "Polakami",
+    "przykładem"
+   ],
+   "questions": [
+    {
+     "q": "Kto dał nam przykład, jak zwyciężać?",
+     "q_ru": "Кто дал нам пример, как побеждать?",
+     "a": "Bonaparte",
+     "wrong": [
+      "Czarniecki",
+      "Dąbrowski"
+     ]
+    }
+   ],
+   "band": 3,
+   "src": "drill/gimn.md, куплет 2",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.kto_czarniecki",
+   "kind": "symbol",
+   "type": "person",
+   "pl": "Stefan Czarniecki był hetmanem i walczył ze Szwedami.",
+   "ru": "Стефан Чарнецкий был гетманом и воевал со шведами.",
+   "tr": "стэ́фан чарнье́цки быў хэтма́нэм и ва́лчыў зэ шфэда́ми.",
+   "tiles_pl": [
+    "Stefan",
+    "Czarniecki",
+    "był",
+    "hetmanem",
+    "i",
+    "walczył",
+    "ze",
+    "Szwedami"
+   ],
+   "distract_pl": [
+    "Szwedzi",
+    "królem"
+   ],
+   "questions": [
+    {
+     "q": "Z kim walczył Czarniecki?",
+     "q_ru": "С кем воевал Чарнецкий?",
+     "a": "ze Szwedami",
+     "wrong": [
+      "z Niemcami",
+      "z Rosjanami"
+     ]
+    }
+   ],
+   "band": 4,
+   "src": "drill/gimn.md, куплет 3",
+   "checked": "2026-10-18"
+  },
+  {
+   "id": "symbol.kto_basia",
+   "kind": "symbol",
+   "type": "person",
+   "pl": "Basia to córka, do której mówi ojciec.",
+   "ru": "Бася — дочь, к которой обращается отец.",
+   "tr": "ба́ща то цу́рка, до кту́рэй му́ви о́йчец.",
+   "tiles_pl": [
+    "Basia",
+    "to",
+    "córka",
+    "do",
+    "której",
+    "mówi",
+    "ojciec"
+   ],
+   "distract_pl": [
+    "syn",
+    "matka"
+   ],
+   "questions": [
+    {
+     "q": "Do kogo mówi ojciec w czwartej zwrotce?",
+     "q_ru": "К кому обращается отец в 4-м куплете?",
+     "a": "do Basi",
+     "wrong": [
+      "do Jana",
+      "do Dąbrowskiego"
+     ]
+    }
+   ],
+   "band": 5,
+   "src": "drill/gimn.md, куплет 4",
+   "checked": "2026-10-18"
+  }
+ ],
+ "whose_pool": [
+  {
+   "pic": "orzel",
+   "a": "Polski"
+  },
+  {
+   "pic": "syrenka",
+   "a": "Warszawy"
+  },
+  {
+   "pic": "zubr",
+   "a": "Puszczy Białowieskiej"
+  },
+  {
+   "pic": "smok_wawelski",
+   "a": "Krakowa"
+  }
+ ]
+}
