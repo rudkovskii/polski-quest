@@ -29,6 +29,16 @@ ${THEME_CSS}
 .pq-goal { max-width: calc(100vw - 80px); padding: 5px 9px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); border-radius: 8px; box-shadow: 0 3px 0 var(--pq-ink);
   color: var(--pq-cream); font: 700 12px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; text-align: left; touch-action: manipulation; }
 .pq-goal[hidden] { display: none; }
+.pq-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+/* Индикатор сохранения (V11a): галочка в углу на секунду после записи; сбой записи — тост с повтором. */
+.pq-saved { min-width: 22px; height: 22px; padding: 0 5px; box-sizing: border-box; border-radius: 11px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); color: #9be07a;
+  font: 800 13px/18px -apple-system, BlinkMacSystemFont, sans-serif; text-align: center; pointer-events: none; opacity: 0; transition: opacity .25s; }
+.pq-saved.on { opacity: .95; }
+.pq-toast { position: fixed; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top) + 64px); z-index: 85; max-width: min(92vw, 420px); box-sizing: border-box; display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; background: var(--pq-wood-dark); color: var(--pq-cream); border: 2px solid var(--pq-ink); border-radius: 8px; box-shadow: 0 3px 0 var(--pq-ink); font: 700 14px/1.25 -apple-system, BlinkMacSystemFont, sans-serif; }
+.pq-toast.err { background: #8a2f2a; }
+.pq-toast[hidden] { display: none; }
+.pq-toast button { font: inherit; font-weight: 800; padding: 6px 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #f2d552; color: var(--pq-ink); cursor: pointer; white-space: nowrap; }
 .pq-gear { width: 44px; height: 44px; padding: 0; font-size: 22px; line-height: 40px; text-align: center; }
 `;
 
@@ -46,6 +56,12 @@ export interface Hud {
   root: HTMLElement;
   gear: HTMLButtonElement;
   setXp(level: string, ratio: number, next?: { level: string; words: number } | null, growing?: number): void;
+  /** Галочка «сохранено» на 1 с. */
+  flashSaved(): void;
+  /** Сбой записи: тост «Не сохранилось, повторяю» (true) или убрать (false). */
+  setSaveError(on: boolean): void;
+  /** Короткий тост с кнопкой (напоминание о копии); сам гаснет через `ms`. */
+  toast(text: string, action?: { label: string; run(): void }, ms?: number): void;
   dispose(): void;
 }
 
@@ -58,6 +74,10 @@ export interface HudOptions {
   onGoal?: () => void;
 }
 
+/** Сколько горит галочка «сохранено», мс. */
+export const SAVED_FLASH_MS = 1000;
+export const SAVE_ERROR_TEXT = 'Не сохранилось, повторяю';
+
 export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
   const bus = o.bus ?? globalBus;
   const lvl = el('span', { class: 'pq-xp-lvl', 'data-xp-level': '' }, 'A0');
@@ -67,8 +87,21 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
   const xp = el('div', { class: 'pq-xp' }, lvl, el('span', { class: 'pq-xp-col' }, bar, nextEl));
   const gear = el('button', { type: 'button', class: 'pq-btn pq-gear', 'aria-label': 'Настройки', onclick: () => o.onSettings() }, '⚙');
   const goalEl = el('button', { type: 'button', class: 'pq-goal', 'data-goal': '', hidden: true, onclick: () => o.onGoal?.() });
-  const root = el('div', { class: 'pq-hud' }, el('style', {}, css), el('div', { class: 'pq-left' }, xp, goalEl), gear);
+  const saved = el('span', { class: 'pq-saved', 'data-saved': '', 'aria-hidden': 'true' }, '✓');
+  const root = el('div', { class: 'pq-hud' }, el('style', {}, css), el('div', { class: 'pq-left' }, xp, goalEl), el('div', { class: 'pq-right' }, gear, saved));
   parent.append(root);
+  const toastEl = el('div', { class: 'pq-toast', role: 'status', 'data-toast': '', hidden: true });
+  parent.append(toastEl);
+  let savedTimer: ReturnType<typeof setTimeout> | null = null;
+  let toastTimer: ReturnType<typeof setTimeout> | null = null;
+  let errOn = false;
+  const hideToast = (): void => {
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = null;
+    toastEl.hidden = true;
+    toastEl.classList.remove('err');
+    toastEl.replaceChildren();
+  };
   const paintGoal = (): void => {
     const g = o.goal?.() ?? null;
     goalEl.hidden = !g;
@@ -109,8 +142,42 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
     root,
     gear,
     setXp,
+    flashSaved() {
+      // Пока горит ошибка, галочку не зажигаем: она означала бы обратное.
+      if (errOn) return;
+      saved.classList.add('on');
+      if (savedTimer) clearTimeout(savedTimer);
+      savedTimer = setTimeout(() => saved.classList.remove('on'), SAVED_FLASH_MS);
+    },
+    setSaveError(on) {
+      if (on === errOn) return;
+      errOn = on;
+      if (on) {
+        hideToast();
+        saved.classList.remove('on');
+        toastEl.classList.add('err');
+        toastEl.replaceChildren(el('span', {}, SAVE_ERROR_TEXT));
+        toastEl.hidden = false;
+      } else hideToast();
+    },
+    toast(text, action, ms = 12_000) {
+      if (errOn) return;
+      hideToast();
+      toastEl.append(el('span', {}, text));
+      if (action) {
+        toastEl.append(
+          el('button', { type: 'button', onclick: () => (hideToast(), action.run()) }, action.label),
+          el('button', { type: 'button', 'aria-label': 'Закрыть', onclick: () => hideToast() }, '✕'),
+        );
+      }
+      toastEl.hidden = false;
+      toastTimer = setTimeout(hideToast, ms);
+    },
     dispose() {
       off();
+      if (savedTimer) clearTimeout(savedTimer);
+      if (toastTimer) clearTimeout(toastTimer);
+      toastEl.remove();
       document.removeEventListener('visibilitychange', onVisible);
       root.remove();
     },

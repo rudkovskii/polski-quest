@@ -1,5 +1,6 @@
 // Мини-игра (ФЕРМА.md, решения 9–10): панель вопроса снизу, как диалог Stardew; мир сверху виден, герой бегает сам.
-// Поток бесконечный: следующее задание даёт `deps.next`. Выход в любой момент: Esc, B, «Выйти». Тап по карте игру не
+// Поток идёт раундами по 10 заданий (V11a, `ui/roundSummary.ts`): шапка «3 / 10», после 10-го итог раунда с «Ещё раунд» / «Закончить»,
+// число раундов не ограничено. Следующее задание даёт `deps.next`. Выход в любой момент: Esc, B, «Выйти». Тап по карте игру не
 // закрывает (это не «мимо оверлея»: мир виден специально). Верно — зелёный и озвучка, дальше само; ошибка — правильный
 // ответ, перевод, транскрипция и «Dalej».
 import { bus as globalBus, type Bus } from '../systems/bus';
@@ -9,6 +10,7 @@ import type { GameMode } from '../types/farm';
 import { el } from './dom';
 import { MODE_NAME } from './glossary';
 import { attachKeyboard, type AttachedKeyboard } from './keyboard';
+import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
 import { THEME_CSS } from './theme';
 
 export interface AnswerResult {
@@ -25,6 +27,8 @@ export interface AnswerResult {
   progress?: string;
   /** Сколько растений созреет завтра. */
   tomorrow?: number;
+  /** Действие героя по ответу (для итога раунда: полито, выросло, собрано, опыт). */
+  act?: { kind: 'water' | 'grow' | 'harvest' | 'miss'; xp: number };
 }
 
 export interface MinigameDeps {
@@ -48,6 +52,7 @@ export interface Minigame {
 
 const css = `
 ${THEME_CSS}
+${roundCss}
 .pq-game { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: flex; justify-content: center; pointer-events: none;
   padding: 0 calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 8px);
   font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); hyphens: none; -webkit-hyphens: none; }
@@ -70,6 +75,8 @@ ${THEME_CSS}
 .pq-progress { font-size: 13px; margin: -4px 0 8px; color: #4a6b2a; font-weight: 600; }
 .pq-fb .pq-progress { margin: 4px 0 0; }
 .pq-rev { font-size: 12px; font-weight: 700; background: var(--pq-cream); color: var(--pq-ink); border-radius: 6px; padding: 1px 6px; }
+.pq-roundno { flex: 0 0 auto; font-size: 13px; font-weight: 800; background: var(--pq-wood-dark); border: 1px solid var(--pq-cream); border-radius: 6px; padding: 1px 7px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pq-roundno[hidden] { display: none; }
 .pq-soon { margin-left: auto; font-weight: 600; font-size: 13px; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
 .pq-rev { white-space: nowrap; flex: 0 0 auto; }
 .pq-game-title { min-width: 0; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -143,12 +150,13 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   const bus = deps.bus ?? globalBus;
   const title = el('span', { class: 'pq-game-title', 'data-title': '' }, '');
   const rev = el('span', { class: 'pq-rev', 'data-reverse': '', hidden: true, title: 'Задание наоборот: растению нужна другая сторона' }, '↔ наоборот');
+  const roundNo = el('span', { class: 'pq-roundno', 'data-round-no': '', title: 'Задание в раунде', hidden: true }, `1 / ${ROUND_SIZE}`);
   const soon = el('span', { class: 'pq-soon', 'data-soon': '', hidden: true }, '');
   const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', 'aria-label': 'Выйти', onclick: () => api.stop() }, el('span', { class: 'pq-exit-lbl' }, 'Выйти '), '✕');
   exitBtn.classList.add('pq-exit');
   const paper = el('div', { class: 'pq-game-paper', 'data-game': '' });
   const foot = el('div', { class: 'pq-game-foot', 'data-foot': '' });
-  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, rev, soon, exitBtn), paper, foot);
+  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, roundNo, rev, soon, exitBtn), paper, foot);
   const root = el('div', { class: 'pq-game', hidden: true }, el('style', {}, css), box);
   parent.append(root);
 
@@ -164,6 +172,10 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   /** Рамка выбора нужна только тому, кто ходит стрелками; на тапе и до первой стрелки ничего не обведено (F5a). */
   let kbNav = false;
   let nextReady = true;
+  /** Раунд: счёт ответов и итог. Раундов за заход сколько угодно. */
+  const round = new Round();
+  let roundN = 1;
+  let summaryOpen = false;
   let armTimer: ReturnType<typeof setTimeout> | null = null;
 
   const navs = (): HTMLElement[] => [...root.querySelectorAll<HTMLElement>('[data-nav]')].filter((n) => !(n as HTMLButtonElement).disabled);
@@ -174,6 +186,12 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     if (!list.length) return;
     focusIdx = (i + list.length) % list.length;
     if (kbNav) list[focusIdx]!.classList.add('is-focus');
+  };
+  /** «3 / 10»: номер текущего задания; после ответа остаётся тем же. В одиночном повторе растения счётчика нет. */
+  const paintRound = (): void => {
+    roundNo.hidden = !!only;
+    const shown = summaryOpen ? ROUND_SIZE : Math.min(ROUND_SIZE, round.count + (answered ? 0 : 1));
+    roundNo.textContent = `${shown} / ${ROUND_SIZE}`;
   };
   const reportHeight = (): void => {
     if (!open) return;
@@ -195,6 +213,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
 
   const finish = (r: AnswerResult): void => {
     answered = true;
+    round.add(r);
+    paintRound();
     paper.classList.add(r.ok ? 'ok' : 'bad');
     const fb = el('div', { class: 'pq-fb', 'data-feedback': r.ok ? 'ok' : 'bad' });
     if (r.ok) {
@@ -311,10 +331,12 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     foot.replaceChildren();
     paper.scrollTop = 0;
     answered = false;
+    summaryOpen = false;
     built = [];
     tileAdder = null;
     focusIdx = -1;
     rev.hidden = true;
+    paintRound();
     if (!q || !mode) {
       paper.append(el('div', { class: 'pq-q' }, 'Пока нечего поливать'), el('div', { class: 'pq-q-hint' }, mode && mode >= 3 ? 'Посади фразу в словаре дома.' : 'Посади слова в словаре дома.'));
       requestAnimationFrame(reportHeight);
@@ -346,6 +368,39 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       api.stop();
       return;
     }
+    // 10 ответов в раунде: вместо следующего задания итог (одиночный повтор растения раундов не знает).
+    if (!only && round.done) {
+      showSummary();
+      return;
+    }
+    q = deps.next(mode, only);
+    render();
+  };
+
+  const showSummary = (): void => {
+    clearTimer();
+    detachKb();
+    summaryOpen = true;
+    answered = true;
+    q = null;
+    paper.classList.remove('ok', 'bad');
+    paper.replaceChildren(renderRoundSummary(roundN, round.stats));
+    paper.scrollTop = 0;
+    rev.hidden = true;
+    const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, 'Ещё раунд');
+    const end = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-end': '', onclick: () => api.stop() }, 'Закончить');
+    foot.replaceChildren(more, end);
+    paintRound();
+    setFocus(0);
+    more.focus({ preventScroll: true });
+    requestAnimationFrame(reportHeight);
+  };
+
+  const nextRound = (): void => {
+    if (!open || !mode || !summaryOpen) return;
+    round.reset();
+    roundN++;
+    summaryOpen = false;
     q = deps.next(mode, only);
     render();
   };
@@ -357,6 +412,11 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         if (i.source !== 'pointer') api.stop();
         return;
       case 'hotkey':
+        if (summaryOpen) {
+          if (i.n === 1) nextRound();
+          else if (i.n === 2) api.stop();
+          return;
+        }
         if (answered) return;
         if (q?.kind === 'choice') pick(i.n - 1);
         else if (q?.kind === 'tiles') tileAdder?.(i.n - 1);
@@ -368,6 +428,10 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         setFocus(focusIdx + (i.dir === 'left' || i.dir === 'up' ? -1 : 1));
         return;
       case 'interact': {
+        if (summaryOpen) {
+          navs()[focusIdx]?.click();
+          return;
+        }
         if (answered) {
           if (nextReady) advance();
           return;
@@ -393,6 +457,12 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     start(m, onlyId) {
       mode = m;
       only = onlyId;
+      // Раунд начинается при открытии; перезапуск из карточки «Фраз мало» (панель уже открыта) его не сбрасывает.
+      if (!open) {
+        round.reset();
+        roundN = 1;
+        summaryOpen = false;
+      }
       title.replaceChildren(el('span', { class: 'full' }, MODE_NAME[m].ru), el('small', {}, MODE_NAME[m].pl), el('span', { class: 'short' }, MODE_SHORT[m]));
       kbNav = false;
       root.classList.remove('kb');
@@ -410,6 +480,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       if (!open) return;
       clearTimer();
       detachKb();
+      summaryOpen = false;
       open = false;
       root.hidden = true;
       q = null;

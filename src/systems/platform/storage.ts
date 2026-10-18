@@ -1,5 +1,6 @@
 // Хранилище сохранения: IndexedDB через idb-keyval, запасной localStorage, затем память.
-// Все обращения к хранилищам в try/catch. Запись с дебаунсом 400 мс; при уходе со страницы — немедленная
+// Все обращения к хранилищам в try/catch. Запись с дебаунсом 400 мс (не позже 1 с при непрерывных ответах); при ошибке записи — повтор с паузой,
+// подписчики (`onWrite`) узнают об успехе и о сбое (HUD: галочка «сохранено», тост «Не сохранилось, повторяю»); при уходе со страницы — немедленная
 // запись плюс синхронная аварийная копия в localStorage, чтобы закрытие вкладки не теряло последние ответы.
 import { createStore, del, get, keys, setMany, type UseStore } from 'idb-keyval';
 import { newSave, normalizeSave, type Save } from '../save';
@@ -197,9 +198,17 @@ export interface StorageOptions {
   /** localStorage для запасного бэкенда и аварийной копии; null — не использовать. */
   ls?: StorageLike | null;
   debounceMs?: number;
-  /** Не откладывать запись дольше этого при непрерывных изменениях. */
+  /** Не откладывать запись дольше этого при непрерывных изменениях (V11a: ≤ 1 с). */
   maxWaitMs?: number;
+  /** Пауза перед повтором после ошибки записи (дальше удваивается до `RETRY_MAX_MS`). */
+  retryMs?: number;
 }
+
+/** Исход записи для HUD: `saved` — данные дошли до хранилища (`at` — настенное время), `error` — запись не удалась, будет повтор. */
+export type WriteEvent = { type: 'saved'; at: number } | { type: 'error'; error: unknown; retryInMs: number };
+
+export const DEFAULT_MAX_WAIT_MS = 1000;
+const RETRY_MAX_MS = 10_000;
 
 export interface LoadResult {
   save: Save;
@@ -217,6 +226,10 @@ export class GameStorage {
   private readonly ns: string;
   private readonly debounceMs: number;
   private readonly maxWaitMs: number;
+  private readonly retryBase: number;
+  private retryMs: number;
+  private readonly listeners = new Set<(e: WriteEvent) => void>();
+  private savedAt0: number | null = null;
   private s: Save | null = null;
   private dirty0 = false;
   private timer: ReturnType<typeof setTimeout> | null = null;
@@ -230,7 +243,9 @@ export class GameStorage {
     this.ls = opts.ls === undefined ? globalLocalStorage() : opts.ls;
     this.ns = opts.profile ? `${profileDbName(opts.profile)}:` : '';
     this.debounceMs = opts.debounceMs ?? 400;
-    this.maxWaitMs = opts.maxWaitMs ?? 2000;
+    this.maxWaitMs = opts.maxWaitMs ?? DEFAULT_MAX_WAIT_MS;
+    this.retryBase = opts.retryMs ?? 1500;
+    this.retryMs = this.retryBase;
     if (opts.kv) this.kv = opts.kv;
     else {
       const chain: KV[] = [];
@@ -253,6 +268,26 @@ export class GameStorage {
   get dirty(): boolean {
     return this.dirty0;
   }
+  /** Когда запись последний раз дошла до хранилища (настенное время); null — с запуска ничего не писали. */
+  get lastSavedAt(): number | null {
+    return this.savedAt0;
+  }
+
+  /** Подписка на исходы записи. Возвращает отписку. */
+  onWrite(fn: (e: WriteEvent) => void): () => void {
+    this.listeners.add(fn);
+    return () => this.listeners.delete(fn);
+  }
+
+  private emit(e: WriteEvent): void {
+    for (const fn of this.listeners) {
+      try {
+        fn(e);
+      } catch (err) {
+        console.warn('storage: подписчик упал', err);
+      }
+    }
+  }
 
   async load(now: number): Promise<LoadResult> {
     let raw: unknown;
@@ -262,6 +297,12 @@ export class GameStorage {
       console.warn('storage: чтение не удалось', e);
     }
     let save = normalizeSave(raw);
+    // Записи шли в localStorage (IndexedDB падал), а теперь IndexedDB жив, но с прошлой версией: берём более свежую.
+    const lsSave = this.readLsSave();
+    if (lsSave && (!save || lsSave.updated > save.updated) && this.kv.kind !== 'local') {
+      save = lsSave;
+      this.dirty0 = true;
+    }
     let recovered = false;
     const tail = this.readTail();
     // Аварийная копия новее записи в IndexedDB: прошлая вкладка закрылась до записи.
@@ -315,12 +356,25 @@ export class GameStorage {
     const job = this.kv.setMany([[KEYS.save, snap]]).then(
       () => {
         this.inFlight--;
+        this.retryMs = this.retryBase;
+        this.savedAt0 = Date.now();
         if (this.s === snap && !this.dirty0 && this.inFlight === 0) this.clearTail();
+        this.emit({ type: 'saved', at: this.savedAt0 });
       },
       (err: unknown) => {
         this.inFlight--;
         console.warn('storage: запись не удалась', err);
         if (this.s === snap) this.dirty0 = true;
+        // Повтор: данные остаются «грязными», пока запись не пройдёт. Новое изменение перебьёт этот таймер обычным дебаунсом.
+        const wait = this.retryMs;
+        this.retryMs = Math.min(RETRY_MAX_MS, this.retryMs * 2);
+        if (!this.wiped && this.timer === null) {
+          this.timer = setTimeout(() => {
+            this.timer = null;
+            void this.flush();
+          }, wait);
+        }
+        this.emit({ type: 'error', error: err, retryInMs: wait });
       },
     );
     this.writing = this.writing.then(() => job);
@@ -360,6 +414,11 @@ export class GameStorage {
       }
     }
     this.clearTail();
+    try {
+      this.ls?.removeItem(this.ns + KEYS.save);
+    } catch {
+      // приватный режим
+    }
   }
 
   /** Подписка на уход со страницы. Возвращает отписку. */
@@ -392,6 +451,16 @@ export class GameStorage {
       return await sm.persist();
     } catch {
       return false;
+    }
+  }
+
+  /** Основная запись в localStorage (туда пишет цепочка, когда IndexedDB недоступна). */
+  private readLsSave(): Save | null {
+    try {
+      const raw = this.ls?.getItem(this.ns + KEYS.save);
+      return raw ? normalizeSave(JSON.parse(raw)) : null;
+    } catch {
+      return null;
     }
   }
 

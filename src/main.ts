@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { startInput } from './input';
 import { Boot } from './scenes/Boot';
 import { BG_COLOR, World, type WorldStart } from './scenes/World';
+import { backupDue, shouldRemind, withMark } from './systems/backup';
 import { bus, type Bus } from './systems/bus';
 import { createFarm } from './systems/farm';
 import { connectAudio } from './systems/platform/audio';
@@ -91,9 +92,12 @@ async function main(): Promise<void> {
     },
     getSfxVolume: () => store.save.settings.sfxVolume,
     setSfxVolume: (v) => store.update((s) => ({ ...s, settings: { ...s.settings, sfxVolume: v } }), Date.now()),
+    lastSaved: () => store.lastSavedAt ?? store.save.updated,
+    backupDue: () => backupDue(Date.now(), store.save.created, store.save.hints),
     exportSave: () => {
       const name = exportFileName(Date.now(), new Date().getTimezoneOffset());
       download(name, exportSave(store.save));
+      store.update((s: Save) => ({ ...s, hints: withMark(s.hints, 'saved', Date.now()) }), Date.now());
       return name;
     },
     importSave: async (text) => {
@@ -125,7 +129,7 @@ async function main(): Promise<void> {
     const t = clock.now();
     return dayOf(t, new Date(t).getTimezoneOffset());
   };
-  mountHud(overlay, {
+  const hud = mountHud(overlay, {
     onSettings: () => settings.open(),
     goal: () => {
       const r = farm.ripeSoon();
@@ -136,6 +140,30 @@ async function main(): Promise<void> {
     },
   });
   mountFloats(overlay);
+  // Надёжное сохранение (V11a): галочка в углу после записи огорода, тост при сбое записи (хранилище само повторяет), раз в 7 дней — напоминание скачать копию.
+  let shownGarden = store.save.garden;
+  store.onWrite((e) => {
+    if (e.type === 'error') return hud.setSaveError(true);
+    hud.setSaveError(false);
+    if (store.save.garden !== shownGarden) {
+      shownGarden = store.save.garden;
+      hud.flashSaved();
+    }
+  });
+  if (shouldRemind(Date.now(), store.save.created, store.save.hints)) {
+    store.update((s: Save) => ({ ...s, hints: withMark(s.hints, 'remind', Date.now()) }), Date.now());
+    setTimeout(
+      () =>
+        hud.toast('Давно не было копии сохранения.', {
+          label: 'Скачать',
+          run: () => {
+            download(exportFileName(Date.now(), new Date().getTimezoneOffset()), exportSave(store.save));
+            store.update((s: Save) => ({ ...s, hints: withMark(s.hints, 'saved', Date.now()) }), Date.now());
+          },
+        }),
+      4000,
+    );
+  }
   const hasHint = (h: string): boolean => store.save.hints.includes(h);
   const addHint = (h: string): void => {
     if (!hasHint(h)) store.update((s: Save) => ({ ...s, hints: [...s.hints, h] }), Date.now());
