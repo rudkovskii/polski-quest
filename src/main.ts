@@ -7,6 +7,8 @@ import { createFarm } from './systems/farm';
 import { connectAudio } from './systems/platform/audio';
 import { createClock } from './systems/platform/clock';
 import { connectSfx } from './systems/platform/sfx';
+import { recapBefore, wateredOn } from './systems/daygoal';
+import { dayOf } from './systems/garden';
 import { lastReloadAt, lastReloadFrom, registerPwa, reloadForUpdate, watchVersion } from './systems/platform/pwa';
 import { GameStorage, memoryKV, parseProfile } from './systems/platform/storage';
 import { exportFileName, exportSave, importSave, type Save } from './systems/save';
@@ -17,6 +19,7 @@ import { mountBoard } from './ui/board';
 import { mountDictionary } from './ui/dictionary';
 import { mountFloats } from './ui/float';
 import { mountMinigame } from './ui/minigame';
+import { mountMorning } from './ui/morning';
 import { mountPantry } from './ui/pantry';
 import { mountPlantCard } from './ui/plantCard';
 import { mountSummary } from './ui/summary';
@@ -71,7 +74,7 @@ async function main(): Promise<void> {
   if (mute) bus.on('audio:play', ({ text, id, slow }) => console.info(`[audio] ${slow ? '(медленно) ' : ''}${id ?? ''} ${text ?? ''}`));
   else {
     connectAudio(gatedAudioBus(bus, () => store.save.settings.sound));
-    connectSfx(bus, () => store.save.settings.sound);
+    connectSfx(bus, () => store.save.settings.sound, undefined, { mute });
   }
   mountAudioToast(overlay);
   mountUpdateToast(overlay);
@@ -103,7 +106,6 @@ async function main(): Promise<void> {
       location.reload();
     },
   });
-  mountHud(overlay, { onSettings: () => settings.open() });
 
   // Ферма (F-03): огород, словарь, банки, мини-игры. Часы со сдвигом `?now=+1d` для проверки дней.
   const clock = createClock(params.get('now'));
@@ -114,6 +116,18 @@ async function main(): Promise<void> {
     now: () => clock.now(),
     tz: (t) => new Date(t).getTimezoneOffset(),
     say: (id, slow) => bus.emit('audio:play', { id, text: farm.word(id)?.pl ?? farm.phrase(id)?.pl ?? '', ...(slow ? { slow } : {}) }),
+  });
+  // Цель дня в HUD: «Сегодня: полито N · созреет завтра M» (верные ответы за календарный день + `ripeSoon`), тап открывает итог.
+  const dayNow = (): number => {
+    const t = clock.now();
+    return dayOf(t, new Date(t).getTimezoneOffset());
+  };
+  mountHud(overlay, {
+    onSettings: () => settings.open(),
+    goal: () => ({ watered: wateredOn(farm.garden.log, dayNow()), tomorrow: farm.ripeSoon().tomorrow }),
+    onGoal: () => {
+      if (!game.isOpen) summary.openBed();
+    },
   });
   mountFloats(overlay);
   const hasHint = (h: string): boolean => store.save.hints.includes(h);
@@ -144,6 +158,18 @@ async function main(): Promise<void> {
   const pantry = mountPantry(overlay, farm, undefined, tips);
   const summary = mountSummary(overlay, farm, undefined, tips);
   const plantCard = mountPlantCard(overlay, farm, { onReview: (id) => game.start(farm.reviewMode(id), id) });
+  // Утро: первый вход в новый день — карточка «Вчера: …». День, для которого утро уже было, лежит одним флагом `morning:<день>` в `Save.hints`.
+  const MORNING = 'morning:';
+  mountMorning(overlay, {
+    today: dayNow,
+    recap: () => recapBefore(farm.garden.log, farm.state.grownByDay, dayNow()),
+    ripeToday: () => farm.ripeSoon().today,
+    seenDay: () => {
+      const h = store.save.hints.find((x) => x.startsWith(MORNING));
+      return h ? Number(h.slice(MORNING.length)) : null;
+    },
+    mark: (day) => store.update((s: Save) => ({ ...s, hints: [...s.hints.filter((x) => !x.startsWith(MORNING)), `${MORNING}${day}`] }), Date.now()),
+  });
   bus.on('world:interact', ({ use, id }) => {
     if (game.isOpen) return;
     if (use === 'desk') dictionary.open();
