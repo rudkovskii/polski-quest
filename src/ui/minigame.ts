@@ -96,12 +96,29 @@ ${THEME_CSS}
 .pq-type { width: 100%; box-sizing: border-box; font-size: 20px; padding: 8px 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fffaf0; color: var(--pq-ink); }
 .pq-fb { margin-top: 8px; font-size: 15px; }
 .pq-fb .big { font-size: 20px; font-weight: 800; }
-.pq-game .is-focus { outline: 3px solid var(--pq-accent); outline-offset: 1px; }
-@media (max-width: 520px) { .pq-q { font-size: 20px; } .pq-qblock { height: 92px; } .pq-opts { grid-auto-rows: 64px; } .pq-game .pq-opt { padding: 6px 7px; font-size: 15px; } .pq-game-paper { padding: 8px; }
+.pq-game.kb .is-focus, .pq-game :focus-visible { outline: 3px solid var(--pq-accent); outline-offset: 1px; }
+/* F5a: после ответа лист не прокручивается, результат стоит на месте вопроса (в блоке той же высоты). */
+.pq-game-paper.fit { overflow: hidden; }
+.pq-qblock .pq-fb, .pq-pool .pq-fb { margin: 0; width: 100%; }
+.pq-fb .big { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; overflow-wrap: break-word; line-height: 1.15; }
+.pq-fb .big .lbl { font-size: 13px; font-weight: 600; opacity: .75; margin-right: 4px; }
+.pq-fb .sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pq-qblock .pq-fb .pq-progress { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pq-fb .tmr { display: none; font-size: 13px; font-weight: 600; color: #4a6b2a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pq-game-title .short { display: none; }
+@media (max-width: 520px) {
+  /* Узко: шапка в одну строку. Приоритет метке «наоборот», название сокращено, «созреет завтра» уходит в блок результата, «Выйти» — крестик. */
+  .pq-game-title .full, .pq-game-title small { display: none; }
+  .pq-game-title .short { display: inline; }
+  .pq-soon { display: none; }
+  .pq-fb .tmr { display: block; }
+  .pq-exit-lbl { display: none; }
+  .pq-game-head .pq-btn.pq-exit { min-width: 40px; }
+  .pq-fb .big { font-size: 17px; }
+  .pq-fb { font-size: 14px; } .pq-q { font-size: 20px; } .pq-qblock { height: 92px; } .pq-opts { grid-auto-rows: 64px; } .pq-game .pq-opt { padding: 6px 7px; font-size: 15px; } .pq-game-paper { padding: 8px; }
   .pq-game .pq-opt .n { min-width: 12px; }
   .pq-game .pq-opt.long .t { font-size: 14px; } .pq-game .pq-opt.xlong .t { font-size: 12px; } .pq-game .pq-opt.xxlong .t { font-size: 10.5px; }
-  /* Узко: польская подпись режима не влезает и режет русское название — прячем её (B4). */
-  .pq-game-title small { display: none; } }
+}
 `;
 
 /**
@@ -112,6 +129,9 @@ export function optSizeClass(text: string): '' | ' long' | ' xlong' | ' xxlong' 
   const maxWord = Math.max(...text.split(/\s+/).map((w) => w.length));
   return maxWord > 15 ? ' xxlong' : maxWord > 11 ? ' xlong' : maxWord > 8 ? ' long' : '';
 }
+
+/** Короткие названия игр для узкой шапки (F5a): название сокращается, метка «наоборот» остаётся. */
+export const MODE_SHORT: Record<GameMode, string> = { 1: 'Слово → перевод', 2: 'Перевод → слово', 3: 'Фраза по-польски', 4: 'Фраза по-русски' };
 
 /** Строка прогресса растения с большой буквы. */
 const progressLine = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
@@ -124,7 +144,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   const title = el('span', { class: 'pq-game-title', 'data-title': '' }, '');
   const rev = el('span', { class: 'pq-rev', 'data-reverse': '', hidden: true, title: 'Задание наоборот: растению нужна другая сторона' }, '↔ наоборот');
   const soon = el('span', { class: 'pq-soon', 'data-soon': '', hidden: true }, '');
-  const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', onclick: () => api.stop() }, 'Выйти ✕');
+  const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', 'aria-label': 'Выйти', onclick: () => api.stop() }, el('span', { class: 'pq-exit-lbl' }, 'Выйти '), '✕');
+  exitBtn.classList.add('pq-exit');
   const paper = el('div', { class: 'pq-game-paper', 'data-game': '' });
   const foot = el('div', { class: 'pq-game-foot', 'data-foot': '' });
   const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, rev, soon, exitBtn), paper, foot);
@@ -140,16 +161,19 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   let kb: AttachedKeyboard | null = null;
   let timer: ReturnType<typeof setTimeout> | null = null;
   let focusIdx = -1;
+  /** Рамка выбора нужна только тому, кто ходит стрелками; на тапе и до первой стрелки ничего не обведено (F5a). */
+  let kbNav = false;
   let nextReady = true;
   let armTimer: ReturnType<typeof setTimeout> | null = null;
 
   const navs = (): HTMLElement[] => [...root.querySelectorAll<HTMLElement>('[data-nav]')].filter((n) => !(n as HTMLButtonElement).disabled);
   const setFocus = (i: number): void => {
+    // Снимаем рамку со всех, в том числе с уже отключённых вариантов (иначе она оставалась на «1» после ответа).
+    for (const n of root.querySelectorAll('.is-focus')) n.classList.remove('is-focus');
     const list = navs();
-    for (const n of list) n.classList.remove('is-focus');
     if (!list.length) return;
     focusIdx = (i + list.length) % list.length;
-    list[focusIdx]!.classList.add('is-focus');
+    if (kbNav) list[focusIdx]!.classList.add('is-focus');
   };
   const reportHeight = (): void => {
     if (!open) return;
@@ -174,16 +198,17 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     paper.classList.add(r.ok ? 'ok' : 'bad');
     const fb = el('div', { class: 'pq-fb', 'data-feedback': r.ok ? 'ok' : 'bad' });
     if (r.ok) {
-      fb.append(el('div', { class: 'big' }, `✓ ${r.pl}`), el('div', {}, `${r.ru} · ${r.tr}`));
-      if (r.note) fb.append(el('div', { class: 'pq-muted' }, r.note));
+      fb.append(el('div', { class: 'big' }, `✓ ${r.pl}`), el('div', { class: 'sub' }, `${r.ru} · ${r.tr}`));
+      if (r.note) fb.append(el('div', { class: 'pq-muted sub' }, r.note));
       if (q) deps.say(q.id);
     } else {
-      fb.append(el('div', {}, 'Правильно:'), el('div', { class: 'big' }, r.correct), el('div', {}, `${r.pl} — ${r.ru}`), el('div', { class: 'pq-muted' }, r.tr));
+      fb.append(el('div', { class: 'big' }, el('span', { class: 'lbl' }, 'Правильно:'), r.correct), el('div', { class: 'sub' }, `${r.pl} — ${r.ru} · ${r.tr}`));
     }
     if (r.progress) fb.append(el('div', { class: 'pq-progress', 'data-progress-after': '' }, `🌱 ${progressLine(r.progress)}`));
     if (r.tomorrow !== undefined) {
       soon.hidden = r.tomorrow < 1;
       soon.textContent = r.tomorrow > 0 ? `🌾 созреет завтра: ${r.tomorrow}` : '';
+      if (r.tomorrow > 0) fb.append(el('div', { class: 'tmr', 'data-tomorrow': '' }, `🌾 Созреет завтра: ${r.tomorrow}`));
     }
     // «Dalej» просыпается через 300 мс: двойной тап по «Sprawdź» не пропускает следующее задание.
     nextReady = false;
@@ -193,15 +218,15 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       nextReady = true;
       dalej.classList.remove('wait');
     }, NEXT_DELAY_MS);
-    paper.append(fb);
+    // F5a: результат встаёт на место вопроса (у сборки — на место набора плиток); блок той же высоты, лист не растёт и не прокручивается.
+    const host = paper.querySelector<HTMLElement>('.pq-qblock') ?? paper.querySelector<HTMLElement>('.pq-pool');
+    if (host) {
+      host.replaceChildren(fb);
+      host.scrollTop = 0;
+      paper.classList.add('fit');
+    } else paper.append(fb);
     for (const b of box.querySelectorAll<HTMLButtonElement>('.pq-opt, .pq-tile, [data-check], [data-reset]')) b.disabled = true;
     foot.replaceChildren(dalej);
-    // Итоговая строка видна целиком (B5): прокручиваем только лист, не страницу (scrollIntoView сдвигал шапку листа).
-    const toEnd = (): void => {
-      paper.scrollTop = paper.scrollHeight;
-    };
-    toEnd();
-    requestAnimationFrame(toEnd);
     detachKb();
     const input = paper.querySelector<HTMLInputElement>('.pq-type');
     if (input) input.disabled = true;
@@ -281,7 +306,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   const render = (): void => {
     clearTimer();
     detachKb();
-    paper.classList.remove('ok', 'bad');
+    paper.classList.remove('ok', 'bad', 'fit');
     paper.replaceChildren();
     foot.replaceChildren();
     paper.scrollTop = 0;
@@ -309,6 +334,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     else if (q.kind === 'type') renderType();
     else renderTiles(q);
     if (q.kind !== 'type') setFocus(0);
+    root.classList.toggle('kb', kbNav);
     reportHeight();
     requestAnimationFrame(reportHeight);
   };
@@ -337,11 +363,20 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         return;
       case 'move':
         if (!i.held) return;
+        kbNav = true;
+        root.classList.add('kb');
         setFocus(focusIdx + (i.dir === 'left' || i.dir === 'up' ? -1 : 1));
         return;
       case 'interact': {
         if (answered) {
           if (nextReady) advance();
+          return;
+        }
+        // Рамки ещё нет: первое нажатие её показывает, а не отвечает за игрока на «1» (F5a).
+        if (!kbNav) {
+          kbNav = true;
+          root.classList.add('kb');
+          setFocus(Math.max(0, focusIdx));
           return;
         }
         navs()[focusIdx]?.click();
@@ -358,7 +393,9 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     start(m, onlyId) {
       mode = m;
       only = onlyId;
-      title.replaceChildren(MODE_NAME[m].ru, el('small', {}, MODE_NAME[m].pl));
+      title.replaceChildren(el('span', { class: 'full' }, MODE_NAME[m].ru), el('small', {}, MODE_NAME[m].pl), el('span', { class: 'short' }, MODE_SHORT[m]));
+      kbNav = false;
+      root.classList.remove('kb');
       soon.hidden = true;
       soon.textContent = '';
       if (!open) {

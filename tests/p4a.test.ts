@@ -80,10 +80,10 @@ describe('B1: шапка словаря', () => {
     expect(rule('.dict-search')).not.toMatch(/180px/);
     expect(rule('.dict-search')).toMatch(/flex: 1 1 auto/);
     expect(rule('.dict-search')).toMatch(/max-height: 40px/);
-    expect(rule('.dict-head')).toMatch(/flex-direction: row/);
-    expect(rule('.dict-head')).toMatch(/max-height: 90px/);
-    // 8 строк по 40 px + зазоры 3 px помещаются в высоту списка (≥ 360 px).
-    expect(css).toMatch(/\.dict-list \{ max-height: max\(46dvh, 360px\)/);
+    // F5a: шапка из рядов (вкладки и поиск в одну строку), липкая, ≤ 120 px.
+    expect(rule('.dict-headrow')).toMatch(/flex-direction: row/);
+    expect(rule('.dict-head')).toMatch(/max-height: 120px/);
+    // 8 строк по 40 px + зазоры 3 px помещаются в видимую часть списка (телефон: шапка + карточка + 8 строк < 812).
     expect(css).toMatch(/\.dict-row \{ grid-template-columns: auto minmax\(0, 1fr\) auto; padding: 4px 8px; min-height: 40px/);
     expect(8 * 40 + 7 * 3).toBeLessThanOrEqual(360);
   });
@@ -126,7 +126,7 @@ describe('тема целиком: мягкий выбор', () => {
 });
 
 describe('B4/B5: мини-игра', () => {
-  it('длинное слово — мельче, без посимвольного переноса; итог после ответа прокручивается внутри листа, не страницы', () => {
+  it('длинное слово — мельче, без посимвольного переноса; итог после ответа не прокручивает ни лист, ни страницу', () => {
     expect(optSizeClass('кот')).toBe('');
     expect(optSizeClass('присаживайтесь')).toBe(' xlong');
     expect(optSizeClass('сверхъестественнопротивоположный')).toBe(' xxlong');
@@ -140,7 +140,7 @@ describe('B4/B5: мини-игра', () => {
     Element.prototype.scrollIntoView = spy;
     root.querySelector<HTMLButtonElement>('.pq-opt')!.click();
     expect(spy).not.toHaveBeenCalled();
-    expect(paper.scrollTop).toBe(480);
+    expect(paper.scrollTop).toBe(0);
     g.stop();
   });
 });

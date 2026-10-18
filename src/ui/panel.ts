@@ -25,6 +25,8 @@ ${THEME_CSS}
 .pq-foot { color: var(--pq-cream); padding: 8px 4px 0; font-size: 14px; }
 .pq-foot[hidden] { display: none; }
 .pq-panel .is-focus { outline: 3px solid var(--pq-accent); outline-offset: 1px; }
+/* F5a: после касания рамки выбора нет (на телефоне она читалась как «нажми сюда»); вернётся от стрелок и клавиш. */
+.pq-panel.touch .is-focus { outline: none; }
 .pq-panel .pq-btn[disabled] { opacity: .45; cursor: default; box-shadow: 0 3px 0 var(--pq-ink); }
 .pq-panel .pq-btn.small { padding: 7px 10px; font-size: 14px; }
 .pq-panel .pq-btn.on { background: var(--pq-accent); }
@@ -93,6 +95,7 @@ export function createPanel(opts: PanelOptions): Panel {
   let focusedIdx = 0;
   const lastInGroup = new Map<string, HTMLElement>();
   let offIntent: (() => void) | null = null;
+  let offSource: (() => void) | null = null;
 
   const items = (): HTMLElement[] => [...body.querySelectorAll<HTMLElement>('[data-nav]')].filter((n) => !(n as HTMLButtonElement).disabled && !n.hidden && !n.closest('[hidden]'));
   const groupOf = (n: HTMLElement): string => n.getAttribute('data-nav-group') ?? '';
@@ -136,6 +139,7 @@ export function createPanel(opts: PanelOptions): Panel {
 
   const onIntent = (i: BusEvents['input:intent']): void => {
     if (!isOpen || i.to !== 'ui') return;
+    if (i.source !== 'pointer') root.classList.remove('touch');
     if (i.type === 'cancel') {
       if (!opts.onCancel?.()) api.close();
     }
@@ -154,6 +158,8 @@ export function createPanel(opts: PanelOptions): Panel {
     root.hidden = true;
     offIntent?.();
     offIntent = null;
+    offSource?.();
+    offSource = null;
     if (document.activeElement instanceof HTMLElement && root.contains(document.activeElement)) document.activeElement.blur();
     if (!quiet) bus.emit('world:input', { enabled: true });
     for (const fn of [...closers]) fn();
@@ -186,6 +192,9 @@ export function createPanel(opts: PanelOptions): Panel {
       root.hidden = false;
       bus.emit('world:input', { enabled: false });
       offIntent = bus.on('input:intent', onIntent);
+      // Последний источник ввода — касание или мышь: рамку выбора прячем; от клавиатуры и d-pad она возвращается.
+      root.classList.remove('touch');
+      offSource = bus.on('input:source', ({ source }) => root.classList.toggle('touch', source === 'pointer'));
       body.scrollTop = 0;
       lastInGroup.clear();
       setFocus(items()[0] ?? null);
