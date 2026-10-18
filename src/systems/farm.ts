@@ -1,7 +1,7 @@
 // Ферма целиком: модель огорода + база A1 + шина. Реализует FarmApi для экранов и даёт мини-игре задания и ответы.
 // Хранилище, часы и озвучку подставляет склейка (main.ts): здесь нет браузера.
 import type { BusEvents } from '../types/bus';
-import type { FarmAct, FarmApi, FarmStats, GameMode, ItemInfo, PlantView } from '../types/farm';
+import type { FarmAct, FarmApi, FarmStats, GameMode, ItemInfo, PhraseHint, PlantView } from '../types/farm';
 import type { Bus } from './bus';
 import { PHRASES, PHRASE_BY_ID, TOPICS, WORDS, WORD_BY_ID, isPhraseId, plOf } from './content';
 import {
@@ -19,7 +19,9 @@ import {
   plant,
   progressText,
   ripeSoon,
+  REVERSE_AFTER,
   REVERSE_EVERY,
+  FOCUS_EVERY,
   wantsReverse,
   sideOf,
   stageOf,
@@ -69,6 +71,8 @@ export interface Farm extends FarmApi {
   counts(): { words: number; phrases: number; assemble: number };
   /** Пересчитать раскладку (время идёт: перезревшие возвращаются) и разослать грядки и опыт. */
   refresh(): void;
+  /** Ближайшая ещё не посаженная фраза для сборки и что ей нужно (null — таких нет). */
+  phraseHint(): PhraseHint | null;
   readonly garden: GardenSave;
   readonly state: GardenState;
 }
@@ -83,6 +87,8 @@ export function createFarm(d: FarmDeps): Farm {
   const recent: string[] = [];
   /** Заданий с последнего «наоборот» (P2a: не чаще, чем каждое 3-е). */
   let sinceReverse = REVERSE_EVERY - 1;
+  /** Заданий выдано (P3a: каждое FOCUS_EVERY-е берётся из-за пределов рабочего набора). */
+  let issued = 0;
   const listeners = new Set<() => void>();
 
   const today = (): number => {
@@ -216,8 +222,10 @@ export function createFarm(d: FarmDeps): Farm {
     },
     next(mode, only) {
       const now = d.now();
-      const canReverse = !only && mode <= 2 && sinceReverse >= REVERSE_EVERY - 1;
-      const id = only ?? pickTask(g, st, mode, now, today(), { recent, assemble, reverse: canReverse });
+      // «Наоборот» не в первые REVERSE_AFTER ответов: сначала привычная сторона (P3a).
+      const canReverse = !only && mode <= 2 && sinceReverse >= REVERSE_EVERY - 1 && g.log.length >= REVERSE_AFTER;
+      const outside = !only && ++issued % FOCUS_EVERY === 0;
+      const id = only ?? pickTask(g, st, mode, now, today(), { recent, assemble, reverse: canReverse, outside });
       if (!id) {
         d.bus.emit('farm:focus', { id: null, tile: null, label: '' });
         return null;
@@ -283,6 +291,26 @@ export function createFarm(d: FarmDeps): Farm {
       let long = 0;
       for (const p of plants()) p.phrase ? (phrases++, assemble(p.id) && long++) : words++;
       return { words, phrases, assemble: long };
+    },
+    phraseHint() {
+      let best: { p: (typeof PHRASES)[number]; miss: string[]; fresh: number } | null = null;
+      for (const p of PHRASES) {
+        if (!canAssemble(p) || st.items.has(p.id)) continue;
+        const miss = missingWords(p.id);
+        const fresh = miss.filter((w) => !st.items.has(w)).length;
+        if (!best || miss.length < best.miss.length || (miss.length === best.miss.length && fresh < best.fresh)) best = { p, miss, fresh };
+      }
+      if (!best) return null;
+      const label = (w: string): string => WORD_BY_ID.get(w)?.pl ?? w;
+      return {
+        id: best.p.id,
+        pl: best.p.pl,
+        ru: best.p.ru,
+        need: best.miss.map(label),
+        growing: best.miss.filter((w) => st.items.has(w)).map(label),
+        toPlant: best.miss.length ? best.miss.filter((w) => !st.items.has(w)) : [best.p.id],
+        ready: best.miss.length === 0,
+      };
     },
     refresh() {
       const now = d.now();

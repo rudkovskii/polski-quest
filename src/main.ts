@@ -137,7 +137,7 @@ async function main(): Promise<void> {
     answer: (q, given) => farm.answer(q, given),
     say: (id) => farm.say(id),
   });
-  const board = mountBoard(overlay, { counts: () => (farm.refresh(), farm.counts()), onPick: (mode) => game.start(mode) });
+  const board = mountBoard(overlay, { counts: () => (farm.refresh(), farm.counts()), onPick: (mode) => game.start(mode), phraseHint: () => farm.phraseHint(), plant: (ids) => farm.plant(ids) });
   // Пояснения «банка» и «мешок»: один раз, при первом показе (флаги `tip:*` в `Save.hints`).
   const tips = createTips({ seen: hasHint, mark: addHint });
   const dictionary = mountDictionary(overlay, farm, undefined, tips);

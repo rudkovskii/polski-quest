@@ -269,7 +269,7 @@ describe('выбор задания по кругу', () => {
 
 describe('разнообразие очереди', () => {
   const ids = WORDS.slice(0, 19).map((w) => w.id);
-  it('19 слов: за 19 заданий звучат все, одно слово не повторяется чаще раза в 6 заданий', () => {
+  it('19 слов: за 19 заданий звучит рабочий набор, одно слово не повторяется чаще раза в 4 задания', () => {
     let g = garden(ids);
     const seen: string[] = [];
     let t = T0;
@@ -278,7 +278,9 @@ describe('разнообразие очереди', () => {
       seen.push(id);
       g = answer(g, id, ++t, 1);
     }
-    expect(new Set(seen).size).toBe(19);
+    expect(new Set(seen).size).toBeLessThan(19);
+    expect(new Set(seen).size).toBeGreaterThanOrEqual(8);
+    for (let i = 3; i < seen.length; i++) expect(seen.slice(i - 3, i)).not.toContain(seen[i]);
   });
   it('пул из 3 слов: окно повтора = пул − 1, из 1 слова — повторять можно', () => {
     let g = garden(ids.slice(0, 3));

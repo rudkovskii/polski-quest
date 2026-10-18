@@ -71,7 +71,7 @@ describe('жаргон', () => {
     expect(txt(3)).toContain('Собери фразу по-польски');
     expect(txt(4)).toContain('Собери фразу по-русски');
     expect(root.querySelector('[data-mode="1"] .board-pl')?.textContent).toBe(MODE_NAME[1].pl);
-    expect(txt(3)).toContain('кустик');
+    expect(txt(3)).toContain('подрастут до ростка'); // P3a: правило — росток, не кустик
     expect(txt(3)).not.toMatch(/кусты/);
   });
 
