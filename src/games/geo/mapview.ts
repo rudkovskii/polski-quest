@@ -7,6 +7,7 @@ import { bus as globalBus } from '../../systems/bus';
 import type { PolskaUnit } from '../../types/polska';
 import { el } from '../../ui/dom';
 import { ANIMS, assetsNow, frameOf, loadAssets } from './assets';
+import { canvasSize, canvasToMap, MIN_SCALE, pickScale } from './fit';
 import type { DotStatus } from './tasks';
 import { anchorOf, groupOf, MAP_H, MAP_W, pathOf, posOf, ringsOf, type Pt } from './world';
 
@@ -50,19 +51,11 @@ export interface MapView {
   destroy(): void;
 }
 
-/** Минимальный масштаб карты: меньше — карту не рисуем (нет места). */
-export const MIN_SCALE = 0.55;
+export { MIN_SCALE, pickScale };
 const ZOOM_SPRITE_MULT = 8;
 const HERO_SPEED = 170; // px карты в секунду
 const REST = { x: 22, y: 282 };
 let lastHero: Pt = { ...REST };
-
-/** Масштаб карты под место: целый, если влезает, иначе дробный (но не меньше MIN_SCALE; ниже — 0). */
-export function pickScale(maxW: number, maxH: number): number {
-  const m = Math.min(maxW / MAP_W, maxH / MAP_H);
-  if (!Number.isFinite(m) || m < MIN_SCALE) return 0;
-  return m >= 1 ? Math.floor(m) : m;
-}
 
 type Dir = 'down' | 'up' | 'left' | 'right';
 const STAND: Record<Dir, number> = { down: 0, up: 3, right: 6, left: 9 };
@@ -123,7 +116,7 @@ export function createMap(o: MapOptions): MapView {
   const byId = new Map(o.units.map((u) => [u.id, u]));
   const toX = (x: number): number => (x - view.x) * view.u;
   const toY = (y: number): number => (y - view.y) * view.u;
-  const fromScreen = (sx: number, sy: number): Pt => ({ x: sx / view.u + view.x, y: sy / view.u + view.y });
+  const fromScreen = (sx: number, sy: number): Pt => canvasToMap(view, sx, sy);
 
   const setView = (zoom: Pt | null): void => {
     if (!zoom) {
@@ -142,11 +135,13 @@ export function createMap(o: MapOptions): MapView {
   };
 
   const layout = (maxW: number, maxH: number): void => {
-    scale = pickScale(maxW, maxH);
+    // Масштаб: целый от 2, шаг 1/8 между 1 и 2 (`fit.ts`); геометрия стоит на реальном u = cw / MAP_W, поэтому тап и рисование совпадают.
+    const sz = canvasSize(pickScale(maxW, maxH));
+    scale = sz.cw ? sz.u : 0;
     base = Math.max(1, Math.floor(scale));
     sprite = base;
-    cw = Math.round(MAP_W * scale);
-    ch = Math.round(MAP_H * scale);
+    cw = sz.cw;
+    ch = sz.ch;
     wrap.hidden = scale === 0;
     canvas.width = cw;
     canvas.height = ch;

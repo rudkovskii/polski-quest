@@ -5,14 +5,26 @@
 import type { GameCheck, GameCtx, GamePanel, PolskaGame, PolskaUnit, Want } from '../../types/polska';
 import { el } from '../../ui/dom';
 import { choiceGrid } from './choice';
+import { canvasSize, planFit, type FitPlan } from './fit';
 import { createMap, type MapView } from './mapview';
 import { checkTask, makeTask, statusOf, verdict, type DirAnswer, type GeoTask } from './tasks';
 import { clusterOf, anchorOf, centroid, dist, MAP_H, MAP_W, type Pt } from './world';
 import { prompt, tiles } from '../kit';
 
+/** Высота кнопки варианта в полосе под картой и в узком окне (≥ 44 px под палец). */
+const OPT_ROW = 46;
+const OPT_ROW_NARROW = 48;
+/** Ширина колонки вариантов справа от карты (когда так карта выходит крупнее). */
+const SIDE_W = 232;
+/** Запас под строку результата движка (`.fb`: ✓/правильно, ru · tr, прогресс), которая появляется под листом после ответа. */
+const FB_H = 92;
+/** Вторая ступень «сосед → форма» выше на строку вопроса. */
+const STEP_H = 32;
+/** Зазор между картой и блоком заданий, рамка карты (3 + 3 px). */
+const GAP = 8;
+const FRAME = 6;
 const CSS = `
-.geo { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-@media (max-width: 519px) { .geo { margin: 0 -8px; } .geo-side { padding: 0 8px; box-sizing: border-box; } }
+.geo { display: flex; flex-direction: column; align-items: center; gap: ${GAP}px; }
 .geo.wide { flex-direction: row; align-items: flex-start; justify-content: center; gap: 12px; }
 .geo-map { position: relative; display: block; padding: 0; margin: 0; border: 3px solid var(--pq-ink); border-radius: 4px; background: #9d9a94;
   box-shadow: 0 3px 0 var(--pq-ink); line-height: 0; flex: 0 0 auto; touch-action: manipulation; cursor: crosshair; font: inherit; }
@@ -21,21 +33,19 @@ const CSS = `
 .geo-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .geo-label { position: absolute; transform: translate(-50%, -100%); font: 700 12px/1 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink);
   background: var(--pq-cream); border: 2px solid var(--pq-ink); border-radius: 3px; padding: 2px 4px; white-space: nowrap; }
-.geo-side { flex: 1 1 0; min-width: 0; width: 100%; }
-.geo.wide .geo-side { align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+.geo-side { flex: 0 0 auto; min-width: 0; width: 100%; box-sizing: border-box; }
+.geo.wide .geo-side { width: ${SIDE_W}px; align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
 .geo-hint { font-size: 13px; opacity: .75; text-align: center; min-height: 18px; }
 .geo-step { font-size: 17px; font-weight: 800; margin: 0 0 6px; overflow-wrap: break-word; }
-.geo-back { margin-top: 6px; }
+.geo-bar { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; }
+.geo-bar .geo-hint { flex: 1 1 auto; min-height: 0; }
+.geo-bar .geo-back { flex: 0 0 auto; margin: 0; }
 .geo-back[hidden] { display: none; }
-.geo .pq-opts { width: 100%; }
+.geo .pq-opts { width: 100%; grid-template-columns: repeat(var(--geo-cols, 2), 1fr); grid-auto-rows: ${OPT_ROW}px; gap: 8px; }
+.geo .pq-opt { padding: 4px 9px; }
+@media (max-width: 519px) { .geo-side { padding: 0 8px; } .geo .pq-opts { grid-auto-rows: ${OPT_ROW_NARROW}px; } }
 `;
 
-/** Место под варианты ответа (px) по виду задания: от него зависит, какой масштаб карты влезает. */
-const OPTS_H = 152;
-const TILES_H = 210;
-/** Запас на строку результата движка (`.fb`), которая появляется под листом после ответа. */
-const FB_H = 100;
-const SIDE_W = 262;
 /** Сколько зелёный флажок виден после анимации, прежде чем движок листает дальше. */
 export const SUCCESS_SHOW_MS = 800;
 
@@ -53,8 +63,6 @@ export function geoPool(ctx: GameCtx): readonly string[] {
   return out;
 }
 
-const hasOptions = (t: GeoTask): boolean => t.t !== 'show';
-
 function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
   const unit = ctx.unit(task.id);
   const hint = task.t === 'show' ? `${task.ru}. Тап по карте или стрелки и A` : task.ru;
@@ -63,51 +71,21 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
   const root = el('div', { class: 'geo', 'data-geo': task.t }, el('style', {}, CSS));
   body.append(root);
 
-  // ——— место под карту ———
-  const bodyW = body.clientWidth || 360;
-  const bodyH = body.clientHeight || 640;
-  const narrow = bodyW < 520;
-  // На узком экране карта выходит на поля листа (отрицательный margin, 8 px с каждой стороны): на iPhone 375 иначе не влезает целый масштаб 1.
-  const padX = narrow ? 0 : 24;
-  const innerW = bodyW - padX - 6;
-  const rows = task.t === 'build' ? 0 : Math.ceil((task.options?.length ?? 4) / 2);
-  const wide = hasOptions(task) && task.t !== 'build' && innerW >= MAP_W + 12 + SIDE_W;
-  const below = task.t === 'build' ? TILES_H : wide || task.t === 'show' ? FB_H + 24 : rows * (narrow ? 58 : 64) + (rows - 1) * 8 + 8;
-  const top = promptEl.offsetHeight + (body.firstElementChild instanceof HTMLElement ? body.firstElementChild.offsetHeight : 0) + 24;
-  const calcMax = (): { w: number; h: number } => ({
-    w: Math.max(0, (body.clientWidth || bodyW) - padX - 6 - (wide ? SIDE_W + 12 : 0)),
-    h: Math.max(0, (body.clientHeight || bodyH) - top - below - 6),
-  });
-  const m0 = calcMax();
-
+  // Карту создаём скрытой (0×0): сначала строится блок заданий, потом `fit()` меряет лист и даёт карте наибольший масштаб.
   const stat = new Map(ctx.units.map((u) => [u.id, statusOf(ctx.info(u.id))] as const));
   const map: MapView = createMap({
     units: ctx.units,
     status: (id) => stat.get(id) ?? 'gray',
-    maxW: m0.w,
-    maxH: m0.h,
+    maxW: 0,
+    maxH: 0,
     mark: task.mark ? [task.mark] : [],
     hide: task.t === 'show' ? task.id : null,
     interactive: task.t === 'show',
   });
   root.append(map.el);
   const side = el('div', { class: 'geo-side' });
-  if (wide) root.classList.add('wide');
   root.append(side);
-
-  // Ширина окна изменилась (поворот телефона): пересчитать масштаб; высоту не трогаем, она «прыгает» от строки результата.
-  let lastW = bodyW;
-  if (typeof ResizeObserver !== 'undefined') {
-    const ro = new ResizeObserver(() => {
-      if (!root.isConnected) return ro.disconnect();
-      const w = body.clientWidth;
-      if (Math.abs(w - lastW) < 4) return;
-      lastW = w;
-      const m = calcMax();
-      map.layout(m.w, m.h);
-    });
-    ro.observe(body);
-  }
+  const fitHooks: (() => void)[] = [];
 
   const here = unit ? anchorOf(unit) : ({ x: MAP_W / 2, y: MAP_H / 2 } as Pt);
   /** Герой бежит к месту задания, флажок по вердикту; единицы показываются и подписываются. */
@@ -132,8 +110,9 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
 
   switch (task.t) {
     case 'show': {
-      const hintEl = el('div', { class: 'geo-hint', 'data-hint': '' }, map.scale ? 'Тап по карте · стрелки и A: курсор' : 'Карта не поместилась: увеличь окно');
+      const hintEl = el('div', { class: 'geo-hint', 'data-hint': '' }, 'Тап по карте · стрелки и A: курсор');
       const back = el('button', { type: 'button', class: 'pq-btn geo-back', 'data-nav': '', 'data-back': '', hidden: true, onclick: () => ((map.zoomOut(), (back.hidden = true), (hintEl.textContent = 'Тап по карте · стрелки и A: курсор'), map.unlock())) }, 'Cała mapa · Вся карта');
+      side.classList.add('geo-bar');
       side.append(hintEl, back);
       const finish = (p: Pt): void => {
         const ok = verdict(task, p, ctx);
@@ -156,10 +135,17 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
         }
         finish(p);
       };
-      if (!map.scale) {
-        // Совсем нет места: карту не рисуем, остаётся «Не знаю» без флажка.
-        side.append(el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', onclick: () => panel.submit({ x: -1, y: -1 }) }, 'Nie wiem · Не знаю'));
-      }
+      // Совсем нет места: карту не рисуем, остаётся «Не знаю» без флажка (кнопка появляется и пропадает вместе с картой).
+      const noMap = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-nomap': '', onclick: () => panel.submit({ x: -1, y: -1 }) }, 'Nie wiem · Не знаю');
+      fitHooks.push(() => {
+        if (map.scale) {
+          noMap.remove();
+          if (!map.zoomed) hintEl.textContent = 'Тап по карте · стрелки и A: курсор';
+        } else {
+          hintEl.textContent = 'Карта не поместилась: увеличь окно';
+          if (!noMap.isConnected) side.append(noMap);
+        }
+      });
       break;
     }
     case 'build':
@@ -187,6 +173,62 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
         side.append(grid(first, task.answer ?? '', (o) => answerTo(o, o === task.answer)));
       }
     }
+  }
+
+  // ——— масштаб карты: наибольший, при котором карта и блок заданий влезают без прокрутки ———
+  const num = (v: string): number => parseFloat(v) || 0;
+  const fbEl = body.closest('.box')?.querySelector<HTMLElement>('[data-feedback]') ?? null;
+  const optTexts = [...(task.options ?? []), ...(task.form?.options ?? [])];
+  const longest = optTexts.reduce((m, t) => Math.max(m, t.length), 0);
+  const nOpts = task.t === 'show' || task.t === 'build' ? 0 : (task.options?.length ?? 4);
+  /** Раскладка по измеренному месту `room` (css px); возвращает высоту содержимого листа, чтобы движок сжал лист по нему. */
+  const place = (room: { w: number; h: number } | null): number => {
+    const cs = getComputedStyle(body);
+    const measured = !!room || (body.offsetWidth > 0 && body.offsetHeight > 0);
+    const innerW = room ? room.w : measured ? body.offsetWidth - 2 * body.clientLeft - num(cs.paddingLeft) - num(cs.paddingRight) : 336;
+    const innerH = room ? room.h : measured ? body.offsetHeight - 2 * body.clientTop - num(cs.paddingTop) - num(cs.paddingBottom) + (fbEl && !fbEl.hidden ? fbEl.offsetHeight + 6 : 0) : 600;
+    const narrow = innerW < 520;
+    const cols = narrow ? 2 : longest <= 16 && innerW >= 560 ? 4 : 2;
+    // Блок заданий под картой (полосой): меряем в этой раскладке, при нуле (нет вёрстки) считаем по числу рядов.
+    root.classList.remove('wide');
+    root.style.setProperty('--geo-cols', String(cols));
+    const rows = Math.ceil(nOpts / cols);
+    const rowH = narrow ? OPT_ROW_NARROW : OPT_ROW;
+    const sideH = Math.max(side.offsetHeight, rows ? rows * rowH + (rows - 1) * 8 : 0);
+    const above = measured ? root.getBoundingClientRect().top - body.getBoundingClientRect().top - body.clientTop - num(cs.paddingTop) + body.scrollTop : 0;
+    const last = body.lastElementChild;
+    const after = measured && last && last !== root ? last.getBoundingClientRect().bottom - root.getBoundingClientRect().bottom : 0;
+    const reserve = FB_H + (task.t === 'dir' && task.form ? STEP_H : 0);
+    const belowH = task.t === 'show' ? Math.max(side.offsetHeight, 44) : sideH;
+    const plan: FitPlan = planFit({ innerW, innerH, above, after, reserve, belowH, sideW: nOpts && !narrow ? SIDE_W : 0, gap: GAP, frame: FRAME });
+    root.classList.toggle('wide', plan.mode === 'side');
+    if (plan.mode === 'side') root.style.setProperty('--geo-cols', '1');
+    if (plan.scale !== map.scale) map.layout(plan.maxW, plan.maxH);
+    for (const h of fitHooks) h();
+    // Высота содержимого при этой раскладке: над картой, карта с рамкой, блок заданий, под ней, запас под результат.
+    const mapH = map.scale ? canvasSize(map.scale).ch + FRAME : 0;
+    const mid = plan.mode === 'side' ? Math.max(mapH, sideH) : mapH + (mapH ? GAP : 0) + belowH;
+    return above + mid + after + reserve;
+  };
+  const fit = (): void => {
+    if (!root.isConnected) return;
+    if (panel.fit) panel.fit((room) => place(room));
+    else place(null);
+  };
+  fit();
+  // Окно изменилось (поворот телефона, размер окна): пересчитать. Следим за экраном игры, а не за листом: высота листа меняется сама.
+  const watched = panel.root ?? body;
+  if (typeof ResizeObserver !== 'undefined') {
+    let lastW = watched.clientWidth;
+    let lastH = watched.clientHeight;
+    const ro = new ResizeObserver(() => {
+      if (!root.isConnected) return ro.disconnect();
+      if (Math.abs(watched.clientWidth - lastW) < 2 && Math.abs(watched.clientHeight - lastH) < 2) return;
+      lastW = watched.clientWidth;
+      lastH = watched.clientHeight;
+      fit();
+    });
+    ro.observe(watched);
   }
 }
 

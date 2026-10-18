@@ -45,11 +45,11 @@ ${roundCss}
 .pq-pg { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: flex; justify-content: center; pointer-events: none;
   padding: 0 calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 8px);
   font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); hyphens: none; }
-.pq-pg.full { top: 0; padding-top: calc(env(safe-area-inset-top) + 8px); background: rgba(42, 20, 24, .55); }
+.pq-pg.full { top: 0; align-items: center; padding-top: calc(env(safe-area-inset-top) + 8px); background: rgba(42, 20, 24, .55); }
 .pq-pg[hidden] { display: none; }
 .pq-pg .box { pointer-events: auto; width: min(720px, 100%); box-sizing: border-box; background: var(--pq-wood); border: 3px solid var(--pq-ink); border-radius: 12px;
   box-shadow: 0 4px 0 var(--pq-ink), inset 0 0 0 2px var(--pq-wood-dark); padding: 6px 8px 8px; height: clamp(250px, max(58dvh, 100dvh - 260px), 450px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; }
-.pq-pg.full .box { width: min(960px, 100%); height: 100%; max-height: none; }
+.pq-pg.full .box { width: min(1200px, 100%); height: 100%; max-height: none; }
 .pq-pg .head { flex: 0 0 auto; min-height: 38px; display: flex; align-items: center; gap: 8px; color: var(--pq-cream); padding: 0 2px 6px; font-weight: 700; font-size: 14px; }
 .pq-pg .title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pq-pg .title small { font-size: 11px; opacity: .7; margin-left: 4px; }
@@ -84,6 +84,14 @@ ${roundCss}
 .pq-pg.kb .is-focus, .pq-pg :focus-visible { outline: 3px solid var(--pq-accent); outline-offset: 1px; }
 .pq-pg .way2 { margin-top: 6px; padding: 6px 8px; text-align: center; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; font-size: 15px; font-weight: 700; }
 .pq-pg .way2 b { color: #4a6b2a; }
+/* Игра во весь экран на телефоне: лист от края до края, карте и календарю каждый пиксель ширины. */
+@media (max-width: 520px) {
+  .pq-pg.full { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); padding-bottom: env(safe-area-inset-bottom); }
+  .pq-pg.full .box { width: 100%; border-left-width: 0; border-right-width: 0; border-radius: 0; padding-left: 0; padding-right: 0; }
+  .pq-pg.full .head, .pq-pg.full .foot, .pq-pg.full .fb { margin-left: 8px; margin-right: 8px; }
+  .pq-pg.full .paper { border-left-width: 0; border-right-width: 0; border-radius: 0; padding-left: 0; padding-right: 0; }
+  .pq-pg.full .paper > :not(.geo):not(.dt) { margin-left: 10px; margin-right: 10px; }
+}
 @media (max-width: 520px) { .pq-pg .title small, .pq-pg .exit-lbl { display: none; } .pq-pg .pq-q { font-size: 19px; } .pq-pg .pq-opts { grid-auto-rows: 58px; } .pq-pg .paper { padding: 8px; } }
 @media (max-width: 520px), (max-height: 860px) { .pq-pg .pq-tile { font-size: 15px; padding: 6px 8px; } .pq-pg .pq-built { min-height: 38px; padding: 4px; gap: 5px; } .pq-pg .pq-pool { gap: 5px; } .pq-pg .pq-progress { margin-bottom: 4px; } .pq-pg .pq-q-hint { margin-bottom: 6px; } .pq-pg .pq-q { font-size: 18px; } }
 `;
@@ -173,6 +181,24 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     submit: (answer) => api.submit(answer),
     say: (text, slow) => deps.say(text, slow),
     rand,
+    root,
+    fit: (measure) => {
+      if (!open || !game || game.layout !== 'full' || summaryOpen) return;
+      box.style.removeProperty('height');
+      const cs = getComputedStyle(paper);
+      const px = (v: string): number => parseFloat(v) || 0;
+      const padX = px(cs.paddingLeft) + px(cs.paddingRight) + 2 * paper.clientLeft;
+      const padY = px(cs.paddingTop) + px(cs.paddingBottom);
+      const full = box.offsetHeight;
+      const fbTaken = fb.hidden ? 0 : fb.offsetHeight + 6;
+      if (!full || !paper.offsetWidth) return;
+      const inner = paper.clientHeight - padY;
+      const want = measure({ w: paper.offsetWidth - padX, h: inner + fbTaken });
+      // Всё, кроме содержимого листа: шапка, подвал, рамки, поля.
+      const chrome = full - inner - fbTaken;
+      const h = Math.ceil(chrome + want);
+      if (want > 0 && h < full - 24) box.style.height = `${h}px`;
+    },
     hold: (ms) => {
       if (!timer || !answered || summaryOpen) return;
       const now = performance.now();
@@ -201,6 +227,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     summaryOpen = false;
     task = null;
     focusIdx = -1;
+    box.style.removeProperty('height');
     if (!game) return;
     const ctx = ctxOf(game);
     if (!only) deps.polska.autoPlant(game.id, game.pool(ctx));
@@ -243,6 +270,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     summaryOpen = true;
     answered = true;
     task = null;
+    box.style.removeProperty('height');
     paper.classList.remove('ok', 'bad');
     fb.hidden = true;
     const card = renderRoundSummary(roundN, round.stats);

@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import polandJson from '../public/maps-art/poland.json';
 import { game, geoPool } from '../src/games/geo';
 import { createMap } from '../src/games/geo/mapview';
+import { canvasSize, canvasToMap, mapToCanvas, pickScale, planFit, type FitInput } from '../src/games/geo/fit';
 import { checkTask, makeKind, makeTask, statusOf, verdict, type DirAnswer, type GeoKind, type GeoTask } from '../src/games/geo/tasks';
 import { anchorOf, centroid, clusterOf, dist, groupOf, hits, inMap, inRings, MAP_H, MAP_W, pathOf, posOf, project, ringsOf, tolPx } from '../src/games/geo/world';
 import { REGION_RINGS } from '../src/games/geo/geodata';
@@ -419,5 +420,152 @@ describe('движок: Geografia целым раундом', () => {
     expect(shows + ok).toBeGreaterThanOrEqual(0);
     expect(root.querySelector('[data-round-summary]')).toBeTruthy();
     ui.stop();
+  });
+});
+
+describe('карта во весь лист: масштаб и попадания по координатам экрана', () => {
+  it('pickScale: от 2 целый, между 1 и 2 шаг 1/8, ниже 1 как есть', () => {
+    expect(pickScale(MAP_W * 2.9, MAP_H * 3.4)).toBe(2);
+    expect(pickScale(MAP_W * 3, MAP_H * 3)).toBe(3);
+    expect(pickScale(MAP_W * 1.99, MAP_H * 2)).toBe(1.875);
+    expect(pickScale(369, 345)).toBe(1.125); // iPhone 375: ширина листа без полей минус рамка карты
+    expect(pickScale(320, 304)).toBe(1);
+    expect(pickScale(300, 304)).toBeCloseTo(0.9375, 3);
+    expect(pickScale(MAP_W * 0.5, MAP_H * 0.5)).toBe(0);
+  });
+
+  it('canvasSize: ширина целая, u = cw / MAP_W, туда и обратно без потерь', () => {
+    for (const s of [0.75, 1, 1.125, 1.5, 1.875, 2, 3]) {
+      const { cw, ch, u } = canvasSize(s);
+      expect(Number.isInteger(cw) && Number.isInteger(ch), `s=${s}`).toBe(true);
+      expect(u * MAP_W).toBeCloseTo(cw, 9);
+      expect(Math.abs(ch - MAP_H * u)).toBeLessThanOrEqual(0.5);
+      const v = { x: 0, y: 0, u };
+      for (const p of [{ x: 0, y: 0 }, { x: 211.1, y: 120.4 }, { x: MAP_W, y: MAP_H }]) {
+        const back = canvasToMap(v, mapToCanvas(v, p).x, mapToCanvas(v, p).y);
+        expect(back.x).toBeCloseTo(p.x, 9);
+        expect(back.y).toBeCloseTo(p.y, 9);
+      }
+    }
+    expect(canvasSize(0)).toEqual({ cw: 0, ch: 0, u: 1 });
+  });
+
+  /** Карта в DOM: холст стоит в (left, top), клик по экранным координатам, независимо от кода пересчёта считаем пиксель сами. */
+  const mount = (scale: number) => {
+    const bus = testBus();
+    const m = createMap({ units: ctx.units, status: () => 'gray', maxW: MAP_W * scale, maxH: MAP_H * scale, interactive: true, bus });
+    document.body.append(m.el);
+    const canvas = m.el.querySelector('canvas')!;
+    const LEFT = 37;
+    const TOP = 91;
+    canvas.getBoundingClientRect = () => ({ left: LEFT, top: TOP, width: canvas.width, height: canvas.height, right: LEFT + canvas.width, bottom: TOP + canvas.height, x: LEFT, y: TOP, toJSON: () => ({}) }) as DOMRect;
+    const picks: { x: number; y: number }[] = [];
+    m.onPick = (p) => {
+      picks.push(p);
+      m.unlock();
+    };
+    const tap = (sx: number, sy: number): void => void m.el.dispatchEvent(new MouseEvent('click', { clientX: LEFT + sx, clientY: TOP + sy, detail: 1, bubbles: true }));
+    return { m, canvas, picks, tap };
+  };
+
+  const PAIRS = ['geo.city.sopot', 'geo.city.gdynia', 'geo.city.gdansk', 'geo.city.krakow', 'geo.city.wieliczka'];
+
+  it('тап в точку города попадает в тот же город при масштабах 1, 1,125, 1,5, 2, 3 (Sopot/Gdynia/Gdańsk, Kraków/Wieliczka)', () => {
+    for (const s of [1, 1.125, 1.5, 2, 3]) {
+      const { m, canvas, picks, tap } = mount(s);
+      expect(m.scale, `s=${s}`).toBe(s);
+      for (const id of PAIRS) {
+        const u = U(id);
+        const c = posOf(u)!;
+        // Экранная точка: центр пикселя картинки под городом, считаем прямо из размеров холста.
+        tap((c.x * canvas.width) / MAP_W, (c.y * canvas.height) / MAP_H);
+        const p = picks.pop()!;
+        expect(Math.abs(p.x - c.x), `${id} x @${s}`).toBeLessThanOrEqual(0.51 / (canvas.width / MAP_W));
+        expect(Math.abs(p.y - c.y), `${id} y @${s}`).toBeLessThanOrEqual(0.51 / (canvas.height / MAP_H));
+        expect(hits(ctx.units, u, p), `${id} @${s}`).toBe(true);
+        for (const other of PAIRS) if (other !== id && dist(posOf(U(other))!, c) > 3) expect(hits(ctx.units, U(other), p), `${id} не ${other} @${s}`).toBe(false);
+      }
+      m.destroy();
+    }
+  });
+
+  it('тап по краям карты и в центре: ровно та же точка картинки, что и вычисленная по пикселю', () => {
+    for (const s of [1, 1.125, 2, 3]) {
+      const { m, canvas, picks, tap } = mount(s);
+      for (const [fx, fy] of [[0, 0], [0.5, 0.5], [0.999, 0.999], [0.25, 0.75]] as const) {
+        const sx = Math.floor(fx * canvas.width);
+        const sy = Math.floor(fy * canvas.height);
+        tap(sx, sy);
+        const p = picks.pop()!;
+        expect(p.x, `x @${s}`).toBeCloseTo((sx * MAP_W) / canvas.width, 6);
+        expect(p.y, `y @${s}`).toBeCloseTo((sy * MAP_H) / canvas.height, 6);
+        expect(inMap(p)).toBe(true);
+      }
+      m.destroy();
+    }
+  });
+
+  it('увеличение кластера (Gdańsk · Gdynia · Sopot): тап в точку города попадает именно в него при любом масштабе', () => {
+    for (const s of [1, 1.125, 2, 3]) {
+      const { m, canvas, picks, tap } = mount(s);
+      const cl = clusterOf(ctx.units, U('geo.city.sopot'));
+      expect(cl.length).toBeGreaterThan(1);
+      const c0 = centroid(cl);
+      m.zoomTo(c0);
+      m.unlock();
+      // Вид после увеличения: 8 × целый масштаб спрайтов px холста на px картинки, центр в кластере, края прижаты к карте.
+      const u = 8 * Math.max(1, Math.floor(m.scale));
+      const vw = canvas.width / u;
+      const vh = canvas.height / u;
+      const x0 = Math.max(0, Math.min(MAP_W - vw, c0.x - vw / 2));
+      const y0 = Math.max(0, Math.min(MAP_H - vh, c0.y - vh / 2));
+      for (const id of ['geo.city.sopot', 'geo.city.gdynia', 'geo.city.gdansk']) {
+        const c = posOf(U(id))!;
+        tap((c.x - x0) * u, (c.y - y0) * u);
+        const p = picks.pop()!;
+        expect(dist(p, c), `${id} @${s}`).toBeLessThanOrEqual(0.51 / u);
+        expect(hits(ctx.units, U(id), p), `${id} @${s}`).toBe(true);
+        for (const other of ['geo.city.sopot', 'geo.city.gdynia', 'geo.city.gdansk']) if (other !== id) expect(hits(ctx.units, U(other), p), `${id} не ${other} @${s}`).toBe(false);
+      }
+      m.destroy();
+    }
+  });
+
+  it('смена масштаба на лету (поворот телефона): точка картинки под пальцем та же, холст пересчитан', () => {
+    const { m, canvas, picks, tap } = mount(1);
+    const c = posOf(U('geo.city.krakow'))!;
+    m.layout(MAP_W * 3, MAP_H * 3);
+    expect([canvas.width, canvas.height]).toEqual([960, 912]);
+    tap(c.x * 3, c.y * 3);
+    expect(dist(picks.pop()!, c)).toBeLessThan(0.2);
+    m.layout(MAP_W * 1.125, MAP_H * 1.125);
+    expect(canvas.width).toBe(360);
+    tap(c.x * 1.125, c.y * 1.125);
+    expect(dist(picks.pop()!, c)).toBeLessThan(0.5);
+    m.destroy();
+  });
+});
+
+describe('раскладка карты и заданий (planFit)', () => {
+  const base: FitInput = { innerW: 1176, innerH: 1000, above: 100, after: 0, reserve: 92, belowH: 46, sideW: 232, gap: 8, frame: 6 };
+  it('десктоп 1230×1260: варианты полосой под картой, масштаб 2', () => {
+    const p = planFit(base);
+    expect(p.mode).toBe('below');
+    expect(p.scale).toBe(2);
+  });
+  it('телефон 375×812: дробный 1,125 во всю ширину, влезает по высоте', () => {
+    const p = planFit({ ...base, innerW: 375, innerH: 640, above: 95, belowH: 96, sideW: 0 });
+    expect(p.mode).toBe('below');
+    expect(p.scale).toBe(1.125);
+    expect(canvasSize(p.scale).ch + 6 + 8 + 96 + 95 + 92).toBeLessThanOrEqual(640);
+  });
+  it('широкий низкий экран: варианты справа, если так карта крупнее', () => {
+    const p = planFit({ ...base, innerW: 1100, innerH: 640, belowH: 100 });
+    expect(p.mode).toBe('side');
+    expect(p.scale).toBeGreaterThan(planFit({ ...base, innerW: 1100, innerH: 640, belowH: 100, sideW: 0 }).scale);
+  });
+  it('тесно: масштаб меньше 1 или карты нет, ничего не падает', () => {
+    expect(planFit({ ...base, innerW: 200, innerH: 300 }).scale).toBeLessThan(1);
+    expect(planFit({ ...base, innerW: 90, innerH: 90 }).scale).toBe(0);
   });
 });
