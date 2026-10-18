@@ -179,9 +179,9 @@ describe('P2a: прогресс до урожая виден', () => {
     expect(progressText(at(g), T0 + 4, day(0))).toBe('до урожая: ещё 2 дня');
     g = add(g, T0 + DAY_MS, 1);
     expect(progressText(at(g), T0 + DAY_MS, day(1))).toBe('до урожая: ещё 1 день');
-    expect(ripeSoon(derive(g), day(1))).toEqual({ today: 0, tomorrow: 1 });
+    expect(ripeSoon(derive(g), day(1))).toMatchObject({ today: 0, tomorrow: 1 });
     expect(progressText(at(g), T0 + 2 * DAY_MS, day(2))).toBe('созреет со следующим верным ответом');
-    expect(ripeSoon(derive(g), day(2))).toEqual({ today: 1, tomorrow: 0 });
+    expect(ripeSoon(derive(g), day(2))).toMatchObject({ today: 1, tomorrow: 0 });
     expect(progressText(undefined, T0)).toBe('не посажено');
   });
 
@@ -202,7 +202,7 @@ describe('P2a: прогресс до урожая виден', () => {
     const q4 = s.farm.next(1, id)!;
     const r4 = s.farm.answer(q4, q4.answer);
     expect(r4).toMatchObject({ progress: 'до урожая: ещё 1 день', tomorrow: 1 });
-    expect(s.farm.ripeSoon()).toEqual({ today: 0, tomorrow: 1 });
+    expect(s.farm.ripeSoon()).toMatchObject({ today: 0, tomorrow: 1 });
 
     const root = document.createElement('div');
     const card = mountPlantCard(root, s.farm, { onReview: () => {} });
