@@ -849,7 +849,7 @@
    "harvest": "quiet",
    "free": false,
    "icon": "candle",
-   "band": 1,
+   "band": 2,
    "src": "daty.md:249; Miso №160",
    "checked": "2026-10-18"
   },
@@ -1524,7 +1524,7 @@
    "harvest": "quiet",
    "free": false,
    "icon": "candle",
-   "band": 1,
+   "band": 2,
    "src": "daty.md:264-265; Miso №173",
    "checked": "2026-10-18"
   },

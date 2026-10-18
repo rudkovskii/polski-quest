@@ -480,14 +480,15 @@ describe('Daty: спокойная подача для дат памяти', () 
 });
 
 describe('Daty: посадка и движок', () => {
-  it('pool: все 22 даты, сначала ближайшие вперёд от сегодняшнего дня (18.10 → 11.11, 13.12, …)', () => {
+  it('pool: все 22 даты, сначала ближайшие вперёд от сегодняшнего дня (18.10 → 11.11, 13.12, …); Smoleńsk и Wołyń во 2-й полосе (ТЗ)', () => {
     const s = mkPolska();
     const ctx = ctxOf(s);
     const pool = datyPool(ctx);
     expect(pool.length).toBe(22);
     expect(new Set(pool).size).toBe(22);
     expect(pool.slice(0, 3)).toEqual(['date.niepodleglosc', 'date.stan_wojenny', 'date.wykleci']);
-    expect(pool.at(-1)).toBe('date.papiez');
+    expect(pool.slice(-2).sort()).toEqual(['date.smolensk', 'date.wolyn']);
+    expect(pool.at(-3)).toBe('date.papiez');
   });
 
   it('игра по контракту: layout full, вход calendar, участок miesiace, виды date', () => {

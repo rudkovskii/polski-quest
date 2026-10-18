@@ -208,3 +208,14 @@ describe('пиксельные значки вместо эмодзи (Daty, Św
     expect(Object.keys(WORD_EMOJI)).toHaveLength(0);
   });
 });
+
+describe('строка итога Daty', () => {
+  it('ближайшая памятная дата по календарю игры', async () => {
+    const { nearestDateLine } = await import('../src/games/daty');
+    const s = mk();
+    const ctx = (y: number, m: number, d: number) => ({ units: s.p.units('daty'), unit: (id: string) => s.p.unit(id), info: (id: string) => s.p.info(id), doc: s.p.content.docs.daty as Record<string, unknown>, now: () => NOW, date: () => ({ y, m, d, weekday: 0 }), rand: seeded(1) });
+    expect(nearestDateLine(ctx(2026, 10, 18))).toBe('Najbliższa data: 11.11 · Święto Niepodległości · za 24 dni');
+    expect(nearestDateLine(ctx(2026, 11, 11))).toContain('dziś');
+    expect(nearestDateLine(ctx(2026, 12, 20))).toMatch(/^Najbliższa data: \d+\.0[1-3] /);
+  });
+});

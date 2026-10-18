@@ -165,6 +165,22 @@ function check(task: DatyTask, answer: unknown, ctx: GameCtx) {
   }
 }
 
+/** Строка итога раунда: ближайшая памятная дата по реальному календарю («Najbliższa data: 11.11 · Święto Niepodległości · za 24 dni»). */
+export function nearestDateLine(ctx: GameCtx): string | null {
+  const t = ctx.date();
+  const today = Date.UTC(t.y, t.m - 1, t.d);
+  let best: { days: number; text: string } | null = null;
+  for (const u of ctx.units) {
+    const a = dateOfUnit(u);
+    let at = Date.UTC(t.y, a.month - 1, a.day);
+    if (at < today) at = Date.UTC(t.y + 1, a.month - 1, a.day);
+    const days = Math.round((at - today) / 86_400_000);
+    if (!best || days < best.days) best = { days, text: `${a.day}.${String(a.month).padStart(2, '0')} · ${u.pl}` };
+  }
+  if (!best) return null;
+  return `Najbliższa data: ${best.text} · ${best.days === 0 ? 'dziś' : best.days === 1 ? 'jutro' : `za ${best.days} dni`}`;
+}
+
 export const game: PolskaGame<DatyTask> = {
   id: 'daty',
   title: { pl: 'Kalendarz', ru: 'Памятные даты' },
@@ -177,4 +193,5 @@ export const game: PolskaGame<DatyTask> = {
   nextTask,
   render,
   check,
+  summaryLine: nearestDateLine,
 };
