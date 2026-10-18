@@ -130,7 +130,8 @@ const RANK: Record<string, number> = { seed: 0, sprout: 1, bush: 2 };
 export function wantOf(it: ItemState, now: number, todayAnswers = 0): Omit<Want, 'id'> | null {
   const s = stageOf(it, now);
   if (s === 'overripe') return { side: 'A', self: false, stage: 'overripe' };
-  if (s === 'seed') return { side: 'A', self: false, stage: s };
+  // Семечко: первый ответ «узнать» (A), после верного — уже «вспомнить» (B): первый раунд не из 10 одинаковых заданий.
+  if (s === 'seed') return { side: it.sides.pr ? 'B' : 'A', self: false, stage: s };
   if (s === 'sprout') return { side: it.sides.pr ? 'B' : 'A', self: false, stage: s };
   if (s === 'bush') {
     if (!it.selfOk) return { side: 'B', self: true, stage: s };
