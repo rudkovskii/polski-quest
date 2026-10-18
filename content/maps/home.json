@@ -208,6 +208,53 @@
     2,
     3
    ]
+  },
+  {
+   "type": "prop",
+   "id": "decor_choinka",
+   "sprite": "w2_choinka",
+   "at": [
+    10,
+    7
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "decor": "dec.choinka",
+   "shadow": 12
+  },
+  {
+   "type": "prop",
+   "id": "decor_palma",
+   "sprite": "w2_palma",
+   "at": [
+    1,
+    7
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "decor": "dec.palma",
+   "shadow": 8
+  },
+  {
+   "type": "prop",
+   "id": "decor_pisanki",
+   "sprite": "w2_pisanki",
+   "at": [
+    9,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false,
+   "decor": "dec.pisanki",
+   "z": 2,
+   "dy": 14
   }
  ]
 }

@@ -2,7 +2,10 @@
 // Контролёр v2 (волна 3): общие хуки движка игр о Польше — пауза на успех (`panel.hold`), строка итога (`summaryLine`),
 // отложенный обход Zagroda после игры во весь экран (`polska:tour`), тихий урожай (`polska:act.quiet`).
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { activeDecor, parseDecor } from '../src/systems/decor';
 import { createPolska, newPolskaSave, type PolskaSave } from '../src/systems/polska';
+import { V2 } from '../src/systems/v2content';
+import { getMap, withDecor } from '../src/world/maps';
 import type { BusEvents } from '../src/types/bus';
 import type { GameTask, PolskaGame } from '../src/types/polska';
 import { AUTO_NEXT_MS, mountPolskaGame } from '../src/ui/polskaGame';
@@ -129,5 +132,40 @@ describe('тихий урожай: тяжёлые даты', () => {
     s.p.answer({ id: 'date.konstytucja', side: 'A' }, true);
     expect(acts.find((a) => a.id === 'date.katyn')!.quiet).toBe(true);
     expect(acts.find((a) => a.id === 'date.konstytucja')!.quiet).toBeUndefined();
+  });
+});
+
+describe('украшения мира к датам (swieta.json:decor)', () => {
+  const defs = parseDecor((V2.docs.swieta as { decor?: unknown }).decor);
+  const on = (y: number, m: number, d: number): string[] => activeDecor(defs, { y, m, d });
+
+  it('знич 1–2.11, ёлка 24.12–6.01 через Новый год, флажки 11.11, пальма за неделю до Пасхи', () => {
+    expect(defs.length).toBeGreaterThanOrEqual(10);
+    expect(on(2026, 10, 31)).not.toContain('dec.znicze');
+    expect(on(2026, 11, 1)).toContain('dec.znicze');
+    expect(on(2026, 11, 2)).toContain('dec.znicze');
+    expect(on(2026, 11, 3)).not.toContain('dec.znicze');
+    expect(on(2026, 11, 11)).toContain('dec.flagi_listopad');
+    expect(on(2026, 12, 23)).not.toContain('dec.choinka');
+    for (const [y, m, d] of [[2026, 12, 24], [2026, 12, 31], [2027, 1, 1], [2027, 1, 6]] as const) expect(on(y, m, d), `${d}.${m}`).toContain('dec.choinka');
+    expect(on(2027, 1, 7)).not.toContain('dec.choinka');
+    // Пасха 2027 — 28 марта: пальма 21–27.03, писанки 27–29.03.
+    expect(on(2027, 3, 21)).toContain('dec.palma');
+    expect(on(2027, 3, 28)).toContain('dec.pisanki');
+    expect(on(2027, 3, 28)).not.toContain('dec.palma');
+    expect(on(2026, 10, 18)).toEqual([]);
+  });
+
+  it('карта с украшениями: объекты с decor стоят только в свой день, у каждого есть спрайт в данных', () => {
+    const farm = getMap('farm');
+    const decorIds = new Set(defs.map((x) => x.id));
+    const props = [...farm.objects, ...getMap('home').objects].filter((o) => o.type === 'prop' && o.decor);
+    expect(props.length).toBeGreaterThanOrEqual(6);
+    for (const o of props) if (o.type === 'prop') expect(decorIds.has(o.decor!), o.id).toBe(true);
+    const plain = withDecor(farm, new Set());
+    expect(plain.objects.some((o) => o.type === 'prop' && o.decor)).toBe(false);
+    const nov1 = withDecor(farm, new Set(on(2026, 11, 1)));
+    expect(nov1.objects.filter((o) => o.type === 'prop' && o.decor === 'dec.znicze')).toHaveLength(3);
+    expect(withDecor(getMap('home'), new Set(on(2026, 12, 25))).objects.some((o) => o.type === 'prop' && o.id === 'decor_choinka')).toBe(true);
   });
 });

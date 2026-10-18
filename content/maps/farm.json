@@ -1248,6 +1248,83 @@
     1
    ],
    "shadow": 12
+  },
+  {
+   "type": "prop",
+   "id": "decor_znicz0",
+   "sprite": "w2_znicz",
+   "at": [
+    19,
+    11
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "decor": "dec.znicze",
+   "shadow": 8
+  },
+  {
+   "type": "prop",
+   "id": "decor_znicz1",
+   "sprite": "w2_znicz",
+   "at": [
+    20,
+    11
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "decor": "dec.znicze",
+   "shadow": 8
+  },
+  {
+   "type": "prop",
+   "id": "decor_znicz2",
+   "sprite": "w2_znicz",
+   "at": [
+    21,
+    11
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "decor": "dec.znicze",
+   "shadow": 8
+  },
+  {
+   "type": "prop",
+   "id": "decor_bunting_maj",
+   "sprite": "w2_bunting",
+   "at": [
+    4,
+    3
+   ],
+   "size": [
+    3,
+    1
+   ],
+   "solid": false,
+   "decor": "dec.flagi_maj",
+   "z": 64
+  },
+  {
+   "type": "prop",
+   "id": "decor_bunting_lis",
+   "sprite": "w2_bunting",
+   "at": [
+    4,
+    3
+   ],
+   "size": [
+    3,
+    1
+   ],
+   "solid": false,
+   "decor": "dec.flagi_listopad",
+   "z": 64
   }
  ]
 }

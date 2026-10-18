@@ -39,7 +39,7 @@ export interface MapView {
   zoomOut(): void;
   unlock(): void;
   /** Герой бежит к `p`, втыкает флажок (зелёный, если `ok`), потом `done`. */
-  /** Герой бежит и втыкает флажок; возвращает, сколько мс до конца анимации (флажок уже стоит и качнулся). */
+  /** Герой бежит и втыкает флажок; возвращает, через сколько мс флажок воткнут и окрашен по вердикту. */
   plant(p: Pt, ok: boolean, done?: () => void): number;
   /** После ответа: подсветить единицы золотом, подписать, показать булавки. */
   reveal(ids: readonly string[]): void;
@@ -469,7 +469,7 @@ export function createMap(o: MapOptions): MapView {
         return 0;
       }
       start();
-      return Math.round((dur + PLANT_T + WOBBLE_T) * 1000);
+      return Math.round((dur + PLANT_T) * 1000);
     },
     reveal(ids) {
       for (const id of ids) reveals.add(id);

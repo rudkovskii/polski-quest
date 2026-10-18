@@ -10,7 +10,7 @@ import { ZagrodaLayer, applyEntries } from './zagrodaLayer';
 import { pickZoom } from '../world/camera';
 import { LocationModel, type Actor, type WorldEvent } from '../world/location';
 import { PositionGate } from '../world/positionGate';
-import { getMap, resolveSpawn, routeTo, START } from '../world/maps';
+import { getMap, resolveSpawn, routeTo, START, withDecor } from '../world/maps';
 
 // Сцена мира: карта, герой, кот, объекты. Логика в world/location.ts; сцена рисует и переводит события модели в шину.
 // Ввод приходит intents через bus (`input:intent`, to = world); тап по карте разбирает PointerSource через tileAt().
@@ -145,7 +145,8 @@ export class World extends Phaser.Scene {
   create(): void {
     this.cameras.main.setBackgroundColor(BG_COLOR);
     const id = this.start0.map ?? START.map;
-    this.mapDef = getMap(id);
+    // Украшения к сегодняшней дате (знич 1–2.11, ёлка 24.12–6.01…): список кладёт main.ts в реестр игры.
+    this.mapDef = withDecor(getMap(id), new Set((this.registry.get('decor') as string[] | undefined) ?? []));
     const spawn = resolveSpawn(this.mapDef, this.start0.spawn ?? START.spawn, this.start0.facing);
     this.sprites = this.cache.json.get('sprites') as SpritesMeta;
     this.model = new LocationModel(this.mapDef, spawn.tile, { facing: spawn.facing, spriteSize: (id) => this.sprites[id]?.size });
@@ -495,9 +496,15 @@ export class World extends Phaser.Scene {
       if (!meta) throw new Error(`World: нет спрайта "${src.sprite}"`);
       const cx = (o.at[0] + o.size[0] / 2) * T;
       const bottom = (o.at[1] + o.size[1]) * T;
-      const s = this.add.sprite(cx, bottom, ATLAS, meta.frames[0]);
+      const s = this.add.sprite(cx, bottom - (src.dy ?? 0), ATLAS, meta.frames[0]);
       s.setOrigin(0.5, 1);
-      s.setDepth(src.depth === 'floor' ? 1.5 : src.depth === 'wall' ? 2 : 10 + bottom);
+      s.setDepth(src.depth === 'floor' ? 1.5 : src.depth === 'wall' ? 2 : 10 + bottom + (src.z ?? 0));
+      // Украшение с несколькими кадрами (огонёк знича, флажок, гирлянда) — тихая петля.
+      if (src.decor && meta.frames.length > 1) {
+        const key = `decor:${src.sprite}`;
+        if (!this.anims.exists(key)) this.anims.create({ key, frames: meta.frames.map((f) => ({ key: ATLAS, frame: f })), frameRate: 4, repeat: -1 });
+        s.play(key);
+      }
       if (src.shadow) this.placeShadow(cx, bottom - 1, src.shadow, 2.5);
       s.setData('sprite', src.sprite);
       this.propSprites.set(o.key, s);

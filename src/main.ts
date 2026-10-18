@@ -9,6 +9,8 @@ import { GAMES, GAME_BY_ENTRY, GAME_BY_ID } from './games/registry';
 import { configureHymnAudio } from './games/hymn';
 import { createPolska } from './systems/polska';
 import { PLOT_NAME } from './systems/zagroda';
+import { activeDecor, parseDecor } from './systems/decor';
+import { V2 } from './systems/v2content';
 import type { PolskaEntry, PolskaGameId } from './types/polska';
 import { audioContext, connectAudio } from './systems/platform/audio';
 import { createMusicPlayer } from './systems/platform/music';
@@ -342,6 +344,9 @@ async function main(): Promise<void> {
     scene: [Boot, World],
   });
   phaser.registry.set('boot:start', start);
+  // Украшения мира к реальной дате (часы игры, `?now=`): знич 1–2.11, флажки 2–3.05 и 11.11, ёлка 24.12–6.01, пальма и писанки к Пасхе.
+  const today = new Date(clock.now());
+  phaser.registry.set('decor', activeDecor(parseDecor((V2.docs.swieta as { decor?: unknown }).decor), { y: today.getFullYear(), m: today.getMonth() + 1, d: today.getDate() }));
 
   const world = (): World | null => {
     const s = phaser.scene.getScene('World') as World | null;

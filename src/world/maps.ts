@@ -46,6 +46,12 @@ export function routeTo(from: string, use: string, maps: Readonly<Record<string,
   return null;
 }
 
+/** Карта с украшениями на сегодня: объекты с `decor` остаются, только если украшение в `active` (`systems/decor.ts`). */
+export function withDecor(m: LocationMap, active: ReadonlySet<string>): LocationMap {
+  if (!m.objects.some((o) => o.type === 'prop' && o.decor)) return m;
+  return { ...m, objects: m.objects.filter((o) => o.type !== 'prop' || !o.decor || active.has(o.decor)) };
+}
+
 /** Где игра стартует с чистого сохранения. */
 export const START = { map: 'farm', spawn: 'start' } as const;
 
