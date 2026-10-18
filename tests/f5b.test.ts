@@ -371,8 +371,8 @@ describe('F5b: «созреет 0» и «до A0.1»', () => {
     s.farm.plant(['w.dzien_dobry', 'w.kot', 'w.pies']);
     s.farm.refresh();
     expect(tip()).toContain('уже растут 3');
-    s.bus.emit('hud:xp', { level: 'Kiełek', ratio: 0.1, sub: 2, of: 20, pct: 0.0149, toNext: 14, growing: 11 });
+    s.bus.emit('hud:xp', { level: 'Уровень 2', ratio: 0.1, sub: 2, of: 20, pct: 0.0149, toNext: 14, growing: 11 });
     expect(next()).toBe('до A1: 1%');
-    expect(tip()).toBe('До следующего подуровня: 14 оч. · уже растут 11');
+    expect(tip()).toBe('До уровня 3: 14 оч. · уже растут 11');
   });
 });

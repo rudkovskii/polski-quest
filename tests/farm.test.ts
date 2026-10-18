@@ -63,15 +63,15 @@ describe('ферма: фасад', () => {
     expect(r).toMatchObject({ ok: false, correct: 'Здравствуйте.', act: { kind: 'miss' } });
   });
 
-  it('полоска опыта двигается с первых ответов, hud:xp несёт подуровень, долю пути и «сколько до следующего»', () => {
+  it('полоска опыта двигается с первых ответов, hud:xp несёт уровень, долю пути и «сколько до следующего»', () => {
     const s = setup();
     const f = s.farm;
     const ids = ['w.dzien_dobry', 'w.dobry_wieczor', 'w.dobranoc', 'w.do_widzenia', 'w.prosze'].filter((id) => f.word(id));
     f.plant(ids);
     const ev: BusEvents['hud:xp'][] = [];
     s.bus.on('hud:xp', (x) => ev.push(x));
-    expect(f.stats()).toMatchObject({ level: 'Ziemia', ratio: 0 });
-    expect(f.stats().path).toMatchObject({ sub: 0, nextPl: 'Ziarenko' });
+    expect(f.stats()).toMatchObject({ level: 'Старт', ratio: 0 });
+    expect(f.stats().path).toMatchObject({ sub: 0, nextPl: 'Poziom 1', nextTo: 'уровня 1' });
     solve(f, 1);
     solve(f, 1);
     solve(f, 1);

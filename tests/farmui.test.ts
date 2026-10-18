@@ -59,7 +59,7 @@ function fakeApi(over: Partial<FarmStats> = {}) {
     // Фраза «Mam kota.» заблокирована: кот ещё не куст.
     missingWords: (id) => (id === 'p.mam_kota' ? ['w.kot'] : []),
     plant,
-    stats: () => ({ xp: 120, level: 'Listek', ratio: 0.4, path: pathOf({ grown: 40, partial: 2.5 }), base: BASE, thresholds: THRESHOLDS, sessionGain: 0.4, grownToday: 3, grownTotal: 17, grownWords: 12, grownPhrases: 5, growing: 4, bag: 1, answersToday: 25, ...over }),
+    stats: () => ({ xp: 120, level: 'Уровень 3', ratio: 0.4, path: pathOf({ grown: 40, partial: 2.5 }), base: BASE, thresholds: THRESHOLDS, sessionGain: 0.4, grownToday: 3, grownTotal: 17, grownWords: 12, grownPhrases: 5, growing: 4, bag: 1, answersToday: 25, ...over }),
     pantry: () => [{ topic: 'jedzenie', ids: ['w.chleb'] }],
     say,
     onChange: (fn) => (listeners.add(fn), () => listeners.delete(fn)),
@@ -270,8 +270,8 @@ describe('коробка, кровать и карточка растения', 
     expect(root.textContent).toContain('Skrzynka');
     expect(root.textContent).toContain('носит фермер сам');
     s.openBed();
-    expect(root.querySelector('[data-level]')?.textContent).toContain('Listek · 3/20');
-    expect(root.querySelector('[data-session-gain]')?.textContent).toBe('+0,4 подуровня за сессию');
+    expect(root.querySelector('[data-level]')?.textContent).toContain('Уровень 3/20');
+    expect(root.querySelector('[data-session-gain]')?.textContent).toBe('+0,4 уровня за сессию');
     expect(root.textContent).not.toMatch(/до завтра|лимит|приходи завтра/);
     d.open();
     expect(s.isOpen).toBe(false);

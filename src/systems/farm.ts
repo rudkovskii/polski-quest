@@ -123,7 +123,7 @@ export function createFarm(d: FarmDeps): Farm {
   const grownPhrases = (): number => [...st.items.values()].filter((it) => it.phrase && it.harvests > 0).length;
   /** Путь к A1 — только по базе A1: слова темы «Święta i zwyczaje» (v2) в очки не идут. */
   const path = (): PathInfo => pathOf(pointsOf([...st.items.values()].filter((it) => isA1(it.id))));
-  /** Позиция на пути при запуске фермы: от неё считается рост за сессию («+0,4 подуровня»). */
+  /** Позиция на пути при запуске фермы: от неё считается рост за сессию («+0,4 уровня»). */
   const pos0 = path().pos;
   /** Фраза для сборки из плиток (иначе растёт в играх 1 и 2 как слово). */
   const assemble = (id: string): boolean => {
@@ -159,7 +159,7 @@ export function createFarm(d: FarmDeps): Farm {
   const emitXp = (gain = 0, up = false): void => {
     const l = path();
     d.bus.emit('hud:xp', {
-      level: l.pl,
+      level: l.ru,
       ratio: l.ratio,
       sub: l.sub,
       of: SUB_COUNT,
@@ -299,7 +299,7 @@ export function createFarm(d: FarmDeps): Farm {
       const items = [...st.items.values()];
       return {
         xp: st.xp,
-        level: l.pl,
+        level: l.ru,
         ratio: l.ratio,
         path: l,
         base: BASE,

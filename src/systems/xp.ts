@@ -1,4 +1,4 @@
-// Путь к A1 (V11c): очки, 20 подуровней и итоговый A1. Чистая часть, без браузера и хранилища: уровень не хранится, а выводится
+// Путь к A1 (V11c): очки, 20 уровней (просто номера, без званий) и итоговый A1. Чистая часть, без браузера и хранилища: уровень не хранится, а выводится
 // из состояния огорода (журнал ответов), поэтому старые сохранения пересчитываются сами.
 //
 // Очки: выращенное слово 1, выращенная фраза сборки (≥ 3 плиток) 2, короткая фраза (растёт в играх 1 и 2 как слово) 1.
@@ -12,45 +12,28 @@ import { canAssemble } from './quiz';
 export const SUB_COUNT = 20;
 
 export interface Sublevel {
-  /** Номер 0…20 (0 — старт, до первого порога). */
+  /** Номер 0…20 (0 — старт, до первого порога; 21 — A1). */
   n: number;
+  /** «Poziom 7», старт — «Start», финал — «A1». */
   pl: string;
+  /** «Уровень 7», старт — «Старт», финал — «A1». */
   ru: string;
-  icon: string;
-  /** Короткая подпись под названием. */
-  note: string;
-  /** Что открыто: подпись для праздничной карточки (без механики). */
-  gift: string;
 }
 
-const S = (n: number, pl: string, ru: string, icon: string, note: string, gift: string): Sublevel => ({ n, pl, ru, icon, note, gift });
+const S = (n: number, pl: string, ru: string): Sublevel => ({ n, pl, ru });
 
-/** Звания: 0 — старт, 1…20 — подуровни, дальше A1 (`A1_LEVEL`). */
-export const SUBLEVELS: readonly Sublevel[] = [
-  S(0, 'Ziemia', 'Земля', '🟫', 'Земля ждёт первое зерно', 'Пустая грядка и лейка'),
-  S(1, 'Ziarenko', 'Зёрнышко', '🌰', 'Первое зерно в земле', 'Табличка «Ziarenko» на воротах'),
-  S(2, 'Kiełek', 'Проросток', '🌱', 'Первые ростки пробились', 'Табличка «Kiełek» на воротах'),
-  S(3, 'Listek', 'Листик', '🍃', 'Появились первые листья', 'Свежий листик в петлицу'),
-  S(4, 'Pączek', 'Бутон', '🌷', 'Бутоны готовы раскрыться', 'Бутон на подоконник'),
-  S(5, 'Kwiat', 'Цветок', '🌼', 'Грядка зацвела', 'Букет на столе'),
-  S(6, 'Grządka', 'Грядка', '🥕', 'Свои ровные грядки', 'Ровные ряды грядок'),
-  S(7, 'Ogródek', 'Огородик', '🥬', 'Огородик за домом', 'Калитка в огородик'),
-  S(8, 'Płot', 'Забор', '🪵', 'Хозяйство обнесено забором', 'Новый забор вокруг участка'),
-  S(9, 'Studnia', 'Колодец', '🪣', 'Вода всегда под рукой', 'Колодец и ведро'),
-  S(10, 'Szklarnia', 'Теплица', '🏡', 'Растёт и зимой', 'Тёплый уголок с рассадой'),
-  S(11, 'Sad', 'Сад', '🍎', 'Яблони дали первый урожай', 'Яблоня у дома'),
-  S(12, 'Pasieka', 'Пасека', '🐝', 'Пчёлы нашли твой сад', 'Улей на краю сада'),
-  S(13, 'Pole', 'Поле', '🌾', 'Поле колосится', 'Поле до горизонта'),
-  S(14, 'Stodoła', 'Амбар', '🏚️', 'Амбар наполняется', 'Новый амбар'),
-  S(15, 'Młyn', 'Мельница', '⚙️', 'Мелешь собственную муку', 'Мельница на реке'),
-  S(16, 'Piekarnia', 'Пекарня', '🍞', 'Из своей муки пахнет хлебом', 'Печь и тёплый хлеб'),
-  S(17, 'Targ', 'Рынок', '🧺', 'Есть что продать на рынке', 'Прилавок на рынке'),
-  S(18, 'Traktor', 'Трактор', '🚜', 'Работа пошла быстрее', 'Трактор во дворе'),
-  S(19, 'Wieś', 'Деревня', '🏘️', 'Вся деревня знает твою ферму', 'Дорога в деревню'),
-  S(20, 'Gospodarstwo', 'Хозяйство', '🏡', 'Большое хозяйство, остался последний рывок', 'Флаг над хозяйством'),
-];
+/** Уровни: 0 — старт, 1…20 — «Poziom N · Уровень N», дальше A1 (`A1_LEVEL`). Без тематических званий: просто номера. */
+export const SUBLEVELS: readonly Sublevel[] = [S(0, 'Start', 'Старт'), ...Array.from({ length: SUB_COUNT }, (_, i) => S(i + 1, `Poziom ${i + 1}`, `Уровень ${i + 1}`))];
 
-export const A1_LEVEL: Sublevel = S(21, 'Rolnik A1', 'Фермер A1', '🏆', 'Вся база выращена', 'Звание Rolnik и золотая лейка');
+export const A1_LEVEL: Sublevel = S(SUB_COUNT + 1, 'A1', 'A1');
+
+/** Короткая подпись уровня для HUD, кровати и итога раунда: «Старт», «Уровень 7/20», «A1». */
+export function levelLabel(n: number): string {
+  return n <= 0 ? SUBLEVELS[0]!.ru : n > SUB_COUNT ? A1_LEVEL.ru : `Уровень ${n}/${SUB_COUNT}`;
+}
+
+/** Куда ведёт следующий порог: «уровня 8» (для «До уровня 8») или «A1» после 20-го. */
+export const nextTarget = (n: number): string => (n >= SUB_COUNT ? A1_LEVEL.ru : `уровня ${n + 1}`);
 
 /** Доля веса за растущее (стадия → доля). */
 export const PARTIAL_BY_STAGE = { seed: 0.1, sprout: 0.3, bush: 0.6 } as const;
@@ -78,7 +61,7 @@ const ASSEMBLE_IDS: ReadonlySet<string> = new Set(PHRASES.filter(canAssemble).ma
 export const weightOf = (id: string): number => (ASSEMBLE_IDS.has(id) ? 2 : 1);
 
 /**
- * Пороги подуровней 1…20 в очках: первые частые (5, 15, 30, 50, 80, 120), дальше шаг растёт, 20-й — 95 % пути.
+ * Пороги уровней 1…20 в очках: первые частые (5, 15, 30, 50, 80, 120), дальше шаг растёт, 20-й — 95 % пути.
  * Строго возрастают, кратны 5 (при малой базе — целые).
  */
 export function thresholds(total: number): number[] {
@@ -127,14 +110,13 @@ export function pointsOf(items: Iterable<ItemState>, weight: (id: string) => num
 }
 
 export interface PathInfo {
-  /** 0…20 — подуровень, 21 — A1. */
+  /** 0…20 — уровень, 21 — A1. */
   sub: number;
   pl: string;
   ru: string;
-  icon: string;
-  /** 0…1 внутри подуровня (до следующего порога). */
+  /** 0…1 внутри уровня (до следующего порога). */
   ratio: number;
-  /** Непрерывная позиция: sub + ratio (для «+0,4 подуровня»). */
+  /** Непрерывная позиция: sub + ratio (для «+0,4 уровня»). */
   pos: number;
   /** Очки с частичным зачётом, и только выращенное. */
   points: number;
@@ -142,11 +124,13 @@ export interface PathInfo {
   total: number;
   /** Доля пути до A1, 0…1 (1 — только на A1). */
   pct: number;
-  /** Очков до следующего подуровня (или до A1); null — A1. */
+  /** Очков до следующего уровня (или до A1); null — A1. */
   toNext: number | null;
-  /** Название следующего звания; null — A1. */
+  /** Название следующего уровня («Poziom 8» / «A1»); null — A1. */
   nextPl: string | null;
-  /** Порог следующего подуровня в очках. */
+  /** «уровня 8» / «A1» — для «До уровня 8: …»; null — A1. */
+  nextTo: string | null;
+  /** Порог следующего уровня в очках. */
   nextAt: number | null;
   a1: boolean;
 }
@@ -154,7 +138,7 @@ export interface PathInfo {
 export function pathOf(p: { grown: number; partial: number }, total: number = BASE.total, th: readonly number[] = THRESHOLDS): PathInfo {
   const grown = round2(p.grown);
   const points = Math.min(total, round2(p.grown + p.partial));
-  if (grown >= total) return { sub: SUB_COUNT + 1, pl: A1_LEVEL.pl, ru: A1_LEVEL.ru, icon: A1_LEVEL.icon, ratio: 1, pos: SUB_COUNT + 1, points: total, grown: total, total, pct: 1, toNext: null, nextPl: null, nextAt: null, a1: true };
+  if (grown >= total) return { sub: SUB_COUNT + 1, pl: A1_LEVEL.pl, ru: A1_LEVEL.ru, ratio: 1, pos: SUB_COUNT + 1, points: total, grown: total, total, pct: 1, toNext: null, nextPl: null, nextTo: null, nextAt: null, a1: true };
   let sub = 0;
   while (sub < th.length && points >= th[sub]!) sub++;
   const lo = sub === 0 ? 0 : th[sub - 1]!;
@@ -166,7 +150,6 @@ export function pathOf(p: { grown: number; partial: number }, total: number = BA
     sub,
     pl: lvl.pl,
     ru: lvl.ru,
-    icon: lvl.icon,
     ratio,
     pos: sub + ratio,
     points,
@@ -175,6 +158,7 @@ export function pathOf(p: { grown: number; partial: number }, total: number = BA
     pct: Math.min(0.99, points / total),
     toNext: Math.max(0, Math.ceil(hi - points - 1e-9)),
     nextPl: next,
+    nextTo: nextTarget(sub),
     nextAt: hi,
     a1: false,
   };
@@ -182,12 +166,12 @@ export function pathOf(p: { grown: number; partial: number }, total: number = BA
 
 const round2 = (x: number): number => Math.round(x * 100) / 100;
 
-/** «+0,4 подуровня»: рост позиции, одна цифра после запятой; меньше 0,05 — пусто. */
+/** «+0,4 уровня»: рост позиции, одна цифра после запятой; меньше 0,05 — пусто. */
 export function growthText(delta: number): string {
   const d = Math.round(delta * 10) / 10;
   if (d < 0.1) return '';
   const s = String(d).replace('.', ',');
   const whole = Number.isInteger(d);
-  const tail = whole && d === 1 ? 'подуровень' : 'подуровня';
+  const tail = whole && d === 1 ? 'уровень' : 'уровня';
   return `+${s} ${tail}`;
 }

@@ -1,12 +1,12 @@
 // @vitest-environment happy-dom
-// V11c: путь к A1 — метрика очков, 20 подуровней, A1 = вся база, пересчёт старого сохранения, монотонность, карточка и экран пути.
+// V11c: путь к A1 — метрика очков, 20 уровней, A1 = вся база, пересчёт старого сохранения, монотонность, карточка и экран пути.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PHRASES, WORDS } from '../src/systems/content';
 import { createFarm } from '../src/systems/farm';
 import { DAY_MS, derive, newGarden, type GardenSave, type ItemState } from '../src/systems/garden';
 import { connectSfx } from '../src/systems/platform/sfx';
 import { canAssemble } from '../src/systems/quiz';
-import { A1_LEVEL, BASE, SUBLEVELS, SUB_COUNT, THRESHOLDS, baseOf, growthText, pathOf, pointsOf, thresholds, weightOf } from '../src/systems/xp';
+import { A1_LEVEL, BASE, SUBLEVELS, SUB_COUNT, THRESHOLDS, baseOf, growthText, levelLabel, nextTarget, pathOf, pointsOf, thresholds, weightOf } from '../src/systems/xp';
 import { mountHud } from '../src/ui/hud';
 import { CARD_MS, mountLevelUp, mountPath } from '../src/ui/levelUp';
 import { Round, renderRoundSummary } from '../src/ui/roundSummary';
@@ -44,7 +44,7 @@ describe('V11c: база и пороги', () => {
     expect(THRESHOLDS.slice(0, 4)).toEqual([5, 15, 30, 50]);
     for (let i = 1; i < THRESHOLDS.length; i++) expect(THRESHOLDS[i]).toBeGreaterThan(THRESHOLDS[i - 1]!);
     expect(THRESHOLDS[19]).toBe(Math.round(BASE.total * 0.95));
-    // шаги растут: следующий подуровень не легче предыдущего (после первых шести)
+    // шаги растут: следующий уровень не легче предыдущего (после первых шести)
     const steps = THRESHOLDS.map((t, i) => t - (THRESHOLDS[i - 1] ?? 0));
     for (let i = 7; i < steps.length; i++) expect(steps[i]!).toBeGreaterThanOrEqual(steps[i - 1]!);
     for (const total of [30, 100, 399, 400, 5000]) {
@@ -54,13 +54,15 @@ describe('V11c: база и пороги', () => {
     }
   });
 
-  it('у каждого подуровня польское название, перевод, значок и подпись; названия не повторяются', () => {
+  it('уровни — просто номера: «Poziom N · Уровень N», старт и A1; названия не повторяются, без званий', () => {
     expect(SUBLEVELS).toHaveLength(SUB_COUNT + 1);
     expect(new Set(SUBLEVELS.map((l) => l.pl)).size).toBe(SUB_COUNT + 1);
-    for (const l of [...SUBLEVELS, A1_LEVEL]) expect([l.pl, l.ru, l.icon, l.note, l.gift].every((x) => x.length > 0)).toBe(true);
-    expect(SUBLEVELS.slice(1, 4).map((l) => l.pl)).toEqual(['Ziarenko', 'Kiełek', 'Listek']);
-    expect(SUBLEVELS[20]!.pl).toBe('Gospodarstwo');
-    expect(A1_LEVEL.pl).toBe('Rolnik A1');
+    expect(SUBLEVELS[0]).toMatchObject({ n: 0, pl: 'Start', ru: 'Старт' });
+    expect(SUBLEVELS.slice(1, 4).map((l) => [l.pl, l.ru])).toEqual([['Poziom 1', 'Уровень 1'], ['Poziom 2', 'Уровень 2'], ['Poziom 3', 'Уровень 3']]);
+    expect(SUBLEVELS[20]).toMatchObject({ pl: 'Poziom 20', ru: 'Уровень 20' });
+    expect(A1_LEVEL).toMatchObject({ n: 21, pl: 'A1', ru: 'A1' });
+    expect([levelLabel(0), levelLabel(7), levelLabel(20), levelLabel(21)]).toEqual(['Старт', 'Уровень 7/20', 'Уровень 20/20', 'A1']);
+    expect([nextTarget(0), nextTarget(7), nextTarget(19), nextTarget(20)]).toEqual(['уровня 1', 'уровня 8', 'уровня 20', 'A1']);
   });
 });
 
@@ -87,7 +89,7 @@ describe('V11c: метрика очков', () => {
     const all = [...WORDS.map((w) => item(w.id, { harvests: 1, stage: null })), ...PHRASES.map((p) => item(p.id, { harvests: 1, stage: null }))];
     const full = pointsOf(all);
     expect(full.grown).toBe(BASE.total);
-    expect(pathOf(full)).toMatchObject({ a1: true, sub: 21, pct: 1, toNext: null, pl: 'Rolnik A1' });
+    expect(pathOf(full)).toMatchObject({ a1: true, sub: 21, pct: 1, toNext: null, pl: 'A1' });
     const almost = pointsOf(all.slice(1).concat(item(all[0]!.id, { stage: 'bush' })));
     const p = pathOf(almost);
     expect(p.a1).toBe(false);
@@ -96,14 +98,14 @@ describe('V11c: метрика очков', () => {
     expect(p.toNext).toBeGreaterThan(0);
   });
 
-  it('пороги: подуровень берётся ровно на пороге, внутри подуровня полоска от 0 до 1', () => {
+  it('пороги: уровень берётся ровно на пороге, внутри уровня полоска от 0 до 1', () => {
     const lv = (x: number) => pathOf({ grown: x, partial: 0 });
-    expect(lv(0)).toMatchObject({ sub: 0, pl: 'Ziemia', ratio: 0, toNext: 5 });
+    expect(lv(0)).toMatchObject({ sub: 0, pl: 'Start', ru: 'Старт', ratio: 0, toNext: 5 });
     expect(lv(4.9).sub).toBe(0);
-    expect(lv(5)).toMatchObject({ sub: 1, pl: 'Ziarenko', nextPl: 'Kiełek' });
+    expect(lv(5)).toMatchObject({ sub: 1, pl: 'Poziom 1', nextPl: 'Poziom 2', nextTo: 'уровня 2' });
     expect(lv(15).sub).toBe(2);
     expect(lv(THRESHOLDS[19]! - 1).sub).toBe(19);
-    expect(lv(THRESHOLDS[19]!)).toMatchObject({ sub: 20, pl: 'Gospodarstwo', nextPl: 'Rolnik A1' });
+    expect(lv(THRESHOLDS[19]!)).toMatchObject({ sub: 20, pl: 'Poziom 20', nextPl: 'A1', nextTo: 'A1' });
     expect(lv(10).ratio).toBeCloseTo(0.5);
     expect(lv(10).pos).toBeCloseTo(1.5);
   });
@@ -119,7 +121,7 @@ describe('V11c: метрика очков', () => {
 });
 
 describe('V11c: ферма', () => {
-  it('первый подуровень берётся в первую сессию: 15 слов, каждое отвечено в обе стороны', () => {
+  it('первый уровень берётся в первую сессию: 15 слов, каждое отвечено в обе стороны', () => {
     const s = setup();
     const ids = WORDS.slice(0, 15).map((w) => w.id);
     s.farm.plant(ids);
@@ -133,7 +135,7 @@ describe('V11c: ферма', () => {
     expect(s.farm.stats().sessionGain).toBeGreaterThan(1);
   });
 
-  it('очки и подуровень не падают за серию ответов, в том числе неверных', () => {
+  it('очки и уровень не падают за серию ответов, в том числе неверных', () => {
     const s = setup();
     const ids = WORDS.slice(0, 20).map((w) => w.id);
     s.farm.plant(ids);
@@ -171,38 +173,39 @@ describe('V11c: ферма', () => {
 });
 
 describe('V11c: HUD, карточка, путь, итоги', () => {
-  it('карточка нового подуровня: название, перевод, «+1 подуровень · 2/20», подпись; гаснет сама; без up молчит', () => {
+  it('карточка нового уровня: «Новый уровень!», Poziom/Уровень, «2 из 20»; гаснет сама; без up молчит', () => {
     vi.useFakeTimers();
     const bus = testBus();
     const root = document.createElement('div');
     const c = mountLevelUp(root, { bus });
-    bus.emit('hud:xp', { level: 'Ziarenko', ratio: 0.2, sub: 1, of: 20 });
+    bus.emit('hud:xp', { level: 'Уровень 1', ratio: 0.2, sub: 1, of: 20 });
     expect(c.isOpen).toBe(false);
-    bus.emit('hud:xp', { level: 'Kiełek', ratio: 0, sub: 2, of: 20, up: true });
+    bus.emit('hud:xp', { level: 'Уровень 2', ratio: 0, sub: 2, of: 20, up: true });
     expect(c.isOpen).toBe(true);
     const text = root.querySelector('[data-levelup]')!.textContent!;
-    expect(text).toContain('Kiełek');
-    expect(text).toContain('Проросток');
-    expect(text).toContain('+1 подуровень · 2/20');
-    expect(text).toContain('Открыто:');
+    expect(text).toContain('Новый уровень!');
+    expect(text).toContain('Poziom 2');
+    expect(text).toContain('Уровень 2');
+    expect(text).toContain('2 из 20');
+    expect(text).not.toMatch(/подуров|Открыто/);
     vi.advanceTimersByTime(CARD_MS + 10);
     expect(c.isOpen).toBe(false);
-    bus.emit('hud:xp', { level: 'Rolnik A1', ratio: 1, sub: 21, of: 20, up: true });
-    expect(root.querySelector('[data-levelup]')!.textContent).toContain('Rolnik A1');
+    bus.emit('hud:xp', { level: 'A1', ratio: 1, sub: 21, of: 20, up: true });
+    expect(root.querySelector('[data-levelup]')!.textContent).toContain('Уровень A1');
     root.querySelector<HTMLElement>('[data-levelup]')!.click();
     expect(c.isOpen).toBe(false);
   });
 
-  it('звук подуровня — тот же `hud:xp {up}`; с mute ничего не подключено и контекст не трогается', () => {
+  it('звук уровня — тот же `hud:xp {up}`; с mute ничего не подключено и контекст не трогается', () => {
     const bus = testBus();
     const ctxOf = vi.fn(() => null);
     const off = connectSfx(bus, () => true, ctxOf, { mute: true });
-    bus.emit('hud:xp', { level: 'Kiełek', ratio: 0, sub: 2, of: 20, up: true });
+    bus.emit('hud:xp', { level: 'Уровень 2', ratio: 0, sub: 2, of: 20, up: true });
     expect(ctxOf).not.toHaveBeenCalled();
     off();
   });
 
-  it('экран «Путь к A1»: лестница из 20 подуровней и A1, текущий отмечен, слова и фразы из скольких, честная строка', () => {
+  it('экран «Путь к A1»: лестница из 20 уровней и A1 (без званий), текущий отмечен, слова и фразы из скольких, честная строка', () => {
     const s = setup();
     const root = document.createElement('div');
     document.body.append(root);
@@ -217,7 +220,12 @@ describe('V11c: HUD, карточка, путь, итоги', () => {
     expect(root.querySelector('.path-step.cur')!.getAttribute('data-step')).toBe(String(sub));
     expect(root.querySelector('[data-path-words]')!.textContent).toBe(`0 из ${BASE.words}`);
     expect(root.querySelector('[data-path-phrases]')!.textContent).toBe(`0 из ${BASE.phrases}`);
-    expect(root.querySelector('[data-path-next]')!.textContent).toMatch(/^До «.+»: ещё \d+ оч/);
+    expect(root.querySelector('[data-path-name]')!.textContent).toBe(sub === 0 ? 'Старт' : `Уровень ${sub} из ${SUB_COUNT}`);
+    expect(root.querySelector('[data-path-next]')!.textContent).toMatch(/^До уровня \d+: ещё \d+ оч/);
+    const ladder = root.querySelector('[data-ladder]')!.textContent!;
+    expect(ladder).toContain('Уровень 20');
+    expect(ladder).toContain('A1');
+    expect(root.textContent).not.toMatch(/подуров|Ziarenko|Kiełek|Rolnik|Gospodarstwo|Ziemia/);
     expect(root.querySelector('[data-path-pct]')!.textContent).toMatch(/^До A1: \d+% · \d+ из \d+ очков$/);
     const honest = root.querySelector('[data-path-honest]')!.textContent!;
     expect(honest).toContain(`A1 ≈ ${BASE.words} слов и ${BASE.phrases} фраз базы`);
@@ -226,7 +234,7 @@ describe('V11c: HUD, карточка, путь, итоги', () => {
     expect(screen.isOpen).toBe(false);
   });
 
-  it('HUD открывает путь по тапу; кровать показывает подуровень, рост за сессию и кнопку «Путь к A1»', () => {
+  it('HUD открывает путь по тапу; кровать показывает уровень, рост за сессию и кнопку «Путь к A1»', () => {
     const s = setup();
     const root = document.createElement('div');
     document.body.append(root);
@@ -235,27 +243,27 @@ describe('V11c: HUD, карточка, путь, итоги', () => {
     s.farm.plant(['w.kot', 'w.pies']);
     s.farm.refresh();
     solveId(s.farm, 1, 'w.kot');
-    expect(root.querySelector('[data-xp-level]')!.textContent).toBe('Ziemia · 0/20');
+    expect(root.querySelector('[data-xp-level]')!.textContent).toBe('Старт');
     root.querySelector<HTMLElement>('[data-xp]')!.click();
     expect(opened).toBe(1);
     const sum = mountSummary(root, s.farm, s.bus, undefined, () => (opened += 10));
     sum.openBed();
-    expect(root.querySelector('[data-level]')!.textContent).toContain('0/20');
-    expect(root.querySelector('[data-level-hint]')!.textContent).toMatch(/^До A1: 0% · до «Ziarenko» ещё \d+ оч\.$/);
+    expect(root.querySelector('[data-level]')!.textContent).toBe('Старт');
+    expect(root.querySelector('[data-level-hint]')!.textContent).toMatch(/^До A1: 0% · до уровня 1 ещё \d+ оч\.$/);
     root.querySelector<HTMLElement>('[data-open-path]')!.click();
     expect(opened).toBe(11);
   });
 
-  it('итог раунда: звание и рост за раунд («+0,4 подуровня»), без роста — только звание', () => {
-    expect([growthText(0.04), growthText(0.4), growthText(1), growthText(2), growthText(1.25)]).toEqual(['', '+0,4 подуровня', '+1 подуровень', '+2 подуровня', '+1,3 подуровня']);
+  it('итог раунда: уровень и рост за раунд («+0,4 уровня»), без роста — только уровень', () => {
+    expect([growthText(0.04), growthText(0.4), growthText(1), growthText(2), growthText(1.25)]).toEqual(['', '+0,4 уровня', '+1 уровень', '+2 уровня', '+1,3 уровня']);
     const r = new Round();
-    r.add({ ok: true, act: { kind: 'water', xp: 1 }, path: { from: 1.2, to: 1.4, sub: 1, pl: 'Ziarenko' } });
-    r.add({ ok: true, act: { kind: 'grow', xp: 4 }, path: { from: 1.4, to: 1.6, sub: 1, pl: 'Ziarenko' } });
-    expect(r.stats.path).toEqual({ from: 1.2, to: 1.6, sub: 1, pl: 'Ziarenko' });
-    expect(renderRoundSummary(1, r.stats).querySelector('[data-round-way]')!.textContent).toBe('Ziarenko · 1/20 · +0,4 подуровня');
+    r.add({ ok: true, act: { kind: 'water', xp: 1 }, path: { from: 1.2, to: 1.4, sub: 1, pl: 'Poziom 1' } });
+    r.add({ ok: true, act: { kind: 'grow', xp: 4 }, path: { from: 1.4, to: 1.6, sub: 1, pl: 'Poziom 1' } });
+    expect(r.stats.path).toEqual({ from: 1.2, to: 1.6, sub: 1, pl: 'Poziom 1' });
+    expect(renderRoundSummary(1, r.stats).querySelector('[data-round-way]')!.textContent).toBe('Уровень 1/20 · +0,4 уровня');
     const flat = new Round();
-    flat.add({ ok: false, path: { from: 2, to: 2, sub: 2, pl: 'Kiełek' } });
-    expect(renderRoundSummary(1, flat.stats).querySelector('[data-round-way]')!.textContent).toBe('Kiełek · 2/20');
+    flat.add({ ok: false, path: { from: 2, to: 2, sub: 2, pl: 'Poziom 2' } });
+    expect(renderRoundSummary(1, flat.stats).querySelector('[data-round-way]')!.textContent).toBe('Уровень 2/20');
     expect(renderRoundSummary(1, new Round().stats).querySelector('[data-round-way]')).toBeNull();
   });
 });

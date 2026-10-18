@@ -57,7 +57,7 @@ export interface BusEvents {
   'world:location': { id: string; controls: MapControls };
   /** Герой остановился: склейка пишет позицию в сохранение. */
   'world:position': { location: string; x: number; y: number; facing: Dir };
-  /** Опыт и путь к A1 для HUD (V11c). `level` — польское звание подуровня; `sub` — номер 0…20 (21 — A1), `of` — подуровней всего (20); `ratio` — доля внутри подуровня; `pct` — доля пути до A1; `toNext` — очков до следующего подуровня (null — A1); `growing` — сколько слов растёт; `xp` — всего очков опыта; `gain` — «+N» за ответ; `up` — новый подуровень (вспышка, карточка, звук). */
+  /** Опыт и путь к A1 для HUD (V11c). `level` — название уровня («Уровень 7», «Старт», «A1»); `sub` — номер 0…20 (21 — A1), `of` — уровней всего (20); `ratio` — доля внутри уровня; `pct` — доля пути до A1; `toNext` — очков до следующего уровня (null — A1); `growing` — сколько слов растёт; `xp` — всего очков опыта; `gain` — «+N» за ответ; `up` — новый уровень (вспышка, карточка, звук). */
   'hud:xp': { level: string; ratio: number; sub?: number; of?: number; pct?: number; pos?: number; toNext?: number | null; xp?: number; gain?: number; up?: boolean; growing?: number };
   /** Грядки фермы: растения и вскопанные клетки (шлёт склейка при любом изменении и при входе на ферму). */
   'farm:plants': { plants: PlantView[]; cells: [number, number][] };
@@ -90,7 +90,7 @@ export interface BusEvents {
   'audio:state': { state: AudioState; via?: AudioVia; text?: string; id?: string };
   /** v2: вид объектов участков Zagroda по прогрессу (шлёт `systems/polska.ts` при любом изменении и при входе в Zagroda); `entries` — кадры точек входа (`map`, `calendar`, `mast`, `seasonBoard`) по прогрессу. */
   'polska:plots': { views: PlotView[]; entries?: Record<string, number> };
-  /** v2: шкала «Wiedza o Polsce» для `ui/polskaHud.ts`: подуровень 0…10, доля внутри, доля всех единиц, опыт v2; `gain` — «+N», `up` — новый подуровень. */
+  /** v2: шкала «Wiedza o Polsce» для `ui/polskaHud.ts`: уровень 0…10, доля внутри, доля всех единиц, опыт v2; `gain` — «+N», `up` — новый уровень. */
   'polska:scale': { sub: number; of: number; pl: string; ru: string; ratio: number; pct: number; xp: number; gain?: number; up?: boolean };
   /** v2: ответ в игре о Польше (для автобега в Zagroda: полив, рост, урожай у объекта `obj`). `quiet` — тихий урожай (тяжёлые даты: без «плим» и искр). */
   'polska:act': { kind: 'water' | 'grow' | 'harvest' | 'miss'; id: string; label: string; obj: string | null; xp: number; quiet?: boolean };

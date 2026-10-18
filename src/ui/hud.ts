@@ -1,4 +1,4 @@
-// HUD: подуровень пути к A1 («Kiełek · 7/20», полоска внутри подуровня, «до A1: 12%») в левом углу и кнопка настроек в правом. Опыт приходит событием `hud:xp` (F-03).
+// HUD: уровень пути к A1 («Уровень 7/20», полоска внутри уровня, «до A1: 12%») в левом углу и кнопка настроек в правом. Опыт приходит событием `hud:xp` (F-03).
 import { bus as globalBus, type Bus } from '../systems/bus';
 import { goalText, type DayGoal } from '../systems/daygoal';
 import type { BusEvents } from '../types/bus';
@@ -74,7 +74,7 @@ export interface HudOptions {
   goal?: () => DayGoal | null;
   /** Тап по плашке цели (открыть итог дня). */
   onGoal?: () => void;
-  /** Тап по подуровню («Путь к A1»). */
+  /** Тап по уровню («Путь к A1»). */
   onLevel?: () => void;
 }
 
@@ -84,7 +84,7 @@ export const SAVE_ERROR_TEXT = 'Не сохранилось, повторяю';
 
 export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
   const bus = o.bus ?? globalBus;
-  const lvl = el('span', { class: 'pq-xp-lvl', 'data-xp-level': '' }, 'Ziemia');
+  const lvl = el('span', { class: 'pq-xp-lvl', 'data-xp-level': '' }, 'Старт');
   const fill = el('span', { class: 'pq-xp-fill', style: 'width: 0%' });
   const bar = el('span', { class: 'pq-xp-bar', role: 'progressbar', 'aria-label': 'Подуровень', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': 0 }, fill);
   const nextEl = el('span', { class: 'pq-xp-next', 'data-xp-next': '' });
@@ -119,12 +119,13 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
   const setXp = (ev: BusEvents['hud:xp']): void => {
     const r = Math.max(0, Math.min(1, ev.ratio));
     lvl.replaceChildren();
-    if (ev.sub !== undefined && ev.of !== undefined && ev.sub <= ev.of) lvl.append(`${ev.level} · `, el('b', {}, `${ev.sub}/${ev.of}`));
+    if (ev.sub !== undefined && ev.of !== undefined && ev.sub >= 1 && ev.sub <= ev.of) lvl.append('Уровень ', el('b', {}, `${ev.sub}/${ev.of}`));
     else lvl.textContent = ev.level;
     // «до A1: 12%»: доля всей базы (слово 1, фраза сборки 2, растущее частично); нет поля — молчим.
     if (ev.pct === undefined) nextEl.textContent = '';
     else nextEl.textContent = ev.pct >= 1 ? 'A1 достигнут' : `до A1: ${Math.floor(ev.pct * 100)}%`;
-    xp.title = ev.toNext != null ? `До следующего подуровня: ${ev.toNext} оч.${ev.growing ? ` · уже растут ${ev.growing}` : ''}` : '';
+    const target = ev.sub === undefined || ev.of === undefined ? 'следующего уровня' : ev.sub >= ev.of ? 'A1' : `уровня ${ev.sub + 1}`;
+    xp.title = ev.toNext != null ? `До ${target}: ${ev.toNext} оч.${ev.growing ? ` · уже растут ${ev.growing}` : ''}` : '';
     bar.setAttribute('aria-valuetext', `${lvl.textContent}. ${nextEl.textContent}`);
     fill.style.width = `${Math.round(r * 100)}%`;
     bar.setAttribute('aria-valuenow', String(Math.round(r * 100)));
@@ -142,7 +143,7 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
       xp.classList.remove('flash');
       void xp.offsetWidth;
       xp.classList.add('flash');
-      xp.title = `Новый подуровень: ${level}`;
+      xp.title = ev.sub !== undefined && ev.sub >= 1 && ev.sub <= (ev.of ?? 20) ? `Новый уровень: ${ev.sub}` : `Новый уровень: ${level}`;
     }
   });
   return {

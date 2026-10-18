@@ -1,6 +1,6 @@
 // Раунды мини-игры (V11a): по 10 заданий, потом итог в стиле Stardew («Ещё раунд» / «Закончить»). Лимита на число раундов нет.
 // Здесь счёт раунда (чистая часть) и карточка итога; шапку «3 / 10» и переходы ведёт `ui/minigame.ts`.
-import { SUB_COUNT, growthText } from '../systems/xp';
+import { growthText, levelLabel } from '../systems/xp';
 import { el } from './dom';
 
 /** Заданий в одном раунде. */
@@ -11,7 +11,7 @@ export interface RoundAnswer {
   ok: boolean;
   /** Действие героя: полив, рост, урожай, промах; `xp` — опыт за ответ. */
   act?: { kind: 'water' | 'grow' | 'harvest' | 'miss'; xp: number };
-  /** Путь к A1 до и после ответа (позиция в подуровнях) и звание после ответа. */
+  /** Путь к A1 до и после ответа (позиция в уровнях) и название после ответа. */
   path?: { from: number; to: number; sub: number; pl: string };
 }
 
@@ -26,7 +26,7 @@ export interface RoundStats {
   harvested: number;
   xp: number;
   bestStreak: number;
-  /** Путь к A1: позиция до первого и после последнего ответа раунда, звание и номер подуровня сейчас. */
+  /** Путь к A1: позиция до первого и после последнего ответа раунда, название и номер уровня сейчас. */
   path?: { from: number; to: number; sub: number; pl: string };
 }
 
@@ -107,10 +107,10 @@ export function renderRoundSummary(n: number, s: Readonly<RoundStats>): HTMLElem
   );
 }
 
-/** Строка пути: «Kiełek · 2/20 · +0,4 подуровня» (рост раунда — только если он есть). */
+/** Строка пути: «Уровень 2/20 · +0,4 уровня» (рост раунда — только если он есть). */
 function wayLine(p: RoundStats['path']): HTMLElement | null {
   if (!p) return null;
-  const where = p.sub > SUB_COUNT ? p.pl : `${p.pl} · ${p.sub}/${SUB_COUNT}`;
+  const where = levelLabel(p.sub);
   const grow = growthText(p.to - p.from);
   return el('div', { class: 'way', 'data-round-way': '' }, where, grow ? ' · ' : '', grow ? el('b', {}, grow) : null);
 }
