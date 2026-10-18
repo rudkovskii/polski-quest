@@ -6,17 +6,17 @@ import { mountSettings } from '../src/ui/settings';
 import { testBus } from './helpers';
 
 describe('HUD', () => {
-  it('подуровень «Ziemia» в углу и кнопка настроек; hud:xp обновляет', () => {
+  it('уровень «Старт» в углу и кнопка настроек; hud:xp обновляет', () => {
     const root = document.createElement('div');
     const bus = testBus();
     let opened = 0;
     const hud = mountHud(root, { onSettings: () => opened++, bus });
-    expect(root.querySelector('[data-xp-level]')?.textContent).toBe('Ziemia');
+    expect(root.querySelector('[data-xp-level]')?.textContent).toBe('Старт');
     expect(root.querySelector<HTMLElement>('.pq-xp-fill')?.style.width).toBe('0%');
     hud.gear.click();
     expect(opened).toBe(1);
-    bus.emit('hud:xp', { level: 'Kiełek', ratio: 0.5, sub: 2, of: 20, pct: 0.12 });
-    expect(root.querySelector('[data-xp-level]')?.textContent).toBe('Kiełek · 2/20');
+    bus.emit('hud:xp', { level: 'Уровень 2', ratio: 0.5, sub: 2, of: 20, pct: 0.12 });
+    expect(root.querySelector('[data-xp-level]')?.textContent).toBe('Уровень 2/20');
     expect(root.querySelector('[data-xp-next]')?.textContent).toBe('до A1: 12%');
     expect(root.querySelector<HTMLElement>('.pq-xp-fill')?.style.width).toBe('50%');
     hud.dispose();
@@ -28,7 +28,7 @@ describe('HUD', () => {
     const hud = mountHud(root, { onSettings: () => {}, bus });
     bus.emit('hud:xp', { level: 'A0', ratio: 0.1, xp: 12, gain: 11 });
     expect(root.querySelector('[data-xp-gain]')?.textContent).toBe('+11');
-    bus.emit('hud:xp', { level: 'Kiełek', ratio: 0, sub: 2, of: 20, xp: 5000, gain: 1, up: true });
+    bus.emit('hud:xp', { level: 'Уровень 2', ratio: 0, sub: 2, of: 20, xp: 5000, gain: 1, up: true });
     expect(root.querySelector('.pq-xp')?.classList.contains('flash')).toBe(true);
     hud.dispose();
   });

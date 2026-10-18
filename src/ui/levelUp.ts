@@ -1,5 +1,5 @@
-// Путь к A1 (V11c): праздничная карточка нового подуровня (стиль Stardew) и экран «Путь к A1» с лестницей из 20 подуровней.
-// Звук нового подуровня играет `connectSfx` на том же событии `hud:xp {up}` (под выключателем звука, с `?mute=1` не подключён).
+// Путь к A1 (V11c): праздничная карточка нового уровня (стиль Stardew) и экран «Путь к A1» с лестницей из 20 уровней (номера в пиксельных плашках).
+// Звук нового уровня играет `connectSfx` на том же событии `hud:xp {up}` (под выключателем звука, с `?mute=1` не подключён).
 import { bus as globalBus, type Bus } from '../systems/bus';
 import { A1_LEVEL, SUBLEVELS, SUB_COUNT, type Sublevel } from '../systems/xp';
 import type { BusEvents } from '../types/bus';
@@ -11,8 +11,18 @@ import { THEME_CSS } from './theme';
 /** Сколько висит карточка, мс (тап закрывает раньше). */
 export const CARD_MS = 5500;
 
+/** Пиксельная плашка с номером уровня (общая для карточки и лестницы). */
+const BADGE_CSS = `
+.pq-bd { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-width: 28px; height: 28px; padding: 0 4px; background: var(--pq-cream); color: var(--pq-ink);
+  border: 2px solid var(--pq-ink); border-radius: 4px; box-shadow: 0 2px 0 var(--pq-ink), inset 0 0 0 2px var(--pq-wood); font: 800 14px/1 ui-monospace, 'SF Mono', Menlo, monospace; font-variant-numeric: tabular-nums; }
+.pq-bd.big { min-width: 64px; height: 64px; font-size: 32px; border-radius: 6px; box-shadow: 0 3px 0 var(--pq-ink), inset 0 0 0 3px var(--pq-wood); }
+.pq-bd.cur { background: var(--pq-accent); }
+.pq-bd.done { background: #e9f1d6; }
+`;
+
 const cardCss = `
 ${THEME_CSS}
+${BADGE_CSS}
 .pq-lvlcard { position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 74px); transform: translateX(-50%); z-index: 90; width: min(300px, calc(100vw - 32px)); box-sizing: border-box;
   background: var(--pq-cream); color: var(--pq-ink); border: 3px solid var(--pq-ink); border-radius: 12px; box-shadow: 0 5px 0 var(--pq-ink), inset 0 0 0 3px var(--pq-wood);
   padding: 14px 14px 12px; text-align: center; cursor: pointer; touch-action: manipulation; font: 15px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -20,7 +30,7 @@ ${THEME_CSS}
 .pq-lvlcard[hidden] { display: none; }
 .pq-lvlcard .rib { display: inline-block; margin-top: -26px; padding: 4px 14px; background: var(--pq-accent); color: var(--pq-ink); border: 2px solid var(--pq-ink); border-radius: 6px; box-shadow: 0 2px 0 var(--pq-ink);
   font-weight: 800; font-size: 13px; letter-spacing: .4px; text-transform: uppercase; }
-.pq-lvlcard .ico { font-size: 46px; line-height: 1.15; margin-top: 6px; animation: pq-lvl-bob 1.4s ease-in-out infinite; }
+.pq-lvlcard .ico { font-size: 46px; line-height: 1.15; margin-top: 10px; animation: pq-lvl-bob 1.4s ease-in-out infinite; }
 .pq-lvlcard h3 { margin: 0; font-size: 26px; font-weight: 800; }
 .pq-lvlcard .ru { opacity: .75; font-size: 15px; }
 .pq-lvlcard .plus { margin: 6px 0 2px; font-weight: 800; color: #4a6b2a; }
@@ -31,28 +41,30 @@ ${THEME_CSS}
 @media (prefers-reduced-motion: reduce) { .pq-lvlcard, .pq-lvlcard .ico { animation: none; } }
 `;
 
+/** Плашка: номер уровня («0» — старт), для A1 — кубок. */
+const badge = (l: Sublevel, cls = ''): HTMLElement => el('span', { class: `pq-bd ${cls}`.trim(), 'aria-hidden': 'true' }, l.n > SUB_COUNT ? '🏆' : String(l.n));
+
 export interface LevelUpCard {
   readonly isOpen: boolean;
   close(): void;
   dispose(): void;
 }
 
-/** Содержимое карточки подуровня `n` (0…21) — отдельно, чтобы тесты не ждали таймеров. */
+/** Содержимое карточки уровня `n` (0…21) — отдельно, чтобы тесты не ждали таймеров. */
 export function cardContent(n: number): HTMLElement[] {
   const l: Sublevel = n > SUB_COUNT ? A1_LEVEL : SUBLEVELS[Math.max(0, n)]!;
   const a1 = n > SUB_COUNT;
   return [
-    el('div', { class: 'rib' }, a1 ? 'Вся база выращена!' : 'Новый подуровень!'),
-    el('div', { class: 'ico', 'aria-hidden': 'true' }, l.icon),
+    el('div', { class: 'rib' }, a1 ? 'Вся база выращена!' : 'Новый уровень!'),
+    el('div', { class: 'ico', 'aria-hidden': 'true' }, badge(l, 'big')),
     el('h3', { 'data-card-name': '' }, l.pl),
-    el('div', { class: 'ru' }, l.ru),
-    el('div', { class: 'plus', 'data-card-plus': '' }, a1 ? 'Уровень A1' : `+1 подуровень · ${n}/${SUB_COUNT}`),
-    el('div', { class: 'note' }, l.note),
-    el('div', { class: 'gift', 'data-card-gift': '' }, `Открыто: ${l.gift}`),
+    el('div', { class: 'ru' }, a1 ? 'Уровень A1' : l.ru),
+    el('div', { class: 'plus', 'data-card-plus': '' }, a1 ? 'Вся база выращена' : `${n} из ${SUB_COUNT}`),
+    ...(a1 ? [el('div', { class: 'gift', 'data-card-gift': '' }, 'Открыто: золотая лейка')] : []),
   ];
 }
 
-/** Карточка нового подуровня на `hud:xp {up}`. Не блокирует ввод: висит сверху, гаснет сама или по тапу. */
+/** Карточка нового уровня на `hud:xp {up}`. Не блокирует ввод: висит сверху, гаснет сама или по тапу. */
 export function mountLevelUp(parent: HTMLElement, o: { bus?: Bus<BusEvents>; ms?: number } = {}): LevelUpCard {
   const bus = o.bus ?? globalBus;
   const card = el('div', { class: 'pq-lvlcard', role: 'status', 'data-levelup': '', hidden: true });
@@ -90,10 +102,10 @@ export function mountLevelUp(parent: HTMLElement, o: { bus?: Bus<BusEvents>; ms?
 
 const pathCss = `
 ${THEME_CSS}
+${BADGE_CSS}
 .path { display: flex; flex-direction: column; gap: 10px; }
 .path-hero { background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; padding: 10px; }
 .path-hero .top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.path-hero .ico { font-size: 34px; line-height: 1; }
 .path-hero .nm { font-size: 22px; font-weight: 800; line-height: 1.1; }
 .path-hero .ru { font-size: 14px; opacity: .75; }
 .path-bar { height: 16px; background: #e4d4a8; border: 2px solid var(--pq-ink); border-radius: 8px; overflow: hidden; }
@@ -102,9 +114,9 @@ ${THEME_CSS}
 .path-rows { display: flex; flex-direction: column; gap: 3px; }
 .path-row { display: flex; justify-content: space-between; gap: 10px; padding: 5px 4px; border-bottom: 1px dashed var(--pq-wood-dark); font-size: 15px; }
 .path-ladder { display: flex; flex-direction: column; gap: 3px; margin: 0; padding: 0; list-style: none; }
-.path-step { display: grid; grid-template-columns: 22px 28px 1fr auto; align-items: center; gap: 6px; padding: 5px 6px; border-radius: 6px; font-size: 15px; }
+.path-step { display: grid; grid-template-columns: 22px 34px 1fr auto; align-items: center; gap: 6px; padding: 5px 6px; border-radius: 6px; font-size: 15px; }
 .path-step .mk { text-align: center; font-weight: 800; }
-.path-step .ic { font-size: 20px; text-align: center; }
+.path-step .pq-bd { justify-self: center; }
 .path-step .nm b { font-weight: 800; }
 .path-step .nm span { opacity: .7; font-size: 13px; margin-left: 4px; }
 .path-step .at { font-size: 12px; opacity: .7; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -128,7 +140,7 @@ const plural = (n: number, one: string, few: string, many: string): string => {
   return a > 10 && a < 20 ? many : b === 1 ? one : b >= 2 && b <= 4 ? few : many;
 };
 
-/** Экран «Путь к A1»: где ты, сколько выращено из скольких, лестница из 20 подуровней и честная строка про объём A1. */
+/** Экран «Путь к A1»: где ты, сколько выращено из скольких, лестница из 20 уровней и честная строка про объём A1. */
 export function mountPath(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>): PathScreen {
   const panel = createPanel({ title: 'Путь к A1', bus });
   const content = el('div', { class: 'path' });
@@ -144,10 +156,10 @@ export function mountPath(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents
     const hero = el(
       'div',
       { class: 'path-hero' },
-      el('div', { class: 'top' }, el('span', { class: 'ico', 'aria-hidden': 'true' }, p.icon), el('div', {}, el('div', { class: 'nm', 'data-path-name': '' }, p.a1 ? p.pl : `${p.pl} · ${p.sub}/${SUB_COUNT}`), el('div', { class: 'ru' }, p.ru))),
+      el('div', { class: 'top' }, badge(SUBLEVELS[Math.min(p.sub, SUB_COUNT + 1)] ?? A1_LEVEL, 'big cur'), el('div', {}, el('div', { class: 'nm', 'data-path-name': '' }, p.a1 ? p.pl : p.sub === 0 ? p.ru : `Уровень ${p.sub} из ${SUB_COUNT}`), el('div', { class: 'ru' }, p.a1 ? 'Вся база выращена' : p.sub === 0 ? 'Пока ни одного очка' : p.pl))),
       el('div', { class: 'path-bar', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, el('i', { style: `width:${pct}%` })),
       el('div', { class: 'path-hint', 'data-path-pct': '' }, p.a1 ? 'Вся база выращена: A1 достигнут' : `До A1: ${pct}% · ${pts(p.points)} из ${b.total} очков`),
-      p.toNext !== null ? el('div', { class: 'path-hint', 'data-path-next': '' }, `До «${p.nextPl}»: ещё ${p.toNext} ${plural(p.toNext, 'очко', 'очка', 'очков')}`) : null,
+      p.toNext !== null ? el('div', { class: 'path-hint', 'data-path-next': '' }, `До ${p.nextTo}: ещё ${p.toNext} ${plural(p.toNext, 'очко', 'очка', 'очков')}`) : null,
     );
     const growing = p.points - p.grown;
     const rows = el(
@@ -160,14 +172,13 @@ export function mountPath(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents
     const steps: HTMLElement[] = [];
     const add = (l: Sublevel, from: number | null): void => {
       const cls = l.n < p.sub ? 'done' : l.n === p.sub ? 'cur' : 'next';
-      const label = l.n === 0 ? 'старт' : l.n > SUB_COUNT ? 'A1' : String(l.n);
       steps.push(
         el(
           'li',
           { class: `path-step ${cls}`, 'data-step': String(l.n), ...(cls === 'cur' ? { 'aria-current': 'step' } : {}) },
           el('span', { class: 'mk' }, cls === 'done' ? '✓' : cls === 'cur' ? '▶' : '·'),
-          el('span', { class: 'ic', 'aria-hidden': 'true' }, l.icon),
-          el('span', { class: 'nm' }, el('b', {}, l.pl), el('span', {}, `${label === 'A1' || label === 'старт' ? label : `${label}/${SUB_COUNT}`} · ${l.ru}`)),
+          badge(l, cls === 'cur' ? 'cur' : cls === 'done' ? 'done' : ''),
+          el('span', { class: 'nm' }, el('b', {}, l.ru), l.n >= 1 && l.n <= SUB_COUNT ? el('span', {}, l.pl) : null),
           el('span', { class: 'at' }, from === null ? '' : `от ${from} оч.`),
         ),
       );
@@ -185,7 +196,7 @@ export function mountPath(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents
     );
   }
 
-  /** На открытии: фокус кнопки сам прокрутил бы вниз, поэтому текущий подуровень ставим в центр после фокуса (начало пути — наверх). */
+  /** На открытии: фокус кнопки сам прокрутил бы вниз, поэтому текущий уровень ставим в центр после фокуса (начало пути — наверх). */
   const reveal = (): void => {
     if (api.stats().path.sub < 3) panel.body.scrollTop = 0;
     else (panel.body.querySelector('.path-step.cur') as (HTMLElement & { scrollIntoView?: (o?: unknown) => void }) | null)?.scrollIntoView?.({ block: 'center' });

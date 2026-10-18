@@ -515,7 +515,7 @@ describe('экран «＋ Своё слово»', () => {
     expect(t.root.querySelector('[data-topic="moje"]')).toBeNull();
   });
 
-  it('не входит в путь к A1: HUD-подуровень и очки не меняются от своих слов', async () => {
+  it('не входит в путь к A1: HUD-уровень и очки не меняются от своих слов', async () => {
     const t = screen();
     const before = JSON.stringify(t.farm.stats().path);
     t.openAdd();

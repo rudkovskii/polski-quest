@@ -1,4 +1,4 @@
-// Маленький элемент HUD (v2): шкала «Wiedza o Polsce» под кнопкой настроек — флажок, звание, номер подуровня и полоска.
+// Маленький элемент HUD (v2): шкала «Wiedza o Polsce» под кнопкой настроек — флажок, звание, номер уровня и полоска.
 // Отдельно от пути к A1 (`ui/hud.ts` не трогаем). Данные — событие `polska:scale`, тап открывает вкладку «Polska» на доске.
 import { bus as globalBus, type Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';

@@ -55,7 +55,7 @@ export interface PolskaAnswerOut {
   act: PolskaAct;
   /** Что осталось единице («ещё 1 день до урожая»). */
   progress: string;
-  /** Шкала «Wiedza o Polsce» до и после ответа (позиция в подуровнях) и звание после. */
+  /** Шкала «Wiedza o Polsce» до и после ответа (позиция в уровнях) и звание после. */
   scale: { from: number; to: number; sub: number; pl: string };
   /** Объект Zagroda, у которого растёт единица. */
   obj: string | null;

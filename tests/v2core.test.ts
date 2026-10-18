@@ -178,7 +178,7 @@ describe('огород v2 и шкала «Wiedza o Polsce»', () => {
     expect(s.p.xp()).toBeGreaterThan(0);
   });
 
-  it('шкала: 10 подуровней по возрастанию, 100 % — только когда всё выращено; медали 50 и 100', () => {
+  it('шкала: 10 уровней по возрастанию, 100 % — только когда всё выращено; медали 50 и 100', () => {
     for (let i = 1; i < POLSKA_LEVELS.length; i++) expect(POLSKA_LEVELS[i]!.at).toBeGreaterThan(POLSKA_LEVELS[i - 1]!.at);
     const units = V2.units;
     const all = derive({ ...newGarden(), planted: units.map((u) => ({ t: NOW, id: u.id })) });
