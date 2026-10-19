@@ -1,4 +1,164 @@
 {
+ "beaver": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "beaver/0",
+   "beaver/1",
+   "beaver/2",
+   "beaver/3",
+   "beaver/4",
+   "beaver/5",
+   "beaver/6",
+   "beaver/7",
+   "beaver/8",
+   "beaver/9",
+   "beaver/10",
+   "beaver/11",
+   "beaver/12",
+   "beaver/13",
+   "beaver/14",
+   "beaver/15",
+   "beaver/16",
+   "beaver/17",
+   "beaver/18",
+   "beaver/19",
+   "beaver/20",
+   "beaver/21",
+   "beaver/22",
+   "beaver/23",
+   "beaver/24",
+   "beaver/25",
+   "beaver/26",
+   "beaver/27",
+   "beaver/28",
+   "beaver/29",
+   "beaver/30",
+   "beaver/31"
+  ],
+  "anims": {
+   "idle_down": [
+    "beaver/0"
+   ],
+   "walk_down": [
+    "beaver/1",
+    "beaver/0",
+    "beaver/2",
+    "beaver/0"
+   ],
+   "idle_up": [
+    "beaver/3"
+   ],
+   "walk_up": [
+    "beaver/4",
+    "beaver/3",
+    "beaver/5",
+    "beaver/3"
+   ],
+   "idle_right": [
+    "beaver/6"
+   ],
+   "walk_right": [
+    "beaver/7",
+    "beaver/6",
+    "beaver/8",
+    "beaver/6"
+   ],
+   "idle_left": [
+    "beaver/9"
+   ],
+   "walk_left": [
+    "beaver/10",
+    "beaver/9",
+    "beaver/11",
+    "beaver/9"
+   ],
+   "sit": [
+    "beaver/12"
+   ],
+   "wash": [
+    "beaver/13",
+    "beaver/14"
+   ],
+   "gnaw_right": [
+    "beaver/15",
+    "beaver/16"
+   ],
+   "gnaw_left": [
+    "beaver/17",
+    "beaver/18"
+   ],
+   "swim_right": [
+    "beaver/19",
+    "beaver/20"
+   ],
+   "swim_left": [
+    "beaver/21",
+    "beaver/22"
+   ],
+   "peek": [
+    "beaver/23",
+    "beaver/24"
+   ],
+   "dive": [
+    "beaver/25"
+   ],
+   "run_right": [
+    "beaver/26",
+    "beaver/27"
+   ],
+   "run_left": [
+    "beaver/28",
+    "beaver/29"
+   ],
+   "sit_right": [
+    "beaver/30"
+   ],
+   "sit_left": [
+    "beaver/31"
+   ]
+  }
+ },
+ "beaver_lodge": {
+  "size": [
+   32,
+   32
+  ],
+  "anchor": [
+   16,
+   31
+  ],
+  "frames": [
+   "beaver_lodge/0"
+  ],
+  "anims": {}
+ },
+ "beaver_pond": {
+  "size": [
+   32,
+   48
+  ],
+  "anchor": [
+   16,
+   47
+  ],
+  "frames": [
+   "beaver_pond/0",
+   "beaver_pond/1"
+  ],
+  "anims": {
+   "ripple": [
+    "beaver_pond/0",
+    "beaver_pond/1"
+   ]
+  }
+ },
  "bed": {
   "size": [
    32,

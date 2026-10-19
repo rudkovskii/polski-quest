@@ -5,6 +5,7 @@ import type { LocationMap } from '../types/map';
 import type { Dir, Intent } from '../types/input';
 import { parseAscii, type ParsedMap, type Xy } from './ascii';
 import { findPath, findPathToAny, type Grid } from './pathfind';
+import type { BeaverRef } from './beaverLife';
 import { CAT_FREE_AFTER_MS, CAT_HOP_MS, CAT_REACT_MAX_MS, CAT_REACT_MIN_MS, CatLife, type LifeHost, type LifeMode, type LifeOrder, type LifePlace } from './catLife';
 
 /** Скорость ходьбы: 4,5 клетки в секунду. */
@@ -30,7 +31,7 @@ type Rect = readonly [number, number, number, number];
 export interface WorldObject {
   /** `prop:desk`, `exit:5,5`, `plot:garden`, `spot:cat_sleep`. */
   key: string;
-  kind: 'prop' | 'exit' | 'plot' | 'spot' | 'plant';
+  kind: 'prop' | 'exit' | 'plot' | 'spot' | 'plant' | 'beaver';
   id: string;
   at: Xy;
   size: Xy;
@@ -199,6 +200,11 @@ export class LocationModel {
   readonly player: Actor;
   readonly cat: Cat | null;
   readonly grid: Grid;
+  /**
+   * Бобёр (`world/beaverLife.ts`, ставит сцена): пока он виден, это интерактивный объект `beaver:0` (тап и A шлют `interact` с `use: 'beaver'`),
+   * а кот не встаёт на его клетку и иногда на него смотрит. Бобёр сам уступает героя (см. `BeaverLife.update`), стеной не служит.
+   */
+  beaver: BeaverRef | null = null;
 
   /** Множитель скорости шага (автобег ускоряется, когда действия копятся в очереди). */
   speed = 1;
@@ -279,7 +285,22 @@ export class LocationModel {
   }
 
   object(key: string): WorldObject | undefined {
-    return this.objects.find((o) => o.key === key) ?? this.plants.find((o) => o.key === key);
+    return this.objects.find((o) => o.key === key) ?? this.dyn().find((o) => o.key === key);
+  }
+
+  /** Живые объекты: растения на грядках и бобёр (по его текущей клетке, шаг дальше середины — уже на новой). */
+  private dyn(): WorldObject[] {
+    const b = this.beaver;
+    if (!b || !b.visible) return this.plants;
+    const t = b.step && b.step.t / b.step.ms > 0.5 ? b.step.to : b.tile;
+    const o: WorldObject = { key: 'beaver:0', kind: 'beaver', id: 'beaver', at: [t[0], t[1]], size: [1, 1], rects: [], cells: [[t[0], t[1], 1, 1]], src: { type: 'spot', id: 'beaver', at: [t[0], t[1]] }, use: 'beaver', label: 'Bóbr · бобёр' };
+    return [...this.plants, o];
+  }
+
+  /** Клетка занята бобром (стоит или идёт на неё). */
+  private beaverOn(c: Xy): boolean {
+    const b = this.beaver;
+    return !!b && b.visible && (eq(b.tile, c) || (!!b.step && eq(b.step.to, c)));
   }
 
   /** Растения на грядках (ключ `plant:<id>`): проходимы, A и тап по ним шлют `interact` с `use: 'plant'`. */
@@ -343,7 +364,7 @@ export class LocationModel {
 
   /** Интерактивный объект, чьи клетки покрывают `tile` (иначе undefined). */
   usableAt(tile: Xy): WorldObject | undefined {
-    return this.objects.find((o) => o.use && o.kind === 'prop' && o.rects.some((r) => inRect(r, tile))) ?? this.plants.find((o) => hitRects(o).some((r) => inRect(r, tile)));
+    return this.objects.find((o) => o.use && o.kind === 'prop' && o.rects.some((r) => inRect(r, tile))) ?? this.dyn().find((o) => hitRects(o).some((r) => inRect(r, tile)));
   }
 
   /** Что под пальцем: ключ интерактивного объекта или двери (`exit:x,y`), иначе null. */
@@ -374,7 +395,7 @@ export class LocationModel {
       if (!best || bottom > best.at[1] + best.size[1]) best = o;
     }
     // Растение в клетке важнее края чужого спрайта: грядки плотные.
-    const plant = this.plants.find((o) => hitRects(o).some((r) => inRect(r, tile)));
+    const plant = this.dyn().find((o) => hitRects(o).some((r) => inRect(r, tile)));
     if (plant) return plant.key;
     return best?.key ?? this.targetAt(tile) ?? this.doorInProp(x, y, !!o.doorZone)?.key ?? null;
   }
@@ -726,7 +747,7 @@ export class LocationModel {
     return {
       w: this.parsed.w,
       h: this.parsed.h,
-      passable: (x, y) => this.passable(x, y) && !this.isExit([x, y]) && !eq([x, y], this.player.tile) && !(this.player.step && eq([x, y], this.player.step.to)),
+      passable: (x, y) => this.passable(x, y) && !this.isExit([x, y]) && !eq([x, y], this.player.tile) && !(this.player.step && eq([x, y], this.player.step.to)) && !this.beaverOn([x, y]),
     };
   }
 
@@ -830,7 +851,7 @@ export class LocationModel {
           c.mode = 'follow';
           c.since = 0;
         } else {
-          c.facing = dirBetween(c.tile, this.player.tile);
+          c.facing = dirBetween(c.tile, this.catGaze(c));
           if (c.since > this.catRestMs) {
             c.mode = c.mode === 'sit' ? 'wash' : 'sit';
             c.since = 0;
@@ -854,6 +875,13 @@ export class LocationModel {
     }
     c.facing = dirBetween(c.tile, nxt);
     c.step = { from: c.tile, to: nxt, t: 0, ms: CAT_STEP_MS };
+  }
+
+  /** Куда смотрит сидящий кот: на героя, а когда рядом бобёр (в 7 клетках) — каждые пару секунд на него. */
+  private catGaze(c: Cat): Xy {
+    const b = this.beaver;
+    if (b && b.visible && manhattan(c.tile, b.tile) <= 7 && Math.floor(c.since / 2200) % 2 === 1) return b.tile;
+    return this.player.tile;
   }
 
   /** Бросить свои дела: сброс плана; с забора — прыжок вниз (true, если прыжок начат). */

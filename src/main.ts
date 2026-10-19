@@ -12,6 +12,8 @@ import { createEntryPoint } from './systems/entryPoint';
 import { createPolska } from './systems/polska';
 import { PLOT_NAME } from './systems/zagroda';
 import { activeDecor, parseDecor } from './systems/decor';
+import { getMap } from './world/maps';
+import { HOME_KEY, createBeaver } from './systems/beaver';
 import { V2 } from './systems/v2content';
 import type { PolskaEntry, PolskaGameId } from './types/polska';
 import { audioContext, connectAudio } from './systems/platform/audio';
@@ -37,6 +39,7 @@ import { mountPantry } from './ui/pantry';
 import { mountPlantCard } from './ui/plantCard';
 import { mountSummary } from './ui/summary';
 import { mountLevelUp, mountPath } from './ui/levelUp';
+import { mountBeaver } from './ui/beaver';
 import { mountDpad } from './ui/dpad';
 import { mountHints } from './ui/hints';
 import { mountGuide, type GuideStage } from './ui/hintsGuide';
@@ -176,6 +179,8 @@ async function main(): Promise<void> {
     },
   });
   mountLevelUp(overlay);
+  // Бобёр (просьба Шэфа 19.10): карточка «Bóbr zamieszkał na farmie!» и пузырь «Bóbr · бобёр» с 🔊.
+  mountBeaver(overlay);
   mountMusicHud(overlay, music);
   const radio = mountRadio(overlay, music);
   mountFloats(overlay);
@@ -372,7 +377,19 @@ async function main(): Promise<void> {
   phaser.registry.set('boot:start', start);
   // Украшения мира к реальной дате (часы игры, `?now=`): знич 1–2.11, флажки 2–3.05 и 11.11, ёлка 24.12–6.01, пальма и писанки к Пасхе.
   const today = new Date(clock.now());
-  phaser.registry.set('decor', activeDecor(parseDecor((V2.docs.swieta as { decor?: unknown }).decor), { y: today.getFullYear(), m: today.getMonth() + 1, d: today.getDate() }));
+  const decor0 = activeDecor(parseDecor((V2.docs.swieta as { decor?: unknown }).decor), { y: today.getFullYear(), m: today.getMonth() + 1, d: today.getDate() });
+  // Бобёр (`systems/beaver.ts`): гость на уровнях 0–9, с 10-го поселяется (хатка и пруд — ключ `beaver.home` в наборе украшений).
+  // `?blvl=N` с `?dev=` подменяет уровень для проверок (профиль dev отдельный, чужие сохранения не трогаем).
+  const devLevel = dev ? Number(params.get('blvl') ?? NaN) : NaN;
+  const beaver = createBeaver({
+    load: () => store.save.beaver,
+    save: (b) => store.update((s: Save) => ({ ...s, beaver: b }), clock.now()),
+    now: () => clock.now(),
+    level: () => (Number.isFinite(devLevel) ? devLevel : farm.stats().path.sub),
+    tz: (t) => new Date(t).getTimezoneOffset(),
+  });
+  phaser.registry.set('beaver', beaver);
+  phaser.registry.set('decor', beaver.phase() === 'resident' ? [...decor0, HOME_KEY] : decor0);
 
   const world = (): World | null => {
     const s = phaser.scene.getScene('World') as World | null;
@@ -416,7 +433,28 @@ async function main(): Promise<void> {
   // Страница из старого кэша (HTTP-кэш index.html, встроенный браузер без SW): версия с сервера без кэша.
   watchVersion({ base: import.meta.env.BASE_URL, local: __BUILD_ID__, isStale: staleBuild, onStale: needReload });
 
-  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock, music, polska, polskaGame };
+  // Бобёр поселился: на ферме, когда ничего не открыто и карточка нового уровня уже погасла. Записываем один раз, хатку и пруд кладём в
+  // реестр, сцена пересоздаётся (`World` слушает `beaver:settled`), карточка «Bóbr zamieszkał na farmie!».
+  let holdSettle = 0;
+  bus.on('hud:xp', ({ up }) => {
+    if (up) holdSettle = Date.now() + 6500;
+  });
+  // Герой стоит там, где вырастут хатка и пруд (клетки и кольцо вокруг): ждём, пока отойдёт.
+  const homeBox = getMap('farm').objects.flatMap((o) => (o.type === 'prop' && o.unlock === HOME_KEY ? [[o.at[0] - 1, o.at[1] - 1, (o.size?.[0] ?? 1) + 2, (o.size?.[1] ?? 1) + 2] as const] : []));
+  let heroAt: readonly [number, number] | null = null;
+  bus.on('world:position', (p) => {
+    heroAt = p.location === 'farm' ? [p.x, p.y] : null;
+  });
+  const maybeSettle = (): void => {
+    if (beaver.phase() === 'resident' || where !== 'farm' || screenOpen || game.isOpen || polskaGame.isOpen || Date.now() < holdSettle) return;
+    if (heroAt && homeBox.some((r) => heroAt![0] >= r[0] && heroAt![1] >= r[1] && heroAt![0] < r[0] + r[2] && heroAt![1] < r[1] + r[3])) return;
+    if (!beaver.trySettle()) return;
+    phaser.registry.set('decor', [...decor0, HOME_KEY]);
+    bus.emit('beaver:settled', {});
+  };
+  setInterval(maybeSettle, 2000);
+
+  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock, music, polska, polskaGame, beaver };
 }
 
 void main();

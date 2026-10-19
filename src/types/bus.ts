@@ -73,6 +73,10 @@ export interface BusEvents {
   'fx:sfx': { name: SfxName };
   /** Подпись над растением у героя (экранные CSS px); null — спрятать. */
   'fx:label': { text: string; x: number; y: number } | null;
+  /** Бобёр (`systems/beaver.ts`): с ним заговорили (тап или A) — пузырь «Bóbr · бобёр» с 🔊 над ним (экранные CSS px). */
+  'beaver:talk': { x: number; y: number };
+  /** Бобёр поселился на ферме (уровень ≥ 10, один раз): карточка «Bóbr zamieszkał na farmie!», хатка и пруд на карте. */
+  'beaver:settled': Record<string, never>;
   /** Герой стоит у объекта, с которым сработает A (над ним рисуется «A»): `x`,`y` — точка над объектом в экранных CSS px; null — отошёл или экран открыт. */
   'fx:near': { use: string; id: string; x: number; y: number } | null;
   /** Первые шаги новичка (`ui/hintsGuide.ts`): к какому объекту вести героя (`desk`, `board`); null — указатель погас. */
