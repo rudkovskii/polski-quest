@@ -8,6 +8,7 @@ from __future__ import annotations
 import random
 
 import art_core
+import art_garden
 from art_core import Cv, P, Sheet, emit, single
 from art_tiles import patch, T
 
@@ -39,80 +40,11 @@ def speckle(c: Cv, rng: random.Random, pts, light: str, dark: str, n: int) -> No
         c.dot(x, y, light if (x + y) % 3 else dark)
 
 
-def mound(c: Cv, cy: float, rx: float, ry: float, part: str = 'soil') -> None:
-    c.ell(8, cy, rx, ry, part)
-
-
-def seed_grid(big: bool = False):
-    """Семя: холмик рыхлой земли (светлее вскопанной, чтобы читался на грядке), в нём семечки и крошечный зелёный кончик."""
-    c = Cv(16, 16, PARTS)
-    if big:  # иконка: крупнее
-        mound(c, 12.4, 6.4, 3.4, 'pile')
-        c.rect(7.0, 5.8, 2.0, 4.2, 'tip'); c.rect(4.6, 5.2, 2.6, 2.0, 'tipl'); c.rect(8.8, 4.2, 2.8, 2.0, 'tipr')
-        c.dots([5, 12, 9, 11, 11, 13], 'loose.3'); c.dots([6, 13, 8, 13], 'loose.1')
-        return c.render()
-    mound(c, 13.0, 3.8, 1.9, 'pile')
-    c.rect(7.4, 9.0, 1.2, 2.4, 'tip'); c.rect(5.4, 8.0, 2.2, 1.6, 'tipl'); c.rect(8.4, 7.4, 2.4, 1.6, 'tipr')
-    c.dots([7, 12], 'loose.3'); c.dots([9, 13], 'loose.1')
-    return c.render()
-
-
-def crop_seed() -> None:
-    single('crop_seed', seed_grid(), anchor=[8, 15])
-
-
-def crop_sprout() -> None:
-    c = Cv(16, 16, PARTS)
-    mound(c, 14.0, 4.6, 1.7, 'pile')
-    c.rect(7.4, 8.0, 1.3, 6.0, 'stem')
-    c.poly([[7.4, 9.4], [3.2, 8.6], [1.6, 5.8], [5.2, 4.8], [7.4, 6.8]], 'leaf')
-    c.poly([[8.7, 8.2], [12.8, 7.2], [14.6, 4.2], [10.6, 3.6], [8.7, 5.8]], 'leaf2')
-    c.dots([4, 6, 11, 5, 3, 7], 'leaf.4')
-    single('crop_sprout', c.render(), anchor=[8, 15])
-
-
-def _leaves(c: Cv, spec, base: int = 0) -> None:
-    for k, (x, y, rx, ry, mat) in enumerate(spec):
-        c.ell(x, y, rx, ry, f'{mat}{(base + k) % 6}')
-
-
-def plant(c: Cv, spec=None, dry=(), stem_top: float = 8.0) -> None:
-    """Куст: стебель и россыпь листьев (каждый лист своей группой, между ними тёмные швы)."""
-    c.rect(7.2, stem_top, 1.6, 15.0 - stem_top, 'stem')
-    spec = spec or [
-        (4.4, 12.0, 3.2, 2.0, 'A'), (11.8, 12.0, 3.2, 2.0, 'B'),
-        (4.2, 8.4, 3.0, 2.2, 'B'), (12.0, 8.2, 3.0, 2.2, 'A'),
-        (8.0, 5.6, 2.6, 2.8, 'B'), (8.0, 10.6, 2.3, 2.6, 'A'),
-    ]
-    for k, (x, y, rx, ry, m) in enumerate(spec):
-        c.ell(x, y, rx, ry, f'd{k}' if k in dry else f'{m}{k}')
-
-
-def crop_bush() -> None:
-    c = Cv(16, 16, PARTS)
-    plant(c)
-    c.dots([3, 7, 10, 4, 7, 4, 10, 7], 'leaf.4')
-    c.dots([7, 8, 6, 12, 14, 12], 'leaf.3')
-    single('crop_bush', c.render(), anchor=[8, 15])
-
-
 def fruit(c: Cv, x: float, y: float, part: str, r: float = 1.7, mat: str = 'tomato') -> None:
     """Плоский плод: блик сверху-слева, тень снизу-справа."""
     c.ell(x, y, r, r, part)
     c.dot(x - r * 0.45, y - r * 0.45, f'{mat}.4' if mat == 'tomato' else f'{mat}.3')
     c.dot(x + r * 0.45, y + r * 0.45, f'{mat}.1')
-
-
-def crop_ripe() -> None:
-    c = Cv(16, 16, PARTS)
-    plant(c, spec=[
-        (4.6, 12.0, 3.0, 1.8, 'A'), (11.6, 12.2, 3.0, 1.8, 'B'),
-        (4.4, 8.0, 2.8, 2.0, 'B'), (11.8, 7.6, 2.8, 2.0, 'A'),
-        (8.0, 5.4, 2.6, 2.8, 'B'), (8.0, 10.0, 2.0, 2.6, 'A'),
-    ])
-    for k, (x, y) in enumerate(((3.2, 10.6), (12.8, 10.2), (8.0, 12.8), (4.6, 5.8), (11.6, 5.6))):
-        fruit(c, x, y, f'f{k}', 2.1)
-    single('crop_ripe', c.render(), anchor=[8, 15])
 
 
 def sunflower_head(c: Cv, cx: float, cy: float, rp: float, rc: float) -> None:
@@ -125,36 +57,6 @@ def sunflower_head(c: Cv, cx: float, cy: float, rp: float, rc: float) -> None:
     for k in range(12):  # швы между лепестками
         a = k * math.pi / 6 + 0.26
         c.dot(cx + math.cos(a) * (rp - 0.4), cy + math.sin(a) * (rp - 0.4), 'sunflower.1')
-
-
-def crop_ripe_phrase() -> None:
-    c = Cv(16, 16, PARTS)
-    c.rect(7.4, 8.0, 1.3, 7.0, 'stem')
-    c.poly([[7.4, 13.8], [3.0, 12.8], [1.8, 10.6], [5.4, 10.8], [7.4, 12.2]], 'leaf')
-    c.poly([[8.7, 12.6], [13.0, 11.4], [14.2, 9.2], [10.6, 9.6], [8.7, 11.0]], 'leaf2')
-    sunflower_head(c, 8.0, 5.0, 3.6, 1.9)
-    c.dots([5, 3, 6, 2, 4, 5], 'sunflower.4')
-    c.dots([8, 5, 9, 6], 'trunk.1')
-    single('crop_ripe_phrase', c.render(), anchor=[8, 15])
-
-
-def overripe_grid():
-    """Перезревшее: куст сник и пожелтел (жёлтые листья свисают), плоды потемнели и висят по бокам."""
-    c = Cv(16, 16, PARTS)
-    c.rect(7.2, 5.0, 1.6, 10.0, 'dstem')
-    c.poly([[7.4, 7.4], [3.4, 6.6], [0.8, 9.8], [1.8, 12.2], [5.6, 10.8], [7.4, 10.2]], 'd0')
-    c.poly([[8.6, 6.6], [12.6, 6.0], [15.2, 9.2], [14.0, 11.6], [10.4, 9.8], [8.6, 9.2]], 'd1')
-    c.poly([[7.6, 6.0], [5.2, 3.4], [8.4, 1.6], [11.6, 3.4], [11.8, 6.6], [9.0, 5.8]], 'd2')
-    c.poly([[7.4, 11.4], [4.6, 11.8], [2.4, 14.0], [5.0, 14.6], [7.4, 13.4]], 'd3')
-    c.poly([[8.6, 11.0], [11.4, 11.6], [13.6, 13.8], [11.0, 14.6], [8.6, 13.0]], 'd4')
-    fruit(c, 4.4, 13.4, 'o0', 1.8, 'fruit_old')
-    fruit(c, 11.8, 13.2, 'o1', 1.8, 'fruit_old')
-    c.dots([4, 9, 12, 8, 8, 4], 'leaf_dry.4'); c.dots([3, 11, 13, 10, 9, 5], 'leaf_dry.1')
-    return c.render()
-
-
-def crop_overripe() -> None:
-    single('crop_overripe', overripe_grid(), anchor=[8, 15])
 
 
 def crop_item() -> None:
@@ -206,8 +108,9 @@ def fx() -> None:
 
 
 def soil_wet() -> None:
-    """Политая земля: тёмное влажное пятно под растением (поверх вскопанной клетки) с бликами воды. Слой под растением."""
-    c = Cv(16, 16, {'wet': P('soil_wet', flat=1), 'wet2': P('soil_wet', flat=2)})
+    """Политая земля: влажное пятно под растением (поверх вскопанной клетки) с бликами воды. Слой под растением.
+    19.10: без самого тёмного тона (`.1`) — рядом со светлыми растениями пятно читалось тяжёлой тёмной массой."""
+    c = Cv(16, 16, {'wet': P('soil_wet', flat=2), 'wet2': P('soil_wet', flat=3)})
     c.ell(8, 11.8, 7.0, 4.0, 'wet')
     c.ell(7.4, 11.4, 5.4, 2.8, 'wet2')
     g = c.render(ring=False)
@@ -217,14 +120,20 @@ def soil_wet() -> None:
     single('soil_wet', g, anchor=[8, 15])
 
 
+def garden_stages() -> None:
+    """Семечко, росток, кустик, урожай (фразы — подсолнух), перезревшее: светлый стиль `art_garden.py` (перерисовка 19.10)."""
+    for name in ('crop_seed', 'crop_sprout', 'crop_bush', 'crop_ripe', 'crop_ripe_phrase', 'crop_overripe'):
+        single(name, art_garden.crop_frame(name), anchor=[8, 15])
+
+
 def icons() -> None:
     """Иконки стадий 16×16 для UI словаря: семя, росток, куст, урожай, перезревшее (кадры icon_<стадия>)."""
-    single('icon_seed', seed_grid(True), anchor=[8, 15])
+    single('icon_seed', art_garden.crop_frame('icon_seed'), anchor=[8, 15])
     for st, name in (('sprout', 'crop_sprout'), ('bush', 'crop_bush'), ('ripe', 'crop_ripe'), ('overripe', 'crop_overripe')):
         sh = art_core.SHEETS[name]
         single(f'icon_{st}', sh.grids()[0], anchor=[8, 15])
 
 
 def build() -> None:
-    crop_seed(); crop_sprout(); crop_bush(); crop_ripe(); crop_ripe_phrase(); crop_overripe()
+    garden_stages()
     crop_item(); crop_item_phrase(); fx(); soil_wet(); icons()

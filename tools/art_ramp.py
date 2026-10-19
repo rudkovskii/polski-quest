@@ -87,7 +87,10 @@ def sdv_ramp(mid: str, tame: float = 1.0) -> list[str]:
 
 
 def load_materials(path: Path | None = None) -> dict[str, str]:
-    """Материал: "#rrggbb" или {"c": "#rrggbb", "tame": 0.6}."""
+    """Материал: "#rrggbb" или {"c": "#rrggbb", "tame": 0.6, "only": ["2", "3"]}.
+
+    `only` — какие тона рампы попадают в палитру (лимит 320 цветов): остальные тона материала не нужны ни одному спрайту,
+    их места отданы другим цветам. Спрайт с тоном вне `only` не соберётся (`sprites:check`: «нет в палитре»)."""
     return json.loads((path or ROOT / 'art' / 'materials.json').read_text('utf8'))['mats']
 
 
@@ -96,8 +99,10 @@ def ramp_colors(mats: dict[str, str]) -> dict[str, str]:
     out: dict[str, str] = {}
     for name, spec in mats.items():
         mid, tame = (spec, 1.0) if isinstance(spec, str) else (spec['c'], spec.get('tame', 1.0))
+        only = None if isinstance(spec, str) else spec.get('only')
         ramp = sdv_ramp(mid, tame)
-        for i, c in enumerate(ramp):
-            out[f'{name}.{i}'] = c
-        out[f'{name}.o'] = darken(ramp[0], 0.8)
+        tones = {**{str(i): c for i, c in enumerate(ramp)}, 'o': darken(ramp[0], 0.8)}
+        for t, c in tones.items():
+            if only is None or t in only:
+                out[f'{name}.{t}'] = c
     return out

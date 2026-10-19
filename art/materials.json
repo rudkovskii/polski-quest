@@ -1,5 +1,5 @@
 {
- "_": "Материал: один средний тон; рампу строит tools/art_ramp.py (sdvRamp). Правишь тон, запускаешь npm run sprites.",
+ "_": "Материал: один средний тон; рампу строит tools/art_ramp.py (sdvRamp). Правишь тон, запускаешь npm run sprites. `only` — тона рампы в палитре (остальные не заняты, см. tools/art_ramp.py).",
  "mats": {
   "grass": "#7ab44f",
   "leaf": "#5e9e3e",
@@ -34,7 +34,12 @@
    "c": "#f5deb0",
    "tame": 0.6
   },
-  "cat_stripe": "#b85a1f",
+  "cat_stripe": {
+   "c": "#b85a1f",
+   "only": [
+    "2"
+   ]
+  },
   "book": "#a94a3d",
   "paper": "#f3ebd2",
   "jar_glass": "#c3e6ea",
@@ -59,6 +64,13 @@
   "tin": "#9aa9b2",
   "sack": "#c8a46e",
   "fruit_old": "#7a3340",
-  "loose": "#a06f4a"
+  "loose": "#a06f4a",
+  "sprout": {
+   "c": "#a2d04c",
+   "only": [
+    "2",
+    "3"
+   ]
+  }
  }
 }
