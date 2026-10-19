@@ -216,8 +216,12 @@ describe('«Sklepy otwarte?»', () => {
     expect(game.check(w, 'otwarte', TODAY).ok).toBe(false);
 
     const g = shopsTask(TODAY, U('wigilia'))!;
-    expect(g.answer).toBe('otwarte do czternastej');
+    // 24.12 — выходной с 2025 года, магазины закрыты (раньше было «до 14:00»); Niedziela Palmowa — торговое воскресенье
+    expect(g.answer).toBe('zamknięte');
     expect(g.q).toMatch(/^Dwudziestego czwartego grudnia/);
+    expect(shopsTask(TODAY, U('palmowa'))!.answer).toBe('otwarte');
+    expect(U('wigilia').raw.shops).toBe('closed');
+    expect(U('palmowa').raw.shops).toBe('open');
 
     // Majówka: три разных вопроса по дням — 1 и 3 мая закрыты, 2 мая открыто.
     expect(shopsQuestions(U('majowka')).map((q) => q.shops)).toEqual(['closed', 'open', 'closed']);
@@ -524,7 +528,10 @@ describe('справка знакомства', () => {
   });
 
   it('магазины строкой: из заметки данных, иначе из shops; первый раз — нет ответов по единице', () => {
-    expect(shopsLine(U('wigilia'))!.ru).toMatch(/14:00/);
+    expect(shopsLine(U('wigilia'))!.ru).toMatch(/закрыты/);
+    expect(shopsLine(U('wigilia'))!.pl).toBe('W Wigilię sklepy są zamknięte.');
+    expect(shopsLine(U('palmowa'))!.ru).toMatch(/открыты/);
+    expect(shopsLine(U('palmowa'))!.pl).toBe('Niedziela handlowa: sklepy są otwarte.');
     expect(shopsLine(U('wszyscy'))!.pl).toBe('Sklepy są zamknięte.');
     // «Первый раз» = нет флага «знакомство принято» (а не «нет ответов»): ответы без флага карточку не отменяют.
     const c = ctxAt(2026, 10, 18);
@@ -824,6 +831,17 @@ describe('«О празднике» (about): данные, колесо, кар�
       for (const s of n.about!.pl) expect(seen.has(s), `${n.id}: ${s}`).toBe(false);
       expect(new Set(n.about!.pl).size, n.id).toBe(n.about!.pl.length);
     }
+  });
+
+  it('about не противоречит магазинам: Wigilia — закрыты, Niedziela Palmowa — открыты', () => {
+    const wg = NODES.find((n) => n.id === 'wigilia')!.about!;
+    const pm = NODES.find((n) => n.id === 'palmowa')!.about!;
+    expect(wg.ru).toMatch(/выходной, магазины закрыты/);
+    expect(wg.pl).toContain('Sklepy są w ten dzień zamknięte.');
+    expect(wg.ru + wg.pl.join(' ')).not.toMatch(/14:00|czternast/);
+    expect(pm.ru).toMatch(/магазины работают/);
+    expect(pm.pl).toContain('Sklepy są w tę niedzielę otwarte.');
+    expect(pm.ru + pm.pl.join(' ')).not.toMatch(/закрыты|zamknięte|bez handlu/);
   });
 
   it('праздник без картины и без истории (Mikołajki) тоже получает about в карточке знакомства', () => {
