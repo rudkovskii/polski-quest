@@ -32,7 +32,7 @@ export interface CustomWord {
 }
 
 const POS_SET: ReadonlySet<string> = new Set(['noun', 'verb', 'adj', 'adv', 'num', 'pron', 'prep', 'conj', 'part', 'intj', 'phrase']);
-const GENDERS: ReadonlySet<string> = new Set(['m', 'f', 'n', 'pl']);
+export const GENDERS: ReadonlySet<string> = new Set(['m', 'f', 'n', 'pl']);
 
 // ───────────── нормализация ─────────────
 
@@ -140,7 +140,7 @@ export function parseRupl(raw: unknown): RuplDb | null {
 }
 
 /** Код части речи rupl → `Pos` игры. */
-const POS_OF: Record<string, Pos> = {
+export const POS_OF: Record<string, Pos> = {
   n: 'noun', v: 'verb', adj: 'adj', adv: 'adv', pron: 'pron', prep: 'prep', conj: 'conj', num: 'num', intj: 'intj', part: 'part', phr: 'phrase', name: 'noun',
 };
 
