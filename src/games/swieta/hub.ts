@@ -2,6 +2,7 @@
 // подсвечен, тип цветом) и карточка знакомства «Poznaj święto». Тап по значку выбирает праздник; «Graj» ведёт раунд про него одного.
 // Первый раз раунду предшествует карточка (картина, справка, обычаи, пожелание), потом она открывается с колеса кнопкой «ℹ Справка».
 import { el } from '../../ui/dom';
+import { sayButton } from '../../ui/sayButton';
 import type { GameCtx, GamePanel, PolskaUnit } from '../../types/polska';
 import { fmtSpan, inDays, nearestHoliday, nextSpan, nextSpanOfWhen, seasonFrame, shortName, upcoming, WEEKDAY_PL, weekdayOf, dayNo, type Span } from './calendar';
 import { FRAMES, WORD_FRAME, frameIcon, itemIcon, itemWord } from './icons';
@@ -106,7 +107,6 @@ export const css = `
 .pq-pg .sw-row > :first-child { flex: 1 1 auto; min-width: 0; }
 .pq-pg .sw-ln b { display: block; font-weight: 800; }
 .pq-pg .sw-ln span { display: block; font-size: 12.5px; opacity: .72; }
-.pq-pg .sw-say { flex: 0 0 auto; padding: 3px 7px; font-size: 14px; line-height: 1; border-radius: 6px; box-shadow: 0 2px 0 var(--pq-ink); }
 .pq-pg .sw-items { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12.5px; }
 .pq-pg .sw-items span { display: inline-flex; align-items: center; gap: 3px; }
 .pq-pg .sw-wishline { font-size: 18px; font-weight: 800; }
@@ -150,8 +150,9 @@ function rich(text: string): HTMLElement {
 
 type CardMode = 'intro' | 'info';
 
-function sayBtn(panel: GamePanel, text: string, label = 'Послушать по-польски'): HTMLElement {
-  return el('button', { type: 'button', class: 'pq-btn sw-say', 'data-nav': '', 'data-say': text, 'aria-label': label, onclick: () => panel.say(text) }, '🔊');
+function sayBtn(panel: GamePanel, text: string): HTMLElement {
+  // Общая кнопка 🔊 (`ui/sayButton.ts`): не в рамке стрелок, клавиатура — клавиша G.
+  return sayButton(text, panel.say);
 }
 
 export function buildCard(panel: GamePanel, ctx: GameCtx, node: WheelNode, unit: PolskaUnit | null, mode: CardMode): HTMLElement {
@@ -165,7 +166,7 @@ export function buildCard(panel: GamePanel, ctx: GameCtx, node: WheelNode, unit:
     fig.append(el('div', { class: 'sw-frame', style: 'display:flex;align-items:center;justify-content:center;min-height:120px;background:#f2dcae;line-height:1' }, itemIcon(nodeItem(node, unit), 4)));
   }
   const bd = el('div', { class: 'sw-bd' });
-  const head = el('div', {}, el('h2', { lang: 'pl', 'data-card-name': '' }, node.pl), node.ru ? el('div', { class: 'sw-ru2' }, node.ru) : null);
+  const head = el('div', {}, el('div', { class: 'sw-row' }, el('h2', { lang: 'pl', 'data-card-name': '' }, node.pl), sayBtn(panel, node.pl)), node.ru ? el('div', { class: 'sw-ru2' }, node.ru) : null);
   const days = span ? Math.max(0, span.start - today) : null;
   bd.append(head, el('div', { class: 'sw-dt' }, dateText(span), days === null ? '' : ` · ${inDays(days)}`), tagsOf(node));
   if (unit) {
@@ -378,7 +379,7 @@ export function renderHub(panel: GamePanel, ctx: GameCtx, begin: (id: string, si
       el(
         'div',
         {},
-        el('div', { class: 'sw-nm', lang: 'pl', 'data-sel-name': '' }, n.pl),
+        el('div', { class: 'sw-row' }, el('div', { class: 'sw-nm', lang: 'pl', 'data-sel-name': '' }, n.pl), sayButton(n.pl, panel.say)),
         n.ru ? el('div', { class: 'sw-rn' }, n.ru) : null,
         el('div', { class: 'sw-mt' }, span ? `${dateText(span)} · ${inDays(Math.max(0, span.start - today))}` : 'bez daty · без даты'),
         tagsOf(n),

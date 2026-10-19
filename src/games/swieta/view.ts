@@ -3,6 +3,7 @@
 import { el } from '../../ui/dom';
 import type { GamePanel } from '../../types/polska';
 import { atlasIcon, plantIconFrame } from '../../ui/atlasIcon';
+import { sayButton, withSay } from '../../ui/sayButton';
 import { choice, prompt, tiles } from '../kit';
 import { frameIcon, itemIcon, itemWord } from './icons';
 import { creditLine, picCss, picFrame } from './pic';
@@ -14,6 +15,11 @@ export const css = `
 .pq-pg .sw-ico.emoji { width: 32px; height: 32px; font-size: 28px; line-height: 32px; text-align: center; background: none; }
 .pq-pg .sw-clue { display: flex; gap: 10px; margin: 2px 0 10px; }
 .pq-pg .sw-clue .sw-card { flex: 1 1 0; }
+.pq-pg .sw-clue > .pq-optw { flex: 1 1 0; }
+.pq-pg .pq-optw > .sw-card { flex: 1 1 auto; min-width: 0; }
+.pq-pg .sw-pack .pq-say { width: 22px; height: 22px; min-width: 22px; top: 1px; right: 1px; font-size: 11px; }
+.pq-pg .sw-bigrow > .sw-big { flex: 1 1 auto; min-width: 0; }
+.pq-pg .sw-bigrow > .pq-say { margin-top: 10px; }
 .pq-pg .sw-big { font-size: 24px; font-weight: 800; margin: 2px 0 10px; padding: 8px 10px; background: #fffaf0; border: 2px dashed var(--pq-wood); border-radius: 8px; overflow-wrap: break-word; }
 .pq-pg .sw-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; box-sizing: border-box; min-height: 74px; padding: 4px 4px 5px; color: var(--pq-ink); background: #fffaf0; text-align: center; }
 .pq-pg .sw-card .sw-box { height: 34px; display: flex; align-items: center; justify-content: center; }
@@ -75,6 +81,7 @@ function renderPack(task: SwTask, panel: GamePanel): void {
   const done = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-check': '', disabled: true }, 'Gotowe · Готово');
   for (const it of task.items ?? []) {
     const c = card(it);
+    const cell = withSay(c, it.pl, panel.say);
     c.setAttribute('aria-pressed', 'false');
     c.addEventListener('click', () => {
       if (sel.has(it.id)) sel.delete(it.id);
@@ -84,7 +91,7 @@ function renderPack(task: SwTask, panel: GamePanel): void {
       done.disabled = sel.size === 0;
       paintStrip();
     });
-    grid.append(c);
+    grid.append(cell);
   }
   done.addEventListener('click', () => {
     if (!sel.size) return;
@@ -157,8 +164,8 @@ export function renderTask(task: SwTask, panel: GamePanel): void {
         if (task.pic.credit) fig.append(creditLine(task.pic.credit));
         q.append(fig);
       }
-      if (task.clue?.length) q.append(el('div', { class: 'sw-clue', 'data-clue': '' }, ...task.clue.map((id) => card(itemWord(id), 'div', 3))));
-      if (task.big) q.append(el('div', { class: 'sw-big', 'data-big': '', lang: 'pl' }, task.big));
+      if (task.clue?.length) q.append(el('div', { class: 'sw-clue', 'data-clue': '' }, ...task.clue.map((id) => withSay(card(itemWord(id), 'div', 3), itemWord(id).pl, panel.say))));
+      if (task.big) q.append(el('div', { class: 'pq-qrow sw-bigrow' }, el('div', { class: 'sw-big', 'data-big': '', lang: 'pl' }, task.big), sayButton(task.big, panel.say)));
       choice(sub, task.options ?? [], task.answer);
       break;
     }

@@ -11,6 +11,7 @@ import type { BusEvents } from '../types/bus';
 import type { GameCtx, GamePanel, GameTask, PolskaGame, PolskaGameId } from '../types/polska';
 import { el } from './dom';
 import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
+import { polishPart, sayButton, sayFocused, SAY_CSS } from './sayButton';
 import { THEME_CSS } from './theme';
 
 export interface PolskaGameDeps {
@@ -43,6 +44,7 @@ export const SUMMARY_GUARD_MS = 400;
 const css = `
 ${THEME_CSS}
 ${roundCss}
+${SAY_CSS}
 .pq-pg { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: flex; justify-content: center; pointer-events: none;
   padding: 0 calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 8px);
   font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); hyphens: none; }
@@ -324,7 +326,10 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       card.append(el('button', { type: 'button', class: 'pq-btn way2 go', 'data-nav': '', 'data-round-plot': '', onclick: () => api.stop(true) }, `${PLOT_NAME[game.plot].ru}: подросло ${grew} · `, el('b', {}, 'Na pole! →')));
     } else if (game && game.layout === 'full' && grew > 0) card.append(el('div', { class: 'way2', 'data-round-plot': '' }, `${PLOT_NAME[game.plot].ru}: подросло ${grew}`));
     const line = game?.summaryLine?.(ctxOf(game));
-    if (line) card.append(el('div', { class: 'way2', 'data-round-line': '' }, line));
+    if (line) {
+      const lineSay = polishPart(line);
+      card.append(el('div', { class: 'way2 pq-fbrow', 'data-round-line': '' }, el('span', {}, line), lineSay ? sayButton(lineSay, panel.say, { inline: true }) : null));
+    }
     paper.replaceChildren(card);
     const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, game?.hub ? 'К колесу' : 'Ещё раунд');
     // «Wróć»: выйти и мгновенно вернуться к месту, откуда запустил игру (`systems/entryPoint.ts`); в фокусе по умолчанию.
@@ -363,6 +368,9 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
         opts[i.n - 1]?.click();
         return;
       }
+      case 'say':
+        sayFocused(root, kbNav ? (navs()[focusIdx] ?? null) : null);
+        return;
       case 'move':
         if (!i.held) return;
         kbNav = true;
@@ -453,17 +461,25 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       paintRound();
       paper.classList.add(r.ok ? 'ok' : 'bad');
       const u = deps.polska.unit(task.id);
+      // 🔊 у польского ответа: то, что движок и так озвучивает после ответа, можно повторить (у русского — нет, `polishPart`).
+      const spoken = polishPart(r.say ?? u?.pl ?? r.correct);
+      const bigLine = r.ok ? el('div', { class: 'big' }, `✓ ${u?.pl ?? r.correct}`) : el('div', { class: 'big' }, el('span', { class: 'lbl' }, 'Правильно:'), r.correct);
       fb.replaceChildren(
-        r.ok ? el('div', { class: 'big' }, `✓ ${u?.pl ?? r.correct}`) : el('div', { class: 'big' }, el('span', { class: 'lbl' }, 'Правильно:'), r.correct),
+        spoken ? el('div', { class: 'pq-fbrow' }, bigLine, sayButton(spoken, panel.say, { inline: true })) : bigLine,
         el('div', { class: 'sub' }, [u?.ru, u?.tr].filter(Boolean).join(' · ')),
         el('div', { class: 'pq-progress', 'data-progress-after': '' }, `🌱 ${out.progress.charAt(0).toUpperCase()}${out.progress.slice(1)}`),
       );
-      if (r.note) fb.append(el('div', { class: 'note', 'data-note': '' }, r.note));
+      if (r.note) {
+        // Польская часть заметки (дата словами, старые слова гимна) читается кнопкой; русский пояснительный текст — нет.
+        const noteSay = polishPart(r.note);
+        const noteEl = el('div', { class: 'note', 'data-note': '' }, r.note);
+        fb.append(noteSay ? el('div', { class: 'pq-fbrow' }, noteEl, sayButton(noteSay, panel.say, { inline: true })) : noteEl);
+      }
       fb.dataset.feedback = r.ok ? 'ok' : 'bad';
       fb.hidden = false;
       // Озвучка после ответа (верного и неверного): название или фраза по-польски.
       deps.say(r.say ?? u?.pl ?? r.correct);
-      for (const b of paper.querySelectorAll<HTMLButtonElement>('button')) b.disabled = true;
+      for (const b of paper.querySelectorAll<HTMLButtonElement>('button:not(.pq-say)')) b.disabled = true;
       nextReady = false;
       const dalej = el('button', { type: 'button', class: 'pq-btn wait', 'data-nav': '', 'data-next': '', onclick: () => nextReady && advance() }, 'Dalej · Следующий →');
       armTimer = setTimeout(() => {

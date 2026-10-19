@@ -159,6 +159,19 @@ describe('Słownik', () => {
     expect(say.mock.calls).toEqual([['w.kot'], ['w.kot', true]]);
   });
 
+  it('пример в карточке слова озвучивается кнопкой 🔊 (audio:play с текстом примера), русская строка без неё', () => {
+    const { root, bus } = setup();
+    const { api } = fakeApi();
+    const played: (string | undefined)[] = [];
+    bus.on('audio:play', (p) => played.push(p.text));
+    mountDictionary(root, api, bus).open();
+    root.querySelector<HTMLElement>('[data-id="w.kot"]')!.click();
+    expect(root.querySelectorAll('.dict-card .ex .pq-say')).toHaveLength(1);
+    root.querySelector<HTMLElement>('.dict-card .ex .pq-say')!.click();
+    expect(played).toEqual(['Mam kota.']);
+    expect(root.querySelector('.dict-card .ex .ru .pq-say')).toBeNull();
+  });
+
   it('заблокированная фраза: замок, недостающие слова, кнопка неактивна', () => {
     const { root, bus } = setup();
     mountDictionary(root, fakeApi().api, bus).open();

@@ -23,7 +23,9 @@ export type Intent =
    */
   | { type: 'focus'; dir: Dir | 'next' | 'prev' }
   /** Цифра 1–9 на клавиатуре: в оверлее (F-03) — выбрать вариант ответа с этим номером; мир её не использует. */
-  | { type: 'hotkey'; n: number };
+  | { type: 'hotkey'; n: number }
+  /** Клавиша G (на русской раскладке П): озвучить польский текст под рамкой выбора; мир её не использует. */
+  | { type: 'say' };
 
 export type Source = 'keyboard' | 'dpad' | 'pointer';
 

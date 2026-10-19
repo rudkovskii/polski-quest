@@ -669,7 +669,7 @@ describe('экран колеса', () => {
     expect(card.querySelectorAll('[data-customs] .sw-row').length).toBe(3);
     expect(card.querySelector('[data-shops]')).toBeTruthy();
     expect(card.querySelector('[data-intro-pl]')).toBeTruthy();
-    card.querySelector<HTMLElement>('[data-intro-pl] [data-say]')!.click();
+    card.querySelector<HTMLElement>('[data-intro-pl] .pq-say')!.click();
     expect(spoken.length).toBe(1);
     expect(spoken[0]).toMatch(/święto wszystkich świętych/i);
     foot.querySelector<HTMLElement>('[data-start]')!.click();

@@ -3,6 +3,7 @@
 // «сам»: «Powiedz słowami» — плитки `trzeciego` + `maja` среди неверных форм. Год — цифрой рядом, словами не спрашивается (решение Шэфа 5).
 // Даты памяти (`tone: solemn|quiet`) — спокойная подача: без зелёной вспышки и анимации обводки.
 import { el } from '../../ui/dom';
+import { sayButton } from '../../ui/sayButton';
 import type { GameCtx, GamePanel, PolskaGame, Want } from '../../types/polska';
 import { choice, tiles } from '../kit';
 import { CSS, calendar, drums, leaf, yearChip } from './view';
@@ -98,7 +99,8 @@ function nextTask(ctx: GameCtx, want: Want): DatyTask | null {
 }
 
 /** Вопрос: крупная строка и подсказка (как у `kit.prompt`, но внутри верхней строки с листом/годом). */
-const ask = (task: DatyTask): HTMLElement => el('div', { class: 'pq-pg-q txt', 'data-prompt': '' }, el('div', { class: 'pq-q', lang: 'pl' }, task.q), el('div', { class: 'pq-q-hint' }, task.hint));
+const ask = (task: DatyTask, say: GamePanel['say']): HTMLElement =>
+  el('div', { class: 'pq-pg-q txt', 'data-prompt': '' }, el('div', { class: 'pq-qrow' }, el('div', { class: 'pq-q', lang: 'pl' }, task.q), sayButton(task.mode === 'say' ? 'Powiedz słowami' : task.q, say, { main: true })), el('div', { class: 'pq-q-hint' }, task.hint));
 
 /** Запас под строку результата движка, которая после ответа встаёт под листом (как `FB_H` у карты). */
 const FB_RESERVE = 92;
@@ -165,14 +167,16 @@ function feedbackHeight(panel: GamePanel, name: string, h: ReturnType<typeof his
   const cf = getComputedStyle(live);
   const w = box.clientWidth - num(cb.paddingLeft) - num(cb.paddingRight) - num(cf.marginLeft) - num(cf.marginRight);
   if (!(w > 0)) return 0;
+  // Как собирает отзыв движок: название с 🔊, перевод, справка, прогресс, заметка (дата) с 🔊.
+  const nope = (): void => {};
   const fb = el(
     'div',
     { class: 'fb', style: 'box-sizing:border-box;margin:0' },
-    el('div', { class: 'big' }, `✓ ${name}`),
+    el('div', { class: 'pq-fbrow' }, el('div', { class: 'big' }, `✓ ${name}`), sayButton(name, nope, { inline: true })),
     el('div', { class: 'sub' }, '·'),
-    historyBlock(h, () => {}),
+    historyBlock(h, nope),
     el('div', { class: 'pq-progress' }, '🌱 Ещё 1 полив до ростка'),
-    el('div', { class: 'note' }, '11 listopada 1918'),
+    el('div', { class: 'pq-fbrow' }, el('div', { class: 'note' }, '11 listopada 1918'), sayButton('11 listopada', nope, { inline: true })),
   );
   const probe = el('div', { style: `position:absolute;visibility:hidden;left:0;top:0;width:${Math.round(w)}px;pointer-events:none` }, fb);
   host.append(probe);
@@ -186,7 +190,7 @@ function render(task: DatyTask, panel: GamePanel, ctx: GameCtx): void {
   panel.body.append(wrap);
   const u = ctx.unit(task.id);
   const hist = u ? historyOf(u) : null;
-  const say = (text: string): void => panel.say(text);
+  const say = panel.say;
   /** Карточка знакомства на экране: под ней отзыва нет, места под него не держим. */
   let card = false;
   /** «Pokaż»: после ответа календарь листает к месяцу ответа, а в нём может быть на неделю больше — держим место заранее. */
@@ -252,7 +256,7 @@ function addHistory(panel: GamePanel, wrap: HTMLElement, hist: ReturnType<typeof
   if (!host || host.hidden) return;
   if (host.querySelector('[data-history]')) return;
   wrap.classList.add('dt-done');
-  const block = historyBlock(hist, (text) => panel.say(text));
+  const block = historyBlock(hist, panel.say);
   const before = host.querySelector('[data-progress-after]');
   if (before) before.before(block);
   else host.append(block);
@@ -266,23 +270,23 @@ function draw(task: DatyTask, panel: GamePanel, ctx: GameCtx, wrap: HTMLElement)
   switch (task.mode) {
     case 'co':
     case 'say':
-      wrap.append(el('div', { class: 'dt-topline' }, leaf(ctx.doc, d, task.year), ask(task)));
+      wrap.append(el('div', { class: 'dt-topline' }, leaf(ctx.doc, d, task.year), ask(task, panel.say)));
       if (task.mode === 'co') choice(sub, task.options, task.answer as string);
       else tiles(sub, task.options);
       return;
     case 'choice':
-      wrap.append(el('div', { class: 'dt-topline' }, ask(task), chip));
+      wrap.append(el('div', { class: 'dt-topline' }, ask(task, panel.say), chip));
       choice(sub, task.options, task.answer as string);
       return;
     case 'drums': {
-      wrap.append(el('div', { class: 'dt-topline' }, ask(task), chip));
-      const dr = drums(ctx.doc, task.drum, (v) => submit(v));
+      wrap.append(el('div', { class: 'dt-topline' }, ask(task, panel.say), chip));
+      const dr = drums(ctx.doc, task.drum, (v) => submit(v), panel.say);
       wrap.append(dr.root);
       panel.foot.replaceChildren(dr.check);
       return;
     }
     case 'pokaz': {
-      wrap.append(el('div', { class: 'dt-topline' }, ask(task), chip));
+      wrap.append(el('div', { class: 'dt-topline' }, ask(task, panel.say), chip));
       const marks = new Map(ctx.units.map((x) => [`${dateOfUnit(x).month}-${dateOfUnit(x).day}`, { icon: String(x.raw.icon ?? ''), calm: isCalm(x) }] as const));
       const cal = calendar({
         doc: ctx.doc,

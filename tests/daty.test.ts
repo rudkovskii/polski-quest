@@ -630,6 +630,11 @@ describe('Daty: справка в блоке отзыва после ответ�
     expect(spoken).not.toContain(h.pl);
     click(block, '[data-say-history]');
     expect(spoken.at(-1)).toBe(h.pl);
+    // у каждого польского ключа своя 🔊
+    const keyBtns = [...block.querySelectorAll<HTMLElement>('[data-say-key]')];
+    expect(keyBtns.map((b) => b.dataset.saytext)).toEqual(h.key);
+    keyBtns[0]!.click();
+    expect(spoken.at(-1)).toBe(h.key[0]);
     ui.stop();
   });
 

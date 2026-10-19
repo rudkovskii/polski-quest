@@ -11,6 +11,7 @@ import { el } from './dom';
 import { MODE_NAME } from './glossary';
 import { attachKeyboard, type AttachedKeyboard } from './keyboard';
 import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
+import { polishPart, sayButton, sayFocused, SAY_CSS, withSay, type SayFn } from './sayButton';
 import { THEME_CSS } from './theme';
 
 export interface AnswerResult {
@@ -55,6 +56,7 @@ export interface Minigame {
 const css = `
 ${THEME_CSS}
 ${roundCss}
+${SAY_CSS}
 .pq-game { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: flex; justify-content: center; pointer-events: none;
   padding: 0 calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 8px);
   font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); hyphens: none; -webkit-hyphens: none; }
@@ -152,6 +154,8 @@ export const NEXT_DELAY_MS = 300;
 
 export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame {
   const bus = deps.bus ?? globalBus;
+  /** Озвучка кнопками 🔊 (`ui/sayButton.ts`): тот же `audio:play`, что у плиток; под выключателем звука, на `?mute=1` — консоль. */
+  const say: SayFn = (text, slow) => bus.emit('audio:play', { text, ...(slow ? { slow: true } : {}) });
   const title = el('span', { class: 'pq-game-title', 'data-title': '' }, '');
   const rev = el('span', { class: 'pq-rev', 'data-reverse': '', hidden: true, title: 'Задание наоборот: растению нужна другая сторона' }, '↔ наоборот');
   const roundNo = el('span', { class: 'pq-roundno', 'data-round-no': '', title: 'Задание в раунде', hidden: true }, `1 / ${ROUND_SIZE}`);
@@ -240,6 +244,9 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     kb = null;
   };
 
+  /** Строка отзыва с 🔊 справа: польское слово или фраза ответа (`r.pl`) всегда по-польски. */
+  const fbRow = (line: HTMLElement, pl: string): HTMLElement => (polishPart(pl) ? el('div', { class: 'pq-fbrow' }, line, sayButton(pl, say, { inline: true })) : line);
+
   const finish = (r: AnswerResult): void => {
     answered = true;
     round.add(r);
@@ -247,11 +254,11 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     paper.classList.add(r.ok ? 'ok' : 'bad');
     const fb = el('div', { class: 'pq-fb', 'data-feedback': r.ok ? 'ok' : 'bad' });
     if (r.ok) {
-      fb.append(el('div', { class: 'big' }, `✓ ${r.pl}`), el('div', { class: 'sub' }, `${r.ru} · ${r.tr}`));
+      fb.append(fbRow(el('div', { class: 'big' }, `✓ ${r.pl}`), r.pl), el('div', { class: 'sub' }, `${r.ru} · ${r.tr}`));
       if (r.note) fb.append(el('div', { class: 'pq-muted sub' }, r.note));
       if (q) deps.say(q.id);
     } else {
-      fb.append(el('div', { class: 'big' }, el('span', { class: 'lbl' }, 'Правильно:'), r.correct), el('div', { class: 'sub' }, `${r.pl} — ${r.ru} · ${r.tr}`));
+      fb.append(fbRow(el('div', { class: 'big' }, el('span', { class: 'lbl' }, 'Правильно:'), r.correct), r.pl), el('div', { class: 'sub' }, `${r.pl} — ${r.ru} · ${r.tr}`));
     }
     if (r.progress) fb.append(el('div', { class: 'pq-progress', 'data-progress-after': '' }, `🌱 ${progressLine(r.progress)}`));
     if (r.tomorrow !== undefined) {
@@ -297,7 +304,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       // Слово не рвём по слогам: длинное уменьшаем в кегле, посимвольный перенос только для совсем длинных.
       const sizeCls = optSizeClass(o);
       const b = el('button', { type: 'button', class: `pq-btn pq-opt${sizeCls}`, 'data-nav': '', 'data-opt': o, onclick: () => pick(i) }, el('span', { class: 'n' }, `${i + 1}`), el('span', { class: 't' }, o));
-      grid.append(b);
+      // Польские варианты (игра 2: вопрос по-русски) — с 🔊 в углу; русские (игра 1) без.
+      grid.append(qq.promptLang === 'ru' ? withSay(b, o, say) : b);
     });
     paper.append(grid);
   };
@@ -381,7 +389,10 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       3: 'Собери фразу по-польски',
       4: 'Собери фразу по-русски',
     };
-    const qb = el('div', { class: q.kind === 'tiles' ? '' : 'pq-qblock', 'data-qblock': '' }, el('div', { class: 'pq-q', lang: q.promptLang, 'data-prompt': '' }, q.prompt), el('div', { class: 'pq-q-hint' }, hint[q.mode]));
+    const qText = el('div', { class: 'pq-q', lang: q.promptLang, 'data-prompt': '' }, q.prompt);
+    // Польский вопрос (игры 1 и 4) — с 🔊 рядом; русский (игры 2 и 3) — без.
+    const qHead = q.promptLang === 'pl' ? el('div', { class: 'pq-qrow' }, qText, sayButton(q.prompt, say, { main: true })) : qText;
+    const qb = el('div', { class: q.kind === 'tiles' ? '' : 'pq-qblock', 'data-qblock': '' }, qHead, el('div', { class: 'pq-q-hint' }, hint[q.mode]));
     if (q.progress) qb.append(el('div', { class: 'pq-progress', 'data-progress': '' }, `🌱 ${progressLine(q.progress)}`));
     paper.append(qb);
     if (q.kind === 'choice') renderChoice(q);
@@ -461,6 +472,9 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         if (answered) return;
         if (q?.kind === 'choice') pick(i.n - 1);
         else if (q?.kind === 'tiles') tileAdder?.(i.n - 1);
+        return;
+      case 'say':
+        sayFocused(root, kbNav ? (navs()[focusIdx] ?? null) : null);
         return;
       case 'move':
         if (!i.held) return;

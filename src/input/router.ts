@@ -174,6 +174,8 @@ export function createRouter(opts: RouterOptions = {}): Router {
       case 'hotkey':
         emit(intent, 'world', source);
         return true;
+      case 'say':
+        return false; // в мире озвучивать нечего, клавиша G свободна
     }
   };
 

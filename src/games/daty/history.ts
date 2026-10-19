@@ -2,6 +2,7 @@
 // Показывается дважды: карточкой «Poznaj datę · Знакомство» перед первым вопросом (пока флаг «знакомство принято» не стоит) и блоком
 // в отзыве после каждого ответа. Модуль без игрового состояния: чистые функции + сборка DOM.
 import { el } from '../../ui/dom';
+import { sayButton, type SayFn } from '../../ui/sayButton';
 import type { GameCtx, PolskaUnit } from '../../types/polska';
 import { leaf } from './view';
 import { dateOfUnit, yearOfUnit } from './model';
@@ -51,7 +52,7 @@ export const HIST_CSS = `
 .dt-hist-ru { margin: 0; font-size: 13px; line-height: 1.3; overflow-wrap: break-word; }
 .dt-hist-ru b { font-weight: 800; }
 .dt-hist-pl { display: flex; align-items: center; gap: 6px; margin-top: 3px; font-size: 14px; font-weight: 700; font-style: italic; }
-.dt-hist-pl .dt-say { flex: 0 0 auto; width: 30px; height: 26px; padding: 0; font-size: 14px; line-height: 1; border: 2px solid var(--pq-ink); border-radius: 6px; background: #f2dcae; cursor: pointer; touch-action: manipulation; }
+.dt-hist-ru .pq-say { vertical-align: middle; margin-left: 3px; margin-right: 2px; }
 .pq-pg .fb .dt-hist { margin: 3px 0 2px; padding-top: 3px; border-top: 2px dashed var(--pq-wood); }
 .dt-intro-lbl { font-size: 13px; font-weight: 800; letter-spacing: .3px; opacity: .8; margin: 2px 0 0; }
 .dt-intro-top { display: flex; align-items: flex-start; gap: 12px; }
@@ -68,20 +69,20 @@ export const HIST_CSS = `
 @media (min-width: 720px) { .pq-pg .fb .dt-hist-ru, .pq-pg .fb .dt-hist-pl { font-size: 15px; } }
 `;
 
-/** Блок справки: русский текст с польскими ключами жирным и польская фраза с кнопкой озвучки (звук — только по нажатию). */
-export function historyBlock(h: History, say: (text: string) => void): HTMLElement {
-  const ru = el('p', { class: 'dt-hist-ru', lang: 'ru', 'data-history-ru': '' }, ...boldKeys(h.ru, h.key).map((r) => (r.b ? el('b', { lang: 'pl' }, r.t) : r.t)));
-  const pl = el(
-    'div',
-    { class: 'dt-hist-pl', 'data-history-pl': '' },
-    el('button', { type: 'button', class: 'dt-say', 'data-say-history': '', 'aria-label': 'Posłuchaj · Слушать', onclick: () => say(h.pl) }, '🔊'),
-    el('span', { lang: 'pl' }, h.pl),
-  );
+/** Блок справки: русский текст, у каждого польского ключа жирным — своя 🔊; польская фраза справки — тоже с 🔊 (звук только по нажатию). */
+export function historyBlock(h: History, say: SayFn): HTMLElement {
+  const parts: (HTMLElement | string)[] = [];
+  for (const r of boldKeys(h.ru, h.key)) {
+    if (r.b) parts.push(el('b', { lang: 'pl', 'data-key': '' }, r.t), sayButton(r.t, say, { inline: true, attrs: { 'data-say-key': '' } }));
+    else parts.push(r.t);
+  }
+  const ru = el('p', { class: 'dt-hist-ru', lang: 'ru', 'data-history-ru': '' }, ...parts);
+  const pl = el('div', { class: 'dt-hist-pl', 'data-history-pl': '' }, sayButton(h.pl, say, { attrs: { 'data-say-history': '' } }), el('span', { lang: 'pl' }, h.pl));
   return el('div', { class: 'dt-hist', 'data-history': '' }, ru, pl);
 }
 
 /** Карточка «Poznaj datę · Знакомство»: лист календаря, название события PL/RU и справка. Кнопку «Rozumiem» ставит игра в подвал. */
-export function introCard(doc: Readonly<Record<string, unknown>>, u: PolskaUnit, h: History, say: (text: string) => void): HTMLElement {
+export function introCard(doc: Readonly<Record<string, unknown>>, u: PolskaUnit, h: History, say: SayFn): HTMLElement {
   const a = dateOfUnit(u);
   return el(
     'div',

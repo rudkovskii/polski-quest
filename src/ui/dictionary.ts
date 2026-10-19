@@ -1,7 +1,7 @@
 // Słownik · Словарь: книга на столе дома. Слова и фразы, темы, поиск без диакритики, фильтр по стадии, карточка, посадка.
 import { fold } from '../systems/content';
 import { isCustomId, type RuplDb } from '../systems/customWords';
-import type { Bus } from '../systems/bus';
+import { bus as globalBus, type Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import type { Phrase, Word } from '../types/content';
 import type { FarmApi, ItemInfo } from '../types/farm';
@@ -9,6 +9,7 @@ import { CUSTOM_CSS, createCustomPane } from './customWord';
 import { el } from './dom';
 import { STAGE_INFO, TIP_CSS, type Tips } from './glossary';
 import { createPanel, nav } from './panel';
+import { sayButton, SAY_CSS, type SayFn } from './sayButton';
 import { iconKeyOf, stageIcon, STAGE_ICON_CSS } from './stageIcon';
 
 type Tab = 'words' | 'phrases' | 'add';
@@ -27,6 +28,7 @@ const css = `
 ${STAGE_ICON_CSS}
 ${TIP_CSS}
 ${CUSTOM_CSS}
+${SAY_CSS}
 .dict-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; opacity: .85; align-items: center; }
 .dict-legend span { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
 .dict { display: flex; flex-direction: column; gap: 10px; }
@@ -63,6 +65,7 @@ ${CUSTOM_CSS}
 .dict-card .ru { font-size: 19px; }
 .dict-card .tr { font-style: italic; opacity: .75; }
 .dict-card .ex { border-left: 4px solid var(--pq-accent); padding-left: 8px; }
+.dict-card .exrow { display: flex; align-items: flex-start; gap: 8px; } .dict-card .exrow > .pl { flex: 1 1 auto; min-width: 0; }
 .dict-card .ex .pl { font-size: 17px; font-weight: 600; }
 .dict-card .ff { background: #ffe9c2; border: 2px dashed var(--pq-accent); border-radius: 6px; padding: 7px 9px; font-size: 14px; }
 .dict-card .lock { background: #eadfc4; border-radius: 6px; padding: 8px 10px; font-size: 14px; }
@@ -208,8 +211,11 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   const cardWrap = el('div', { class: 'dict-cardwrap', hidden: true }, cardCol);
   const cols = el('div', { class: 'dict-cols nocard', 'data-cols': '' }, topicsCol, el('div', {}, listCol), cardWrap);
   // «＋ Своё слово»: русское слово → варианты из словаря → правка → посадка (ui/customWord.ts).
+  /** Озвучка произвольного польского текста (пример, вариант перевода): тот же `audio:play`, что у ▶. */
+  const sayText: SayFn = (text, slow) => (bus ?? globalBus).emit('audio:play', { text, ...(slow ? { slow: true } : {}) });
   const pane = api.custom
     ? createCustomPane({
+        sayText,
         api: api as FarmApi & { custom: NonNullable<FarmApi['custom']> },
         ...(extras.loadDict ? { loadDict: extras.loadDict } : {}),
         refocus: (key) => (key ? panel.focus(key) : panel.syncFocus()),
@@ -453,7 +459,10 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     const lock = !!p && i.status === 'new' && api.missingWords(id).length > 0;
     const kids: Node[] = [el('div', { class: 'big', 'data-pl': '' }, item.pl), el('div', { class: 'ru' }, item.ru), el('div', { class: 'tr' }, item.tr)];
     if (w?.gender) kids.push(el('div', { class: 'status' }, GENDER[w.gender]));
-    if (w?.ex) kids.push(el('div', { class: 'ex' }, el('div', { class: 'pl' }, w.ex.pl), el('div', { class: 'ru' }, w.ex.ru)));
+    if (w?.ex)
+      kids.push(
+        el('div', { class: 'ex' }, el('div', { class: 'exrow' }, el('div', { class: 'pl' }, w.ex.pl), sayButton(w.ex.pl, sayText, { attrs: nav('card', 'v', 'say-ex') })), el('div', { class: 'ru' }, w.ex.ru)),
+      );
     if (w?.ff) kids.push(el('div', { class: 'ff' }, `Не путать: похоже на «${w.ff.ru}», а значит: ${w.ff.note}`));
     kids.push(
       el(
