@@ -55,6 +55,8 @@ export function mountPlantCard(parent: HTMLElement, api: FarmApi, opts: PlantCar
         row('Капли', `💧×${i.drops}`),
         row('PL → RU', ok(i.sides.pr)),
         row('RU → PL', ok(i.sides.rp)),
+        // Слово для урожая собирают само (игра 5 «Собери слово»); у фраз строки нет.
+        i.prod === null || i.prod === undefined ? null : row('Собрано само', ok(i.prod)),
         row('Дни с верными ответами', `${i.days} из 3`),
       ),
       el('div', { class: 'pc-next', 'data-next': '' }, el('b', {}, '🌱 '), i.next || 'Всё идёт как надо'),

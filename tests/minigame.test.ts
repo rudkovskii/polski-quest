@@ -94,10 +94,12 @@ describe('P3b: панель мини-игры', () => {
     vi.useRealTimers();
   });
 
-  it('пустой ответ не отправляется: «Sprawdź» неактивна, пока в поле пусто или пробелы', () => {
+  it('пустой ответ не отправляется: «Sprawdź» неактивна, пока в поле пусто или пробелы (игра 5, «⌨ Напечатать»)', () => {
     const given: unknown[] = [];
-    const { root, g } = mk({ mode: 2, id: 'w.kot', kind: 'type', prompt: 'кот', promptLang: 'ru', answer: 'kot' } as Question, given);
-    g.start(2);
+    const spell = { mode: 5, id: 'w.kot', kind: 'spell', dir: 'rp', prompt: 'кот', promptLang: 'ru', answer: 'kot', accept: ['kot'], units: ['k', 'o', 't'], tiles: ['t', 'ó', 'k', 'o', 'l'], layout: [null, null, null] };
+    const { root, g } = mk(spell as Question, given);
+    g.start(5);
+    root.querySelector<HTMLButtonElement>('[data-typemode]')!.click();
     const check = root.querySelector<HTMLButtonElement>('[data-check]')!;
     const input = root.querySelector<HTMLInputElement>('[data-type]')!;
     expect(check.disabled).toBe(true);

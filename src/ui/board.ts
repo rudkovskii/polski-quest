@@ -4,13 +4,13 @@ import type { Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import type { GameMode, PhraseHint } from '../types/farm';
 import { el } from './dom';
-import { MODE_NAME } from './glossary';
+import { MODE_ICON, MODE_NAME } from './glossary';
 import { createPanel, nav } from './panel';
 
 export interface BoardDeps {
   bus?: Bus<BusEvents>;
-  /** Сколько на грядках слов и фраз. */
-  counts(): { words: number; phrases: number; assemble: number };
+  /** Сколько на грядках слов и фраз; `spell` — кустов слов, которым для урожая не хватает слова, собранного самому (игра 5). */
+  counts(): { words: number; phrases: number; assemble: number; spell?: number };
   onPick(mode: GameMode): void;
   /** Ближайшая фраза для сборки и что ей нужно (P3a); без неё — только общая подсказка. */
   phraseHint?(): PhraseHint | null;
@@ -33,9 +33,10 @@ export type BoardTab = 'words' | 'polska';
 
 const DESC: Record<GameMode, string> = {
   1: 'Видишь польское слово, выбери перевод',
-  2: 'Видишь перевод, выбери польское слово (ближе к кустику — напиши сам)',
+  2: 'Видишь перевод, выбери польское слово',
   3: 'Видишь русскую фразу, собери её по-польски из плиток',
   4: 'Видишь польскую фразу, собери её по-русски из плиток',
+  5: 'Видишь перевод, собери польское слово из букв или напечатай; «↔ наоборот» — по-русски. Без неё слова не созреют',
 };
 
 export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(tab?: BoardTab): void; close(): void; readonly isOpen: boolean; readonly tab: BoardTab } {
@@ -86,21 +87,27 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(tab?: B
     const t = tabs();
     if (t) list.append(t);
     list.append(el('div', { class: 'pq-muted' }, `На грядках: слов ${c.words}, фраз ${c.phrases}. Пока отвечаешь, фермер сам поливает.`));
-    for (const m of [1, 2, 3, 4] as GameMode[]) {
-      // Фразы короче 3 плиток растут в играх 1 и 2 как слова; сборка — только из длинных.
+    for (const m of [1, 2, 3, 4, 5] as GameMode[]) {
+      // Фразы короче 3 плиток растут в играх 1 и 2 как слова; сборка — только из длинных; игра 5 — только слова.
       const why =
         m <= 2
           ? c.words + (c.phrases - c.assemble) > 0
             ? ''
             : 'Нет посаженных слов: посади их в словаре дома'
-          : c.assemble > 0
-            ? ''
-            : 'Сборка фраз откроется, когда слова фразы подрастут до ростка';
+          : m === 5
+            ? c.words > 0
+              ? ''
+              : 'Нет посаженных слов: посади их в словаре дома'
+            : c.assemble > 0
+              ? ''
+              : 'Сборка фраз откроется, когда слова фразы подрастут до ростка';
       const b = el(
         'button',
         { type: 'button', class: 'pq-btn', 'data-mode': m, disabled: !!why, style: 'text-align:left;line-height:1.3', ...nav('modes', 'v', `mode:${m}`), onclick: () => (panel.close(), deps.onPick(m)) },
-        el('div', { style: 'font-size:18px;font-weight:800' }, `${m}. ${MODE_NAME[m].ru} `, el('small', { class: 'board-pl', style: 'font-size:12px;font-weight:600;opacity:.65;white-space:nowrap' }, MODE_NAME[m].pl)),
+        el('div', { style: 'font-size:18px;font-weight:800' }, `${MODE_ICON[m]} ${m}. ${MODE_NAME[m].ru} `, el('small', { class: 'board-pl', style: 'font-size:12px;font-weight:600;opacity:.65;white-space:nowrap' }, MODE_NAME[m].pl)),
         el('div', { style: 'font-weight:500;font-size:14px;opacity:.85' }, why || DESC[m]),
+        // Кусты, которым до урожая не хватает только собранного слова: подсказка прямо на кнопке игры 5.
+        m === 5 && !why && (c.spell ?? 0) > 0 ? el('div', { 'data-spell-wait': '', style: 'font-weight:700;font-size:14px;color:#f2d552' }, `🌾 Ждут сборки для урожая: ${c.spell}`) : null,
       );
       list.append(b);
     }

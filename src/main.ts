@@ -244,8 +244,8 @@ async function main(): Promise<void> {
     exit: () => game.stop(),
   });
   const game = mountMinigame(overlay, {
-    next: (mode, only) => {
-      const q = farm.next(mode, only);
+    next: (mode, only, opts) => {
+      const q = farm.next(mode, only, opts);
       if (!q && !only) queueMicrotask(() => gapCard.check(mode));
       return q;
     },

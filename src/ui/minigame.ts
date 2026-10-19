@@ -4,14 +4,14 @@
 // закрывает (это не «мимо оверлея»: мир виден специально). Верно — зелёный и озвучка, дальше само; ошибка — правильный
 // ответ, перевод, транскрипция и «Dalej».
 import { bus as globalBus, type Bus } from '../systems/bus';
-import type { Question } from '../systems/quiz';
+import type { Question, SpellQuestion } from '../systems/quiz';
 import type { BusEvents } from '../types/bus';
-import type { GameMode } from '../types/farm';
+import type { GameMode, Side } from '../types/farm';
 import { el } from './dom';
 import { MODE_NAME } from './glossary';
-import { attachKeyboard, type AttachedKeyboard } from './keyboard';
 import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
 import { polishPart, sayButton, sayFocused, SAY_CSS, withSay, type SayFn } from './sayButton';
+import { renderSpell, spellFeedback, SPELL_CSS, type SpellView } from './spell';
 import { THEME_CSS } from './theme';
 
 export interface AnswerResult {
@@ -36,12 +36,14 @@ export interface AnswerResult {
 
 export interface MinigameDeps {
   bus?: Bus<BusEvents>;
-  /** Следующее задание (null — спрашивать нечего). `only` — одно задание по этому растению. */
-  next(mode: GameMode, only?: string): Question | null;
+  /** Следующее задание (null — спрашивать нечего). `only` — одно задание по этому растению; `dir` — сторона игры 5. */
+  next(mode: GameMode, only?: string, opts?: { dir?: Side }): Question | null;
   answer(q: Question, given: string | readonly string[]): AnswerResult;
   say(id: string): void;
   /** Мини-игра закрылась. */
   onExit?(): void;
+  /** Сенсорный экран (игра 5: польскую печать ведёт экранная клавиатура, системная спрятана). По умолчанию `pointer: coarse`. */
+  coarse?: boolean;
 }
 
 export interface Minigame {
@@ -57,6 +59,7 @@ const css = `
 ${THEME_CSS}
 ${roundCss}
 ${SAY_CSS}
+${SPELL_CSS}
 .pq-game { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: flex; justify-content: center; pointer-events: none;
   padding: 0 calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 8px);
   font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); hyphens: none; -webkit-hyphens: none; }
@@ -106,6 +109,9 @@ ${SAY_CSS}
 .pq-pool { display: flex; flex-wrap: wrap; gap: 6px; }
 .pq-game .pq-tile { color: var(--pq-ink); background: #f2dcae; font-size: 17px; padding: 8px 10px; }
 .pq-game .pq-tile[disabled] { opacity: .25; }
+.pq-dir { flex: 0 0 auto; font-size: 13px !important; padding: 5px 8px !important; }
+.pq-dir[aria-pressed='true'] { background: #f2d552; color: var(--pq-ink); }
+.pq-dir[hidden] { display: none; }
 .pq-type { width: 100%; box-sizing: border-box; font-size: 20px; padding: 8px 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fffaf0; color: var(--pq-ink); }
 .pq-fb { margin-top: 8px; font-size: 15px; }
 .pq-fb .big { font-size: 20px; font-weight: 800; }
@@ -144,7 +150,7 @@ export function optSizeClass(text: string): '' | ' long' | ' xlong' | ' xxlong' 
 }
 
 /** Короткие названия игр для узкой шапки (F5a): название сокращается, метка «наоборот» остаётся. */
-export const MODE_SHORT: Record<GameMode, string> = { 1: 'Слово → перевод', 2: 'Перевод → слово', 3: 'Фраза по-польски', 4: 'Фраза по-русски' };
+export const MODE_SHORT: Record<GameMode, string> = { 1: 'Слово → перевод', 2: 'Перевод → слово', 3: 'Фраза по-польски', 4: 'Фраза по-русски', 5: 'Собери слово' };
 
 /** Строка прогресса растения с большой буквы. */
 const progressLine = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
@@ -160,11 +166,13 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   const rev = el('span', { class: 'pq-rev', 'data-reverse': '', hidden: true, title: 'Задание наоборот: растению нужна другая сторона' }, '↔ наоборот');
   const roundNo = el('span', { class: 'pq-roundno', 'data-round-no': '', title: 'Задание в раунде', hidden: true }, `1 / ${ROUND_SIZE}`);
   const soon = el('span', { class: 'pq-soon', 'data-soon': '', hidden: true }, '');
+  // Игра 5: «↔ наоборот» — собирать по-русски (польское слово показано и звучит); нажатый — сторона pr до выхода.
+  const dirBtn = el('button', { type: 'button', class: 'pq-btn pq-dir', 'data-dir': '', hidden: true, 'aria-pressed': 'false', title: 'Собирать наоборот: польское слово → русское', onclick: () => toggleDir() }, '↔ наоборот');
   const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', 'aria-label': 'Выйти', onclick: () => api.stop() }, el('span', { class: 'pq-exit-lbl' }, 'Выйти '), '✕');
   exitBtn.classList.add('pq-exit');
   const paper = el('div', { class: 'pq-game-paper', 'data-game': '' });
   const foot = el('div', { class: 'pq-game-foot', 'data-foot': '' });
-  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, roundNo, rev, soon, exitBtn), paper, foot);
+  const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, roundNo, rev, soon, dirBtn, exitBtn), paper, foot);
   const root = el('div', { class: 'pq-game', hidden: true }, el('style', {}, css), box);
   parent.append(root);
 
@@ -174,7 +182,12 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   let q: Question | null = null;
   let answered = false;
   let built: number[] = [];
-  let kb: AttachedKeyboard | null = null;
+  /** Игра 5: экран задания, сторона сборки, режим ввода (запоминаются до выхода). */
+  let spell: SpellView | null = null;
+  let dir: Side = 'rp';
+  let typing = false;
+  let lastGiven = '';
+  const coarse = deps.coarse ?? (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
   let focusIdx = -1;
   /** Рамка выбора нужна только тому, кто ходит стрелками; на тапе и до первой стрелки ничего не обведено (F5a). */
   let kbNav = false;
@@ -240,9 +253,10 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   };
 
   const detachKb = (): void => {
-    kb?.detach();
-    kb = null;
+    spell?.detach();
+    spell = null;
   };
+  const nextQ = (m: GameMode): Question | null => (m === 5 ? deps.next(m, only, { dir }) : deps.next(m, only));
 
   /** Строка отзыва с 🔊 справа: польское слово или фраза ответа (`r.pl`) всегда по-польски. */
   const fbRow = (line: HTMLElement, pl: string): HTMLElement => (polishPart(pl) ? el('div', { class: 'pq-fbrow' }, line, sayButton(pl, say, { inline: true })) : line);
@@ -255,8 +269,13 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     const fb = el('div', { class: 'pq-fb', 'data-feedback': r.ok ? 'ok' : 'bad' });
     if (r.ok) {
       fb.append(fbRow(el('div', { class: 'big' }, `✓ ${r.pl}`), r.pl), el('div', { class: 'sub' }, `${r.ru} · ${r.tr}`));
-      if (r.note) fb.append(el('div', { class: 'pq-muted sub' }, r.note));
+      if (r.note) fb.append(el('div', { class: 'pq-muted sub', 'data-note': '' }, r.note));
       if (q) deps.say(q.id);
+    } else if (q?.kind === 'spell') {
+      // Игра 5: правильное с подсвеченными буквами и собранное с зачёркнутыми; польское слово звучит и после ошибки.
+      const [right, mine] = spellFeedback(lastGiven, r.correct);
+      fb.append(fbRow(right!, r.pl), mine!, el('div', { class: 'sub' }, `${r.pl} — ${r.ru} · ${r.tr}`));
+      deps.say(q.id);
     } else {
       fb.append(fbRow(el('div', { class: 'big' }, el('span', { class: 'lbl' }, 'Правильно:'), r.correct), r.pl), el('div', { class: 'sub' }, `${r.pl} — ${r.ru} · ${r.tr}`));
     }
@@ -275,13 +294,13 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       dalej.classList.remove('wait');
     }, NEXT_DELAY_MS);
     // F5a: результат встаёт на место вопроса (у сборки — на место набора плиток); блок той же высоты, лист не растёт и не прокручивается.
-    const host = paper.querySelector<HTMLElement>('.pq-qblock') ?? paper.querySelector<HTMLElement>('.pq-pool');
+    const host = paper.querySelector<HTMLElement>('[data-fbhost]') ?? paper.querySelector<HTMLElement>('.pq-qblock') ?? paper.querySelector<HTMLElement>('.pq-pool');
     if (host) {
       host.replaceChildren(fb);
       host.scrollTop = 0;
       paper.classList.add('fit');
     } else paper.append(fb);
-    for (const b of box.querySelectorAll<HTMLButtonElement>('.pq-opt, .pq-tile, [data-check], [data-reset]')) b.disabled = true;
+    for (const b of box.querySelectorAll<HTMLButtonElement>('.pq-opt, .pq-tile, [data-check], [data-reset], [data-hint], [data-typemode]')) b.disabled = true;
     foot.replaceChildren(dalej);
     detachKb();
     const input = paper.querySelector<HTMLInputElement>('.pq-type');
@@ -322,16 +341,37 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     submit(o);
   };
 
-  const renderType = (): void => {
-    const input = el('input', { type: 'text', class: 'pq-type', 'data-type': '', placeholder: 'Напиши по-польски', enterkeyhint: 'done' });
-    const check = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-check': '', disabled: true, onclick: () => submit(input.value) }, 'Sprawdź · Проверить');
-    input.addEventListener('input', () => {
-      check.disabled = !input.value.trim();
+  const renderSpellQ = (qq: SpellQuestion): void => {
+    spell = renderSpell(qq, {
+      paper,
+      foot,
+      coarse,
+      typing,
+      onTyping: (on) => (typing = on),
+      relayout: () => requestAnimationFrame(reportHeight),
+      submit: (sq, given) => {
+        if (!q || answered || !given.trim()) return;
+        lastGiven = given;
+        // Задание с пометками экрана (подсказка, ввод) уходит ферме: «сам» решает она.
+        q = { ...sq, ...(q.progress ? { progress: q.progress } : {}), ...(q.reverse ? { reverse: true } : {}) };
+        finish(deps.answer(q, given));
+      },
     });
-    paper.append(input);
-    foot.replaceChildren(check);
-    kb = attachKeyboard(input, { onEnter: () => submit(input.value) });
-    setTimeout(() => input.focus({ preventScroll: true }), 30);
+  };
+
+  /** «↔ наоборот» в игре 5: другая сторона сборки; неотвеченное задание пересобирается в новую сторону. */
+  const toggleDir = (): void => {
+    if (mode !== 5) return;
+    dir = dir === 'rp' ? 'pr' : 'rp';
+    paintDir();
+    if (open && !answered && !summaryOpen) {
+      q = nextQ(5);
+      render();
+    }
+  };
+  const paintDir = (): void => {
+    dirBtn.hidden = mode !== 5;
+    dirBtn.setAttribute('aria-pressed', dir === 'pr' ? 'true' : 'false');
   };
 
   const renderTiles = (qq: Extract<Question, { kind: 'tiles' }>): void => {
@@ -377,28 +417,38 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     focusIdx = -1;
     rev.hidden = true;
     paintRound();
+    box.classList.toggle('spell', mode === 5);
     if (!q || !mode) {
-      paper.append(el('div', { class: 'pq-q' }, 'Пока нечего поливать'), el('div', { class: 'pq-q-hint' }, mode && mode >= 3 ? 'Посади фразу в словаре дома.' : 'Посади слова в словаре дома.'));
+      box.classList.remove('typing');
+      paper.append(
+        el('div', { class: 'pq-q' }, 'Пока нечего поливать'),
+        el('div', { class: 'pq-q-hint' }, mode === 3 || mode === 4 ? 'Посади фразу в словаре дома.' : mode === 5 && dir === 'pr' ? 'Посади слова в словаре дома или собери по-польски (сними «↔ наоборот»).' : 'Посади слова в словаре дома.'),
+      );
       requestAnimationFrame(reportHeight);
       return;
     }
-    rev.hidden = !q.reverse;
+    // Игра 5: сторону показывают кнопка «↔ наоборот» и подсказка под вопросом, отдельная метка не нужна.
+    rev.hidden = !q.reverse || q.kind === 'spell';
     const hint: Record<GameMode, string> = {
       1: 'Выбери перевод',
-      2: q.kind === 'type' ? 'Напиши по-польски сам, без вариантов' : 'Выбери польское слово',
+      2: 'Выбери польское слово',
       3: 'Собери фразу по-польски',
       4: 'Собери фразу по-русски',
+      5: q.kind === 'spell' && q.dir === 'pr' ? 'Собери перевод по-русски из букв' : 'Собери слово по-польски из букв',
     };
     const qText = el('div', { class: 'pq-q', lang: q.promptLang, 'data-prompt': '' }, q.prompt);
-    // Польский вопрос (игры 1 и 4) — с 🔊 рядом; русский (игры 2 и 3) — без.
+    // Польский вопрос (игры 1 и 4, игра 5 наоборот) — с 🔊 рядом; русский (игры 2, 3, 5) — без.
     const qHead = q.promptLang === 'pl' ? el('div', { class: 'pq-qrow' }, qText, sayButton(q.prompt, say, { main: true })) : qText;
-    const qb = el('div', { class: q.kind === 'tiles' ? '' : 'pq-qblock', 'data-qblock': '' }, qHead, el('div', { class: 'pq-q-hint' }, hint[q.mode]));
+    const qb = el('div', { class: q.kind === 'tiles' ? '' : q.kind === 'spell' ? 'pq-spell-q' : 'pq-qblock', 'data-qblock': '' }, qHead, el('div', { class: 'pq-q-hint' }, hint[q.mode]));
     if (q.progress) qb.append(el('div', { class: 'pq-progress', 'data-progress': '' }, `🌱 ${progressLine(q.progress)}`));
     paper.append(qb);
     if (q.kind === 'choice') renderChoice(q);
-    else if (q.kind === 'type') renderType();
-    else renderTiles(q);
-    if (q.kind !== 'type') setFocus(0);
+    else if (q.kind === 'spell') {
+      renderSpellQ(q);
+      // PL→RU: польское слово показано и сразу звучит (буквы-плитки молчат).
+      if (q.dir === 'pr') bus.emit('audio:play', { text: q.prompt });
+    } else renderTiles(q);
+    if (q.kind !== 'spell' || !typing) setFocus(0);
     root.classList.toggle('kb', kbNav);
     reportHeight();
     requestAnimationFrame(reportHeight);
@@ -416,7 +466,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       showSummary();
       return;
     }
-    q = deps.next(mode, only);
+    q = nextQ(mode);
     // Поливать больше нечего, а ответы в раунде уже были: итог раунда вместо пустого «Пока нечего поливать» со счётчиком «10 / 10».
     if (!q && !only && round.count > 0) {
       showSummary('Сегодня в этой игре больше нечего поливать · посади ещё слов в словаре дома');
@@ -453,7 +503,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     round.reset();
     roundN++;
     summaryOpen = false;
-    q = deps.next(mode, only);
+    q = nextQ(mode);
     render();
   };
 
@@ -472,6 +522,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         if (answered) return;
         if (q?.kind === 'choice') pick(i.n - 1);
         else if (q?.kind === 'tiles') tileAdder?.(i.n - 1);
+        else if (q?.kind === 'spell') spell?.hotkey(i.n);
         return;
       case 'say':
         sayFocused(root, kbNav ? (navs()[focusIdx] ?? null) : null);
@@ -524,6 +575,9 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         summaryOpen = false;
       }
       title.replaceChildren(el('span', { class: 'full' }, MODE_NAME[m].ru), el('small', {}, MODE_NAME[m].pl), el('span', { class: 'short' }, MODE_SHORT[m]));
+      // Игра 5 «Повторить» открывает по-польски (ответ «сам» нужен для урожая); с доски — сторона прошлого захода.
+      if (onlyId) dir = 'rp';
+      paintDir();
       kbNav = false;
       root.classList.remove('kb');
       soon.hidden = true;
@@ -533,13 +587,16 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         root.hidden = false;
         bus.emit('world:input', { enabled: false });
       }
-      q = deps.next(m, onlyId);
+      q = nextQ(m);
       render();
     },
     stop() {
       if (!open) return;
       clearTimer();
       detachKb();
+      box.classList.remove('spell', 'typing');
+      dirBtn.hidden = true;
+      typing = false;
       summaryOpen = false;
       open = false;
       root.hidden = true;

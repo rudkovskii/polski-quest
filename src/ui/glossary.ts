@@ -10,7 +10,11 @@ export const MODE_NAME: Record<GameMode, { ru: string; pl: string }> = {
   2: { ru: 'Перевод → польское слово', pl: 'Rosyjski → Polski' },
   3: { ru: 'Собери фразу по-польски', pl: 'Złóż zdanie po polsku' },
   4: { ru: 'Собери фразу по-русски', pl: 'Złóż zdanie po rosyjsku' },
+  5: { ru: 'Собери слово', pl: 'Ułóż słowo' },
 };
+
+/** Значок игры на доске. */
+export const MODE_ICON: Record<GameMode, string> = { 1: '📖', 2: '🎯', 3: '🧩', 4: '🔁', 5: '🔤' };
 
 /** Стадии роста: русская подпись, значок атласа и пояснение в одну строку. */
 export const STAGE_INFO: Record<Stage, { ru: string; icon: IconKey; hint: string }> = {
