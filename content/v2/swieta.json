@@ -12,7 +12,8 @@
    "daty Dnia Babci/Dziadka 21-22.01",
    "dekoracje 2-3.05 vs 1-3.05"
   ],
-  "wheel": "wheel: колесо праздников из ПМЖ/Собес/swieta-kolo (даты, тип, справка RU/PL, фраза, картины Wikimedia Commons: автор и лицензия в credit). Ключ unit — праздник игры, по которому идут вопросы; null — только справка."
+  "wheel": "wheel: колесо праздников из ПМЖ/Собес/swieta-kolo (даты, тип, справка RU/PL, фраза, картины Wikimedia Commons: автор и лицензия в credit). Ключ unit — праздник игры, по которому идут вопросы; null — только справка.",
+  "about": "about {ru, pl[], key[]} у каждого узла wheel (19.10.2026): справка-контекст для карточки выбранного праздника на колесе и для «Poznaj święto»; источники и сверка — README_swieta.md"
  },
  "tasks": {
   "what": {
@@ -2502,6 +2503,18 @@
      "Noc przed Nowym Rokiem to Sylwester. Nazwa pochodzi od papieża Sylwestra I, który zmarł 31 grudnia 335 roku. Dla Kościoła 1 stycznia to uroczystość Świętej Bożej Rodzicielki Maryi.",
      "Dzień wolny od pracy wynika z ustawy z 1951 roku."
     ]
+   },
+   "about": {
+    "ru": "1 января в Польше выходной, магазины закрыты. Накануне, 31 декабря, Sylwester: вечеринки, большие городские концерты под открытым небом и фейерверки в полночь. Пьют шампанское и желают друг другу «Szczęśliwego Nowego Roku!». Утром 1 января улицы тихие, продукты лучше купить заранее.",
+    "pl": [
+     "Pierwszego stycznia mamy dzień wolny.",
+     "Sylwester to wieczór przed Nowym Rokiem.",
+     "O północy pijemy szampana i oglądamy fajerwerki."
+    ],
+    "key": [
+     "Sylwester",
+     "Szczęśliwego Nowego Roku"
+    ]
    }
   },
   {
@@ -2538,13 +2551,38 @@
     "pl": "Święto Trzech Króli obchodzimy 6 stycznia. Trzej Królowie to Kacper, Melchior i Baltazar.",
     "tr": "щвенто тшех круля обходжимы шустэго стычнья. тшэй крулёве то кацпер, мельхёр и бальтазар.",
     "ru": "Праздник Трёх Королей отмечаем 6 января. Три короля — это Каспар, Мельхиор и Бальтазар."
+   },
+   "about": {
+    "ru": "6 января выходной, магазины закрыты. Церковь вспоминает трёх мудрецов, которые принесли дары младенцу Иисусу. Во многих городах идёт Orszak Trzech Króli: люди в костюмах королей шагают по улицам и поют колядки. Верующие пишут мелом над дверью K+M+B и год.",
+    "pl": [
+     "Szóstego stycznia nie pracujemy.",
+     "W mieście idzie orszak Trzech Króli.",
+     "Na drzwiach piszemy kredą K+M+B i rok."
+    ],
+    "key": [
+     "Orszak Trzech Króli",
+     "K+M+B"
+    ]
    }
   },
   {
    "id": "babcia",
    "unit": "hol.babcia",
    "class": "folk",
-   "off": false
+   "off": false,
+   "about": {
+    "ru": "21 января Dzień Babci, 22 января Dzień Dziadka. Это не выходные, но в польских семьях даты важные. Дети в школе и в детском саду делают бабушкам и дедушкам открытки-laurki и готовят маленькие выступления. Внуки приходят в гости с цветами и сладостями.",
+    "pl": [
+     "Dwudziestego pierwszego stycznia jest Dzień Babci.",
+     "Dwudziestego drugiego stycznia jest Dzień Dziadka.",
+     "Wnuki robią laurki i dają kwiaty."
+    ],
+    "key": [
+     "Dzień Babci",
+     "Dzień Dziadka",
+     "laurki"
+    ]
+   }
   },
   {
    "id": "tlusty",
@@ -2580,6 +2618,19 @@
     "pl": "W tłusty czwartek je się pączki i faworki.",
     "tr": "в тусты чвартэк е щэ пончки и фаворки.",
     "ru": "В жирный четверг едят пончики и хворост."
+   },
+   "about": {
+    "ru": "Tłusty czwartek — последний четверг перед Великим постом. Не выходной, но в этот день принято есть сладкое: pączki (пончики с вареньем) и faworki (хворост). У пекарен и кондитерских с утра очереди, на работу приносят коробки с пончиками.",
+    "pl": [
+     "W tłusty czwartek wszyscy jedzą słodycze.",
+     "Pączki mają dżem i cukier.",
+     "Ten dzień jest przed Wielkim Postem."
+    ],
+    "key": [
+     "Tłusty czwartek",
+     "pączki",
+     "faworki"
+    ]
    }
   },
   {
@@ -2616,6 +2667,17 @@
     "pl": "Środa Popielcowa to początek Wielkiego Postu. Ksiądz posypuje głowy wiernych popiołem.",
     "tr": "щьрода попельцова то почёнтэк вельке́го посту. ксёндз посыпуе гуовы верных попёуэм.",
     "ru": "Пепельная среда — начало Великого поста. Священник посыпает головы верующих пеплом."
+   },
+   "about": {
+    "ru": "Środa Popielcowa — первый день Великого поста, за 46 дней до Пасхи. Не выходной, магазины работают. В костёле священник посыпает головы верующих пеплом. По правилам церкви в этот день католики не едят мясо. Карнавальные веселья заканчиваются.",
+    "pl": [
+     "Środa Popielcowa to początek Wielkiego Postu.",
+     "W kościele ksiądz posypuje głowy popiołem.",
+     "W ten dzień katolicy nie jedzą mięsa."
+    ],
+    "key": [
+     "Środa Popielcowa"
+    ]
    }
   },
   {
@@ -2652,13 +2714,37 @@
     "pl": "Niedziela Palmowa to święto na tydzień przed Wielkanocą. Wierni przynoszą do kościoła kolorowe palmy.",
     "tr": "недзеля пальмова то щвенто на тыдзень пшэд вельканоцон. верни пшыношон до кощьцёуа колёровэ пальмы.",
     "ru": "Вербное воскресенье — праздник за неделю до Пасхи. Верующие приносят в костёл разноцветные пальмы."
+   },
+   "about": {
+    "ru": "Niedziela Palmowa — воскресенье за неделю до Пасхи, с него начинается Страстная неделя. Palmy делают из веток вербы, сухих цветов и цветной бумаги. Дети несут их в костёл, где священник их освящает. Освящённую пальму хранят дома до следующего года.",
+    "pl": [
+     "Niedziela Palmowa jest tydzień przed Wielkanocą.",
+     "Dzieci niosą do kościoła kolorowe palmy.",
+     "Ksiądz święci palmy w kościele."
+    ],
+    "key": [
+     "Niedziela Palmowa",
+     "Palmy"
+    ]
    }
   },
   {
    "id": "wiosna",
    "unit": "hol.wiosna",
    "class": "folk",
-   "off": false
+   "off": false,
+   "about": {
+    "ru": "21 марта в Польше провожают зиму. Дети в школе и в детском саду делают из соломы и тряпок куклу Marzanna, несут её к реке и топят или сжигают. Это старый славянский обычай. В тот же день Dzień Wagarowicza: ученики шутливо «прогуливают» уроки. Выходного нет, магазины открыты.",
+    "pl": [
+     "Dwudziestego pierwszego marca zaczyna się wiosna.",
+     "Dzieci robią Marzannę ze słomy.",
+     "Wrzucają kukłę do rzeki."
+    ],
+    "key": [
+     "Marzanna",
+     "Dzień Wagarowicza"
+    ]
+   }
   },
   {
    "id": "wielkanoc",
@@ -2694,6 +2780,19 @@
     "pl": "Najważniejsze święta katolickie to Boże Narodzenie (25–26 grudnia) i Wielkanoc.",
     "tr": "найважнейшэ щвента католицке то божэ народзэнe (двуджестэго пёнтэго и двуджестэго шустэго груднья) и вельканоц.",
     "ru": "Главные католические праздники — Рождество (25–26 декабря) и Пасха."
+   },
+   "about": {
+    "ru": "Wielkanoc — главный праздник года для католиков. В Великую субботу в костёле освящают корзинку święconka: яйца, хлеб, соль, колбасу, хрен. В воскресенье семья завтракает вместе: żurek, яйца, пасхальные кексы. Воскресенье и понедельник выходные, магазины закрыты, в субботу работают до 14:00.",
+    "pl": [
+     "Wielkanoc to najważniejsze święto wiosną.",
+     "W sobotę święcimy jedzenie w koszyczku.",
+     "W niedzielę rodzina je śniadanie razem."
+    ],
+    "key": [
+     "Wielkanoc",
+     "święconka",
+     "żurek"
+    ]
    }
   },
   {
@@ -2731,6 +2830,18 @@
     "pl": "Święconka to koszyczek z jedzeniem, który święci się w kościele. Śmigus-dyngus to polewanie się wodą w poniedziałek wielkanocny.",
     "tr": "щвенцонка то кошычэк з едзэнем, ктуры щвенчи щэ в кощьцеле. щмигус-дынгус то полеванe щэ водон в понедзяуэк вельканоцны.",
     "ru": "Święconka — корзинка с едой, которую святят в костёле. Śmigus-dyngus — обливание водой в пасхальный понедельник."
+   },
+   "about": {
+    "ru": "Lany poniedziałek — второй день Пасхи, выходной, магазины закрыты. Принято обливать друг друга водой: утром могут облить из ведра, бутылки или водяного пистолета. Обычай называется śmigus-dyngus. Шутят в основном дети и молодёжь, на улицу лучше выходить в старой одежде.",
+    "pl": [
+     "Lany poniedziałek jest po Wielkanocy.",
+     "Ludzie mają wodę w butelkach i wiadrach.",
+     "Dzieci lubią tę zabawę."
+    ],
+    "key": [
+     "Lany poniedziałek",
+     "śmigus-dyngus"
+    ]
    }
   },
   {
@@ -2768,6 +2879,19 @@
     "pl": "Polska wstąpiła do Unii Europejskiej 1 maja 2004 roku.",
     "tr": "польска фстомпиуа до унии эуропейскей перфшэго мая два тыщёнцэ чвартэго року.",
     "ru": "Польша вступила в Евросоюз 1 мая 2004 года."
+   },
+   "about": {
+    "ru": "1 мая — Święto Pracy, выходной, магазины закрыты. Сегодня для большинства поляков это начало «majówki», длинных майских выходных. В хорошую погоду едут за город, на озеро или на дачу и устраивают grill. Поезда и дороги в эти дни загружены.",
+    "pl": [
+     "Pierwszego maja jest Święto Pracy.",
+     "Mamy dzień wolny od pracy.",
+     "Wiele osób robi grill za miastem."
+    ],
+    "key": [
+     "Święto Pracy",
+     "majówki",
+     "grill"
+    ]
    }
   },
   {
@@ -2805,6 +2929,19 @@
     "pl": "2 maja obchodzimy Dzień Flagi oraz Dzień Polonii i Polaków za Granicą.",
     "tr": "другего мая обходжимы джень флаги ораз джень полёнии и полякуф за границон.",
     "ru": "2 мая отмечаем День флага и День Полонии и поляков за границей."
+   },
+   "about": {
+    "ru": "2 мая — Dzień Flagi Rzeczypospolitej Polskiej. Это не выходной, магазины открыты, но многие берут отпуск между 1 и 3 мая и получают длинную majówkę. Бело-красные флаги вывешивают на домах и балконах. В тот же день Dzień Polonii — поляков, живущих за границей.",
+    "pl": [
+     "Drugiego maja jest Dzień Flagi.",
+     "Flaga jest biało-czerwona.",
+     "Ten dzień nie jest wolny od pracy."
+    ],
+    "key": [
+     "Dzień Flagi",
+     "majówkę",
+     "Dzień Polonii"
+    ]
    }
   },
   {
@@ -2843,6 +2980,19 @@
     "pl": "Konstytucja 3 maja z 1791 roku to pierwsza konstytucja w Europie i druga na świecie.",
     "tr": "конституцья тшечего мая з тыщонц щедэмсэт джевеньджещёнтэго перфшэго року то перфша конституцья в эуропе и друга на щьвече.",
     "ru": "Конституция 3 мая 1791 года — первая конституция в Европе и вторая в мире."
+   },
+   "about": {
+    "ru": "3 мая — Święto Konstytucji 3 Maja, годовщина конституции 1791 года, выходной, магазины закрыты. В городах проходят церемонии и шествия с бело-красными флагами, службы в костёлах. Для церкви это ещё и праздник Богородицы, Королевы Польши. Вместе с 1 мая даёт majówkę: поездки, пикники и grill.",
+    "pl": [
+     "Trzeciego maja jest Święto Konstytucji.",
+     "Wieszamy flagi na domach i balkonach.",
+     "W tym dniu nie pracujemy."
+    ],
+    "key": [
+     "Święto Konstytucji",
+     "majówkę",
+     "grill"
+    ]
    }
   },
   {
@@ -2875,13 +3025,37 @@
      "Nazwa Zielone Świątki pochodzi od zwyczaju dekorowania domów zielonymi gałązkami brzozy i tataraku.",
      "Święto zawsze wypada w niedzielę."
     ]
+   },
+   "about": {
+    "ru": "Zielone Świątki — Пятидесятница, пятидесятый день после Пасхи. Всегда воскресенье, поэтому магазины закрыты. Дома и костёлы украшают зелёными ветками берёзы и клёна. Праздник завершает пасхальное время, через 11 дней наступает Boże Ciało.",
+    "pl": [
+     "Zielone Świątki są zawsze w niedzielę.",
+     "Ten dzień jest pięćdziesiąt dni po Wielkanocy.",
+     "Sklepy są w ten dzień zamknięte."
+    ],
+    "key": [
+     "Zielone Świątki",
+     "Boże Ciało"
+    ]
    }
   },
   {
    "id": "matka",
    "unit": "hol.matka",
    "class": "folk",
-   "off": false
+   "off": false,
+   "about": {
+    "ru": "26 мая в Польше Dzień Matki. Это не выходной, но почти все семьи поздравляют мам. Дети приносят открытку-laurkę, которую сделали в школе или в садике, дарят цветы, пекут торт. Принято говорить маме тёплые слова и накрыть праздничный стол.",
+    "pl": [
+     "Dwudziestego szóstego maja jest Dzień Matki.",
+     "W szkole dzieci malują dla mamy laurkę.",
+     "W domu jest tort i bukiet kwiatów."
+    ],
+    "key": [
+     "Dzień Matki",
+     "laurkę"
+    ]
+   }
   },
   {
    "id": "boze-cialo",
@@ -2912,19 +3086,56 @@
      "Po mszy wierni idą w procesji do czterech ołtarzy. Dzieci sypią kwiaty.",
      "Najbardziej znana procesja jest w Łowiczu, w strojach ludowych. Boże Ciało jest zawsze w czwartek, 60 dni po Wielkanocy."
     ]
+   },
+   "about": {
+    "ru": "Boże Ciało — четверг через 60 дней после Пасхи, выходной, магазины закрыты. После мессы люди идут крестным ходом по улицам, у четырёх алтарей читают Евангелие, дети бросают лепестки. Многие берут отпуск в пятницу и получают длинный weekend.",
+    "pl": [
+     "Boże Ciało jest zawsze w czwartek.",
+     "Po mszy idzie procesja ulicami miasta.",
+     "Dzieci sypią płatki kwiatów."
+    ],
+    "key": [
+     "Boże Ciało",
+     "weekend"
+    ]
    }
   },
   {
    "id": "dziecko",
    "unit": "hol.dziecko",
    "class": "folk",
-   "off": false
+   "off": false,
+   "about": {
+    "ru": "1 июня в Польше Dzień Dziecka. Это не выходной, но дети ждут его весь год: в школах проходят игры и соревнования. Родители дарят подарки и сладости, зовут на мороженое. В городах устраивают праздники для детей в парках.",
+    "pl": [
+     "Pierwszego czerwca jest Dzień Dziecka.",
+     "W szkole są gry i zabawy.",
+     "Dzieci dostają prezenty i lody."
+    ],
+    "key": [
+     "Dzień Dziecka"
+    ]
+   }
   },
   {
    "id": "kupala",
    "unit": "hol.kupala",
    "class": "folk",
-   "off": false
+   "off": false,
+   "about": {
+    "ru": "В ночь с 23 на 24 июня, около летнего солнцестояния, отмечают Noc Kupały, или Noc Świętojańska. Это славянский обычай. Девушки плетут венки wianki и пускают их по реке, у воды горят костры. В Кракове на Висле каждый год проходят Wianki: концерты и фейерверки.",
+    "pl": [
+     "W noc świętojańską puszczamy wianki na wodę.",
+     "Ludzie palą ogniska nad wodą.",
+     "W Krakowie są wielkie Wianki nad Wisłą."
+    ],
+    "key": [
+     "Noc Kupały",
+     "Noc Świętojańska",
+     "wianki",
+     "Wianki"
+    ]
+   }
   },
   {
    "id": "1-sierpnia",
@@ -2960,6 +3171,18 @@
     "pl": "Powstanie warszawskie to był zryw przeciwko Niemcom. Wybuchło 1 sierpnia 1944 roku i trwało 63 dni. Niestety zakończyło się klęską — miasto zostało zniszczone. Byłem w Muzeum Powstania Warszawskiego i zrobiło to na mnie ogromne wrażenie.",
     "tr": "повстанe варшавске то был зрыв пшецифко немцом. выбухуо перфшэго щерпнья тыщонц джевеньцьсэт чтэрджестэго чвартэго року и трвауо шэщьджесёнт тшы дни. нестэты закончыуо щэ клёнскон — място зостауо знищчонэ. былэм в музэум повстаня варшавскего и зробиуо то на мне огромнэ вражэнe.",
     "ru": "Варшавское восстание — это порыв против немцев. Оно вспыхнуло 1 августа 1944 года и длилось 63 дня. К сожалению, оно закончилось поражением — город был разрушен. Я был в Музее Варшавского восстания, и это произвело на меня огромное впечатление."
+   },
+   "about": {
+    "ru": "1 августа — годовщина Варшавского восстания 1944 года. Не выходной, магазины открыты. В 17:00, в Godzina W, на минуту воют сирены, в Варшаве замирают люди, а машины сигналят. Многие приходят в Музей Варшавского восстания и к памятникам, зажигают znicze.",
+    "pl": [
+     "Pierwszego sierpnia pamiętamy o powstaniu.",
+     "O siedemnastej wyją syreny.",
+     "Wtedy w Warszawie wszyscy stoją w ciszy."
+    ],
+    "key": [
+     "Godzina W",
+     "znicze"
+    ]
    }
   },
   {
@@ -2998,6 +3221,18 @@
     "pl": "Bitwa Warszawska to zwycięstwo Polski nad bolszewicką Rosją w 1920 roku, zwane Cudem nad Wisłą.",
     "tr": "битва варшавска то звыченьство польски над большевицкон росьён в тыщонц джевеньцьсэт двуджестым року, зване цудэм над висуон.",
     "ru": "Варшавская битва — победа Польши над большевистской Россией в 1920 году, названная Чудом на Висле."
+   },
+   "about": {
+    "ru": "15 августа — выходной, магазины закрыты. Церковь празднует Wniebowzięcie NMP, в народе — Matki Boskiej Zielnej: в костёлах освящают букеты из трав и цветов. Государство отмечает День Войска Польского: торжества с участием армии, иногда парад.",
+    "pl": [
+     "W kościele święcimy zioła i kwiaty.",
+     "To też święto żołnierzy.",
+     "Sklepy są w ten dzień zamknięte."
+    ],
+    "key": [
+     "Wniebowzięcie NMP",
+     "Matki Boskiej Zielnej"
+    ]
    }
   },
   {
@@ -3034,13 +3269,37 @@
     "pl": "1 listopada obchodzi się Wszystkich Świętych. Ludzie odwiedzają groby i zapalają znicze.",
     "tr": "перфшэго листопада обходжи щэ фшыстких щвентых. людже одведзайон гробы и запаляйон зничэ.",
     "ru": "1 ноября отмечают День всех святых. Люди посещают могилы и зажигают поминальные свечи."
+   },
+   "about": {
+    "ru": "1 ноября — один из самых важных дней в Польше, выходной, магазины закрыты. Вся страна едет на кладбища к родным: убирают могилы, кладут chryzantemy и зажигают znicze. К вечеру кладбища светятся тысячами огней. На дорогах пробки, билеты лучше купить заранее.",
+    "pl": [
+     "Cała Polska odwiedza groby bliskich.",
+     "Na grobach stoją chryzantemy i znicze.",
+     "Sklepy są w ten dzień zamknięte."
+    ],
+    "key": [
+     "chryzantemy",
+     "znicze"
+    ]
    }
   },
   {
    "id": "zaduszki",
    "unit": "hol.zaduszki",
    "class": "rel",
-   "off": false
+   "off": false,
+   "about": {
+    "ru": "2 ноября — Zaduszki, день памяти всех умерших. Это не выходной, магазины работают. Кладбища снова полны людей, вечером в костёлах идут мессы за умерших, на могилах горят znicze. Праздник тихий и семейный, без веселья.",
+    "pl": [
+     "Zaduszki są dzień po Wszystkich Świętych.",
+     "To dzień pamięci o zmarłych.",
+     "W kościele jest msza za zmarłych."
+    ],
+    "key": [
+     "Zaduszki",
+     "znicze"
+    ]
+   }
   },
   {
    "id": "11-listopada",
@@ -3076,6 +3335,18 @@
     "pl": "Józef Piłsudski to twórca Legionów Polskich i pierwszy marszałek Polski. 11 listopada 1918 roku Polska odzyskała niepodległość.",
     "tr": "юзэф пиусудски то тфурца легёнуф польских и перфшы маршауэк польски. едэнастэго листопада тыщонц джевеньцьсэт ощемнастэго року польска одзыскауа неподлеглощьчь.",
     "ru": "Юзеф Пилсудский — создатель Польских легионов и первый маршал Польши. 11 ноября 1918 года Польша вернула независимость."
+   },
+   "about": {
+    "ru": "11 ноября — Narodowe Święto Niepodległości, выходной, магазины закрыты. В Варшаве проходят государственные церемонии, днём большое шествие Marsz Niepodległości. Люди идут с бело-красными флагами и кокардами. В Познани в этот день пекут и едят rogale świętomarcińskie.",
+    "pl": [
+     "Jedenastego listopada jest Święto Niepodległości.",
+     "Ludzie mają biało-czerwone flagi.",
+     "W Poznaniu jemy rogale świętomarcińskie."
+    ],
+    "key": [
+     "Marsz Niepodległości",
+     "rogale świętomarcińskie"
+    ]
    }
   },
   {
@@ -3112,6 +3383,18 @@
     "pl": "Andrzejki to wieczór wróżb z 29 na 30 listopada. Najbardziej znana wróżba to lanie wosku przez klucz.",
     "tr": "анджейки то вечур вружп з двуджестэго джевёнтэго на тшыджестэго листопада. найбарджей знана вружба то лянe воску пшэз ключ.",
     "ru": "Анджейки — вечер гаданий с 29 на 30 ноября. Самое известное гадание — лить воск через ключ."
+   },
+   "about": {
+    "ru": "Andrzejki — вечер гаданий в ночь на 30 ноября, накануне дня святого Андрея. Не выходной, магазины открыты. Друзья собираются дома или в клубе и гадают о будущем. Главный обычай — lanie wosku: горячий воск льют через ключ в холодную воду и смотрят на фигурку.",
+    "pl": [
+     "Andrzejki są w listopadzie, przed dniem świętego Andrzeja.",
+     "Młodzi ludzie chcą poznać przyszłość.",
+     "Wosk w wodzie ma ciekawy kształt."
+    ],
+    "key": [
+     "Andrzejki",
+     "lanie wosku"
+    ]
    }
   },
   {
@@ -3119,7 +3402,18 @@
    "unit": "hol.mikolajki",
    "class": "folk",
    "class2": "rel",
-   "off": false
+   "off": false,
+   "about": {
+    "ru": "6 декабря — Mikołajki, день святого Николая. Не выходной, магазины открыты. Утром дети находят маленькие подарки в ботинке или под подушкой. В школах и на работе дарят шоколадки и сладости. Главные подарки получают позже, на Рождество.",
+    "pl": [
+     "Szóstego grudnia mamy Mikołajki.",
+     "Dzieci rano szukają prezentów.",
+     "W szkole i w pracy są czekoladki."
+    ],
+    "key": [
+     "Mikołajki"
+    ]
+   }
   },
   {
    "id": "wigilia",
@@ -3156,6 +3450,19 @@
     "pl": "Wigilia to uroczysta kolacja 24 grudnia. Rodzina czeka na pierwszą gwiazdkę, żeby zacząć kolację.",
     "tr": "вигиля то урочыста колячья двуджестэго чвартэго груднья. роджина чэка на перфшон гвяздкэ, жэбы зачёнчь колячье.",
     "ru": "Сочельник — торжественный ужин 24 декабря. Семья ждёт первую звёздочку, чтобы начать ужин."
+   },
+   "about": {
+    "ru": "Wigilia — вечер 24 декабря, главный семейный ужин года, с 2025 года официальный выходной. Ужин начинают с первой звездой. Сначала делятся opłatek и желают друг другу добра, потом едят 12 постных блюд: борщ с ушками, карп, pierogi. Одно место за столом оставляют для гостя.",
+    "pl": [
+     "Wigilia to wieczór przed Bożym Narodzeniem.",
+     "Dzielimy się opłatkiem i składamy życzenia.",
+     "Na stole jest dwanaście potraw bez mięsa."
+    ],
+    "key": [
+     "Wigilia",
+     "opłatek",
+     "pierogi"
+    ]
    }
   },
   {
@@ -3192,13 +3499,37 @@
     "pl": "Kolędy to pieśni bożonarodzeniowe. Najbardziej znana polska kolęda to „Bóg się rodzi”.",
     "tr": "колэнды то пещьни божонародзэнёвэ. найбарджей знана польска колэнда то «бук щэ роджи».",
     "ru": "Колядки — рождественские песни. Самая известная польская колядка — «Бог рождается»."
+   },
+   "about": {
+    "ru": "Boże Narodzenie — 25 и 26 декабря, оба дня выходные, магазины закрыты. Праздник проводят с семьёй: общий обед, поход в костёл, визиты к родным. Принято желать «Wesołych Świąt!». Продукты и подарки покупают заранее: в декабре перед праздником три воскресенья подряд магазины открыты.",
+    "pl": [
+     "Boże Narodzenie trwa dwa dni.",
+     "Dużo osób jedzie do rodziny.",
+     "Mówimy: „Wesołych Świąt!”."
+    ],
+    "key": [
+     "Boże Narodzenie",
+     "Wesołych Świąt"
+    ]
    }
   },
   {
    "id": "imieniny",
    "unit": "hol.imieniny",
    "class": "folk",
-   "off": false
+   "off": false,
+   "about": {
+    "ru": "Imieniny — именины, день святого, имя которого носит человек. Для многих поляков они важны не меньше дня рождения. Коллеги и друзья поздравляют, дарят цветы, на работу приносят торт. В календаре у каждого имени свой день. Обычно поют «Sto lat!».",
+    "pl": [
+     "Imieniny to dzień świętego z twoim imieniem.",
+     "Dostajemy kwiaty i życzenia.",
+     "Śpiewamy „Sto lat!”."
+    ],
+    "key": [
+     "Imieniny",
+     "Sto lat"
+    ]
+   }
   }
  ],
  "decor": [

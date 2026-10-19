@@ -3,6 +3,7 @@
 // Первый раз раунду предшествует карточка (картина, справка, обычаи, пожелание), потом она открывается с колеса кнопкой «ℹ Справка».
 import { el } from '../../ui/dom';
 import { sayButton } from '../../ui/sayButton';
+import { ABOUT_CSS, aboutBlock } from './about';
 import type { GameCtx, GamePanel, PolskaUnit } from '../../types/polska';
 import { fmtSpan, inDays, nearestHoliday, nextSpan, nextSpanOfWhen, seasonFrame, shortName, upcoming, WEEKDAY_PL, weekdayOf, dayNo, type Span } from './calendar';
 import { FRAMES, WORD_FRAME, frameIcon, itemIcon, itemWord } from './icons';
@@ -71,6 +72,8 @@ export const css = `
 .pq-pg .sw-near { display: flex; align-items: center; gap: 8px; width: 100%; box-sizing: border-box; padding: 2px 8px 2px 2px; text-align: left; color: var(--pq-ink); background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; font: inherit; font-size: 14px; cursor: pointer; }
 .pq-pg .sw-near b { font-weight: 800; }
 .pq-pg .sw-sel { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 10px; padding: 8px; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; }
+.pq-pg .sw-sel .sw-hd { min-width: 0; }
+.pq-pg .sw-sel .sw-sub { grid-column: 1 / -1; }
 .pq-pg .sw-sel .sw-th { display: flex; align-items: center; justify-content: center; align-self: start; width: 78px; min-height: 58px; background: #f2dcae; border: 2px solid var(--pq-wood-dark); border-radius: 4px; box-sizing: border-box; }
 .pq-pg .sw-sel .sw-th .sw-frame { width: 100%; min-width: 0; border-width: 2px; outline-width: 1px; box-shadow: none; }
 .pq-pg .sw-sel .sw-nm { font-size: 17px; font-weight: 800; line-height: 1.15; overflow-wrap: anywhere; }
@@ -84,7 +87,21 @@ export const css = `
 .pq-pg .sw-legend { display: flex; flex-wrap: wrap; gap: 4px 6px; justify-content: center; }
 .pq-pg .sw-legend .sw-tag { cursor: default; font: inherit; font-size: 11.5px; font-weight: 700; color: var(--pq-ink); }
 .pq-pg .sw-legend button.sw-tag { cursor: pointer; }
-@media (min-aspect-ratio: 13/10) and (min-width: 760px) {
+@media (max-width: 520px) {
+  .pq-pg .sw-wheel { width: min(100%, calc(100dvh - 475px)); }
+  .pq-pg .sw-near { font-size: 12px; gap: 6px; }
+  .pq-pg .sw-hub { gap: 6px; }
+  .pq-pg .sw-side { gap: 6px; }
+  .pq-pg .sw-sel { grid-template-columns: 64px minmax(0, 1fr); gap: 4px 8px; padding: 6px 8px; }
+  .pq-pg .sw-sel .sw-th { width: 64px; min-height: 48px; }
+  .pq-pg .sw-sel .sw-nm { font-size: 16px; }
+  .pq-pg .sw-sel .sw-mt { margin-top: 1px; }
+  .pq-pg .sw-sel .sw-tags { margin-top: 0; }
+  .pq-pg .sw-sel .sw-gr { margin-top: 2px; }
+  /* Раскрытое «О празднике» занимает место баннера, легенды и строки чипов: страница не прокручивается, листается сам текст. */
+  .pq-pg .sw-hub.about-open .sw-near, .pq-pg .sw-hub.about-open .sw-legend, .pq-pg .sw-hub.about-open .sw-sel .sw-sub { display: none; }
+}
+@media (min-aspect-ratio: 13/10) and (min-width: 760px), (min-width: 1100px) and (min-height: 880px) {
   .pq-pg .sw-hub { flex-direction: row; gap: 22px; }
   .pq-pg .sw-wheel { width: min(60%, calc(100dvh - 176px)); }
   .pq-pg .sw-side { flex: 1 1 0; max-width: 430px; padding: 0; }
@@ -101,6 +118,7 @@ export const css = `
 .pq-pg .sw-info p { margin: 0; }
 .pq-pg .sw-info p b { font-weight: 800; color: #7a3a14; }
 .pq-pg .sw-sec { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; }
+.pq-pg .sw-info h3.sw-hist { margin: 4px 0 -4px; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; opacity: .65; font-weight: 800; }
 .pq-pg .sw-sec h3 { margin: 0; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; opacity: .65; font-weight: 800; }
 .pq-pg .sw-sec .sw-pltxt { font-style: italic; }
 .pq-pg .sw-row { display: flex; align-items: flex-start; gap: 6px; }
@@ -175,16 +193,20 @@ export function buildCard(panel: GamePanel, ctx: GameCtx, node: WheelNode, unit:
       bd.append(el('div', { class: 'sw-game', 'data-ingame': '' }, 'В игре: ', el('b', { lang: 'pl' }, shortName(unit)), us ? ` · ${fmtSpan(us)}` : ''));
     }
   }
-  // Справка: RU с польскими словами жирным; короткая при знакомстве, полная — по кнопке «Справка».
+  // «О празднике»: контекст RU (польские слова жирным) и простые польские предложения, у каждого своя 🔊. Это и есть справка знакомства;
+  // по кнопке «ℹ Справка» ниже добавляется история (`intro`): без повтора — они о разном. Узел без `about` показывает прежнюю справку.
+  const about = node.about;
+  if (about) bd.append(aboutBlock(about, panel.say, false));
   const intro = node.intro;
-  if (intro) {
+  if (intro && (mode === 'info' || !about)) {
     const ruText = mode === 'intro' ? [shortIntro(intro.ru)] : intro.ru;
+    if (about) bd.append(el('h3', { class: 'sw-hist' }, 'Historia · История'));
     bd.append(el('div', { 'data-intro': '' }, ...ruText.map((t) => rich(t))));
     if (intro.pl.length) {
       const pl = mode === 'intro' ? sentences(intro.pl).slice(0, 2).join(' ') : intro.pl.join(' ');
       bd.append(el('div', { class: 'sw-sec', 'data-intro-pl': '' }, el('h3', {}, 'Po polsku'), el('div', { class: 'sw-row' }, el('div', { class: 'sw-pltxt', lang: 'pl' }, pl), sayBtn(panel, pl))));
     }
-  } else if (unit) {
+  } else if (!about && unit) {
     const note = unit.raw.note as { pl?: string; ru?: string } | undefined;
     if (note?.ru) bd.append(el('div', { 'data-intro': '' }, rich(note.ru)));
   }
@@ -361,7 +383,7 @@ export function renderHub(panel: GamePanel, ctx: GameCtx, begin: (id: string, si
   }
   side.append(...(banner ? [banner] : []), sel, legend);
   hub.append(wheel, side);
-  panel.body.append(el('style', {}, css + picCss), hub);
+  panel.body.append(el('style', {}, css + ABOUT_CSS + picCss), hub);
 
   const nodeOf = (id: string): WheelNode | undefined => all.find((n) => n.id === id);
 
@@ -374,17 +396,18 @@ export function renderHub(panel: GamePanel, ctx: GameCtx, begin: (id: string, si
     const th = el('div', { class: 'sw-th' });
     if (n.img) th.append(picFrame(n.img, n.pl, 96, 72));
     else th.append(itemIcon(nodeItem(n, u), 3));
+    hub.classList.remove('about-open');
     sel.replaceChildren(
       th,
       el(
         'div',
-        {},
+        { class: 'sw-hd' },
         el('div', { class: 'sw-row' }, el('div', { class: 'sw-nm', lang: 'pl', 'data-sel-name': '' }, n.pl), sayButton(n.pl, panel.say)),
         n.ru ? el('div', { class: 'sw-rn' }, n.ru) : null,
         el('div', { class: 'sw-mt' }, span ? `${dateText(span)} · ${inDays(Math.max(0, span.start - today))}` : 'bez daty · без даты'),
-        tagsOf(n),
-        el('div', { class: 'sw-gr', 'data-growth-line': '' }, growthLine(ctx, u)),
       ),
+      el('div', { class: 'sw-sub' }, tagsOf(n), el('div', { class: 'sw-gr', 'data-growth-line': '' }, growthLine(ctx, u))),
+      ...(n.about ? [aboutBlock(n.about, panel.say, true, (open) => hub.classList.toggle('about-open', open))] : []),
     );
     for (const [id, b] of buttons) {
       const on = id === n.id;
@@ -412,7 +435,7 @@ export function renderHub(panel: GamePanel, ctx: GameCtx, begin: (id: string, si
   function showCard(n: WheelNode, mode: CardMode): void {
     const u = unitOf(n);
     box?.style.removeProperty('width');
-    panel.body.replaceChildren(el('style', {}, css + picCss), el('div', { class: 'sw-hub', 'data-hub-card': '' }, buildCard(panel, ctx, n, u, mode)));
+    panel.body.replaceChildren(el('style', {}, css + ABOUT_CSS + picCss), el('div', { class: 'sw-hub', 'data-hub-card': '' }, buildCard(panel, ctx, n, u, mode)));
     panel.body.scrollTop = 0;
     const back = el('button', { type: 'button', class: 'pq-btn', style: 'flex:0 0 auto', 'data-nav': '', 'data-back': '', 'aria-label': 'К колесу', onclick: () => draw() }, '‹ Koło');
     const go = u
@@ -438,7 +461,7 @@ export function renderHub(panel: GamePanel, ctx: GameCtx, begin: (id: string, si
 
   function draw(): void {
     box?.style.removeProperty('width');
-    panel.body.replaceChildren(el('style', {}, css + picCss), hub);
+    panel.body.replaceChildren(el('style', {}, css + ABOUT_CSS + picCss), hub);
     paintSel();
     resize();
   }
