@@ -367,6 +367,14 @@ describe('экран «＋ Своё слово»', () => {
     expect(vars[1]!.textContent).toContain(translit('inspiracja'));
     expect(vars[1]!.textContent).toContain('сущ.');
     expect(vars[1]!.textContent).toContain('ж. р.');
+    // У каждого польского варианта и у слова базы есть 🔊 рядом (внутри кнопки варианта её нет: кнопка в кнопке недопустима).
+    expect(t.$$('.cw-varrow > .pq-say')).toHaveLength(2);
+    expect(vars[1]!.querySelector('.pq-say')).toBeNull();
+    const heard: (string | undefined)[] = [];
+    t.bus.on('audio:play', (p) => heard.push(p.text));
+    t.$$('.cw-varrow > .pq-say')[1]!.click();
+    expect(heard).toEqual(['inspiracja']);
+    expect(t.$('[data-cw-variants]').textContent).not.toContain('🔊');
     expect(t.loadDict).toHaveBeenCalledTimes(1);
     vars[1]!.click();
     const pl = t.$<HTMLInputElement>('[data-cw-pl]');

@@ -6,6 +6,7 @@ import type { Pos, Word } from '../types/content';
 import type { CustomApi, FarmApi } from '../types/farm';
 import { el } from './dom';
 import { nav } from './panel';
+import { sayButton, type SayFn } from './sayButton';
 
 export const CUSTOM_CSS = `
 .dict [hidden] { display: none !important; }
@@ -20,6 +21,8 @@ export const CUSTOM_CSS = `
 .cw-h { font-size: 14px; font-weight: 700; opacity: .85; margin-top: 2px; }
 .cw-list { display: flex; flex-direction: column; gap: 6px; }
 .cw-var { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 8px; align-items: center; text-align: left; font: inherit; color: var(--pq-ink); background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 6px; padding: 8px 10px; min-height: 52px; cursor: pointer; box-sizing: border-box; }
+.cw-varrow { display: flex; align-items: center; gap: 8px; } .cw-varrow > .cw-var { flex: 1 1 auto; min-width: 0; }
+.cw-base .plrow { grid-column: 1; display: flex; align-items: center; gap: 8px; min-width: 0; } .cw-base .plrow .pl { flex: 0 1 auto; }
 .cw-var .pl { font-size: 20px; font-weight: 700; overflow-wrap: anywhere; }
 .cw-var .meta { grid-column: 1; font-size: 13px; opacity: .75; overflow-wrap: anywhere; }
 .cw-var .go { grid-row: 1 / span 2; grid-column: 2; font-size: 20px; opacity: .6; }
@@ -39,6 +42,8 @@ export const CUSTOM_CSS = `
 
 export interface CustomPaneOpts {
   api: FarmApi & { custom: CustomApi };
+  /** Озвучка польского текста кнопкой 🔊 (варианты перевода, слова базы). Нет — кнопок нет. */
+  sayText?: SayFn;
   /** Загрузка словаря (platform/rupl). Нет — только ручной ввод. */
   loadDict?: () => Promise<RuplDb | null>;
   /** Содержимое пане перерисовано: панели вернуть фокус (на элемент с ключом `key`, если он есть). */
@@ -243,12 +248,18 @@ export function createCustomPane(o: CustomPaneOpts): CustomPane {
     );
   }
 
+  /** Вариант перевода с 🔊 рядом (кнопка внутри кнопки невозможна): послушать слово до выбора. */
+  function variantRow(v: Variant, h: Hit): HTMLElement {
+    const b = variantButton(v, h);
+    return o.sayText ? el('div', { class: 'cw-varrow' }, b, sayButton(v.pl, o.sayText, { attrs: nav('cwv', 'h', `cwvs:${v.pl}`) })) : b;
+  }
+
   function baseRow(w: Word): HTMLElement {
     const st = api.info(w.id).status;
     return el(
       'div',
       { class: 'cw-base', 'data-cw-base': w.id },
-      el('span', { class: 'pl' }, w.pl),
+      o.sayText ? el('span', { class: 'plrow' }, el('span', { class: 'pl' }, w.pl), sayButton(w.pl, o.sayText, { attrs: nav('cwb', 'v', `cwbs:${w.id}`) })) : el('span', { class: 'pl' }, w.pl),
       el('span', { class: 'ru' }, `${w.ru} · ${w.tr}`),
       st === 'new'
         ? el('button', { type: 'button', class: 'pq-btn small', 'data-cw-plant-base': w.id, ...nav('cwb', 'v', `cwb:${w.id}`), onclick: () => (api.plant([w.id]), showBase(w, api.info(w.id).status === 'bag' ? 'Посажено, грядки заняты: слово ждёт в мешке.' : 'Посажено на грядку.')) }, 'Посадить')
@@ -281,7 +292,7 @@ export function createCustomPane(o: CustomPaneOpts): CustomPane {
     if (hit) {
       nodes.push(
         say([base.length ? 'Или добавь своё слово. ' : '', hit.viaForm ? `«${hit.query}» — форма слова «${hit.lemma}». ` : '', 'Выбери вариант:'], 'cw-h'),
-        el('div', { class: 'cw-list', 'data-cw-variants': '' }, ...hit.variants.map((v) => variantButton(v, hit))),
+        el('div', { class: 'cw-list', 'data-cw-variants': '' }, ...hit.variants.map((v) => variantRow(v, hit))),
         manualBtn('Свой вариант…', { pl: '', ru: hit.lemma }),
       );
     } else {
