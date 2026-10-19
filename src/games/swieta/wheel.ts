@@ -20,6 +20,12 @@ export interface Credit {
   title: string;
 }
 
+export interface About {
+  ru: string;
+  pl: string[];
+  key: string[];
+}
+
 export interface WheelNode {
   id: string;
   /** Единица игры (`hol.*`), по которой идут вопросы; null — только справка. */
@@ -37,6 +43,8 @@ export interface WheelNode {
   pic: boolean;
   credit: Credit | null;
   intro: { ru: string[]; pl: string[] } | null;
+  /** «О празднике»: контекст RU (3–4 предложения, `key` — польские слова жирным) и 2–3 простых польских предложения (у каждого своя 🔊). */
+  about: About | null;
   phrase: { pl: string; tr: string; ru: string } | null;
 }
 
@@ -61,6 +69,7 @@ export function parseWheel(doc: Readonly<Record<string, unknown>>, units: readon
     const c = obj(x.credit);
     const intro = obj(x.intro);
     const phrase = obj(x.phrase);
+    const ab = obj(x.about);
     out.push({
       id,
       unit: u ? u.id : null,
@@ -74,13 +83,14 @@ export function parseWheel(doc: Readonly<Record<string, unknown>>, units: readon
       pic: x.pic !== false,
       credit: c.author ? { author: str(c.author), license: str(c.license), page: str(c.page), title: str(c.title) } : null,
       intro: strs(intro.ru).length ? { ru: strs(intro.ru), pl: strs(intro.pl) } : null,
+      about: str(ab.ru).trim() ? { ru: str(ab.ru), pl: strs(ab.pl), key: strs(ab.key) } : null,
       phrase: phrase.pl ? { pl: str(phrase.pl), tr: str(phrase.tr), ru: str(phrase.ru) } : null,
     });
   }
   const covered = new Set(out.map((n) => n.unit));
   for (const u of units) {
     if (covered.has(u.id)) continue;
-    out.push({ id: u.id.replace(/^hol\./, ''), unit: u.id, when: obj(u.raw.when) as When, cls: 'folk', cls2: null, off: u.raw.free === true, pl: shortName(u), ru: u.ru, img: null, pic: false, credit: null, intro: null, phrase: null });
+    out.push({ id: u.id.replace(/^hol\./, ''), unit: u.id, when: obj(u.raw.when) as When, cls: 'folk', cls2: null, off: u.raw.free === true, pl: shortName(u), ru: u.ru, img: null, pic: false, credit: null, intro: null, about: null, phrase: null });
   }
   return out;
 }

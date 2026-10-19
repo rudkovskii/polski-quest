@@ -216,8 +216,12 @@ describe('«Sklepy otwarte?»', () => {
     expect(game.check(w, 'otwarte', TODAY).ok).toBe(false);
 
     const g = shopsTask(TODAY, U('wigilia'))!;
-    expect(g.answer).toBe('otwarte do czternastej');
+    // 24.12 — выходной с 2025 года, магазины закрыты (раньше было «до 14:00»); Niedziela Palmowa — торговое воскресенье
+    expect(g.answer).toBe('zamknięte');
     expect(g.q).toMatch(/^Dwudziestego czwartego grudnia/);
+    expect(shopsTask(TODAY, U('palmowa'))!.answer).toBe('otwarte');
+    expect(U('wigilia').raw.shops).toBe('closed');
+    expect(U('palmowa').raw.shops).toBe('open');
 
     // Majówka: три разных вопроса по дням — 1 и 3 мая закрыты, 2 мая открыто.
     expect(shopsQuestions(U('majowka')).map((q) => q.shops)).toEqual(['closed', 'open', 'closed']);
@@ -524,7 +528,10 @@ describe('справка знакомства', () => {
   });
 
   it('магазины строкой: из заметки данных, иначе из shops; первый раз — нет ответов по единице', () => {
-    expect(shopsLine(U('wigilia'))!.ru).toMatch(/14:00/);
+    expect(shopsLine(U('wigilia'))!.ru).toMatch(/закрыты/);
+    expect(shopsLine(U('wigilia'))!.pl).toBe('W Wigilię sklepy są zamknięte.');
+    expect(shopsLine(U('palmowa'))!.ru).toMatch(/открыты/);
+    expect(shopsLine(U('palmowa'))!.pl).toBe('Niedziela handlowa: sklepy są otwarte.');
     expect(shopsLine(U('wszyscy'))!.pl).toBe('Sklepy są zamknięte.');
     // «Первый раз» = нет флага «знакомство принято» (а не «нет ответов»): ответы без флага карточку не отменяют.
     const c = ctxAt(2026, 10, 18);
@@ -666,13 +673,14 @@ describe('экран колеса', () => {
     expect(card.querySelector('[data-credit]')!.textContent).toMatch(/© Marek Ślusarczyk.*CC BY 3\.0/);
     expect(card.querySelector('[data-credit] a')!.getAttribute('href')).toMatch(/commons\.wikimedia\.org/);
     expect(card.querySelector('[data-card-name]')!.textContent).toBe('Wszystkich Świętych');
-    expect(card.querySelector('[data-intro] b')!.textContent).toBe('znicze');
+    expect(card.querySelector('[data-about-ru] b')!.textContent).toBe('chryzantemy');
     expect(card.querySelectorAll('[data-customs] .sw-row').length).toBe(3);
     expect(card.querySelector('[data-shops]')).toBeTruthy();
-    expect(card.querySelector('[data-intro-pl]')).toBeTruthy();
-    card.querySelector<HTMLElement>('[data-intro-pl] .pq-say')!.click();
-    expect(spoken.length).toBe(1);
-    expect(spoken[0]).toMatch(/święto wszystkich świętych/i);
+    // справка знакомства — «О празднике»: польские предложения по одному, у каждого своя 🔊; истории (intro) в первой карточке нет, повторов нет
+    expect(card.querySelector('[data-intro]')).toBeNull();
+    expect(card.querySelectorAll('[data-about-pl] .pq-say').length).toBe(3);
+    card.querySelector<HTMLElement>('[data-about-pl] .pq-say')!.click();
+    expect(spoken).toEqual(['Cała Polska odwiedza groby bliskich.']);
     foot.querySelector<HTMLElement>('[data-start]')!.click();
     expect(begun.length).toBe(1);
     expect(begun[0]![0]).toBe('hol.wszyscy');
@@ -704,6 +712,146 @@ describe('экран колеса', () => {
     expect(card.querySelector('[data-pic]')).toBeNull();
     expect(card.querySelector('[data-customs]')).toBeTruthy();
     expect(card.querySelector('[data-wish]')).toBeTruthy();
+  });
+});
+
+describe('«О празднике» (about): данные, колесо, карточка', () => {
+  const sw = V2.docs.swieta.wheel as { id: string; about?: { ru: string; pl: string[]; key: string[] } }[];
+  const mkBusHub = (ctx: GameCtx = TODAY, answers = 5) => {
+    const bus = testBus();
+    const heard: string[] = [];
+    bus.on('audio:play', (p) => heard.push(p.text ?? ''));
+    const body = document.createElement('div');
+    const foot = document.createElement('div');
+    const panel: GamePanel = { body, foot, layout: 'full', submit: () => {}, say: (t) => bus.emit('audio:play', { text: t }), rand: seeded(2) };
+    renderHub(panel, { ...ctx, info: (id) => ({ ...ctx.info(id), answers }), seen: answers > 0 ? () => true : ctx.seen }, () => {});
+    return { body, foot, heard };
+  };
+
+  it('у каждого из 27 узлов есть about: RU ≤ 380 знаков и 3–4 предложения, PL 2–3 предложения, key встречаются в RU', () => {
+    expect(sw.length).toBe(27);
+    for (const n of sw) {
+      const a = n.about!;
+      expect(a, n.id).toBeTruthy();
+      expect(a.ru.length, n.id).toBeLessThanOrEqual(380);
+      expect(sentences([a.ru]).length, n.id).toBeGreaterThanOrEqual(3);
+      expect(sentences([a.ru]).length, n.id).toBeLessThanOrEqual(5);
+      expect(a.pl.length, n.id).toBeGreaterThanOrEqual(2);
+      expect(a.pl.length, n.id).toBeLessThanOrEqual(3);
+      for (const x of a.pl) expect(/[а-яё]/i.test(x), `${n.id}: ${x}`).toBe(false);
+      expect(a.key.length, n.id).toBeGreaterThan(0);
+      for (const k of a.key) expect(a.ru, n.id).toContain(k);
+    }
+    for (const n of NODES) expect(n.about, n.id).toBeTruthy();
+  });
+
+  it('в карточке выбранного праздника на колесе блок «О празднике»: RU с жирными польскими словами и польские предложения', () => {
+    const { body } = mkBusHub();
+    const box = body.querySelector('[data-sel] [data-about]')!;
+    expect(box).toBeTruthy();
+    expect(box.querySelector('[data-about-ru]')!.textContent).toMatch(/^1 ноября/);
+    expect([...box.querySelectorAll('[data-about-ru] b')].map((b) => b.textContent)).toEqual(['chryzantemy', 'znicze']);
+    expect([...box.querySelectorAll('[data-about-sentence]')].map((x) => x.textContent)).toEqual([
+      'Cała Polska odwiedza groby bliskich.',
+      'Na grobach stoją chryzantemy i znicze.',
+      'Sklepy są w ten dzień zamknięte.',
+    ]);
+  });
+
+  it('у каждого узла колеса блок показывается, и 🔊 каждого польского предложения шлёт audio:play с этим предложением (русский — без кнопки)', () => {
+    const { body, heard } = mkBusHub();
+    for (const n of NODES) {
+      body.querySelector<HTMLElement>(`[data-node="${n.id}"]`)!.click();
+      const box = body.querySelector('[data-sel] [data-about]')!;
+      expect(box, n.id).toBeTruthy();
+      expect(box.querySelector('[data-about-ru] .pq-say'), n.id).toBeNull();
+      const sentencesPl = [...box.querySelectorAll('[data-about-sentence]')].map((x) => x.textContent!);
+      expect(sentencesPl, n.id).toEqual(n.about!.pl);
+      const btns = [...box.querySelectorAll<HTMLElement>('[data-about-pl] .pq-say')];
+      expect(btns.length, n.id).toBe(n.about!.pl.length);
+      heard.length = 0;
+      btns.forEach((b) => b.click());
+      expect(heard, n.id).toEqual(n.about!.pl);
+    }
+  });
+
+  it('на узком экране блок свёрнут и разворачивается кнопкой «Подробнее»; выбор другого праздника сворачивает; чистый вид не сломан', () => {
+    const { body } = mkBusHub();
+    const hub = body.querySelector<HTMLElement>('[data-hub]')!;
+    const box = () => body.querySelector<HTMLElement>('[data-sel] [data-about]')!;
+    expect(box().classList.contains('open')).toBe(false);
+    expect(hub.classList.contains('about-open')).toBe(false);
+    const more = box().querySelector<HTMLElement>('[data-about-more]')!;
+    expect(more.getAttribute('aria-expanded')).toBe('false');
+    more.click();
+    expect(box().classList.contains('open')).toBe(true);
+    expect(hub.classList.contains('about-open')).toBe(true);
+    expect(box().querySelector('[data-about-more]')!.getAttribute('aria-expanded')).toBe('true');
+    box().querySelector<HTMLElement>('[data-about-more]')!.click();
+    expect(box().classList.contains('open')).toBe(false);
+    box().querySelector<HTMLElement>('[data-about-more]')!.click();
+    body.querySelector<HTMLElement>('[data-node="andrzejki"]')!.click();
+    expect(box().classList.contains('open')).toBe(false);
+    expect(hub.classList.contains('about-open')).toBe(false);
+    expect(body.querySelector('[data-wheel]')).toBeTruthy();
+  });
+
+  it('карточка «Poznaj święto»: about целиком и без повтора истории; в «ℹ Справка» история (intro) идёт ниже about', () => {
+    const first = mkBusHub(ctxAt(2026, 10, 18), 0);
+    first.foot.querySelector<HTMLElement>('[data-poznaj]')!.click();
+    const card = first.body.querySelector('[data-card="intro"]')!;
+    const about = card.querySelector('[data-about]')!;
+    expect(about.classList.contains('full')).toBe(true);
+    expect(about.querySelector('[data-about-more]')).toBeNull();
+    expect(card.querySelector('[data-intro]')).toBeNull();
+    const second = mkBusHub(TODAY, 5);
+    second.foot.querySelector<HTMLElement>('[data-info]')!.click();
+    const info = second.body.querySelector('[data-card="info"]')!;
+    expect(info.querySelector('[data-about]')).toBeTruthy();
+    expect(info.querySelector('[data-intro]')).toBeTruthy();
+    const order = [...info.querySelectorAll('[data-about], [data-intro]')].map((x) => (x.hasAttribute('data-about') ? 'about' : 'intro'));
+    expect(order).toEqual(['about', 'intro']);
+    expect(info.querySelector('[data-about-ru]')!.textContent).not.toBe(info.querySelector('[data-intro]')!.textContent);
+    // 🔊 в карточке тоже шлёт audio:play
+    info.querySelector<HTMLElement>('[data-about-pl] .pq-say')!.click();
+    expect(second.heard).toEqual(['Cała Polska odwiedza groby bliskich.']);
+  });
+
+  it('польские предложения about не повторяют обычаи, заметку о магазинах, пожелание и историю того же праздника', () => {
+    for (const n of NODES) {
+      const u = n.unit ? BY_ID.get(n.unit) : undefined;
+      const seen = new Set<string>([...(n.intro?.pl ?? [])]);
+      if (u) {
+        for (const c of (u.raw.customs as { pl: string }[] | undefined) ?? []) seen.add(c.pl);
+        const sn = u.raw.shops_note as { pl?: string } | undefined;
+        if (sn?.pl) seen.add(sn.pl);
+        const w = u.raw.wish as { pl?: string } | undefined;
+        if (w?.pl) seen.add(w.pl);
+      }
+      for (const s of n.about!.pl) expect(seen.has(s), `${n.id}: ${s}`).toBe(false);
+      expect(new Set(n.about!.pl).size, n.id).toBe(n.about!.pl.length);
+    }
+  });
+
+  it('about не противоречит магазинам: Wigilia — закрыты, Niedziela Palmowa — открыты', () => {
+    const wg = NODES.find((n) => n.id === 'wigilia')!.about!;
+    const pm = NODES.find((n) => n.id === 'palmowa')!.about!;
+    expect(wg.ru).toMatch(/выходной, магазины закрыты/);
+    expect(wg.pl).toContain('Sklepy są w ten dzień zamknięte.');
+    expect(wg.ru + wg.pl.join(' ')).not.toMatch(/14:00|czternast/);
+    expect(pm.ru).toMatch(/магазины работают/);
+    expect(pm.pl).toContain('Sklepy są w tę niedzielę otwarte.');
+    expect(pm.ru + pm.pl.join(' ')).not.toMatch(/закрыты|zamknięte|bez handlu/);
+  });
+
+  it('праздник без картины и без истории (Mikołajki) тоже получает about в карточке знакомства', () => {
+    const { body, foot } = mkBusHub(ctxAt(2026, 10, 18), 0);
+    body.querySelector<HTMLElement>('[data-node="mikolajki"]')!.click();
+    foot.querySelector<HTMLElement>('[data-poznaj]')!.click();
+    const card = body.querySelector('[data-card="intro"]')!;
+    expect(card.querySelector('[data-pic]')).toBeNull();
+    expect(card.querySelector('[data-about-ru]')!.textContent).toMatch(/Mikołajki/);
+    expect(card.querySelectorAll('[data-about-pl] .pq-say').length).toBe(3);
   });
 });
 
