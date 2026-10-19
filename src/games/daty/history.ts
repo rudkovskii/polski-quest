@@ -65,7 +65,7 @@ export const HIST_CSS = `
 /* После ответа варианты ужимаются, чтобы справка в отзыве влезла без прокрутки (телефон 375×812). */
 .pq-pg .dt.dt-done .pq-opts { grid-auto-rows: minmax(38px, auto); }
 .pq-pg .dt.dt-done .pq-opt { min-height: 38px; }
-@media (max-width: 520px) { .dt-day, .dt-blank { min-height: 33px; } }
+@media (max-width: 520px) { .dt-day, .dt-blank { min-height: 33px; } .pq-pg .dt.dt-done .dt-day, .pq-pg .dt.dt-done .dt-blank { min-height: 26px; } }
 @media (min-width: 720px) { .pq-pg .fb .dt-hist-ru, .pq-pg .fb .dt-hist-pl { font-size: 15px; } }
 `;
 

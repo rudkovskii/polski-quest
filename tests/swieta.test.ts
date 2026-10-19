@@ -528,7 +528,8 @@ describe('справка знакомства', () => {
     expect(shopsLine(U('wszyscy'))!.pl).toBe('Sklepy są zamknięte.');
     // «Первый раз» = нет флага «знакомство принято» (а не «нет ответов»): ответы без флага карточку не отменяют.
     const c = ctxAt(2026, 10, 18);
-    expect(isFirst({ ...c, info: (id) => ({ ...c.info(id), answers: 5 }) }, 'hol.wszyscy')).toBe(true);
+    const answered: GameCtx = { ...c, info: (id) => ({ ...c.info(id), answers: 5 }) };
+    expect(isFirst(answered, 'hol.wszyscy')).toBe(true);
     c.markSeen('hol.wszyscy');
     expect(isFirst(c, 'hol.wszyscy')).toBe(false);
     expect(isFirst(c, 'hol.wigilia')).toBe(true);

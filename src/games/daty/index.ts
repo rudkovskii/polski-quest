@@ -172,7 +172,7 @@ function feedbackHeight(panel: GamePanel, name: string, h: ReturnType<typeof his
   const fb = el(
     'div',
     { class: 'fb', style: 'box-sizing:border-box;margin:0' },
-    el('div', { class: 'pq-fbrow' }, el('div', { class: 'big' }, `✓ ${name}`), sayButton(name, nope, { inline: true })),
+    el('div', { class: 'pq-fbrow' }, el('div', { class: 'big' }, el('span', { class: 'lbl' }, 'Правильно:'), name), sayButton(name, nope, { inline: true })),
     el('div', { class: 'sub' }, '·'),
     historyBlock(h, nope),
     el('div', { class: 'pq-progress' }, '🌱 Ещё 1 полив до ростка'),
@@ -201,7 +201,7 @@ function render(task: DatyTask, panel: GamePanel, ctx: GameCtx): void {
     return more * (row + 4);
   };
   watchFeedback(panel, wrap, hist);
-  const refit = fitToSheet(panel, wrap, () => (card ? { fb: 6 } : { fb: Math.max(FB_RESERVE, feedbackHeight(panel, u?.pl ?? '', hist)), inner: spare() }));
+  const refit = fitToSheet(panel, wrap, () => (card ? { fb: 6 } : { fb: Math.max(FB_RESERVE, feedbackHeight(panel, task.mode === 'co' ? (u?.pl ?? '') : sayDate(ctx.doc, task.day, task.month), hist)), inner: spare() }));
   const showTask = (): void => {
     card = false;
     wrap.dataset.dt = task.mode;
