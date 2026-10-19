@@ -92,7 +92,7 @@ export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEven
           el('div', { class: 'lid' }),
           el('div', { class: 'glass' }, el('div', { class: 'fill', style: `height:${pct}%;--jar:hsl(${hue(idx)} 62% 58%)` }), el('div', { class: 'shine' })),
         ),
-        el('div', { class: 'name' }, t.pl),
+        el('div', { class: 'name', lang: 'pl' }, t.pl),
         el('div', { class: 'cnt' }, `${n} / ${tot}`),
       );
     });
@@ -113,7 +113,7 @@ export function mountPantry(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEven
         'div',
         { class: 'pantry-item', 'data-id': id },
         itemIcon(id, item),
-        el('div', { class: 'txt' }, el('div', { class: 'pl' }, item?.pl ?? id), el('div', { class: 'ru' }, item?.ru ?? ''), over ? el('div', { class: 'over' }, 'перезрело, на грядке') : null),
+        el('div', { class: 'txt' }, el('div', { class: 'pl', lang: 'pl' }, item?.pl ?? id), el('div', { class: 'ru' }, item?.ru ?? ''), over ? el('div', { class: 'over' }, 'перезрело, на грядке') : null),
         el('button', { type: 'button', class: 'pq-btn small', 'aria-label': 'Озвучить', ...nav('items', 'v', `say:${id}`), onclick: () => api.say(id) }, '▶'),
       );
     });

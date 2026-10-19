@@ -30,7 +30,12 @@ import type { BusEvents } from './types/bus';
 import { mountAudioToast } from './ui/audioToast';
 import { mountAssembleGap } from './ui/assembleGap';
 import { mountBoard } from './ui/board';
-import { createRuplLoader } from './systems/platform/rupl';
+import { createPlruLoader, createRuplLoader } from './systems/platform/rupl';
+import { attachLongPress } from './input/press';
+import { BASE_WORDS, isA1 } from './systems/content';
+import { isCustomId } from './systems/customWords';
+import { wordIndex, type WordIndex } from './systems/wordPick';
+import { LONG_PRESS_MS, mountWordPick } from './ui/wordPick';
 import { mountDictionary } from './ui/dictionary';
 import { mountFloats } from './ui/float';
 import { mountMinigame } from './ui/minigame';
@@ -160,6 +165,23 @@ async function main(): Promise<void> {
     // Свои слова («Moje słowa»): раздел Save.custom; озвучка — Web Speech pl-PL (в манифесте их нет), при ?mute=1 тишина.
     customs: { load: () => store.save.custom, save: (custom) => store.update((s: Save) => ({ ...s, custom }), clock.now()) },
   });
+  // Узнаваемые слова (просьба Шэфа 19.10): любое польское слово в игре — тап (в тексте) или долгое нажатие/правый клик (на кнопке-ответе)
+  // → лемма, перевод, 🔊, статус и «＋ В словарь». Словарь plru грузится при первом слове (не в precache).
+  let wordIdx: WordIndex | null = null;
+  const wordPick = mountWordPick(overlay, {
+    api: farm,
+    load: createPlruLoader({ url: `${import.meta.env.BASE_URL}dict/plru.json.gz` }),
+    // База A1 и тема «Święta» + названия из игр v2 (города, реки, воеводства с падежами).
+    index: () =>
+      (wordIdx ??= wordIndex(
+        BASE_WORDS,
+        V2.units.map((u) => ({ pl: u.pl, ru: u.ru, forms: Object.values((u.raw.forms ?? {}) as Record<string, unknown>).filter((x): x is string => typeof x === 'string') })),
+      )),
+    isA1,
+    isCustom: isCustomId,
+    say: (text, slow) => bus.emit('audio:play', { text, ...(slow ? { slow } : {}) }),
+  });
+  attachLongPress(overlay, { selector: '.pq-w', ms: LONG_PRESS_MS, onLongPress: (w) => void wordPick.open(w) });
   // Цель дня в HUD: «Сегодня: полито N · созреет завтра M» (верные ответы за календарный день + `ripeSoon`), тап открывает итог.
   const dayNow = (): number => {
     const t = clock.now();
@@ -454,7 +476,7 @@ async function main(): Promise<void> {
   };
   setInterval(maybeSettle, 2000);
 
-  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock, music, polska, polskaGame, beaver };
+  if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock, music, polska, polskaGame, beaver, wordPick };
 }
 
 void main();

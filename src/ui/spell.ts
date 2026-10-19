@@ -255,7 +255,8 @@ export function renderSpell(q: SpellQuestion, ctx: SpellCtx): SpellView {
     ctx.relayout();
   };
 
-  paper.append(el('div', { class: 'pq-spell' }, hintLine, area));
+  // Буквы в слотах и разбор ошибки по буквам — не слова: узнаваемые слова (ui/wordPick.ts) здесь не размечаются.
+  paper.append(el('div', { class: 'pq-spell', 'data-nopick': '' }, hintLine, area));
   foot.replaceChildren(hintBtn, typeBtn, reset, check);
   setTyping(typing);
 

@@ -363,7 +363,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
           ...nav('rows', 'v', `row:${e.id}`),
           onclick: () => select(e.id),
         },
-        el('span', { class: 'pl' }, e.pl),
+        el('span', { class: 'pl', lang: 'pl' }, e.pl),
         el('span', { class: 'st', 'aria-hidden': 'true' }, statusIcon(e.id)),
         el('span', { class: 'ru' }, e.ru),
       ),
@@ -457,11 +457,11 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     }
     const i = info(id);
     const lock = !!p && i.status === 'new' && api.missingWords(id).length > 0;
-    const kids: Node[] = [el('div', { class: 'big', 'data-pl': '' }, item.pl), el('div', { class: 'ru' }, item.ru), el('div', { class: 'tr' }, item.tr)];
+    const kids: Node[] = [el('div', { class: 'big', 'data-pl': '', lang: 'pl' }, item.pl), el('div', { class: 'ru' }, item.ru), el('div', { class: 'tr' }, item.tr)];
     if (w?.gender) kids.push(el('div', { class: 'status' }, GENDER[w.gender]));
     if (w?.ex)
       kids.push(
-        el('div', { class: 'ex' }, el('div', { class: 'exrow' }, el('div', { class: 'pl' }, w.ex.pl), sayButton(w.ex.pl, sayText, { attrs: nav('card', 'v', 'say-ex') })), el('div', { class: 'ru' }, w.ex.ru)),
+        el('div', { class: 'ex' }, el('div', { class: 'exrow' }, el('div', { class: 'pl', lang: 'pl' }, w.ex.pl), sayButton(w.ex.pl, sayText, { attrs: nav('card', 'v', 'say-ex') })), el('div', { class: 'ru' }, w.ex.ru)),
       );
     if (w?.ff) kids.push(el('div', { class: 'ff' }, `Не путать: похоже на «${w.ff.ru}», а значит: ${w.ff.note}`));
     kids.push(
@@ -484,7 +484,7 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
             {},
             ...miss.map((m) => {
               const mw = api.word(m);
-              return el('li', {}, mw ? `${mw.pl} — ${mw.ru}` : m);
+              return el('li', { 'data-plw': '' }, mw ? `${mw.pl} — ${mw.ru}` : m);
             }),
           ),
         ),

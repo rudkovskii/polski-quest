@@ -45,7 +45,7 @@ export function mountPlantCard(parent: HTMLElement, api: FarmApi, opts: PlantCar
     const i = api.info(cur);
     const stage = i.stage ? STAGE_RU[i.stage] : i.status === 'grown' ? 'в банке' : i.status === 'bag' ? 'в мешке' : 'не посажено';
     content.replaceChildren(
-      el('div', { class: 'big', 'data-pl': '' }, item?.pl ?? cur),
+      el('div', { class: 'big', 'data-pl': '', lang: 'pl' }, item?.pl ?? cur),
       el('div', { class: 'ru' }, item?.ru ?? ''),
       el('div', { class: 'tr' }, item?.tr ?? ''),
       el(

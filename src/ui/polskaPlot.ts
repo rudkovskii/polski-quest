@@ -31,7 +31,7 @@ export function mountPolskaPlot(parent: HTMLElement, deps: PolskaPlotDeps): { op
       const row = el(
         'div',
         { 'data-unit': u.id, style: 'display:flex;align-items:center;gap:8px' },
-        el('div', { style: 'flex:1;min-width:0' }, el('span', { class: 'pq-pl' }, u.pl), ' ', el('span', { class: 'pq-muted' }, u.ru), el('div', { class: 'pq-muted', style: 'font-size:13px' }, stage)),
+        el('div', { style: 'flex:1;min-width:0' }, el('span', { class: 'pq-pl', lang: 'pl' }, u.pl), ' ', el('span', { class: 'pq-muted' }, u.ru), el('div', { class: 'pq-muted', style: 'font-size:13px' }, stage)),
       );
       if (game && inf.planted) row.append(el('button', { type: 'button', class: 'pq-btn small', ...nav('units', 'v', `rev:${u.id}`), onclick: () => (panel.close(), deps.play(game, u.id)) }, 'Повторить'));
       list.append(row);

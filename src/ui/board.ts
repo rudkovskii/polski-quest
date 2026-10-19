@@ -58,7 +58,7 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(tab?: B
       const row = el(
         'div',
         { class: 'board-polska', 'data-game': g.id, style: 'display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:8px;background:rgba(0,0,0,.06)' },
-        el('div', { style: 'font-size:18px;font-weight:800' }, `${g.title.ru} `, el('small', { class: 'board-pl', style: 'font-size:12px;font-weight:600;opacity:.65;white-space:nowrap' }, g.title.pl)),
+        el('div', { style: 'font-size:18px;font-weight:800' }, `${g.title.ru} `, el('small', { class: 'board-pl', lang: 'pl', style: 'font-size:12px;font-weight:600;opacity:.65;white-space:nowrap' }, g.title.pl)),
         el('div', { style: 'font-weight:500;font-size:14px;opacity:.85' }, g.desc),
         el('div', { class: 'pq-muted', 'data-progress': '', style: 'font-size:13px' }, `${g.progress} · ${g.where}`),
         g.pct === undefined
@@ -104,7 +104,7 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(tab?: B
       const b = el(
         'button',
         { type: 'button', class: 'pq-btn', 'data-mode': m, disabled: !!why, style: 'text-align:left;line-height:1.3', ...nav('modes', 'v', `mode:${m}`), onclick: () => (panel.close(), deps.onPick(m)) },
-        el('div', { style: 'font-size:18px;font-weight:800' }, `${MODE_ICON[m]} ${m}. ${MODE_NAME[m].ru} `, el('small', { class: 'board-pl', style: 'font-size:12px;font-weight:600;opacity:.65;white-space:nowrap' }, MODE_NAME[m].pl)),
+        el('div', { style: 'font-size:18px;font-weight:800' }, `${MODE_ICON[m]} ${m}. ${MODE_NAME[m].ru} `, el('small', { class: 'board-pl', lang: 'pl', style: 'font-size:12px;font-weight:600;opacity:.65;white-space:nowrap' }, MODE_NAME[m].pl)),
         el('div', { style: 'font-weight:500;font-size:14px;opacity:.85' }, why || DESC[m]),
         // Кусты, которым до урожая не хватает только собранного слова: подсказка прямо на кнопке игры 5.
         m === 5 && !why && (c.spell ?? 0) > 0 ? el('div', { 'data-spell-wait': '', style: 'font-weight:700;font-size:14px;color:#f2d552' }, `🌾 Ждут сборки для урожая: ${c.spell}`) : null,
@@ -115,7 +115,7 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(tab?: B
     const hint = c.assemble === 0 ? deps.phraseHint?.() : null;
     if (hint) {
       const box = el('div', { class: 'board-hint', style: 'display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:8px;background:rgba(0,0,0,.06)' });
-      box.append(el('div', { style: 'font-weight:700' }, `Ближайшая фраза: «${hint.pl}»`), el('div', { class: 'pq-muted' }, hint.ru));
+      box.append(el('div', { style: 'font-weight:700', 'data-plw': '' }, `Ближайшая фраза: «${hint.pl}»`), el('div', { class: 'pq-muted' }, hint.ru));
       if (hint.ready) box.append(el('div', {}, 'Её слова уже подросли: посади фразу, и сборка откроется.'));
       else {
         // Одно слово — в одной строке: что осталось посадить и что уже растёт (подрастёт до ростка).

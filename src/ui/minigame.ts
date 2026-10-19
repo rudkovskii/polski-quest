@@ -170,7 +170,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   const dirBtn = el('button', { type: 'button', class: 'pq-btn pq-dir', 'data-dir': '', hidden: true, 'aria-pressed': 'false', title: 'Собирать наоборот: польское слово → русское', onclick: () => toggleDir() }, '↔ наоборот');
   const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', 'aria-label': 'Выйти', onclick: () => api.stop() }, el('span', { class: 'pq-exit-lbl' }, 'Выйти '), '✕');
   exitBtn.classList.add('pq-exit');
-  const paper = el('div', { class: 'pq-game-paper', 'data-game': '' });
+  // `data-plw`: польские слова на листе узнаваемые (ui/wordPick.ts): тап по слову в тексте, долгое нажатие на варианте.
+  const paper = el('div', { class: 'pq-game-paper', 'data-game': '', 'data-plw': '' });
   const foot = el('div', { class: 'pq-game-foot', 'data-foot': '' });
   const box = el('div', { class: 'pq-game-box', role: 'dialog', 'aria-label': 'Мини-игра' }, el('div', { class: 'pq-game-head' }, title, roundNo, rev, soon, dirBtn, exitBtn), paper, foot);
   const root = el('div', { class: 'pq-game', hidden: true }, el('style', {}, css), box);
@@ -263,6 +264,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
 
   const finish = (r: AnswerResult): void => {
     answered = true;
+    paper.dataset.quiz = 'done';
     round.add(r);
     paintRound();
     paper.classList.add(r.ok ? 'ok' : 'bad');
@@ -411,6 +413,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     foot.replaceChildren();
     paper.scrollTop = 0;
     answered = false;
+    // Пока задание без ответа, поповер слова (ui/wordPick.ts) не показывает перевод слов вопроса и вариантов.
+    paper.dataset.quiz = 'open';
     summaryOpen = false;
     built = [];
     tileAdder = null;
@@ -480,6 +484,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     detachKb();
     summaryOpen = true;
     answered = true;
+    paper.dataset.quiz = 'done';
     q = null;
     paper.classList.remove('ok', 'bad');
     const card = renderRoundSummary(roundN, round.stats);

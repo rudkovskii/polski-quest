@@ -15,7 +15,7 @@ const css = `
 `;
 
 export function mountFloats(parent: HTMLElement, bus: Bus<BusEvents> = globalBus): () => void {
-  const label = el('div', { class: 'pq-label', hidden: true, 'data-plant-label': '' });
+  const label = el('div', { class: 'pq-label', hidden: true, 'data-plant-label': '', lang: 'pl' });
   parent.append(el('style', {}, css), label);
   const offs = [
     bus.on('fx:float', ({ x, y, text, kind }) => {

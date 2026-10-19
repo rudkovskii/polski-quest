@@ -114,7 +114,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   const title = el('span', { class: 'title', 'data-title': '' }, '');
   const roundNo = el('span', { class: 'roundno', 'data-round-no': '', hidden: true }, `1 / ${ROUND_SIZE}`);
   const exitBtn = el('button', { type: 'button', class: 'pq-btn', 'data-exit': '', 'aria-label': 'Выйти', onclick: () => api.stop() }, el('span', { class: 'exit-lbl' }, 'Выйти '), '✕');
-  const paper = el('div', { class: 'paper', 'data-game': '' });
+  // `data-plw`: польские слова задания узнаваемые (ui/wordPick.ts): тап по слову в тексте, долгое нажатие на варианте.
+  const paper = el('div', { class: 'paper', 'data-game': '', 'data-plw': '' });
   const fb = el('div', { class: 'fb', 'data-feedback': '', hidden: true });
   const foot = el('div', { class: 'foot', 'data-foot': '' });
   const box = el('div', { class: 'box', role: 'dialog', 'aria-label': 'Игра о Польше' }, el('div', { class: 'head' }, title, roundNo, exitBtn), paper, fb, foot);
@@ -224,6 +225,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     fb.hidden = true;
     fb.replaceChildren();
     answered = false;
+    // Пока задание без ответа, поповер слова (ui/wordPick.ts) не показывает перевод слов вопроса и вариантов.
+    paper.dataset.quiz = 'open';
     summaryOpen = false;
     task = null;
     focusIdx = -1;
@@ -273,6 +276,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     focus = undefined;
     limit = ROUND_SIZE;
     answered = false;
+    paper.dataset.quiz = 'done';
     summaryOpen = false;
     task = null;
     focusIdx = -1;
@@ -311,6 +315,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     clearTimers();
     summaryOpen = true;
     answered = true;
+    paper.dataset.quiz = 'done';
     task = null;
     box.style.removeProperty('height');
     paper.classList.remove('ok', 'bad');
@@ -454,6 +459,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       const r = game.check(task, answer, ctx);
       const out = deps.polska.answer({ id: task.id, side: task.side, ...(task.self ? { self: true } : {}) }, r.ok);
       answered = true;
+      paper.dataset.quiz = 'done';
       if (scaleFrom === null) scaleFrom = out.scale.from;
       scaleTo = { pos: out.scale.to, sub: out.scale.sub, pl: out.scale.pl };
       round.add({ ok: r.ok, act: out.act });

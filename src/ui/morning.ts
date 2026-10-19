@@ -63,7 +63,7 @@ export function mountMorning(parent: HTMLElement, d: MorningDeps): Morning {
     );
     if (r.extra) text.append(el('div', { class: 'pq-morning-soon', 'data-soon': '' }, r.extra));
     const pl = d.polska?.() ?? null;
-    if (pl) text.append(el('div', { class: 'pq-morning-polska', 'data-morning-polska': '', style: 'padding:6px 8px;background:#fffaf0;border:2px solid var(--pq-wood-dark);border-radius:8px;font-size:15px' }, pl));
+    if (pl) text.append(el('div', { class: 'pq-morning-polska', 'data-morning-polska': '', 'data-plw': '', style: 'padding:6px 8px;background:#fffaf0;border:2px solid var(--pq-wood-dark);border-radius:8px;font-size:15px' }, pl));
     panel.open();
     panel.focus('go');
   };

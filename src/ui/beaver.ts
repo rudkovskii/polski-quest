@@ -86,7 +86,7 @@ export function mountBeaver(parent: HTMLElement, o: { bus?: Bus<BusEvents>; card
     }),
     bus.on('beaver:talk', ({ x, y }) => {
       const btn = el('button', { type: 'button', 'aria-label': 'Озвучить: Bóbr', 'data-beaver-say': '', onclick: say }, '🔊');
-      talk.replaceChildren(el('div', { class: 't' }, el('b', {}, BEAVER_PL), BEAVER_RU), btn);
+      talk.replaceChildren(el('div', { class: 't' }, el('b', { lang: 'pl' }, BEAVER_PL), BEAVER_RU), btn);
       talk.hidden = false;
       const r = talk.getBoundingClientRect();
       const half = r.width / 2 || 70;
