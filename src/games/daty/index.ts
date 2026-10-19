@@ -3,6 +3,7 @@
 // «сам»: «Powiedz słowami» — плитки `trzeciego` + `maja` среди неверных форм. Год — цифрой рядом, словами не спрашивается (решение Шэфа 5).
 // Даты памяти (`tone: solemn|quiet`) — спокойная подача: без зелёной вспышки и анимации обводки.
 import { el } from '../../ui/dom';
+import { sayButton } from '../../ui/sayButton';
 import type { GameCtx, GamePanel, PolskaGame, Want } from '../../types/polska';
 import { choice, tiles } from '../kit';
 import { CSS, calendar, drums, leaf, yearChip } from './view';
@@ -96,7 +97,8 @@ function nextTask(ctx: GameCtx, want: Want): DatyTask | null {
 }
 
 /** Вопрос: крупная строка и подсказка (как у `kit.prompt`, но внутри верхней строки с листом/годом). */
-const ask = (task: DatyTask): HTMLElement => el('div', { class: 'pq-pg-q txt', 'data-prompt': '' }, el('div', { class: 'pq-q', lang: 'pl' }, task.q), el('div', { class: 'pq-q-hint' }, task.hint));
+const ask = (task: DatyTask, say: GamePanel['say']): HTMLElement =>
+  el('div', { class: 'pq-pg-q txt', 'data-prompt': '' }, el('div', { class: 'pq-qrow' }, el('div', { class: 'pq-q', lang: 'pl' }, task.q), sayButton(task.mode === 'say' ? 'Powiedz słowami' : task.q, say, { main: true })), el('div', { class: 'pq-q-hint' }, task.hint));
 
 /** Запас под строку результата движка, которая после ответа встаёт под листом (как `FB_H` у карты). */
 const FB_RESERVE = 92;
@@ -160,23 +162,23 @@ function draw(task: DatyTask, panel: GamePanel, ctx: GameCtx, wrap: HTMLElement)
   switch (task.mode) {
     case 'co':
     case 'say':
-      wrap.append(el('div', { class: 'dt-topline' }, leaf(ctx.doc, d, task.year), ask(task)));
+      wrap.append(el('div', { class: 'dt-topline' }, leaf(ctx.doc, d, task.year), ask(task, panel.say)));
       if (task.mode === 'co') choice(sub, task.options, task.answer as string);
       else tiles(sub, task.options);
       return;
     case 'choice':
-      wrap.append(el('div', { class: 'dt-topline' }, ask(task), chip));
+      wrap.append(el('div', { class: 'dt-topline' }, ask(task, panel.say), chip));
       choice(sub, task.options, task.answer as string);
       return;
     case 'drums': {
-      wrap.append(el('div', { class: 'dt-topline' }, ask(task), chip));
-      const dr = drums(ctx.doc, task.drum, (v) => panel.submit(v));
+      wrap.append(el('div', { class: 'dt-topline' }, ask(task, panel.say), chip));
+      const dr = drums(ctx.doc, task.drum, (v) => panel.submit(v), panel.say);
       wrap.append(dr.root);
       panel.foot.replaceChildren(dr.check);
       return;
     }
     case 'pokaz': {
-      wrap.append(el('div', { class: 'dt-topline' }, ask(task), chip));
+      wrap.append(el('div', { class: 'dt-topline' }, ask(task, panel.say), chip));
       const marks = new Map(ctx.units.map((x) => [`${dateOfUnit(x).month}-${dateOfUnit(x).day}`, { icon: String(x.raw.icon ?? ''), calm: isCalm(x) }] as const));
       const cal = calendar({
         doc: ctx.doc,

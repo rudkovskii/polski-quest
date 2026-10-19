@@ -2,6 +2,7 @@
 // Ввод только кликами по кнопкам (клавиши 1–4 и стрелки ведёт движок через `data-opt` / `data-nav`).
 import { el } from '../../ui/dom';
 import type { GamePanel } from '../../types/polska';
+import { sayButton, withSay } from '../../ui/sayButton';
 import { choice, prompt, tiles } from '../kit';
 import { melodyContext, melodyWarm, playNotes, soundAllowed, type Note, type PlayHandle } from './melody';
 import type { HymnTask } from './tasks';
@@ -26,7 +27,9 @@ const css = `
 .hy-bar .pq-btn { padding: 5px 9px; font-size: 13px; }
 .hy-wrap .pq-opts.three { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 52px; }
 .hy-wrap .pq-opts.three .pq-opt { font-size: 15px; padding: 4px 6px; }
-.hy-wrap .pq-opts.three .pq-opt .n { display: none; }
+/* Три узкие колонки: 🔊 в верхнем углу, слово прижато вниз и занимает всю ширину (иначе «Jeszcze» рвётся). */
+.hy-wrap .pq-opts.three .pq-opt.has-say { align-items: flex-end; padding: 4px 6px 5px; }
+.hy-wrap .pq-opts.three .pq-optw > .pq-say { width: 24px; height: 24px; min-width: 24px; top: 2px; right: 2px; }
 .hy-wrap .pq-q-hint { margin-bottom: 0; }
 .hy-quiet { font-size: 12px; opacity: .7; }
 .hy-slots { display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; padding: 4px 6px; border: 2px dashed var(--pq-wood); border-radius: 6px; background: #fffaf0; align-items: center; }
@@ -121,7 +124,8 @@ function renderKaraoke(task: HymnTask, panel: GamePanel): void {
   withCss(wrap);
   panel.body.append(wrap);
   const ok = alive(wrap);
-  wrap.append(el('div', { class: 'pq-pg-q', 'data-prompt': '' }, el('div', { class: 'pq-q', lang: 'ru' }, task.prompt), el('div', { class: 'pq-q-hint' }, task.hint ?? '')));
+  // Строка перед пропетой («… Jeszcze Polska nie zginęła») польская: с 🔊 рядом («Początek hymnu» тоже).
+  wrap.append(el('div', { class: 'pq-pg-q', 'data-prompt': '' }, el('div', { class: 'pq-qrow' }, el('div', { class: 'pq-q', lang: 'pl' }, task.prompt), sayButton(task.prompt, panel.say, { main: true })), el('div', { class: 'pq-q-hint' }, task.hint ?? '')));
 
   const main = strip(notes, 'Ten wers');
   const before = task.ctxNotes ? strip(task.ctxNotes, 'Poprzedni wers', task.ctxText ? `♪ ${task.ctxText}` : 'Poprzedni wers') : null;
@@ -190,7 +194,7 @@ function renderKaraoke(task: HymnTask, panel: GamePanel): void {
           el('span', { class: 'n' }, `${i + 1}`),
           el('span', { class: 't' }, o),
         );
-        return b;
+        return withSay(b, o, panel.say);
       }),
     );
   };
@@ -201,7 +205,8 @@ function renderKaraoke(task: HymnTask, panel: GamePanel): void {
 
 // ───────────────────────── сборка флага и герба ─────────────────────────
 
-const rowsOf = (wrap: HTMLElement, defs: { key: string; label: string; options: string[] }[], sel: Record<string, string>, onChange: () => void): void => {
+// Выбор части флага/герба — как плитки: тап по польскому слову сразу его произносит (в ряду на 4–5 колонок места под отдельную 🔊 нет).
+const rowsOf = (wrap: HTMLElement, defs: { key: string; label: string; options: string[] }[], sel: Record<string, string>, onChange: () => void, say: (t: string) => void): void => {
   const box = el('div', { class: 'hy-rows' });
   for (const d of defs) {
     const row = el('div', { class: 'hy-row', 'data-row': d.key, 'data-n': String(d.options.length), style: `--n:${d.options.length}` }, el('span', { class: 'lbl' }, d.label));
@@ -217,6 +222,7 @@ const rowsOf = (wrap: HTMLElement, defs: { key: string; label: string; options: 
           onclick: () => {
             if (b.disabled) return;
             sel[d.key] = o;
+            say(o);
             for (const x of row.querySelectorAll<HTMLElement>('.hy-pick')) {
               x.classList.toggle('sel', x === b);
               x.setAttribute('aria-pressed', String(x === b));
@@ -267,7 +273,7 @@ function renderFlag(task: HymnTask, panel: GamePanel): void {
     bottom.style.background = sel.bottom ? colorOf(sel.bottom) : '';
     refresh();
   };
-  rowsOf(box, [{ key: 'top', label: 'Góra', options: task.parts?.top ?? [] }, { key: 'bottom', label: 'Dół', options: task.parts?.bottom ?? [] }], sel, paint);
+  rowsOf(box, [{ key: 'top', label: 'Góra', options: task.parts?.top ?? [] }, { key: 'bottom', label: 'Dół', options: task.parts?.bottom ?? [] }], sel, paint, panel.say);
 }
 
 const shield = (s: Record<string, string>): string => {
@@ -307,7 +313,7 @@ function renderGodlo(task: HymnTask, panel: GamePanel): void {
     paint();
   });
   const p = task.parts ?? {};
-  rowsOf(box, [{ key: 'field', label: 'Pole', options: p.field ?? [] }, { key: 'eagle', label: 'Orzeł', options: p.eagle ?? [] }, { key: 'crown', label: 'Korona', options: p.crown ?? [] }], sel, paint);
+  rowsOf(box, [{ key: 'field', label: 'Pole', options: p.field ?? [] }, { key: 'eagle', label: 'Orzeł', options: p.eagle ?? [] }, { key: 'crown', label: 'Korona', options: p.crown ?? [] }], sel, paint, panel.say);
   paint();
 }
 
@@ -319,12 +325,13 @@ export function renderTask(task: HymnTask, panel: GamePanel): void {
     case 'choice': {
       const q = prompt(panel, task.prompt, task.hint ?? '', task.lang);
       if (task.pic) q.before(el('div', { class: 'hy-pic', 'aria-hidden': 'true', 'data-pic': '' }, task.pic));
-      choice(panel, task.options, task.answer as string);
+      // Варианты польские, кроме перевода строки («mean»): русские без 🔊.
+      choice(panel, task.options, task.answer as string, task.kind === 'mean' ? 'ru' : 'pl');
       return;
     }
     case 'tiles':
     case 'order':
-      prompt(panel, task.prompt, task.hint ?? '', task.lang);
+      prompt(panel, task.prompt, task.hint ?? '', task.lang, task.kind === 'order-lines' ? 'Kolejność' : undefined);
       tiles(panel, task.options);
       return;
     case 'karaoke':

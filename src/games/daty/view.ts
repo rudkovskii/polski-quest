@@ -1,6 +1,7 @@
 // Игра 3: Daty — DOM: страница отрывного календаря (сетка месяца), барабаны день/месяц, лист с датой, стили.
 // Весь ввод — click на кнопках (клавиши, стрелки и 1–4 ведёт движок через [data-nav] и [data-opt]); своих keydown/pointerdown нет.
 import { el } from '../../ui/dom';
+import { sayButton, type SayFn } from '../../ui/sayButton';
 import { ICON_FRAME, WEEKDAYS, iconOf, monthGrid, monthRow, sayDate, shiftMonth, spin, type DayMonth } from './model';
 /** Значок даты в углу клетки: кадр атласа 16×16 (знич, флажок, мини-предмет), без кадра — глиф. */
 function markIcon(icon: string): HTMLElement | string {
@@ -52,6 +53,7 @@ export const CSS = `
 .dt-row.near { opacity: .55; } .dt-row.far { opacity: .25; font-size: 15px; }
 .dt-row.cur { height: 42px; line-height: 42px; font-size: 24px; font-weight: 900; cursor: default; }
 .dt-read { margin: 8px 0 2px; padding: 8px 10px; text-align: center; font-size: 20px; font-weight: 800; background: #f2dcae; border: 2px dashed var(--pq-wood); border-radius: 6px; min-height: 28px; overflow-wrap: anywhere; }
+.dt-readrow { align-items: center; } .dt-readrow > .dt-read { flex: 1 1 auto; min-width: 0; } .dt-readrow > .pq-say { margin-top: 0; }
 .dt-event { font-size: 15px; font-weight: 700; opacity: .85; margin: 0 0 4px; }
 .pq-pg .dt .pq-opts { grid-auto-rows: minmax(54px, auto); }
 .pq-pg .dt .pq-opt { height: auto; min-height: 54px; }
@@ -172,7 +174,7 @@ export interface Drums {
 }
 
 /** Два барабана «день 1–31» и «месяц»: стрелки ▲▼, тап по соседней строке, колесо мыши. Внизу дата читается словами. */
-export function drums(doc: Readonly<Record<string, unknown>>, start: DayMonth, onCheck: (v: DayMonth) => void): Drums {
+export function drums(doc: Readonly<Record<string, unknown>>, start: DayMonth, onCheck: (v: DayMonth) => void, say?: SayFn): Drums {
   let v: DayMonth = { ...start };
   const read = el('div', { class: 'dt-read', lang: 'pl', 'data-read': '' }, '');
   const label = (which: 'day' | 'month', x: number): string => (which === 'day' ? `${x}` : (monthRow(doc, x)?.nom ?? `${x}`));
@@ -199,12 +201,15 @@ export function drums(doc: Readonly<Record<string, unknown>>, start: DayMonth, o
     };
     return { box: el('div', { class: 'dt-drum', 'data-drum': which }, up, win, down), paint };
   };
+  // Дата словами под барабанами («jedenastego listopada») читается кнопкой 🔊 справа.
+  const readSay = say ? sayButton(sayDate(doc, v.day, v.month), say) : null;
   const dayD = mk('day');
   const monD = mk('month');
   const paint = (): void => {
     dayD.paint();
     monD.paint();
     read.textContent = sayDate(doc, v.day, v.month);
+    if (readSay) readSay.dataset.saytext = read.textContent;
     read.dataset.read = `${v.day}-${v.month}`;
   };
   function step(which: 'day' | 'month', delta: number): void {
@@ -214,6 +219,6 @@ export function drums(doc: Readonly<Record<string, unknown>>, start: DayMonth, o
   }
   paint();
   const check = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-check': '', onclick: () => onCheck({ ...v }) }, 'Sprawdź · Проверить');
-  const root = el('div', { class: 'dt-drums-wrap', 'data-drums': '' }, el('div', { class: 'dt-drums' }, dayD.box, monD.box), read);
+  const root = el('div', { class: 'dt-drums-wrap', 'data-drums': '' }, el('div', { class: 'dt-drums' }, dayD.box, monD.box), readSay ? el('div', { class: 'pq-qrow dt-readrow' }, read, readSay) : read);
   return { root, check, value: () => ({ ...v }), step };
 }

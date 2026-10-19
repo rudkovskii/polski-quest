@@ -4,6 +4,7 @@
 // сторона света, падежные формы и сборка фраз из плиток (`want.self`).
 import type { GameCheck, GameCtx, GamePanel, PolskaGame, PolskaUnit, Want } from '../../types/polska';
 import { el } from '../../ui/dom';
+import { sayButton } from '../../ui/sayButton';
 import { choiceGrid } from './choice';
 import { canvasSize, planFit, type FitPlan } from './fit';
 import { createMap, type MapView } from './mapview';
@@ -37,6 +38,7 @@ const CSS = `
 .geo.wide .geo-side { width: ${SIDE_W}px; align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
 .geo-hint { font-size: 13px; opacity: .75; text-align: center; min-height: 18px; }
 .geo-step { font-size: 17px; font-weight: 800; margin: 0 0 6px; overflow-wrap: break-word; }
+.geo-step > span { flex: 1 1 auto; min-width: 0; }
 .geo-bar { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; }
 .geo-bar .geo-hint { flex: 1 1 auto; min-height: 0; }
 .geo-bar .geo-back { flex: 0 0 auto; margin: 0; }
@@ -66,7 +68,8 @@ export function geoPool(ctx: GameCtx): readonly string[] {
 function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
   const unit = ctx.unit(task.id);
   const hint = task.t === 'show' ? `${task.ru}. Тап по карте или стрелки и A` : task.ru;
-  const promptEl = prompt(panel, task.q, hint, 'pl');
+  // «Сам» (сборка): вопрос — русская фраза, кнопки озвучки у него нет (польское звучит по плиткам и в отзыве).
+  const promptEl = prompt(panel, task.q, hint, task.t === 'build' ? 'ru' : 'pl');
   const body = panel.body;
   const root = el('div', { class: 'geo', 'data-geo': task.t }, el('style', {}, CSS));
   body.append(root);
@@ -150,7 +153,7 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
       break;
     default: {
       const first = task.options ?? [];
-      const grid = (opts: string[], correct: string, onPick: (o: string) => void): HTMLElement => choiceGrid(opts, correct, onPick);
+      const grid = (opts: string[], correct: string, onPick: (o: string) => void): HTMLElement => choiceGrid(opts, correct, onPick, panel.say);
       const answerTo = (a: unknown, ok: boolean): void => {
         panel.submit(a);
         celebrate(ok);
@@ -160,7 +163,7 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
         let stepEl = grid(first, task.answer ?? '', (o) => {
           if (o !== task.answer) return answerTo({ nb: o } satisfies DirAnswer, false);
           // Сосед назван верно: теперь форма («Polska graniczy … Niemcy» → z Niemcami).
-          const q = el('div', { class: 'geo-step', 'data-step2': '' }, f.q);
+          const q = el('div', { class: 'geo-step pq-qrow', 'data-step2': '' }, el('span', {}, f.q), sayButton(f.q, panel.say));
           const g2 = grid(f.options, f.answer, (form) => answerTo({ nb: o, form } satisfies DirAnswer, form === f.answer));
           stepEl.replaceWith(q, g2);
           stepEl = g2;
