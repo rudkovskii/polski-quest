@@ -24,7 +24,8 @@ import {
   spin,
   startMonth,
 } from '../src/games/daty/model';
-import { createPolska, newPolskaSave, type PolskaSave } from '../src/systems/polska';
+import { boldKeys, historyOf } from '../src/games/daty/history';
+import { createPolska, newPolskaSave, normalizePolska, type PolskaSave } from '../src/systems/polska';
 import type { GameCtx, GamePanel, Want } from '../src/types/polska';
 import { mountPolskaGame, NEXT_DELAY_MS } from '../src/ui/polskaGame';
 import { ROUND_SIZE } from '../src/ui/roundSummary';
@@ -32,16 +33,20 @@ import { seeded, testBus } from './helpers';
 
 const NOW = Date.UTC(2026, 9, 18, 9, 0);
 
-function mkPolska() {
+/** `fresh` — игрок ничего не знает (карточки знакомства покажут); по умолчанию все даты уже «знакомы», как будто карточки приняты. */
+function mkPolska(fresh = false) {
   let save: PolskaSave = newPolskaSave();
   const bus = testBus();
   const p = createPolska({ bus, load: () => save, save: (x) => (save = x), now: () => NOW, tz: () => 0 });
+  if (!fresh) for (const u of p.units('daty')) p.markSeen(u.id);
   return { p, bus, get save() { return save; } };
 }
 const ctxOf = (s: ReturnType<typeof mkPolska>, seed = 3): GameCtx => ({
   units: s.p.units('daty'),
   unit: (id) => s.p.unit(id),
   info: (id) => s.p.info(id),
+  seen: (id) => s.p.seen(id),
+  markSeen: (id) => s.p.markSeen(id),
   doc: s.p.content.docs.daty,
   now: () => NOW,
   date: () => ({ y: 2026, m: 10, d: 18, weekday: 0 }),
@@ -547,5 +552,246 @@ describe('лист во весь экран: страница увеличива
     expect(zoomFor({ w: 375, h: 640 }, { w: 480, h: 400 })).toBe(1);
     expect(zoomFor({ w: 1176, h: 410 }, { w: 480, h: 400 })).toBe(1);
     expect(zoomFor({ w: 0, h: 0 }, { w: 0, h: 0 })).toBe(1);
+  });
+});
+
+// ---------- историческая справка ----------
+
+/** Дать отработать микрозадачам: справка кладётся в отзыв по наблюдателю сразу после ответа. */
+const later = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
+const HIST = (u: { raw: Readonly<Record<string, unknown>> }) => u.raw.history as { ru: string; pl: string; key: string[] };
+
+describe('Daty: историческая справка в данных', () => {
+  const ctx = ctxOf(mkPolska());
+
+  it('у всех 22 дат есть history: ru 2–3 предложения ≤ 320 знаков, pl одно предложение, key 1–3 слова из ru', () => {
+    expect(ctx.units.length).toBe(22);
+    for (const u of ctx.units) {
+      const h = historyOf(u);
+      expect(h, u.id).toBeTruthy();
+      const raw = HIST(u);
+      expect(raw.ru.length, u.id).toBeLessThanOrEqual(320);
+      expect(raw.ru, u.id).not.toContain('**');
+      expect((raw.ru.match(/[.!?…](?:\s|$)/g) ?? []).length, u.id).toBeGreaterThanOrEqual(2);
+      expect((raw.ru.match(/[.!?…](?:\s|$)/g) ?? []).length, u.id).toBeLessThanOrEqual(3);
+      expect(raw.pl.trim().endsWith('.'), u.id).toBe(true);
+      expect(raw.pl.length, u.id).toBeLessThanOrEqual(80);
+      expect(raw.key.length, u.id).toBeGreaterThanOrEqual(1);
+      expect(raw.key.length, u.id).toBeLessThanOrEqual(3);
+      for (const k of raw.key) expect(raw.ru, `${u.id}: ключ ${k}`).toContain(k);
+    }
+  });
+
+  it('факт, который проверяли: конец Варшавского восстания 2 октября, не 3-е; Wołyń, Katyń, Smoleńsk на месте', () => {
+    expect(HIST(ctx.unit('date.godzina_w')!).ru).toContain('2 октября');
+    expect(HIST(ctx.unit('date.godzina_w')!).ru).not.toContain('3 октября');
+    for (const id of ['date.wolyn', 'date.katyn', 'date.smolensk']) expect(ctx.unit(id)).toBeTruthy();
+  });
+
+  it('boldKeys: ключи жирным дословно, длинные раньше коротких; без ключей — один кусок', () => {
+    expect(boldKeys('Это stan wojenny в Польше', ['stan wojenny'])).toEqual([
+      { t: 'Это ', b: false },
+      { t: 'stan wojenny', b: true },
+      { t: ' в Польше', b: false },
+    ]);
+    expect(boldKeys('Święto Konstytucji 3 Maja и Konstytucji', ['Konstytucji', 'Święto Konstytucji 3 Maja']).filter((r) => r.b).map((r) => r.t)).toEqual(['Święto Konstytucji 3 Maja', 'Konstytucji']);
+    expect(boldKeys('просто', [])).toEqual([{ t: 'просто', b: false }]);
+  });
+});
+
+describe('Daty: справка в блоке отзыва после ответа', () => {
+  function mount(spoken: string[]) {
+    const s = mkPolska();
+    const root = document.createElement('div');
+    const ui = mountPolskaGame(root, { bus: s.bus, games: [game], polska: s.p, now: () => NOW, rand: seeded(7), say: (t) => spoken.push(t) });
+    s.p.autoPlant('daty', datyPool(ctxOf(s)));
+    return { s, root, ui };
+  }
+
+  it.each([true, false])('после ответа (верного: %s) в отзыве справка: русский текст с жирными польскими ключами и польская строка', async (ok) => {
+    const spoken: string[] = [];
+    const { root, ui } = mount(spoken);
+    ui.start('daty', 'date.stan_wojenny');
+    const t = ui.task as DatyTask;
+    ui.submit(ok ? rightAnswer(t) : wrongAnswer(t));
+    await later();
+    const fb = q(root, '[data-feedback]');
+    expect(fb.getAttribute('data-feedback')).toBe(ok ? 'ok' : 'bad');
+    const block = q(fb, '[data-history]');
+    const h = HIST(ctxOf(mkPolska()).unit('date.stan_wojenny')!);
+    expect(q(block, '[data-history-ru]').textContent).toBe(h.ru);
+    expect([...block.querySelectorAll('[data-history-ru] b')].map((b) => b.textContent)).toEqual(h.key);
+    expect(q(block, '[data-history-pl]').textContent).toContain(h.pl);
+    // справка внутри отзыва, до строки прогресса; один раз
+    expect(fb.querySelectorAll('[data-history]').length).toBe(1);
+    expect(block.compareDocumentPosition(q(fb, '[data-progress-after]')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // автоматом звучит только ответ; польская фраза справки — по кнопке 🔊
+    expect(spoken.length).toBe(1);
+    expect(spoken).not.toContain(h.pl);
+    click(block, '[data-say-history]');
+    expect(spoken.at(-1)).toBe(h.pl);
+    // у каждого польского ключа своя 🔊
+    const keyBtns = [...block.querySelectorAll<HTMLElement>('[data-say-key]')];
+    expect(keyBtns.map((b) => b.dataset.saytext)).toEqual(h.key);
+    keyBtns[0]!.click();
+    expect(spoken.at(-1)).toBe(h.key[0]);
+    ui.stop();
+  });
+
+  it('справка есть у каждой из 22 дат', async () => {
+    const { s, root, ui } = mount([]);
+    s.p.plant(s.p.units('daty').map((x) => x.id));
+    for (const u of ctxOf(mkPolska()).units) {
+      ui.start('daty', u.id);
+      const t = ui.task as DatyTask;
+      ui.submit(wrongAnswer(t));
+      await later();
+      expect(root.querySelector('[data-feedback] [data-history-ru]')!.textContent, u.id).toBe(HIST(u).ru);
+      ui.stop();
+    }
+  });
+});
+
+describe('Daty: «Poznaj datę» — знакомство при первой встрече', () => {
+  function mount(fresh: boolean, now = NOW) {
+    const s = mkPolska(fresh);
+    const root = document.createElement('div');
+    const ui = mountPolskaGame(root, { bus: s.bus, games: [game], polska: s.p, now: () => now, rand: seeded(7), say: () => {} });
+    s.p.autoPlant('daty', datyPool(ctxOf(s)));
+    return { s, root, ui };
+  }
+  const ID = 'date.niepodleglosc';
+
+  it('первый раз: до вопроса карточка (лист, название PL/RU, справка, «Rozumiem»), вопроса и ответа ещё нет; флаг ставится только по «Rozumiem»', () => {
+    const { s, root, ui } = mount(true);
+    ui.start('daty', ID);
+    const card = q(root, '[data-intro]');
+    expect(card.getAttribute('data-intro')).toBe(ID);
+    expect(card.textContent).toContain('Poznaj datę');
+    expect(q(card, '[data-leaf] .day').textContent).toBe('11');
+    expect(q(card, '[data-intro-pl]').textContent).toBe('Święto Niepodległości');
+    expect(q(card, '[data-intro-ru]').textContent).toBe('День Независимости');
+    expect(q(card, '[data-history-ru]').textContent).toBe(HIST(s.p.unit(ID)!).ru);
+    expect(root.querySelector('[data-prompt]')).toBeNull();
+    expect(root.querySelector('[data-opt]')).toBeNull();
+    expect(q(root, '[data-feedback]').hidden).toBe(true);
+    expect(q(root, '[data-understood]').textContent).toBe('Rozumiem · Понятно →');
+    // открыли, но не нажали «Понятно» — флага нет (закрыл игру: покажем снова)
+    expect(s.p.seen(ID)).toBe(false);
+    expect(s.save.seen).toEqual({});
+    ui.stop();
+    ui.start('daty', ID);
+    expect(root.querySelector('[data-intro]')).toBeTruthy();
+    click(root, '[data-understood]');
+    expect(s.p.seen(ID)).toBe(true);
+    expect(s.save.seen[ID]).toBe('2026-10-18');
+    expect(root.querySelector('[data-intro]')).toBeNull();
+    expect(root.querySelector('[data-prompt]')).toBeTruthy();
+    expect(root.querySelector('[data-understood]')).toBeNull();
+    // карточка не засчитывалась как ответ
+    expect(s.save.garden.log.length).toBe(0);
+    ui.stop();
+  });
+
+  it('после «Понятно» повторно не показывается: ни в этом раунде, ни после перезагрузки сохранения', () => {
+    const { s, root, ui } = mount(true);
+    ui.start('daty', ID);
+    click(root, '[data-understood]');
+    ui.submit(rightAnswer(ui.task as DatyTask));
+    ui.stop();
+    ui.start('daty', ID);
+    expect(root.querySelector('[data-intro]')).toBeNull();
+    expect(root.querySelector('[data-prompt]')).toBeTruthy();
+    ui.stop();
+    // «перезагрузка»: тот же сохранённый раздел, новый движок
+    const bus = testBus();
+    const p2 = createPolska({ bus, load: () => normalizePolska(JSON.parse(JSON.stringify(s.save))), save: () => {}, now: () => NOW, tz: () => 0 });
+    expect(p2.seen(ID)).toBe(true);
+    expect(p2.seen('date.wykleci')).toBe(false);
+    const root2 = document.createElement('div');
+    const ui2 = mountPolskaGame(root2, { bus, games: [game], polska: p2, now: () => NOW, rand: seeded(7), say: () => {} });
+    p2.autoPlant('daty', datyPool(ctxOf(s)));
+    ui2.start('daty', ID);
+    expect(root2.querySelector('[data-intro]')).toBeNull();
+    ui2.stop();
+    ui2.start('daty', 'date.wykleci');
+    expect(root2.querySelector('[data-intro]')).toBeTruthy();
+    ui2.stop();
+  });
+
+  it('ответы уже есть, а флага нет (игрок отвечал до появления карточек) — карточка всё равно показывается', () => {
+    const { s, root, ui } = mount(true);
+    s.p.answer({ id: ID, side: 'A' }, true);
+    s.p.answer({ id: ID, side: 'B' }, false);
+    expect(s.p.info(ID).answers).toBe(2);
+    expect(s.p.seen(ID)).toBe(false);
+    ui.start('daty', ID);
+    expect(root.querySelector('[data-intro]')).toBeTruthy();
+    expect(root.querySelector('[data-prompt]')).toBeNull();
+    ui.stop();
+  });
+
+  it('сохранение без поля seen читается (старое сохранение): карточки покажутся для всех, ответы и огород целы', () => {
+    const old = { garden: { ...newPolskaSave().garden, planted: [{ t: NOW, id: ID }] } };
+    const norm = normalizePolska(old);
+    expect(norm.seen).toEqual({});
+    expect(norm.garden.planted).toEqual([{ t: NOW, id: ID }]);
+    expect(normalizePolska(undefined).seen).toEqual({});
+    expect(normalizePolska({ garden: old.garden, seen: { [ID]: '2026-10-01', bad: 5 } }).seen).toEqual({ [ID]: '2026-10-01' });
+    const p = createPolska({ load: () => norm, save: () => {}, now: () => NOW, tz: () => 0 });
+    for (const u of p.units('daty')) expect(p.seen(u.id)).toBe(false);
+  });
+
+  it('markSeen: сохраняет один раз (дата не перезаписывается), чужой id игнорируется', () => {
+    let save: PolskaSave = newPolskaSave();
+    let writes = 0;
+    let t = NOW;
+    const p = createPolska({ load: () => save, save: (x) => ((save = x), writes++), now: () => t, tz: () => 0 });
+    p.markSeen(ID);
+    t += 86_400_000;
+    p.markSeen(ID);
+    p.markSeen('date.nie_ma');
+    expect(save.seen).toEqual({ [ID]: '2026-10-18' });
+    expect(writes).toBe(1);
+  });
+
+  it('карточка только перед вопросом: в отзыве после ответа карточки нет, у «знакомых» дат вопрос сразу', async () => {
+    const { root, ui } = mount(false);
+    ui.start('daty', ID);
+    expect(root.querySelector('[data-intro]')).toBeNull();
+    ui.submit(rightAnswer(ui.task as DatyTask));
+    await later();
+    expect(root.querySelector('[data-intro]')).toBeNull();
+    expect(root.querySelector('[data-feedback] [data-history]')).toBeTruthy();
+    ui.stop();
+  });
+
+  it('движок: раунд в свежем профиле — на каждой новой дате сначала карточка, потом вопрос; повтор даты без карточки', () => {
+    const { s, root, ui } = mount(true);
+    ui.start('daty');
+    vi.useFakeTimers();
+    const shown: string[] = [];
+    const repeats: string[] = [];
+    for (let i = 0; i < ROUND_SIZE; i++) {
+      const t = ui.task as DatyTask;
+      const card = root.querySelector('[data-intro]');
+      if (card) {
+        expect(card.getAttribute('data-intro')).toBe(t.id);
+        expect(shown).not.toContain(t.id);
+        shown.push(t.id);
+        click(root, '[data-understood]');
+      } else {
+        repeats.push(t.id);
+      }
+      expect(root.querySelector('[data-prompt]'), `задание ${i + 1}`).toBeTruthy();
+      ui.submit(rightAnswer(ui.task as DatyTask));
+      vi.advanceTimersByTime(NEXT_DELAY_MS + 10);
+      root.querySelector<HTMLButtonElement>('[data-next]')!.click();
+    }
+    vi.useRealTimers();
+    expect(shown.length).toBeGreaterThan(0);
+    for (const id of repeats) expect(shown).toContain(id);
+    expect(Object.keys(s.save.seen).sort()).toEqual([...shown].sort());
+    ui.stop();
   });
 });

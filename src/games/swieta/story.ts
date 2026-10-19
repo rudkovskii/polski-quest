@@ -1,13 +1,10 @@
 // Игра «Święta»: что показываем в рассказе («Poznaj święto») — чистые функции без DOM: первый ли раз, 2–4 предложения справки, ключевые польские
 // слова в русском тексте, магазины и выходной, обычаи, которые видел игрок. Вопросы первого раунда берут ровно эти обычаи и эту картину.
-import type { PolskaUnit, UnitInfo } from '../../types/polska';
+import type { GameCtx, PolskaUnit } from '../../types/polska';
 import { customsOf } from './tasks';
 
-/** Игрок ещё не встречал праздник: по нему нет ни одного ответа (верного и неверного). */
-export function isFirst(info: UnitInfo): boolean {
-  if (typeof info.answers === 'number') return info.answers === 0;
-  return !info.sides.A && !info.sides.B && info.harvests === 0 && info.days === 0;
-}
+/** Игрок ещё не принял знакомство («Rozumiem · Понятно»): флага `seen` в сохранении нет — даже если ответы уже были. */
+export const isFirst = (ctx: Pick<GameCtx, 'seen'>, id: string): boolean => !ctx.seen(id);
 
 /** Предложения абзацев подряд. Делим по «. ! ? …» перед заглавной буквой, кавычкой или цифрой. */
 export function sentences(paragraphs: readonly string[]): string[] {

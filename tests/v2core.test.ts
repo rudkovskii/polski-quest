@@ -36,6 +36,8 @@ const ctxFor = (s: ReturnType<typeof mkPolska>, g: PolskaGameId): GameCtx => ({
   units: s.p.units(g),
   unit: (id) => s.p.unit(id),
   info: (id) => s.p.info(id),
+  seen: () => true,
+  markSeen: () => {},
   doc: s.p.content.docs[g],
   now: () => NOW,
   date: () => ({ y: 2026, m: 10, d: 18, weekday: 0 }),
@@ -387,7 +389,7 @@ describe('сохранение v3', () => {
     expect(s.garden.planted).toEqual([{ t: 5, id: 'w.kot' }]);
     expect(s.polska.garden.planted).toEqual([]);
     const save = newSave(NOW);
-    save.polska = { garden: { ...newGarden(), planted: [{ t: NOW, id: 'hymn.s1.1', start: 'bush' }], log: [{ t: NOW + 1, day: 1, id: 'hymn.s1.1', side: 'rp', ok: true, mode: 2, self: true }] } };
+    save.polska = { garden: { ...newGarden(), planted: [{ t: NOW, id: 'hymn.s1.1', start: 'bush' }], log: [{ t: NOW + 1, day: 1, id: 'hymn.s1.1', side: 'rp', ok: true, mode: 2, self: true }] }, seen: { 'date.nato': '2026-10-19' } };
     const r = importSave(exportSave(save));
     expect(r.ok && r.save.polska).toEqual(save.polska);
   });

@@ -27,7 +27,11 @@ const BY_ID = new Map(UNITS.map((u) => [u.id, u]));
 const doc = V2.docs.swieta;
 const U = (id: string): PolskaUnit => BY_ID.get(`hol.${id}`)!;
 
-const ctxAt = (y: number, m: number, d: number, seed = 1): GameCtx => ({
+const ctxAt = (y: number, m: number, d: number, seed = 1): GameCtx => {
+  const seen = new Set<string>();
+  return {
+  seen: (id) => seen.has(id),
+  markSeen: (id) => void seen.add(id),
   units: UNITS,
   unit: (id) => BY_ID.get(id),
   info: (id) => ({ id, kind: 'holiday', stage: null, planted: false, drops: 0, sides: { A: false, B: false }, selfOk: false, days: 0, harvests: 0, next: '' }) as UnitInfo,
@@ -35,7 +39,8 @@ const ctxAt = (y: number, m: number, d: number, seed = 1): GameCtx => ({
   now: () => Date.UTC(y, m - 1, d, 9),
   date: () => ({ y, m, d, weekday: new Date(Date.UTC(y, m - 1, d)).getUTCDay() }),
   rand: seeded(seed),
-});
+  };
+};
 const TODAY = ctxAt(2026, 10, 18);
 const day = (y: number, m: number, d: number): number => dayNo(y, m, d);
 
@@ -521,9 +526,13 @@ describe('справка знакомства', () => {
   it('магазины строкой: из заметки данных, иначе из shops; первый раз — нет ответов по единице', () => {
     expect(shopsLine(U('wigilia'))!.ru).toMatch(/14:00/);
     expect(shopsLine(U('wszyscy'))!.pl).toBe('Sklepy są zamknięte.');
-    expect(isFirst({ ...TODAY.info('hol.wszyscy'), answers: 0 })).toBe(true);
-    expect(isFirst({ ...TODAY.info('hol.wszyscy'), answers: 1 })).toBe(false);
-    expect(isFirst({ ...TODAY.info('hol.wszyscy'), sides: { A: true, B: false }, answers: undefined })).toBe(false);
+    // «Первый раз» = нет флага «знакомство принято» (а не «нет ответов»): ответы без флага карточку не отменяют.
+    const c = ctxAt(2026, 10, 18);
+    const answered: GameCtx = { ...c, info: (id) => ({ ...c.info(id), answers: 5 }) };
+    expect(isFirst(answered, 'hol.wszyscy')).toBe(true);
+    c.markSeen('hol.wszyscy');
+    expect(isFirst(c, 'hol.wszyscy')).toBe(false);
+    expect(isFirst(c, 'hol.wigilia')).toBe(true);
     expect(growthOf({ ...TODAY.info('hol.wszyscy'), planted: true, stage: 'sprout' })).toBe('sprout');
     expect(growthOf({ ...TODAY.info('hol.wszyscy'), harvests: 1 })).toBe('ripe');
   });
@@ -606,7 +615,7 @@ function mkHub(ctx: GameCtx = TODAY, answers = 0) {
   const foot = document.createElement('div');
   const spoken: string[] = [];
   const panel: GamePanel = { body, foot, layout: 'full', submit: () => {}, say: (t) => spoken.push(t), rand: seeded(2) };
-  const c: GameCtx = { ...ctx, info: (id) => ({ ...ctx.info(id), answers }) };
+  const c: GameCtx = { ...ctx, info: (id) => ({ ...ctx.info(id), answers }), seen: answers > 0 ? () => true : ctx.seen };
   renderHub(panel, c, (id, size) => begun.push([id, size]));
   return { body, foot, begun, spoken, panel };
 }

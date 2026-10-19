@@ -26,6 +26,8 @@ const ctxOf = (s: ReturnType<typeof mk>, seed = 3): GameCtx => ({
   units: s.p.units('geo'),
   unit: (id) => s.p.unit(id),
   info: (id) => s.p.info(id),
+  seen: () => true,
+  markSeen: () => {},
   doc: s.p.content.docs.geo,
   now: () => NOW,
   date: () => ({ y: 2026, m: 10, d: 18, weekday: 0 }),

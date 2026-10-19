@@ -400,6 +400,8 @@ export function renderHub(panel: GamePanel, ctx: GameCtx, begin: (id: string, si
   }
 
   function goRound(n: WheelNode, u: PolskaUnit, firstTime: boolean): void {
+    // Флаг «знакомство принято» ставится только по «Rozumiem · Понятно», не при открытии карточки.
+    if (firstTime) ctx.markSeen(u.id);
     const tasks = buildRound(ctx, u, n, firstTime);
     startSession(u.id, tasks);
     returnTo = n.id;
@@ -427,7 +429,7 @@ export function renderHub(panel: GamePanel, ctx: GameCtx, begin: (id: string, si
     const n = nodeOf(selId);
     if (!n) return;
     const u = unitOf(n);
-    const firstTime = !!u && isFirst(ctx.info(u.id));
+    const firstTime = !!u && isFirst(ctx, u.id);
     const info = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-info': '', onclick: () => showCard(n, 'info') }, 'ℹ Справка');
     if (!u) return void panel.foot.replaceChildren(info);
     if (firstTime) return void panel.foot.replaceChildren(el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-poznaj': '', onclick: () => showCard(n, 'intro') }, 'Poznaj · Знакомство →'));

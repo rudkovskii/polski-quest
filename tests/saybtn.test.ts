@@ -21,12 +21,16 @@ function mkPolska() {
   let save: PolskaSave = newPolskaSave();
   const bus = testBus();
   const p = createPolska({ bus, load: () => save, save: (x) => (save = x), now: () => NOW, tz: () => 0 });
+  // Знакомство («Poznaj …») здесь не проверяется: все единицы уже «знакомы».
+  for (const u of p.content.units) p.markSeen(u.id);
   return { p, bus };
 }
 const ctxFor = (s: ReturnType<typeof mkPolska>, g: PolskaGameId, seed = 3): GameCtx => ({
   units: s.p.units(g),
   unit: (id) => s.p.unit(id),
   info: (id) => s.p.info(id),
+  seen: (id) => s.p.seen(id),
+  markSeen: (id) => s.p.markSeen(id),
   doc: s.p.content.docs[g],
   now: () => NOW,
   date: () => ({ y: 2026, m: 10, d: 18, weekday: 0 }),
