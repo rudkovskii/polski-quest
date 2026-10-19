@@ -35,7 +35,8 @@ type S = ReturnType<typeof setup>;
 /** Ответы по растению в обе стороны верно: `rounds` кругов игр 1 и 2. */
 function answerAll(s: S, id: string, rounds = 2): void {
   for (let i = 0; i < rounds; i++)
-    for (const m of [1, 2] as GameMode[]) {
+    // Слову для урожая нужна игра 5 (собрать само); фразы — игры 1 и 2.
+    for (const m of [1, id.startsWith('p.') ? 2 : 5] as GameMode[]) {
       s.setNow(s.now() + 1000);
       const q = s.farm.next(m, id)!;
       s.farm.answer(q, q.answer);

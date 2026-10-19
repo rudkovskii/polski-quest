@@ -108,7 +108,8 @@ describe('модель: kind, «сам», drillSeed', () => {
       const g: GardenSave = { ...newGarden(), planted: [{ t: NOW, id }] };
       const st = derive(g);
       let t = NOW;
-      const a = (side: 'pr' | 'rp', day: number, s = false): void => void applyAnswer(st, { t: (t += 1000), day, id, side, ok: true, mode: side === 'pr' ? 1 : 2, ...(s ? { self: true } : {}) });
+      // «Сам»: у единиц v2 — `self`, у слова — `prod` (собрано в игре 5).
+      const a = (side: 'pr' | 'rp', day: number, s = false): void => void applyAnswer(st, { t: (t += 1000), day, id, side, ok: true, mode: side === 'pr' ? 1 : s ? 5 : 2, ...(s ? { self: true, prod: true } : {}) });
       a('pr', 0);
       a('pr', 0);
       a('rp', 0);
@@ -118,7 +119,9 @@ describe('модель: kind, «сам», drillSeed', () => {
       if (self) a('rp', 2, true);
       return st;
     };
-    expect(grow('w.kot', false).items.get('w.kot')!.harvests).toBe(1);
+    // Слово с 19.10 тоже ждёт «сам» — собранное в игре 5 (`prod`).
+    expect(grow('w.kot', false).items.get('w.kot')!.harvests).toBe(0);
+    expect(grow('w.kot', true).items.get('w.kot')!.harvests).toBe(1);
     expect(grow('geo.city.krakow', false).items.get('geo.city.krakow')!.harvests).toBe(0);
     expect(grow('geo.city.krakow', true).items.get('geo.city.krakow')!.harvests).toBe(1);
   });

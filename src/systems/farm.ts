@@ -1,7 +1,7 @@
 // Ферма целиком: модель огорода + база A1 + шина. Реализует FarmApi для экранов и даёт мини-игре задания и ответы.
 // Хранилище, часы и озвучку подставляет склейка (main.ts): здесь нет браузера.
 import type { BusEvents } from '../types/bus';
-import type { CustomAdd, CustomApi, FarmAct, FarmApi, FarmStats, GameMode, ItemInfo, PhraseHint, PlantView } from '../types/farm';
+import type { CustomAdd, CustomApi, FarmAct, FarmApi, FarmStats, GameMode, ItemInfo, PhraseHint, PlantView, Side } from '../types/farm';
 import type { Bus } from './bus';
 import { ALL_WORDS, BASE_WORDS, PHRASES, PHRASE_BY_ID, TOPICS, WORD_BY_ID, isA1, isPhraseId, plOf, setCustomWords } from './content';
 import { CUSTOM_LIMIT, MAX_EX, MAX_PL, MAX_RU, baseMatches, cleanLine, customId, forgetItem, isCustomId, normalizeCustom, type CustomWord } from './customWords';
@@ -21,16 +21,19 @@ import {
   REVERSE_EVERY,
   FOCUS_EVERY,
   wantsReverse,
+  isAssembleMode,
+  needsProd,
   sideOf,
   stageOf,
   statusOf,
   syncSlots,
+  withProdFrom,
   type AnswerEntry,
   type GardenSave,
   type GardenState,
 } from './garden';
 import { lookOf } from './plantLook';
-import { canAssemble, grade, makeQuestion, type Question } from './quiz';
+import { canAssemble, canSpell, grade, makeQuestion, type Question } from './quiz';
 import { BASE, SUB_COUNT, THRESHOLDS, pathOf, pointsOf, type PathInfo } from './xp';
 
 export interface FarmDeps {
@@ -66,16 +69,19 @@ export const ASSEMBLE_POOL_MIN = 3;
 export const PAUSE_TASKS = 3;
 
 export interface Farm extends FarmApi {
-  /** Следующее задание мини-игры (и `farm:focus` для героя). */
-  next(mode: GameMode, only?: string): Question | null;
+  /** Следующее задание мини-игры (и `farm:focus` для героя). `dir` — сторона игры 5 (переключатель «↔ наоборот»). */
+  next(mode: GameMode, only?: string, opts?: { dir?: Side }): Question | null;
   answer(q: Question, given: string | readonly string[]): AnswerOut;
   /** Скоро урожай: сегодня одним верным ответом и завтра. */
   ripeSoon(): { today: number; tomorrow: number; soon: number };
   /** Режим для «Повторить сейчас»: тот, что продвинет растение. */
   reviewMode(id: string): GameMode;
   plants(): PlantView[];
-  /** На грядках: слов, фраз всего и сколько из фраз годятся для сборки (игры 3 и 4; остальные идут в игры 1 и 2). */
-  counts(): { words: number; phrases: number; assemble: number };
+  /**
+   * На грядках: слов, фраз всего и сколько из фраз годятся для сборки (игры 3 и 4; остальные идут в игры 1 и 2);
+   * `spell` — кусты слов, которым для урожая не хватает слова, собранного самому (игра 5).
+   */
+  counts(): { words: number; phrases: number; assemble: number; spell: number };
   /** Пересчитать раскладку (время идёт: перезревшие возвращаются) и разослать грядки и опыт. */
   refresh(): void;
   /**
@@ -93,7 +99,8 @@ const STAGE_RANK: Record<string, number> = { seed: 0, sprout: 1, bush: 2, overri
 
 export function createFarm(d: FarmDeps): Farm {
   const rand = d.rand ?? Math.random;
-  let g: GardenSave = d.load();
+  // Сохранение до игры 5: отметка, с какого ответа слову нужен «сам» (старые ответы — по прежнему правилу).
+  let g: GardenSave = withProdFrom(d.load());
   // Свои слова: в реестр содержимого до первого расчёта (иначе их растения остались бы без слова).
   let customs: CustomWord[] = normalizeCustom(d.customs?.load());
   setCustomWords(customs);
@@ -202,6 +209,7 @@ export function createFarm(d: FarmDeps): Farm {
       stage: it ? stageOf(it, now) : null,
       drops: it?.drops ?? 0,
       sides: { pr: it?.sides.pr ?? false, rp: it?.sides.rp ?? false },
+      prod: isPhraseId(id) ? null : (it?.prodOk ?? false),
       days: it?.days.size ?? 0,
       next: nextText(it, now, today()),
       harvests: it?.harvests ?? 0,
@@ -328,13 +336,21 @@ export function createFarm(d: FarmDeps): Farm {
       listeners.add(fn);
       return () => listeners.delete(fn);
     },
-    next(mode, only) {
+    next(mode, only, opts) {
       const now = d.now();
+      // Игра 5: сторона сборки (по умолчанию по-польски); «наоборот» — в другую.
+      const dir: Side = opts?.dir ?? 'rp';
       // «Наоборот» не в первые REVERSE_AFTER ответов: сначала привычная сторона (P3a).
-      const canReverse = !only && mode <= 2 && sinceReverse >= REVERSE_EVERY - 1 && g.log.length >= REVERSE_AFTER;
+      const canReverse = !only && !isAssembleMode(mode) && sinceReverse >= REVERSE_EVERY - 1 && g.log.length >= REVERSE_AFTER;
       const outside = !only && ++issued % FOCUS_EVERY === 0;
-      const exclude = !only && mode >= 3 ? pausedAssemble() : undefined;
-      const id = only ?? pickTask(g, st, mode, now, today(), { recent, assemble, reverse: canReverse, outside, ...(exclude?.size ? { exclude } : {}) });
+      const exclude = !only && isAssembleMode(mode) ? pausedAssemble() : undefined;
+      const spellable = (x: string, side: Side): boolean => {
+        const w = WORD_BY_ID.get(x);
+        return !!w && canSpell(w, side);
+      };
+      const id =
+        only ??
+        pickTask(g, st, mode, now, today(), { recent, assemble, reverse: canReverse, outside, ...(exclude?.size ? { exclude } : {}), ...(mode === 5 ? { side: dir, spellable } : {}) });
       if (!id) {
         d.bus.emit('farm:focus', { id: null, tile: null, label: '' });
         return null;
@@ -342,15 +358,15 @@ export function createFarm(d: FarmDeps): Farm {
       recent.push(id);
       if (recent.length > 8) recent.shift();
       const it = st.items.get(id);
-      const stage = it ? stageOf(it, now) : null;
-      // «Наоборот»: растению не хватает другой стороны — в игре 2 спросим с польского, в игре 1 — на польский (выбором).
-      const reverse = canReverse && !!it && wantsReverse(it, mode, today(), now);
+      const other: Side = dir === 'rp' ? 'pr' : 'rp';
+      // «Наоборот»: растению не хватает другой стороны — в игре 2 спросим с польского, в игре 1 — на польский (выбором),
+      // в игре 5 соберём слово в другую сторону. Слово, которое в сторону игры 5 не собрать (перевод не из букв), — всегда в другую.
+      const cantDirect = mode === 5 && !spellable(id, dir);
+      const reverse = (cantDirect && spellable(id, other)) || (canReverse && !!it && wantsReverse(it, mode, today(), now, mode === 5 ? dir : undefined) && (mode !== 5 || spellable(id, other)));
       if (!only) sinceReverse = reverse ? 0 : sinceReverse + 1;
-      const qmode: GameMode = reverse ? (mode === 1 ? 2 : 1) : mode;
-      // «Напиши сам» (игра 2): кустик и перезревшее, а ещё росток с ответами в обе стороны — этот ответ сделает его кустиком.
-      // Без последнего ввод почти не встречался: игра 1 раньше засчитывает кустикам день, и в игру 2 они не попадают (P4a).
-      const typed = !reverse && mode === 2 && isTypedStage(it, stage);
-      const made = makeQuestion(qmode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: ALL_WORDS, phrases: PHRASES }, rand, typed);
+      const qmode: GameMode = reverse && mode <= 2 ? (mode === 1 ? 2 : 1) : mode;
+      // «Напиши сам» в игре 2 больше нет (19.10): слово «по-польски само» собирается в игре 5 («Собери слово»).
+      const made = makeQuestion(qmode, id, { word: (x) => WORD_BY_ID.get(x), phrase: (x) => PHRASE_BY_ID.get(x), words: ALL_WORDS, phrases: PHRASES }, rand, mode === 5 ? { dir: reverse ? other : dir } : {});
       const q = made && { ...made, progress: progressText(it, now, today()), ...(reverse ? { reverse: true } : {}) };
       const slot = g.slots[id];
       const cell = slot !== undefined ? PLOT_CELLS[slot] : undefined;
@@ -363,11 +379,14 @@ export function createFarm(d: FarmDeps): Farm {
       const p0 = path();
       const slot = g.slots[q.id];
       const cell = slot !== undefined ? PLOT_CELLS[slot] : undefined;
-      const e: AnswerEntry = { t: now, day: today(), id: q.id, side: sideOf(q.mode), ok: r.ok, mode: q.mode };
+      // Игра 5: сторона — куда собирали; «сам» (production) — по-польски, без подсказки, буквы точно.
+      const side: Side = q.kind === 'spell' ? q.dir : sideOf(q.mode);
+      const prod = q.kind === 'spell' && q.dir === 'rp' && r.ok && r.verdict === 'exact' && !q.hinted;
+      const e: AnswerEntry = { t: now, day: today(), id: q.id, side, ok: r.ok, mode: q.mode, ...(prod ? { prod: true } : {}) };
       g = { ...g, log: [...g.log, e] };
       answered++;
       // Игры 3 и 4 с одной-двумя фразами: ответленная фраза отдыхает 3 ответа, а не крутится по кругу (F5b).
-      if (q.mode >= 3 && farm.counts().assemble < ASSEMBLE_POOL_MIN) pausedUntil.set(q.id, answered + PAUSE_TASKS);
+      if (isAssembleMode(q.mode) && farm.counts().assemble < ASSEMBLE_POOL_MIN) pausedUntil.set(q.id, answered + PAUSE_TASKS);
       const o = applyAnswer(st, e);
       g = syncSlots(g, st, now);
       const act: FarmAct = {
@@ -384,7 +403,16 @@ export function createFarm(d: FarmDeps): Farm {
       if (p1.sub > p0.sub) d.bus.emit('audio:play', { text: `Brawo! ${p1.pl}.`, queue: true });
       changed();
       const c = content(q.id);
-      const note = r.verdict === 'diacritics' ? 'Засчитано, но проверь польские буквы' : r.verdict === 'ortho' || r.verdict === 'typo' ? 'Засчитано, но есть ошибка в написании' : undefined;
+      // Слово по-польски засчитано, но не «само» (подсказка, ошибка в буквах при вводе): для урожая его ещё надо собрать.
+      const notSelf = q.kind === 'spell' && q.dir === 'rp' && r.ok && !prod ? ' (не как «сам»)' : '';
+      const note =
+        r.verdict === 'diacritics'
+          ? `Засчитано${notSelf}, но проверь польские буквы`
+          : r.verdict === 'ortho' || r.verdict === 'typo'
+            ? `Засчитано${notSelf}, но есть ошибка в написании`
+            : q.kind === 'spell' && q.hinted && r.ok
+              ? `Засчитано с подсказкой${notSelf}`
+              : undefined;
       const day = today();
       return { ok: r.ok, correct: r.correct, ...c, ...(note ? { note } : {}), act, path: { from: p0.pos, to: p1.pos, sub: p1.sub, pl: p1.pl }, progress: progressText(st.items.get(q.id), now, day), tomorrow: ripeSoon(st, day).tomorrow };
     },
@@ -394,6 +422,8 @@ export function createFarm(d: FarmDeps): Farm {
       if (isPhraseId(id) && assemble(id)) return it && !it.sides.rp ? 3 : it && !it.sides.pr ? 4 : 3;
       if (!it) return 1;
       if (it.stage === 'seed') return 1;
+      // Кусту слова для урожая не хватает слова, собранного самому: «Повторить» открывает игру 5.
+      if (needsProd(it)) return 5;
       if (!it.sides.rp || !it.rpOk) return 2;
       if (!it.sides.pr) return 1;
       return 2;
@@ -403,11 +433,21 @@ export function createFarm(d: FarmDeps): Farm {
       let words = 0;
       let phrases = 0;
       let long = 0;
-      for (const p of plants()) p.phrase ? (phrases++, assemble(p.id) && long++) : words++;
-      return { words, phrases, assemble: long };
+      let spell = 0;
+      for (const p of plants()) {
+        if (p.phrase) {
+          phrases++;
+          if (assemble(p.id)) long++;
+        } else {
+          words++;
+          const it = st.items.get(p.id);
+          if (it && needsProd(it)) spell++;
+        }
+      }
+      return { words, phrases, assemble: long, spell };
     },
     gap(mode) {
-      if (mode < 3) return null;
+      if (!isAssembleMode(mode)) return null;
       const n = farm.counts().assemble;
       if (n === 0 || n >= ASSEMBLE_POOL_MIN) return null;
       const paused = pausedAssemble();
@@ -466,8 +506,3 @@ function equalsWord(p: { pl: string; words: readonly string[] }): boolean {
   });
 }
 
-/** Игра 2 спрашивает ввод (экранная клавиатура), а не выбор: кустик, перезревшее или «почти кустик» (росток, обе стороны отвечены). */
-export function isTypedStage(it: { stage: string | null; sides: { pr: boolean; rp: boolean } } | undefined, stage: string | null): boolean {
-  if (stage === 'bush' || stage === 'overripe') return true;
-  return stage === 'sprout' && !!it && it.sides.pr && it.sides.rp;
-}

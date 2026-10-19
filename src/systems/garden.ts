@@ -6,7 +6,9 @@
 // Правила роста (одинаковые для слов и фраз):
 //   семя → росток: 2 капли (верно +1, ошибка −1, не ниже 0; стадия от ошибки не падает);
 //   росток → куст: были верные ответы в обе стороны (pr — с польского, rp — на польский);
-//   куст → урожай: верные ответы в 3 разных календарных дня (за весь цикл), хотя бы один верный rp.
+//   куст → урожай: верные ответы в 3 разных календарных дня (за весь цикл), хотя бы один верный rp; у слова этот rp —
+//   «сам» (production, `AnswerEntry.prod`): собрано из букв в игре 5 без подсказки (или прежнее «напиши сам» в игре 2,
+//   ответы до `GardenSave.prodFrom` засчитываются по старому правилу: любой верный rp). Фразам и единицам v2 production не нужен.
 // За один ответ — не больше одной стадии. Урожай сразу уходит в банку (Spiżarnia). Через 7, 21, 60 (дальше каждые 60)
 // дней после сбора растение возвращается на грядку «перезревшим»; один верный ответ — обратно в банку.
 import type { GameMode, ItemStatus, Side, Stage } from '../types/farm';
@@ -64,6 +66,8 @@ export interface AnswerEntry {
   mode: GameMode;
   /** v2: задание «сказать/собрать самому» (сторона B без подсказки). Нужно для урожая единиц игр о Польше. */
   self?: boolean;
+  /** Игра 5: слово собрано (или напечатано точно) по-польски само, без подсказки — production, нужен слову для урожая. */
+  prod?: boolean;
 }
 
 export interface GardenSave {
@@ -73,10 +77,16 @@ export interface GardenSave {
   slots: Record<string, number>;
   /** Ступень расширения (индекс в PLOT_TIERS), только растёт. */
   tier: number;
+  /**
+   * С какого момента (мс) слову для урожая нужен ответ «сам» (`prod`, игра 5). Ответы журнала раньше — по прежнему
+   * правилу: любой верный ответ по-польски засчитан как «сам» (в старом журнале «напиши сам» не отличить от выбора).
+   * Новый огород — 0. Нет поля — старое сохранение: `withProdFrom` (при загрузке) ставит конец его журнала.
+   */
+  prodFrom?: number;
 }
 
 export function newGarden(): GardenSave {
-  return { planted: [], log: [], slots: {}, tier: 0 };
+  return { planted: [], log: [], slots: {}, tier: 0, prodFrom: 0 };
 }
 
 /** Календарный день по местному времени: `tzOffsetMin` = `Date#getTimezoneOffset()`. */
@@ -93,6 +103,10 @@ export interface ItemState {
   needSelf: boolean;
   /** Был верный ответ «сам» (за цикл роста). */
   selfOk: boolean;
+  /** Для урожая нужен ответ «сам» по-польски (`AnswerEntry.prod`, игра 5): у слов. */
+  needProd: boolean;
+  /** Был такой ответ (за цикл роста). */
+  prodOk: boolean;
   plantedAt: number;
   /** Стадия роста; null — в банке. */
   stage: 'seed' | 'sprout' | 'bush' | null;
@@ -175,6 +189,8 @@ function plantItem(st: GardenState, e: PlantEntry): void {
     kind,
     needSelf: isPolskaKind(kind),
     selfOk: false,
+    needProd: kind === 'word',
+    prodOk: bush,
     plantedAt: e.t,
     stage: bush ? 'bush' : 'seed',
     drops: 0,
@@ -191,8 +207,8 @@ function plantItem(st: GardenState, e: PlantEntry): void {
   });
 }
 
-/** Применить ответ к состоянию (мутирует). Не посаженное игнорируется. */
-export function applyAnswer(st: GardenState, a: AnswerEntry): Outcome {
+/** Применить ответ к состоянию (мутирует). Не посаженное игнорируется. `legacy` — ответ до `prodFrom`: любой верный rp = «сам». */
+export function applyAnswer(st: GardenState, a: AnswerEntry, legacy = false): Outcome {
   const it = st.items.get(a.id);
   if (!it) return { kind: 'none', xp: 0, from: null, to: null };
   it.lastAnswer = a.t;
@@ -224,6 +240,7 @@ export function applyAnswer(st: GardenState, a: AnswerEntry): Outcome {
   it.days.add(a.day);
   if (a.side === 'rp') it.rpOk = true;
   if (a.self) it.selfOk = true;
+  if (a.prod || (legacy && a.side === 'rp')) it.prodOk = true;
   let kind: Outcome['kind'] = 'water';
   let to: Stage | null = it.stage;
   if (it.stage === 'seed' && it.drops >= SPROUT_DROPS) {
@@ -238,10 +255,11 @@ export function applyAnswer(st: GardenState, a: AnswerEntry): Outcome {
     to = 'bush';
     kind = 'grow';
     xp += XP.stage;
-  } else if (it.stage === 'bush' && it.days.size >= HARVEST_DAYS && it.rpOk && (!it.needSelf || it.selfOk)) {
+  } else if (it.stage === 'bush' && it.days.size >= HARVEST_DAYS && it.rpOk && (!it.needSelf || it.selfOk) && (!it.needProd || it.prodOk)) {
     it.stage = null;
     it.drops = 0;
     it.selfOk = false;
+    it.prodOk = false;
     it.harvests = 1;
     it.lastHarvest = a.t;
     it.firstHarvestDay = a.day;
@@ -261,9 +279,11 @@ export function derive(g: GardenSave): GardenState {
   const ev: ({ p: PlantEntry } | { a: AnswerEntry })[] = [...g.planted.map((p) => ({ p })), ...g.log.map((a) => ({ a }))];
   // Стабильная сортировка: при равном времени посадка первой.
   ev.sort((x, y) => ('p' in x ? x.p.t : x.a.t) - ('p' in y ? y.p.t : y.a.t) || ('p' in x ? 0 : 1) - ('p' in y ? 0 : 1));
+  // Нет отметки — сохранение до игры 5: весь журнал по прежнему правилу.
+  const prodFrom = g.prodFrom ?? Infinity;
   for (const e of ev) {
     if ('p' in e) plantItem(st, e.p);
-    else applyAnswer(st, e.a);
+    else applyAnswer(st, e.a, e.a.t < prodFrom);
   }
   return st;
 }
@@ -306,9 +326,13 @@ export function progressText(it: ItemState | undefined, now: number, day?: numbe
     if (!it.sides.pr) return 'нужно ответить с польского';
     return 'ещё 1 полив до кустика';
   }
-  // Куст: дни (сегодняшний, если ещё не засчитан, идёт в счёт) и ответ по-польски.
+  // Куст: дни (сегодняшний, если ещё не засчитан, идёт в счёт) и ответ по-польски (у слова — собранный сам, игра 5).
   const today = day !== undefined && !it.days.has(day);
   const left = Math.max(0, HARVEST_DAYS - it.days.size);
+  if (needsProd(it)) {
+    if (left <= 1 && (left === 0 || today)) return `осталось: ${SPELL_TODO} — и урожай`;
+    return `${SPELL_TODO}; до урожая: ещё ${left} ${plural(left, 'день', 'дня', 'дней')}`;
+  }
   if (!it.rpOk) {
     if (left <= 1 && (left === 0 || today)) return 'нужно ответить по-польски — и урожай';
     return `нужно ответить по-польски; до урожая: ещё ${left} ${plural(left, 'день', 'дня', 'дней')}`;
@@ -316,6 +340,14 @@ export function progressText(it: ItemState | undefined, now: number, day?: numbe
   if (left === 0 || (left === 1 && today)) return 'созреет со следующим верным ответом';
   if (today) return `до урожая: ещё ${left} ${plural(left, 'день', 'дня', 'дней')}, сегодняшний тоже в счёт`;
   return `до урожая: ещё ${left} ${plural(left, 'день', 'дня', 'дней')}`;
+}
+
+/** Чего не хватает слову для урожая, если не хватает ответа «сам» (подсказка в задании, карточке, словаре и на доске). */
+export const SPELL_TODO = 'собери слово в игре «Собери слово»';
+
+/** Кусту слова для урожая не хватает ответа «сам» по-польски (игра 5). */
+export function needsProd(it: ItemState): boolean {
+  return it.stage === 'bush' && it.needProd && !it.prodOk;
 }
 
 /** Что нужно до урожая, с большой буквы (словарь, карточка растения). */
@@ -339,7 +371,7 @@ export function ripeSoon(st: GardenState, day: number): { today: number; tomorro
     if (it.stage === null) continue;
     const has = it.days.has(day);
     const days = it.days.size + (has ? 0 : 1);
-    if (it.stage === 'bush' && it.rpOk) {
+    if (it.stage === 'bush' && it.rpOk && !needsProd(it)) {
       if (days >= HARVEST_DAYS) {
         today++;
         continue;
@@ -404,17 +436,19 @@ export function syncSlots(g: GardenSave, st: GardenState, now: number): GardenSa
   return same ? g : { ...g, slots, tier };
 }
 
-/** Сторона мини-игры: 1 и 4 — с польского (узнать), 2 и 3 — на польский (написать/собрать). */
+/** Сторона мини-игры: 1 и 4 — с польского (узнать), 2, 3 и 5 — на польский (написать/собрать; игра 5 «наоборот» — pr). */
 export const sideOf = (mode: GameMode): Side => (mode === 1 || mode === 4 ? 'pr' : 'rp');
-export const modeKind = (mode: GameMode): 'word' | 'phrase' => (mode <= 2 ? 'word' : 'phrase');
+export const modeKind = (mode: GameMode): 'word' | 'phrase' => (mode <= 2 || mode === 5 ? 'word' : 'phrase');
+/** Игры сборки фраз (3 и 4). */
+export const isAssembleMode = (mode: GameMode): boolean => mode === 3 || mode === 4;
 
-/** Продвинет ли верный ответ в эту сторону растение сегодня (стадию или к урожаю). */
-export function canProgress(it: ItemState, side: Side, day: number, now: number): boolean {
+/** Продвинет ли верный ответ в эту сторону растение сегодня (стадию или к урожаю). `prod` — ответ будет «сам» (игра 5 по-польски). */
+export function canProgress(it: ItemState, side: Side, day: number, now: number, prod = false): boolean {
   if (isOverripe(it, now)) return true;
   if (it.stage === 'seed') return true;
   // Росток: ответ в недостающую сторону, или обе стороны уже были (за один ответ — одна стадия, куст ждёт следующего).
   if (it.stage === 'sprout') return !it.sides[side] || it.sides[side === 'pr' ? 'rp' : 'pr'];
-  if (it.stage === 'bush') return !it.days.has(day) || (side === 'rp' && !it.rpOk);
+  if (it.stage === 'bush') return !it.days.has(day) || (side === 'rp' && !it.rpOk) || (prod && needsProd(it));
   return false;
 }
 
@@ -431,6 +465,10 @@ export interface PickOpts {
   outside?: boolean;
   /** Растения на паузе (игры 3 и 4 с одной-двумя фразами, F5b): их не берём вовсе, даже если больше брать нечего (тогда null). */
   exclude?: ReadonlySet<string>;
+  /** Игра 5: сторона сборки (по умолчанию rp — по-польски, ответ «сам»; pr — по-русски). */
+  side?: Side;
+  /** Игра 5: слово годится для сборки в эту сторону (русский перевод из букв). По умолчанию все. */
+  spellable?: (id: string, side: Side) => boolean;
 }
 
 /** Сколько заданий подряд одно растение не повторяется (P3a: было 5; при 5 очередь вынужденно крутит ≥ 6 растений и не концентрируется). */
@@ -450,16 +488,19 @@ export function answersOnDay(g: GardenSave, day: number): Map<string, number> {
 }
 
 /**
- * Дать ли задание «наоборот» (игра 2 — с польского выбором, игра 1 — на польский выбором): растению для куста или урожая не хватает другой стороны, а ответ в сторону игры ему сейчас не нужен.
+ * Дать ли задание «наоборот» (игра 2 — с польского выбором, игра 1 — на польский выбором, игра 5 — сборка в другую сторону `side`):
+ * растению для куста или урожая не хватает другой стороны, а ответ в сторону игры ему сейчас не нужен.
+ * `side` — сторона игры (по умолчанию `sideOf(mode)`; у игры 5 её выбирает игрок переключателем).
  */
-export function wantsReverse(it: ItemState, mode: GameMode, day: number, now: number): boolean {
-  if (mode > 2 || it.stage === null || isOverripe(it, now)) return false;
-  const side = sideOf(mode);
+export function wantsReverse(it: ItemState, mode: GameMode, day: number, now: number, side: Side = sideOf(mode)): boolean {
+  if (isAssembleMode(mode) || it.stage === null || isOverripe(it, now)) return false;
   if (it.sideAns[side] < REVERSE_MIN_DIRECT) return false;
   const other: Side = side === 'pr' ? 'rp' : 'pr';
-  if (harvestsNow(it, side, day)) return false;
-  if (harvestsNow(it, other, day)) return true;
-  return !needsSide(it, side) && needsSide(it, other);
+  const prodOf = (s: Side): boolean => mode === 5 && s === 'rp';
+  if (harvestsNow(it, side, day, prodOf(side))) return false;
+  if (harvestsNow(it, other, day, prodOf(other))) return true;
+  const needs = (s: Side): boolean => needsSide(it, s) || (prodOf(s) && needsProd(it));
+  return !needs(side) && needs(other);
 }
 
 /** Задание «наоборот» не чаще, чем каждое REVERSE_EVERY-е. */
@@ -473,15 +514,23 @@ export const FOCUS_SIZE = 8;
 /** Из скольких заданий одно берётся из-за пределов рабочего набора. */
 export const FOCUS_EVERY = 5;
 
-/** На сегодня больше нечего дать: ни стадии, ни зачёта дня (куст уже засчитан сегодня и с «по-польски»). Уходит в конец очереди. */
-export function settledToday(it: ItemState, day: number, now: number): boolean {
+/**
+ * На сегодня больше нечего дать: ни стадии, ни зачёта дня (куст уже засчитан сегодня и с «по-польски»). Уходит в конец очереди.
+ * `prod` — игра может дать ответ «сам» (игра 5): кусту слова без него ещё есть что дать.
+ */
+export function settledToday(it: ItemState, day: number, now: number, prod = false): boolean {
   if (it.stage !== 'bush' || isOverripe(it, now)) return false;
-  return !(['pr', 'rp'] as Side[]).some((s) => canProgress(it, s, day, now) || harvestsNow(it, s, day));
+  return !(['pr', 'rp'] as Side[]).some((s) => canProgress(it, s, day, now, prod && s === 'rp') || harvestsNow(it, s, day, prod && s === 'rp'));
 }
 
-/** Верный ответ в эту сторону сейчас соберёт урожай. */
-export function harvestsNow(it: ItemState, side: Side, day: number): boolean {
-  return it.stage === 'bush' && (it.rpOk || side === 'rp') && it.days.size + (it.days.has(day) ? 0 : 1) >= HARVEST_DAYS;
+/** Верный ответ в эту сторону сейчас соберёт урожай. `prod` — ответ будет «сам» (игра 5 по-польски). */
+export function harvestsNow(it: ItemState, side: Side, day: number, prod = false): boolean {
+  return (
+    it.stage === 'bush' &&
+    (it.rpOk || side === 'rp') &&
+    (!it.needProd || it.prodOk || (prod && side === 'rp')) &&
+    it.days.size + (it.days.has(day) ? 0 : 1) >= HARVEST_DAYS
+  );
 }
 
 /** Растению сегодня не хватает зачёта дня для урожая: рост уже начат в прошлые дни, сегодня верного ответа ещё нет. */
@@ -506,10 +555,15 @@ export function needsSide(it: ItemState, side: Side): boolean {
  * Одно и то же растение не раньше, чем через `repeatGap` заданий.
  */
 export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: number, day: number, opts: PickOpts = {}): string | null {
-  const side = sideOf(mode);
+  const side = mode === 5 ? (opts.side ?? 'rp') : sideOf(mode);
   const assemble = opts.assemble ?? (() => true);
+  const spellable = opts.spellable ?? (() => true);
+  const rev = !!opts.reverse && !isAssembleMode(mode);
+  const other: Side = side === 'pr' ? 'rp' : 'pr';
+  // Игра 5: слова (фразы — нет). «Наоборот» берёт слово, которое собирается и в другую сторону.
   const pool = [...st.items.values()].filter((it) => {
     if (!(g.slots[it.id] !== undefined || isOverripe(it, now)) || !(it.stage !== null || isOverripe(it, now))) return false;
+    if (mode === 5) return !it.phrase && (spellable(it.id, side) || (rev && spellable(it.id, other)));
     if (mode <= 2) return !it.phrase || !assemble(it.id);
     return it.phrase && assemble(it.id);
   });
@@ -517,15 +571,18 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
   const today = answersOnDay(g, day);
   const gap = repeatGap(pool.length);
   const banned = new Set(gap > 0 ? (opts.recent ?? []).slice(-gap) : []);
-  const other: Side = side === 'pr' ? 'rp' : 'pr';
-  const rev = !!opts.reverse && mode <= 2;
+  // Ответ «сам» (production): игра 5 по-польски. «Наоборот» игры 5 по-русски даёт его в другую сторону.
+  const prodS = mode === 5 && side === 'rp';
+  const prodO = mode === 5 && other === 'rp';
   // «Наоборот» только растениям, у которых уже есть 2 верных ответа в прямой стороне игры.
-  const revFor = (it: ItemState): boolean => rev && it.sideAns[side] >= REVERSE_MIN_DIRECT;
+  const revFor = (it: ItemState): boolean => rev && it.sideAns[side] >= REVERSE_MIN_DIRECT && (mode !== 5 || spellable(it.id, other));
+  const direct = (it: ItemState): boolean => mode !== 5 || spellable(it.id, side);
+  const settled = (it: ItemState): boolean => settledToday(it, day, now, mode === 5);
   const progressOf = (it: ItemState): number => (STAGE_RANK[it.stage ?? 'seed'] ?? 0) * 100 + it.days.size * 10 + it.drops;
   // Рабочий набор (P3a): FOCUS_SIZE ближайших к урожаю растений, которым сегодня ещё есть что дать; порядок устойчивый (по посадке).
   const focus = new Set(
     pool
-      .filter((it) => it.stage !== null && !settledToday(it, day, now))
+      .filter((it) => it.stage !== null && !settled(it))
       .sort((a, b) => progressOf(b) - progressOf(a) || b.answers - a.answers || a.plantedAt - b.plantedAt || (g.slots[a.id] ?? 0) - (g.slots[b.id] ?? 0))
       .slice(0, FOCUS_SIZE)
       .map((it) => it.id),
@@ -533,20 +590,23 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
   const key = (it: ItemState): number[] => {
     const over = isOverripe(it, now);
     const r = revFor(it);
-    const helps = over || canProgress(it, side, day, now) || (r && canProgress(it, other, day, now));
+    const d = direct(it);
+    const helps = over || (d && canProgress(it, side, day, now, prodS)) || (r && canProgress(it, other, day, now, prodO));
     const progress = progressOf(it);
     const day0 = !over && needsDay(it, day);
-    const side0 = !over && !day0 && (needsSide(it, side) || (r && needsSide(it, other)));
+    const needs = (s: Side, prod: boolean): boolean => needsSide(it, s) || (prod && needsProd(it));
+    const side0 = !over && !day0 && ((d && needs(side, prodS)) || (r && needs(other, prodO)));
     const inFocus = focus.has(it.id);
+    const harvest = (d && harvestsNow(it, side, day, prodS)) || (r && harvestsNow(it, other, day, prodO));
     // Ответу в этой игре сегодня нечего дать (ни стадии, ни зачёта дня): в конец, даже если растение в рабочем наборе
     // (P4a: `Dobranoc` 3 раза за 18 заданий без пользы).
-    const useless = !helps && !harvestsNow(it, side, day) && !(r && harvestsNow(it, other, day)) && it.days.has(day);
+    const useless = !helps && !harvest && it.days.has(day);
     return [
       // Созревшее на сегодня (зачёт дня есть, до урожая нужен только следующий день) — в самый конец.
-      settledToday(it, day, now) ? 1 : 0,
+      settled(it) ? 1 : 0,
       useless ? 1 : 0,
       over ? 0 : 1,
-      !over && (harvestsNow(it, side, day) || (r && harvestsNow(it, other, day))) ? 0 : 1,
+      !over && harvest ? 0 : 1,
       // Рабочий набор вперёд; для «редкого» задания (каждое FOCUS_EVERY-е) — наоборот, остальные вперёд, ближние к урожаю раньше.
       opts.outside ? (inFocus ? 1 : 0) : inFocus ? 0 : 1,
       opts.outside && !inFocus ? -progress : 0,
@@ -580,11 +640,17 @@ export function normalizeGarden(raw: unknown): GardenSave {
     : [];
   const log = Array.isArray(r.log)
     ? r.log
-        .filter((a): a is AnswerEntry => !!a && typeof a === 'object' && typeof a.id === 'string' && num(a.t) && num(a.day) && (a.side === 'pr' || a.side === 'rp') && typeof a.ok === 'boolean' && [1, 2, 3, 4].includes(a.mode))
-        .map((a) => ({ t: a.t, day: a.day, id: a.id, side: a.side, ok: a.ok, mode: a.mode, ...(a.self === true ? { self: true } : {}) }))
+        .filter((a): a is AnswerEntry => !!a && typeof a === 'object' && typeof a.id === 'string' && num(a.t) && num(a.day) && (a.side === 'pr' || a.side === 'rp') && typeof a.ok === 'boolean' && [1, 2, 3, 4, 5].includes(a.mode))
+        .map((a) => ({ t: a.t, day: a.day, id: a.id, side: a.side, ok: a.ok, mode: a.mode, ...(a.self === true ? { self: true } : {}), ...(a.prod === true ? { prod: true } : {}) }))
     : [];
   const slots: Record<string, number> = {};
   if (r.slots && typeof r.slots === 'object') for (const [k, v] of Object.entries(r.slots as Record<string, unknown>)) if (num(v) && v >= 0) slots[k] = Math.trunc(v);
   const tier = num(r.tier) ? Math.max(0, Math.min(TIER_CAP.length - 1, Math.trunc(r.tier))) : 0;
-  return { planted, log, slots, tier };
+  return withProdFrom({ planted, log, slots, tier, ...(num(r.prodFrom) ? { prodFrom: r.prodFrom } : {}) });
+}
+
+/** Сохранение до игры 5 (нет `prodFrom`): весь его журнал — по прежнему правилу (любой верный rp = «сам»), прогресс не теряется. */
+export function withProdFrom(g: GardenSave): GardenSave {
+  if (g.prodFrom !== undefined) return g;
+  return { ...g, prodFrom: g.log.reduce((m, a) => Math.max(m, a.t + 1), 0) };
 }

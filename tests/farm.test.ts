@@ -17,13 +17,13 @@ function setup() {
   return { bus, farm, acts, xp, saved: () => saved, setNow: (t: number) => (now = t), now: () => now };
 }
 
-const solve = (f: ReturnType<typeof setup>['farm'], mode: 1 | 2 | 3 | 4) => {
+const solve = (f: ReturnType<typeof setup>['farm'], mode: 1 | 2 | 3 | 4 | 5) => {
   const q = f.next(mode)!;
   const ans = q.kind === 'tiles' ? q.answer : q.answer;
   return f.answer(q, ans);
 };
 
-const solveId = (f: ReturnType<typeof setup>['farm'], mode: 1 | 2 | 3 | 4, id: string) => {
+const solveId = (f: ReturnType<typeof setup>['farm'], mode: 1 | 2 | 3 | 4 | 5, id: string) => {
   const q = f.next(mode, id)!;
   return f.answer(q, q.answer);
 };
@@ -43,11 +43,15 @@ describe('ферма: фасад', () => {
     expect(f.info('w.dzien_dobry').stage).toBe('bush');
     expect(f.missingWords('p.dzien_dobry')).toEqual([]);
     expect(f.plant(['p.dzien_dobry']).planted).toBe(1);
-    expect(f.next(2, 'w.dzien_dobry')!.kind).toBe('type');
+    // Игра 2 — только выбор; слово «само» для урожая собирают в игре 5, «Повторить» ведёт туда.
+    expect(f.next(2, 'w.dzien_dobry')!.kind).toBe('choice');
+    expect(f.reviewMode('w.dzien_dobry')).toBe(5);
+    expect(f.counts()).toMatchObject({ words: 1, spell: 1 });
     s.setNow(s.now() + DAY_MS);
     expect(solveId(f, 1, 'w.dzien_dobry').act.kind).toBe('water');
     s.setNow(s.now() + DAY_MS);
-    const last = solveId(f, 1, 'w.dzien_dobry');
+    expect(f.info('w.dzien_dobry')).toMatchObject({ prod: false, next: 'Осталось: собери слово в игре «Собери слово» — и урожай' });
+    const last = solveId(f, 5, 'w.dzien_dobry');
     expect(last.act).toMatchObject({ kind: 'harvest', id: 'w.dzien_dobry', tile: [12, 14], xp: 11 });
     expect(f.info('w.dzien_dobry').status).toBe('grown');
     expect(f.stats()).toMatchObject({ grownToday: 1, grownTotal: 1, grownWords: 1 });
@@ -56,7 +60,7 @@ describe('ферма: фасад', () => {
     // Ошибка: правильный ответ и минус капля.
     // «Dzień dobry.» короче 3 плиток: в сборку не идёт, растёт в играх 1 и 2 как слово.
     expect(f.next(3)).toBeNull();
-    expect(f.counts()).toEqual({ words: 0, phrases: 1, assemble: 0 });
+    expect(f.counts()).toEqual({ words: 0, phrases: 1, assemble: 0, spell: 0 });
     const q = f.next(1, 'p.dzien_dobry')!;
     expect(q.kind).toBe('choice');
     const r = f.answer(q, 'не то');
@@ -89,7 +93,7 @@ describe('ферма: фасад', () => {
     for (let i = 0; i < 40; i++) {
       const q = f.next(i % 2 ? 2 : 1)!;
       seen.push(q.id);
-      f.answer(q, q.kind === 'choice' ? q.answer : q.kind === 'type' ? q.answer : '');
+      f.answer(q, q.kind === 'choice' ? q.answer : '');
     }
     for (let i = 3; i < seen.length; i++) expect(seen.slice(i - 3, i)).not.toContain(seen[i]);
     // Первые 19 заданий не размазаны по всем 19: рабочий набор (до 8) и по одному «редкому» из 5.

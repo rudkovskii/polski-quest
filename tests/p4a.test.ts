@@ -1,9 +1,9 @@
 // @vitest-environment happy-dom
 // P4a: баги теста 4. Стрелка над домом ведёт в дверь (B2), шапка словаря низкая (B1), позиция героя пишется на стоянке (B3),
-// слова в мини-игре не рвутся и итог виден (B4/B5), «напиши сам» в игре 2 встречается, тема целиком — мягкий выбор, повторы без пользы.
+// слова в мини-игре не рвутся и итог виден (B4/B5), тема целиком — мягкий выбор, повторы без пользы. «Напиши сам» с 19.10 — игра 5.
 import { describe, expect, it, vi } from 'vitest';
 import sprites from '../public/atlas/sprites.json';
-import { createFarm, isTypedStage } from '../src/systems/farm';
+import { createFarm } from '../src/systems/farm';
 import { canProgress, DAY_MS, dayOf, harvestsNow, isOverripe, newGarden, sideOf, type GardenSave } from '../src/systems/garden';
 import type { Question } from '../src/systems/quiz';
 import type { GameMode } from '../src/types/farm';
@@ -153,24 +153,27 @@ function simulate(seed: number, onTask: (q: Question, mode: GameMode, useful: bo
   const farm = createFarm({ bus: testBus(), load: () => saved, save: (g) => (saved = g), now: () => now, tz: () => 0, say: () => {}, rand: seeded(seed) });
   farm.plant(farm.words.slice(0, 19).map((w) => w.id));
   const r = seeded(seed + 100);
-  const plan: [number, number][] = [
-    [20, 13],
-    [19, 6],
-    [18, 8],
+  // По дням: игра 1, игра 2, игра 5 («Собери слово», с 19.10 нужна слову для урожая).
+  const plan: [number, number, number][] = [
+    [20, 8, 5],
+    [19, 3, 3],
+    [18, 4, 4],
   ];
   let t = 0;
-  plan.forEach(([g1, g2], d) => {
+  plan.forEach(([g1, g2, g5], d) => {
     for (const [mode, n] of [
       [1, g1],
       [2, g2],
+      [5, g5],
     ] as [GameMode, number][])
       for (let i = 0; i < n; i++) {
         now = T0 + d * DAY_MS + ++t * 60_000;
         const q = farm.next(mode)!;
         const it = farm.state.items.get(q.id)!;
-        const side = sideOf(q.reverse ? (mode === 1 ? 2 : 1) : mode);
+        const side = q.kind === 'spell' ? q.dir : sideOf(q.reverse ? (mode === 1 ? 2 : 1) : mode);
+        const prod = q.kind === 'spell' && q.dir === 'rp';
         const day = dayOf(now, 0);
-        const useful = isOverripe(it, now) || canProgress(it, side, day, now) || harvestsNow(it, side, day) || !it.days.has(day);
+        const useful = isOverripe(it, now) || canProgress(it, side, day, now, prod) || harvestsNow(it, side, day, prod) || !it.days.has(day);
         onTask(q, mode, useful, d);
         farm.answer(q, r() < 0.87 ? q.answer : 'zzz');
       }
@@ -178,31 +181,15 @@ function simulate(seed: number, onTask: (q: Question, mode: GameMode, useful: bo
   return farm.stats().grownTotal;
 }
 
-describe('очередь: «напиши сам» и повторы', () => {
-  it('ввод в игре 2: кустик, перезревшее и почти кустик (росток с обеими сторонами); семя и росток с одной стороной — выбор', () => {
-    const sides = (pr: boolean, rp: boolean) => ({ stage: 'sprout', sides: { pr, rp } });
-    expect(isTypedStage(sides(true, true), 'sprout')).toBe(true);
-    expect(isTypedStage(sides(true, false), 'sprout')).toBe(false);
-    expect(isTypedStage(undefined, 'bush')).toBe(true);
-    expect(isTypedStage(undefined, 'overripe')).toBe(true);
-    expect(isTypedStage({ stage: 'seed', sides: { pr: true, rp: true } }, 'seed')).toBe(false);
-  });
-
-  it('за 3 дня (84 ответа) ввод встречается в игре 2 в каждом прогоне, в день 3 — почти всегда', () => {
-    let day3 = 0;
-    for (let seed = 1; seed <= 20; seed++) {
-      let typed = 0;
-      let typedDay3 = 0;
-      simulate(seed, (q, mode, _u, d) => {
-        if (mode === 2 && q.kind === 'type') {
-          typed++;
-          if (d === 2) typedDay3++;
-        }
-      });
-      expect(typed, `seed ${seed}`).toBeGreaterThan(0);
-      if (typedDay3 > 0) day3++;
+describe('очередь: игра 2 без ввода, игра 5 и повторы', () => {
+  it('за 3 дня игра 2 — только выбор, игра 5 — всегда сборка слова; урожай есть в каждом прогоне', () => {
+    for (let seed = 1; seed <= 10; seed++) {
+      const kinds: Record<number, Set<string>> = { 1: new Set(), 2: new Set(), 5: new Set() };
+      const grown = simulate(seed, (q, mode) => kinds[mode]!.add(q.kind));
+      expect([...kinds[2]!]).toEqual(['choice']);
+      expect([...kinds[5]!]).toEqual(['spell']);
+      expect(grown, `seed ${seed}`).toBeGreaterThan(0);
     }
-    expect(day3).toBeGreaterThanOrEqual(18);
   });
 
   it('при рабочем наборе ≥ 4 одно слово не чаще раза в 4 задания; задания без пользы — только когда больше нечего дать', () => {

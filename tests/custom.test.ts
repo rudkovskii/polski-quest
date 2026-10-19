@@ -222,7 +222,8 @@ describe('ферма: свои слова', () => {
     farm.plant([id]);
     for (let day = 0; day < 4; day++) {
       now.t = T0 + day * 86_400_000;
-      for (const mode of [1, 2, 1, 2] as const) {
+      // Игра 5 — слово собрано само (нужно для урожая слова).
+      for (const mode of [1, 5, 1, 2] as const) {
         const q = farm.next(mode, id)!;
         farm.answer(q, q.answer);
       }

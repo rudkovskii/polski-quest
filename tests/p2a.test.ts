@@ -43,7 +43,8 @@ function play(pattern: (i: number) => GameMode, per = 20, seed = 1): number {
     let t = T0 + d * DAY_MS;
     for (let i = 0; i < per; i++) {
       s.setNow((t += 60_000));
-      const q = s.farm.next(pattern(i))!;
+      const q = s.farm.next(pattern(i));
+      if (!q) continue;
       s.farm.answer(q, r() < 0.85 ? q.answer : 'zzz');
     }
   }
@@ -51,20 +52,35 @@ function play(pattern: (i: number) => GameMode, per = 20, seed = 1): number {
 }
 
 describe('P2a: очередь ведёт к урожаю', () => {
-  it('19 слов, 3 дня по 20 ответов (85% верно), игры 1 и 2 вперемешку → не меньше 8 урожаев', () => {
+  it('19 слов, 3 дня по 20 ответов (85% верно), игры 1, 2 и 5 вперемешку → не меньше 8 урожаев', () => {
+    // С 19.10 слову для урожая нужно собрать его самому в игре 5 («Собери слово»): один раз за рост, в любой день.
     for (const seed of [1, 2, 3]) {
-      expect(play((i) => (i < 10 ? 1 : 2), 20, seed)).toBeGreaterThanOrEqual(8); // 10 в игре 1, потом 10 в игре 2
-      expect(play((i) => (i < 10 ? 2 : 1), 20, seed)).toBeGreaterThanOrEqual(8);
-      expect(play((i) => (i % 2 ? 2 : 1), 20, seed)).toBeGreaterThanOrEqual(8); // через раз
+      expect(play((i) => (i < 10 ? 1 : 5), 20, seed)).toBeGreaterThanOrEqual(8); // 10 в игре 1, потом 10 в игре 5
+      expect(play((i) => ([1, 2, 5] as const)[i % 3]!, 20, seed)).toBeGreaterThanOrEqual(8); // по очереди
+      expect(play((i) => (i < 7 ? 1 : i < 14 ? 2 : 5), 20, seed)).toBeGreaterThanOrEqual(7); // по раунду в каждой
     }
   });
 
-  it('только игра 2 (или только игра 1): 19 слов, 3 дня по 20 ответов → не меньше 6 урожаев за счёт заданий «наоборот»', () => {
-    // P3a: «наоборот» открывается позже (после 10 ответов и двух ответов слова в его стороне), поэтому в одной игре чуть медленнее.
-    for (const seed of [1, 2, 3]) {
-      expect(play(() => 2, 20, seed)).toBeGreaterThanOrEqual(6);
-      expect(play(() => 1, 20, seed)).toBeGreaterThanOrEqual(6);
-    }
+  it('только игра 5: 19 слов, 3 дня по 20 ответов → не меньше 6 урожаев (другая сторона — сборкой «наоборот» по-русски)', () => {
+    for (const seed of [1, 2, 3]) expect(play(() => 5, 20, seed)).toBeGreaterThanOrEqual(6);
+  });
+
+  it('только игры 1 и 2: урожая нет, но кусты говорят, что осталось собрать слово в игре «Собери слово»', () => {
+    const s = setup();
+    const ids = s.farm.words.filter((w) => w.topic === s.farm.words[0]!.topic).slice(0, 6).map((w) => w.id);
+    s.farm.plant(ids);
+    for (let d = 0; d < 3; d++)
+      for (let i = 0; i < 20; i++) {
+        s.setNow(T0 + d * DAY_MS + (i + 1) * 60_000);
+        const q = s.farm.next(i % 2 ? 2 : 1)!;
+        s.farm.answer(q, q.answer);
+      }
+    expect(s.farm.stats().grownTotal).toBe(0);
+    for (const id of ids) expect(s.farm.info(id)).toMatchObject({ stage: 'bush', prod: false, next: 'Осталось: собери слово в игре «Собери слово» — и урожай' });
+    expect(s.farm.counts().spell).toBe(6);
+    // Одна сборка — и урожай.
+    const q = s.farm.next(5)!;
+    expect(s.farm.answer(q, q.answer).act.kind).toBe('harvest');
   });
 
   it('«наоборот»: в игре 2 — с польского выбором, не чаще каждого 3-го задания, по «Повторить» не бывает', () => {
@@ -85,7 +101,8 @@ describe('P2a: очередь ведёт к урожаю', () => {
     for (const i of rev) expect(qs[i]).toMatchObject({ mode: 1, kind: 'choice', promptLang: 'pl' });
     for (let k = 1; k < rev.length; k++) expect(rev[k]! - rev[k - 1]!).toBeGreaterThanOrEqual(3);
     for (const q of qs) if (!q.reverse) expect(q.mode).toBe(2);
-    expect(s.farm.stats().grownTotal).toBe(6);
+    // Без игры 5 слова доходят до кустика с тремя днями и ждут сборки.
+    for (const id of ids) expect(s.farm.info(id).next).toBe('Осталось: собери слово в игре «Собери слово» — и урожай');
     // Росток без «с польского»: по «Повторить» (only) — без подмены.
     const t = setup();
     t.farm.plant(['w.kot']);
@@ -110,7 +127,7 @@ describe('P2a: очередь ведёт к урожаю', () => {
     s.farm.plant([id]);
     const kinds: string[] = [];
     for (let d = 0; d < 3; d++) {
-      for (const m of [1, 2] as const) {
+      for (const m of [1, 5] as const) {
         s.setNow(T0 + d * DAY_MS + m * 60_000);
         const q = s.farm.next(m)!;
         if (s.farm.info(id).status === 'grown') break;
@@ -168,7 +185,7 @@ describe('P2a: прогресс до урожая виден', () => {
     g = plant(g, derive(g), ['w.kot'], T0).save;
     const day = (n: number) => dayOf(T0 + n * DAY_MS);
     const at = (gg: GardenSave) => derive(gg).items.get('w.kot');
-    const add = (gg: GardenSave, t: number, mode: GameMode): GardenSave => ({ ...gg, log: [...gg.log, { t, day: dayOf(t), id: 'w.kot', side: mode === 1 ? 'pr' : 'rp', ok: true, mode }] });
+    const add = (gg: GardenSave, t: number, mode: GameMode): GardenSave => ({ ...gg, log: [...gg.log, { t, day: dayOf(t), id: 'w.kot', side: mode === 1 ? 'pr' : 'rp', ok: true, mode, ...(mode === 5 ? { prod: true } : {}) }] });
     expect(progressText(at(g), T0, day(0))).toBe('ещё 2 полива до ростка');
     g = add(g, T0 + 1, 1);
     expect(progressText(at(g), T0, day(0))).toBe('ещё 1 полив до ростка');
@@ -176,6 +193,9 @@ describe('P2a: прогресс до урожая виден', () => {
     expect(progressText(at(g), T0, day(0))).toBe('нужно ответить по-польски');
     g = add(g, T0 + 3, 2);
     expect(at(g)!.stage).toBe('bush');
+    // Выбор по-польски сделал кустик, но слово ещё не собрано само.
+    expect(progressText(at(g), T0 + 4, day(0))).toBe('собери слово в игре «Собери слово»; до урожая: ещё 2 дня');
+    g = add(g, T0 + 4, 5);
     expect(progressText(at(g), T0 + 4, day(0))).toBe('до урожая: ещё 2 дня');
     g = add(g, T0 + DAY_MS, 1);
     expect(progressText(at(g), T0 + DAY_MS, day(1))).toBe('до урожая: ещё 1 день');
@@ -195,7 +215,7 @@ describe('P2a: прогресс до урожая виден', () => {
     const q2 = s.farm.next(1, id)!;
     const r2 = s.farm.answer(q2, q2.answer);
     expect(r2.progress).toBe('нужно ответить по-польски');
-    const q3 = s.farm.next(2, id)!;
+    const q3 = s.farm.next(5, id)!;
     const r3 = s.farm.answer(q3, q3.answer);
     expect(r3.progress).toBe('до урожая: ещё 2 дня');
     s.setNow(T0 + DAY_MS);

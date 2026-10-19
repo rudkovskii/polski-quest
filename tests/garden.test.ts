@@ -31,8 +31,9 @@ function garden(ids: string[], t = T0): GardenSave {
   return syncSlots(plant(g, derive(g), ids, t).save, derive(plant(g, derive(g), ids, t).save), t);
 }
 
+/** Ответ в журнал; игра 5 (собрал слово по-польски сам) — с пометкой `prod`. */
 function answer(g: GardenSave, id: string, t: number, mode: GameMode, ok = true): GardenSave {
-  const e: AnswerEntry = { t, day: dayOf(t), id, side: mode === 1 || mode === 4 ? 'pr' : 'rp', ok, mode };
+  const e: AnswerEntry = { t, day: dayOf(t), id, side: mode === 1 || mode === 4 ? 'pr' : 'rp', ok, mode, ...(mode === 5 && ok ? { prod: true } : {}) };
   const next = { ...g, log: [...g.log, e] };
   return syncSlots(next, derive(next), t);
 }
@@ -65,7 +66,7 @@ describe('рост', () => {
 
   it('нельзя созреть за один календарный день: урожай только на 3-й разный день', () => {
     let g = garden(['w.kot']);
-    for (let i = 1; i <= 30; i++) g = answer(g, 'w.kot', T0 + i * 1000, (i % 2 ? 1 : 2) as GameMode);
+    for (let i = 1; i <= 30; i++) g = answer(g, 'w.kot', T0 + i * 1000, (i % 2 ? 1 : 5) as GameMode);
     expect(stage(g, 'w.kot', T0)).toBe('bush');
     g = answer(g, 'w.kot', D(1), 1);
     expect(stage(g, 'w.kot', D(1))).toBe('bush');
@@ -74,6 +75,43 @@ describe('рост', () => {
     expect(derive(g).items.get('w.kot')!.stage).toBeNull();
     expect(statusOf(derive(g), g, 'w.kot', D(2))).toBe('grown');
     expect(g.slots['w.kot']).toBeUndefined();
+  });
+
+  it('слово: урожай только после слова, собранного самому (игра 5); выбор в игре 2 и подсказка не в счёт', () => {
+    let g = garden(['w.kot']);
+    g = answer(answer(answer(g, 'w.kot', T0 + 1, 1), 'w.kot', T0 + 2, 1), 'w.kot', T0 + 3, 2);
+    g = answer(g, 'w.kot', D(1), 2);
+    g = answer(g, 'w.kot', D(2), 2);
+    expect(stage(g, 'w.kot', D(2))).toBe('bush');
+    expect(nextText(derive(g).items.get('w.kot'), D(2), dayOf(D(2)))).toBe('Осталось: собери слово в игре «Собери слово» — и урожай');
+    // Подсказка «первая буква»: ответ стороны rp без `prod` — не урожай.
+    const hinted: AnswerEntry = { t: D(2) + 1, day: dayOf(D(2)), id: 'w.kot', side: 'rp', ok: true, mode: 5 };
+    g = { ...g, log: [...g.log, hinted] };
+    expect(stage(g, 'w.kot', D(2) + 1)).toBe('bush');
+    g = answer(g, 'w.kot', D(2) + 2, 5);
+    expect(derive(g).items.get('w.kot')!.stage).toBeNull();
+    // Фразе «сам» не нужен: «Dzień dobry.» созревает выбором.
+    let p = garden(['p.dzien_dobry']);
+    p = answer(answer(answer(p, 'p.dzien_dobry', T0 + 1, 1), 'p.dzien_dobry', T0 + 2, 1), 'p.dzien_dobry', T0 + 3, 2);
+    p = answer(answer(p, 'p.dzien_dobry', D(1), 2), 'p.dzien_dobry', D(2), 1);
+    expect(derive(p).items.get('p.dzien_dobry')!.stage).toBeNull();
+  });
+
+  it('старый журнал (до игры 5): ответы по-польски выбором засчитаны как «сам», прогресс не теряется', () => {
+    let g = garden(['w.kot']);
+    g = answer(answer(answer(g, 'w.kot', T0 + 1, 1), 'w.kot', T0 + 2, 1), 'w.kot', T0 + 3, 2);
+    g = answer(g, 'w.kot', D(1), 1);
+    // Сохранение без `prodFrom` (как у Шэфа до 19.10): весь его журнал — по прежнему правилу.
+    const { prodFrom: _drop, ...old } = g;
+    const loaded = normalizeGarden(JSON.parse(JSON.stringify(old)));
+    expect(loaded.prodFrom).toBe(D(1) + 1);
+    expect(derive(loaded).items.get('w.kot')!.prodOk).toBe(true);
+    // День 3 — выбор в игре 1 даёт урожай, как раньше.
+    const after = answer(loaded, 'w.kot', D(2), 1);
+    expect(derive(after).items.get('w.kot')!.stage).toBeNull();
+    expect(normalizeGarden(after).prodFrom).toBe(D(1) + 1);
+    // Новый огород: тот же журнал без `prod` урожая не даёт.
+    expect(derive({ ...after, prodFrom: 0 }).items.get('w.kot')!.stage).toBe('bush');
   });
 
   it('урожай требует хотя бы один верный ответ на польский', () => {
@@ -101,7 +139,7 @@ describe('рост', () => {
     let g = garden(['w.kot']);
     g = answer(g, 'w.kot', T0 + 1, 1);
     g = answer(g, 'w.kot', T0 + 2, 1);
-    g = answer(g, 'w.kot', T0 + 3, 2);
+    g = answer(g, 'w.kot', T0 + 3, 5);
     g = answer(g, 'w.kot', D(1), 1);
     g = answer(g, 'w.kot', D(2), 2);
     const h = D(2);
@@ -183,12 +221,10 @@ describe('задания', () => {
     expect(grade(q, w.ru).ok).toBe(true);
     expect(grade(q, q.options.find((o) => o !== w.ru)!).ok).toBe(false);
   });
-  it('RU→PL: куст — ввод с мягкой проверкой (без диакритики засчитывается)', () => {
+  it('RU→PL: в игре 2 только выбор (ввода «напиши сам» больше нет)', () => {
     const w = WORD_BY_ID.get('w.dzien_dobry')!;
-    const q = makeQuestion(2, w.id, db, seeded(1), true)!;
-    expect(q.kind).toBe('type');
-    expect(grade(q, 'dzien dobry').ok).toBe(true);
-    expect(grade(q, 'do widzenia').ok).toBe(false);
+    const q = makeQuestion(2, w.id, db, seeded(1))!;
+    expect(q.kind).toBe('choice');
   });
   it('плитки: польская и русская сборка с лишними плитками', () => {
     const p = PHRASES[0]!;
@@ -262,7 +298,7 @@ describe('разнообразие очереди', () => {
     const h = T0;
     // быстро вырастить первое слово и вернуть на грядку перезревшим
     for (const [i, day] of [[0, 0], [1, 0], [2, 0], [3, 0]] as const) g = answer(g, ids[0]!, h + i + day, 1);
-    g = answer(g, ids[0]!, h + 10, 2);
+    g = answer(g, ids[0]!, h + 10, 5);
     g = answer(g, ids[0]!, D(1), 1);
     g = answer(g, ids[0]!, D(2), 1);
     expect(derive(g).items.get(ids[0]!)!.harvests).toBe(1);
@@ -307,8 +343,9 @@ describe('короткие фразы и сборка', () => {
     expect(q1.options).toHaveLength(4);
     expect(new Set(q1.options).size).toBe(4);
     expect(grade(q1, PHRASE_BY_ID.get('p.dzien_dobry')!.ru).ok).toBe(true);
-    const q2 = makeQuestion(2, 'p.dzien_dobry', db, seeded(2), true)!;
-    expect(q2.kind).toBe('type');
-    expect(grade(q2, 'dzien dobry').ok).toBe(true);
+    const q2 = makeQuestion(2, 'p.dzien_dobry', db, seeded(2))!;
+    expect(q2.kind).toBe('choice');
+    // Игра 5 — только слова: фраза задания не даёт.
+    expect(makeQuestion(5, 'p.dzien_dobry', db, seeded(2))).toBeNull();
   });
 });

@@ -108,9 +108,12 @@ describe('сохранение: экспорт и импорт', () => {
   it('огород (v2) переживает экспорт и импорт; сохранение v1 читается с пустым огородом', () => {
     const garden = { planted: [{ t: 1, id: 'w.kot' }], log: [{ t: 2, day: 0, id: 'w.kot', side: 'pr' as const, ok: true, mode: 1 as const }], slots: { 'w.kot': 0 }, tier: 0 };
     const s = { ...newSave(NOW), garden };
-    expect(importSave(exportSave(s))).toEqual({ ok: true, save: s });
+    // Огород без отметки игры 5 получает её при загрузке: весь старый журнал — по прежнему правилу урожая.
+    expect(importSave(exportSave(s))).toEqual({ ok: true, save: { ...s, garden: { ...garden, prodFrom: 3 } } });
+    const s2 = { ...s, garden: { ...garden, prodFrom: 3 } };
+    expect(importSave(exportSave(s2))).toEqual({ ok: true, save: s2 });
     const old = normalizeSave({ v: 1, created: 1, updated: 2, position: null, settings: { sound: true } });
-    expect(old?.garden).toEqual({ planted: [], log: [], slots: {}, tier: 0 });
+    expect(old?.garden).toEqual({ planted: [], log: [], slots: {}, tier: 0, prodFrom: 0 });
   });
 
   it('подсказки: флаги переживают экспорт; сохранение без них читается, мусор отбрасывается', () => {

@@ -17,7 +17,7 @@ function setup(seed = 7) {
   return { farm, setNow: (t: number) => (now = t), now: () => now };
 }
 
-/** Тема из 19 слов, 3 дня по `per` ответов, верно с вероятностью `acc`; игры 1 и 2 через раз. */
+/** Тема из 19 слов, 3 дня по `per` ответов, верно с вероятностью `acc`; игры 1, 2 и 5 по очереди (5 — слово собрать самому, 19.10). */
 function play(seed: number, per = 15, acc = 0.75): number {
   const s = setup(seed);
   s.farm.plant(s.farm.words.slice(0, 19).map((w) => w.id));
@@ -25,16 +25,17 @@ function play(seed: number, per = 15, acc = 0.75): number {
   for (let d = 0; d < 3; d++)
     for (let i = 0; i < per; i++) {
       s.setNow(T0 + d * DAY_MS + (i + 1) * 60_000);
-      const q = s.farm.next((i % 2 ? 2 : 1) as GameMode)!;
+      const q = s.farm.next(([1, 2, 5] as GameMode[])[i % 3]!)!;
       s.farm.answer(q, r() < acc ? q.answer : 'zzz');
     }
   return s.farm.stats().grownTotal;
 }
 
 describe('P3a: фокус-грядка', () => {
-  it('19 слов, 3 дня по 15 ответов, 75% верно: в среднем по 20 прогонам не меньше 5 урожаев (без фокуса ≈ 4,7), лучшие прогоны ≥ 6', () => {
+  // С 19.10 слову для урожая нужна ещё сборка в игре 5: в среднем ≈ 4,9 (порядок 1-5-2 — 4,75, 5-1-2 — 5,2; до игры 5 было ≈ 5,3).
+  it('19 слов, 3 дня по 15 ответов, 75% верно (игры 1, 2, 5): в среднем по 20 прогонам не меньше 4,7 урожая, лучшие прогоны ≥ 6', () => {
     const res = Array.from({ length: 20 }, (_, i) => play(i + 1));
-    expect(res.reduce((a, b) => a + b, 0) / res.length).toBeGreaterThanOrEqual(5);
+    expect(res.reduce((a, b) => a + b, 0) / res.length).toBeGreaterThanOrEqual(4.7);
     expect(Math.max(...res)).toBeGreaterThanOrEqual(6);
     expect(Math.min(...res)).toBeGreaterThanOrEqual(3);
   });
@@ -69,7 +70,7 @@ describe('P3a: созревшее на сегодня — в конец', () => 
       s.farm.answer(q, q.answer);
     };
     feed(T0 + 1000, 1);
-    feed(T0 + 2000, 2);
+    feed(T0 + 2000, 5);
     feed(T0 + DAY_MS + 1000, 1);
     return { s, id };
   }

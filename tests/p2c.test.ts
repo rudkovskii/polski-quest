@@ -51,10 +51,10 @@ describe('P2c: тексты прогресса без жаргона', () => {
     let g = newGarden();
     g = plant(g, derive(g), ['w.kot'], T0).save;
     const add = (t: number, mode: GameMode): void => {
-      g = { ...g, log: [...g.log, { t, day: Math.floor(t / DAY_MS), id: 'w.kot', side: mode === 1 ? 'pr' : 'rp', ok: true, mode }] };
+      g = { ...g, log: [...g.log, { t, day: Math.floor(t / DAY_MS), id: 'w.kot', side: mode === 1 ? 'pr' : 'rp', ok: true, mode, ...(mode === 5 ? { prod: true } : {}) }] };
     };
     add(T0 + 1, 1);
-    add(T0 + 2, 2);
+    add(T0 + 2, 5);
     expect(progressText(derive(g).items.get('w.kot'), T0 + 4)).toBe('ещё 1 полив до кустика');
     add(T0 + 5, 1);
     add(T0 + DAY_MS, 1);

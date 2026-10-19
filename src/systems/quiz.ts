@@ -1,21 +1,46 @@
 // Задания мини-игр (ФЕРМА.md, решение 9): чистые функции. Случай приходит параметром (`rand`).
 //   1 Polski → Rosyjski: польское слово, выбор из 4 русских (отвлекающие из той же темы, лучше той же части речи);
-//   2 Rosyjski → Polski: русское слово, выбор из 4 польских; когда слово уже «куст» — ввод с клавиатуры (мягкая проверка);
+//   2 Rosyjski → Polski: русское слово, выбор из 4 польских (ввода «напиши сам» тут больше нет: он ушёл в игру 5, 19.10);
 //   Короткие фразы (меньше 3 плиток, `canAssemble`) растут через игры 1 и 2 как слова: сборка из 1–2 плиток бессмысленна.
 //   3 Złóż zdanie po polsku: русская фраза, плитки tiles_pl + distract_pl;
-//   4 Złóż zdanie po rosyjsku: польская фраза, плитки tiles_ru + distract_ru.
+//   4 Złóż zdanie po rosyjsku: польская фраза, плитки tiles_ru + distract_ru;
+//   5 Ułóż słowo: слово из плиток-букв (`systems/spell.ts`) в сторону `dir` (rp — по-польски, pr — по-русски) или ввод с клавиатуры.
 import type { Phrase, Word } from '../types/content';
-import type { GameMode } from '../types/farm';
-import { checkAnswer, type Verdict } from './answer';
+import type { GameMode, Side } from '../types/farm';
+import type { Verdict } from './answer';
+import { gradeSpell, primaryRu, ruSpellable, ruVariants, spellTarget, spellTiles, type SpellCell } from './spell';
+
+/**
+ * Задание игры 5: `dir` — сторона (rp: русское → собрать польское, pr: польское → собрать русское), `answer` — как показать
+ * правильный ответ, `accept` — что принять при вводе, `units` — плитки ответа по порядку, `tiles` — они же с ловушками
+ * вперемешку, `layout` — ряд ответа (слоты и неподвижные знаки). Экран ставит `hinted` (взята «первая буква») и `typed`
+ * (ответ напечатан, а не собран) перед отправкой.
+ */
+export interface SpellQuestion {
+  mode: GameMode;
+  id: string;
+  kind: 'spell';
+  dir: Side;
+  prompt: string;
+  promptLang: 'pl' | 'ru';
+  answer: string;
+  accept: string[];
+  units: string[];
+  tiles: string[];
+  layout: SpellCell[];
+  hinted?: boolean;
+  typed?: boolean;
+}
 
 /**
  * `progress` — что осталось растению до урожая («ещё 1 полив до ростка»), его дописывает ферма (P2a).
- * `reverse` — задание «наоборот»: в игре 2 пришло с польского (mode 1), в игре 1 — на польский (mode 2), всегда выбором.
+ * `reverse` — задание «наоборот»: в игре 2 пришло с польского (mode 1), в игре 1 — на польский (mode 2), всегда выбором;
+ * в игре 5 — сборка в другую сторону (`dir`).
  */
 export type Question = (
   | { mode: GameMode; id: string; kind: 'choice'; prompt: string; promptLang: 'pl' | 'ru'; options: string[]; answer: string }
-  | { mode: GameMode; id: string; kind: 'type'; prompt: string; promptLang: 'ru'; answer: string; accept: string[] }
   | { mode: GameMode; id: string; kind: 'tiles'; prompt: string; promptLang: 'pl' | 'ru'; tiles: string[]; answer: string[] }
+  | SpellQuestion
 ) & { progress?: string; reverse?: boolean };
 
 /** Минимум плиток, чтобы фразу имело смысл собирать (игры 3 и 4). */
@@ -75,26 +100,47 @@ export function phraseDistractors(p: Phrase, phrases: readonly Phrase[], field: 
   return out;
 }
 
-/** Собрать задание. `typed` — слово уже «куст» (режим 2 переходит на ввод). */
+/** Слово годится для игры 5 в эту сторону: по-польски — любое, по-русски — если первое значение собирается из букв. */
+export const canSpell = (w: Pick<Word, 'ru'>, dir: Side): boolean => dir === 'rp' || ruSpellable(w.ru);
+
+/** Собрать задание. `dir` — сторона игры 5 (по умолчанию по-польски). */
 export function makeQuestion(
   mode: GameMode,
   id: string,
   db: { word(id: string): Word | undefined; phrase(id: string): Phrase | undefined; words: readonly Word[]; phrases?: readonly Phrase[] },
   rand: () => number,
-  typed = false,
+  opts: { dir?: Side } = {},
 ): Question | null {
+  if (mode === 5) {
+    const w = db.word(id);
+    const dir = opts.dir ?? 'rp';
+    if (!w || !canSpell(w, dir)) return null;
+    const lang = dir === 'rp' ? 'pl' : 'ru';
+    const t = spellTarget(dir === 'rp' ? w.pl : primaryRu(w.ru), lang);
+    return {
+      mode,
+      id,
+      kind: 'spell',
+      dir,
+      prompt: dir === 'rp' ? w.ru : w.pl,
+      promptLang: dir === 'rp' ? 'ru' : 'pl',
+      answer: t.text,
+      accept: dir === 'rp' ? [w.pl] : ruVariants(w.ru),
+      units: t.units,
+      tiles: spellTiles(t.units, lang, rand),
+      layout: t.layout,
+    };
+  }
   if (mode === 1 || mode === 2) {
     const w = db.word(id);
     if (!w) {
       // Короткая фраза в играх 1 и 2: как слово, отвлекающие — другие фразы.
       const p = db.phrase(id);
       if (!p) return null;
-      if (mode === 2 && typed) return { mode, id, kind: 'type', prompt: p.ru, promptLang: 'ru', answer: p.pl, accept: [p.pl] };
       const f = mode === 1 ? 'ru' : 'pl';
       const options = shuffle([p[f], ...phraseDistractors(p, db.phrases ?? [], f, rand)], rand);
       return { mode, id, kind: 'choice', prompt: mode === 1 ? p.pl : p.ru, promptLang: mode === 1 ? 'pl' : 'ru', options, answer: p[f] };
     }
-    if (mode === 2 && typed) return { mode, id, kind: 'type', prompt: w.ru, promptLang: 'ru', answer: w.pl, accept: [w.pl] };
     const field = mode === 1 ? 'ru' : 'pl';
     const options = shuffle([w[field], ...distractors(w, db.words, field, rand)], rand);
     return { mode, id, kind: 'choice', prompt: mode === 1 ? w.pl : w.ru, promptLang: mode === 1 ? 'pl' : 'ru', options, answer: w[field] };
@@ -114,15 +160,18 @@ export interface Graded {
 
 const normTiles = (xs: readonly string[]): string => xs.map((x) => x.trim().toLowerCase()).join(' ');
 
-/** Проверить ответ: выбор — строка варианта; ввод — текст (мягко: без диакритики «почти», орфография R10); плитки — порядок. */
+/**
+ * Проверить ответ: выбор — строка варианта; плитки — порядок; игра 5 — собранное слово (буквы точно) или напечатанное
+ * (мягко: без диакритики «почти», орфография R10, `systems/spell.ts`).
+ */
 export function grade(q: Question, given: string | readonly string[]): Graded {
   if (q.kind === 'choice') {
     const ok = typeof given === 'string' && given.trim() === q.answer.trim();
     return { ok, verdict: ok ? 'exact' : 'wrong', correct: q.answer };
   }
-  if (q.kind === 'type') {
-    const c = checkAnswer(typeof given === 'string' ? given : given.join(' '), q.accept, { diacritics: 'warn', ortho: true, typo: true });
-    return { ok: c.verdict !== 'wrong', verdict: c.verdict, correct: q.answer };
+  if (q.kind === 'spell') {
+    const r = gradeSpell(typeof given === 'string' ? given : given.join(''), q.answer, q.accept, q.dir === 'rp' ? 'pl' : 'ru', !!q.typed);
+    return { ...r, correct: q.answer };
   }
   const arr = typeof given === 'string' ? given.split(/\s+/).filter(Boolean) : given;
   const ok = normTiles(arr) === normTiles(q.answer);
