@@ -83,6 +83,7 @@ export function createKeyboardSource(router: Router, target: Window | Document |
       let intent: Intent | null = null;
       if (INTERACT.has(code)) intent = { type: 'interact' };
       else if (code === 'Escape') intent = { type: 'cancel' };
+      else if (code === 'KeyG') intent = { type: 'say' };
       else if (code === 'Tab') intent = { type: 'focus', dir: e.shiftKey ? 'prev' : 'next' };
       else if (/^(Digit|Numpad)[1-9]$/.test(code) && !e.shiftKey) intent = { type: 'hotkey', n: Number(code.slice(-1)) };
       if (intent) consumed = router.push('keyboard', intent);

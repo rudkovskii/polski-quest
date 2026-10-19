@@ -2,6 +2,7 @@
 // только пользуются (нужно новое общее — список правок дирижёру). Кнопки с `data-opt` движок нажимает клавишами 1–4,
 // `data-nav` — стрелками и A/Enter (ввод только через движок, свои keydown/pointerdown в играх запрещены).
 import { el } from '../ui/dom';
+import { hasCyrillic, sayButton, spokenText, withSay } from '../ui/sayButton';
 import type { GamePanel, PolskaUnit } from '../types/polska';
 
 export function shuffle<T>(xs: readonly T[], rand: () => number): T[] {
@@ -36,15 +37,23 @@ export const wordsOf = (s: string): string[] => s.replace(/[.,!?;:…«»„”"
 /** Сравнение собранного (регистр и лишние пробелы не важны). */
 export const sameTiles = (a: readonly string[], b: readonly string[]): boolean => a.map((x) => x.trim().toLowerCase()).join(' ') === b.map((x) => x.trim().toLowerCase()).join(' ');
 
-/** Блок вопроса: крупная строка и подсказка мелко. */
-export function prompt(panel: GamePanel, text: string, hint = '', lang: 'pl' | 'ru' = 'pl'): HTMLElement {
-  const b = el('div', { class: 'pq-pg-q', 'data-prompt': '' }, el('div', { class: 'pq-q', lang }, text), hint ? el('div', { class: 'pq-q-hint' }, hint) : null);
+/**
+ * Блок вопроса: крупная строка и подсказка мелко. Польский вопрос (`lang: 'pl'`) получает кнопку 🔊 справа (`ui/sayButton.ts`);
+ * `say` — что произнести, если оно отличается от текста («Powiedz słowami: 3.05» → «Powiedz słowami»); пропуски «___» и «…» становятся паузой.
+ */
+export function prompt(panel: GamePanel, text: string, hint = '', lang: 'pl' | 'ru' = 'pl', say?: string): HTMLElement {
+  const q = el('div', { class: 'pq-q', lang }, text);
+  const head = lang === 'pl' && spokenText(say ?? text) ? el('div', { class: 'pq-qrow' }, q, sayButton(say ?? text, panel.say, { main: true })) : q;
+  const b = el('div', { class: 'pq-pg-q', 'data-prompt': '' }, head, hint ? el('div', { class: 'pq-q-hint' }, hint) : null);
   panel.body.append(b);
   return b;
 }
 
-/** Варианты кнопками (до 4, клавиши 1–4). Нажатие отдаёт строку варианта в `panel.submit`. */
-export function choice(panel: GamePanel, options: readonly string[], answer?: string): HTMLElement {
+/**
+ * Варианты кнопками (до 4, клавиши 1–4). Нажатие отдаёт строку варианта в `panel.submit`. Польские варианты (`lang: 'pl'`, по умолчанию)
+ * получают 🔊 в углу: тап по нему только озвучивает, клавиатура — клавиша G на варианте под рамкой; русские — без кнопки.
+ */
+export function choice(panel: GamePanel, options: readonly string[], answer?: string, lang: 'pl' | 'ru' = 'pl'): HTMLElement {
   const grid = el('div', { class: 'pq-opts', 'data-opts': '' });
   options.forEach((o, i) => {
     const b = el(
@@ -64,7 +73,7 @@ export function choice(panel: GamePanel, options: readonly string[], answer?: st
       el('span', { class: 'n' }, `${i + 1}`),
       el('span', { class: 't' }, o),
     );
-    grid.append(b);
+    grid.append(lang === 'pl' && !hasCyrillic(o) ? withSay(b, o, panel.say) : b);
   });
   panel.body.append(grid);
   return grid;
