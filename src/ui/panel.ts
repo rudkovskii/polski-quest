@@ -6,6 +6,7 @@ import { bus as globalBus, type Bus } from '../systems/bus';
 import type { BusEvents } from '../types/bus';
 import type { Stage } from '../types/farm';
 import { el } from './dom';
+import { wordPopGuard } from './wordPick';
 import { THEME_CSS } from './theme';
 
 export const PANEL_CSS = `
@@ -139,6 +140,7 @@ export function createPanel(opts: PanelOptions): Panel {
 
   const onIntent = (i: BusEvents['input:intent']): void => {
     if (!isOpen || i.to !== 'ui') return;
+    if (wordPopGuard(i)) return;
     if (i.source !== 'pointer') root.classList.remove('touch');
     if (i.type === 'cancel') {
       if (!opts.onCancel?.()) api.close();

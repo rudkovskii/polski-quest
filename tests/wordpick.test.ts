@@ -241,7 +241,7 @@ describe('вариант ответа: долгое нажатие — слов�
     const off = attachLongPress(overlay, { selector: '.pq-w', ms: LONG_PRESS_MS, onLongPress: (w) => void pick.open(w) });
     g.start(2);
     markWords(overlay);
-    return { overlay, pick, answers, off };
+    return { overlay, pick, answers, off, bus, g };
   }
   afterEach(() => {
     vi.useRealTimers();
@@ -278,6 +278,18 @@ describe('вариант ответа: долгое нажатие — слов�
     optWord(overlay, 'dom').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, button: 2 }));
     await vi.waitFor(() => expect(pick.info?.lemma).toBe('dom'));
     expect(answers).toEqual([]);
+  });
+
+  it('Esc при открытом поповере закрывает только поповер, игра остаётся; второй Esc закрывает игру', async () => {
+    const { overlay, pick, bus, g } = setup();
+    optWord(overlay, 'dom').dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, button: 2 }));
+    await vi.waitFor(() => expect(pick.isOpen).toBe(true));
+    bus.emit('input:intent', { type: 'cancel', to: 'ui', source: 'keyboard' });
+    expect(pick.isOpen).toBe(false);
+    expect(g.isOpen).toBe(true);
+    bus.emit('input:intent', { type: 'hotkey', n: 1, to: 'ui', source: 'keyboard' } as never);
+    bus.emit('input:intent', { type: 'cancel', to: 'ui', source: 'keyboard' });
+    expect(g.isOpen).toBe(false);
   });
 
   it('короткий тап по варианту (по слову внутри) — ответ, поповер не открывается', () => {

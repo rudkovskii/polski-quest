@@ -10,6 +10,7 @@ import { PLOT_NAME } from '../systems/zagroda';
 import type { BusEvents } from '../types/bus';
 import type { GameCtx, GamePanel, GameTask, PolskaGame, PolskaGameId } from '../types/polska';
 import { el } from './dom';
+import { wordPopGuard } from './wordPick';
 import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
 import { polishPart, sayButton, sayFocused, SAY_CSS } from './sayButton';
 import { THEME_CSS } from './theme';
@@ -358,6 +359,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
 
   const offIntent = bus.on('input:intent', (i) => {
     if (!open || i.to !== 'ui') return;
+    if (wordPopGuard(i)) return;
     switch (i.type) {
       case 'cancel':
         if (i.source !== 'pointer') api.stop();

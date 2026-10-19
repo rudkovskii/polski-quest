@@ -8,6 +8,7 @@ import type { Question, SpellQuestion } from '../systems/quiz';
 import type { BusEvents } from '../types/bus';
 import type { GameMode, Side } from '../types/farm';
 import { el } from './dom';
+import { wordPopGuard } from './wordPick';
 import { MODE_NAME } from './glossary';
 import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
 import { polishPart, sayButton, sayFocused, SAY_CSS, withSay, type SayFn } from './sayButton';
@@ -514,6 +515,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
 
   const offIntent = bus.on('input:intent', (i) => {
     if (!open || i.to !== 'ui') return;
+    if (wordPopGuard(i)) return;
     switch (i.type) {
       case 'cancel':
         if (i.source !== 'pointer') api.stop();

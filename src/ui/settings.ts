@@ -4,6 +4,7 @@ import { bus as globalBus, type Bus } from '../systems/bus';
 import { TRACKS, type MusicControl } from '../systems/musicSettings';
 import type { BusEvents } from '../types/bus';
 import { el } from './dom';
+import { wordPopGuard } from './wordPick';
 import { THEME_CSS } from './theme';
 
 const css = `
@@ -166,7 +167,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
   parent.append(root);
   let open = false;
   const offIntent = bus.on('input:intent', (i) => {
-    if (open && i.to === 'ui' && i.type === 'cancel') api.close();
+    if (open && i.to === 'ui' && i.type === 'cancel' && !wordPopGuard(i)) api.close();
   });
   const api: SettingsPanel = {
     open() {

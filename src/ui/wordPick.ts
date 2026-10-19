@@ -135,6 +135,15 @@ const metaLine = (i: WordInfo): string => {
   return bits.filter(Boolean).join(' · ');
 };
 
+let active: WordPick | null = null;
+
+/** Поповер слова открыт поверх экрана: экраны (панели, мини-игры, настройки) не реагируют на клавиши, а Esc закрывает только поповер. */
+export function wordPopGuard(i: { type: string }): boolean {
+  if (!active?.isOpen) return false;
+  if (i.type === 'cancel') active.close();
+  return true;
+}
+
 /** Поповер слова + разметка оверлея + тап по слову в тексте и правый клик. */
 export function mountWordPick(overlay: HTMLElement, deps: WordPickDeps): WordPick {
   const card = el('div', { class: 'wp-card', role: 'dialog', 'aria-label': 'Слово', 'data-wordpop': '' });
@@ -352,5 +361,6 @@ export function mountWordPick(overlay: HTMLElement, deps: WordPickDeps): WordPic
     markWords(overlay);
   }
   window.addEventListener('resize', place);
+  active = api;
   return api;
 }
