@@ -8,7 +8,8 @@
   2. перекрашивает на СУЩЕСТВУЮЩИЕ материалы проекта (палитра 319/320, новых материалов не добавляем): для каждого нового материала
      берётся ближайший проектный по рампе (ΔE в Lab по тонам .0…4 и .o, основной тон вдвое весомее), тон сохраняется
      (`apple.3` → `jam_red.3`), правки руками — `OVERRIDE`;
-  3. пишет art/plants/*.sprite.json (формат проекта, ключи пересобраны), их рисует в art/sprites `tools/art_plants.py` (`npm run art`);
+  3. пишет art/plants/plant_icons_*.sprite.json (формат проекта, ключи пересобраны), их вносит в art/sprites `tools/art_plants.py`
+     (`npm run art`). Кусты `plant_v*` и плоды `plant_fruits_*` с 19.10 рисует `tools/art_garden.py` (светлый стиль), выгрузка их не трогает;
   4. копирует метаданные в content/plants/ (mapping, rules, plants, icons).
 """
 from __future__ import annotations
@@ -107,12 +108,12 @@ def main() -> int:
 
     out = ROOT / 'art' / 'plants'
     out.mkdir(parents=True, exist_ok=True)
-    for p in out.glob('*.sprite.json'):
+    for p in out.glob('plant_icons_*.sprite.json'):
         p.unlink()
     letters = KEYCHARS[1:]
     used: set[str] = set()
     n = 0
-    for f in sorted((src / 'sprites').glob('*.sprite.json')):
+    for f in sorted((src / 'sprites').glob('plant_icons_*.sprite.json')):
         d = json.loads(f.read_text('utf8'))
         names = sorted({remap(v) for v in d['keys'].values() if v})
         key = {nm: letters[i] for i, nm in enumerate(names)}
