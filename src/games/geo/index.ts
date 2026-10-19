@@ -92,9 +92,7 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
   const celebrate = (ok: boolean, at: Pt = here): void => {
     if (map.scale === 0) return;
     map.reveal(task.reveal);
-    // Верный ответ: движок ждёт, пока герой добежит и зелёный флажок постоит ~0,8 с (иначе следующее задание его закрывает).
-    const ms = map.plant(at, ok);
-    if (ok) panel.hold?.(ms + SUCCESS_SHOW_MS);
+    map.plant(at, ok);
   };
   const wrapped: GamePanel = {
     body: panel.body,
@@ -120,7 +118,6 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
         map.plant(p, ok, () => {
           map.reveal(task.reveal);
           panel.submit(p);
-          if (ok) panel.hold?.(SUCCESS_SHOW_MS);
         });
       };
       map.onPick = (p) => {

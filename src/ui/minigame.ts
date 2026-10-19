@@ -10,7 +10,7 @@ import type { GameMode } from '../types/farm';
 import { el } from './dom';
 import { MODE_NAME } from './glossary';
 import { attachKeyboard, type AttachedKeyboard } from './keyboard';
-import { AUTO_NEXT_MS, Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
+import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
 import { THEME_CSS } from './theme';
 
 export interface AnswerResult {
@@ -70,6 +70,7 @@ ${roundCss}
 .pq-game-foot { flex: 0 0 auto; display: flex; gap: 8px; align-items: stretch; min-height: 46px; padding-top: 8px; }
 .pq-game-foot .pq-btn { flex: 1 1 auto; }
 .pq-game-foot .pq-btn.wait { opacity: .5; }
+.pq-game-foot .pq-btn[data-next] { font-size: 18px; font-weight: 800; padding-top: 12px; padding-bottom: 12px; }
 .pq-game-foot .pq-btn.pq-back { flex: 1.3 1 0; background: #f2d552; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
 .pq-game-paper.ok { background: #d6efc0; }
 .pq-game-paper.bad { background: #f6d7cc; }
@@ -170,7 +171,6 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   let answered = false;
   let built: number[] = [];
   let kb: AttachedKeyboard | null = null;
-  let timer: ReturnType<typeof setTimeout> | null = null;
   let focusIdx = -1;
   /** Рамка выбора нужна только тому, кто ходит стрелками; на тапе и до первой стрелки ничего не обведено (F5a). */
   let kbNav = false;
@@ -230,8 +230,6 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   };
 
   const clearTimer = (): void => {
-    if (timer) clearTimeout(timer);
-    timer = null;
     if (armTimer) clearTimeout(armTimer);
     armTimer = null;
     nextReady = true;
@@ -263,7 +261,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     }
     // «Dalej» просыпается через 300 мс: двойной тап по «Sprawdź» не пропускает следующее задание.
     nextReady = false;
-    const dalej = el('button', { type: 'button', class: 'pq-btn wait', 'data-nav': '', 'data-next': '', onclick: () => nextReady && advance() }, 'Dalej →');
+    const dalej = el('button', { type: 'button', class: 'pq-btn wait', 'data-nav': '', 'data-next': '', onclick: () => nextReady && advance() }, 'Dalej · Следующий →');
     armTimer = setTimeout(() => {
       armTimer = null;
       nextReady = true;
@@ -283,7 +281,6 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     if (input) input.disabled = true;
     setFocus(navs().indexOf(dalej));
     dalej.focus({ preventScroll: true });
-    if (r.ok) timer = setTimeout(advance, AUTO_NEXT_MS);
     requestAnimationFrame(reportHeight);
   };
 

@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// Контролёр v2 (волна 3): общие хуки движка игр о Польше — пауза на успех (`panel.hold`), строка итога (`summaryLine`),
+// Контролёр v2 (волна 3): общие хуки движка игр о Польше — без автоперехода (19.10), строка итога (`summaryLine`),
 // отложенный обход Zagroda после игры во весь экран (`polska:tour`), тихий урожай (`polska:act.quiet`).
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ICON_FRAME } from '../src/games/daty/model';
@@ -13,7 +13,7 @@ import type { BusEvents } from '../src/types/bus';
 import type { GameTask, PolskaGame } from '../src/types/polska';
 import type { Question } from '../src/systems/quiz';
 import { mountMinigame, NEXT_DELAY_MS } from '../src/ui/minigame';
-import { AUTO_NEXT_MS, mountPolskaGame } from '../src/ui/polskaGame';
+import { mountPolskaGame, NEXT_DELAY_MS as PG_NEXT } from '../src/ui/polskaGame';
 import { ROUND_SIZE } from '../src/ui/roundSummary';
 import { seeded, testBus } from './helpers';
 
@@ -51,32 +51,24 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
-describe('движок v2: пауза на успех (panel.hold)', () => {
-  it('без hold верный ответ листается через AUTO_NEXT_MS; с hold — не раньше, чем просила игра', () => {
+describe('движок v2: без автоперехода после верного ответа', () => {
+  it('верный ответ сам не листается; «Dalej · Следующий» нажимается после NEXT_DELAY_MS и листает', () => {
     const s = mk();
     const root = document.createElement('div');
     document.body.append(root);
-    let panelRef: { hold?: (ms: number) => void } | null = null;
-    const g = fakeGame('full');
-    g.render = (_t, panel) => {
-      panelRef = panel;
-      panel.body.append(document.createElement('div'));
-    };
-    const ui = mountPolskaGame(root, { bus: s.bus, games: [g], polska: s.p, now: () => NOW, rand: seeded(3), say: () => {} });
+    const ui = mountPolskaGame(root, { bus: s.bus, games: [fakeGame('full')], polska: s.p, now: () => NOW, rand: seeded(3), say: () => {} });
     vi.useFakeTimers();
     ui.start('geo');
     const first = ui.task!.id;
     ui.submit('ok');
-    vi.advanceTimersByTime(AUTO_NEXT_MS + 5);
-    expect(ui.task!.id).not.toBe(first);
-    const second = ui.task!.id;
-    ui.submit('ok');
-    panelRef!.hold!(AUTO_NEXT_MS + 1100);
-    vi.advanceTimersByTime(AUTO_NEXT_MS + 5);
-    expect(ui.task?.id ?? second).toBe(second);
+    vi.advanceTimersByTime(60_000);
+    expect(ui.task!.id).toBe(first);
     expect(root.querySelector('[data-feedback]')!.hasAttribute('hidden')).toBe(false);
-    vi.advanceTimersByTime(1200);
-    expect(ui.task!.id).not.toBe(second);
+    const next = root.querySelector<HTMLButtonElement>('[data-next]')!;
+    expect(next.textContent).toContain('Следующий');
+    vi.advanceTimersByTime(PG_NEXT + 5);
+    next.click();
+    expect(ui.task!.id).not.toBe(first);
     ui.stop();
   });
 });
@@ -93,7 +85,8 @@ describe('движок v2: итог раунда и обход', () => {
     ui.start('geo');
     for (let i = 0; i < ROUND_SIZE; i++) {
       ui.submit('ok');
-      vi.advanceTimersByTime(AUTO_NEXT_MS + 5);
+      vi.advanceTimersByTime(PG_NEXT + 5);
+      root.querySelector<HTMLButtonElement>('[data-next]')!.click();
     }
     expect(root.querySelector('[data-round-summary]')).toBeTruthy();
     expect(root.querySelector('[data-round-line]')!.textContent).toBe('Najbliższe święto: Wigilia za 3 dni');
@@ -120,7 +113,8 @@ describe('движок v2: итог раунда и обход', () => {
     ui.start('geo');
     for (let i = 0; i < 4; i++) {
       ui.submit('ok');
-      vi.advanceTimersByTime(AUTO_NEXT_MS + 5);
+      vi.advanceTimersByTime(PG_NEXT + 5);
+      root.querySelector<HTMLButtonElement>('[data-next]')!.click();
     }
     ui.stop();
     expect(tours).toHaveLength(0);

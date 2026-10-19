@@ -10,7 +10,7 @@ import { PLOT_NAME } from '../systems/zagroda';
 import type { BusEvents } from '../types/bus';
 import type { GameCtx, GamePanel, GameTask, PolskaGame, PolskaGameId } from '../types/polska';
 import { el } from './dom';
-import { Round, renderRoundSummary, roundCss, ROUND_SIZE, AUTO_NEXT_MS } from './roundSummary';
+import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
 import { THEME_CSS } from './theme';
 
 export interface PolskaGameDeps {
@@ -35,9 +35,8 @@ export interface PolskaGameUi {
   root: HTMLElement;
 }
 
-/** Через сколько после ответа «Dalej» начинает нажиматься; верный ответ листается сам через AUTO_NEXT_MS. */
+/** Через сколько после ответа «Dalej» начинает нажиматься. Само ничего не листается: следующее задание — только кнопкой (Шэф 19.10). */
 export const NEXT_DELAY_MS = 300;
-export { AUTO_NEXT_MS };
 /** Итог раунда: столько мс клавиша действия его не нажимает. */
 export const SUMMARY_GUARD_MS = 400;
 
@@ -70,6 +69,7 @@ ${roundCss}
 .pq-pg .foot { flex: 0 0 auto; display: flex; gap: 8px; min-height: 46px; padding-top: 8px; }
 .pq-pg .foot .pq-btn { flex: 1 1 auto; }
 .pq-pg .foot .pq-btn.wait { opacity: .5; }
+.pq-pg .foot .pq-btn[data-next] { font-size: 18px; font-weight: 800; padding-top: 12px; padding-bottom: 12px; }
 .pq-pg .foot .pq-btn.pq-back { flex: 1.3 1 0; background: #f2d552; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
 .pq-pg .pq-progress { font-size: 13px; margin: 0 0 6px; color: #4a6b2a; font-weight: 600; }
 .pq-pg .pq-q { font-size: 22px; font-weight: 800; margin: 0 0 4px; overflow-wrap: break-word; }
@@ -132,7 +132,6 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   /** Когда показан итог (мс, `performance.now`): клавиша действия в первые 400 мс его не нажимает (не промахнуться по «Wróć» на «Dalej»). */
   let summaryAt = 0;
   let nextReady = true;
-  let timer: ReturnType<typeof setTimeout> | null = null;
   let armTimer: ReturnType<typeof setTimeout> | null = null;
   let focusIdx = -1;
   let kbNav = false;
@@ -142,8 +141,6 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   /** Позиция на шкале «Wiedza o Polsce» до первого ответа раунда. */
   let scaleFrom: number | null = null;
   let scaleTo: { pos: number; sub: number; pl: string } | null = null;
-  /** Когда сработает автопереход после верного ответа (мс, `performance.now`); `panel.hold` его отодвигает. */
-  let autoAt = 0;
   /** Игра во весь экран: объекты Zagroda, которые подросли за открытие (обход после выхода, `polska:tour`). */
   let grownObjs: string[] = [];
 
@@ -175,9 +172,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     bus.emit('farm:auto', { on: true, bottom: game.layout === 'panel' ? Math.round(box.getBoundingClientRect().height + 12) : 0 });
   };
   const clearTimers = (): void => {
-    if (timer) clearTimeout(timer);
     if (armTimer) clearTimeout(armTimer);
-    timer = armTimer = null;
+    armTimer = null;
     nextReady = true;
   };
 
@@ -207,15 +203,6 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       const chrome = full - inner - fbTaken;
       const h = Math.ceil(chrome + want);
       if (want > 0 && h < full - 24) box.style.height = `${h}px`;
-    },
-    hold: (ms) => {
-      if (!timer || !answered || summaryOpen) return;
-      const now = performance.now();
-      const at = Math.max(autoAt, now + ms);
-      if (at <= autoAt) return;
-      clearTimeout(timer);
-      autoAt = at;
-      timer = setTimeout(advance, at - now);
     },
   };
 
@@ -476,7 +463,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       deps.say(r.say ?? u?.pl ?? r.correct);
       for (const b of paper.querySelectorAll<HTMLButtonElement>('button')) b.disabled = true;
       nextReady = false;
-      const dalej = el('button', { type: 'button', class: 'pq-btn wait', 'data-nav': '', 'data-next': '', onclick: () => nextReady && advance() }, 'Dalej →');
+      const dalej = el('button', { type: 'button', class: 'pq-btn wait', 'data-nav': '', 'data-next': '', onclick: () => nextReady && advance() }, 'Dalej · Следующий →');
       armTimer = setTimeout(() => {
         armTimer = null;
         nextReady = true;
@@ -484,10 +471,6 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       }, NEXT_DELAY_MS);
       foot.replaceChildren(dalej);
       setFocus(navs().indexOf(dalej));
-      if (r.ok) {
-        autoAt = performance.now() + AUTO_NEXT_MS;
-        timer = setTimeout(advance, AUTO_NEXT_MS);
-      }
       requestAnimationFrame(reportHeight);
     },
     get isOpen() {
