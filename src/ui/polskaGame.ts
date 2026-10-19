@@ -10,7 +10,7 @@ import { PLOT_NAME } from '../systems/zagroda';
 import type { BusEvents } from '../types/bus';
 import type { GameCtx, GamePanel, GameTask, PolskaGame, PolskaGameId } from '../types/polska';
 import { el } from './dom';
-import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
+import { Round, renderRoundSummary, roundCss, ROUND_SIZE, AUTO_NEXT_MS } from './roundSummary';
 import { THEME_CSS } from './theme';
 
 export interface PolskaGameDeps {
@@ -37,7 +37,7 @@ export interface PolskaGameUi {
 
 /** Через сколько после ответа «Dalej» начинает нажиматься; верный ответ листается сам через AUTO_NEXT_MS. */
 export const NEXT_DELAY_MS = 300;
-export const AUTO_NEXT_MS = 900;
+export { AUTO_NEXT_MS };
 /** Итог раунда: столько мс клавиша действия его не нажимает. */
 export const SUMMARY_GUARD_MS = 400;
 

@@ -10,7 +10,7 @@ import type { GameMode } from '../types/farm';
 import { el } from './dom';
 import { MODE_NAME } from './glossary';
 import { attachKeyboard, type AttachedKeyboard } from './keyboard';
-import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
+import { AUTO_NEXT_MS, Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
 import { THEME_CSS } from './theme';
 
 export interface AnswerResult {
@@ -283,7 +283,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     if (input) input.disabled = true;
     setFocus(navs().indexOf(dalej));
     dalej.focus({ preventScroll: true });
-    if (r.ok) timer = setTimeout(advance, 900);
+    if (r.ok) timer = setTimeout(advance, AUTO_NEXT_MS);
     requestAnimationFrame(reportHeight);
   };
 

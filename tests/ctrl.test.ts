@@ -71,7 +71,7 @@ describe('движок v2: пауза на успех (panel.hold)', () => {
     expect(ui.task!.id).not.toBe(first);
     const second = ui.task!.id;
     ui.submit('ok');
-    panelRef!.hold!(2000);
+    panelRef!.hold!(AUTO_NEXT_MS + 1100);
     vi.advanceTimersByTime(AUTO_NEXT_MS + 5);
     expect(ui.task?.id ?? second).toBe(second);
     expect(root.querySelector('[data-feedback]')!.hasAttribute('hidden')).toBe(false);

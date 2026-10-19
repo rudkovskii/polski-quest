@@ -5,6 +5,8 @@ import { el } from './dom';
 
 /** Заданий в одном раунде. */
 export const ROUND_SIZE = 10;
+/** Верный ответ листается сам через столько мс (успеть прочитать отзыв и услышать слово); «Dalej»/Enter — сразу. Шэф 19.10: 900 мс — слишком быстро. */
+export const AUTO_NEXT_MS = 2200;
 
 /** Что нужно раунду от результата ответа (подмножество `AnswerResult`). */
 export interface RoundAnswer {
