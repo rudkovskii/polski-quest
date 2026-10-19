@@ -148,6 +148,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     units: deps.polska.units(g.id),
     unit: (id) => deps.polska.unit(id),
     info: (id) => deps.polska.info(id),
+    seen: (id) => deps.polska.seen(id),
+    markSeen: (id) => deps.polska.markSeen(id),
     doc: deps.polska.content.docs[g.id],
     now: deps.now,
     date: () => dateOf(deps.now()),

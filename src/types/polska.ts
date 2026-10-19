@@ -101,6 +101,10 @@ export interface GameCtx {
   readonly units: readonly PolskaUnit[];
   unit(id: string): PolskaUnit | undefined;
   info(id: string): UnitInfo;
+  /** Знакомство с единицей принято («Понятно») — флаг в сохранении, не зависит от числа ответов. Нет флага → покажи карточку первым делом. */
+  seen(id: string): boolean;
+  /** Отметить знакомство принятым: звать только по кнопке «Понятно», не при открытии карточки. */
+  markSeen(id: string): void;
   /** Исходный документ игры целиком (`content/v2/<файл>.json`): справочники (months, ordinals, rivers, melody…). */
   readonly doc: Readonly<Record<string, unknown>>;
   now(): number;

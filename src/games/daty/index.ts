@@ -6,6 +6,7 @@ import { el } from '../../ui/dom';
 import type { GameCtx, GamePanel, PolskaGame, Want } from '../../types/polska';
 import { choice, tiles } from '../kit';
 import { CSS, calendar, drums, leaf, yearChip } from './view';
+import { HIST_CSS, historyBlock, historyOf, introCard, isFirst } from './history';
 import {
   type DatyMode,
   type DatyTask,
@@ -15,6 +16,7 @@ import {
   drumStart,
   isCalm,
   labelDate,
+  monthGrid,
   monthRow,
   ordinalRow,
   sameDate,
@@ -110,8 +112,9 @@ export function zoomFor(room: { w: number; h: number }, natural: { w: number; h:
   return k < 1.05 ? 1 : Math.floor(k * 20) / 20;
 }
 
-/** Лист `full` занимает ровно задание: увеличиваем страницу под свободное место и просим движок сжать лист по высоте. */
-function fitToSheet(panel: GamePanel, wrap: HTMLElement): void {
+/** Лист `full` занимает ровно задание: увеличиваем страницу под свободное место и просим движок сжать лист по высоте.
+ *  `reserve()` — место под блок отзыва (строка результата и справка), которое после ответа займёт `.fb`; возвращает функцию «подогнать заново». */
+function fitToSheet(panel: GamePanel, wrap: HTMLElement, reserve: () => { fb: number; inner?: number } = () => ({ fb: FB_RESERVE })): () => void {
   const body = panel.body;
   const place = (room: { w: number; h: number }): number => {
     wrap.style.zoom = '';
@@ -119,12 +122,14 @@ function fitToSheet(panel: GamePanel, wrap: HTMLElement): void {
     const num = (v: string): number => parseFloat(v) || 0;
     const above = wrap.getBoundingClientRect().top - body.getBoundingClientRect().top - body.clientTop - num(cs.paddingTop) + body.scrollTop;
     const natural = { w: Math.min(480, room.w), h: wrap.offsetHeight };
-    const k = zoomFor({ w: room.w, h: room.h - above - FB_RESERVE }, { w: 480, h: natural.h });
+    const { fb: fbRoom, inner = 0 } = reserve();
+    // `inner` — запас внутри листа при масштабе 1 (лишняя неделя календаря): растёт вместе с `zoom`.
+    const k = zoomFor({ w: room.w, h: room.h - above - fbRoom }, { w: 480, h: natural.h + inner });
     // Узкий лист (телефон): страница и так во всю ширину, увеличивать нечего.
     if (k > 1 && room.w >= 480) wrap.style.zoom = String(k);
     const last = body.lastElementChild;
     const after = last && last !== wrap ? last.getBoundingClientRect().bottom - wrap.getBoundingClientRect().bottom : 0;
-    return above + wrap.getBoundingClientRect().height + after + FB_RESERVE;
+    return above + wrap.getBoundingClientRect().height + inner * (k > 1 && room.w >= 480 ? k : 1) + after + fbRoom;
   };
   const run = (): void => {
     if (!wrap.isConnected) return;
@@ -144,17 +149,118 @@ function fitToSheet(panel: GamePanel, wrap: HTMLElement): void {
     });
     ro.observe(watched);
   }
+  return run;
+}
+
+/** Высота всего блока отзыва (`.fb`: название, перевод, справка, прогресс, заметка) при ширине `w`: меряем невидимую копию, чтобы лист не прыгал,
+ *  когда после ответа появится справка, и подгонялся под неё заранее. 0 — не вышло измерить (нет движка, ширина 0). */
+function feedbackHeight(panel: GamePanel, name: string, h: ReturnType<typeof historyOf>): number {
+  const host = panel.root;
+  const box = host?.querySelector<HTMLElement>('.box');
+  const live = host?.querySelector<HTMLElement>('[data-feedback]');
+  if (!h || !host || !box || !live) return 0;
+  // Ширина блока отзыва в движке: ширина рамки минус её поля и поля самого блока.
+  const num = (v: string): number => parseFloat(v) || 0;
+  const cb = getComputedStyle(box);
+  const cf = getComputedStyle(live);
+  const w = box.clientWidth - num(cb.paddingLeft) - num(cb.paddingRight) - num(cf.marginLeft) - num(cf.marginRight);
+  if (!(w > 0)) return 0;
+  const fb = el(
+    'div',
+    { class: 'fb', style: 'box-sizing:border-box;margin:0' },
+    el('div', { class: 'big' }, `✓ ${name}`),
+    el('div', { class: 'sub' }, '·'),
+    historyBlock(h, () => {}),
+    el('div', { class: 'pq-progress' }, '🌱 Ещё 1 полив до ростка'),
+    el('div', { class: 'note' }, '11 listopada 1918'),
+  );
+  const probe = el('div', { style: `position:absolute;visibility:hidden;left:0;top:0;width:${Math.round(w)}px;pointer-events:none` }, fb);
+  host.append(probe);
+  const px = fb.getBoundingClientRect().height;
+  probe.remove();
+  return Math.ceil(px) + 8;
 }
 
 function render(task: DatyTask, panel: GamePanel, ctx: GameCtx): void {
-  const wrap = el('div', { class: 'dt', 'data-dt': task.mode, 'data-calm': task.calm ? '' : undefined }, el('style', {}, CSS));
+  const wrap = el('div', { class: 'dt', 'data-dt': task.mode, 'data-calm': task.calm ? '' : undefined }, el('style', {}, CSS + HIST_CSS));
   panel.body.append(wrap);
-  draw(task, panel, ctx, wrap);
-  fitToSheet(panel, wrap);
+  const u = ctx.unit(task.id);
+  const hist = u ? historyOf(u) : null;
+  const say = (text: string): void => panel.say(text);
+  /** Карточка знакомства на экране: под ней отзыва нет, места под него не держим. */
+  let card = false;
+  /** «Pokaż»: после ответа календарь листает к месяцу ответа, а в нём может быть на неделю больше — держим место заранее. */
+  const spare = (): number => {
+    if (task.mode !== 'pokaz') return 0;
+    const more = Math.max(0, monthGrid(task.cal.year, task.month).length - monthGrid(task.cal.year, task.cal.start).length);
+    const row = wrap.querySelector<HTMLElement>('.dt-day')?.getBoundingClientRect().height ?? 0;
+    return more * (row + 4);
+  };
+  watchFeedback(panel, wrap, hist);
+  const refit = fitToSheet(panel, wrap, () => (card ? { fb: 6 } : { fb: Math.max(FB_RESERVE, feedbackHeight(panel, u?.pl ?? '', hist)), inner: spare() }));
+  const showTask = (): void => {
+    card = false;
+    wrap.dataset.dt = task.mode;
+    draw(task, panel, ctx, wrap);
+    refit();
+  };
+  if (u && hist && isFirst(ctx, u.id)) {
+    // Знакомство: карточка → «Rozumiem · Понятно» (только тут ставится флаг) → вопрос. Закрыл игру на карточке — покажем снова.
+    card = true;
+    wrap.dataset.dt = 'intro';
+    wrap.append(introCard(ctx.doc, u, hist, say));
+    panel.foot.replaceChildren(
+      el(
+        'button',
+        {
+          type: 'button',
+          class: 'pq-btn',
+          'data-nav': '',
+          'data-understood': '',
+          onclick: () => {
+            ctx.markSeen(u.id);
+            wrap.replaceChildren(el('style', {}, CSS + HIST_CSS));
+            panel.foot.replaceChildren();
+            showTask();
+          },
+        },
+        'Rozumiem · Понятно →',
+      ),
+    );
+    refit();
+    return;
+  }
+  showTask();
+}
+
+/** Движок показывает блок отзыва (`hidden` снимается) после любого ответа, в том числе `ui.submit`; следим за ним и кладём справку.
+ *  Срабатывает сразу после ответа (микрозадача, до отрисовки). */
+function watchFeedback(panel: GamePanel, wrap: HTMLElement, hist: ReturnType<typeof historyOf>): void {
+  const fb = panel.root?.querySelector<HTMLElement>('[data-feedback]');
+  if (!hist || !fb || typeof MutationObserver === 'undefined') return;
+  const mo = new MutationObserver(() => {
+    if (!panel.body.contains(wrap)) return mo.disconnect();
+    if (!fb.hidden) addHistory(panel, wrap, hist);
+  });
+  mo.observe(fb, { attributes: true, attributeFilter: ['hidden'] });
+}
+
+/** После ответа движок строит блок отзыва; кладём в него справку (ru с жирными ключами + польская строка с 🔊) между названием и прогрессом. */
+function addHistory(panel: GamePanel, wrap: HTMLElement, hist: ReturnType<typeof historyOf>): void {
+  if (!hist) return;
+  const host = panel.root?.querySelector<HTMLElement>('[data-feedback]');
+  if (!host || host.hidden) return;
+  if (host.querySelector('[data-history]')) return;
+  wrap.classList.add('dt-done');
+  const block = historyBlock(hist, (text) => panel.say(text));
+  const before = host.querySelector('[data-progress-after]');
+  if (before) before.before(block);
+  else host.append(block);
 }
 
 function draw(task: DatyTask, panel: GamePanel, ctx: GameCtx, wrap: HTMLElement): void {
-  const sub: GamePanel = { body: wrap, foot: panel.foot, layout: panel.layout, submit: panel.submit, say: panel.say, rand: panel.rand };
+  const submit = panel.submit;
+  const sub: GamePanel = { body: wrap, foot: panel.foot, layout: panel.layout, submit, say: panel.say, rand: panel.rand };
   const d = { day: task.day, month: task.month };
   const chip = yearChip(task.year);
   switch (task.mode) {
@@ -170,7 +276,7 @@ function draw(task: DatyTask, panel: GamePanel, ctx: GameCtx, wrap: HTMLElement)
       return;
     case 'drums': {
       wrap.append(el('div', { class: 'dt-topline' }, ask(task), chip));
-      const dr = drums(ctx.doc, task.drum, (v) => panel.submit(v));
+      const dr = drums(ctx.doc, task.drum, (v) => submit(v));
       wrap.append(dr.root);
       panel.foot.replaceChildren(dr.check);
       return;
@@ -190,7 +296,7 @@ function draw(task: DatyTask, panel: GamePanel, ctx: GameCtx, wrap: HTMLElement)
           else if (day !== task.day) cal.miss(day);
           cal.circle(task.day, task.calm);
           cal.reveal();
-          panel.submit({ day, month });
+          submit({ day, month });
         },
       });
       wrap.append(cal.root);
@@ -204,7 +310,9 @@ function check(task: DatyTask, answer: unknown, ctx: GameCtx) {
   const spoken = sayDate(ctx.doc, d.day, d.month);
   const u = ctx.unit(task.id);
   const year = task.year === null ? '' : ` ${task.year}`;
-  const note = `${labelDate(ctx.doc, d.day, d.month)}${year}${u && typeof u.raw.note_ru === 'string' ? ` · ${u.raw.note_ru}` : ''}`;
+  // Справка (history) в отзыве заменяет прежнюю заметку note_ru; без справки остаётся она.
+  const withNote = u && !historyOf(u) && typeof u.raw.note_ru === 'string';
+  const note = `${labelDate(ctx.doc, d.day, d.month)}${year}${withNote ? ` · ${u.raw.note_ru}` : ''}`;
   switch (task.mode) {
     case 'co':
       return { ok: typeof answer === 'string' && answer === task.answer, correct: task.answer as string, note };

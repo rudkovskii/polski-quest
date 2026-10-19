@@ -31,13 +31,19 @@ import { entryFrames, plotMap, plotViews, type PlotRef } from './zagroda';
 
 export interface PolskaSave {
   garden: GardenSave;
+  /** Знакомство («Poznaj datę», «Poznaj święto») показано и принято кнопкой «Понятно»: id единицы → ISO-дата. Старое сохранение без поля — пусто. */
+  seen: Record<string, string>;
 }
 
-export const newPolskaSave = (): PolskaSave => ({ garden: newGarden() });
+export const newPolskaSave = (): PolskaSave => ({ garden: newGarden(), seen: {} });
 
 export function normalizePolska(raw: unknown): PolskaSave {
   const r = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
-  return { garden: normalizeGarden(r.garden) };
+  const seen: Record<string, string> = {};
+  if (r.seen && typeof r.seen === 'object' && !Array.isArray(r.seen)) {
+    for (const [id, v] of Object.entries(r.seen as Record<string, unknown>)) if (typeof v === 'string' && v) seen[id] = v;
+  }
+  return { garden: normalizeGarden(r.garden), seen };
 }
 
 /** Сколько семян и ростков одной игры растёт одновременно: движок досаживает из `pool` до этого числа. */
@@ -75,6 +81,10 @@ export interface Polska {
   units(game: PolskaGameId): PolskaUnit[];
   unit(id: string): PolskaUnit | undefined;
   info(id: string): UnitInfo;
+  /** Знакомство с единицей уже принято («Понятно»)? Нет флага — карточку покажут, даже если ответы уже есть. */
+  seen(id: string): boolean;
+  /** Отметить знакомство принятым (ISO-дата по часам игры) и сохранить. Повторный вызов ничего не меняет. */
+  markSeen(id: string): void;
   /** Посадить (строки гимна из `drillSeed` — сразу кустиком). Возвращает добавленные id. */
   plant(ids: readonly string[]): string[];
   /** Досадить из `pool` игры, пока семян и ростков этой игры меньше ACTIVE_MAX. */
@@ -195,6 +205,13 @@ export function createPolska(d: PolskaDeps): Polska {
     };
   };
 
+  const seen = (id: string): boolean => Object.prototype.hasOwnProperty.call(p.seen, id);
+  const markSeen = (id: string): void => {
+    if (!content.byId.has(id) || seen(id)) return;
+    p = { ...p, seen: { ...p.seen, [id]: new Date(d.now()).toISOString().slice(0, 10) } };
+    d.save(p);
+  };
+
   const plant = (ids: readonly string[]): string[] => {
     const now = d.now();
     const added: PlantEntry[] = [];
@@ -213,6 +230,8 @@ export function createPolska(d: PolskaDeps): Polska {
   };
 
   const api: Polska = {
+    seen,
+    markSeen,
     content,
     units,
     unit: (id) => content.byId.get(id),
