@@ -64,8 +64,15 @@ export interface CustomPane {
   focusInput(): void;
 }
 
-type Status = 'idle' | 'loading' | 'result';
-interface FormInit {
+
+const variantMeta = (v: Variant): string => {
+  const bits = [v.tr, v.name ? 'имя' : POS_RU[v.pos]];
+  if (v.gender) bits.push(GENDER_RU[v.gender]);
+  if (v.aspect) bits.push(v.aspect === 'pf' ? 'сов.' : 'несов.');
+  return bits.filter(Boolean).join(' · ');
+};
+
+export interface FormInit {
   id?: string;
   pl: string;
   ru: string;
@@ -75,12 +82,101 @@ interface FormInit {
   exRu?: string;
 }
 
-const variantMeta = (v: Variant): string => {
-  const bits = [v.tr, v.name ? 'имя' : POS_RU[v.pos]];
-  if (v.gender) bits.push(GENDER_RU[v.gender]);
-  if (v.aspect) bits.push(v.aspect === 'pf' ? 'сов.' : 'несов.');
-  return bits.filter(Boolean).join(' · ');
-};
+export interface FormDone {
+  id: string;
+  pl: string;
+  ru: string;
+  /** Такое своё слово уже было. */
+  existed: boolean;
+  /** Посадка (null — «Только в словарь»). */
+  planted: { planted: number; bag: number; skipped: number } | null;
+}
+
+export interface CustomFormOpts {
+  api: FarmApi & { custom: CustomApi };
+  init: FormInit;
+  /** Строка над полями (например, «форма слова …»). */
+  hint?: string;
+  /** Новое слово сохранено (и посажено). */
+  onDone(r: FormDone): void;
+  /** Правка сохранена (режим `init.id`). */
+  onEdited?(id: string): void;
+  /** «Отмена». */
+  onCancel(): void;
+}
+
+/**
+ * Карточка своего слова: польское (можно исправить, транскрипция пересчитывается), перевод, пример; «Posadź · Посадить» /
+ * «Только в словарь» / «Отмена» (правка: «Сохранить» / «Отмена»). Общая для вкладки «＋ Своё» и поповера слова (`ui/wordPick.ts`).
+ */
+export function customForm(o: CustomFormOpts): HTMLFormElement {
+  const { api, init } = o;
+  const cu = api.custom;
+  const pl = el('input', { type: 'text', 'data-cw-pl': '', lang: 'pl', value: init.pl, maxlength: MAX_PL, autocomplete: 'off', autocapitalize: 'none', autocorrect: 'off', spellcheck: 'false', 'aria-label': 'Польское слово', ...nav('cwf', 'v', 'cwf:pl') });
+  const tr = el('div', { class: 'tr', 'data-cw-tr': '' }, init.pl ? translit(init.pl) : '');
+  const ru = el('input', { type: 'text', 'data-cw-ru': '', lang: 'ru', value: init.ru, maxlength: MAX_RU, autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', 'aria-label': 'Перевод', ...nav('cwf', 'v', 'cwf:ru') });
+  const exPl = el('input', { type: 'text', 'data-cw-expl': '', lang: 'pl', value: init.exPl ?? '', maxlength: MAX_EX, autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', 'aria-label': 'Пример по-польски', placeholder: 'Mam nowy samochód.', ...nav('cwf', 'v', 'cwf:expl') });
+  const exRu = el('input', { type: 'text', 'data-cw-exru': '', lang: 'ru', value: init.exRu ?? '', maxlength: MAX_EX, autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', 'aria-label': 'Перевод примера', placeholder: 'У меня новая машина.', ...nav('cwf', 'v', 'cwf:exru') });
+  for (const i of [pl, ru, exPl, exRu]) i.addEventListener('click', () => i.focus());
+  pl.addEventListener('input', () => {
+    tr.textContent = pl.value.trim() ? translit(pl.value.trim()) : '';
+  });
+  const err = el('div', { class: 'err', role: 'alert', 'data-cw-err': '' });
+  const fail = (m: string, at: HTMLInputElement): void => {
+    err.textContent = m;
+    at.focus();
+  };
+  const read = () => ({
+    pl: pl.value.trim(),
+    ru: ru.value.trim(),
+    ...(exPl.value.trim() ? { ex: { pl: exPl.value.trim(), ru: exRu.value.trim() } } : {}),
+  });
+  const check = (): ReturnType<typeof read> | null => {
+    const v = read();
+    if (!v.pl) return void fail('Впиши польское слово', pl), null;
+    if (!v.ru) return void fail('Впиши перевод', ru), null;
+    return v;
+  };
+  const add = (plantIt: boolean): void => {
+    const v = check();
+    if (!v) return;
+    const r = cu.add({ ...v, ...(init.pos ? { pos: init.pos } : {}), ...(init.gender ? { gender: init.gender } : {}) });
+    if (!r.ok) return void (err.textContent = r.reason === 'limit' ? `Своих слов уже ${CUSTOM_LIMIT}, больше не помещается` : 'Впиши слово и перевод');
+    const planted = plantIt ? api.plant([r.id]) : null;
+    o.onDone({ id: r.id, pl: v.pl, ru: v.ru, existed: r.existed, planted });
+  };
+  const save = (): void => {
+    const v = check();
+    if (!v || !init.id) return;
+    if (!cu.update(init.id, { pl: v.pl, ru: v.ru, ex: v.ex ?? null })) return void (err.textContent = 'Не получилось сохранить');
+    o.onEdited?.(init.id);
+  };
+  const btns = init.id
+    ? el(
+        'div',
+        { class: 'btns' },
+        el('button', { type: 'submit', class: 'pq-btn', 'data-cw-save': '', ...nav('cwf', 'v', 'cwf:save') }, 'Сохранить'),
+        el('button', { type: 'button', class: 'pq-btn small', 'data-cw-cancel': '', ...nav('cwf', 'v', 'cwf:cancel'), onclick: () => o.onCancel() }, 'Отмена'),
+      )
+    : el(
+        'div',
+        { class: 'btns' },
+        el('button', { type: 'submit', class: 'pq-btn', 'data-cw-plant': '', ...nav('cwf', 'v', 'cwf:plant') }, 'Posadź · Посадить'),
+        el('button', { type: 'button', class: 'pq-btn small', 'data-cw-store': '', ...nav('cwf', 'v', 'cwf:store'), onclick: () => add(false) }, 'Только в словарь'),
+        el('button', { type: 'button', class: 'pq-btn small', 'data-cw-back': '', ...nav('cwf', 'v', 'cwf:back'), onclick: () => o.onCancel() }, 'Отмена'),
+      );
+  return el(
+    'form',
+    { class: 'cw-form', 'data-cw-form': '', onsubmit: (e: Event) => (e.preventDefault(), init.id ? save() : add(true)) },
+    o.hint ? el('div', { class: 'cw-lead', role: 'status' }, o.hint) : null,
+    el('label', {}, 'Польское слово (можно исправить)', pl),
+    tr,
+    el('label', {}, 'Перевод', ru),
+    el('div', { class: 'opt' }, el('label', {}, 'Пример (необязательно)', exPl), el('label', {}, 'Перевод примера', exRu)),
+    err,
+    btns,
+  );
+}
 
 export function createCustomPane(o: CustomPaneOpts): CustomPane {
   const { api } = o;
@@ -126,74 +222,16 @@ export function createCustomPane(o: CustomPaneOpts): CustomPane {
     o.refocus();
   };
 
-  // ---- форма слова (новое и правка)
-  function form(init: FormInit, hint?: string): HTMLElement {
-    const pl = el('input', { type: 'text', 'data-cw-pl': '', lang: 'pl', value: init.pl, maxlength: MAX_PL, autocomplete: 'off', autocapitalize: 'none', autocorrect: 'off', spellcheck: 'false', 'aria-label': 'Польское слово', ...nav('cwf', 'v', 'cwf:pl') });
-    const tr = el('div', { class: 'tr', 'data-cw-tr': '' }, init.pl ? translit(init.pl) : '');
-    const ru = el('input', { type: 'text', 'data-cw-ru': '', lang: 'ru', value: init.ru, maxlength: MAX_RU, autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', 'aria-label': 'Перевод', ...nav('cwf', 'v', 'cwf:ru') });
-    const exPl = el('input', { type: 'text', 'data-cw-expl': '', lang: 'pl', value: init.exPl ?? '', maxlength: MAX_EX, autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', 'aria-label': 'Пример по-польски', placeholder: 'Mam nowy samochód.', ...nav('cwf', 'v', 'cwf:expl') });
-    const exRu = el('input', { type: 'text', 'data-cw-exru': '', lang: 'ru', value: init.exRu ?? '', maxlength: MAX_EX, autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', 'aria-label': 'Перевод примера', placeholder: 'У меня новая машина.', ...nav('cwf', 'v', 'cwf:exru') });
-    for (const i of [pl, ru, exPl, exRu]) i.addEventListener('click', () => i.focus());
-    pl.addEventListener('input', () => {
-      tr.textContent = pl.value.trim() ? translit(pl.value.trim()) : '';
+  // ---- форма слова (новое и правка): общая с поповером слова (`customForm`)
+  const form = (init: FormInit, hint?: string): HTMLElement =>
+    customForm({
+      api,
+      init,
+      ...(hint ? { hint } : {}),
+      onDone: (r) => done(r.id, r.pl, r.ru, r.existed, r.planted),
+      onEdited: (id) => o.onEdited(id),
+      onCancel: () => (init.id ? ((editing = null), o.onCancel()) : (token++, draw())),
     });
-    const err = el('div', { class: 'err', role: 'alert', 'data-cw-err': '' });
-    const fail = (m: string, at: HTMLInputElement): void => {
-      err.textContent = m;
-      at.focus();
-    };
-    const read = () => ({
-      pl: pl.value.trim(),
-      ru: ru.value.trim(),
-      ...(exPl.value.trim() ? { ex: { pl: exPl.value.trim(), ru: exRu.value.trim() } } : {}),
-    });
-    const check = (): ReturnType<typeof read> | null => {
-      const v = read();
-      if (!v.pl) return void fail('Впиши польское слово', pl), null;
-      if (!v.ru) return void fail('Впиши перевод', ru), null;
-      return v;
-    };
-    const add = (plantIt: boolean): void => {
-      const v = check();
-      if (!v) return;
-      const r = cu.add({ ...v, ...(init.pos ? { pos: init.pos } : {}), ...(init.gender ? { gender: init.gender } : {}) });
-      if (!r.ok) return void (err.textContent = r.reason === 'limit' ? `Своих слов уже ${CUSTOM_LIMIT}, больше не помещается` : 'Впиши слово и перевод');
-      const planted = plantIt ? api.plant([r.id]) : null;
-      done(r.id, v.pl, v.ru, r.existed, planted);
-    };
-    const save = (): void => {
-      const v = check();
-      if (!v || !init.id) return;
-      if (!cu.update(init.id, { pl: v.pl, ru: v.ru, ex: v.ex ?? null })) return void (err.textContent = 'Не получилось сохранить');
-      o.onEdited(init.id);
-    };
-    const btns = init.id
-      ? el(
-          'div',
-          { class: 'btns' },
-          el('button', { type: 'submit', class: 'pq-btn', 'data-cw-save': '', ...nav('cwf', 'v', 'cwf:save') }, 'Сохранить'),
-          el('button', { type: 'button', class: 'pq-btn small', 'data-cw-cancel': '', ...nav('cwf', 'v', 'cwf:cancel'), onclick: () => ((editing = null), o.onCancel()) }, 'Отмена'),
-        )
-      : el(
-          'div',
-          { class: 'btns' },
-          el('button', { type: 'submit', class: 'pq-btn', 'data-cw-plant': '', ...nav('cwf', 'v', 'cwf:plant') }, 'Posadź · Посадить'),
-          el('button', { type: 'button', class: 'pq-btn small', 'data-cw-store': '', ...nav('cwf', 'v', 'cwf:store'), onclick: () => add(false) }, 'Только в словарь'),
-          el('button', { type: 'button', class: 'pq-btn small', 'data-cw-back': '', ...nav('cwf', 'v', 'cwf:back'), onclick: () => (token++, draw()) }, 'Отмена'),
-        );
-    const f = el(
-      'form',
-      { class: 'cw-form', 'data-cw-form': '', onsubmit: (e: Event) => (e.preventDefault(), init.id ? save() : add(true)) },
-      hint ? say([hint], 'cw-lead') : null,
-      el('label', {}, 'Польское слово (можно исправить)', pl),
-      tr,
-      el('label', {}, 'Перевод', ru),
-      el('div', { class: 'opt' }, el('label', {}, 'Пример (необязательно)', exPl), el('label', {}, 'Перевод примера', exRu)),
-      err,
-      btns,
-    );
-    return f;
-  }
 
   /** Слово сохранено (и посажено): итог и чистое поле для следующего. */
   function done(id: string, pl: string, ru: string, existed: boolean, planted: { planted: number; bag: number; skipped: number } | null): void {
@@ -242,7 +280,7 @@ export function createCustomPane(o: CustomPaneOpts): CustomPane {
           o.refocus('cwf:pl');
         },
       },
-      el('span', { class: 'pl' }, v.pl),
+      el('span', { class: 'pl', lang: 'pl' }, v.pl),
       el('span', { class: 'go', 'aria-hidden': 'true' }, '›'),
       el('span', { class: 'meta' }, variantMeta(v)),
     );
@@ -259,7 +297,7 @@ export function createCustomPane(o: CustomPaneOpts): CustomPane {
     return el(
       'div',
       { class: 'cw-base', 'data-cw-base': w.id },
-      o.sayText ? el('span', { class: 'plrow' }, el('span', { class: 'pl' }, w.pl), sayButton(w.pl, o.sayText, { attrs: nav('cwb', 'v', `cwbs:${w.id}`) })) : el('span', { class: 'pl' }, w.pl),
+      o.sayText ? el('span', { class: 'plrow' }, el('span', { class: 'pl', lang: 'pl' }, w.pl), sayButton(w.pl, o.sayText, { attrs: nav('cwb', 'v', `cwbs:${w.id}`) })) : el('span', { class: 'pl', lang: 'pl' }, w.pl),
       el('span', { class: 'ru' }, `${w.ru} · ${w.tr}`),
       st === 'new'
         ? el('button', { type: 'button', class: 'pq-btn small', 'data-cw-plant-base': w.id, ...nav('cwb', 'v', `cwb:${w.id}`), onclick: () => (api.plant([w.id]), showBase(w, api.info(w.id).status === 'bag' ? 'Посажено, грядки заняты: слово ждёт в мешке.' : 'Посажено на грядку.')) }, 'Посадить')
