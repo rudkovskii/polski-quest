@@ -5,6 +5,8 @@ import type { BusEvents } from '../types/bus';
 import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap, PropObject } from '../types/map';
 import { frameFor, tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
+import { BeaverLayer } from './beaverLayer';
+import type { BeaverApi } from '../systems/beaver';
 import { FarmLayer } from './farmLayer';
 import { ZagrodaLayer, applyEntries } from './zagrodaLayer';
 import { pickZoom } from '../world/camera';
@@ -114,6 +116,8 @@ export class World extends Phaser.Scene {
   private cam0: { zoom: number; mw: number; mh: number; fitsW: boolean; fitsH: boolean } | null = null;
   private farm: FarmLayer | null = null;
   private zagroda: ZagrodaLayer | null = null;
+  /** Бобёр (только ферма): гость на уровнях 0–9, хозяин хатки с 10-го; `api` кладёт в реестр main.ts. */
+  private beaver: BeaverLayer | null = null;
   /** Спрайты объектов карты по ключу `prop:<id>` (слой Zagroda меняет их вид по прогрессу). */
   private propSprites = new Map<string, Phaser.GameObjects.Sprite>();
   private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
@@ -162,6 +166,15 @@ export class World extends Phaser.Scene {
     this.marker = this.add.graphics().setDepth(10_000);
     this.farm = this.mapDef.id === 'farm' ? new FarmLayer({ scene: this, model: this.model, sprites: this.sprites, hero: this.hero, soil: (c) => this.soil(c), toScreen: (x, y) => this.toScreen(x, y), inputOn: () => this.inputOn }) : null;
     this.zagroda = this.mapDef.id === 'zagroda' ? new ZagrodaLayer({ scene: this, model: this.model, sprites: this.sprites, props: this.propSprites, toScreen: (x, y) => this.toScreen(x, y) }) : null;
+    const beaverApi = this.registry.get('beaver') as BeaverApi | undefined;
+    this.beaver =
+      this.mapDef.id === 'farm' && beaverApi
+        ? new BeaverLayer({ scene: this, model: this.model, sprites: this.sprites, api: beaverApi, toScreen: (x, y) => this.toScreen(x, y), placeShadow: (cx, b, w, d) => this.placeShadow(cx, b, w, d), auto: () => !!this.farm?.auto })
+        : null;
+    // Бобёр поселился (main.ts уже положил хатку и пруд в реестр): сцена пересоздаётся на той же клетке, и они появляются.
+    const offSettled = bus.on('beaver:settled', () => {
+      if (this.mapDef.id === 'farm' && !this.leaving) this.time.delayedCall(400, () => !this.leaving && this.go('farm', [this.model.player.tile[0], this.model.player.tile[1]], this.model.player.facing));
+    });
     const offGoto = bus.on('world:goto', () => setTimeout(() => this.runGoto(), 0));
     const offTour = bus.on('polska:tour', ({ go }) => go && setTimeout(() => this.runGoto(), 0));
     const offPolska = bus.on('polska:auto', () => this.polskaToZagroda());
@@ -193,6 +206,9 @@ export class World extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       offIntent();
       offInput();
+      offSettled();
+      this.beaver?.dispose();
+      this.beaver = null;
       offAuto();
       offGoto();
       offTour();
@@ -279,6 +295,11 @@ export class World extends Phaser.Scene {
     return target ? { tile: [tx, ty], target } : { tile: [tx, ty] };
   }
 
+  /** Бобёр для проверок в браузере и тестах (`force`, `state`); не на ферме — null. */
+  get beaverLayer(): BeaverLayer | null {
+    return this.beaver;
+  }
+
   /** Состояние для проверок в браузере и тестах. */
   get state(): { location: string; tile: Xy; facing: Dir; moving: boolean; aBubble: string | null; cat: { tile: Xy; mode: string } | null; zoom: number } {
     const m = this.model;
@@ -299,6 +320,7 @@ export class World extends Phaser.Scene {
     this.farm?.update(time);
     this.zagroda?.update(time);
     for (const ev of this.model.update(Math.min(delta, 100))) this.onWorldEvent(ev, time);
+    this.beaver?.update(time, Math.min(delta, 100));
     // Герой стоит (после ходьбы, автобега мини-игры, доигрыша очереди): новая клетка или поворот — в сохранение (B3).
     const busy = this.model.busy || !!this.farm?.blocking || !!this.zagroda?.auto;
     const pos = this.posGate.tick(busy, this.mapDef.id, this.model.player.tile, this.model.player.facing);
@@ -525,9 +547,9 @@ export class World extends Phaser.Scene {
       s.setOrigin(0.5, 1);
       s.setDepth(src.depth === 'floor' ? 1.5 : src.depth === 'wall' ? 2 : 10 + bottom + (src.z ?? 0));
       // Украшение с несколькими кадрами (огонёк знича, флажок, гирлянда) — тихая петля.
-      if (src.decor && meta.frames.length > 1) {
+      if ((src.decor || src.unlock) && meta.frames.length > 1) {
         const key = `decor:${src.sprite}`;
-        if (!this.anims.exists(key)) this.anims.create({ key, frames: meta.frames.map((f) => ({ key: ATLAS, frame: f })), frameRate: 4, repeat: -1 });
+        if (!this.anims.exists(key)) this.anims.create({ key, frames: meta.frames.map((f) => ({ key: ATLAS, frame: f })), frameRate: src.unlock ? 1.5 : 4, repeat: -1 });
         s.play(key);
       }
       if (src.shadow) this.placeShadow(cx, bottom - 1, src.shadow, 2.5);

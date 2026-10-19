@@ -1325,6 +1325,36 @@
    "solid": false,
    "decor": "dec.flagi_listopad",
    "z": 64
+  },
+  {
+   "type": "prop",
+   "id": "beaver_pond",
+   "sprite": "beaver_pond",
+   "at": [
+    24,
+    14
+   ],
+   "size": [
+    2,
+    3
+   ],
+   "depth": "floor",
+   "unlock": "beaver.home"
+  },
+  {
+   "type": "prop",
+   "id": "beaver_lodge",
+   "sprite": "beaver_lodge",
+   "at": [
+    22,
+    15
+   ],
+   "size": [
+    2,
+    2
+   ],
+   "shadow": 30,
+   "unlock": "beaver.home"
   }
  ]
 }

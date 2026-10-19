@@ -3,6 +3,7 @@
 import type { Dir } from '../types/input';
 import { normalizeCustom, type CustomWord } from './customWords';
 import { newGarden, normalizeGarden, type GardenSave } from './garden';
+import { newBeaverSave, normalizeBeaver, type BeaverSave } from './beaver';
 import { MUSIC_DEFAULT, normalizeMusic, type MusicSettings } from './musicSettings';
 import { newPolskaSave, normalizePolska, type PolskaSave } from './polska';
 
@@ -43,10 +44,12 @@ export interface Save {
   custom: CustomWord[];
   /** Подсказки-пузыри, которые уже показаны (по `use` объекта: desk, board, bin). Каждая показывается один раз. */
   hints: string[];
+  /** Бобёр (`systems/beaver.ts`): когда поселился, когда был последний визит. Старые сохранения читаются как «бобра ещё не было». */
+  beaver: BeaverSave;
 }
 
 export function newSave(now: number): Save {
-  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT, music: { ...MUSIC_DEFAULT } }, garden: newGarden(), polska: newPolskaSave(), custom: [], hints: [] };
+  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT, music: { ...MUSIC_DEFAULT } }, garden: newGarden(), polska: newPolskaSave(), custom: [], hints: [], beaver: newBeaverSave() };
 }
 
 const DIRS: readonly Dir[] = ['up', 'down', 'left', 'right'];
@@ -75,6 +78,7 @@ export function normalizeSave(raw: unknown): Save | null {
     polska: normalizePolska(r.polska),
     custom: normalizeCustom(r.custom),
     hints: Array.isArray(r.hints) ? [...new Set(r.hints.filter((h): h is string => typeof h === 'string'))].slice(0, 32) : [],
+    beaver: normalizeBeaver(r.beaver),
   };
 }
 
