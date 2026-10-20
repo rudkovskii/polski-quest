@@ -60,6 +60,18 @@ ${SAY_CSS}
 .dict-row .ru { grid-column: 1; font-size: 14px; opacity: .8; overflow-wrap: anywhere; }
 .dict-row .st { grid-row: 1 / span 2; grid-column: 2; font-size: 18px; min-width: 32px; min-height: 32px; display: flex; align-items: center; justify-content: center; }
 .dict-empty { opacity: .7; padding: 12px 4px; }
+/* Посадка в один клик: «＋» лежит поверх ячейки значка стадии (рядом со строкой, а не внутри: кнопка в кнопке недопустима). */
+.dict-rowwrap { position: relative; }
+.dict-rowwrap > .dict-row { width: 100%; box-sizing: border-box; }
+.dict-add { position: absolute; top: 50%; right: 11px; transform: translateY(-50%); box-sizing: border-box; width: 32px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--pq-ink); background: #9fd96b; border: 2px solid var(--pq-ink); border-radius: 6px; box-shadow: 0 2px 0 var(--pq-ink); cursor: pointer; touch-action: manipulation; font: 700 20px/1 ui-monospace, 'Courier New', monospace; }
+.dict-add::before { content: '+'; pointer-events: none; margin-top: -2px; }
+.dict-add::after { content: ''; position: absolute; inset: -4px -6px; }
+.dict-add:hover { background: #b4e585; }
+.dict-add:active { transform: translateY(calc(-50% + 1px)); box-shadow: 0 1px 0 var(--pq-ink); }
+.dict-row .st.pop > * { animation: dict-pop .42s steps(6, end); }
+@keyframes dict-pop { 0% { transform: scale(.3) translateY(6px); opacity: .2; } 60% { transform: scale(1.3) translateY(-3px); opacity: 1; } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .dict-row .st.pop > * { animation: none; } }
 .dict-card { background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; align-content: start; }
 .dict-card .big { font-size: 28px; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
 .dict-card .ru { font-size: 19px; }
@@ -76,6 +88,8 @@ ${SAY_CSS}
 .dict-card .plant-slot { min-height: 46px; display: flex; align-items: center; }
 .dict-card .plant-slot .done { font-size: 14px; opacity: .75; }
 .dict-more { align-self: stretch; margin-top: 4px; }
+/* Подпись внизу («Посажено…») занимает место всегда (и на десктопе): появление строки не сдвигает список, а «＋» нажимают подряд. */
+.pq-foot[data-dict][hidden] { display: block !important; visibility: hidden; box-sizing: border-box; min-height: 26px; }
 @media (max-width: 640px) {
   .dict-cols { display: block; height: auto; }
   .dict-cols > div { overflow: visible; }
@@ -111,10 +125,10 @@ ${SAY_CSS}
   /* Высота строки фиксирована: значок стадии (32 px) не раздувает её, когда слово посадили. */
   .dict-row { height: 40px; }
   .dict-row .st { grid-row: 1; grid-column: 3; width: 32px; min-width: 32px; height: 28px; min-height: 0; overflow: visible; }
+  .dict-add { right: 10px; height: 28px; }
+  .dict-add::after { inset: -5px -6px; }
   .dict-filters { gap: 4px; flex-wrap: nowrap; }
   .dict-filters .pq-btn { flex: 1 1 auto; min-width: 0; padding: 6px 3px; font-size: 12px; white-space: nowrap; }
-  /* Подпись внизу («Посажено…») занимает место всегда: появление строки не сдвигает карточку. */
-  .pq-foot[data-dict][hidden] { display: block !important; visibility: hidden; box-sizing: border-box; min-height: 26px; }
 }
 `;
 
@@ -335,6 +349,29 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     bulkAll.textContent = `Всю тему (${n})`;
   }
 
+  /** «＋» нужна непосаженному и открытому слову (фраза под замком её не получает); посаженному кнопка уходит, на её месте значок стадии. */
+  function syncAdd(wrap: HTMLElement, id: string): void {
+    const want = tab !== 'add' && info(id).status === 'new' && !locked(id);
+    const btn = wrap.querySelector('.dict-add');
+    if (!want) return void btn?.remove();
+    if (btn) return;
+    const word = (api.word(id) ?? api.phrase(id))?.pl ?? '';
+    wrap.append(
+      el('button', {
+        type: 'button',
+        class: 'dict-add',
+        'data-add': id,
+        title: 'Посадить',
+        'aria-label': `Посадить ${word}`,
+        tabindex: '-1',
+        onclick: (ev: Event) => {
+          ev.stopPropagation();
+          plantOne(id, false);
+        },
+      }),
+    );
+  }
+
   /** Какие слова сейчас нарисованы в списке (id через пробел) и с каким предисловием: если не изменились, строки не пересобираем. */
   let listSig = '';
   function renderList(): void {
@@ -348,13 +385,23 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
       for (const r of listCol.querySelectorAll<HTMLElement>('.dict-row')) {
         const id = r.getAttribute('data-id')!;
         r.classList.toggle('sel', id === selected);
-        r.querySelector('.st')?.replaceChildren(statusIcon(id));
+        const st = r.querySelector<HTMLElement>('.st');
+        const had = !!r.parentElement?.querySelector('.dict-add');
+        st?.replaceChildren(statusIcon(id));
+        if (r.parentElement) syncAdd(r.parentElement, id);
+        // «＋» сменился значком стадии: короткая анимация «посажено» (узлы строк те же, ничего не сдвигается).
+        if (had && st && st.firstChild && !r.parentElement?.querySelector('.dict-add')) {
+          st.classList.remove('pop');
+          void st.offsetWidth;
+          st.classList.add('pop');
+          setTimeout(() => st.classList.remove('pop'), 500);
+        }
       }
       return;
     }
     listSig = sig;
-    const rows: HTMLElement[] = shown.map((e) =>
-      el(
+    const rows: HTMLElement[] = shown.map((e) => {
+      const row = el(
         'button',
         {
           type: 'button',
@@ -366,8 +413,11 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
         el('span', { class: 'pl', lang: 'pl' }, e.pl),
         el('span', { class: 'st', 'aria-hidden': 'true' }, statusIcon(e.id)),
         el('span', { class: 'ru' }, e.ru),
-      ),
-    );
+      );
+      const wrap = el('div', { class: 'dict-rowwrap' }, row);
+      syncAdd(wrap, e.id);
+      return wrap;
+    });
     if (!rows.length) rows.push(el('div', { class: 'dict-empty' }, query || filter !== 'all' ? 'Ничего не найдено' : 'Здесь пока пусто'));
     if (query.trim() && topic) rows.unshift(el('div', { class: 'dict-scope', 'data-scope': '' }, 'Поиск по всем темам'));
     if (all.length > shown.length) {
@@ -576,14 +626,16 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
     renderAll();
   }
 
-  function plantOne(id: string): void {
+  function plantOne(id: string, refocus = true): void {
+    if (info(id).status !== 'new' || locked(id)) return;
     const r = api.plant([id]);
     say(r.bag > 0 ? 'В мешке: грядки заняты' : r.planted > 0 ? 'Посажено на грядку' : 'Уже посажено');
     const bagTip = r.bag > 0 ? tips?.note('bag') : null;
     if (bagTip) note.append(' ', bagTip);
     renderAll();
     // Кнопка «Посадить» исчезла: фокус на строку слова, а не на соседнюю «▶ медленно» (на тач-устройствах рамки нет, см. panel.ts).
-    if (listCol.querySelector(`[data-nav="row:${id}"]`)) panel.focus(`row:${id}`);
+    // Из «＋» в строке фокус не трогаем: scrollIntoView сдвинул бы список под пальцем.
+    if (refocus && listCol.querySelector(`[data-nav="row:${id}"]`)) panel.focus(`row:${id}`);
   }
 
   function plantTopic(quick: boolean): void {
@@ -601,9 +653,19 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
 
   // ---- жизненный цикл
   let off: (() => void) | null = null;
+  let offKey: (() => void) | null = null;
+  /** Клавиша «+» (intent `plant`, не свой keydown): сажает слово под рамкой выбора, а если рамка не на слове — открытую карточку. */
+  const onIntent = (i: BusEvents['input:intent']): void => {
+    if (i.to !== 'ui' || i.type !== 'plant' || !panel.isOpen || tab === 'add') return;
+    const key = listCol.querySelector('.is-focus')?.getAttribute('data-nav') ?? '';
+    const id = key.startsWith('row:') ? key.slice(4) : selected;
+    if (id && listCol.querySelector(`[data-add="${id}"]`)) plantOne(id);
+  };
   panel.onClose(() => {
     off?.();
     off = null;
+    offKey?.();
+    offKey = null;
     tips?.commit();
   });
 
@@ -612,6 +674,8 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
       if (panel.isOpen) return;
       say('');
       panel.open();
+      offKey?.();
+      offKey = (bus ?? globalBus).on('input:intent', onIntent);
       off?.();
       off = api.onChange(() => {
         if (!panel.isOpen) return;

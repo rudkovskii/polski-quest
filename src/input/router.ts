@@ -176,6 +176,8 @@ export function createRouter(opts: RouterOptions = {}): Router {
         return true;
       case 'say':
         return false; // в мире озвучивать нечего, клавиша G свободна
+      case 'plant':
+        return false; // в мире сажать «плюсом» нечего: это клавиша словаря
     }
   };
 
