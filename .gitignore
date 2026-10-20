@@ -5,3 +5,4 @@ dev-dist
 *.local
 .claude/
 __pycache__
+content/audio_harvest.json

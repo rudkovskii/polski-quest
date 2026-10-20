@@ -23,7 +23,7 @@ export function workboxOptions() {
         handler: 'CacheFirst' as const,
         options: {
           cacheName: 'pq-audio',
-          expiration: { maxEntries: 4000 },
+          expiration: { maxEntries: 10000 },
         },
       },
       {

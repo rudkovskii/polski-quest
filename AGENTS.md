@@ -66,7 +66,13 @@
   `ui/board.ts` (доска), `ui/minigame.ts` (панель вопроса снизу), общая модалка `ui/panel.ts`, надписи над миром `ui/float.ts`.
 - Мир: `scenes/farmLayer.ts` — растения, вскопанные клетки, подпись, автобег (`farm:act` в очередь, ускорение при очереди).
   События шины: `farm:plants`, `farm:auto`, `farm:focus`, `farm:act`, `fx:float`, `fx:label`, `hud:xp {gain, up}`.
-- Озвучка: `python3 tools/audio_list.py` пишет `content/audio.json` (слова обычно и медленно, фразы), потом `npm run audio`.
+- Озвучка (с 20.10 голос `omni:hela-4b1ad1bd`, OmniVoice k2-fsa, придуманный голос, веса CC BY-NC — `CREDITS.md`; выбор — `../research/voices/README.md`, «Этап 2»):
+  1. `npx vitest run --config tools/audio_harvest.config.ts` — сборщик `tools/audio_harvest.spec.ts` (не тест) рисует все задания игр v2 и жмёт 🔊/плитки → `content/audio_harvest.json` (не в git);
+  2. `python3 tools/audio_list.py` → `content/audio.json`: A1 (слова обычно и медленно, фразы, примеры, плитки), слова «Święta», всё, что произносят игры v2, тексты v2 из данных, даты словами; `prio` — порядок генерации, `spoken` — цифры словами для голоса (`numbers_to_words`: даты порядковым в род. п., годы, «Poziom N»); своё слово Шэфа и леммы поповера не входят (Web Speech);
+  3. `PQ_TTS_PY=<venv mlx-audio 0.5.8>/bin/python caffeinate -i npm run audio -- --jobs 1` — воркер `tools/tts_omni_worker.py` (модель один раз, токены референса в `~/.cache/pq-voices/omni`), референс `../research/voices/refs/hela.{wav,txt}` (хэш в имени голоса), постобработка: обрезка тишины, −18 LUFS, AAC 64k; ≈ 3,5 с на строку на M3 Pro (вместе с QA);
+  4. `$PQ_QA_PY -I tools/audio_qa.py [--retry]` (Python с mlx_whisper и jiwer) — Whisper CER каждого файла → `content/audio_qa.json`; пороги: фраза ≤ 0.10, слово ≤ 0.34, длительность; провал → seed 43/44/45; после трёх — статус fail: `build_audio.py` ставит в манифест старый файл Zosia (если был), иначе строки нет в манифесте (Web Speech), `audio:check` это не считает ошибкой;
+  5. ещё раз `npm run audio` (пересобрать манифест), `python3 tools/build_audio.py --prune`. Звук не воспроизводится ни на одном шаге.
+  20.10 за ночь озвучены prio 0–1 (4628 записей: A1 обычно и медленно, «Święta», всё, что говорят игры v2); в `content/audio.json` оставлены только они. prio 2–3 (2442 строки: примеры слов, тексты v2 из данных, плитки фраз A1, даты словами) пока звучат через Web Speech, как раньше: `python3 tools/audio_list.py` и шаги 3–5 (≈ 2,5 ч) их доделают.
 - Подсказки: `ui/hints.ts` (пузырь «Słownik · Посади слова» при первом подходе к столу, доске, коробке; сцена шлёт `fx:near`, флаги в `Save.hints`).
   Звук нового уровня: `systems/platform/sfx.ts` (WebAudio-тон, тихий, под тем же выключателем звука). Иконки PWA: `npm run icons` (`tools/gen_icons.py`, портрет героя).
   Короткие нажатия стрелки во время шага ставятся в очередь (до 3, `QUEUE_MAX` в `world/location.ts`). Esc/B в панели: `createPanel({ onCancel })`.

@@ -12,4 +12,7 @@ npm run art       # tools/art_*.py → art/sprites/*.sprite.json
 npm run sprites   # art/ → public/atlas (Python 3 + Pillow 12.2.0)
 ```
 
+Озвучка польского — синтетический голос «hela» (OmniVoice, придуманный моделью, не голос реального человека; веса CC BY-NC 4.0,
+игра некоммерческая), подробности в `CREDITS.md`. Пересборка: `python3 tools/audio_list.py`, `npm run audio` (см. `AGENTS.md`).
+
 Деплой: пуш в `main` → GitHub Actions (`.github/workflows/deploy.yml`) → Pages. Старая версия игры: тег `archive-v1`, ветка `archive/v1`.
