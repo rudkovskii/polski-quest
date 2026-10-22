@@ -11,7 +11,7 @@ from __future__ import annotations
 from art_core import Cv, Sheet, P, emit, single
 
 PARTS = {
-    'hair': P('hair', r=3, g='head'), 'skin': P('skin', r=2, g='head'), 'hairb': P('hair', r=3, g='hairb'),
+    'hair': P('hair', r=3, g='head'), 'skin': P('skin', r=2, g='head'), 'hairb': P('hair', r=3, g='hairb'), 'neck': P('skin', flat=3, g='head'),
     'vest': P('vest', r=3, g='torso'), 'sleeve': P('skin', flat=2, g='arm'), 'hand': P('skin', flat=2, g='arm'),
     'pants': P('pants', r=2, g='legs'), 'shoe': P('shoe', r=1, g='shoe'),
     'handf': P('skin', flat=2, g='arm'), 'can': P('tin', r=2, g='can'), 'sack': P('sack', r=2, g='sack'),
@@ -264,8 +264,8 @@ def portrait() -> Cv:
     c = Cv(32, 32, PARTS)
     c.poly([[5.0, 9.0], [27.0, 9.0], [29.0, 20.0], [28.0, 32.0], [4.0, 32.0], [3.0, 20.0]], 'hairb')
     c.poly([[2, 32], [4, 26.0], [9, 23.0], [23, 23.0], [28, 26.0], [30, 32]], 'vest')
-    c.poly([[12.0, 23.0], [20.0, 23.0], [16, 29.6]], 'skin')
-    c.rect(13.2, 19.6, 5.6, 4.0, 'skin')
+    c.poly([[11.0, 23.0], [21.0, 23.0], [16, 30.4]], 'neck')
+    c.rect(13.2, 19.0, 5.6, 4.4, 'neck')
     c.ell(16, 13.6, 8.4, 9.2, 'skin')
     c.ell(16, 8.6, 9.6, 7.6, 'hair')
     c.ell(16, 4.8, 7.4, 3.6, 'hair')
@@ -281,8 +281,7 @@ def portrait() -> Cv:
     c.orect(10, 12, 4, 1, 'hair.0'); c.orect(18, 12, 4, 1, 'hair.0')
     c.orect(9, 18, 2, 1, 'cheek'); c.orect(21, 18, 2, 1, 'cheek')
     c.dots([16, 17, 15, 17], 'skin.1')
-    c.orect(14, 20, 4, 1, 'mouth'); c.dots([13, 19, 18, 19], 'mouth')
-    c.dots([14, 26, 16, 26, 17, 26], 'skin.1')
+    c.orect(14, 20, 4, 1, 'mouth'); c.dots([13, 19, 18, 19], 'cheek')
     c.dots([16, 27, 16, 29, 16, 31], 'vest.4')
     strands(c, [(7, 4, 10, 2), (22, 3, 9, 2), (5, 11, 22, 2), (27, 12, 24, 2), (3, 14, 20, 3), (28, 15, 22, 3), (8, 6, 12, 3), (11, 3, 7, 3), (9, 24, 31, 2), (24, 24, 31, 2)])
     return c

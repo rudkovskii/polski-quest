@@ -41,17 +41,16 @@ def face_front(c: Cv, y: float = 6.0, cx: float = 8.0) -> None:
 
 
 def stripes_body(c: Cv, pts=None) -> None:
-    """Тёплый налёт на кончиках шерсти: верхняя кромка тела и головы (шашечкой), без полос."""
+    """Едва заметный тёплый налёт: 2–3 пикселя на верхней кромке спины (не на голове, лапах, животе)."""
     w, h = c.w, c.h
+    cand = []
     for y in range(h):
         for x in range(w):
-            if c.m[y * w + x] not in ('body', 'head', 'tail'):
-                continue
-            up = [c.m[(y - k) * w + x] if y - k >= 0 else None for k in (1, 2)]
-            top = up[0] not in ('body', 'head', 'tail', 'ear')
-            second = not top and up[1] not in ('body', 'head', 'tail', 'ear')
-            if c.ov[y * w + x] is None and ((top and (x + y) % 2 == 0) or (second and (x + y) % 4 == 0 and x % 3 == 0)):
-                c.dot(x, y, WARM)
+            if c.m[y * w + x] == 'body' and c.ov[y * w + x] is None and (y == 0 or c.m[(y - 1) * w + x] in (None, 'ear', 'tail')) and y < 12:
+                cand.append((x, y))
+    cand.sort()
+    for x, y in cand[1::max(1, len(cand) // 3)][:3]:
+        c.dot(x, y, WARM)
 
 
 def cat_down(step: int) -> Cv:
