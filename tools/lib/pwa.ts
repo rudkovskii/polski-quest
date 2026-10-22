@@ -1,7 +1,12 @@
 // Настройки service worker'а (vite.config.ts → vite-plugin-pwa, generateSW). Вынесены сюда, чтобы тест проверял ту же
 // конфигурацию, что уходит в сборку, без запуска Vite.
 
-export const BASE = '/polski-quest/';
+import edition from '../../edition.json';
+
+/** Путь сборки: `/polski-quest/` у игры Шэфа, `/polski-quest/p/<ключ>/` у персональной версии (`edition.json`). */
+export const BASE: string = edition.base;
+/** Персональные версии лежат внутри scope игры Шэфа: его service worker не отдаёт им свою страницу. */
+const EDITIONS_PATH = /^\/polski-quest\/p\//;
 
 /** Опции `workbox` для VitePWA (generateSW). */
 export function workboxOptions() {
@@ -14,7 +19,7 @@ export function workboxOptions() {
     globIgnores: ['**/version.json'],
     maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
     navigateFallback: 'index.html',
-    navigateFallbackDenylist: [/supabase/],
+    navigateFallbackDenylist: [/supabase/, ...(EDITIONS_PATH.test(BASE) ? [] : [EDITIONS_PATH])],
     // Параметры адреса (?dev, ?mute…) — только для клиента: страница из precache и с ними.
     ignoreURLParametersMatching: [/.*/],
     runtimeCaching: [

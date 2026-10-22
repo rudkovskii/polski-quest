@@ -4,6 +4,7 @@ import { goalText, type DayGoal } from '../systems/daygoal';
 import type { BusEvents } from '../types/bus';
 import { el } from './dom';
 import { THEME_CSS } from './theme';
+import { LEVEL } from '../systems/edition';
 
 const css = `
 ${THEME_CSS}
@@ -88,7 +89,7 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
   const fill = el('span', { class: 'pq-xp-fill', style: 'width: 0%' });
   const bar = el('span', { class: 'pq-xp-bar', role: 'progressbar', 'aria-label': 'Подуровень', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': 0 }, fill);
   const nextEl = el('span', { class: 'pq-xp-next', 'data-xp-next': '' });
-  const xp = el('button', { type: 'button', class: 'pq-xp', 'aria-label': 'Путь к A1', 'data-xp': '', onclick: () => o.onLevel?.() }, el('span', { class: 'pq-xp-col' }, lvl, bar, nextEl));
+  const xp = el('button', { type: 'button', class: 'pq-xp', 'aria-label': `Путь к ${LEVEL}`, 'data-xp': '', onclick: () => o.onLevel?.() }, el('span', { class: 'pq-xp-col' }, lvl, bar, nextEl));
   const gear = el('button', { type: 'button', class: 'pq-btn pq-gear', 'aria-label': 'Настройки', onclick: () => o.onSettings() }, '⚙');
   const goalEl = el('button', { type: 'button', class: 'pq-goal', 'data-goal': '', hidden: true, onclick: () => o.onGoal?.() });
   const saved = el('span', { class: 'pq-saved', 'data-saved': '', 'aria-hidden': 'true' }, '✓');
@@ -123,8 +124,8 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
     else lvl.textContent = ev.level;
     // «до A1: 12%»: доля всей базы (слово 1, фраза сборки 2, растущее частично); нет поля — молчим.
     if (ev.pct === undefined) nextEl.textContent = '';
-    else nextEl.textContent = ev.pct >= 1 ? 'A1 достигнут' : `до A1: ${Math.floor(ev.pct * 100)}%`;
-    const target = ev.sub === undefined || ev.of === undefined ? 'следующего уровня' : ev.sub >= ev.of ? 'A1' : `уровня ${ev.sub + 1}`;
+    else nextEl.textContent = ev.pct >= 1 ? `${LEVEL} достигнут` : `до ${LEVEL}: ${Math.floor(ev.pct * 100)}%`;
+    const target = ev.sub === undefined || ev.of === undefined ? 'следующего уровня' : ev.sub >= ev.of ? LEVEL : `уровня ${ev.sub + 1}`;
     xp.title = ev.toNext != null ? `До ${target}: ${ev.toNext} оч.${ev.growing ? ` · уже растут ${ev.growing}` : ''}` : '';
     bar.setAttribute('aria-valuetext', `${lvl.textContent}. ${nextEl.textContent}`);
     fill.style.width = `${Math.round(r * 100)}%`;

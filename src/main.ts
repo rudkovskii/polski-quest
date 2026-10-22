@@ -56,11 +56,15 @@ import { mountUpdateToast } from './ui/updateToast';
 import { mountPolskaGame } from './ui/polskaGame';
 import { mountPolskaHud } from './ui/polskaHud';
 import { mountPolskaPlot } from './ui/polskaPlot';
+import { passGate } from './ui/gate';
+import { EDITION } from './systems/edition';
 
 const params = new URLSearchParams(location.search);
 // `?dev=<id>`: dev-режим (`window.__pq`) и отдельный профиль сохранения `polski-farm-<id>` (тесты не трогают игру Шэфа).
-const profile = parseProfile(params.get('dev'));
-const dev = profile !== null;
+const devProfile = parseProfile(params.get('dev'));
+const dev = devProfile !== null;
+// Персональная версия (`edition.json`): своя база сохранения, dev-профиль поверх неё.
+const profile = devProfile ?? EDITION.profile;
 // Без звука вслух: `?mute=1` — `audio:play` только в консоль.
 const mute = params.get('mute') === '1';
 
@@ -90,6 +94,7 @@ async function main(): Promise<void> {
   const overlay = document.getElementById('overlay');
   const parent = document.getElementById('game');
   if (!overlay || !parent) throw new Error('#overlay или #game не найден');
+  if (EDITION.gate) await passGate(document.body, EDITION.id, EDITION.gate);
 
   const store = new GameStorage(params.get('mem') === '1' ? { kv: memoryKV(), ls: null } : profile ? { profile } : {});
   const { save } = await store.load(Date.now());

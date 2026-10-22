@@ -8,6 +8,7 @@ import type { Phrase, Word } from '../types/content';
 import { WORDS, PHRASES } from './content';
 import type { ItemState } from './garden';
 import { canAssemble } from './quiz';
+import { LEVEL } from './edition';
 
 export const SUB_COUNT = 20;
 
@@ -25,7 +26,7 @@ const S = (n: number, pl: string, ru: string): Sublevel => ({ n, pl, ru });
 /** Уровни: 0 — старт, 1…20 — «Poziom N · Уровень N», дальше A1 (`A1_LEVEL`). Без тематических званий: просто номера. */
 export const SUBLEVELS: readonly Sublevel[] = [S(0, 'Start', 'Старт'), ...Array.from({ length: SUB_COUNT }, (_, i) => S(i + 1, `Poziom ${i + 1}`, `Уровень ${i + 1}`))];
 
-export const A1_LEVEL: Sublevel = S(SUB_COUNT + 1, 'A1', 'A1');
+export const A1_LEVEL: Sublevel = S(SUB_COUNT + 1, LEVEL, LEVEL);
 
 /** Короткая подпись уровня для HUD, кровати и итога раунда: «Старт», «Уровень 7/20», «A1». */
 export function levelLabel(n: number): string {

@@ -13,6 +13,7 @@ import { CUSTOM_CSS, customForm } from './customWord';
 import { el } from './dom';
 import { STAGE_INFO } from './glossary';
 import { SAY_CSS, sayButton, type SayFn } from './sayButton';
+import { LEVEL } from '../systems/edition';
 
 /** Где размечать: польский текст и смешанные строки. Ближайший `lang` решает («ru» внутри польского блока — нет). */
 export const PL_SCOPE = '[lang="pl"], [data-plw]';
@@ -193,7 +194,7 @@ export function mountWordPick(overlay: HTMLElement, deps: WordPickDeps): WordPic
       return row;
     }
     const w = st.word;
-    const where = st.kind === 'custom' ? 'в Moje słowa' : st.a1 ? 'уже в словаре A1' : `уже в словаре (${deps.api.topics.find((t) => t.id === w.topic)?.pl ?? 'тема игры'})`;
+    const where = st.kind === 'custom' ? 'в Moje słowa' : st.a1 ? `уже в словаре ${LEVEL}` : `уже в словаре (${deps.api.topics.find((t) => t.id === w.topic)?.pl ?? 'тема игры'})`;
     row.append(el('span', { class: 'ok' }, `✓ ${where}`));
     const it = deps.api.info(w.id);
     if (it.status === 'new') {

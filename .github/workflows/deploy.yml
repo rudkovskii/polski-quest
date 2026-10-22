@@ -27,6 +27,7 @@ jobs:
           python-version: '3.12'
       - run: pip install Pillow==12.2.0
       - run: npm run check
+      - run: deploy/build_editions.sh
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist

@@ -6,6 +6,7 @@ import { el } from './dom';
 import { TIP_CSS, type Tips } from './glossary';
 import { createPanel, nav } from './panel';
 import { growthText, levelLabel } from '../systems/xp';
+import { LEVEL } from '../systems/edition';
 
 const css = `
 ${TIP_CSS}
@@ -68,8 +69,8 @@ export function mountSummary(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEve
         { class: 'sum-level' },
         el('div', { class: 'top' }, el('span', { class: 'lvl', 'data-level': '' }, levelLabel(p.sub)), el('span', { 'data-session-gain': '' }, grow ? `${grow} за сессию` : `${s.xp} опыта`)),
         el('div', { class: 'sum-bar', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, el('i', { style: `width:${pct}%` })),
-        el('div', { class: 'sum-hint', style: 'margin-top:4px', 'data-level-hint': '' }, p.a1 ? 'Уровень A1: вся база выращена' : `До A1: ${Math.floor(p.pct * 100)}% · до ${p.nextTo} ещё ${p.toNext} оч.`),
-        onPath ? el('button', { type: 'button', class: 'pq-btn small', style: 'margin-top:8px', 'data-open-path': '', ...nav('path', 'v', 'path'), onclick: () => (panel.close(), onPath()) }, 'Путь к A1') : null,
+        el('div', { class: 'sum-hint', style: 'margin-top:4px', 'data-level-hint': '' }, p.a1 ? `Уровень ${LEVEL}: вся база выращена` : `До ${LEVEL}: ${Math.floor(p.pct * 100)}% · до ${p.nextTo} ещё ${p.toNext} оч.`),
+        onPath ? el('button', { type: 'button', class: 'pq-btn small', style: 'margin-top:8px', 'data-open-path': '', ...nav('path', 'v', 'path'), onclick: () => (panel.close(), onPath()) }, `Путь к ${LEVEL}`) : null,
       ),
       el(
         'div',

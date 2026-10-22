@@ -7,6 +7,7 @@ import type { FarmApi } from '../types/farm';
 import { el } from './dom';
 import { createPanel, nav } from './panel';
 import { THEME_CSS } from './theme';
+import { LEVEL } from '../systems/edition';
 
 /** Сколько висит карточка, мс (тап закрывает раньше). */
 export const CARD_MS = 5500;
@@ -58,7 +59,7 @@ export function cardContent(n: number): HTMLElement[] {
     el('div', { class: 'rib' }, a1 ? 'Вся база выращена!' : 'Новый уровень!'),
     el('div', { class: 'ico', 'aria-hidden': 'true' }, badge(l, 'big')),
     el('h3', { 'data-card-name': '' }, l.pl),
-    el('div', { class: 'ru' }, a1 ? 'Уровень A1' : l.ru),
+    el('div', { class: 'ru' }, a1 ? `Уровень ${LEVEL}` : l.ru),
     el('div', { class: 'plus', 'data-card-plus': '' }, a1 ? 'Вся база выращена' : `${n} из ${SUB_COUNT}`),
     ...(a1 ? [el('div', { class: 'gift', 'data-card-gift': '' }, 'Открыто: золотая лейка')] : []),
   ];
@@ -142,7 +143,7 @@ const plural = (n: number, one: string, few: string, many: string): string => {
 
 /** Экран «Путь к A1»: где ты, сколько выращено из скольких, лестница из 20 уровней и честная строка про объём A1. */
 export function mountPath(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents>): PathScreen {
-  const panel = createPanel({ title: 'Путь к A1', bus });
+  const panel = createPanel({ title: `Путь к ${LEVEL}`, bus });
   const content = el('div', { class: 'path' });
   const closeBtn = el('button', { type: 'button', class: 'pq-btn', 'data-done': '', ...nav('done', 'v', 'done'), onclick: () => panel.close() }, 'Закрыть');
   panel.body.append(el('style', {}, pathCss), content, el('div', { style: 'margin-top:12px' }, closeBtn));
@@ -158,7 +159,7 @@ export function mountPath(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents
       { class: 'path-hero' },
       el('div', { class: 'top' }, badge(SUBLEVELS[Math.min(p.sub, SUB_COUNT + 1)] ?? A1_LEVEL, 'big cur'), el('div', {}, el('div', { class: 'nm', 'data-path-name': '' }, p.a1 ? p.pl : p.sub === 0 ? p.ru : `Уровень ${p.sub} из ${SUB_COUNT}`), el('div', { class: 'ru' }, p.a1 ? 'Вся база выращена' : p.sub === 0 ? 'Пока ни одного очка' : p.pl))),
       el('div', { class: 'path-bar', role: 'progressbar', 'aria-valuenow': pct, 'aria-valuemin': 0, 'aria-valuemax': 100 }, el('i', { style: `width:${pct}%` })),
-      el('div', { class: 'path-hint', 'data-path-pct': '' }, p.a1 ? 'Вся база выращена: A1 достигнут' : `До A1: ${pct}% · ${pts(p.points)} из ${b.total} очков`),
+      el('div', { class: 'path-hint', 'data-path-pct': '' }, p.a1 ? `Вся база выращена: ${LEVEL} достигнут` : `До ${LEVEL}: ${pct}% · ${pts(p.points)} из ${b.total} очков`),
       p.toNext !== null ? el('div', { class: 'path-hint', 'data-path-next': '' }, `До ${p.nextTo}: ещё ${p.toNext} ${plural(p.toNext, 'очко', 'очка', 'очков')}`) : null,
     );
     const growing = p.points - p.grown;
@@ -191,7 +192,7 @@ export function mountPath(parent: HTMLElement, api: FarmApi, bus?: Bus<BusEvents
       hero,
       rows,
       ladder,
-      el('div', { class: 'path-note', 'data-path-honest': '' }, `A1 ≈ ${b.words} слов и ${b.phrases} фраз базы, как у экзамена A1 (ориентир 1100–1500 слов). Официального списка слов для польского нет, это международный ориентир.`),
+      el('div', { class: 'path-note', 'data-path-honest': '' }, LEVEL === 'A1' ? `A1 ≈ ${b.words} слов и ${b.phrases} фраз базы, как у экзамена A1 (ориентир 1100–1500 слов). Официального списка слов для польского нет, это международный ориентир.` : `${LEVEL}: ${b.words} слов и ${b.phrases} фраз базы.`),
       el('div', { class: 'path-note' }, `Очки: слово — 1, фраза сборки — 2 (всего ${b.assemble} таких фраз), растущее даёт часть: семечко 0,1, росток 0,3, кустик 0,6. Вся база = ${b.total} очков.`),
     );
   }
