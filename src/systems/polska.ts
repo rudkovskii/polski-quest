@@ -127,10 +127,10 @@ export function unitProgress(it: ItemState | undefined, now: number, day: number
     const n = Math.max(1, SPROUT_DROPS - it.drops);
     return `ещё ${n} ${plural(n, 'полив', 'полива', 'поливов')} до ростка`;
   }
-  if (s === 'sprout') return !it.sides.pr ? 'нужно узнать (выбрать ответ)' : 'нужно вспомнить самому';
+  if (s === 'sprout') return !it.sides.pr ? 'нужно узнать (выбрать ответ)' : 'нужно вспомнить по памяти';
   const left = Math.max(0, HARVEST_DAYS - it.days.size - (it.days.has(day) ? 0 : 1));
   const days = left > 0 ? `до урожая: ещё ${left} ${plural(left, 'день', 'дня', 'дней')}` : '';
-  if (!it.selfOk) return left > 0 ? `нужно сказать самому; ${days}` : 'скажи самому — и урожай';
+  if (!it.selfOk) return left > 0 ? `нужно собрать самому; ${days}` : 'собери сам — и будет урожай';
   return left > 0 ? days : 'созреет со следующим верным ответом';
 }
 

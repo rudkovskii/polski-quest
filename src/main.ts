@@ -6,7 +6,6 @@ import { backupDue, shouldRemind, withMark } from './systems/backup';
 import { bus, type Bus } from './systems/bus';
 import { createFarm } from './systems/farm';
 import { GAMES, GAME_BY_ENTRY, GAME_BY_ID } from './games/registry';
-import { configureHymnAudio } from './games/hymn';
 import { inDays, nearestHoliday, shortName } from './games/swieta/calendar';
 import { createEntryPoint } from './systems/entryPoint';
 import { createPolska } from './systems/polska';
@@ -102,8 +101,6 @@ async function main(): Promise<void> {
   else {
     connectAudio(gatedAudioBus(bus, () => store.save.settings.sound));
     connectSfx(bus, () => store.save.settings.sound, undefined, { mute, volume: () => store.save.settings.sfxVolume / 100 });
-    // Караоке гимна: мелодия только по тапу ▶ и при включённом звуке; с `?mute=1` выключатель не подключаем.
-    configureHymnAudio({ sound: () => store.save.settings.sound });
   }
   // Музыка (V11b): плеер HTMLAudio, по умолчанию выключена; `?mute=1` — аудио не создаётся, переключатели работают.
   const music = createMusicPlayer({

@@ -44,7 +44,7 @@ export interface UnitInfo {
   harvests: number;
   /** Сколько ответов (верных и нет) уже дано по единице: 0 — игрок её ещё не встречал. Необязательно, чтобы чужие фейки не ломались. */
   answers?: number;
-  /** «ещё 1 полив до ростка», «нужно сказать самому»… */
+  /** «ещё 1 полив до ростка», «нужно собрать самому»… */
   next: string;
 }
 
@@ -105,7 +105,7 @@ export interface GameCtx {
   seen(id: string): boolean;
   /** Отметить знакомство принятым: звать только по кнопке «Понятно», не при открытии карточки. */
   markSeen(id: string): void;
-  /** Исходный документ игры целиком (`content/v2/<файл>.json`): справочники (months, ordinals, rivers, melody…). */
+  /** Исходный документ игры целиком (`content/v2/<файл>.json`): справочники (months, ordinals, rivers…). */
   readonly doc: Readonly<Record<string, unknown>>;
   now(): number;
   /** Локальная дата (часы игры с `?now=`): для календаря и сезона. */

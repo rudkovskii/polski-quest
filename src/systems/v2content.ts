@@ -30,7 +30,7 @@ export const SWIETA_TOPIC: Topic = { id: 'swieta', pl: 'Święta i zwyczaje', ru
 export interface V2Content {
   units: PolskaUnit[];
   byId: Map<string, PolskaUnit>;
-  /** Исходные документы по играм (справочники: months, ordinals, rivers, melody, order…). */
+  /** Исходные документы по играм (справочники: months, ordinals, rivers, order…). */
   docs: Record<PolskaGameId, Readonly<Record<string, unknown>>>;
   /** Строки гимна, выученные в дриле собеса: сажаются сразу кустиком (решение Шэфа 4). */
   drillSeed: string[];

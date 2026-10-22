@@ -1,6 +1,6 @@
 // Заглушка игры v2 (ядро): рабочая, но простая — A: польское → выбор перевода; B: перевод → выбор польского; «сам»: собрать
 // польский текст единицы из плиток (+2 лишних). Каждая из четырёх папок `src/games/<id>/` стартует с неё; игровой агент
-// заменяет свой `index.ts` настоящей игрой (карта, барабаны, корзинка, караоке), контракт тот же (`PolskaGame`).
+// заменяет свой `index.ts` настоящей игрой (карта, барабаны, корзинка), контракт тот же (`PolskaGame`).
 import type { GameCtx, GameTask, PolskaGame, PolskaUnit, Want } from '../types/polska';
 import { choice, distractUnits, prompt, sameTiles, shuffle, tiles, wordsOf } from './kit';
 

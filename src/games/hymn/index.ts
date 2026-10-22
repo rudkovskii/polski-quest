@@ -1,13 +1,11 @@
-// Игра 2: Hymn i symbole («Maszt», ФЕРМА_v2.md §3). Гимн: ułóż wers, uzupełnij, co dalej, kolejność строк и куплетов (перевод — справкой после ответа), караоке с мелодией
-// (WebAudio, тихо, под выключателем, на `?mute=1` без AudioContext — ноты видны дорожкой). Символы: вопросы-шаблоны с дистракторами, czyj to symbol,
+// Игра 2: Hymn i symbole («Maszt», ФЕРМА_v2.md §3). Гимн только текстом, без музыки и нот (решение Шэфа 22.10): uzupełnij, co dalej, kolejność строк и куплетов,
+// «Jaki jest następny wers?» (собрать строку из плиток); перевод — справкой после ответа. Символы: вопросы-шаблоны с дистракторами, czyj to symbol,
 // сборка флага и герба тап-тап, порядок легенды о Лехе. Посадка (`pool`): куплет 1 и припев, следующий куплет — когда посаженное подросло до ростка;
 // строки из дриля собеса (`drillSeed`) движок сажает кустиками (решение Шэфа №4).
 import type { GameCtx, PolskaGame } from '../../types/polska';
 import { bandOrder } from '../stub';
-import { renderTask, stopMelody } from './view';
+import { renderTask } from './view';
 import { checkTask, makeTask, type HymnTask } from './tasks';
-
-export { configureHymnAudio } from './melody';
 
 const STANZA_ORDER = ['s1', 'ref', 's2', 's3', 's4'];
 
@@ -34,21 +32,13 @@ export function hymnPool(ctx: GameCtx): string[] {
 export const game: PolskaGame<HymnTask> = {
   id: 'hymn',
   title: { pl: 'Hymn i symbole', ru: 'Гимн и символы' },
-  desc: 'Mazurek Dąbrowskiego строка за строкой с мелодией, герб, флаг и символы',
+  desc: 'Mazurek Dąbrowskiego строка за строкой, герб, флаг и символы',
   entry: 'mast',
   plot: 'pasieka',
   kinds: ['hymn', 'symbol'],
   layout: 'panel',
   pool: hymnPool,
   nextTask: makeTask,
-  render(task, panel) {
-    renderTask(task, {
-      ...panel,
-      submit(answer) {
-        stopMelody();
-        panel.submit(answer);
-      },
-    });
-  },
+  render: (task, panel) => renderTask(task, panel),
   check: (task, answer) => checkTask(task, answer),
 };

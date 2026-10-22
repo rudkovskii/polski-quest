@@ -218,7 +218,8 @@ describe('v2: движок — отзыв, клавиша G, без автопе
     const t = ui.task as unknown as { mode: string; options: string[]; prompt: string; lang: string };
     said.length = 0;
     s.bus.emit('input:intent', { type: 'say', to: 'ui', source: 'keyboard' });
-    expect(said.length).toBe(1);
+    // Русский вопрос («Начало 2-го куплета») не озвучивается: G молчит.
+    expect(said.length).toBe(t.lang === 'pl' ? 1 : 0);
     if (t.lang === 'pl') expect(said[0]).toBe(spokenText(t.prompt));
     if (t.mode === 'choice') {
       s.bus.emit('input:intent', { type: 'move', dir: 'down', held: true, to: 'ui', source: 'keyboard' });

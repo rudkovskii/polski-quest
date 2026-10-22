@@ -16,8 +16,8 @@ import { SAY_CSS, sayButton, type SayFn } from './sayButton';
 
 /** Где размечать: польский текст и смешанные строки. Ближайший `lang` решает («ru» внутри польского блока — нет). */
 export const PL_SCOPE = '[lang="pl"], [data-plw]';
-/** Где не размечать: поля ввода, 🔊, буквы-плитки игры 5, экранная клавиатура, ноты караоке гимна (A, C, D), SVG, сам поповер. */
-export const NO_PICK = 'input, textarea, select, option, script, style, svg, .pq-say, [data-letter], [data-nopick], .pq-kb, [class^="pq-kb"], .hy-n, .pq-wpop, [contenteditable="true"]';
+/** Где не размечать: поля ввода, 🔊, буквы-плитки игры 5, экранная клавиатура, SVG, сам поповер. */
+export const NO_PICK = 'input, textarea, select, option, script, style, svg, .pq-say, [data-letter], [data-nopick], .pq-kb, [class^="pq-kb"], .pq-wpop, [contenteditable="true"]';
 /** Элементы, где тап — действие (ответ, выбор, навигация): там слово открывается только долгим нажатием или правым кликом. */
 export const INTERACTIVE = 'button, a[href], label, summary, [role="button"], [data-opt], [data-nav], [data-tile]';
 /** Части задания, где перевод подсказал бы ответ: пока лист `[data-quiz="open"]`, перевод скрыт за кнопкой. */
