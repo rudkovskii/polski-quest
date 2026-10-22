@@ -3,5 +3,7 @@
   "base": "/polski-quest/",
   "profile": null,
   "gate": null,
-  "level": "A1"
+  "level": "A1",
+  "languageOnly": false,
+  "onboarding": false
 }

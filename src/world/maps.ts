@@ -6,13 +6,35 @@ import type { Dir } from '../types/input';
 import type { LocationMap } from '../types/map';
 import { parseAscii } from './ascii';
 import { buildObjects } from './location';
+import { EDITION } from '../systems/edition';
 
-export const MAPS: Readonly<Record<string, LocationMap>> = {
+const ALL_MAPS: Readonly<Record<string, LocationMap>> = {
   farm: farm as unknown as LocationMap,
   home: home as unknown as LocationMap,
   // v2: новая локация к востоку от фермы (калитка, переход шагом): сад, пасека, огород месяцев, клумба.
   zagroda: zagroda as unknown as LocationMap,
 };
+
+/** Локации блока v2 «Игры о Польше»: при `languageOnly` их нет, выходы в них убираются. */
+export const POLSKA_MAPS: readonly string[] = ['zagroda'];
+/** Объекты-входы в игры v2 (`use`): карта и календарь в доме, мачта и сезонная доска на ферме, участки Zagroda. */
+export const POLSKA_USES: readonly string[] = ['map', 'calendar', 'mast', 'seasonBoard', 'zplot'];
+
+/**
+ * Карта для версии «только язык»: без входов в игры v2 (`POLSKA_USES`), без праздничного декора (`decor`) и без выходов в локации v2.
+ * Файлы карт не правятся: фильтр при загрузке, ветку легко обновлять из main.
+ */
+export function languageOnlyMap(m: LocationMap): LocationMap {
+  return { ...m, objects: m.objects.filter((o) => (o.type === 'prop' ? !(o.use && POLSKA_USES.includes(o.use)) && !o.decor : o.type === 'exit' ? !POLSKA_MAPS.includes(o.to) : true)) };
+}
+
+/** Набор карт игры: при `languageOnly` без локаций v2, остальные через `languageOnlyMap`. */
+export function buildMaps(all: Readonly<Record<string, LocationMap>>, languageOnly: boolean): Readonly<Record<string, LocationMap>> {
+  if (!languageOnly) return all;
+  return Object.fromEntries(Object.entries(all).filter(([id]) => !POLSKA_MAPS.includes(id)).map(([id, m]) => [id, languageOnlyMap(m)]));
+}
+
+export const MAPS: Readonly<Record<string, LocationMap>> = buildMaps(ALL_MAPS, EDITION.languageOnly);
 
 /**
  * Куда идти к объекту с `use` (кнопка «Idź», v2): на этой карте — `prop:<id>` (`here`), иначе первая дверь кратчайшего маршрута
