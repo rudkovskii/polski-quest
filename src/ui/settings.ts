@@ -49,6 +49,8 @@ export interface SettingsDeps {
   backupDue?(): boolean;
   /** Звук выключен ссылкой (`?mute=1`): переключатель показывает «Выкл» и не работает. */
   muted?: boolean;
+  /** «Как играть» (только при `onboarding` в edition.json): закрыть настройки и открыть онбординг. Нет — пункта нет. */
+  onHowTo?(): void;
   /** Версия сборки (`0.2.0+abc1234`) и профиль (`?dev=<id>`) — мелко внизу панели. */
   version?: string;
   profile?: string;
@@ -151,6 +153,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     el('div', { class: 'row' }, el('span', {}, 'Звук'), sound),
     el('label', { class: 'pq-vol' }, el('span', {}, 'Громкость эффектов'), vol, volOut),
     ...musicRows,
+    deps.onHowTo ? el('button', { type: 'button', class: 'pq-btn', 'data-howto': '', onclick: () => (api.close(), deps.onHowTo?.()) }, 'Как играть') : null,
     savedLine,
     el('button', { type: 'button', class: 'pq-btn', 'data-export': '', onclick: () => (note.textContent = `Сохранено: ${deps.exportSave()}`) }, 'Экспорт сохранения'),
     el('button', { type: 'button', class: 'pq-btn', 'data-import': '', onclick: () => file.click() }, 'Импорт сохранения'),

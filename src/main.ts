@@ -11,7 +11,7 @@ import { createEntryPoint } from './systems/entryPoint';
 import { createPolska } from './systems/polska';
 import { PLOT_NAME } from './systems/zagroda';
 import { activeDecor, parseDecor } from './systems/decor';
-import { getMap } from './world/maps';
+import { MAPS, getMap } from './world/maps';
 import { HOME_KEY, createBeaver } from './systems/beaver';
 import { V2 } from './systems/v2content';
 import type { PolskaEntry, PolskaGameId } from './types/polska';
@@ -57,7 +57,8 @@ import { mountPolskaGame } from './ui/polskaGame';
 import { mountPolskaHud } from './ui/polskaHud';
 import { mountPolskaPlot } from './ui/polskaPlot';
 import { passGate } from './ui/gate';
-import { EDITION } from './systems/edition';
+import { EDITION, LEVEL } from './systems/edition';
+import { ONBOARDING_HINT, mountOnboarding, shouldShowOnboarding } from './ui/onboarding';
 
 const params = new URLSearchParams(location.search);
 // `?dev=<id>`: dev-режим (`window.__pq`) и отдельный профиль сохранения `polski-farm-<id>` (тесты не трогают игру Шэфа).
@@ -131,6 +132,7 @@ async function main(): Promise<void> {
       store.update((s) => ({ ...s, settings: { ...s.settings, sound: on } }), Date.now());
     },
     music,
+    ...(EDITION.onboarding ? { onHowTo: () => onboarding.open() } : {}),
     getSfxVolume: () => store.save.settings.sfxVolume,
     setSfxVolume: (v) => store.update((s) => ({ ...s, settings: { ...s.settings, sfxVolume: v } }), Date.now()),
     lastSaved: () => store.lastSavedAt ?? store.save.updated,
@@ -173,11 +175,11 @@ async function main(): Promise<void> {
   const wordPick = mountWordPick(overlay, {
     api: farm,
     load: createPlruLoader({ url: `${import.meta.env.BASE_URL}dict/plru.json.gz` }),
-    // База A1 и тема «Święta» + названия из игр v2 (города, реки, воеводства с падежами).
+    // База A1 и тема «Święta» (кроме версии «только язык») + названия из игр v2 (города, реки, воеводства с падежами).
     index: () =>
       (wordIdx ??= wordIndex(
         BASE_WORDS,
-        V2.units.map((u) => ({ pl: u.pl, ru: u.ru, forms: Object.values((u.raw.forms ?? {}) as Record<string, unknown>).filter((x): x is string => typeof x === 'string') })),
+        (EDITION.languageOnly ? [] : V2.units).map((u) => ({ pl: u.pl, ru: u.ru, forms: Object.values((u.raw.forms ?? {}) as Record<string, unknown>).filter((x): x is string => typeof x === 'string') })),
       )),
     isA1,
     isCustom: isCustomId,
@@ -242,9 +244,20 @@ async function main(): Promise<void> {
   bus.on('world:location', ({ id }) => {
     where = id;
   });
+  // Онбординг (`edition.onboarding`): первым при первом запуске, указатель первых шагов стартует после него; «Как играть» в настройках открывает снова.
+  const onboarding = mountOnboarding(overlay, { level: LEVEL, seen: () => addHint(ONBOARDING_HINT) });
+  const showOnboarding = EDITION.onboarding && shouldShowOnboarding({ enabled: true, hints: store.save.hints, planted: store.save.garden.planted.length, answered: store.save.garden.log.length });
+  if (EDITION.onboarding && !showOnboarding) addHint(ONBOARDING_HINT);
+  if (showOnboarding) {
+    // Мир загружен (первая локация) → карточки; ввод героя на это время выключен самой панелью.
+    const offLoc = bus.on('world:location', () => {
+      offLoc();
+      setTimeout(() => onboarding.open(), 350);
+    });
+  }
   // Первые шаги: к столу (до первого открытия словаря), потом к доске (до первой мини-игры). Игрок, который уже сажал
   // слова или отвечал, указателя не видит.
-  mountGuide(overlay, {
+  const startGuide = (): void => void mountGuide(overlay, {
     stage: (): GuideStage | null => {
       const g = store.save.garden;
       if (!hasHint('guide:desk') && g.planted.length === 0) return 'desk';
@@ -260,6 +273,9 @@ async function main(): Promise<void> {
       if (stage !== 'replant') addHint(`guide:${stage}`);
     },
   });
+  // Указатель ждёт, пока онбординг не закроют (подсказки после него, не поверх).
+  if (showOnboarding) onboarding.onClose(startGuide);
+  else startGuide();
   // Игры 3 и 4 с одной-двумя фразами: после ответа фраза отдыхает, а панель предлагает посадить ещё (F5b).
   const gapCard = mountAssembleGap(overlay, {
     gap: (mode) => farm.gap(mode),
@@ -310,7 +326,7 @@ async function main(): Promise<void> {
     onPick: (mode) => game.start(mode),
     phraseHint: () => farm.phraseHint(),
     plant: (ids) => farm.plant(ids),
-    polska: {
+    ...(EDITION.languageOnly ? {} : { polska: {
       games: () =>
         GAMES.map((g) => {
           const p = polska.progress(g.id);
@@ -326,9 +342,10 @@ async function main(): Promise<void> {
         if (g) bus.emit('world:goto', { use: g.entry });
       },
       play: (id) => playPolska(id as PolskaGameId),
-    },
+    } }),
   });
-  mountPolskaHud(overlay, { onTap: () => !game.isOpen && !polskaGame.isOpen && board.open('polska') });
+  // Шкала «Wiedza o Polsce» — часть блока v2; в версии «только язык» её нет.
+  if (!EDITION.languageOnly) mountPolskaHud(overlay, { onTap: () => !game.isOpen && !polskaGame.isOpen && board.open('polska') });
   // Пояснения «банка» и «мешок»: один раз, при первом показе (флаги `tip:*` в `Save.hints`).
   const tips = createTips({ seen: hasHint, mark: addHint });
   const dictionary = mountDictionary(overlay, farm, undefined, tips, { loadDict: createRuplLoader({ url: `${import.meta.env.BASE_URL}dict/rupl.json.gz` }) });
@@ -349,7 +366,7 @@ async function main(): Promise<void> {
     },
     mark: (day) => store.update((s: Save) => ({ ...s, hints: [...s.hints.filter((x) => !x.startsWith(MORNING)), `${MORNING}${day}`] }), Date.now()),
     // Праздник сегодня или на неделе (Święta) — строкой в утренней карточке; украшение дня, если оно есть.
-    polska: () => {
+    polska: EDITION.languageOnly ? () => null : () => {
       const t = new Date(clock.now());
       const near = nearestHoliday(polska.units('swieta'), { y: t.getFullYear(), m: t.getMonth() + 1, d: t.getDate() });
       if (!near || near.days > 7) return null;
@@ -387,7 +404,7 @@ async function main(): Promise<void> {
     store.update((s: Save) => ({ ...s, position: { map, x, y, facing } }), clock.now());
   });
 
-  const start: WorldStart = save.position ? { map: save.position.map, spawn: [save.position.x, save.position.y], facing: save.position.facing } : {};
+  const start: WorldStart = save.position && MAPS[save.position.map] ? { map: save.position.map, spawn: [save.position.x, save.position.y], facing: save.position.facing } : {};
   const phaser = new Phaser.Game({
     type: Phaser.WEBGL,
     parent,
@@ -401,7 +418,7 @@ async function main(): Promise<void> {
   phaser.registry.set('boot:start', start);
   // Украшения мира к реальной дате (часы игры, `?now=`): знич 1–2.11, флажки 2–3.05 и 11.11, ёлка 24.12–6.01, пальма и писанки к Пасхе.
   const today = new Date(clock.now());
-  const decor0 = activeDecor(parseDecor((V2.docs.swieta as { decor?: unknown }).decor), { y: today.getFullYear(), m: today.getMonth() + 1, d: today.getDate() });
+  const decor0 = EDITION.languageOnly ? [] : activeDecor(parseDecor((V2.docs.swieta as { decor?: unknown }).decor), { y: today.getFullYear(), m: today.getMonth() + 1, d: today.getDate() });
   // Бобёр (`systems/beaver.ts`): гость на уровнях 0–9, с 10-го поселяется (хатка и пруд — ключ `beaver.home` в наборе украшений).
   // `?blvl=N` с `?dev=` подменяет уровень для проверок (профиль dev отдельный, чужие сохранения не трогаем).
   const devLevel = dev ? Number(params.get('blvl') ?? NaN) : NaN;

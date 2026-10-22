@@ -3,13 +3,19 @@ import phrasesJson from '../../content/a1/phrases.json';
 import wordsJson from '../../content/a1/words.json';
 import type { Phrase, Topic, Word } from '../types/content';
 import { CUSTOM_TOPIC, toWord, type CustomWord } from './customWords';
+import { EDITION } from './edition';
 import { V2 } from './v2content';
 
 /** База A1 (только она считается в путь к A1, `systems/xp.ts`). */
 export const WORDS: readonly Word[] = wordsJson as unknown as Word[];
 export const PHRASES: readonly Phrase[] = phrasesJson as unknown as Phrase[];
 /** v2: слова темы «Święta i zwyczaje» (`content/v2/words_swieta.json`). Растут как слова, но вне A1. */
-export const EXTRA_WORDS: readonly Word[] = V2.words;
+export const EXTRA_WORDS: readonly Word[] = extraWords(EDITION.languageOnly);
+
+/** Слова темы «Święta» для словаря; в версии «только язык» их нет (тема не появляется). */
+export function extraWords(languageOnly: boolean): readonly Word[] {
+  return languageOnly ? [] : V2.words;
+}
 /** Все слова словаря: A1, темы вне A1 и в самом конце свои слова («Moje słowa», новые первыми). Массив общий: `setCustomWords` меняет его на месте. */
 const ALL: Word[] = [...WORDS, ...EXTRA_WORDS];
 export const ALL_WORDS: readonly Word[] = ALL;

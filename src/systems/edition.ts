@@ -13,8 +13,13 @@ export interface Edition {
   gate: string | null;
   /** Цель пути в интерфейсе: «A1», «B1». */
   level: string;
+  /** Только язык: вырезан блок v2 «Игры о Польше», Zagroda, праздничный декор и тема «Święta» (фильтры при сборке, файлы на месте). */
+  languageOnly: boolean;
+  /** Базовый онбординг при первом запуске + пункт «Как играть» в настройках. */
+  onboarding: boolean;
 }
 
-export const EDITION: Edition = editionJson as Edition;
+/** Старые `edition.json` без новых флагов читаются как `false`. */
+export const EDITION: Edition = { ...(editionJson as Edition), languageOnly: (editionJson as Partial<Edition>).languageOnly === true, onboarding: (editionJson as Partial<Edition>).onboarding === true };
 /** Название цели пути: «Путь к A1», «до B1: 12%». */
 export const LEVEL: string = EDITION.level;
