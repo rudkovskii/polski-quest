@@ -949,8 +949,8 @@ def apple_item():
 
 # ───────────────────────────── карта Geografia: герой, кот, флажок, точки, компас ─────────────────────────────
 
-HERO_LEG = {'o': 'outline', 'H': 'hair.2', 'h': 'hair.3', 'S': 'skin.2', 's': 'skin.3', 'e': 'ink', 'B': 'blazer.2', 'b': 'blazer.3',
-            'w': 'shirt.2', 'T': 'trouser.2', 'U': 'trouser.1', 'F': 'boot.2', 'K': 'blazer.1'}
+HERO_LEG = {'o': 'outline', 'H': 'hair.2', 'h': 'hair.3', 'S': 'skin.2', 's': 'skin.3', 'e': 'ink', 'B': 'vest.2', 'b': 'vest.3',
+            'w': 'skin.2', 'T': 'pants.2', 'U': 'pants.1', 'F': 'shoe.2', 'K': 'vest.1'}
 
 # герой 8×12 (с контуром); 16×16-ячейка, рисунок в x 4..11, y 4..15
 HERO_DOWN = [
@@ -958,10 +958,10 @@ HERO_DOWN = [
     '.oHhhHo.',
     'oHHHHHHo',
     'oHeSSeHo',
-    '.oSSSSo.',
-    '.oBwwBo.',
-    'oSBbBBSo',
-    '.oBBBKo.',
+    'oHSSSSHo',
+    '.oHwwHo.',
+    'oHBbBBHo',
+    'oHBBBKHo',
     '.oTTTUo.',
     '.oT..To.',
     '.oF..Fo.',
@@ -973,9 +973,9 @@ HERO_UP = [
     'oHHHHHHo',
     'oHHHHHHo',
     '.oHHHHo.',
-    '.oBBBBo.',
-    'oSBbBBSo',
-    '.oBBBKo.',
+    'oHHHHHHo',
+    'oHHhHHHo',
+    '.oHHHHo.',
     '.oTTTUo.',
     '.oT..To.',
     '.oF..Fo.',
@@ -987,9 +987,9 @@ HERO_SIDE = [  # смотрит вправо
     'oHHHHHHo',
     'oHHHSeSo',
     '.oHSSSo.',
-    '.oBwBBo.',
-    '.oBBbSo.',
-    '.oBBBKo.',
+    'oHHwBBo.',
+    'oHHBbSo.',
+    'oHHBBKo.',
     '.oTTTUo.',
     '.oTTUTo.',
     '..oFFFo.',
@@ -1022,9 +1022,9 @@ def hero_kick(extend: bool):
         'oHHHHHHo',
         'oHHHSeSo',
         '.oHSSSo.',
-        '.oBwBBo.',
-        '.oBBbSo.',
-        '.oBBBKo.',
+        'oHHwBBo.',
+        'oHHBbSo.',
+        'oHHBBKo.',
         '.oTTTTo.' if extend else '.oTTTUo.',
         '.oTT.Uo.' if not extend else '.oTUoTUo',
         '.oFo.oFo' if not extend else '.oFo.oFFo',
@@ -1057,7 +1057,7 @@ def hero_sheet() -> None:
     emit(sh)
 
 
-CAT_LEG = {'o': 'outline', 'C': 'cat.2', 'c': 'cat.3', 'S': 'cat_stripe.2', 'W': 'cat_cream.2', 'e': 'ink'}
+CAT_LEG = {'o': 'outline', 'C': 'cat_fur.2', 'c': 'cat_fur.3', 'S': 'cat_warm.2', 'W': 'cat_fluff.2', 'e': 'cat_eye.2'}
 
 
 def geo_cat_sheet() -> None:
@@ -1176,7 +1176,7 @@ def geo_dot_sheet() -> None:
 def compass_frame():
     c = Cv(32, 32, {
         'ring': P('wood', r=3, g='ring'), 'face': P('paper', r=5, g='face'),
-        'n': P('tomato', flat=2, g='n'), 's': P('shade', flat=2, g='s'), 'ew': P('blazer', flat=2, g='ew'),
+        'n': P('tomato', flat=2, g='n'), 's': P('shade', flat=2, g='s'), 'ew': P('vest', flat=2, g='ew'),
     })
     c.ell(16, 16, 14.5, 14.5, 'ring')
     c.ell(16, 16, 12, 12, 'face')

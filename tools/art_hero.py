@@ -1,62 +1,86 @@
-"""Герой по фото Шэфа: 16×32, 4 стороны × 3 кадра, портрет 32×32.
+"""Героиня по фото Оли: 16×32, 4 стороны × 3 кадра, портрет 32×32.
 
-Короткие тёмно-русые волосы с зачёсом вверх, короткая борода, светло-голубая рубашка, тёмно-синий пиджак и брюки,
-коричневый ремень и ботинки. Голова — одна группа (без швов), руки отдельной группой, ботинки отдельной.
-Профиль (left, right = зеркало) нарисован вручную тонами палитры (HEAD_SIDE, TORSO_SIDE, ARM_SIDE, LEGS_SIDE): голова 3/4
-в духе SDV, рука против ближней ноги, в шаге корпус опускается на 1 px.
+Очень длинные прямые тёмно-каштановые волосы с карамельными прядями и пробором по центру, карие глаза, розовые губы.
+Тёмно-шоколадный приталенный жилет до бёдер с пуговицами, голые руки (золотые часы), кремовые широкие брюки, светлая обувь.
+Голова — одна группа (без швов), руки отдельной группой, обувь отдельной. Волосы за спиной рисуются первым слоем.
+Профиль (left, right = зеркало) нарисован вручную тонами палитры (HEAD_SIDE, TORSO_SIDE, ARM_SIDE, LEGS_SIDE):
+рука против ближней ноги, в шаге корпус опускается на 1 px.
 """
 from __future__ import annotations
 
 from art_core import Cv, Sheet, P, emit, single
 
 PARTS = {
-    'hair': P('hair', r=3, g='head'), 'skin': P('skin', r=2, g='head'), 'beard': P('beard', r=2, g='head'),
-    'shirt': P('shirt', r=2, g='torso'), 'blazer': P('blazer', r=3, g='torso'), 'belt': P('belt', r=1, g='torso'),
-    'sleeve': P('blazer', r=2, g='sleeve'), 'hand': P('skin', r=1, g='hand'),
-    'trouser': P('trouser', r=3, g='legs'), 'boot': P('boot', r=1, g='boot'),
-    'handf': P('skin', flat=2, g='hand'), 'can': P('tin', r=2, g='can'), 'sack': P('sack', r=2, g='sack'), 'tie': P('belt', flat=2, g='tie'),
+    'hair': P('hair', r=3, g='head'), 'skin': P('skin', r=2, g='head'), 'hairb': P('hair', r=3, g='hairb'),
+    'vest': P('vest', r=3, g='torso'), 'sleeve': P('skin', flat=2, g='arm'), 'hand': P('skin', flat=2, g='arm'),
+    'pants': P('pants', r=2, g='legs'), 'shoe': P('shoe', r=1, g='shoe'),
+    'handf': P('skin', flat=2, g='arm'), 'can': P('tin', r=2, g='can'), 'sack': P('sack', r=2, g='sack'),
 }
 
 
+def strands(c: Cv, runs) -> None:
+    """Карамельные пряди: (x, y0, y1, тон) вертикальными отрезками."""
+    for x, y0, y1, t in runs:
+        for y in range(y0, y1):
+            if c.m[y * c.w + x] in ('hair', 'hairb'):
+                c.dot(x, y, f'caramel.{t}')
+
+
 def legs_front(c: Cv, step: int, cx: float = 8.0) -> None:
-    """Штаны и ботинки спереди/сзади. step: -1 левая нога приподнята, +1 правая, 0 стоит."""
-    for side, sx in ((-1, cx - 2.0), (1, cx + 2.0)):
+    """Широкие брюки и обувь спереди/сзади. step: -1 левая нога приподнята, +1 правая, 0 стоит."""
+    for side in (-1, 1):
         lift = 1.2 if step == side else 0
-        c.rect(sx - 1.9, 23.0, 3.8, 6.9 - lift, 'trouser')
-        c.ell(sx + side * 0.2, 30.2 - lift, 2.4, 1.4, 'boot')
-    c.vline(8, 25, 30, 'trouser.1')
+        yb = 29.9 - lift
+        o = cx + side * 0.15
+        c.poly([[o, 23.0], [o + side * 3.1, 23.0], [o + side * 4.2, yb], [o, yb]], 'pants')
+        c.ell(cx + side * 2.6, 30.3 - lift, 2.2, 1.3, 'shoe')
+    c.vline(8, 26, 30, 'pants.1')
 
 
 def arms_front(c: Cv, step: int) -> None:
     for side in (-1, 1):
         sw = -0.9 if step == -side else (0.6 if step == side else 0)
-        x = 8 + side * 5.4
-        c.cap(x, 16.2, x + side * 0.1, 21.6 + sw, 1.5, 'sleeve')
-        c.ell(x + side * 0.1, 23.1 + sw, 1.3, 1.2, 'hand')
+        x = 8 + side * 4.8
+        c.cap(x, 16.4, x + side * 0.1, 21.4 + sw, 1.3, 'sleeve')
+        c.ell(x + side * 0.1, 22.8 + sw, 1.2, 1.2, 'hand')
+        if side == -1:
+            c.dot(x, 21.4 + sw, 'gold.3')   # золотые часы
+
+
+def hair_back_front(c: Cv) -> None:
+    """Волосы за плечами, видны по бокам фигуры (первым слоем)."""
+    c.poly([[2.6, 8.0], [13.4, 8.0], [13.9, 18.0], [13.2, 22.4], [10.0, 22.9], [6.0, 22.9], [2.8, 22.4], [2.1, 18.0]], 'hairb')
+
+
+VEST = [[4.5, 16.2], [6.0, 14.8], [10.0, 14.8], [11.5, 16.2], [11.0, 20.4], [11.9, 25.3], [4.1, 25.3], [5.0, 20.4]]
 
 
 def head_front(c: Cv) -> None:
-    c.ell(8, 9.2, 5.2, 5.4, 'skin')
-    c.ell(2.9, 9.8, 0.9, 1.4, 'skin'); c.ell(13.1, 9.8, 0.9, 1.4, 'skin')
-    c.ell(8, 5.6, 5.5, 4.5, 'hair')
-    c.ell(8.8, 3.4, 4.0, 2.5, 'hair')
-    c.fill(lambda x, y: ((x - 8) / 5.2) ** 2 + ((y - 9.2) / 5.4) ** 2 <= 1 and y > 7.2 and 4.7 < x < 11.3, 'skin', only=['hair'])
-    c.poly([[3.5, 10.2], [4.5, 13.2], [8, 15.0], [11.5, 13.2], [12.5, 10.2], [11.4, 11.8], [8, 12.7], [4.6, 11.8]], 'beard', only=['skin'])
-    c.rect(5.8, 11.0, 4.4, 1.0, 'beard', only=['skin'])
-    c.dots([5, 9, 10, 9], 'ink')
+    c.ell(8, 9.4, 4.7, 5.0, 'skin')
+    c.ell(8, 5.4, 5.3, 4.4, 'hair')
+    c.ell(8, 3.8, 4.2, 2.6, 'hair')
+    # лоб с прямым пробором: волосы расходятся от центра вниз по сторонам
+    c.fill(lambda x, y: ((x - 8) / 4.7) ** 2 + ((y - 9.4) / 5.0) ** 2 <= 1 and y > 5.2 + abs(x - 8) * 0.55 and 5.2 < x < 10.8, 'skin', only=['hair'])
+    # пряди по бокам лица спадают на грудь
+    for s in (-1, 1):
+        c.cap(8 + s * 4.2, 11.0, 8 + s * 4.5, 18.6, 1.0, 'hair')
+    c.dots([8, 3, 8, 4], 'hair.1')                         # пробор
+    c.dots([4, 8, 5, 8, 10, 8, 11, 8], 'hair.0')           # брови
+    c.dots([5, 9, 5, 10, 10, 9, 10, 10], 'ink')            # карие глаза
+    c.dots([4, 11, 11, 11], 'cheek')
     c.dots([7, 12, 8, 12], 'mouth')
+    strands(c, [(4, 5, 8, 2), (11, 5, 8, 2), (4, 12, 17, 2), (11, 13, 18, 2), (3, 8, 11, 3)])
 
 
 def hero_down(step: int, arms=None, post=None) -> Cv:
     c = Cv(16, 32, PARTS)
+    hair_back_front(c)
     legs_front(c, step)
-    c.rect(4.8, 22.0, 6.4, 1.8, 'belt')
-    c.rect(4.2, 15.0, 7.6, 7.2, 'shirt')
-    c.poly([[2.8, 16.2], [4.4, 14.6], [6.4, 14.6], [7.2, 20.4], [6.6, 23.9], [3.2, 23.9]], 'blazer')
-    c.poly([[13.2, 16.2], [11.6, 14.6], [9.6, 14.6], [8.8, 20.4], [9.4, 23.9], [12.8, 23.9]], 'blazer')
-    c.dot(8, 22.6, 'gold.3')
+    c.poly(VEST, 'vest')
+    c.poly([[6.4, 14.8], [9.6, 14.8], [8.0, 18.6]], 'skin')   # V-вырез
+    c.dots([8, 19, 8, 21, 8, 23], 'vest.4')
     (arms or arms_front)(c, step)
-    c.rect(6.2, 13.4, 3.6, 2.2, 'skin')
+    c.rect(6.8, 13.2, 2.4, 2.2, 'skin')
     head_front(c)
     if post:
         post(c)
@@ -66,15 +90,16 @@ def hero_down(step: int, arms=None, post=None) -> Cv:
 def hero_up(step: int, arms=None, post=None) -> Cv:
     c = Cv(16, 32, PARTS)
     legs_front(c, step)
-    c.poly([[2.8, 16.2], [4.4, 14.6], [11.6, 14.6], [13.2, 16.2], [12.8, 23.9], [3.2, 23.9]], 'blazer')
+    c.poly(VEST, 'vest')
     (arms or arms_front)(c, step)
-    c.rect(6.2, 13.2, 3.6, 2.2, 'skin')
-    c.ell(8, 9.2, 5.2, 5.4, 'skin')
-    c.ell(2.9, 9.8, 0.9, 1.4, 'skin'); c.ell(13.1, 9.8, 0.9, 1.4, 'skin')
-    c.ell(8, 7.6, 5.5, 6.4, 'hair')
-    c.ell(8.0, 3.4, 4.2, 2.5, 'hair')
-    c.rect(4.6, 11.6, 6.8, 2.2, 'skin', only=['hair'])
-    c.vline(8, 17, 23, 'blazer.1')
+    c.rect(6.8, 13.2, 2.4, 2.2, 'skin')
+    c.ell(8, 9.4, 4.7, 5.0, 'skin')
+    # волосы закрывают голову и спину почти до пояса
+    c.ell(8, 7.4, 5.3, 6.2, 'hair')
+    c.ell(8, 3.8, 4.2, 2.6, 'hair')
+    c.poly([[3.5, 9.0], [12.5, 9.0], [12.9, 17.0], [12.3, 22.0], [10.4, 23.6], [8.6, 22.6], [7.2, 23.8], [5.4, 22.4], [3.7, 22.0], [3.1, 17.0]], 'hair')
+    c.vline(8, 4, 21, 'hair.1')
+    strands(c, [(5, 6, 12, 2), (11, 8, 14, 2), (6, 13, 20, 2), (10, 14, 21, 2), (4, 11, 17, 3), (12, 12, 19, 3), (8, 15, 20, 3)])
     if post:
         post(c)
     return c
@@ -96,14 +121,13 @@ class HCv(Cv):
 # Ручная раскладка тонов (профиль рисуется как пиксель-арт): буква → (часть для контура, тон палитры). '.' пусто.
 TONES = {
     'k': ('hair', 'hair.4'), 'K': ('hair', 'hair.3'), 'H': ('hair', 'hair.2'), 'h': ('hair', 'hair.1'), 'D': ('hair', 'hair.0'),
+    'a': ('hair', 'caramel.3'), 'A': ('hair', 'caramel.2'), 'z': ('hair', 'caramel.1'),
     'l': ('skin', 'skin.4'), 'L': ('skin', 'skin.3'), 'S': ('skin', 'skin.2'), 's': ('skin', 'skin.1'), 'x': ('skin', 'skin.0'),
     'C': ('skin', 'cheek'), 'E': ('skin', 'ink'), 'W': ('skin', 'eye_white'), 'M': ('skin', 'mouth'),
-    'n': ('beard', 'beard.3'), 'B': ('beard', 'beard.2'), 'b': ('beard', 'beard.1'), 'd': ('beard', 'beard.0'),
-    't': ('blazer', 'blazer.4'), 'r': ('blazer', 'blazer.3'), 'e': ('blazer', 'blazer.2'), 'w': ('blazer', 'blazer.1'), 'q': ('blazer', 'blazer.0'),
-    'v': ('shirt', 'shirt.4'), 'g': ('shirt', 'shirt.3'), 'f': ('shirt', 'shirt.2'),
-    'P': ('trouser', 'trouser.4'), 'p': ('trouser', 'trouser.3'), 'o': ('trouser', 'trouser.2'), 'i': ('trouser', 'trouser.1'), 'u': ('trouser', 'trouser.0'),
-    'G': ('boot', 'boot.3'), 'J': ('boot', 'boot.2'), 'j': ('boot', 'boot.1'), 'Y': ('boot', 'boot.0'),
-    'V': ('belt', 'belt.2'), 'c': ('belt', 'belt.1'), 'Q': ('belt', 'gold.3'),
+    't': ('vest', 'vest.4'), 'r': ('vest', 'vest.3'), 'e': ('vest', 'vest.2'), 'w': ('vest', 'vest.1'), 'q': ('vest', 'vest.0'),
+    'P': ('pants', 'pants.4'), 'p': ('pants', 'pants.3'), 'o': ('pants', 'pants.2'), 'i': ('pants', 'pants.1'), 'u': ('pants', 'pants.0'),
+    'G': ('shoe', 'shoe.3'), 'J': ('shoe', 'shoe.2'), 'j': ('shoe', 'shoe.1'), 'Y': ('shoe', 'shoe.0'),
+    'Q': ('skin', 'gold.3'),
 }
 
 
@@ -120,88 +144,87 @@ def paint(c: Cv, rows: list[str], ox: int = 0, oy: int = 0) -> None:
                 c.ov[Y * c.w + X] = tone
 
 
-# Профиль (смотрит влево). Голова y=0…14: зачёс вверх-назад, бровь, глаз, нос 1 px, ухо, бакенбард переходит
-# в короткую бороду по линии челюсти, усы.
+# Профиль (смотрит влево). Голова y=0…14: волосы с карамельными прядями, лоб, бровь, глаз, нос 1 px, ухо закрыто прядью.
 HEAD_SIDE = [
     '................',
-    '.....KKKHH......',
-    '...KKKHHHHh.....',
-    '..KKHKHHhHHh....',
-    '..KHHHKHHHHhh...',
-    '..HHhHHhHHHhh...',
-    '..LLSShHhHHhh...',
-    '..SSSSShhHHhh...',
-    '..hhSSSbhHhhh...',
-    '..SESSSbLShhh...',
-    '.SSSSSnbSshh....',
-    '..nnSBBbSsh.....',
-    '..MBBBBbbSs.....',
-    '...nBBbbsSs.....',
-    '....bbb.........',
+    '.....kkKKKh.....',
+    '...kKKAHHHHhh...',
+    '..kKHHAHAHHHhh..',
+    '..KHHHHHAHAHHh..',
+    '..KHHHHHAHAHHhh.',
+    '..LSHHHHHHAHHhh.',
+    '..DDSsHHHHAHHhh.',
+    '..SESSsHHAHHHhh.',
+    '.SSSSSsHHAHHHh..',
+    '..SSCSsHhAHHHh..',
+    '..SMSSsHhAHHHh..',
+    '...SSSsHhHHHh...',
+    '....ssSHhHHh....',
+    '.....sSsHHh.....',
 ]
-# Корпус y=14…23 без руки: воротник рубашки и шея, грудь с полосой рубашки, лацкан, ремень с пряжкой спереди, спина.
+# Корпус y=14…23: шея, жилет (грудь с пуговицей, талия), длинные волосы за спиной и прядь на груди.
 TORSO_SIDE = [
-    '.......gSse.....',
-    '....gfrrrrew....',
-    '....gerrreew....',
-    '....ferreeew....',
-    '....fweeeeew....',
-    '....fewreeew....',
-    '....feeeeeew....',
-    '....fewwweew....',
-    '....Qceeeeew....',
-    '....wwwwwwqw....',
+    '.....SsKHHhh....',
+    '....KKreeHHh....',
+    '....KHrteeAHh...',
+    '....KHreeeAHh...',
+    '....KHrewwAHh...',
+    '....HHrtewwHHh..',
+    '....KHrreeeHHh..',
+    '....hHeeeeeqHh..',
+    '.....hweeeeqhh..',
+    '.....wwwwwwqhh..',
 ]
-# Ближняя рука y=15…23: 0 висит, 1 отведена назад, -1 вынесена вперёд.
+# Ближняя рука y=15…23 (голая): 0 висит, 1 отведена назад, -1 вынесена вперёд.
 ARM_SIDE = {
     0: [
-        '.......rre......',
-        '......wreeq.....',
-        '......wreeq.....',
-        '......wreeq.....',
-        '......wreeq.....',
-        '......wrewq.....',
-        '......qwwwq.....',
-        '......qLSq......',
+        '.......LS.......',
+        '.......LSs......',
+        '.......LSs......',
+        '.......LSs......',
+        '.......LSs......',
+        '.......LSs......',
+        '.......sQs......',
+        '.......LSs......',
         '.......Ss.......',
     ],
     1: [
-        '.......rre......',
-        '.......reew.....',
-        '.......wreeq....',
-        '........wreeq...',
-        '........wreeq...',
-        '.........wreq...',
-        '.........qwwwq..',
-        '..........LSq...',
+        '.......LS.......',
+        '.......LSs......',
+        '........LSs.....',
+        '........LSs.....',
+        '.........LSs....',
+        '.........LSs....',
+        '.........sQs....',
+        '.........LSs....',
         '..........Ss....',
     ],
     -1: [
-        '.......rre......',
-        '......rreew.....',
-        '......rreeq.....',
-        '.....wreeq......',
-        '.....wreeq......',
-        '....wreeq.......',
-        '....qwwwq.......',
-        '....qLSq........',
-        '.....Ss.........',
+        '.......LS.......',
+        '.......LSs......',
+        '......LSs.......',
+        '......LSs.......',
+        '.....LSs........',
+        '.....LSs........',
+        '.....sQs........',
+        '.....LSs........',
+        '......Ss........',
     ],
 }
 # Ноги y=24…31 (в шаге корпус опускается на 1 px, ноги с y=25). 0 стоит; -1 ближняя нога впереди; +1 ближняя сзади.
 LEGS_SIDE = {
     0: [
-        '.....pooooi.....',
-        '.....poouii.....',
-        '.....poouii.....',
-        '.....poouii.....',
-        '.....poouii.....',
+        '.....poooi......',
+        '.....poooii.....',
+        '.....pooiii.....',
+        '.....pooiii.....',
+        '.....pooiii.....',
         '....GJJjYjj.....',
         '...GJJJjjYjj....',
         '...YYYYYYYYY....',
     ],
     -1: [
-        '.....pooouii....',
+        '.....poooii.....',
         '....pooo.uii....',
         '...pooo..uii....',
         '...poo...uiii...',
@@ -239,20 +262,29 @@ def hero_left(step: int, arms=None, post=None) -> Cv:
 def portrait() -> Cv:
     """32×32: голова и плечи для UI."""
     c = Cv(32, 32, PARTS)
-    c.poly([[1, 32], [3, 25.4], [8, 22.6], [24, 22.6], [29, 25.4], [31, 32]], 'blazer')
-    c.poly([[12, 22.6], [20, 22.6], [17.6, 32], [14.4, 32]], 'shirt')
-    c.rect(12.4, 19.6, 7.2, 4.0, 'skin')
-    c.ell(16, 13.2, 9.4, 9.8, 'skin')
-    c.ell(6.8, 14.0, 1.8, 2.8, 'skin'); c.ell(25.2, 14.0, 1.8, 2.8, 'skin')
-    c.ell(16, 8.0, 10.2, 8.0, 'hair')
-    c.ell(17.6, 3.4, 8.0, 3.2, 'hair')
-    c.fill(lambda x, y: ((x - 16) / 9.4) ** 2 + ((y - 13.2) / 9.8) ** 2 <= 1 and y > 10.6 and 8.4 < x < 23.6, 'skin', only=['hair'])
-    c.poly([[6.8, 15.0], [8.6, 20.6], [16, 24.2], [23.4, 20.6], [25.2, 15.0], [23.0, 18.6], [16, 20.6], [9.0, 18.6]], 'beard', only=['skin'])
-    c.rect(11.4, 17.6, 9.2, 1.8, 'beard', only=['skin'])
-    c.orect(10, 13, 4, 2, 'eye_white'); c.orect(18, 13, 4, 2, 'eye_white')
-    c.orect(11, 13, 2, 2, 'ink'); c.orect(19, 13, 2, 2, 'ink')
-    c.orect(10, 11, 4, 1, 'hair.1'); c.orect(18, 11, 4, 1, 'hair.1')
-    c.orect(15, 20, 2, 1, 'mouth')
+    c.poly([[5.0, 9.0], [27.0, 9.0], [29.0, 20.0], [28.0, 32.0], [4.0, 32.0], [3.0, 20.0]], 'hairb')
+    c.poly([[2, 32], [4, 26.0], [9, 23.0], [23, 23.0], [28, 26.0], [30, 32]], 'vest')
+    c.poly([[12.0, 23.0], [20.0, 23.0], [16, 29.6]], 'skin')
+    c.rect(13.2, 19.6, 5.6, 4.0, 'skin')
+    c.ell(16, 13.6, 8.4, 9.2, 'skin')
+    c.ell(16, 8.6, 9.6, 7.6, 'hair')
+    c.ell(16, 4.8, 7.4, 3.6, 'hair')
+    # лоб: волосы расходятся от пробора по центру
+    c.fill(lambda x, y: ((x - 16) / 8.4) ** 2 + ((y - 13.6) / 9.2) ** 2 <= 1 and y > 7.4 + abs(x - 16) * 0.62 and 9.6 < x < 22.4, 'skin', only=['hair'])
+    # пряди спереди спадают на плечи
+    for s in (-1, 1):
+        c.cap(16 + s * 8.2, 13.0, 16 + s * 9.4, 27.4, 2.0, 'hair')
+    c.vline(16, 1, 6, 'hair.1')
+    c.orect(10, 14, 4, 2, 'eye_white'); c.orect(18, 14, 4, 2, 'eye_white')
+    c.orect(11, 14, 2, 2, 'hair.3'); c.orect(19, 14, 2, 2, 'hair.3')
+    c.dots([12, 14, 20, 14], 'ink')
+    c.orect(10, 12, 4, 1, 'hair.0'); c.orect(18, 12, 4, 1, 'hair.0')
+    c.orect(9, 18, 2, 1, 'cheek'); c.orect(21, 18, 2, 1, 'cheek')
+    c.dots([16, 17, 15, 17], 'skin.1')
+    c.orect(14, 20, 4, 1, 'mouth'); c.dots([13, 19, 18, 19], 'mouth')
+    c.dots([14, 26, 16, 26, 17, 26], 'skin.1')
+    c.dots([16, 27, 16, 29, 16, 31], 'vest.4')
+    strands(c, [(7, 4, 10, 2), (22, 3, 9, 2), (5, 11, 22, 2), (27, 12, 24, 2), (3, 14, 20, 3), (28, 15, 22, 3), (8, 6, 12, 3), (11, 3, 7, 3), (9, 24, 31, 2), (24, 24, 31, 2)])
     return c
 
 
@@ -352,7 +384,7 @@ def fert_front(frame: int, up: bool = False):
             c.ell(13.4, 23.8, 2.6, 2.8, 'sack')
         else:
             c.ell(13.6, 22.8, 2.8, 2.5, 'sack')
-        c.dot(14, 21 if frame == 0 else 20, 'belt.2'); c.dot(13, 21 if frame == 0 else 20, 'belt.2')
+        c.dot(14, 21 if frame == 0 else 20, 'vest.2'); c.dot(13, 21 if frame == 0 else 20, 'vest.2')
         hand(c, 14.2, 20.4 if frame == 0 else 19.6, 1.2, 1.1)
         if frame == 1:
             c.dots([12, 25], 'sack.1')
@@ -367,10 +399,10 @@ def fert_left(frame: int):
     def post(c):
         if frame == 0:
             c.ell(3.8, 23.0, 2.7, 2.8, 'sack')
-            c.dots([3, 20, 4, 20], 'belt.2'); hand(c, 4.6, 19.6, 1.2, 1.1)
+            c.dots([3, 20, 4, 20], 'vest.2'); hand(c, 4.6, 19.6, 1.2, 1.1)
         else:
             c.ell(3.2, 22.0, 2.9, 2.5, 'sack')
-            c.dots([4, 19, 5, 19], 'belt.2'); hand(c, 5.2, 18.8, 1.2, 1.1)
+            c.dots([4, 19, 5, 19], 'vest.2'); hand(c, 5.2, 18.8, 1.2, 1.1)
             c.dot(2, 24, 'sack.1')
             spill(c, 2, 25)
     return arms, post
