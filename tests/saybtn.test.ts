@@ -198,6 +198,8 @@ describe('v2: движок — отзыв, клавиша G, без автопе
     vi.useFakeTimers();
     const { said, root, ui } = fixture();
     ui.start('geo');
+    // у карты экран уровней: «Dalej» запускает раунд рекомендованного уровня
+    root.querySelector<HTMLButtonElement>('[data-level-go]')!.click();
     const first = ui.task!.id;
     ui.submit({ x: -1, y: -1 });
     const fbBtn = root.querySelector<HTMLElement>('[data-feedback] .pq-say')!;

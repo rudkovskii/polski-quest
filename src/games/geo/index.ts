@@ -2,7 +2,7 @@
 // реки линиями. Задания: «Pokaż na mapie» (тап или курсор + A: мини-герой бежит к месту и втыкает флажок, кот рядом),
 // «Co to za miasto?», «Nad jaką rzeką leży…?», «Z kim graniczy Polska na zachodzie?» (сосед + форма «z Niemcami»), столица воеводства,
 // сторона света, падежные формы и сборка фраз из плиток (`want.self`).
-import type { GameCheck, GameCtx, GamePanel, PolskaGame, PolskaUnit, Want } from '../../types/polska';
+import type { GameCheck, GameCtx, GamePanel, PolskaGame, Want } from '../../types/polska';
 import { el } from '../../ui/dom';
 import { sayButton } from '../../ui/sayButton';
 import { choiceGrid } from './choice';
@@ -11,6 +11,7 @@ import { createMap, type MapView } from './mapview';
 import { checkTask, makeTask, statusOf, verdict, type DirAnswer, type GeoTask } from './tasks';
 import { clusterOf, anchorOf, centroid, dist, MAP_H, MAP_W, type Pt } from './world';
 import { prompt, tiles } from '../kit';
+import { levelViews, nextLevel, renderLevels } from './levels';
 
 /** Высота кнопки варианта в полосе под картой и в узком окне (≥ 44 px под палец). */
 const OPT_ROW = 46;
@@ -51,18 +52,17 @@ const CSS = `
 /** Сколько зелёный флажок виден после анимации, прежде чем движок листает дальше. */
 export const SUCCESS_SHOW_MS = 800;
 
-/** Порядок посадки: по полосам, внутри полосы виды чередуются (город, река, сосед, гора…), чтобы первые 8 семян были разными. */
+/** Порядок посадки всей карты: уровни по очереди (`levels.ts`), внутри уровня полосы и чередование видов. */
 export function geoPool(ctx: GameCtx): readonly string[] {
-  const out: string[] = [];
-  const bands = [...new Set(ctx.units.map((u) => u.band))].sort((a, b) => a - b);
-  const order = ['city', 'river', 'neighbor', 'mountain', 'sea', 'region', 'nature'];
-  for (const b of bands) {
-    const by = new Map<string, PolskaUnit[]>();
-    for (const u of ctx.units.filter((x) => x.band === b)) by.set(u.type, [...(by.get(u.type) ?? []), u]);
-    const types = [...by.keys()].sort((a, c) => (order.indexOf(a) + 100) % 100 - (order.indexOf(c) + 100) % 100);
-    for (let i = 0; types.some((t) => (by.get(t)?.length ?? 0) > i); i++) for (const t of types) if (by.get(t)![i]) out.push(by.get(t)![i]!.id);
-  }
-  return out;
+  return levelViews(ctx).flatMap((v) => v.ids);
+}
+
+/**
+ * Что движок досаживает вне раунда уровня (экран уровней, «Повторить» без `only`): только рекомендованный уровень, чтобы не сажать
+ * соседей и воеводства, пока игрок их не выбрал. Раунд уровня досаживает из своего набора сам (`begin(ids)`).
+ */
+export function geoNextPool(ctx: GameCtx): readonly string[] {
+  return nextLevel(levelViews(ctx))?.ids ?? [];
 }
 
 function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
@@ -235,12 +235,14 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
 export const game: PolskaGame<GeoTask> = {
   id: 'geo',
   title: { pl: 'Mapa Polski', ru: 'Карта Польши' },
-  desc: 'Города, реки, горы и соседи: найди на карте, назови и скажи фразу',
+  desc: 'По уровням: города и природа, соседи, парки, UNESCO, воеводства. Найди на карте, назови, скажи фразу',
   entry: 'map',
   plot: 'sad',
   kinds: ['geo'],
   layout: 'full',
-  pool: geoPool,
+  pool: geoNextPool,
+  hub: (panel, ctx, begin) => renderLevels(panel, ctx, (ids, size) => begin(ids, size)),
+  hubBack: 'К уровням',
   nextTask: (ctx: GameCtx, want: Want) => makeTask(ctx, want),
   render,
   check: (task: GeoTask, answer: unknown, ctx: GameCtx): GameCheck => checkTask(task, answer, ctx),

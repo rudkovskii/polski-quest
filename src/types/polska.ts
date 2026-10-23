@@ -107,6 +107,9 @@ export interface GameCtx {
   markSeen(id: string): void;
   /** Исходный документ игры целиком (`content/v2/<файл>.json`): справочники (months, ordinals, rivers…). */
   readonly doc: Readonly<Record<string, unknown>>;
+  /** Флаги игры в сохранении (`geo.level.2` — уровень открыт вручную). Необязательны: фейки тестов без них. */
+  flag?(key: string): boolean;
+  setFlag?(key: string): void;
   now(): number;
   /** Локальная дата (часы игры с `?now=`): для календаря и сезона. */
   date(): { y: number; m: number; d: number; weekday: number };
@@ -137,11 +140,15 @@ export interface PolskaGame<T extends GameTask = GameTask> {
   /** Строка в итоге раунда («Najbliższe święto: Wigilia za 3 dni»); null — без строки. */
   summaryLine?(ctx: GameCtx): string | null;
   /**
-   * Экран выбора до раунда (колесо праздников, `layout: 'full'`). Игра рисует его в `panel.body`/`panel.foot` и зовёт `begin(id, size)`:
-   * движок досаживает единицу и ведёт раунд из `size` заданий про неё одну (`nextTask` получает `want.id` = `id`). После итога раунда
-   * «К колесу» возвращает на этот экран. Без `hub` раунд начинается сразу и идёт по 10 заданий из разных единиц.
+   * Экран выбора до раунда (колесо праздников, уровни карты; `layout: 'full'`). Игра рисует его в `panel.body`/`panel.foot` и зовёт `begin`:
+   * - `begin(id, size)` — движок досаживает единицу и ведёт раунд из `size` заданий про неё одну (`nextTask` получает `want.id` = `id`);
+   * - `begin(ids, size)` — раунд по набору (уровень): досадка из `ids` по порядку, своих ≤ 8 растущих, задания только про эти единицы
+   *   (плюс перезревшие из других наборов игры — они возвращаются сами); в итоге «Ещё раунд» повторяет тот же набор.
+   * Кнопка итога `hubBack` («К колесу», «К уровням») возвращает на этот экран. Без `hub` раунд начинается сразу и идёт по 10 заданий из разных единиц.
    */
-  hub?(panel: GamePanel, ctx: GameCtx, begin: (id: string, size: number) => void): void;
+  hub?(panel: GamePanel, ctx: GameCtx, begin: (id: string | readonly string[], size: number) => void): void;
+  /** Подпись кнопки итога «назад к экрану выбора» (по умолчанию «К колесу»). */
+  hubBack?: string;
 }
 
 /** Вид объекта на участке Zagroda по прогрессу (для сцены). */
