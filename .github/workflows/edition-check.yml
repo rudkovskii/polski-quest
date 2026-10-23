@@ -1,0 +1,27 @@
+name: edition check
+
+# Проверка персональной версии на её собственной ветке (t02, проект «Бобер»).
+# Только проверка: ничего не собирает на Pages и не трогает деплой (деплой — deploy.yml, только с main).
+on:
+  push:
+    branches: ['ed/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: pip install Pillow==12.2.0
+      - run: npm run check
