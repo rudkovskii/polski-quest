@@ -23,6 +23,13 @@ export interface MorningDeps {
   mark(day: number): void;
   /** Строка о Польше на сегодня («Dziś: Wszystkich Świętych · znicze przy ogrodzie»), null — без неё. */
   polska?(): string | null;
+  /**
+   * Новости дня перед карточкой (случайные слова дня, `systems/dailySeeds.ts`): зовётся при каждой проверке, когда мир готов
+   * и экраны закрыты; сама решает, пора ли (раз в день). Строка — в карточку утра, а если утра сегодня нет — в `toast`.
+   */
+  news?(day: number): string | null;
+  /** Куда деть новость дня, когда карточки утра нет (новичок, утро уже было). */
+  toast?(text: string): void;
   /** Пауза до первой проверки после загрузки мира, мс. */
   delayMs?: number;
 }
@@ -51,17 +58,21 @@ export function mountMorning(parent: HTMLElement, d: MorningDeps): Morning {
   const check = (): void => {
     if (!ready || !inputOn || panel.isOpen) return;
     const day = d.today();
+    const news = d.news?.(day) ?? null;
     const recap = d.recap();
     const act = morningAction(day, d.seenDay(), recap);
-    if (act === 'none') return;
-    d.mark(day);
-    if (act !== 'show' || !recap) return;
+    if (act !== 'none') d.mark(day);
+    if (act !== 'show' || !recap) {
+      if (news) d.toast?.(news);
+      return;
+    }
     const r = morningRipeLines(d.ripeToday(), d.ripeSoon?.() ?? 0);
     text.replaceChildren(
       el('div', {}, el('b', {}, `${recap.label}:`), ` выращено ${recap.grown}, полито ${recap.watered}`),
       el('div', {}, el('b', {}, r.label), r.value),
     );
     if (r.extra) text.append(el('div', { class: 'pq-morning-soon', 'data-soon': '' }, r.extra));
+    if (news) text.append(el('div', { class: 'pq-morning-news', 'data-morning-news': '', 'data-plw': '', style: 'font-size:15px' }, news));
     const pl = d.polska?.() ?? null;
     if (pl) text.append(el('div', { class: 'pq-morning-polska', 'data-morning-polska': '', 'data-plw': '', style: 'padding:6px 8px;background:#fffaf0;border:2px solid var(--pq-wood-dark);border-radius:8px;font-size:15px' }, pl));
     panel.open();

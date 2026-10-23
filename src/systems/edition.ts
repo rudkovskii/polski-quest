@@ -17,9 +17,21 @@ export interface Edition {
   languageOnly: boolean;
   /** Базовый онбординг при первом запуске + пункт «Как играть» в настройках. */
   onboarding: boolean;
+  /** Сколько случайных новых слов базы садится само в первый вход нового дня (`systems/dailySeeds.ts`); 0 — выключено. */
+  dailyRandom: number;
 }
 
-/** Старые `edition.json` без новых флагов читаются как `false`. */
-export const EDITION: Edition = { ...(editionJson as Edition), languageOnly: (editionJson as Partial<Edition>).languageOnly === true, onboarding: (editionJson as Partial<Edition>).onboarding === true };
+/** Старые `edition.json` без новых флагов читаются как `false` (число — как 0). */
+export const EDITION: Edition = normalizeEdition(editionJson as Partial<Edition>);
+
+export function normalizeEdition(e: Partial<Edition>): Edition {
+  const n = e.dailyRandom;
+  return {
+    ...(e as Edition),
+    languageOnly: e.languageOnly === true,
+    onboarding: e.onboarding === true,
+    dailyRandom: typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0,
+  };
+}
 /** Название цели пути: «Путь к A1», «до B1: 12%». */
 export const LEVEL: string = EDITION.level;
