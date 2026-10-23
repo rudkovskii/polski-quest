@@ -5,5 +5,6 @@
   "gate": "07575aa9e70794505959e90cac6506ee47b8148da8090bdfd39f1a4df62f320a",
   "level": "B1",
   "languageOnly": true,
-  "onboarding": true
+  "onboarding": true,
+  "dailyRandom": 10
 }

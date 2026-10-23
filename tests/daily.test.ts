@@ -55,8 +55,9 @@ describe('выбор слов дня', () => {
 });
 
 describe('флаг в edition.json', () => {
-  it('в игре Шэфа (main) выключено; старый edition.json без поля — 0; мусор — 0', () => {
-    expect(normalizeEdition(editionJson as never).dailyRandom).toBe(0);
+  it('в игре Шэфа (main) выключено, у Оли 10; старый edition.json без поля — 0; мусор — 0', () => {
+    const own = normalizeEdition(editionJson as never);
+    expect(own.dailyRandom).toBe(own.id === 'main' ? 0 : own.id === 'olya' ? 10 : own.dailyRandom);
     expect(normalizeEdition({ id: 'x' }).dailyRandom).toBe(0);
     expect(normalizeEdition({ id: 'x', dailyRandom: -3 }).dailyRandom).toBe(0);
     expect(normalizeEdition({ id: 'x', dailyRandom: 10 }).dailyRandom).toBe(10);
