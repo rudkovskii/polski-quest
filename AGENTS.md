@@ -65,6 +65,7 @@
 - Экраны: `ui/dictionary.ts` (стол), `ui/pantry.ts` (полка), `ui/summary.ts` (коробка, кровать), `ui/plantCard.ts` (растение),
   `ui/board.ts` (доска), `ui/minigame.ts` (панель вопроса снизу), общая модалка `ui/panel.ts`, надписи над миром `ui/float.ts`.
 - Мир: `scenes/farmLayer.ts` — растения, вскопанные клетки, подпись, автобег (`farm:act` в очередь, ускорение при очереди).
+- Вскопанное расширение участка (`farm:plants.cells` = клетки текущей ступени `PLOT_TIERS`) рисует `World.soil`; `soilKey` сбрасывается в `init`, потому что после смены карты земля фермы строится заново (баг 23.10: после дома ряды резерва стояли на траве).
   События шины: `farm:plants`, `farm:auto`, `farm:focus`, `farm:act`, `fx:float`, `fx:label`, `hud:xp {gain, up}`.
 - Озвучка (с 20.10 голос `omni:hela-4b1ad1bd`, OmniVoice k2-fsa, придуманный голос, веса CC BY-NC — `CREDITS.md`; выбор — `../research/voices/README.md`, «Этап 2»):
   1. `npx vitest run --config tools/audio_harvest.config.ts` — сборщик `tools/audio_harvest.spec.ts` (не тест) рисует все задания игр v2 и жмёт 🔊/плитки → `content/audio_harvest.json` (не в git);
