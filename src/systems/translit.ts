@@ -16,6 +16,7 @@ const STRESS: Record<string, number> = {
 const OVERRIDE: Record<string, string> = {
   'pięćdziesiąt': 'пеньдже́щонт',
   'weekend': 'уи́кэнт', 'mail': 'мэйл', 'hobby': 'хо́бы', 'pizza': 'пи́цца', 'kiosk': 'кьоск',
+  'unesco': 'унэ́ско', 'auschwitz': 'а́ушвиц', 'birkenau': 'би́ркенау', 'auschwitz-birkenau': 'а́ушвиц-би́ркенау',
 };
 const has = (o: object, k: string): boolean => Object.prototype.hasOwnProperty.call(o, k);
 

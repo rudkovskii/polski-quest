@@ -306,7 +306,7 @@ describe('экран: рисуется, отвечает', () => {
     const t = makeKind(ctx, U('geo.nb.niemcy'), 'dir')!;
     const { panel, body, given } = panelOf();
     game.render(t, panel, ctx);
-    body.querySelector<HTMLElement>('[data-opt="Czechy"], [data-opt="Ukraina"]')?.click();
+    body.querySelector<HTMLElement>('[data-opt]:not([data-opt="Niemcy"])')!.click();
     expect(given).toEqual([{ nb: expect.any(String) }]);
     expect(game.check(t, given[0], ctx).ok).toBe(false);
 
@@ -592,21 +592,19 @@ describe('уровни карты (решение Шэфа 23.10)', () => {
   };
   const levelCtx = (s: ReturnType<typeof mk>) => ({ units: s.p.units('geo'), info: (id: string) => s.p.info(id), doc: s.p.content.docs.geo, flag: (k: string) => s.p.flag(k) });
 
-  it('данные: 5 уровней по порядку, каждая единица ровно в одном; 23 парка, UNESCO пока пустой', () => {
+  it('данные: 5 уровней по порядку, каждая единица ровно в одном; 23 парка, 16 мест UNESCO', () => {
     const lv = levelsOf(ctx.doc);
     expect(lv.map((l) => l.pl)).toEqual(['Miasta i przyroda', 'Sąsiedzi', 'Parki narodowe', 'UNESCO', 'Województwa']);
     for (const u of ctx.units) expect(levelOf(u, lv), u.id).toBeGreaterThan(0);
     const views = levelViews({ ...ctx, flag: () => false });
-    expect(views.map((v) => v.total)).toEqual([OF('city').length + OF('river').length + OF('mountain').length + OF('sea').length + OF('nature').length, 7, 23, 0, 16]);
+    expect(views.map((v) => v.total)).toEqual([OF('city').length + OF('river').length + OF('mountain').length + OF('sea').length + OF('nature').length, 7, 23, 16, 16]);
   });
 
-  it('новый игрок: открыт только уровень 1; каждый следующий ждёт предыдущий непустой; пустой — «скоро»', () => {
+  it('новый игрок: открыт только уровень 1; каждый следующий ждёт предыдущий', () => {
     const s = mk();
     const v = levelViews(levelCtx(s));
-    expect(v.map((x) => x.why)).toEqual(['first', 'locked', 'locked', 'empty', 'locked']);
-    expect(v[1]!.after?.level.n).toBe(1);
-    expect(v[2]!.after?.level.n).toBe(2);
-    expect(v[4]!.after?.level.n).toBe(3);
+    expect(v.map((x) => x.why)).toEqual(['first', 'locked', 'locked', 'locked', 'locked']);
+    expect(v.slice(1).map((x) => x.after?.level.n)).toEqual([1, 2, 3, 4]);
     expect(nextLevel(v)?.level.n).toBe(1);
   });
 
@@ -749,7 +747,23 @@ describe('лупа «Крупнее»', () => {
   });
 });
 
-describe('парки народове (уровень 3)', () => {
+describe('парки народове (уровень 3) и UNESCO (уровень 4)', () => {
+  it('16 мест UNESCO: покажи, какое место, воеводство, фразы собираются; Беловежа не дублируется', () => {
+    const list = OF('unesco');
+    expect(list.length).toBe(16);
+    expect(list.some((u) => /Białowiesk/.test(u.pl))).toBe(false);
+    for (const u of list) {
+      expect(inMap(posOf(u)!), u.id).toBe(true);
+      for (const k of ['show', 'name', 'region', 'build'] as GeoKind[]) {
+        const t = makeKind(ctx, u, k);
+        expect(t, `${u.id} ${k}`).toBeTruthy();
+        const right = k === 'show' ? anchorOf(u) : k === 'build' ? t!.need : t!.answer;
+        expect(checkTask(t!, right, ctx).ok, `${u.id} ${k}`).toBe(true);
+      }
+    }
+    expect(U('geo.unesco.auschwitz').tr).toBe('а́ушвиц-би́ркенау');
+  });
+
   it('23 парка внутри Польши: «покажи» по точке, «какой парк», воеводство, форма «w … Parku Narodowym», фразы собираются', () => {
     const parks = OF('park');
     expect(parks.length).toBe(23);

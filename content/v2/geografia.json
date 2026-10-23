@@ -120,7 +120,8 @@
     "neighbor",
     "sea",
     "nature",
-    "park"
+    "park",
+    "unesco"
    ],
    "pl": "Pokaż na mapie: {pl}",
    "ru": "Покажи на карте: {ru}"
@@ -132,6 +133,14 @@
    ],
    "pl": "Jaki to park narodowy?",
    "ru": "Какой это национальный парк?"
+  },
+  {
+   "t": "name",
+   "for": [
+    "unesco"
+   ],
+   "pl": "Co to za miejsce UNESCO?",
+   "ru": "Что это за объект ЮНЕСКО?"
   },
   {
    "t": "name",
@@ -15119,6 +15128,1771 @@
     {
      "t": "build",
      "phrase": "geo.park.ujscie_warty.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.krakow",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Stare Miasto w Krakowie",
+   "ru": "Старый город Кракова",
+   "tr": "ста́рэ мя́сто ф крако́ве",
+   "pos": [
+    50.0614,
+    19.9372
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "Stare Miasto w Krakowie było na pierwszej liście UNESCO.",
+     "ru": "Старый Краков был в самом первом списке ЮНЕСКО."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Stare Miasto w Krakowie"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.krakow.main",
+     "role": "main",
+     "pl": "W Krakowie są Wawel i Sukiennice.",
+     "ru": "В Кракове есть Вавель и Суконные ряды.",
+     "tr": "ф крако́ве соў ва́вэл и сукенни́цэ.",
+     "tiles_pl": [
+      "W",
+      "Krakowie",
+      "są",
+      "Wawel",
+      "i",
+      "Sukiennice"
+     ],
+     "distract_pl": [
+      "Kraków",
+      "Wawelu"
+     ]
+    },
+    {
+     "id": "geo.unesco.krakow.list",
+     "role": "list",
+     "pl": "Stare Miasto w Krakowie jest na liście UNESCO.",
+     "ru": "Старый город Кракова — в списке ЮНЕСКО.",
+     "tr": "ста́рэ мя́сто ф крако́ве ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Stare",
+      "Miasto",
+      "w",
+      "Krakowie",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Stare Miasto w Krakowie",
+     "q_ru": "Покажи на карте: Старый город Кракова",
+     "hit": "point",
+     "hit_km": 15
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.krakow",
+     "distract": [
+      "geo.unesco.wieliczka",
+      "geo.unesco.kalwaria",
+      "geo.unesco.auschwitz"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Stare Miasto w Krakowie?",
+     "q_ru": "В каком воеводстве: Старый город Кракова?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.krakow.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.krakow.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.wieliczka",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Kopalnia soli w Wieliczce",
+   "ru": "Соляная шахта в Величке",
+   "tr": "копа́лня со́ли ф вели́чцэ",
+   "pos": [
+    49.9833,
+    20.055
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "Pod ziemią jest kaplica z soli.",
+     "ru": "Под землёй есть часовня из соли."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Kopalnia soli w Wieliczce"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.wieliczka.main",
+     "role": "main",
+     "pl": "W Wieliczce jest stara kopalnia soli.",
+     "ru": "В Величке есть старая соляная шахта.",
+     "tr": "ф вели́чцэ ест ста́ра копа́лня со́ли.",
+     "tiles_pl": [
+      "W",
+      "Wieliczce",
+      "jest",
+      "stara",
+      "kopalnia",
+      "soli"
+     ],
+     "distract_pl": [
+      "Wieliczka",
+      "sól"
+     ]
+    },
+    {
+     "id": "geo.unesco.wieliczka.list",
+     "role": "list",
+     "pl": "Kopalnia soli w Wieliczce jest na liście UNESCO.",
+     "ru": "Соляная шахта в Величке — в списке ЮНЕСКО.",
+     "tr": "копа́лня со́ли ф вели́чцэ ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Kopalnia",
+      "soli",
+      "w",
+      "Wieliczce",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Kopalnia soli w Wieliczce",
+     "q_ru": "Покажи на карте: Соляная шахта в Величке",
+     "hit": "point",
+     "hit_km": 15
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.wieliczka",
+     "distract": [
+      "geo.unesco.krakow",
+      "geo.unesco.kalwaria",
+      "geo.unesco.drewniane_koscioly"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Kopalnia soli w Wieliczce?",
+     "q_ru": "В каком воеводстве: Соляная шахта в Величке?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.wieliczka.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.wieliczka.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.auschwitz",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Auschwitz-Birkenau",
+   "ru": "Аушвиц-Биркенау",
+   "tr": "а́ушвиц-би́ркенау",
+   "pos": [
+    50.027,
+    19.204
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "To były niemiecki nazistowski obóz koncentracyjny i zagłady.",
+     "ru": "Это бывший немецкий нацистский концлагерь и лагерь смерти."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Auschwitz-Birkenau"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.auschwitz.main",
+     "role": "main",
+     "pl": "Oświęcim to miejsce pamięci.",
+     "ru": "Освенцим — место памяти.",
+     "tr": "ощфе́ньчим то ме́йсцэ паме́ньчи.",
+     "tiles_pl": [
+      "Oświęcim",
+      "to",
+      "miejsce",
+      "pamięci"
+     ],
+     "distract_pl": [
+      "Oświęcimiu",
+      "pamięć"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Auschwitz-Birkenau",
+     "q_ru": "Покажи на карте: Аушвиц-Биркенау",
+     "hit": "point",
+     "hit_km": 20
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.auschwitz",
+     "distract": [
+      "geo.unesco.kalwaria",
+      "geo.unesco.tarnowskie_gory",
+      "geo.unesco.krakow"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Auschwitz-Birkenau?",
+     "q_ru": "В каком воеводстве: Аушвиц-Биркенау?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.auschwitz.main"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.warszawa",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Stare Miasto w Warszawie",
+   "ru": "Старый город Варшавы",
+   "tr": "ста́рэ мя́сто ф варша́ве",
+   "pos": [
+    52.2497,
+    21.0122
+   ],
+   "orchard": "geo.voi.mazowieckie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "Na Starym Mieście jest Zamek Królewski.",
+     "ru": "В Старом городе есть Королевский замок."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.mazowieckie",
+   "regions": [
+    "geo.voi.mazowieckie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Stare Miasto w Warszawie"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.warszawa.main",
+     "role": "main",
+     "pl": "Stare Miasto w Warszawie odbudowano po wojnie.",
+     "ru": "Старый город Варшавы восстановили после войны.",
+     "tr": "ста́рэ мя́сто ф варша́ве одбудова́но по во́йнье.",
+     "tiles_pl": [
+      "Stare",
+      "Miasto",
+      "w",
+      "Warszawie",
+      "odbudowano",
+      "po",
+      "wojnie"
+     ],
+     "distract_pl": [
+      "wojna",
+      "Warszawa"
+     ]
+    },
+    {
+     "id": "geo.unesco.warszawa.list",
+     "role": "list",
+     "pl": "Stare Miasto w Warszawie jest na liście UNESCO.",
+     "ru": "Старый город Варшавы — в списке ЮНЕСКО.",
+     "tr": "ста́рэ мя́сто ф варша́ве ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Stare",
+      "Miasto",
+      "w",
+      "Warszawie",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Stare Miasto w Warszawie",
+     "q_ru": "Покажи на карте: Старый город Варшавы",
+     "hit": "point",
+     "hit_km": 15
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.warszawa",
+     "distract": [
+      "geo.unesco.krzemionki",
+      "geo.unesco.torun",
+      "geo.unesco.zamosc"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Stare Miasto w Warszawie?",
+     "q_ru": "В каком воеводстве: Старый город Варшавы?",
+     "answer": [
+      "geo.voi.mazowieckie"
+     ],
+     "distract": [
+      "geo.voi.lodzkie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podlaskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.warszawa.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.warszawa.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.malbork",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Zamek w Malborku",
+   "ru": "Замок в Мальборке",
+   "tr": "за́мэк ф малбо́рку",
+   "pos": [
+    54.0398,
+    19.0278
+   ],
+   "orchard": "geo.voi.pomorskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "To jeden z największych zamków z cegły na świecie.",
+     "ru": "Один из самых больших кирпичных замков в мире."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.pomorskie",
+   "regions": [
+    "geo.voi.pomorskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Zamek w Malborku"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.malbork.main",
+     "role": "main",
+     "pl": "Zamek w Malborku zbudowali Krzyżacy.",
+     "ru": "Замок в Мальборке построили крестоносцы.",
+     "tr": "за́мэк ф малбо́рку збудова́ли кшыжа́цы.",
+     "tiles_pl": [
+      "Zamek",
+      "w",
+      "Malborku",
+      "zbudowali",
+      "Krzyżacy"
+     ],
+     "distract_pl": [
+      "Krzyżaków",
+      "zamku"
+     ]
+    },
+    {
+     "id": "geo.unesco.malbork.list",
+     "role": "list",
+     "pl": "Zamek w Malborku jest na liście UNESCO.",
+     "ru": "Замок в Мальборке — в списке ЮНЕСКО.",
+     "tr": "за́мэк ф малбо́рку ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Zamek",
+      "w",
+      "Malborku",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Zamek w Malborku",
+     "q_ru": "Покажи на карте: Замок в Мальборке",
+     "hit": "point",
+     "hit_km": 20
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.malbork",
+     "distract": [
+      "geo.unesco.torun",
+      "geo.unesco.warszawa",
+      "geo.unesco.hala_stulecia"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Zamek w Malborku?",
+     "q_ru": "В каком воеводстве: Замок в Мальборке?",
+     "answer": [
+      "geo.voi.pomorskie"
+     ],
+     "distract": [
+      "geo.voi.kujawsko_pomorskie",
+      "geo.voi.zachodniopomorskie",
+      "geo.voi.warminsko_mazurskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.malbork.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.malbork.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.torun",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Stare Miasto w Toruniu",
+   "ru": "Старый город Торуня",
+   "tr": "ста́рэ мя́сто ф тору́ню",
+   "pos": [
+    53.0103,
+    18.6046
+   ],
+   "orchard": "geo.voi.kujawsko_pomorskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "Toruń słynie z pierników.",
+     "ru": "Торунь славится пряниками."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.kujawsko_pomorskie",
+   "regions": [
+    "geo.voi.kujawsko_pomorskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Stare Miasto w Toruniu"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.torun.main",
+     "role": "main",
+     "pl": "W Toruniu urodził się Kopernik.",
+     "ru": "В Торуне родился Коперник.",
+     "tr": "ф тору́ню уро́джиў ще копэ́рник.",
+     "tiles_pl": [
+      "W",
+      "Toruniu",
+      "urodził",
+      "się",
+      "Kopernik"
+     ],
+     "distract_pl": [
+      "Toruń",
+      "Kopernika"
+     ]
+    },
+    {
+     "id": "geo.unesco.torun.list",
+     "role": "list",
+     "pl": "Stare Miasto w Toruniu jest na liście UNESCO.",
+     "ru": "Старый город Торуня — в списке ЮНЕСКО.",
+     "tr": "ста́рэ мя́сто ф тору́ню ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Stare",
+      "Miasto",
+      "w",
+      "Toruniu",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Stare Miasto w Toruniu",
+     "q_ru": "Покажи на карте: Старый город Торуня",
+     "hit": "point",
+     "hit_km": 20
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.torun",
+     "distract": [
+      "geo.unesco.malbork",
+      "geo.unesco.warszawa",
+      "geo.unesco.hala_stulecia"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Stare Miasto w Toruniu?",
+     "q_ru": "В каком воеводстве: Старый город Торуня?",
+     "answer": [
+      "geo.voi.kujawsko_pomorskie"
+     ],
+     "distract": [
+      "geo.voi.wielkopolskie",
+      "geo.voi.pomorskie",
+      "geo.voi.warminsko_mazurskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.torun.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.torun.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.zamosc",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Stare Miasto w Zamościu",
+   "ru": "Старый город Замосця",
+   "tr": "ста́рэ мя́сто ф замо́щчу",
+   "pos": [
+    50.7172,
+    23.2527
+   ],
+   "orchard": "geo.voi.lubelskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "Zamość zbudowano według jednego planu.",
+     "ru": "Замосць построили по единому плану."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.lubelskie",
+   "regions": [
+    "geo.voi.lubelskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Stare Miasto w Zamościu"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.zamosc.main",
+     "role": "main",
+     "pl": "Zamość to perła renesansu.",
+     "ru": "Замосць — жемчужина Ренессанса.",
+     "tr": "за́мощчь то пэ́рўа рэнэса́нсу.",
+     "tiles_pl": [
+      "Zamość",
+      "to",
+      "perła",
+      "renesansu"
+     ],
+     "distract_pl": [
+      "Zamościu",
+      "perły"
+     ]
+    },
+    {
+     "id": "geo.unesco.zamosc.list",
+     "role": "list",
+     "pl": "Stare Miasto w Zamościu jest na liście UNESCO.",
+     "ru": "Старый город Замосця — в списке ЮНЕСКО.",
+     "tr": "ста́рэ мя́сто ф замо́щчу ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Stare",
+      "Miasto",
+      "w",
+      "Zamościu",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Stare Miasto w Zamościu",
+     "q_ru": "Покажи на карте: Старый город Замосця",
+     "hit": "point",
+     "hit_km": 20
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.zamosc",
+     "distract": [
+      "geo.unesco.krzemionki",
+      "geo.unesco.cerkwie",
+      "geo.unesco.buki"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Stare Miasto w Zamościu?",
+     "q_ru": "В каком воеводстве: Старый город Замосця?",
+     "answer": [
+      "geo.voi.lubelskie"
+     ],
+     "distract": [
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie",
+      "geo.voi.mazowieckie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.zamosc.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.zamosc.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.hala_stulecia",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Hala Stulecia",
+   "ru": "Зал Столетия",
+   "tr": "ха́ла стуле́ча",
+   "pos": [
+    51.1069,
+    17.0773
+   ],
+   "orchard": "geo.voi.dolnoslaskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "To wielka hala z betonu.",
+     "ru": "Это огромный зал из бетона."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.dolnoslaskie",
+   "regions": [
+    "geo.voi.dolnoslaskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Hala Stulecia"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.hala_stulecia.main",
+     "role": "main",
+     "pl": "Hala Stulecia jest we Wrocławiu.",
+     "ru": "Зал Столетия находится во Вроцлаве.",
+     "tr": "ха́ла стуле́ча ест вэ вроцўа́вю.",
+     "tiles_pl": [
+      "Hala",
+      "Stulecia",
+      "jest",
+      "we",
+      "Wrocławiu"
+     ],
+     "distract_pl": [
+      "Wrocław",
+      "Wrocławia"
+     ]
+    },
+    {
+     "id": "geo.unesco.hala_stulecia.list",
+     "role": "list",
+     "pl": "Hala Stulecia jest na liście UNESCO.",
+     "ru": "Зал Столетия — в списке ЮНЕСКО.",
+     "tr": "ха́ла стуле́ча ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Hala",
+      "Stulecia",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Hala Stulecia",
+     "q_ru": "Покажи на карте: Зал Столетия",
+     "hit": "point",
+     "hit_km": 20
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.hala_stulecia",
+     "distract": [
+      "geo.unesco.koscioly_pokoju",
+      "geo.unesco.tarnowskie_gory",
+      "geo.unesco.park_muzakowski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Hala Stulecia?",
+     "q_ru": "В каком воеводстве: Зал Столетия?",
+     "answer": [
+      "geo.voi.dolnoslaskie"
+     ],
+     "distract": [
+      "geo.voi.opolskie",
+      "geo.voi.lubuskie",
+      "geo.voi.wielkopolskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.hala_stulecia.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.hala_stulecia.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.kalwaria",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Kalwaria Zebrzydowska",
+   "ru": "Кальвария-Зебжидовска",
+   "tr": "калва́ря зэбжыдо́фска",
+   "pos": [
+    49.867,
+    19.678
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "W Kalwarii są kaplice w parku i na wzgórzach.",
+     "ru": "В Кальварии часовни стоят в парке и на холмах."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Kalwaria Zebrzydowska"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.kalwaria.main",
+     "role": "main",
+     "pl": "Kalwaria Zebrzydowska to miejsce pielgrzymek.",
+     "ru": "Кальвария-Зебжидовска — место паломничества.",
+     "tr": "калва́ря зэбжыдо́фска то ме́йсцэ пелгжы́мэк.",
+     "tiles_pl": [
+      "Kalwaria",
+      "Zebrzydowska",
+      "to",
+      "miejsce",
+      "pielgrzymek"
+     ],
+     "distract_pl": [
+      "pielgrzymka",
+      "miejsca"
+     ]
+    },
+    {
+     "id": "geo.unesco.kalwaria.list",
+     "role": "list",
+     "pl": "Kalwaria Zebrzydowska jest na liście UNESCO.",
+     "ru": "Кальвария-Зебжидовска — в списке ЮНЕСКО.",
+     "tr": "калва́ря зэбжыдо́фска ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Kalwaria",
+      "Zebrzydowska",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Kalwaria Zebrzydowska",
+     "q_ru": "Покажи на карте: Кальвария-Зебжидовска",
+     "hit": "point",
+     "hit_km": 20
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.kalwaria",
+     "distract": [
+      "geo.unesco.krakow",
+      "geo.unesco.wieliczka",
+      "geo.unesco.auschwitz"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Kalwaria Zebrzydowska?",
+     "q_ru": "В каком воеводстве: Кальвария-Зебжидовска?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.kalwaria.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.kalwaria.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.koscioly_pokoju",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Kościoły Pokoju",
+   "ru": "Костёлы Мира",
+   "tr": "кощчо́ўы поко́ю",
+   "pos": [
+    50.846,
+    16.484
+   ],
+   "orchard": "geo.voi.dolnoslaskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Zbudowano je z drewna i gliny.",
+     "ru": "Их построили из дерева и глины."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.dolnoslaskie",
+   "regions": [
+    "geo.voi.dolnoslaskie"
+   ],
+   "plural": true,
+   "forms": {
+    "nom": "Kościoły Pokoju"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.koscioly_pokoju.main",
+     "role": "main",
+     "pl": "Kościoły Pokoju są w Jaworze i Świdnicy.",
+     "ru": "Костёлы Мира находятся в Яворе и Свиднице.",
+     "tr": "кощчо́ўы поко́ю соў ф яво́жэ и щфидни́цы.",
+     "tiles_pl": [
+      "Kościoły",
+      "Pokoju",
+      "są",
+      "w",
+      "Jaworze",
+      "i",
+      "Świdnicy"
+     ],
+     "distract_pl": [
+      "Jawor",
+      "Świdnica"
+     ]
+    },
+    {
+     "id": "geo.unesco.koscioly_pokoju.list",
+     "role": "list",
+     "pl": "Kościoły Pokoju są na liście UNESCO.",
+     "ru": "Костёлы Мира — в списке ЮНЕСКО.",
+     "tr": "кощчо́ўы поко́ю соў на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Kościoły",
+      "Pokoju",
+      "są",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "jest",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Kościoły Pokoju",
+     "q_ru": "Покажи на карте: Костёлы Мира",
+     "hit": "point",
+     "hit_km": 40
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.koscioly_pokoju",
+     "distract": [
+      "geo.unesco.hala_stulecia",
+      "geo.unesco.park_muzakowski",
+      "geo.unesco.tarnowskie_gory"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Kościoły Pokoju?",
+     "q_ru": "В каком воеводстве: Костёлы Мира?",
+     "answer": [
+      "geo.voi.dolnoslaskie"
+     ],
+     "distract": [
+      "geo.voi.opolskie",
+      "geo.voi.lubuskie",
+      "geo.voi.wielkopolskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.koscioly_pokoju.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.koscioly_pokoju.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.drewniane_koscioly",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Drewniane kościoły Małopolski",
+   "ru": "Деревянные костёлы Малопольски",
+   "tr": "дрэвня́нэ кощчо́ўы маўопо́лски",
+   "pos": [
+    49.6,
+    20.5
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Kościoły zbudowano z drewna bez gwoździ.",
+     "ru": "Костёлы построены из дерева без гвоздей."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "plural": true,
+   "forms": {
+    "nom": "Drewniane kościoły Małopolski"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.drewniane_koscioly.main",
+     "role": "main",
+     "pl": "Na południu Polski są stare drewniane kościoły.",
+     "ru": "На юге Польши есть старые деревянные костёлы.",
+     "tr": "на поўу́дню по́лски соў ста́рэ дрэвня́нэ кощчо́ўы.",
+     "tiles_pl": [
+      "Na",
+      "południu",
+      "Polski",
+      "są",
+      "stare",
+      "drewniane",
+      "kościoły"
+     ],
+     "distract_pl": [
+      "drewno",
+      "kościół"
+     ]
+    },
+    {
+     "id": "geo.unesco.drewniane_koscioly.list",
+     "role": "list",
+     "pl": "Drewniane kościoły Małopolski są na liście UNESCO.",
+     "ru": "Деревянные костёлы Малопольски — в списке ЮНЕСКО.",
+     "tr": "дрэвня́нэ кощчо́ўы маўопо́лски соў на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Drewniane",
+      "kościoły",
+      "Małopolski",
+      "są",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "jest",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Drewniane kościoły Małopolski",
+     "q_ru": "Покажи на карте: Деревянные костёлы Малопольски",
+     "hit": "point",
+     "hit_km": 60
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.drewniane_koscioly",
+     "distract": [
+      "geo.unesco.wieliczka",
+      "geo.unesco.krakow",
+      "geo.unesco.kalwaria"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Drewniane kościoły Małopolski?",
+     "q_ru": "В каком воеводстве: Деревянные костёлы Малопольски?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.drewniane_koscioly.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.drewniane_koscioly.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.cerkwie",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Drewniane cerkwie w Karpatach",
+   "ru": "Деревянные церкви в Карпатах",
+   "tr": "дрэвня́нэ цэ́ркфе ф карпа́тах",
+   "pos": [
+    49.4,
+    22.3
+   ],
+   "orchard": "geo.voi.podkarpackie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Część cerkwi jest w Polsce, a część na Ukrainie.",
+     "ru": "Часть церквей — в Польше, часть — в Украине."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.podkarpackie",
+   "regions": [
+    "geo.voi.podkarpackie"
+   ],
+   "plural": true,
+   "forms": {
+    "nom": "Drewniane cerkwie w Karpatach"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.cerkwie.main",
+     "role": "main",
+     "pl": "W Karpatach są drewniane cerkwie.",
+     "ru": "В Карпатах есть деревянные церкви.",
+     "tr": "ф карпа́тах соў дрэвня́нэ цэ́ркфе.",
+     "tiles_pl": [
+      "W",
+      "Karpatach",
+      "są",
+      "drewniane",
+      "cerkwie"
+     ],
+     "distract_pl": [
+      "cerkiew",
+      "Karpaty"
+     ]
+    },
+    {
+     "id": "geo.unesco.cerkwie.list",
+     "role": "list",
+     "pl": "Drewniane cerkwie w Karpatach są na liście UNESCO.",
+     "ru": "Деревянные церкви в Карпатах — в списке ЮНЕСКО.",
+     "tr": "дрэвня́нэ цэ́ркфе ф карпа́тах соў на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Drewniane",
+      "cerkwie",
+      "w",
+      "Karpatach",
+      "są",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "jest",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Drewniane cerkwie w Karpatach",
+     "q_ru": "Покажи на карте: Деревянные церкви в Карпатах",
+     "hit": "point",
+     "hit_km": 60
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.cerkwie",
+     "distract": [
+      "geo.unesco.buki",
+      "geo.unesco.drewniane_koscioly",
+      "geo.unesco.zamosc"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Drewniane cerkwie w Karpatach?",
+     "q_ru": "В каком воеводстве: Деревянные церкви в Карпатах?",
+     "answer": [
+      "geo.voi.podkarpackie"
+     ],
+     "distract": [
+      "geo.voi.malopolskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.lubelskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.cerkwie.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.cerkwie.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.park_muzakowski",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Park Mużakowski",
+   "ru": "Мужаковский парк",
+   "tr": "парк мужако́фски",
+   "pos": [
+    51.55,
+    14.73
+   ],
+   "orchard": "geo.voi.lubuskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Przez park płynie Nysa Łużycka.",
+     "ru": "Через парк течёт Ныса-Лужицка."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.lubuskie",
+   "regions": [
+    "geo.voi.lubuskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Park Mużakowski"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.park_muzakowski.main",
+     "role": "main",
+     "pl": "Park Mużakowski leży na granicy z Niemcami.",
+     "ru": "Мужаковский парк находится на границе с Германией.",
+     "tr": "парк мужако́фски ле́жы на грани́цы с ньемца́ми.",
+     "tiles_pl": [
+      "Park",
+      "Mużakowski",
+      "leży",
+      "na",
+      "granicy",
+      "z",
+      "Niemcami"
+     ],
+     "distract_pl": [
+      "Niemcy",
+      "granica"
+     ]
+    },
+    {
+     "id": "geo.unesco.park_muzakowski.list",
+     "role": "list",
+     "pl": "Park Mużakowski jest na liście UNESCO.",
+     "ru": "Мужаковский парк — в списке ЮНЕСКО.",
+     "tr": "парк мужако́фски ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Park",
+      "Mużakowski",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Park Mużakowski",
+     "q_ru": "Покажи на карте: Мужаковский парк",
+     "hit": "point",
+     "hit_km": 25
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.park_muzakowski",
+     "distract": [
+      "geo.unesco.koscioly_pokoju",
+      "geo.unesco.hala_stulecia",
+      "geo.unesco.torun"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Park Mużakowski?",
+     "q_ru": "В каком воеводстве: Мужаковский парк?",
+     "answer": [
+      "geo.voi.lubuskie"
+     ],
+     "distract": [
+      "geo.voi.dolnoslaskie",
+      "geo.voi.wielkopolskie",
+      "geo.voi.zachodniopomorskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.park_muzakowski.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.park_muzakowski.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.tarnowskie_gory",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Kopalnia w Tarnowskich Górach",
+   "ru": "Шахта в Тарновских Гурах",
+   "tr": "копа́лня ф тарно́фских гу́рах",
+   "pos": [
+    50.43,
+    18.86
+   ],
+   "orchard": "geo.voi.slaskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Pod ziemią można płynąć łodzią.",
+     "ru": "Под землёй можно плыть на лодке."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.slaskie",
+   "regions": [
+    "geo.voi.slaskie"
+   ],
+   "plural": false,
+   "forms": {
+    "nom": "Kopalnia w Tarnowskich Górach"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.tarnowskie_gory.main",
+     "role": "main",
+     "pl": "W Tarnowskich Górach jest stara kopalnia srebra.",
+     "ru": "В Тарновских Гурах есть старая серебряная шахта.",
+     "tr": "ф тарно́фских гу́рах ест ста́ра копа́лня срэ́бра.",
+     "tiles_pl": [
+      "W",
+      "Tarnowskich",
+      "Górach",
+      "jest",
+      "stara",
+      "kopalnia",
+      "srebra"
+     ],
+     "distract_pl": [
+      "srebro",
+      "kopalni"
+     ]
+    },
+    {
+     "id": "geo.unesco.tarnowskie_gory.list",
+     "role": "list",
+     "pl": "Kopalnia w Tarnowskich Górach jest na liście UNESCO.",
+     "ru": "Шахта в Тарновских Гурах — в списке ЮНЕСКО.",
+     "tr": "копа́лня ф тарно́фских гу́рах ест на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Kopalnia",
+      "w",
+      "Tarnowskich",
+      "Górach",
+      "jest",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "są",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Kopalnia w Tarnowskich Górach",
+     "q_ru": "Покажи на карте: Шахта в Тарновских Гурах",
+     "hit": "point",
+     "hit_km": 20
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.tarnowskie_gory",
+     "distract": [
+      "geo.unesco.auschwitz",
+      "geo.unesco.kalwaria",
+      "geo.unesco.krakow"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Kopalnia w Tarnowskich Górach?",
+     "q_ru": "В каком воеводстве: Шахта в Тарновских Гурах?",
+     "answer": [
+      "geo.voi.slaskie"
+     ],
+     "distract": [
+      "geo.voi.opolskie",
+      "geo.voi.malopolskie",
+      "geo.voi.swietokrzyskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.tarnowskie_gory.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.tarnowskie_gory.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.krzemionki",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Krzemionki",
+   "ru": "Кшемёнки",
+   "tr": "кшэмёнки",
+   "pos": [
+    50.97,
+    21.5
+   ],
+   "orchard": "geo.voi.swietokrzyskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "To kopalnia z epoki kamienia.",
+     "ru": "Это шахта каменного века."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.swietokrzyskie",
+   "regions": [
+    "geo.voi.swietokrzyskie"
+   ],
+   "plural": true,
+   "forms": {
+    "nom": "Krzemionki"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.krzemionki.main",
+     "role": "main",
+     "pl": "W Krzemionkach ludzie kopali krzemień.",
+     "ru": "В Кшемёнках люди добывали кремень.",
+     "tr": "ф кшэмёнках лу́дже копа́ли кшэ́мень.",
+     "tiles_pl": [
+      "W",
+      "Krzemionkach",
+      "ludzie",
+      "kopali",
+      "krzemień"
+     ],
+     "distract_pl": [
+      "krzemienia",
+      "kopią"
+     ]
+    },
+    {
+     "id": "geo.unesco.krzemionki.list",
+     "role": "list",
+     "pl": "Krzemionki są na liście UNESCO.",
+     "ru": "Кшемёнки — в списке ЮНЕСКО.",
+     "tr": "кшэмёнки соў на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Krzemionki",
+      "są",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "jest",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Krzemionki",
+     "q_ru": "Покажи на карте: Кшемёнки",
+     "hit": "point",
+     "hit_km": 25
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.krzemionki",
+     "distract": [
+      "geo.unesco.zamosc",
+      "geo.unesco.warszawa",
+      "geo.unesco.krakow"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Krzemionki?",
+     "q_ru": "В каком воеводстве: Кшемёнки?",
+     "answer": [
+      "geo.voi.swietokrzyskie"
+     ],
+     "distract": [
+      "geo.voi.malopolskie",
+      "geo.voi.slaskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.krzemionki.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.krzemionki.list"
+    }
+   ]
+  },
+  {
+   "id": "geo.unesco.buki",
+   "kind": "geo",
+   "type": "unesco",
+   "pl": "Lasy bukowe w Bieszczadach",
+   "ru": "Буковые леса в Бещадах",
+   "tr": "ла́сы буко́вэ ф бешча́дах",
+   "pos": [
+    49.1,
+    22.6
+   ],
+   "orchard": "geo.voi.podkarpackie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "To część pradawnych lasów bukowych Europy.",
+     "ru": "Это часть древних буковых лесов Европы."
+    }
+   ],
+   "src": "UNESCO World Heritage List (Poland); OSM (точка объекта, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.podkarpackie",
+   "regions": [
+    "geo.voi.podkarpackie"
+   ],
+   "plural": true,
+   "forms": {
+    "nom": "Lasy bukowe w Bieszczadach"
+   },
+   "phrases": [
+    {
+     "id": "geo.unesco.buki.main",
+     "role": "main",
+     "pl": "W Bieszczadach rosną stare lasy bukowe.",
+     "ru": "В Бещадах растут старые буковые леса.",
+     "tr": "ф бешча́дах ро́сноў ста́рэ ла́сы буко́вэ.",
+     "tiles_pl": [
+      "W",
+      "Bieszczadach",
+      "rosną",
+      "stare",
+      "lasy",
+      "bukowe"
+     ],
+     "distract_pl": [
+      "las",
+      "buk"
+     ]
+    },
+    {
+     "id": "geo.unesco.buki.list",
+     "role": "list",
+     "pl": "Lasy bukowe w Bieszczadach są na liście UNESCO.",
+     "ru": "Буковые леса в Бещадах — в списке ЮНЕСКО.",
+     "tr": "ла́сы буко́вэ ф бешча́дах соў на ли́щче унэ́ско.",
+     "tiles_pl": [
+      "Lasy",
+      "bukowe",
+      "w",
+      "Bieszczadach",
+      "są",
+      "na",
+      "liście",
+      "UNESCO"
+     ],
+     "distract_pl": [
+      "jest",
+      "lista"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Lasy bukowe w Bieszczadach",
+     "q_ru": "Покажи на карте: Буковые леса в Бещадах",
+     "hit": "point",
+     "hit_km": 40
+    },
+    {
+     "t": "name",
+     "q_pl": "Co to za miejsce UNESCO?",
+     "q_ru": "Что это за объект ЮНЕСКО?",
+     "answer": "geo.unesco.buki",
+     "distract": [
+      "geo.unesco.cerkwie",
+      "geo.unesco.drewniane_koscioly",
+      "geo.unesco.zamosc"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Lasy bukowe w Bieszczadach?",
+     "q_ru": "В каком воеводстве: Буковые леса в Бещадах?",
+     "answer": [
+      "geo.voi.podkarpackie"
+     ],
+     "distract": [
+      "geo.voi.malopolskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.lubelskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.buki.main"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.unesco.buki.list"
     }
    ]
   }
