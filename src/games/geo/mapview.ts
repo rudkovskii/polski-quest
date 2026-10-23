@@ -23,6 +23,8 @@ export interface MapOptions {
   hide?: string | null;
   /** Ввод: тап и курсор. Без него карта только рисуется. */
   interactive?: boolean;
+  /** Подписать собранное (золотые единицы) мелкими подписями — кроме `hide` и `mark`. Только там, где подпись не выдаёт ответ. */
+  known?: boolean;
   /** Шина событий (по умолчанию общая). */
   bus?: typeof globalBus;
 }
@@ -36,7 +38,8 @@ export interface MapView {
   /** Куда отдавать выбранную точку (px картинки). После выбора ввод закрыт до `unlock()`. */
   onPick: ((p: Pt) => void) | null;
   readonly zoomed: boolean;
-  zoomTo(c: Pt): void;
+  /** Приблизить к точке: по умолчанию ×8 (кластер городов), `mult` — свой множитель (лупа «Крупнее» — `LOOK_MULT`). */
+  zoomTo(c: Pt, mult?: number): void;
   zoomOut(): void;
   unlock(): void;
   /** Герой бежит к `p`, втыкает флажок (зелёный, если `ok`), потом `done`. */
@@ -53,6 +56,8 @@ export interface MapView {
 
 export { MIN_SCALE, pickScale };
 const ZOOM_SPRITE_MULT = 8;
+/** Лупа «🔍 Крупнее» на маленьком экране: втрое крупнее, спрайты ×2. */
+export const LOOK_MULT = 3;
 const HERO_SPEED = 170; // px карты в секунду
 const REST = { x: 22, y: 282 };
 let lastHero: Pt = { ...REST };
@@ -61,6 +66,10 @@ type Dir = 'down' | 'up' | 'left' | 'right';
 const STAND: Record<Dir, number> = { down: 0, up: 3, right: 6, left: 9 };
 const ANCHOR = { dot: [8, 8], flag: [5, 15], hero: [8, 15], cat: [8, 15], compass: [16, 16] } as const;
 const COMPASS_AT = { x: 292, y: 30 };
+/** Столица: подложка точки красная. */
+const CAPITAL = 'geo.city.warszawa';
+/** Подложка под точкой города (px спрайта от центра): точка 6×6 в пиксельном круге диаметром 10 — город виден на детальной карте. */
+const HALO = { fill: '#f3ebd2', capital: '#b84c40', edge: '#2a1418' };
 
 interface FlagState {
   p: Pt;
@@ -118,18 +127,18 @@ export function createMap(o: MapOptions): MapView {
   const toY = (y: number): number => (y - view.y) * view.u;
   const fromScreen = (sx: number, sy: number): Pt => canvasToMap(view, sx, sy);
 
-  const setView = (zoom: Pt | null): void => {
+  const setView = (zoom: Pt | null, mult = ZOOM_SPRITE_MULT): void => {
     if (!zoom) {
       view = { x: 0, y: 0, u: scale || 1 };
       zoomed = false;
     } else {
-      const u = ZOOM_SPRITE_MULT * base;
+      const u = mult * base;
       const vw = cw / u;
       const vh = ch / u;
       view = { x: Math.max(0, Math.min(MAP_W - vw, zoom.x - vw / 2)), y: Math.max(0, Math.min(MAP_H - vh, zoom.y - vh / 2)), u };
       zoomed = true;
     }
-    sprite = zoom ? 3 * base : base;
+    sprite = zoom ? (mult >= ZOOM_SPRITE_MULT ? 3 : 2) * base : base;
     cursor = null;
     placeLabels();
   };
@@ -151,15 +160,34 @@ export function createMap(o: MapOptions): MapView {
     start();
   };
 
+  const labelText = (u: PolskaUnit): string => (u.type === 'region' && typeof u.raw.short === 'string' ? u.raw.short : u.pl);
   const placeLabels = (): void => {
     labels.replaceChildren();
+    const boxes: { x0: number; y0: number; x1: number; y1: number }[] = [];
     for (const id of reveals) {
       const u = byId.get(id);
       if (!u) continue;
       const a = anchorOf(u);
       const x = Math.max(4, Math.min(cw - 4, toX(a.x)));
       const y = Math.max(10, Math.min(ch - 4, toY(a.y) - (groupOf(u) === 'city' ? 10 * sprite : 0)));
-      labels.append(el('span', { class: 'geo-label', 'data-label': id, style: `left:${Math.round(x)}px;top:${Math.round(y)}px` }, u.type === 'region' && typeof u.raw.short === 'string' ? u.raw.short : u.pl));
+      const w = labelText(u).length * 7.5 + 12;
+      boxes.push({ x0: x - w / 2, y0: y - 20, x1: x + w / 2, y1: y });
+      labels.append(el('span', { class: 'geo-label', 'data-label': id, style: `left:${Math.round(x)}px;top:${Math.round(y)}px` }, labelText(u)));
+    }
+    // Собранное подписано мелко (карта заполняется названиями по мере урожая); подписи не налезают друг на друга.
+    if (!o.known) return;
+    const order = [...o.units].sort((p, q) => (p.type === 'city' ? 0 : 1) - (q.type === 'city' ? 0 : 1));
+    for (const u of order) {
+      if (reveals.has(u.id) || marks.has(u.id) || u.id === o.hide || o.status(u.id) !== 'gold') continue;
+      const a = anchorOf(u);
+      const x = toX(a.x);
+      const y = toY(a.y) - (groupOf(u) === 'city' ? 4 * sprite + 1 : 0);
+      if (x < 0 || y < 12 || x > cw || y > ch) continue;
+      const w = labelText(u).length * 6 + 8;
+      const b = { x0: x - w / 2, y0: y - 14, x1: x + w / 2, y1: y };
+      if (boxes.some((q) => b.x0 < q.x1 && b.x1 > q.x0 && b.y0 < q.y1 && b.y1 > q.y0)) continue;
+      boxes.push(b);
+      labels.append(el('span', { class: 'geo-label known', 'data-known': u.id, style: `left:${Math.round(x)}px;top:${Math.round(y)}px` }, labelText(u)));
     }
   };
 
@@ -210,8 +238,11 @@ export function createMap(o: MapOptions): MapView {
       c.fillRect(0, 0, cw, ch);
       return;
     }
-    // база
-    c.drawImage(a.map, view.x, view.y, cw / view.u, ch / view.u, 0, 0, cw, ch);
+    // база: при ×2 и крупнее — детальная картинка 640×608 (та же проекция, вдвое плотнее), иначе 320×304
+    if (a.map2 && view.u >= 2) {
+      c.imageSmoothingEnabled = false;
+      c.drawImage(a.map2, view.x * 2, view.y * 2, (cw / view.u) * 2, (ch / view.u) * 2, 0, 0, cw, ch);
+    } else c.drawImage(a.map, view.x, view.y, cw / view.u, ch / view.u, 0, 0, cw, ch);
     c.imageSmoothingEnabled = false;
     const pulse = 0.5 + 0.5 * Math.sin(t * 5);
 
@@ -245,6 +276,25 @@ export function createMap(o: MapOptions): MapView {
     }
     // компас
     if (!zoomed) spr(c, 'geo_compass', 0, ANCHOR.compass, COMPASS_AT.x, COMPASS_AT.y);
+    // подложки городов: пиксельный «кружок» 8×8 с контуром (у столицы красный) — сначала все, чтобы не закрыть соседние точки
+    for (const u of o.units) {
+      if (u.type !== 'city') continue;
+      const p = posOf(u);
+      if (!p) continue;
+      const X = Math.round(toX(p.x));
+      const Y = Math.round(toY(p.y));
+      if (X < -16 || Y < -16 || X > cw + 16 || Y > ch + 16) continue;
+      const k = sprite;
+      // пиксельный круг диаметром 10: контур, внутри 8
+      c.fillStyle = HALO.edge;
+      c.fillRect(X - 2 * k, Y - 5 * k, 4 * k, 10 * k);
+      c.fillRect(X - 4 * k, Y - 4 * k, 8 * k, 8 * k);
+      c.fillRect(X - 5 * k, Y - 2 * k, 10 * k, 4 * k);
+      c.fillStyle = u.id === CAPITAL ? HALO.capital : HALO.fill;
+      c.fillRect(X - 2 * k, Y - 4 * k, 4 * k, 8 * k);
+      c.fillRect(X - 3 * k, Y - 3 * k, 6 * k, 6 * k);
+      c.fillRect(X - 4 * k, Y - 2 * k, 8 * k, 4 * k);
+    }
     // точки: города всегда, булавки гор и озёр — только собранные
     for (const u of o.units) {
       const p = posOf(u);
@@ -439,7 +489,7 @@ export function createMap(o: MapOptions): MapView {
     get zoomed() {
       return zoomed;
     },
-    zoomTo: (c) => setView(c),
+    zoomTo: (c, mult) => setView(c, mult),
     zoomOut: () => setView(null),
     unlock: () => {
       locked = false;

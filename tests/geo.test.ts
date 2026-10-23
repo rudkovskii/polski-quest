@@ -4,7 +4,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import polandJson from '../public/maps-art/poland.json';
 import { game, geoPool } from '../src/games/geo';
-import { createMap } from '../src/games/geo/mapview';
+import { createMap, LOOK_MULT } from '../src/games/geo/mapview';
 import { canvasSize, canvasToMap, mapToCanvas, pickScale, planFit, type FitInput } from '../src/games/geo/fit';
 import { checkTask, makeKind, makeTask, statusOf, verdict, type DirAnswer, type GeoKind, type GeoTask } from '../src/games/geo/tasks';
 import { anchorOf, centroid, clusterOf, dist, groupOf, hits, inMap, inRings, MAP_H, MAP_W, pathOf, posOf, project, ringsOf, tolPx } from '../src/games/geo/world';
@@ -696,5 +696,54 @@ describe('уровни карты (решение Шэфа 23.10)', () => {
     spy.mockRestore();
     pick.mockRestore();
     ui.stop();
+  });
+});
+
+describe('карта: подписи собранного', () => {
+  it('known: золотые единицы подписаны мелко, кроме цели «покажи» и подсвеченной; без known подписей нет; подписи не налезают', () => {
+    const gold = new Set(['geo.city.warszawa', 'geo.city.krakow', 'geo.city.wieliczka', 'geo.city.gdansk', 'geo.city.sopot', 'geo.river.wisla', 'geo.city.poznan']);
+    const mk2 = (known: boolean) =>
+      createMap({ units: ctx.units, status: (id) => (gold.has(id) ? 'gold' : 'gray'), maxW: MAP_W * 2, maxH: MAP_H * 2, hide: 'geo.city.poznan', mark: ['geo.city.gdansk'], known, bus: testBus() });
+    const on = mk2(true);
+    const ids = [...on.el.querySelectorAll<HTMLElement>('[data-known]')].map((e) => e.dataset.known);
+    expect(ids).toContain('geo.city.warszawa');
+    expect(ids).not.toContain('geo.city.poznan');
+    expect(ids).not.toContain('geo.city.gdansk');
+    // Kraków и Wieliczka рядом: подписан только один
+    expect(ids.filter((i) => i === 'geo.city.krakow' || i === 'geo.city.wieliczka').length).toBe(1);
+    expect(mk2(false).el.querySelectorAll('[data-known]').length).toBe(0);
+    on.destroy();
+  });
+});
+
+describe('лупа «Крупнее»', () => {
+  it('zoomTo(c, LOOK_MULT): втрое крупнее, спрайты ×2; без множителя — прежние ×8 и ×3; «вся карта» возвращает', () => {
+    const m = createMap({ units: ctx.units, status: () => 'gray', maxW: MAP_W * 1.125, maxH: MAP_H * 1.125, interactive: true, bus: testBus() });
+    const base = m.sprite;
+    m.zoomTo({ x: 200, y: 130 }, LOOK_MULT);
+    expect(m.zoomed).toBe(true);
+    expect(m.sprite).toBe(2 * base);
+    m.zoomOut();
+    expect(m.zoomed).toBe(false);
+    m.zoomTo({ x: 200, y: 130 });
+    expect(m.sprite).toBe(3 * base);
+    m.destroy();
+  });
+
+  it('в «Pokaż na mapie» на маленькой карте есть кнопка лупы, на крупной (×2) её нет', () => {
+    const u = U('geo.city.lodz');
+    const t = makeKind(ctx, u, 'show')!;
+    const small = panelOf();
+    small.panel.fit = (measure) => void measure({ w: 360, h: 640 });
+    document.body.append(small.body);
+    game.render(t, small.panel, ctx);
+    expect(small.body.querySelector<HTMLElement>('[data-look]')?.hidden).toBe(false);
+    const big = panelOf();
+    big.panel.fit = (measure) => void measure({ w: MAP_W * 3, h: MAP_H * 3 });
+    document.body.append(big.body);
+    game.render(t, big.panel, ctx);
+    expect(big.body.querySelector<HTMLElement>('[data-look]')?.hidden).toBe(true);
+    small.body.remove();
+    big.body.remove();
   });
 });
