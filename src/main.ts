@@ -31,7 +31,8 @@ import { mountAssembleGap } from './ui/assembleGap';
 import { mountBoard } from './ui/board';
 import { createPlruLoader, createRuplLoader } from './systems/platform/rupl';
 import { attachLongPress } from './input/press';
-import { BASE_WORDS, isA1 } from './systems/content';
+import { BASE_WORDS, WORDS, isA1, plOf } from './systems/content';
+import { dailyDue, dailyLine, dailySeenDay, markDaily, pickDaily } from './systems/dailySeeds';
 import { isCustomId } from './systems/customWords';
 import { wordIndex, type WordIndex } from './systems/wordPick';
 import { LONG_PRESS_MS, mountWordPick } from './ui/wordPick';
@@ -355,7 +356,20 @@ async function main(): Promise<void> {
   const plantCard = mountPlantCard(overlay, farm, { onReview: (id) => game.start(farm.reviewMode(id), id) });
   // Утро: первый вход в новый день — карточка «Вчера: …». День, для которого утро уже было, лежит одним флагом `morning:<день>` в `Save.hints`.
   const MORNING = 'morning:';
+  // Случайные слова дня (`edition.dailyRandom`, версия Оли): в первый вход нового дня N новых слов базы садятся сами.
+  // Только посадки — журнал и выращенное не трогаются; день отмечен флагом `daily:<день>` в `Save.hints`.
+  const dailyNews = (day: number): string | null => {
+    const n = EDITION.dailyRandom;
+    if (!dailyDue({ n, day, seen: dailySeenDay(store.save.hints), started: farm.garden.planted.length > 0 })) return null;
+    const ids = pickDaily(WORDS.filter((w) => farm.info(w.id).status === 'new').map((w) => w.id), n, day);
+    store.update((s: Save) => ({ ...s, hints: markDaily(s.hints, day) }), clock.now());
+    if (!ids.length) return null;
+    const r = farm.plant(ids);
+    return dailyLine(ids.map(plOf), r.bag);
+  };
   mountMorning(overlay, {
+    news: dailyNews,
+    toast: (text) => hud.toast(text, undefined, 15_000),
     today: dayNow,
     recap: () => recapBefore(farm.garden.log, farm.state.grownByDay, dayNow()),
     ripeToday: () => farm.ripeSoon().today,
