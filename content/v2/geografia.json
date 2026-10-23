@@ -119,10 +119,19 @@
     "region",
     "neighbor",
     "sea",
-    "nature"
+    "nature",
+    "park"
    ],
    "pl": "Pokaż na mapie: {pl}",
    "ru": "Покажи на карте: {ru}"
+  },
+  {
+   "t": "name",
+   "for": [
+    "park"
+   ],
+   "pl": "Jaki to park narodowy?",
+   "ru": "Какой это национальный парк?"
   },
   {
    "t": "name",
@@ -12291,6 +12300,2825 @@
     {
      "t": "build",
      "phrase": "geo.nat.puszcza_bialowieska.main"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.tatrzanski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Tatrzański Park Narodowy",
+   "ru": "Татранский национальный парк",
+   "tr": "татша́ньски парк народо́вы",
+   "pos": [
+    49.24,
+    19.95
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "W Tatrzańskim Parku Narodowym są Rysy i Morskie Oko.",
+     "ru": "В Татранском нацпарке — Рысы и Морское Око."
+    },
+    {
+     "pl": "W Tatrach żyją kozice i świstaki.",
+     "ru": "В Татрах живут серны и сурки."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "forms": {
+    "nom": "Tatrzański Park Narodowy",
+    "loc": "w Tatrzańskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.tatrzanski.where",
+     "role": "where",
+     "pl": "Tatrzański Park Narodowy leży w Tatrach.",
+     "ru": "Татранский национальный парк находится в Татрах.",
+     "tr": "татша́ньски парк народо́вы ле́жы ф та́трах.",
+     "tiles_pl": [
+      "Tatrzański",
+      "Park",
+      "Narodowy",
+      "leży",
+      "w",
+      "Tatrach"
+     ],
+     "distract_pl": [
+      "Tatry",
+      "Tatrami"
+     ]
+    },
+    {
+     "id": "geo.park.tatrzanski.loc",
+     "role": "loc",
+     "pl": "Jestem w Tatrzańskim Parku Narodowym.",
+     "ru": "Я в Татранском национальном парке.",
+     "tr": "е́стэм ф татша́ньским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Tatrzańskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Tatrzański",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Tatrzański Park Narodowy",
+     "q_ru": "Покажи на карте: Татранский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.tatrzanski",
+     "distract": [
+      "geo.park.pieninski",
+      "geo.park.gorczanski",
+      "geo.park.babiogorski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Tatrzański Park Narodowy?",
+     "q_ru": "В каком воеводстве: Татранский национальный парк?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Tatrzański Park Narodowy)",
+     "answer": "w Tatrzańskim Parku Narodowym",
+     "wrong": [
+      "w Tatrzański Park Narodowy",
+      "w Tatrzańskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.tatrzanski.where"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.tatrzanski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.bialowieski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Białowieski Park Narodowy",
+   "ru": "Беловежский национальный парк",
+   "tr": "бяўове́ски парк народо́вы",
+   "pos": [
+    52.76,
+    23.87
+   ],
+   "orchard": "geo.voi.podlaskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "To jeden z dwóch najstarszych parków narodowych w Polsce.",
+     "ru": "Один из двух старейших нацпарков Польши."
+    },
+    {
+     "pl": "Puszcza Białowieska jest na liście UNESCO.",
+     "ru": "Беловежская пуща — в списке ЮНЕСКО."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.podlaskie",
+   "regions": [
+    "geo.voi.podlaskie"
+   ],
+   "forms": {
+    "nom": "Białowieski Park Narodowy",
+    "loc": "w Białowieskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.bialowieski.animal",
+     "role": "animal",
+     "pl": "W Białowieskim Parku Narodowym żyją żubry.",
+     "ru": "В Беловежском нацпарке живут зубры.",
+     "tr": "ф бяўове́ским па́рку народо́вым жы́ёў жу́бры.",
+     "tiles_pl": [
+      "W",
+      "Białowieskim",
+      "Parku",
+      "Narodowym",
+      "żyją",
+      "żubry"
+     ],
+     "distract_pl": [
+      "żubr",
+      "żubrów"
+     ]
+    },
+    {
+     "id": "geo.park.bialowieski.loc",
+     "role": "loc",
+     "pl": "Jestem w Białowieskim Parku Narodowym.",
+     "ru": "Я в Беловежском национальном парке.",
+     "tr": "е́стэм ф бяўове́ским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Białowieskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Białowieski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Białowieski Park Narodowy",
+     "q_ru": "Покажи на карте: Беловежский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.bialowieski",
+     "distract": [
+      "geo.park.narwianski",
+      "geo.park.biebrzanski",
+      "geo.park.wigierski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Białowieski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Беловежский национальный парк?",
+     "answer": [
+      "geo.voi.podlaskie"
+     ],
+     "distract": [
+      "geo.voi.warminsko_mazurskie",
+      "geo.voi.mazowieckie",
+      "geo.voi.lubelskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Białowieski Park Narodowy)",
+     "answer": "w Białowieskim Parku Narodowym",
+     "wrong": [
+      "w Białowieski Park Narodowy",
+      "w Białowieskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.bialowieski.animal"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.bialowieski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.kampinoski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Kampinoski Park Narodowy",
+   "ru": "Кампиноский национальный парк",
+   "tr": "кампино́ски парк народо́вы",
+   "pos": [
+    52.33,
+    20.55
+   ],
+   "orchard": "geo.voi.mazowieckie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "W Puszczy Kampinoskiej są wydmy i lasy.",
+     "ru": "В Кампиноской пуще есть дюны и леса."
+    },
+    {
+     "pl": "Symbolem parku jest łoś.",
+     "ru": "Символ парка — лось."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.mazowieckie",
+   "regions": [
+    "geo.voi.mazowieckie"
+   ],
+   "forms": {
+    "nom": "Kampinoski Park Narodowy",
+    "loc": "w Kampinoskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.kampinoski.near",
+     "role": "near",
+     "pl": "Kampinoski Park Narodowy leży blisko Warszawy.",
+     "ru": "Кампиноский нацпарк находится недалеко от Варшавы.",
+     "tr": "кампино́ски парк народо́вы ле́жы бли́ско варша́вы.",
+     "tiles_pl": [
+      "Kampinoski",
+      "Park",
+      "Narodowy",
+      "leży",
+      "blisko",
+      "Warszawy"
+     ],
+     "distract_pl": [
+      "Warszawa",
+      "Warszawie"
+     ]
+    },
+    {
+     "id": "geo.park.kampinoski.loc",
+     "role": "loc",
+     "pl": "Jestem w Kampinoskim Parku Narodowym.",
+     "ru": "Я в Кампиноском национальном парке.",
+     "tr": "е́стэм ф кампино́ским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Kampinoskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Kampinoski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Kampinoski Park Narodowy",
+     "q_ru": "Покажи на карте: Кампиноский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.kampinoski",
+     "distract": [
+      "geo.park.swietokrzyski",
+      "geo.park.narwianski",
+      "geo.park.biebrzanski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Kampinoski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Кампиноский национальный парк?",
+     "answer": [
+      "geo.voi.mazowieckie"
+     ],
+     "distract": [
+      "geo.voi.lodzkie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podlaskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Kampinoski Park Narodowy)",
+     "answer": "w Kampinoskim Parku Narodowym",
+     "wrong": [
+      "w Kampinoski Park Narodowy",
+      "w Kampinoskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.kampinoski.near"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.kampinoski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.slowinski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Słowiński Park Narodowy",
+   "ru": "Словинский национальный парк",
+   "tr": "сўови́ньски парк народо́вы",
+   "pos": [
+    54.71,
+    17.35
+   ],
+   "orchard": "geo.voi.pomorskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "Park leży nad Morzem Bałtyckim, obok Łeby.",
+     "ru": "Парк находится у Балтийского моря, рядом с Лебой."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.pomorskie",
+   "regions": [
+    "geo.voi.pomorskie"
+   ],
+   "forms": {
+    "nom": "Słowiński Park Narodowy",
+    "loc": "w Słowińskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.slowinski.dunes",
+     "role": "dunes",
+     "pl": "W Słowińskim Parku Narodowym są ruchome wydmy.",
+     "ru": "В Словинском нацпарке есть движущиеся дюны.",
+     "tr": "ф сўови́ньским па́рку народо́вым соў рухо́мэ вы́дмы.",
+     "tiles_pl": [
+      "W",
+      "Słowińskim",
+      "Parku",
+      "Narodowym",
+      "są",
+      "ruchome",
+      "wydmy"
+     ],
+     "distract_pl": [
+      "wydma",
+      "wydmach"
+     ]
+    },
+    {
+     "id": "geo.park.slowinski.loc",
+     "role": "loc",
+     "pl": "Jestem w Słowińskim Parku Narodowym.",
+     "ru": "Я в Словинском национальном парке.",
+     "tr": "е́стэм ф сўови́ньским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Słowińskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Słowiński",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Słowiński Park Narodowy",
+     "q_ru": "Покажи на карте: Словинский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.slowinski",
+     "distract": [
+      "geo.park.bory_tucholskie",
+      "geo.park.drawienski",
+      "geo.park.wolinski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Słowiński Park Narodowy?",
+     "q_ru": "В каком воеводстве: Словинский национальный парк?",
+     "answer": [
+      "geo.voi.pomorskie"
+     ],
+     "distract": [
+      "geo.voi.kujawsko_pomorskie",
+      "geo.voi.zachodniopomorskie",
+      "geo.voi.warminsko_mazurskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Słowiński Park Narodowy)",
+     "answer": "w Słowińskim Parku Narodowym",
+     "wrong": [
+      "w Słowiński Park Narodowy",
+      "w Słowińskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.slowinski.dunes"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.slowinski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.karkonoski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Karkonoski Park Narodowy",
+   "ru": "Карконошский национальный парк",
+   "tr": "карконо́ски парк народо́вы",
+   "pos": [
+    50.78,
+    15.65
+   ],
+   "orchard": "geo.voi.dolnoslaskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "Karkonosze to najwyższe góry Sudetów.",
+     "ru": "Карконоше — самые высокие горы Судет."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.dolnoslaskie",
+   "regions": [
+    "geo.voi.dolnoslaskie"
+   ],
+   "forms": {
+    "nom": "Karkonoski Park Narodowy",
+    "loc": "w Karkonoskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.karkonoski.peak",
+     "role": "peak",
+     "pl": "W Karkonoskim Parku Narodowym jest Śnieżka.",
+     "ru": "В Карконошском нацпарке есть Снежка.",
+     "tr": "ф карконо́ским па́рку народо́вым ест щнье́шка.",
+     "tiles_pl": [
+      "W",
+      "Karkonoskim",
+      "Parku",
+      "Narodowym",
+      "jest",
+      "Śnieżka"
+     ],
+     "distract_pl": [
+      "Śnieżki",
+      "Śnieżką"
+     ]
+    },
+    {
+     "id": "geo.park.karkonoski.loc",
+     "role": "loc",
+     "pl": "Jestem w Karkonoskim Parku Narodowym.",
+     "ru": "Я в Карконошском национальном парке.",
+     "tr": "е́стэм ф карконо́ским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Karkonoskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Karkonoski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Karkonoski Park Narodowy",
+     "q_ru": "Покажи на карте: Карконошский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.karkonoski",
+     "distract": [
+      "geo.park.gor_stolowych",
+      "geo.park.wielkopolski",
+      "geo.park.ujscie_warty"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Karkonoski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Карконошский национальный парк?",
+     "answer": [
+      "geo.voi.dolnoslaskie"
+     ],
+     "distract": [
+      "geo.voi.opolskie",
+      "geo.voi.lubuskie",
+      "geo.voi.wielkopolskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Karkonoski Park Narodowy)",
+     "answer": "w Karkonoskim Parku Narodowym",
+     "wrong": [
+      "w Karkonoski Park Narodowy",
+      "w Karkonoskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.karkonoski.peak"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.karkonoski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.bieszczadzki",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Bieszczadzki Park Narodowy",
+   "ru": "Бещадский национальный парк",
+   "tr": "бешча́цки парк народо́вы",
+   "pos": [
+    49.12,
+    22.65
+   ],
+   "orchard": "geo.voi.podkarpackie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "Na szczytach Bieszczadów są połoniny, czyli górskie łąki.",
+     "ru": "На вершинах Бещад — полонины, горные луга."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.podkarpackie",
+   "regions": [
+    "geo.voi.podkarpackie"
+   ],
+   "forms": {
+    "nom": "Bieszczadzki Park Narodowy",
+    "loc": "w Bieszczadzkim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.bieszczadzki.animal",
+     "role": "animal",
+     "pl": "W Bieszczadach żyją niedźwiedzie i wilki.",
+     "ru": "В Бещадах живут медведи и волки.",
+     "tr": "ф бешча́дах жы́ёў ньеджьве́дже и ви́лки.",
+     "tiles_pl": [
+      "W",
+      "Bieszczadach",
+      "żyją",
+      "niedźwiedzie",
+      "i",
+      "wilki"
+     ],
+     "distract_pl": [
+      "niedźwiedź",
+      "wilk"
+     ]
+    },
+    {
+     "id": "geo.park.bieszczadzki.loc",
+     "role": "loc",
+     "pl": "Jestem w Bieszczadzkim Parku Narodowym.",
+     "ru": "Я в Бещадском национальном парке.",
+     "tr": "е́стэм ф бешча́цким па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Bieszczadzkim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Bieszczadzki",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Bieszczadzki Park Narodowy",
+     "q_ru": "Покажи на карте: Бещадский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.bieszczadzki",
+     "distract": [
+      "geo.park.magurski",
+      "geo.park.roztoczanski",
+      "geo.park.pieninski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Bieszczadzki Park Narodowy?",
+     "q_ru": "В каком воеводстве: Бещадский национальный парк?",
+     "answer": [
+      "geo.voi.podkarpackie"
+     ],
+     "distract": [
+      "geo.voi.malopolskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.lubelskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Bieszczadzki Park Narodowy)",
+     "answer": "w Bieszczadzkim Parku Narodowym",
+     "wrong": [
+      "w Bieszczadzki Park Narodowy",
+      "w Bieszczadzkiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.bieszczadzki.animal"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.bieszczadzki.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.wielkopolski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Wielkopolski Park Narodowy",
+   "ru": "Великопольский национальный парк",
+   "tr": "велкопо́лски парк народо́вы",
+   "pos": [
+    52.27,
+    16.8
+   ],
+   "orchard": "geo.voi.wielkopolskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "W parku jest dużo jezior i lasów.",
+     "ru": "В парке много озёр и лесов."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.wielkopolskie",
+   "regions": [
+    "geo.voi.wielkopolskie"
+   ],
+   "forms": {
+    "nom": "Wielkopolski Park Narodowy",
+    "loc": "w Wielkopolskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.wielkopolski.near",
+     "role": "near",
+     "pl": "Wielkopolski Park Narodowy leży blisko Poznania.",
+     "ru": "Великопольский нацпарк находится недалеко от Познани.",
+     "tr": "велкопо́лски парк народо́вы ле́жы бли́ско позна́ня.",
+     "tiles_pl": [
+      "Wielkopolski",
+      "Park",
+      "Narodowy",
+      "leży",
+      "blisko",
+      "Poznania"
+     ],
+     "distract_pl": [
+      "Poznań",
+      "Poznaniu"
+     ]
+    },
+    {
+     "id": "geo.park.wielkopolski.loc",
+     "role": "loc",
+     "pl": "Jestem w Wielkopolskim Parku Narodowym.",
+     "ru": "Я в Великопольском национальном парке.",
+     "tr": "е́стэм ф велкопо́лским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Wielkopolskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Wielkopolski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Wielkopolski Park Narodowy",
+     "q_ru": "Покажи на карте: Великопольский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.wielkopolski",
+     "distract": [
+      "geo.park.drawienski",
+      "geo.park.ujscie_warty",
+      "geo.park.bory_tucholskie"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Wielkopolski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Великопольский национальный парк?",
+     "answer": [
+      "geo.voi.wielkopolskie"
+     ],
+     "distract": [
+      "geo.voi.kujawsko_pomorskie",
+      "geo.voi.dolnoslaskie",
+      "geo.voi.lubuskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Wielkopolski Park Narodowy)",
+     "answer": "w Wielkopolskim Parku Narodowym",
+     "wrong": [
+      "w Wielkopolski Park Narodowy",
+      "w Wielkopolskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.wielkopolski.near"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.wielkopolski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.ojcowski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Ojcowski Park Narodowy",
+   "ru": "Ойцовский национальный парк",
+   "tr": "ойцо́фски парк народо́вы",
+   "pos": [
+    50.21,
+    19.82
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 2,
+   "facts": [
+    {
+     "pl": "W parku są skały, jaskinie i zamek Pieskowa Skała.",
+     "ru": "В парке скалы, пещеры и замок Пескова-Скала."
+    },
+    {
+     "pl": "Park leży blisko Krakowa.",
+     "ru": "Парк находится недалеко от Кракова."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "forms": {
+    "nom": "Ojcowski Park Narodowy",
+    "loc": "w Ojcowskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.ojcowski.small",
+     "role": "small",
+     "pl": "Ojcowski Park Narodowy to najmniejszy park narodowy w Polsce.",
+     "ru": "Ойцовский нацпарк — самый маленький нацпарк Польши.",
+     "tr": "ойцо́фски парк народо́вы то наймнье́йшы парк народо́вы ф по́лсцэ.",
+     "tiles_pl": [
+      "Ojcowski",
+      "Park",
+      "Narodowy",
+      "to",
+      "najmniejszy",
+      "park",
+      "narodowy",
+      "w",
+      "Polsce"
+     ],
+     "distract_pl": [
+      "najmniejsza",
+      "parku"
+     ]
+    },
+    {
+     "id": "geo.park.ojcowski.loc",
+     "role": "loc",
+     "pl": "Jestem w Ojcowskim Parku Narodowym.",
+     "ru": "Я в Ойцовском национальном парке.",
+     "tr": "е́стэм ф ойцо́фским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Ojcowskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Ojcowski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Ojcowski Park Narodowy",
+     "q_ru": "Покажи на карте: Ойцовский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.ojcowski",
+     "distract": [
+      "geo.park.babiogorski",
+      "geo.park.gorczanski",
+      "geo.park.pieninski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Ojcowski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Ойцовский национальный парк?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Ojcowski Park Narodowy)",
+     "answer": "w Ojcowskim Parku Narodowym",
+     "wrong": [
+      "w Ojcowski Park Narodowy",
+      "w Ojcowskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.ojcowski.small"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.ojcowski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.pieninski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Pieniński Park Narodowy",
+   "ru": "Пенинский национальный парк",
+   "tr": "пени́ньски парк народо́вы",
+   "pos": [
+    49.42,
+    20.4
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Po Dunajcu pływają tu tratwy flisaków.",
+     "ru": "По Дунайцу здесь сплавляются плоты плотогонов."
+    },
+    {
+     "pl": "Nad Dunajcem stoją Trzy Korony.",
+     "ru": "Над Дунайцем возвышаются Тши-Короны."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "forms": {
+    "nom": "Pieniński Park Narodowy",
+    "loc": "w Pienińskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.pieninski.river",
+     "role": "river",
+     "pl": "Przez Pieniński Park Narodowy płynie Dunajec.",
+     "ru": "Через Пенинский нацпарк течёт Дунаец.",
+     "tr": "пшэс пени́ньски парк народо́вы пўы́нье дуна́ец.",
+     "tiles_pl": [
+      "Przez",
+      "Pieniński",
+      "Park",
+      "Narodowy",
+      "płynie",
+      "Dunajec"
+     ],
+     "distract_pl": [
+      "Dunajcem",
+      "Dunajca"
+     ]
+    },
+    {
+     "id": "geo.park.pieninski.loc",
+     "role": "loc",
+     "pl": "Jestem w Pienińskim Parku Narodowym.",
+     "ru": "Я в Пенинском национальном парке.",
+     "tr": "е́стэм ф пени́ньским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Pienińskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Pieniński",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Pieniński Park Narodowy",
+     "q_ru": "Покажи на карте: Пенинский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.pieninski",
+     "distract": [
+      "geo.park.gorczanski",
+      "geo.park.tatrzanski",
+      "geo.park.babiogorski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Pieniński Park Narodowy?",
+     "q_ru": "В каком воеводстве: Пенинский национальный парк?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Pieniński Park Narodowy)",
+     "answer": "w Pienińskim Parku Narodowym",
+     "wrong": [
+      "w Pieniński Park Narodowy",
+      "w Pienińskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.pieninski.river"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.pieninski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.babiogorski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Babiogórski Park Narodowy",
+   "ru": "Бабьегурский национальный парк",
+   "tr": "бабёгу́рски парк народо́вы",
+   "pos": [
+    49.57,
+    19.53
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Babia Góra to najwyższy szczyt polskich Beskidów (1725 m).",
+     "ru": "Бабья-Гура — высшая вершина польских Бескид (1725 м)."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "forms": {
+    "nom": "Babiogórski Park Narodowy",
+    "loc": "w Babiogórskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.babiogorski.peak",
+     "role": "peak",
+     "pl": "W Babiogórskim Parku Narodowym jest Babia Góra.",
+     "ru": "В Бабьегурском нацпарке есть Бабья-Гура.",
+     "tr": "ф бабёгу́рским па́рку народо́вым ест ба́бя гу́ра.",
+     "tiles_pl": [
+      "W",
+      "Babiogórskim",
+      "Parku",
+      "Narodowym",
+      "jest",
+      "Babia",
+      "Góra"
+     ],
+     "distract_pl": [
+      "Babiej",
+      "Górze"
+     ]
+    },
+    {
+     "id": "geo.park.babiogorski.loc",
+     "role": "loc",
+     "pl": "Jestem w Babiogórskim Parku Narodowym.",
+     "ru": "Я в Бабьегурском национальном парке.",
+     "tr": "е́стэм ф бабёгу́рским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Babiogórskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Babiogórski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Babiogórski Park Narodowy",
+     "q_ru": "Покажи на карте: Бабьегурский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.babiogorski",
+     "distract": [
+      "geo.park.gorczanski",
+      "geo.park.tatrzanski",
+      "geo.park.pieninski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Babiogórski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Бабьегурский национальный парк?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Babiogórski Park Narodowy)",
+     "answer": "w Babiogórskim Parku Narodowym",
+     "wrong": [
+      "w Babiogórski Park Narodowy",
+      "w Babiogórskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.babiogorski.peak"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.babiogorski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.gorczanski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Gorczański Park Narodowy",
+   "ru": "Горчанский национальный парк",
+   "tr": "горча́ньски парк народо́вы",
+   "pos": [
+    49.56,
+    20.15
+   ],
+   "orchard": "geo.voi.malopolskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Gorce to pasmo górskie w Beskidach.",
+     "ru": "Горце — горный хребет в Бескидах."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.malopolskie",
+   "regions": [
+    "geo.voi.malopolskie"
+   ],
+   "forms": {
+    "nom": "Gorczański Park Narodowy",
+    "loc": "w Gorczańskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.gorczanski.where",
+     "role": "where",
+     "pl": "Gorczański Park Narodowy leży w Gorcach.",
+     "ru": "Горчанский нацпарк находится в Горцах.",
+     "tr": "горча́ньски парк народо́вы ле́жы ф го́рцах.",
+     "tiles_pl": [
+      "Gorczański",
+      "Park",
+      "Narodowy",
+      "leży",
+      "w",
+      "Gorcach"
+     ],
+     "distract_pl": [
+      "Gorce",
+      "Gorcami"
+     ]
+    },
+    {
+     "id": "geo.park.gorczanski.loc",
+     "role": "loc",
+     "pl": "Jestem w Gorczańskim Parku Narodowym.",
+     "ru": "Я в Горчанском национальном парке.",
+     "tr": "е́стэм ф горча́ньским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Gorczańskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Gorczański",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Gorczański Park Narodowy",
+     "q_ru": "Покажи на карте: Горчанский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.gorczanski",
+     "distract": [
+      "geo.park.pieninski",
+      "geo.park.tatrzanski",
+      "geo.park.babiogorski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Gorczański Park Narodowy?",
+     "q_ru": "В каком воеводстве: Горчанский национальный парк?",
+     "answer": [
+      "geo.voi.malopolskie"
+     ],
+     "distract": [
+      "geo.voi.slaskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Gorczański Park Narodowy)",
+     "answer": "w Gorczańskim Parku Narodowym",
+     "wrong": [
+      "w Gorczański Park Narodowy",
+      "w Gorczańskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.gorczanski.where"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.gorczanski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.magurski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Magurski Park Narodowy",
+   "ru": "Магурский национальный парк",
+   "tr": "магу́рски парк народо́вы",
+   "pos": [
+    49.5,
+    21.45
+   ],
+   "orchard": "geo.voi.podkarpackie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "To park lasów i niskich gór na południu Polski.",
+     "ru": "Это парк лесов и невысоких гор на юге Польши."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.podkarpackie",
+   "regions": [
+    "geo.voi.podkarpackie"
+   ],
+   "forms": {
+    "nom": "Magurski Park Narodowy",
+    "loc": "w Magurskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.magurski.where",
+     "role": "where",
+     "pl": "Magurski Park Narodowy leży w Beskidzie Niskim.",
+     "ru": "Магурский нацпарк находится в Низких Бескидах.",
+     "tr": "магу́рски парк народо́вы ле́жы ф бэски́дже ни́ским.",
+     "tiles_pl": [
+      "Magurski",
+      "Park",
+      "Narodowy",
+      "leży",
+      "w",
+      "Beskidzie",
+      "Niskim"
+     ],
+     "distract_pl": [
+      "Beskid",
+      "Niski"
+     ]
+    },
+    {
+     "id": "geo.park.magurski.loc",
+     "role": "loc",
+     "pl": "Jestem w Magurskim Parku Narodowym.",
+     "ru": "Я в Магурском национальном парке.",
+     "tr": "е́стэм ф магу́рским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Magurskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Magurski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Magurski Park Narodowy",
+     "q_ru": "Покажи на карте: Магурский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.magurski",
+     "distract": [
+      "geo.park.pieninski",
+      "geo.park.gorczanski",
+      "geo.park.bieszczadzki"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Magurski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Магурский национальный парк?",
+     "answer": [
+      "geo.voi.podkarpackie"
+     ],
+     "distract": [
+      "geo.voi.malopolskie",
+      "geo.voi.swietokrzyskie",
+      "geo.voi.lubelskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Magurski Park Narodowy)",
+     "answer": "w Magurskim Parku Narodowym",
+     "wrong": [
+      "w Magurski Park Narodowy",
+      "w Magurskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.magurski.where"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.magurski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.gor_stolowych",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Park Narodowy Gór Stołowych",
+   "ru": "Национальный парк Столовых гор",
+   "tr": "парк народо́вы гур стоўо́вых",
+   "pos": [
+    50.47,
+    16.35
+   ],
+   "orchard": "geo.voi.dolnoslaskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Góry Stołowe mają płaskie szczyty jak stoły.",
+     "ru": "У Столовых гор плоские вершины, как столы."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.dolnoslaskie",
+   "regions": [
+    "geo.voi.dolnoslaskie"
+   ],
+   "forms": {
+    "nom": "Park Narodowy Gór Stołowych",
+    "loc": "w Parku Narodowym Gór Stołowych"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.gor_stolowych.rocks",
+     "role": "rocks",
+     "pl": "W Górach Stołowych są Błędne Skały.",
+     "ru": "В Столовых горах есть Блендне-Скалы.",
+     "tr": "ф гу́рах стоўо́вых соў бўэ́нднэ ска́ўы.",
+     "tiles_pl": [
+      "W",
+      "Górach",
+      "Stołowych",
+      "są",
+      "Błędne",
+      "Skały"
+     ],
+     "distract_pl": [
+      "Błędnych",
+      "Skałach"
+     ]
+    },
+    {
+     "id": "geo.park.gor_stolowych.loc",
+     "role": "loc",
+     "pl": "Jestem w Parku Narodowym Gór Stołowych.",
+     "ru": "Я в национальном парке Столовых гор.",
+     "tr": "е́стэм ф па́рку народо́вым гур стоўо́вых.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Parku",
+      "Narodowym",
+      "Gór",
+      "Stołowych"
+     ],
+     "distract_pl": [
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Park Narodowy Gór Stołowych",
+     "q_ru": "Покажи на карте: Национальный парк Столовых гор",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.gor_stolowych",
+     "distract": [
+      "geo.park.karkonoski",
+      "geo.park.wielkopolski",
+      "geo.park.ojcowski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Park Narodowy Gór Stołowych?",
+     "q_ru": "В каком воеводстве: Национальный парк Столовых гор?",
+     "answer": [
+      "geo.voi.dolnoslaskie"
+     ],
+     "distract": [
+      "geo.voi.opolskie",
+      "geo.voi.lubuskie",
+      "geo.voi.wielkopolskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Park Narodowy Gór Stołowych)",
+     "answer": "w Parku Narodowym Gór Stołowych",
+     "wrong": [
+      "w Park Narodowy Gór Stołowych",
+      "w Parku Narodowego Gór Stołowych"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.gor_stolowych.rocks"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.gor_stolowych.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.swietokrzyski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Świętokrzyski Park Narodowy",
+   "ru": "Свентокшиский национальный парк",
+   "tr": "щфентокшы́ски парк народо́вы",
+   "pos": [
+    50.89,
+    20.95
+   ],
+   "orchard": "geo.voi.swietokrzyskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Gołoborza to pola kamieni na zboczach gór.",
+     "ru": "Голобожа — каменные россыпи на склонах гор."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.swietokrzyskie",
+   "regions": [
+    "geo.voi.swietokrzyskie"
+   ],
+   "forms": {
+    "nom": "Świętokrzyski Park Narodowy",
+    "loc": "w Świętokrzyskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.swietokrzyski.peak",
+     "role": "peak",
+     "pl": "W Świętokrzyskim Parku Narodowym jest Łysica.",
+     "ru": "В Свентокшиском нацпарке есть Лысица.",
+     "tr": "ф щфентокшы́ским па́рку народо́вым ест ўыщи́ца.",
+     "tiles_pl": [
+      "W",
+      "Świętokrzyskim",
+      "Parku",
+      "Narodowym",
+      "jest",
+      "Łysica"
+     ],
+     "distract_pl": [
+      "Łysicy",
+      "Łysicą"
+     ]
+    },
+    {
+     "id": "geo.park.swietokrzyski.loc",
+     "role": "loc",
+     "pl": "Jestem w Świętokrzyskim Parku Narodowym.",
+     "ru": "Я в Свентокшиском национальном парке.",
+     "tr": "е́стэм ф щфентокшы́ским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Świętokrzyskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Świętokrzyski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Świętokrzyski Park Narodowy",
+     "q_ru": "Покажи на карте: Свентокшиский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.swietokrzyski",
+     "distract": [
+      "geo.park.ojcowski",
+      "geo.park.roztoczanski",
+      "geo.park.gorczanski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Świętokrzyski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Свентокшиский национальный парк?",
+     "answer": [
+      "geo.voi.swietokrzyskie"
+     ],
+     "distract": [
+      "geo.voi.malopolskie",
+      "geo.voi.slaskie",
+      "geo.voi.podkarpackie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Świętokrzyski Park Narodowy)",
+     "answer": "w Świętokrzyskim Parku Narodowym",
+     "wrong": [
+      "w Świętokrzyski Park Narodowy",
+      "w Świętokrzyskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.swietokrzyski.peak"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.swietokrzyski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.roztoczanski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Roztoczański Park Narodowy",
+   "ru": "Розточанский национальный парк",
+   "tr": "росточа́ньски парк народо́вы",
+   "pos": [
+    50.6,
+    23.0
+   ],
+   "orchard": "geo.voi.lubelskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Park leży niedaleko Zamościa.",
+     "ru": "Парк находится недалеко от Замосця."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.lubelskie",
+   "regions": [
+    "geo.voi.lubelskie"
+   ],
+   "forms": {
+    "nom": "Roztoczański Park Narodowy",
+    "loc": "w Roztoczańskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.roztoczanski.animal",
+     "role": "animal",
+     "pl": "W Roztoczańskim Parku Narodowym żyją koniki polskie.",
+     "ru": "В Розточанском нацпарке живут польские коники.",
+     "tr": "ф росточа́ньским па́рку народо́вым жы́ёў кони́ки по́лске.",
+     "tiles_pl": [
+      "W",
+      "Roztoczańskim",
+      "Parku",
+      "Narodowym",
+      "żyją",
+      "koniki",
+      "polskie"
+     ],
+     "distract_pl": [
+      "konik",
+      "polski"
+     ]
+    },
+    {
+     "id": "geo.park.roztoczanski.loc",
+     "role": "loc",
+     "pl": "Jestem w Roztoczańskim Parku Narodowym.",
+     "ru": "Я в Розточанском национальном парке.",
+     "tr": "е́стэм ф росточа́ньским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Roztoczańskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Roztoczański",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Roztoczański Park Narodowy",
+     "q_ru": "Покажи на карте: Розточанский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.roztoczanski",
+     "distract": [
+      "geo.park.poleski",
+      "geo.park.swietokrzyski",
+      "geo.park.magurski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Roztoczański Park Narodowy?",
+     "q_ru": "В каком воеводстве: Розточанский национальный парк?",
+     "answer": [
+      "geo.voi.lubelskie"
+     ],
+     "distract": [
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie",
+      "geo.voi.mazowieckie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Roztoczański Park Narodowy)",
+     "answer": "w Roztoczańskim Parku Narodowym",
+     "wrong": [
+      "w Roztoczański Park Narodowy",
+      "w Roztoczańskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.roztoczanski.animal"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.roztoczanski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.poleski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Poleski Park Narodowy",
+   "ru": "Полесский национальный парк",
+   "tr": "поле́ски парк народо́вы",
+   "pos": [
+    51.43,
+    23.15
+   ],
+   "orchard": "geo.voi.lubelskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Tu żyje rzadki żółw błotny.",
+     "ru": "Здесь живёт редкая болотная черепаха."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.lubelskie",
+   "regions": [
+    "geo.voi.lubelskie"
+   ],
+   "forms": {
+    "nom": "Poleski Park Narodowy",
+    "loc": "w Poleskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.poleski.nature",
+     "role": "nature",
+     "pl": "W Poleskim Parku Narodowym są bagna i torfowiska.",
+     "ru": "В Полесском нацпарке есть болота и торфяники.",
+     "tr": "ф поле́ским па́рку народо́вым соў ба́гна и торфови́ска.",
+     "tiles_pl": [
+      "W",
+      "Poleskim",
+      "Parku",
+      "Narodowym",
+      "są",
+      "bagna",
+      "i",
+      "torfowiska"
+     ],
+     "distract_pl": [
+      "bagno",
+      "torfowisko"
+     ]
+    },
+    {
+     "id": "geo.park.poleski.loc",
+     "role": "loc",
+     "pl": "Jestem w Poleskim Parku Narodowym.",
+     "ru": "Я в Полесском национальном парке.",
+     "tr": "е́стэм ф поле́ским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Poleskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Poleski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Poleski Park Narodowy",
+     "q_ru": "Покажи на карте: Полесский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.poleski",
+     "distract": [
+      "geo.park.roztoczanski",
+      "geo.park.bialowieski",
+      "geo.park.swietokrzyski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Poleski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Полесский национальный парк?",
+     "answer": [
+      "geo.voi.lubelskie"
+     ],
+     "distract": [
+      "geo.voi.swietokrzyskie",
+      "geo.voi.podkarpackie",
+      "geo.voi.mazowieckie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Poleski Park Narodowy)",
+     "answer": "w Poleskim Parku Narodowym",
+     "wrong": [
+      "w Poleski Park Narodowy",
+      "w Poleskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.poleski.nature"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.poleski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.biebrzanski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Biebrzański Park Narodowy",
+   "ru": "Бебжанский национальный парк",
+   "tr": "бебжа́ньски парк народо́вы",
+   "pos": [
+    53.5,
+    22.7
+   ],
+   "orchard": "geo.voi.podlaskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Nad Biebrzą są bagna, ptaki i łosie.",
+     "ru": "На Бебже — болота, птицы и лоси."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.podlaskie",
+   "regions": [
+    "geo.voi.podlaskie"
+   ],
+   "forms": {
+    "nom": "Biebrzański Park Narodowy",
+    "loc": "w Biebrzańskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.biebrzanski.big",
+     "role": "big",
+     "pl": "Biebrzański Park Narodowy to największy park narodowy w Polsce.",
+     "ru": "Бебжанский нацпарк — самый большой нацпарк Польши.",
+     "tr": "бебжа́ньски парк народо́вы то найве́нкшы парк народо́вы ф по́лсцэ.",
+     "tiles_pl": [
+      "Biebrzański",
+      "Park",
+      "Narodowy",
+      "to",
+      "największy",
+      "park",
+      "narodowy",
+      "w",
+      "Polsce"
+     ],
+     "distract_pl": [
+      "największa",
+      "parku"
+     ]
+    },
+    {
+     "id": "geo.park.biebrzanski.loc",
+     "role": "loc",
+     "pl": "Jestem w Biebrzańskim Parku Narodowym.",
+     "ru": "Я в Бебжанском национальном парке.",
+     "tr": "е́стэм ф бебжа́ньским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Biebrzańskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Biebrzański",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Biebrzański Park Narodowy",
+     "q_ru": "Покажи на карте: Бебжанский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.biebrzanski",
+     "distract": [
+      "geo.park.narwianski",
+      "geo.park.wigierski",
+      "geo.park.bialowieski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Biebrzański Park Narodowy?",
+     "q_ru": "В каком воеводстве: Бебжанский национальный парк?",
+     "answer": [
+      "geo.voi.podlaskie"
+     ],
+     "distract": [
+      "geo.voi.warminsko_mazurskie",
+      "geo.voi.mazowieckie",
+      "geo.voi.lubelskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Biebrzański Park Narodowy)",
+     "answer": "w Biebrzańskim Parku Narodowym",
+     "wrong": [
+      "w Biebrzański Park Narodowy",
+      "w Biebrzańskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.biebrzanski.big"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.biebrzanski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.narwianski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Narwiański Park Narodowy",
+   "ru": "Нарвянский национальный парк",
+   "tr": "нарвя́ньски парк народо́вы",
+   "pos": [
+    53.07,
+    22.85
+   ],
+   "orchard": "geo.voi.podlaskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Narew płynie tu wieloma korytami: to „polska Amazonia”.",
+     "ru": "Нарев течёт здесь многими рукавами: это «польская Амазония»."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.podlaskie",
+   "regions": [
+    "geo.voi.podlaskie"
+   ],
+   "forms": {
+    "nom": "Narwiański Park Narodowy",
+    "loc": "w Narwiańskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.narwianski.river",
+     "role": "river",
+     "pl": "Przez Narwiański Park Narodowy płynie Narew.",
+     "ru": "Через Нарвянский нацпарк течёт Нарев.",
+     "tr": "пшэс нарвя́ньски парк народо́вы пўы́нье на́рэф.",
+     "tiles_pl": [
+      "Przez",
+      "Narwiański",
+      "Park",
+      "Narodowy",
+      "płynie",
+      "Narew"
+     ],
+     "distract_pl": [
+      "Narwią",
+      "Narwi"
+     ]
+    },
+    {
+     "id": "geo.park.narwianski.loc",
+     "role": "loc",
+     "pl": "Jestem w Narwiańskim Parku Narodowym.",
+     "ru": "Я в Нарвянском национальном парке.",
+     "tr": "е́стэм ф нарвя́ньским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Narwiańskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Narwiański",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Narwiański Park Narodowy",
+     "q_ru": "Покажи на карте: Нарвянский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.narwianski",
+     "distract": [
+      "geo.park.biebrzanski",
+      "geo.park.bialowieski",
+      "geo.park.wigierski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Narwiański Park Narodowy?",
+     "q_ru": "В каком воеводстве: Нарвянский национальный парк?",
+     "answer": [
+      "geo.voi.podlaskie"
+     ],
+     "distract": [
+      "geo.voi.warminsko_mazurskie",
+      "geo.voi.mazowieckie",
+      "geo.voi.lubelskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Narwiański Park Narodowy)",
+     "answer": "w Narwiańskim Parku Narodowym",
+     "wrong": [
+      "w Narwiański Park Narodowy",
+      "w Narwiańskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.narwianski.river"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.narwianski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.wigierski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Wigierski Park Narodowy",
+   "ru": "Вигерский национальный парк",
+   "tr": "виге́рски парк народо́вы",
+   "pos": [
+    54.03,
+    23.08
+   ],
+   "orchard": "geo.voi.podlaskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Symbolem parku jest bóbr.",
+     "ru": "Символ парка — бобр."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.podlaskie",
+   "regions": [
+    "geo.voi.podlaskie"
+   ],
+   "forms": {
+    "nom": "Wigierski Park Narodowy",
+    "loc": "w Wigierskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.wigierski.lake",
+     "role": "lake",
+     "pl": "W Wigierskim Parku Narodowym jest jezioro Wigry.",
+     "ru": "В Вигерском нацпарке есть озеро Вигры.",
+     "tr": "ф виге́рским па́рку народо́вым ест ежёро ви́гры.",
+     "tiles_pl": [
+      "W",
+      "Wigierskim",
+      "Parku",
+      "Narodowym",
+      "jest",
+      "jezioro",
+      "Wigry"
+     ],
+     "distract_pl": [
+      "jeziorze",
+      "Wigrach"
+     ]
+    },
+    {
+     "id": "geo.park.wigierski.loc",
+     "role": "loc",
+     "pl": "Jestem w Wigierskim Parku Narodowym.",
+     "ru": "Я в Вигерском национальном парке.",
+     "tr": "е́стэм ф виге́рским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Wigierskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Wigierski",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Wigierski Park Narodowy",
+     "q_ru": "Покажи на карте: Вигерский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.wigierski",
+     "distract": [
+      "geo.park.biebrzanski",
+      "geo.park.narwianski",
+      "geo.park.bialowieski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Wigierski Park Narodowy?",
+     "q_ru": "В каком воеводстве: Вигерский национальный парк?",
+     "answer": [
+      "geo.voi.podlaskie"
+     ],
+     "distract": [
+      "geo.voi.warminsko_mazurskie",
+      "geo.voi.mazowieckie",
+      "geo.voi.lubelskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Wigierski Park Narodowy)",
+     "answer": "w Wigierskim Parku Narodowym",
+     "wrong": [
+      "w Wigierski Park Narodowy",
+      "w Wigierskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.wigierski.lake"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.wigierski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.drawienski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Drawieński Park Narodowy",
+   "ru": "Дравенский национальный парк",
+   "tr": "драве́ньски парк народо́вы",
+   "pos": [
+    53.1,
+    15.95
+   ],
+   "orchard": "geo.voi.zachodniopomorskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Drawa to rzeka dla kajakarzy.",
+     "ru": "Драва — река для байдарочников."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.zachodniopomorskie",
+   "regions": [
+    "geo.voi.zachodniopomorskie"
+   ],
+   "forms": {
+    "nom": "Drawieński Park Narodowy",
+    "loc": "w Drawieńskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.drawienski.river",
+     "role": "river",
+     "pl": "Przez Drawieński Park Narodowy płynie Drawa.",
+     "ru": "Через Дравенский нацпарк течёт Драва.",
+     "tr": "пшэс драве́ньски парк народо́вы пўы́нье дра́ва.",
+     "tiles_pl": [
+      "Przez",
+      "Drawieński",
+      "Park",
+      "Narodowy",
+      "płynie",
+      "Drawa"
+     ],
+     "distract_pl": [
+      "Drawą",
+      "Drawy"
+     ]
+    },
+    {
+     "id": "geo.park.drawienski.loc",
+     "role": "loc",
+     "pl": "Jestem w Drawieńskim Parku Narodowym.",
+     "ru": "Я в Дравенском национальном парке.",
+     "tr": "е́стэм ф драве́ньским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Drawieńskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Drawieński",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Drawieński Park Narodowy",
+     "q_ru": "Покажи на карте: Дравенский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.drawienski",
+     "distract": [
+      "geo.park.ujscie_warty",
+      "geo.park.wielkopolski",
+      "geo.park.bory_tucholskie"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Drawieński Park Narodowy?",
+     "q_ru": "В каком воеводстве: Дравенский национальный парк?",
+     "answer": [
+      "geo.voi.zachodniopomorskie"
+     ],
+     "distract": [
+      "geo.voi.lubuskie",
+      "geo.voi.pomorskie",
+      "geo.voi.wielkopolskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Drawieński Park Narodowy)",
+     "answer": "w Drawieńskim Parku Narodowym",
+     "wrong": [
+      "w Drawieński Park Narodowy",
+      "w Drawieńskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.drawienski.river"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.drawienski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.wolinski",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Woliński Park Narodowy",
+   "ru": "Волинский национальный парк",
+   "tr": "воли́ньски парк народо́вы",
+   "pos": [
+    53.93,
+    14.5
+   ],
+   "orchard": "geo.voi.zachodniopomorskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Nad morzem są tu wysokie klify.",
+     "ru": "У моря здесь высокие клифы."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.zachodniopomorskie",
+   "regions": [
+    "geo.voi.zachodniopomorskie"
+   ],
+   "forms": {
+    "nom": "Woliński Park Narodowy",
+    "loc": "w Wolińskim Parku Narodowym"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.wolinski.island",
+     "role": "island",
+     "pl": "Woliński Park Narodowy leży na wyspie Wolin.",
+     "ru": "Волинский нацпарк находится на острове Волин.",
+     "tr": "воли́ньски парк народо́вы ле́жы на вы́спе во́лин.",
+     "tiles_pl": [
+      "Woliński",
+      "Park",
+      "Narodowy",
+      "leży",
+      "na",
+      "wyspie",
+      "Wolin"
+     ],
+     "distract_pl": [
+      "wyspa",
+      "Wolinie"
+     ]
+    },
+    {
+     "id": "geo.park.wolinski.loc",
+     "role": "loc",
+     "pl": "Jestem w Wolińskim Parku Narodowym.",
+     "ru": "Я в Волинском национальном парке.",
+     "tr": "е́стэм ф воли́ньским па́рку народо́вым.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Wolińskim",
+      "Parku",
+      "Narodowym"
+     ],
+     "distract_pl": [
+      "Woliński",
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Woliński Park Narodowy",
+     "q_ru": "Покажи на карте: Волинский национальный парк",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.wolinski",
+     "distract": [
+      "geo.park.drawienski",
+      "geo.park.ujscie_warty",
+      "geo.park.bory_tucholskie"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Woliński Park Narodowy?",
+     "q_ru": "В каком воеводстве: Волинский национальный парк?",
+     "answer": [
+      "geo.voi.zachodniopomorskie"
+     ],
+     "distract": [
+      "geo.voi.lubuskie",
+      "geo.voi.pomorskie",
+      "geo.voi.wielkopolskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Woliński Park Narodowy)",
+     "answer": "w Wolińskim Parku Narodowym",
+     "wrong": [
+      "w Woliński Park Narodowy",
+      "w Wolińskiego Parku Narodowego"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.wolinski.island"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.wolinski.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.bory_tucholskie",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Park Narodowy Bory Tucholskie",
+   "ru": "Национальный парк Тухольские боры",
+   "tr": "парк народо́вы бо́ры тухо́лске",
+   "pos": [
+    53.82,
+    17.55
+   ],
+   "orchard": "geo.voi.pomorskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "W parku jest dużo czystych jezior.",
+     "ru": "В парке много чистых озёр."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.pomorskie",
+   "regions": [
+    "geo.voi.pomorskie"
+   ],
+   "forms": {
+    "nom": "Park Narodowy Bory Tucholskie",
+    "loc": "w Parku Narodowym Bory Tucholskie"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.bory_tucholskie.forest",
+     "role": "forest",
+     "pl": "Bory Tucholskie to duży las sosnowy.",
+     "ru": "Тухольские боры — большой сосновый лес.",
+     "tr": "бо́ры тухо́лске то ду́жы лас сосно́вы.",
+     "tiles_pl": [
+      "Bory",
+      "Tucholskie",
+      "to",
+      "duży",
+      "las",
+      "sosnowy"
+     ],
+     "distract_pl": [
+      "lasy",
+      "sosna"
+     ]
+    },
+    {
+     "id": "geo.park.bory_tucholskie.loc",
+     "role": "loc",
+     "pl": "Jestem w Parku Narodowym Bory Tucholskie.",
+     "ru": "Я в национальном парке «Тухольские боры».",
+     "tr": "е́стэм ф па́рку народо́вым бо́ры тухо́лске.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Parku",
+      "Narodowym",
+      "Bory",
+      "Tucholskie"
+     ],
+     "distract_pl": [
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Park Narodowy Bory Tucholskie",
+     "q_ru": "Покажи на карте: Национальный парк Тухольские боры",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.bory_tucholskie",
+     "distract": [
+      "geo.park.slowinski",
+      "geo.park.drawienski",
+      "geo.park.wielkopolski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Park Narodowy Bory Tucholskie?",
+     "q_ru": "В каком воеводстве: Национальный парк Тухольские боры?",
+     "answer": [
+      "geo.voi.pomorskie"
+     ],
+     "distract": [
+      "geo.voi.kujawsko_pomorskie",
+      "geo.voi.zachodniopomorskie",
+      "geo.voi.warminsko_mazurskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Park Narodowy Bory Tucholskie)",
+     "answer": "w Parku Narodowym Bory Tucholskie",
+     "wrong": [
+      "w Park Narodowy Bory Tucholskie",
+      "w Parku Narodowego Bory Tucholskie"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.bory_tucholskie.forest"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.bory_tucholskie.loc"
+    }
+   ]
+  },
+  {
+   "id": "geo.park.ujscie_warty",
+   "kind": "geo",
+   "type": "park",
+   "pl": "Park Narodowy Ujście Warty",
+   "ru": "Национальный парк Устье Варты",
+   "tr": "парк народо́вы у́йщче ва́рты",
+   "pos": [
+    52.58,
+    14.75
+   ],
+   "orchard": "geo.voi.lubuskie",
+   "band": 3,
+   "facts": [
+    {
+     "pl": "Warta wpada tu do Odry.",
+     "ru": "Здесь Варта впадает в Одру."
+    }
+   ],
+   "src": "Wikipedia PL «Parki narodowe w Polsce»; OSM (центр парка, приблизительно)",
+   "checked": "2026-10-18",
+   "region": "geo.voi.lubuskie",
+   "regions": [
+    "geo.voi.lubuskie"
+   ],
+   "forms": {
+    "nom": "Park Narodowy Ujście Warty",
+    "loc": "w Parku Narodowym Ujście Warty"
+   },
+   "phrases": [
+    {
+     "id": "geo.park.ujscie_warty.birds",
+     "role": "birds",
+     "pl": "W Parku Narodowym Ujście Warty jest dużo ptaków.",
+     "ru": "В нацпарке Устье Варты много птиц.",
+     "tr": "ф па́рку народо́вым у́йщче ва́рты ест ду́жо пта́куф.",
+     "tiles_pl": [
+      "W",
+      "Parku",
+      "Narodowym",
+      "Ujście",
+      "Warty",
+      "jest",
+      "dużo",
+      "ptaków"
+     ],
+     "distract_pl": [
+      "ptaki",
+      "ptak"
+     ]
+    },
+    {
+     "id": "geo.park.ujscie_warty.loc",
+     "role": "loc",
+     "pl": "Jestem w Parku Narodowym Ujście Warty.",
+     "ru": "Я в национальном парке «Устье Варты».",
+     "tr": "е́стэм ф па́рку народо́вым у́йщче ва́рты.",
+     "tiles_pl": [
+      "Jestem",
+      "w",
+      "Parku",
+      "Narodowym",
+      "Ujście",
+      "Warty"
+     ],
+     "distract_pl": [
+      "Park",
+      "Narodowy"
+     ]
+    }
+   ],
+   "tasks": [
+    {
+     "t": "show",
+     "q_pl": "Pokaż na mapie: Park Narodowy Ujście Warty",
+     "q_ru": "Покажи на карте: Национальный парк Устье Варты",
+     "hit": "point",
+     "hit_km": 30
+    },
+    {
+     "t": "name",
+     "q_pl": "Jaki to park narodowy?",
+     "q_ru": "Какой это национальный парк?",
+     "answer": "geo.park.ujscie_warty",
+     "distract": [
+      "geo.park.drawienski",
+      "geo.park.wielkopolski",
+      "geo.park.wolinski"
+     ]
+    },
+    {
+     "t": "region",
+     "q_pl": "W jakim województwie jest Park Narodowy Ujście Warty?",
+     "q_ru": "В каком воеводстве: Национальный парк Устье Варты?",
+     "answer": [
+      "geo.voi.lubuskie"
+     ],
+     "distract": [
+      "geo.voi.dolnoslaskie",
+      "geo.voi.wielkopolskie",
+      "geo.voi.zachodniopomorskie"
+     ]
+    },
+    {
+     "t": "form",
+     "slot": "loc",
+     "q_pl": "Jestem … (Park Narodowy Ujście Warty)",
+     "answer": "w Parku Narodowym Ujście Warty",
+     "wrong": [
+      "w Park Narodowy Ujście Warty",
+      "w Parku Narodowego Ujście Warty"
+     ]
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.ujscie_warty.birds"
+    },
+    {
+     "t": "build",
+     "phrase": "geo.park.ujscie_warty.loc"
     }
    ]
   }

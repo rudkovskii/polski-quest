@@ -592,20 +592,21 @@ describe('уровни карты (решение Шэфа 23.10)', () => {
   };
   const levelCtx = (s: ReturnType<typeof mk>) => ({ units: s.p.units('geo'), info: (id: string) => s.p.info(id), doc: s.p.content.docs.geo, flag: (k: string) => s.p.flag(k) });
 
-  it('данные: 5 уровней по порядку, каждая единица ровно в одном; парки и UNESCO пока пустые', () => {
+  it('данные: 5 уровней по порядку, каждая единица ровно в одном; 23 парка, UNESCO пока пустой', () => {
     const lv = levelsOf(ctx.doc);
     expect(lv.map((l) => l.pl)).toEqual(['Miasta i przyroda', 'Sąsiedzi', 'Parki narodowe', 'UNESCO', 'Województwa']);
     for (const u of ctx.units) expect(levelOf(u, lv), u.id).toBeGreaterThan(0);
     const views = levelViews({ ...ctx, flag: () => false });
-    expect(views.map((v) => v.total)).toEqual([OF('city').length + OF('river').length + OF('mountain').length + OF('sea').length + OF('nature').length, 7, 0, 0, 16]);
+    expect(views.map((v) => v.total)).toEqual([OF('city').length + OF('river').length + OF('mountain').length + OF('sea').length + OF('nature').length, 7, 23, 0, 16]);
   });
 
-  it('новый игрок: открыт только уровень 1; соседи ждут 60 % кустиков в уровне 1, воеводства — в соседях; пустые — «скоро»', () => {
+  it('новый игрок: открыт только уровень 1; каждый следующий ждёт предыдущий непустой; пустой — «скоро»', () => {
     const s = mk();
     const v = levelViews(levelCtx(s));
-    expect(v.map((x) => x.why)).toEqual(['first', 'locked', 'empty', 'empty', 'locked']);
+    expect(v.map((x) => x.why)).toEqual(['first', 'locked', 'locked', 'empty', 'locked']);
     expect(v[1]!.after?.level.n).toBe(1);
-    expect(v[4]!.after?.level.n).toBe(2);
+    expect(v[2]!.after?.level.n).toBe(2);
+    expect(v[4]!.after?.level.n).toBe(3);
     expect(nextLevel(v)?.level.n).toBe(1);
   });
 
@@ -745,5 +746,23 @@ describe('лупа «Крупнее»', () => {
     expect(big.body.querySelector<HTMLElement>('[data-look]')?.hidden).toBe(true);
     small.body.remove();
     big.body.remove();
+  });
+});
+
+describe('парки народове (уровень 3)', () => {
+  it('23 парка внутри Польши: «покажи» по точке, «какой парк», воеводство, форма «w … Parku Narodowym», фразы собираются', () => {
+    const parks = OF('park');
+    expect(parks.length).toBe(23);
+    for (const u of parks) {
+      const p = posOf(u)!;
+      expect(inRings(p, REGION_RINGS[u.raw.region as string]!) || dist(p, anchorOf(U(u.raw.region as string))) < 60, u.id).toBe(true);
+      for (const k of ['show', 'name', 'region', 'form', 'build'] as GeoKind[]) {
+        const t = makeKind(ctx, u, k);
+        expect(t, `${u.id} ${k}`).toBeTruthy();
+        const right = k === 'show' ? anchorOf(u) : k === 'build' ? t!.need : t!.answer;
+        expect(checkTask(t!, right, ctx).ok, `${u.id} ${k}`).toBe(true);
+      }
+      expect(makeKind(ctx, u, 'form')!.answer).toMatch(/^w (\S+m Parku Narodowym|Parku Narodowym )/);
+    }
   });
 });
