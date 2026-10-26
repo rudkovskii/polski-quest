@@ -30,7 +30,7 @@ export const WORD_CSS = `
 .pq-w { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; border-radius: 2px; }
 @media (hover: hover) and (pointer: fine) {
   .pq-w:hover { text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 2px; }
-  :not(button, [data-opt], [data-nav], [data-tile]) > .pq-w:hover, [data-opt] .pq-w:hover { cursor: help; }
+  :not(button, [data-opt], [data-nav], [data-tile]) > .pq-w:hover, [data-opt]:not([data-tile]) .pq-w:hover { cursor: help; }
 }
 .pq-w.on { background: rgba(242, 213, 82, .55); }
 /* Подписи над миром и на карте Geografia «прозрачны» для тапа, а слова в них — нет (на карте тап по слову всё равно ставит флажок: он в кнопке карты). */
@@ -341,7 +341,7 @@ export function mountWordPick(overlay: HTMLElement, deps: WordPickDeps): WordPic
       const w = e.target instanceof Element ? e.target.closest<HTMLElement>('.pq-w') : null;
       if (!w || root.contains(w)) return;
       const box = w.closest(INTERACTIVE);
-      if (box && !(box.matches('[data-opt]') && byMouse(e))) return;
+      if (box && !(box.matches('[data-opt]:not([data-tile])') && byMouse(e))) return;
       e.stopPropagation();
       e.preventDefault();
       void api.open(w);
