@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+// Гимн и символы с 26.10 — две игры (hymn, symbole) с общими заданиями: тест гоняет обе на общем контексте.
 // Игра «Hymn i symbole»: данные, задания на все виды Want, проверка ответов, «Jaki jest następny wers?» (плитки по предыдущей строке; музыки и нот нет, 22.10),
 // сборка флага и герба, раунд через общий движок.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -28,7 +29,7 @@ function mkPolska(bush = false) {
 }
 
 const ctxOf = (s: ReturnType<typeof mkPolska>, seed = 3): GameCtx => ({
-  units: s.p.units('hymn'),
+  units: [...s.p.units('hymn'), ...s.p.units('symbole')],
   unit: (id) => s.p.unit(id),
   info: (id) => s.p.info(id),
   seen: () => true,
@@ -66,7 +67,7 @@ afterEach(() => {
 
 describe('данные заданий', () => {
   const s = mkPolska();
-  const units = s.p.units('hymn');
+  const units = [...s.p.units('hymn'), ...s.p.units('symbole')];
 
   it('строки: плитки = слова строки, у пропуска верное слово среди вариантов и в тексте', () => {
     for (const u of units.filter((x) => x.kind === 'hymn')) {
@@ -115,7 +116,7 @@ describe('каждая единица: задание на все виды пр�
   for (const bush of [false, true]) {
     it(`все 39 единиц × 4 просьбы × 6 случайностей${bush ? ' (строки кустиками)' : ''}`, () => {
       const s = mkPolska(bush);
-      for (const u of s.p.units('hymn')) {
+      for (const u of [...s.p.units('hymn'), ...s.p.units('symbole')]) {
         for (const w of WANTS) {
           for (let seed = 1; seed <= 6; seed++) {
             const ctx = ctxOf(s, seed * 17);
@@ -153,7 +154,7 @@ describe('каждая единица: задание на все виды пр�
   it('решение Шэфа 18.10: у строк гимна нет заданий на перевод (ни в вопросе, ни в вариантах), перевод — справкой после ответа', () => {
     for (const bush of [false, true]) {
       const s = mkPolska(bush);
-      for (const u of s.p.units('hymn').filter((x) => x.kind === 'hymn')) {
+      for (const u of [...s.p.units('hymn'), ...s.p.units('symbole')].filter((x) => x.kind === 'hymn')) {
         for (const w of WANTS) {
           for (let seed = 1; seed <= 6; seed++) {
             const ctx = ctxOf(s, seed * 31);

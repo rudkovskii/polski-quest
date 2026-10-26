@@ -3,6 +3,7 @@
 import type { Polska } from '../systems/polska';
 import { PLOT_NAME } from '../systems/zagroda';
 import type { PolskaGameId } from '../types/polska';
+import { gameOfKind } from '../systems/v2content';
 import { el } from './dom';
 import { STAGE_INFO } from './glossary';
 import { createPanel, nav } from './panel';
@@ -33,7 +34,7 @@ export function mountPolskaPlot(parent: HTMLElement, deps: PolskaPlotDeps): { op
         { 'data-unit': u.id, style: 'display:flex;align-items:center;gap:8px' },
         el('div', { style: 'flex:1;min-width:0' }, el('span', { class: 'pq-pl', lang: 'pl' }, u.pl), ' ', el('span', { class: 'pq-muted' }, u.ru), el('div', { class: 'pq-muted', style: 'font-size:13px' }, stage)),
       );
-      if (game && inf.planted) row.append(el('button', { type: 'button', class: 'pq-btn small', ...nav('units', 'v', `rev:${u.id}`), onclick: () => (panel.close(), deps.play(game, u.id)) }, 'Повторить'));
+      if (game && inf.planted) row.append(el('button', { type: 'button', class: 'pq-btn small', ...nav('units', 'v', `rev:${u.id}`), onclick: () => (panel.close(), deps.play(gameOfKind(u.kind), u.id)) }, 'Повторить'));
       list.append(row);
     }
     if (game) list.append(el('button', { type: 'button', class: 'pq-btn', 'data-play': game, ...nav('units', 'v', 'play'), onclick: () => (panel.close(), deps.play(game)) }, 'Играть'));

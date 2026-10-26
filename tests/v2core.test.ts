@@ -2,7 +2,7 @@
 // Ядро v2 «Игры о Польше»: контент, модель (kind, «сам», drillSeed), огород v2 отдельно от A1, шкала «Wiedza o Polsce», реестр игр,
 // движок раунда, маршрутизация точек входа, локация Zagroda, сохранение v3.
 import { describe, expect, it, vi } from 'vitest';
-import { GAMES, GAME_BY_ENTRY, GAME_BY_ID } from '../src/games/registry';
+import { GAMES, GAMES_BY_ENTRY, GAME_BY_ID } from '../src/games/registry';
 import { hymnPool } from '../src/games/hymn';
 import { A1_IDS, ALL_WORDS, PHRASES, TOPICS, WORDS, WORD_BY_ID } from '../src/systems/content';
 import { createFarm } from '../src/systems/farm';
@@ -247,7 +247,8 @@ describe('Zagroda: участки и точки входа', () => {
   });
 
   it('вид объектов по прогрессу: пусто → ничего, урожай → pct 1', () => {
-    const units = unitsOfGame(V2, 'daty').filter((u) => u.raw.month === 5);
+    // На грядке мая растут и даты мая, и сам месяц (игра «Miesiące», 26.10).
+    const units = [...unitsOfGame(V2, 'daty'), ...unitsOfGame(V2, 'miesiace')].filter((u) => u.raw.month === 5);
     const st = derive({ ...newGarden(), planted: units.map((u) => ({ t: NOW, id: u.id })) });
     let v = plotViews(V2.units, st.items, NOW).find((x) => x.obj === 'bed_5')!;
     expect(v).toMatchObject({ units: units.length, planted: units.length, grown: 0, best: 'seed', group: 'month:5' });
@@ -266,12 +267,25 @@ describe('Zagroda: участки и точки входа', () => {
 });
 
 describe('реестр игр и маршрутизация', () => {
-  it('4 игры: свои папки, разные точки входа и участки, виды покрывают все единицы', () => {
-    expect(GAMES.map((g) => g.id).sort()).toEqual(['daty', 'geo', 'hymn', 'swieta']);
+  it('6 игр (26.10: гимн и символы раздельно, месяцы — своя игра): 4 точки входа, у мачты и календаря по две игры', () => {
+    expect(GAMES.map((g) => g.id).sort()).toEqual(['daty', 'geo', 'hymn', 'miesiace', 'swieta', 'symbole']);
     expect(new Set(GAMES.map((g) => g.entry)).size).toBe(4);
     expect(new Set(GAMES.map((g) => g.plot)).size).toBe(4);
     for (const g of GAMES) expect([...g.kinds]).toEqual([...GAME_KINDS[g.id]]);
-    for (const [use, id] of [['map', 'geo'], ['mast', 'hymn'], ['calendar', 'daty'], ['seasonBoard', 'swieta']] as const) expect(GAME_BY_ENTRY.get(use)?.id).toBe(id);
+    const ids = (use: 'map' | 'mast' | 'calendar' | 'seasonBoard') => GAMES_BY_ENTRY.get(use)?.map((g) => g.id);
+    expect(ids('map')).toEqual(['geo']);
+    expect(ids('mast')).toEqual(['hymn', 'symbole']);
+    expect(ids('calendar')).toEqual(['daty', 'miesiace']);
+    expect(ids('seasonBoard')).toEqual(['swieta']);
+    // Каждая единица — ровно в одной игре; месяцев 12.
+    const owner = new Map<string, string>();
+    for (const g of GAMES) for (const u of unitsOfGame(V2, g.id)) {
+      expect(owner.has(u.id), u.id).toBe(false);
+      owner.set(u.id, g.id);
+    }
+    expect(owner.size).toBe(V2.units.length);
+    expect(unitsOfGame(V2, 'miesiace').map((u) => u.pl)[0]).toBe('styczeń');
+    expect(unitsOfGame(V2, 'miesiace')).toHaveLength(12);
   });
 
   it('точки входа стоят на картах: карта и календарь в доме, мачта и сезонная доска на ферме', () => {
@@ -372,7 +386,7 @@ describe('движок раунда v2', () => {
       },
     });
     b.open('polska');
-    expect(root.querySelectorAll('[data-game]').length).toBe(4);
+    expect(root.querySelectorAll('[data-game]').length).toBe(GAMES.length);
     root.querySelector<HTMLButtonElement>('[data-go="geo"]')!.click();
     expect(went).toEqual(['geo']);
     b.open('polska');

@@ -1,9 +1,8 @@
-// Игра 2: Hymn i symbole («Maszt», ФЕРМА_v2.md §3). Гимн только текстом, без музыки и нот (решение Шэфа 22.10): uzupełnij, co dalej, kolejność строк и куплетов,
-// «Jaki jest następny wers?» (собрать строку из плиток); перевод — справкой после ответа. Символы: вопросы-шаблоны с дистракторами, czyj to symbol,
-// сборка флага и герба тап-тап, порядок легенды о Лехе. Посадка (`pool`): куплет 1 и припев, следующий куплет — когда посаженное подросло до ростка;
+// Игра «Hymn» («Maszt», ФЕРМА_v2.md §3). Гимн только текстом, без музыки и нот (решение Шэфа 22.10): uzupełnij, co dalej, kolejność строк и куплетов,
+// «Jaki jest następny wers?» (собрать строку из плиток); перевод — справкой после ответа. Символы с 26.10 — отдельная игра `games/symbole`
+// (просьба Шэфа), задания у обеих в `tasks.ts` этой папки. Посадка (`pool`): куплет 1 и припев, следующий куплет — когда посаженное подросло до ростка;
 // строки из дриля собеса (`drillSeed`) движок сажает кустиками (решение Шэфа №4).
 import type { GameCtx, PolskaGame } from '../../types/polska';
-import { bandOrder } from '../stub';
 import { renderTask } from './view';
 import { checkTask, makeTask, type HymnTask } from './tasks';
 
@@ -25,17 +24,16 @@ export function hymnPool(ctx: GameCtx): string[] {
     });
     if (!ready) break;
   }
-  const symbols = bandOrder(ctx.units.filter((u) => u.kind === 'symbol'));
-  return [...out, ...symbols];
+  return out;
 }
 
 export const game: PolskaGame<HymnTask> = {
   id: 'hymn',
-  title: { pl: 'Hymn i symbole', ru: 'Гимн и символы' },
-  desc: 'Mazurek Dąbrowskiego строка за строкой, герб, флаг и символы',
+  title: { pl: 'Hymn', ru: 'Гимн' },
+  desc: 'Mazurek Dąbrowskiego строка за строкой: пропуски, что дальше, порядок',
   entry: 'mast',
   plot: 'pasieka',
-  kinds: ['hymn', 'symbol'],
+  kinds: ['hymn'],
   layout: 'panel',
   pool: hymnPool,
   nextTask: makeTask,

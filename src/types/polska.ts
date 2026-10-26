@@ -4,9 +4,9 @@
 import type { Stage } from './farm';
 
 /** Виды единиц v2 (поле `kind` в данных и у растения). */
-export type PolskaKind = 'geo' | 'hymn' | 'symbol' | 'date' | 'holiday';
+export type PolskaKind = 'geo' | 'hymn' | 'symbol' | 'date' | 'holiday' | 'month';
 /** Игры v2: папка `src/games/<id>/`. */
-export type PolskaGameId = 'geo' | 'hymn' | 'daty' | 'swieta';
+export type PolskaGameId = 'geo' | 'hymn' | 'symbole' | 'daty' | 'miesiace' | 'swieta';
 /** Точки входа в мире (`use` объекта на карте). */
 export type PolskaEntry = 'map' | 'mast' | 'calendar' | 'seasonBoard';
 /** Участки в Zagroda, где растут единицы. */
@@ -14,7 +14,7 @@ export type ZPlot = 'sad' | 'pasieka' | 'miesiace' | 'klumba';
 
 /** Единица контента v2 (город, строка гимна, факт-символ, дата, праздник) после загрузки `content/v2/*.json`. */
 export interface PolskaUnit {
-  /** `geo.city.wroclaw`, `hymn.s1.1`, `symbol.godlo`, `date.konstytucja`, `hol.wigilia`. Префикс совпадает с `kind`. */
+  /** `geo.city.wroclaw`, `hymn.s1.1`, `symbol.godlo`, `date.konstytucja`, `hol.wigilia`, `month.3`. Префикс совпадает с `kind`. */
   id: string;
   kind: PolskaKind;
   /** Подвид из данных: city, river, neighbour, voivodeship, line, build, observance… */

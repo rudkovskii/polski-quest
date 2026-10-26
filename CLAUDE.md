@@ -242,6 +242,11 @@ V11a: запись после каждого ответа и посадки (д�
 - Точки входа (`world:interact`, `use`): `map` и `calendar` (стена дома), `mast` и `seasonBoard` (ферма) → `GAME_BY_ENTRY` → игра. Доска: вкладка «Polska» (`board.open('polska')`), «Idź» = `world:goto {use}` (герой сам идёт через двери, `routeTo` в `world/maps.ts`), «Graj tu» = сразу.
 - Автобег: игра с `layout: 'panel'` шлёт `polska:auto` — сцена уходит в Zagroda (спавн у участка), герой бежит к объекту задания (`polska:focus`), ответ — `polska:act`. `layout: 'full'` (карта, календарь) мир не трогает; рост виден в итоге раунда («Sad: подросло N · Na pole!»).
 
+### v2: шесть игр (26.10, просьба Шэфа)
+- «Hymn i symbole» разделена: `games/hymn` (только строки гимна, kind `hymn`) и `games/symbole` (kind `symbol`; задания и вид общие — `games/hymn/tasks.ts`, `view.ts`; id единиц те же, прогресс не теряется). Обе — вход `mast`.
+- Новая игра `games/miesiace` («Miesiące · Месяцы»): 12 единиц `month.<n>` (kind `month`) строит `v2content.ts` (`monthsOf`) из справочника `daty.json:months`; растут на грядках месяцев `bed_<n>` рядом с датами. Задания (`tasks.ts`): A — польское → русское, «Który z kolei jest …?»; B — русское → польское, «Po marcu jest…» (местный падеж), «3 ___» (родительный, вслух порядковым из `ordinals`), четыре месяца подряд по порядку; «сам» — название из букв (диграфы rz/cz/sz/ch/dz одной плиткой, буквы не озвучиваются). Вход `calendar` вместе с Daty.
+- Несколько игр на одной точке входа: `GAMES_BY_ENTRY` (`games/registry.ts`) → `ui/entryPick.ts` («Во что играем?»), одна игра — сразу. «Повторить» на участке Zagroda берёт игру по виду единицы (`gameOfKind`).
+
 ### v2: как добавить игру
 - Игровой агент правит **только свою папку** `src/games/<id>/` (`geo`, `hymn`, `daty`, `swieta`). `index.ts` экспортирует `game: PolskaGame` (контракт — `src/types/polska.ts`):
   `id, title {pl,ru}, desc, entry, plot, kinds, layout ('panel'|'full')`, `pool(ctx)` — id единиц для посадки по порядку (полосы, куплеты), `nextTask(ctx, want)` — задание по просьбе движка (сторона A «узнать» / B «вспомнить»; `want.self` — дай задание «сказать/собрать самому», без него кустик не созреет; null — пропустить), `render(task, panel, ctx)` — DOM в `panel.body`/`panel.foot`, ответ через `panel.submit(answer)`, `check(task, answer, ctx)` → `{ok, correct, note?, say?}`.

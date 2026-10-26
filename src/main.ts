@@ -5,7 +5,8 @@ import { BG_COLOR, World, type WorldStart } from './scenes/World';
 import { backupDue, shouldRemind, withMark } from './systems/backup';
 import { bus, type Bus } from './systems/bus';
 import { createFarm } from './systems/farm';
-import { GAMES, GAME_BY_ENTRY, GAME_BY_ID } from './games/registry';
+import { GAMES, GAMES_BY_ENTRY, GAME_BY_ID } from './games/registry';
+import { mountEntryPick } from './ui/entryPick';
 import { inDays, nearestHoliday, shortName } from './games/swieta/calendar';
 import { createEntryPoint } from './systems/entryPoint';
 import { createPolska } from './systems/polska';
@@ -354,6 +355,7 @@ async function main(): Promise<void> {
   const playPolska = (id: PolskaGameId, only?: string): void => {
     if (!game.isOpen) polskaGame.start(id, only);
   };
+  const entryPick = mountEntryPick(overlay, { play: playPolska });
   const polskaPlot = mountPolskaPlot(overlay, {
     polska,
     play: playPolska,
@@ -429,8 +431,9 @@ async function main(): Promise<void> {
   bus.on('world:interact', ({ use, id }) => {
     if (game.isOpen || polskaGame.isOpen) return;
     // v2: точки входа (карта и календарь в доме, мачта и сезонная доска на ферме) и объекты участков Zagroda.
-    const entry = GAME_BY_ENTRY.get(use as PolskaEntry);
-    if (entry) return polskaGame.start(entry.id);
+    const entry = GAMES_BY_ENTRY.get(use as PolskaEntry);
+    if (entry?.length === 1) return polskaGame.start(entry[0]!.id);
+    if (entry) return entryPick.open(entry);
     if (use === 'zplot') return polskaPlot.open(id);
     if (use === 'desk') dictionary.open();
     else if (use === 'shelf') pantry.open();
