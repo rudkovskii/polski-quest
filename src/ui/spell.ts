@@ -35,7 +35,8 @@ export const SPELL_CSS = `
 .pq-spell { display: flex; flex-direction: column; gap: 6px; }
 .pq-spell-q { display: flex; flex-direction: column; gap: 1px; }
 .pq-spell-q .pq-q { font-size: 22px; margin: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
-.pq-spell-q .pq-q-hint, .pq-spell-q .pq-progress { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pq-spell-q .pq-q-hint { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pq-spell-q .pq-progress { margin: 0; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
 .pq-spell-q .pq-hintline { font-size: 13px; font-weight: 700; color: #7a4a00; }
 .pq-sw { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; max-width: 100%; }
 .pq-slots { display: flex; flex-wrap: wrap; align-items: center; column-gap: 12px; row-gap: 3px; min-height: 40px; padding: 4px; border: 2px dashed var(--pq-wood); border-radius: 6px; background: #fffaf0; }

@@ -22,8 +22,9 @@ import { connectSfx } from './systems/platform/sfx';
 import { recapBefore, wateredOn } from './systems/daygoal';
 import { dayOf } from './systems/garden';
 import { lastReloadAt, lastReloadFrom, registerPwa, reloadForUpdate, watchVersion } from './systems/platform/pwa';
-import { GameStorage, memoryKV, parseProfile } from './systems/platform/storage';
-import { exportFileName, exportSave, importSave, type Save } from './systems/save';
+import { GameStorage, memoryKV, parseProfile, type StorageOptions } from './systems/platform/storage';
+import { exportFileName, exportSave, importSave, normalizeSave, type Save } from './systems/save';
+import { guardStart } from './ui/crash';
 import { staleBuild, updateAction } from './systems/update';
 import type { BusEvents } from './types/bus';
 import { mountAudioToast } from './ui/audioToast';
@@ -70,6 +71,21 @@ const profile = devProfile ?? EDITION.profile;
 // Без звука вслух: `?mute=1` — `audio:play` только в консоль.
 const mute = params.get('mute') === '1';
 
+const storageOptions = (): StorageOptions => (params.get('mem') === '1' ? { kv: memoryKV(), ls: null } : profile ? { profile } : {});
+/** Хранилище, когда оно уже создано: экран «Что-то сломалось» берёт сохранение из него, иначе читает с диска сам. */
+let liveStore: GameStorage | null = null;
+
+/** Текст файла сохранения для экрана ошибки: из памяти игры, иначе сырые данные хранилища (даже нечитаемые — как есть). */
+async function crashSaveText(): Promise<string | null> {
+  const st = liveStore ?? new GameStorage(storageOptions());
+  const loaded = st.peek();
+  if (loaded) return exportSave(loaded);
+  const raw = await st.readRaw();
+  if (raw === undefined) return null;
+  const norm = normalizeSave(raw);
+  return norm ? exportSave(norm) : `${JSON.stringify(raw, null, 1)}\n`;
+}
+
 function download(name: string, text: string): void {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
@@ -98,8 +114,9 @@ async function main(): Promise<void> {
   if (!overlay || !parent) throw new Error('#overlay или #game не найден');
   if (EDITION.gate) await passGate(document.body, EDITION.id, EDITION.gate);
 
-  const store = new GameStorage(params.get('mem') === '1' ? { kv: memoryKV(), ls: null } : profile ? { profile } : {});
-  const { save } = await store.load(Date.now());
+  const store = new GameStorage(storageOptions());
+  liveStore = store;
+  const { save, kept } = await store.load(Date.now());
   store.attachLifecycle();
   void store.requestPersist();
 
@@ -221,6 +238,26 @@ async function main(): Promise<void> {
       hud.flashSaved();
     }
   });
+  // Сохранение не прочиталось, пришло из более новой версии или нашлось второе: копия уже лежит отдельно (`KEYS.kept`), игроку — сообщение и файл.
+  if (kept.length) {
+    const why = kept.some((k) => k.reason === 'broken')
+      ? 'Старое сохранение не прочиталось — игра началась заново. Копия старого сохранена.'
+      : kept.some((k) => k.reason === 'newer')
+        ? 'Сохранение из более новой версии игры. Обновите страницу; копия сохранена.'
+        : 'Нашлось второе сохранение. Копия отложена.';
+    setTimeout(
+      () =>
+        hud.toast(why, {
+          label: 'Скачать копию',
+          run: () =>
+            void store.keptCopies().then((list) => {
+              const name = exportFileName(Date.now(), new Date().getTimezoneOffset()).replace('.json', '-kopia.json');
+              download(name, `${JSON.stringify(list, null, 1)}\n`);
+            }),
+        }, 30_000),
+      1500,
+    );
+  }
   if (shouldRemind(Date.now(), store.save.created, store.save.hints)) {
     store.update((s: Save) => ({ ...s, hints: withMark(s.hints, 'remind', Date.now()) }), Date.now());
     setTimeout(
@@ -512,4 +549,11 @@ async function main(): Promise<void> {
   if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock, music, polska, polskaGame, beaver, wordPick };
 }
 
-void main();
+// Запасной экран в index.html смотрит на этот флаг: модуль дошёл до запуска, дальше ошибки ловит guardStart.
+(window as unknown as { __pqGuard?: boolean }).__pqGuard = true;
+void guardStart(main, {
+  saveText: crashSaveText,
+  fileName: () => exportFileName(Date.now(), new Date().getTimezoneOffset()),
+  download,
+  reload: () => location.reload(),
+});

@@ -722,7 +722,7 @@
   "id": "w.kolega",
   "pl": "kolega",
   "ru": "приятель; коллега",
-  "tr": "коле́га",
+  "tr": "колэ́га",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -1013,8 +1013,8 @@
   "freq": 1,
   "ff": null,
   "ex": {
-   "pl": "Jest godzina czwarta.",
-   "ru": "Сейчас четыре часа."
+   "pl": "Na stole są cztery jabłka.",
+   "ru": "На столе четыре яблока."
   },
   "band": 1,
   "order": 52
@@ -1794,7 +1794,7 @@
   "id": "w.obiad",
   "pl": "obiad",
   "ru": "обед",
-  "tr": "о́бят",
+  "tr": "о́бьят",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -1814,7 +1814,7 @@
   "id": "w.chleb",
   "pl": "chleb",
   "ru": "хлеб",
-  "tr": "хлеп",
+  "tr": "хлэп",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -1983,7 +1983,7 @@
   "id": "w.mleko",
   "pl": "mleko",
   "ru": "молоко",
-  "tr": "мле́ко",
+  "tr": "млэ́ко",
   "pos": "noun",
   "gender": "n",
   "forms": {
@@ -2187,7 +2187,7 @@
   "id": "w.sklep",
   "pl": "sklep",
   "ru": "магазин",
-  "tr": "склеп",
+  "tr": "склэп",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -2315,7 +2315,7 @@
   "id": "w.rozmiar",
   "pl": "rozmiar",
   "ru": "размер",
-  "tr": "ро́змяр",
+  "tr": "ро́змьяр",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -2609,7 +2609,7 @@
   "id": "w.bilet",
   "pl": "bilet",
   "ru": "билет",
-  "tr": "би́лет",
+  "tr": "би́лэт",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -2696,7 +2696,7 @@
   "id": "w.plecy",
   "pl": "plecy",
   "ru": "спина",
-  "tr": "пле́цы",
+  "tr": "плэ́цы",
   "pos": "noun",
   "gender": "pl",
   "forms": {},
@@ -2755,7 +2755,7 @@
   "id": "w.lekarz",
   "pl": "lekarz",
   "ru": "врач",
-  "tr": "ле́каш",
+  "tr": "лэ́каш",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -2798,7 +2798,7 @@
   "id": "w.lekarstwo",
   "pl": "lekarstwo",
   "ru": "лекарство",
-  "tr": "лека́рстфо",
+  "tr": "лэка́рстфо",
   "pos": "noun",
   "gender": "n",
   "forms": {
@@ -3027,7 +3027,7 @@
   "id": "w.lekcja",
   "pl": "lekcja",
   "ru": "урок",
-  "tr": "ле́кця",
+  "tr": "лэ́кця",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -3402,7 +3402,7 @@
   "id": "w.kwiat",
   "pl": "kwiat",
   "ru": "цветок",
-  "tr": "кфят",
+  "tr": "кфьят",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -3444,7 +3444,7 @@
   "id": "w.pole",
   "pl": "pole",
   "ru": "поле",
-  "tr": "по́ле",
+  "tr": "по́лэ",
   "pos": "noun",
   "gender": "n",
   "forms": {
@@ -3771,7 +3771,7 @@
   "id": "w.telefon",
   "pl": "telefon",
   "ru": "телефон",
-  "tr": "тэле́фон",
+  "tr": "тэлэ́фон",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -3852,7 +3852,7 @@
   "id": "w.wiadomosc",
   "pl": "wiadomość",
   "ru": "сообщение",
-  "tr": "вядо́мощчь",
+  "tr": "вьядо́мощчь",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -3872,7 +3872,7 @@
   "id": "w.numer_telefonu",
   "pl": "numer telefonu",
   "ru": "номер телефона",
-  "tr": "ну́мэр тэлефо́ну",
+  "tr": "ну́мэр тэлэфо́ну",
   "pos": "noun",
   "gender": "m",
   "forms": {},
@@ -4230,7 +4230,7 @@
   "id": "w.zle",
   "pl": "źle",
   "ru": "плохо",
-  "tr": "жьле",
+  "tr": "жьлэ",
   "pos": "adv",
   "forms": {},
   "topic": "przyslowki",
@@ -4298,7 +4298,7 @@
   "id": "w.daleko",
   "pl": "daleko",
   "ru": "далеко",
-  "tr": "дале́ко",
+  "tr": "далэ́ко",
   "pos": "adv",
   "forms": {},
   "topic": "przyslowki",
@@ -4349,7 +4349,7 @@
   "id": "w.w_lewo",
   "pl": "w lewo",
   "ru": "налево",
-  "tr": "ф ле́во",
+  "tr": "ф лэ́во",
   "pos": "adv",
   "forms": {},
   "topic": "przyslowki",
@@ -4749,7 +4749,7 @@
   "id": "w.ile",
   "pl": "ile",
   "ru": "сколько",
-  "tr": "и́ле",
+  "tr": "и́лэ",
   "pos": "adv",
   "forms": {},
   "topic": "pytania",
@@ -5809,7 +5809,7 @@
   "id": "w.bolec",
   "pl": "boleć",
   "ru": "болеть (о боли)",
-  "tr": "бо́лечь",
+  "tr": "бо́лэчь",
   "pos": "verb",
   "forms": {
    "3sg": "boli",
@@ -6606,7 +6606,7 @@
   "id": "w.toaleta",
   "pl": "toaleta",
   "ru": "туалет",
-  "tr": "тоале́та",
+  "tr": "тоалэ́та",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -6944,7 +6944,7 @@
   "id": "w.miasto",
   "pl": "miasto",
   "ru": "город",
-  "tr": "мя́сто",
+  "tr": "мья́сто",
   "pos": "noun",
   "gender": "n",
   "forms": {
@@ -7009,7 +7009,7 @@
   "id": "w.kawiarnia",
   "pl": "kawiarnia",
   "ru": "кафе",
-  "tr": "кавя́рня",
+  "tr": "кавья́рня",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -7566,7 +7566,7 @@
   "id": "w.bialy",
   "pl": "biały",
   "ru": "белый",
-  "tr": "бя́ўы",
+  "tr": "бья́ўы",
   "pos": "adj",
   "forms": {
    "f": "biała",
@@ -7911,7 +7911,7 @@
   "id": "w.ale",
   "pl": "ale",
   "ru": "но",
-  "tr": "а́ле",
+  "tr": "а́лэ",
   "pos": "conj",
   "forms": {},
   "topic": "przyimki_i_spojniki",
@@ -7979,7 +7979,7 @@
   "id": "w.problem",
   "pl": "problem",
   "ru": "проблема",
-  "tr": "про́блем",
+  "tr": "про́блэм",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -8000,7 +8000,7 @@
   "id": "w.myslec",
   "pl": "myśleć",
   "ru": "думать",
-  "tr": "мы́щлечь",
+  "tr": "мы́щлэчь",
   "pos": "verb",
   "forms": {
    "1sg": "myślę",
@@ -8310,7 +8310,7 @@
   "id": "w.nie_ma_problemu",
   "pl": "Nie ma problemu",
   "ru": "нет проблем",
-  "tr": "нье ма пробле́му",
+  "tr": "нье ма проблэ́му",
   "pos": "phrase",
   "forms": {},
   "topic": "powitania",
@@ -8703,7 +8703,7 @@
   "id": "w.sypialnia",
   "pl": "sypialnia",
   "ru": "спальня",
-  "tr": "сыпя́лня",
+  "tr": "сыпья́лня",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -9341,7 +9341,7 @@
   "id": "w.tabletka",
   "pl": "tabletka",
   "ru": "таблетка",
-  "tr": "табле́тка",
+  "tr": "таблэ́тка",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -9952,7 +9952,7 @@
   "id": "w.po_lewej",
   "pl": "po lewej",
   "ru": "слева",
-  "tr": "по ле́вэй",
+  "tr": "по лэ́вэй",
   "pos": "adv",
   "forms": {},
   "topic": "przyslowki",
@@ -10196,7 +10196,7 @@
   "id": "w.leciec",
   "pl": "lecieć",
   "ru": "лететь",
-  "tr": "ле́чечь",
+  "tr": "лэ́чечь",
   "pos": "verb",
   "forms": {
    "1sg": "lecę",
@@ -10629,7 +10629,7 @@
   "id": "w.podlewac",
   "pl": "podlewać",
   "ru": "поливать",
-  "tr": "подле́вачь",
+  "tr": "подлэ́вачь",
   "pos": "verb",
   "forms": {
    "1sg": "podlewam",
@@ -11532,7 +11532,7 @@
   "id": "w.kolezanka",
   "pl": "koleżanka",
   "ru": "приятельница; коллега (ж.)",
-  "tr": "колежа́нка",
+  "tr": "колэжа́нка",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -11715,7 +11715,7 @@
   "id": "w.bialorus",
   "pl": "Białoruś",
   "ru": "Беларусь",
-  "tr": "бяўо́рущ",
+  "tr": "бьяўо́рущ",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -11778,7 +11778,7 @@
   "id": "w.anglia",
   "pl": "Anglia",
   "ru": "Англия",
-  "tr": "а́нгля",
+  "tr": "а́нглья",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -12025,7 +12025,7 @@
   "id": "w.swiat",
   "pl": "świat",
   "ru": "мир (планета)",
-  "tr": "щфят",
+  "tr": "щфьят",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -12475,7 +12475,7 @@
   "id": "w.wiosna",
   "pl": "wiosna",
   "ru": "весна",
-  "tr": "вёсна",
+  "tr": "вьо́сна",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -12656,7 +12656,7 @@
   "id": "w.meble",
   "pl": "meble",
   "ru": "мебель",
-  "tr": "мэ́бле",
+  "tr": "мэ́блэ",
   "pos": "noun",
   "gender": "pl",
   "forms": {},
@@ -12800,7 +12800,7 @@
   "id": "w.telewizor",
   "pl": "telewizor",
   "ru": "телевизор",
-  "tr": "тэлеви́зор",
+  "tr": "тэлэви́зор",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -12860,7 +12860,7 @@
   "id": "w.talerz",
   "pl": "talerz",
   "ru": "тарелка",
-  "tr": "та́леш",
+  "tr": "та́лэш",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -12942,7 +12942,7 @@
   "id": "w.widelec",
   "pl": "widelec",
   "ru": "вилка",
-  "tr": "видэ́лец",
+  "tr": "видэ́лэц",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -13062,7 +13062,7 @@
   "id": "w.swiatlo",
   "pl": "światło",
   "ru": "свет",
-  "tr": "щфя́тўо",
+  "tr": "щфья́тўо",
   "pos": "noun",
   "gender": "n",
   "forms": {},
@@ -13309,7 +13309,7 @@
   "id": "w.nalesniki",
   "pl": "naleśniki",
   "ru": "блины",
-  "tr": "налещни́ки",
+  "tr": "налэщни́ки",
   "pos": "noun",
   "gender": "pl",
   "forms": {},
@@ -13327,7 +13327,7 @@
   "id": "w.kotlet",
   "pl": "kotlet",
   "ru": "котлета; отбивная",
-  "tr": "ко́тлет",
+  "tr": "ко́тлэт",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -13703,7 +13703,7 @@
   "id": "w.olej",
   "pl": "olej",
   "ru": "растительное масло",
-  "tr": "о́лей",
+  "tr": "о́лэй",
   "pos": "noun",
   "gender": "m",
   "forms": {},
@@ -14355,7 +14355,7 @@
   "id": "w.biblioteka",
   "pl": "biblioteka",
   "ru": "библиотека",
-  "tr": "библётэ́ка",
+  "tr": "библьотэ́ка",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -14543,7 +14543,7 @@
   "id": "w.swiatla",
   "pl": "światła",
   "ru": "светофор",
-  "tr": "щфя́тўа",
+  "tr": "щфья́тўа",
   "pos": "noun",
   "gender": "pl",
   "forms": {},
@@ -14695,8 +14695,8 @@
   "freq": 2,
   "ff": null,
   "ex": {
-   "pl": "Pociąg jest na peronie drugim.",
-   "ru": "Поезд на второй платформе."
+   "pl": "Pociąg odjeżdża z peronu drugiego.",
+   "ru": "Поезд отправляется со второй платформы."
   },
   "band": 2,
   "order": 731
@@ -14705,7 +14705,7 @@
   "id": "w.plecak",
   "pl": "plecak",
   "ru": "рюкзак",
-  "tr": "пле́цак",
+  "tr": "плэ́цак",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -14945,7 +14945,7 @@
   "id": "w.palec",
   "pl": "palec",
   "ru": "палец",
-  "tr": "па́лец",
+  "tr": "па́лэц",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -15005,7 +15005,7 @@
   "id": "w.lekarka",
   "pl": "lekarka",
   "ru": "врач (женщина)",
-  "tr": "лека́рка",
+  "tr": "лэка́рка",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -15576,7 +15576,7 @@
   "id": "w.piosenka",
   "pl": "piosenka",
   "ru": "песня",
-  "tr": "пёсэ́нка",
+  "tr": "пьосэ́нка",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -15597,7 +15597,7 @@
   "id": "w.serial",
   "pl": "serial",
   "ru": "сериал",
-  "tr": "сэ́рял",
+  "tr": "сэ́рьял",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -15699,7 +15699,7 @@
   "id": "w.radio",
   "pl": "radio",
   "ru": "радио",
-  "tr": "ра́дё",
+  "tr": "ра́дьо",
   "pos": "noun",
   "gender": "n",
   "forms": {
@@ -15719,7 +15719,7 @@
   "id": "w.wiatr",
   "pl": "wiatr",
   "ru": "ветер",
-  "tr": "вятр",
+  "tr": "вьятр",
   "pos": "noun",
   "gender": "m",
   "forms": {},
@@ -15795,7 +15795,7 @@
   "id": "w.ziemia",
   "pl": "ziemia",
   "ru": "земля, почва",
-  "tr": "же́мя",
+  "tr": "же́мья",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -16460,7 +16460,7 @@
   "id": "w.lekki",
   "pl": "lekki",
   "ru": "лёгкий (по весу)",
-  "tr": "ле́кки",
+  "tr": "лэ́кки",
   "pos": "adj",
   "forms": {
    "f": "lekka",
@@ -16780,7 +16780,7 @@
   "id": "w.lepszy",
   "pl": "lepszy",
   "ru": "лучше (прил.)",
-  "tr": "ле́пшы",
+  "tr": "лэ́пшы",
   "pos": "adj",
   "forms": {
    "f": "lepsza"
@@ -16799,7 +16799,7 @@
   "id": "w.najlepszy",
   "pl": "najlepszy",
   "ru": "лучший",
-  "tr": "найле́пшы",
+  "tr": "найлэ́пшы",
   "pos": "adj",
   "forms": {
    "f": "najlepsza"
@@ -17439,7 +17439,7 @@
   "id": "w.odpowiadac",
   "pl": "odpowiadać",
   "ru": "отвечать",
-  "tr": "отповя́дачь",
+  "tr": "отповья́дачь",
   "pos": "verb",
   "forms": {
    "1sg": "odpowiadam",
@@ -17487,7 +17487,7 @@
   "id": "w.znalezc",
   "pl": "znaleźć",
   "ru": "найти",
-  "tr": "зна́лещчь",
+  "tr": "зна́лэщчь",
   "pos": "verb",
   "forms": {
    "1sg": "znajdę",
@@ -17608,7 +17608,7 @@
   "id": "w.lezec",
   "pl": "leżeć",
   "ru": "лежать",
-  "tr": "ле́жэчь",
+  "tr": "лэ́жэчь",
   "pos": "verb",
   "forms": {
    "1sg": "leżę",
@@ -17996,7 +17996,7 @@
   "id": "w.zamawiac",
   "pl": "zamawiać",
   "ru": "заказывать",
-  "tr": "зама́вячь",
+  "tr": "зама́вьячь",
   "pos": "verb",
   "forms": {
    "1sg": "zamawiam",
@@ -18119,7 +18119,7 @@
   "id": "w.studiowac",
   "pl": "studiować",
   "ru": "учиться в вузе",
-  "tr": "студёвачь",
+  "tr": "студьо́вачь",
   "pos": "verb",
   "forms": {
    "1sg": "studiuję",
@@ -18143,7 +18143,7 @@
   "id": "w.zarabiac",
   "pl": "zarabiać",
   "ru": "зарабатывать",
-  "tr": "зара́бячь",
+  "tr": "зара́бьячь",
   "pos": "verb",
   "forms": {
    "1sg": "zarabiam",
@@ -18326,7 +18326,7 @@
   "id": "w.ulubiony",
   "pl": "ulubiony",
   "ru": "любимый",
-  "tr": "улубёны",
+  "tr": "улубьо́ны",
   "pos": "adj",
   "forms": {
    "f": "ulubiona",
@@ -18346,7 +18346,7 @@
   "id": "w.zwykle",
   "pl": "zwykle",
   "ru": "обычно",
-  "tr": "звы́кле",
+  "tr": "звы́клэ",
   "pos": "adv",
   "forms": {},
   "topic": "przyslowki",
@@ -18475,7 +18475,7 @@
   "id": "w.wegetarianski",
   "pl": "wegetariański",
   "ru": "вегетарианский",
-  "tr": "вэгэтаря́ньски",
+  "tr": "вэгэтарья́ньски",
   "pos": "adj",
   "forms": {
    "f": "wegetariańska",
@@ -18555,7 +18555,7 @@
   "id": "w.alergia",
   "pl": "alergia",
   "ru": "аллергия",
-  "tr": "але́ргя",
+  "tr": "алэ́ргья",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -18834,7 +18834,7 @@
   "id": "w.pozdrawiam",
   "pl": "Pozdrawiam",
   "ru": "с уважением; передаю привет",
-  "tr": "поздра́вям",
+  "tr": "поздра́вьям",
   "pos": "phrase",
   "forms": {},
   "topic": "powitania",
@@ -18885,7 +18885,7 @@
   "id": "w.wszystkiego_najlepszego",
   "pl": "Wszystkiego najlepszego",
   "ru": "всего наилучшего (с днём рождения)",
-  "tr": "фшыстке́го найлепшэ́го",
+  "tr": "фшыстке́го найлэпшэ́го",
   "pos": "phrase",
   "forms": {},
   "topic": "powitania",
@@ -19756,7 +19756,7 @@
   "id": "w.kalendarz",
   "pl": "kalendarz",
   "ru": "календарь",
-  "tr": "кале́ндаш",
+  "tr": "калэ́ндаш",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -20552,7 +20552,7 @@
   "id": "w.lemoniada",
   "pl": "lemoniada",
   "ru": "лимонад",
-  "tr": "лемоня́да",
+  "tr": "лэмоня́да",
   "pos": "noun",
   "gender": "f",
   "forms": {},
@@ -20588,7 +20588,7 @@
   "id": "w.wegetarianin",
   "pl": "wegetarianin",
   "ru": "вегетарианец",
-  "tr": "вэгэтаря́нин",
+  "tr": "вэгэтарья́нин",
   "pos": "noun",
   "gender": "m",
   "forms": {
@@ -21063,7 +21063,7 @@
   "id": "w.leczyc",
   "pl": "leczyć",
   "ru": "лечить",
-  "tr": "ле́чычь",
+  "tr": "лэ́чычь",
   "pos": "verb",
   "forms": {
    "1sg": "leczę",
@@ -21306,8 +21306,8 @@
   "freq": 3,
   "ff": null,
   "ex": {
-   "pl": "Mam dobrą karierę.",
-   "ru": "У меня хорошая карьера."
+   "pl": "Ona robi karierę w banku.",
+   "ru": "Она делает карьеру в банке."
   },
   "band": 3,
   "order": 1061
@@ -21397,7 +21397,7 @@
   "id": "w.telewizja",
   "pl": "telewizja",
   "ru": "телевидение",
-  "tr": "тэлеви́зя",
+  "tr": "тэлэви́зя",
   "pos": "noun",
   "gender": "f",
   "forms": {},
@@ -21724,7 +21724,7 @@
   "id": "w.gwiazda",
   "pl": "gwiazda",
   "ru": "звезда",
-  "tr": "гвя́зда",
+  "tr": "гвья́зда",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -21822,7 +21822,7 @@
   "id": "w.fioletowy",
   "pl": "fioletowy",
   "ru": "фиолетовый",
-  "tr": "фёлето́вы",
+  "tr": "фьолэто́вы",
   "pos": "adj",
   "forms": {
    "f": "fioletowa",
@@ -21902,7 +21902,7 @@
   "id": "w.bateria",
   "pl": "bateria",
   "ru": "батарейка; аккумулятор",
-  "tr": "батэ́ря",
+  "tr": "батэ́рья",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -22403,7 +22403,7 @@
   "id": "w.na_dole",
   "pl": "na dole",
   "ru": "внизу",
-  "tr": "на до́ле",
+  "tr": "на до́лэ",
   "pos": "adv",
   "forms": {},
   "topic": "przyslowki",
@@ -22454,7 +22454,7 @@
   "id": "w.nagle",
   "pl": "nagle",
   "ru": "вдруг",
-  "tr": "на́гле",
+  "tr": "на́глэ",
   "pos": "adv",
   "forms": {},
   "topic": "przyslowki",
@@ -22648,7 +22648,7 @@
   "id": "w.zdziwiony",
   "pl": "zdziwiony",
   "ru": "удивлённый",
-  "tr": "жьдживёны",
+  "tr": "жьдживьо́ны",
   "pos": "adj",
   "forms": {
    "f": "zdziwiona"
@@ -22930,7 +22930,7 @@
   "id": "w.uprawiac",
   "pl": "uprawiać",
   "ru": "выращивать, возделывать",
-  "tr": "упра́вячь",
+  "tr": "упра́вьячь",
   "pos": "verb",
   "forms": {
    "1sg": "uprawiam",
@@ -23200,8 +23200,8 @@
   "freq": 3,
   "ff": null,
   "ex": {
-   "pl": "Jest jedenasta godzina.",
-   "ru": "Одиннадцать часов."
+   "pl": "Mieszkam na jedenastym piętrze.",
+   "ru": "Я живу на одиннадцатом этаже."
   },
   "band": 3,
   "order": 1156
@@ -23384,7 +23384,7 @@
   "id": "w.wiele",
   "pl": "wiele",
   "ru": "много (о счётном)",
-  "tr": "ве́ле",
+  "tr": "ве́лэ",
   "pos": "adv",
   "forms": {},
   "topic": "przyslowki",

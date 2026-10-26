@@ -26,6 +26,56 @@
   <body>
     <div id="game"></div>
     <div id="overlay"></div>
+    <script>
+      // t26: модуль игры не загрузился или упал ещё до запуска (сломанный файл, оборванная загрузка) — main.ts не успел поставить
+      // свой экран ошибки (`window.__pqGuard`). Тогда запасной экран: перезагрузить и скачать сохранение прямо из IndexedDB/localStorage.
+      // Имя базы как в storage.ts: профиль из ?dev=, иначе основная база игры (в edition.json main профиля нет).
+      window.addEventListener('load', function () {
+        if (window.__pqGuard || document.querySelector('.pq-crash')) return;
+        var m = /[?&]dev=([a-z0-9_-]{1,32})(&|$)/i.exec(location.search);
+        var profile = m && m[1] !== '0' ? m[1].toLowerCase() : null;
+        var db = profile ? 'polski-farm-' + profile : 'polski-quest-farm';
+        var ns = profile ? db + ':' : '';
+        function save(text) {
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+          a.download = 'ferma-' + new Date().toISOString().slice(0, 10) + '.json';
+          a.click();
+        }
+        function fromLs() {
+          try { return localStorage.getItem(ns + 'pq_save_tail') || localStorage.getItem(ns + 'pq_save'); } catch (e) { return null; }
+        }
+        function exportSave(status) {
+          var done = function (v) {
+            var text = v === undefined || v === null ? fromLs() : JSON.stringify({ app: 'polski-quest-farm', v: v.v, save: v }, null, 1);
+            status.textContent = text ? 'Файл сохранения скачан.' : 'Сохранения на этом устройстве нет.';
+            if (text) save(text);
+          };
+          try {
+            var req = indexedDB.open(db);
+            req.onsuccess = function () {
+              try {
+                var g = req.result.transaction('kv').objectStore('kv').get('pq_save');
+                g.onsuccess = function () { done(g.result); };
+                g.onerror = function () { done(null); };
+              } catch (e) { done(null); }
+            };
+            req.onerror = function () { done(null); };
+          } catch (e) { done(null); }
+        }
+        var box = document.createElement('div');
+        box.className = 'pq-crash';
+        box.setAttribute('role', 'alert');
+        box.style.cssText = 'position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;background:#1a1c2c;color:#f4f4f4;font:18px/1.4 -apple-system,BlinkMacSystemFont,sans-serif';
+        box.innerHTML = '<div style="width:min(100%,440px);display:flex;flex-direction:column;gap:14px"><h1 style="margin:0;font-size:26px">Что-то сломалось</h1>' +
+          '<p style="margin:0">Игра не загрузилась. Прогресс лежит на этом устройстве: скачайте сохранение на всякий случай и перезагрузите страницу.</p>' +
+          '<button type="button" data-crash-reload style="font:inherit;font-weight:800;min-height:52px;border-radius:8px;background:#f2d552;border:2px solid #1a1c2c">Перезагрузить</button>' +
+          '<button type="button" data-crash-export style="font:inherit;font-weight:800;min-height:52px;border-radius:8px;background:#29366f;color:#f4f4f4;border:2px solid #f4f4f4">Скачать сохранение</button><p data-crash-status style="margin:0"></p></div>';
+        document.body.appendChild(box);
+        box.querySelector('[data-crash-reload]').onclick = function () { location.reload(); };
+        box.querySelector('[data-crash-export]').onclick = function () { exportSave(box.querySelector('[data-crash-status]')); };
+      });
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

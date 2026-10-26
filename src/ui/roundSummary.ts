@@ -1,6 +1,7 @@
 // Раунды мини-игры (V11a): по 10 заданий, потом итог в стиле Stardew («Ещё раунд» / «Закончить»). Лимита на число раундов нет.
 // Здесь счёт раунда (чистая часть) и карточка итога; шапку «3 / 10» и переходы ведёт `ui/minigame.ts`.
-import { growthText, levelLabel } from '../systems/xp';
+import { a1PctText, growthText, levelLabel } from '../systems/xp';
+import { LEVEL } from '../systems/edition';
 import { el } from './dom';
 
 /** Заданий в одном раунде. */
@@ -12,7 +13,7 @@ export interface RoundAnswer {
   /** Действие героя: полив, рост, урожай, промах; `xp` — опыт за ответ. */
   act?: { kind: 'water' | 'grow' | 'harvest' | 'miss'; xp: number };
   /** Путь к A1 до и после ответа (позиция в уровнях) и название после ответа. */
-  path?: { from: number; to: number; sub: number; pl: string };
+  path?: { from: number; to: number; sub: number; pl: string; pct?: number };
 }
 
 export interface RoundStats {
@@ -27,7 +28,7 @@ export interface RoundStats {
   xp: number;
   bestStreak: number;
   /** Путь к A1: позиция до первого и после последнего ответа раунда, название и номер уровня сейчас. */
-  path?: { from: number; to: number; sub: number; pl: string };
+  path?: { from: number; to: number; sub: number; pl: string; pct?: number };
 }
 
 /** Счётчик раунда: `add` на каждый ответ, `done` — раунд набрал `ROUND_SIZE`. */
@@ -48,7 +49,7 @@ export class Round {
     const s = this.s;
     s.total++;
     s.xp += r.act?.xp ?? 0;
-    if (r.path) s.path = { from: s.path?.from ?? r.path.from, to: r.path.to, sub: r.path.sub, pl: r.path.pl };
+    if (r.path) s.path = { from: s.path?.from ?? r.path.from, to: r.path.to, sub: r.path.sub, pl: r.path.pl, ...(r.path.pct === undefined ? {} : { pct: r.path.pct }) };
     if (r.ok) {
       s.correct++;
       this.streak++;
@@ -107,10 +108,11 @@ export function renderRoundSummary(n: number, s: Readonly<RoundStats>): HTMLElem
   );
 }
 
-/** Строка пути: «Уровень 2/20 · +0,4 уровня» (рост раунда — только если он есть). */
+/** Строка пути: «Уровень 2/20 · +0,4 уровня · до A1: 3,2%» (рост раунда — только если он есть; доля пути — та же, что в HUD). */
 function wayLine(p: RoundStats['path']): HTMLElement | null {
   if (!p) return null;
   const where = levelLabel(p.sub);
   const grow = growthText(p.to - p.from);
-  return el('div', { class: 'way', 'data-round-way': '' }, where, grow ? ' · ' : '', grow ? el('b', {}, grow) : null);
+  const pct = p.pct === undefined ? null : `до ${LEVEL}: ${a1PctText(p.pct)}`;
+  return el('div', { class: 'way', 'data-round-way': '' }, where, grow ? ' · ' : '', grow ? el('b', {}, grow) : null, pct ? ` · ${pct}` : '');
 }

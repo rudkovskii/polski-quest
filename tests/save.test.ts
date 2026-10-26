@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { createStore, type UseStore } from 'idb-keyval';
 import { describe, expect, it } from 'vitest';
-import { GameStorage, KEYS, memoryKV, type StorageLike } from '../src/systems/platform/storage';
+import { GameStorage, KEYS, memoryKV, type KV, type StorageLike } from '../src/systems/platform/storage';
 import { exportFileName, exportSave, importSave, newSave, normalizeSave, SAVE_V } from '../src/systems/save';
 import { getMap, resolveSpawn } from '../src/world/maps';
 import { modelAt, press, release, run } from './helpers';
@@ -139,5 +139,68 @@ describe('сохранение: экспорт и импорт', () => {
 
   it('имя файла по дате', () => {
     expect(exportFileName(Date.UTC(2026, 9, 17, 9, 0), 0)).toBe('ferma-2026-10-17.json');
+  });
+});
+
+describe('сохранение: прогресс не теряется молча (t27)', () => {
+  const withGarden = (kv: ReturnType<typeof memoryKV>, at: number) => {
+    const s = newSave(at);
+    return kv.setMany([[KEYS.save, { ...s, position: { map: 'farm', x: 3, y: 3, facing: 'up' } }]]).then(() => s);
+  };
+
+  it('мусор вместо сохранения: копия под отдельным ключом до нового, игре сообщается', async () => {
+    const kv = memoryKV();
+    await kv.setMany([[KEYS.save, 'это не сохранение']]);
+    const st = new GameStorage({ kv, ls: null });
+    const r = await st.load(NOW);
+    expect(r.created).toBe(true);
+    expect(r.kept).toHaveLength(1);
+    expect(r.kept[0]!.reason).toBe('broken');
+    expect(await kv.get(r.kept[0]!.key)).toBe('это не сохранение');
+    expect((await st.keptCopies())[0]!.data).toBe('это не сохранение');
+    // Второй запуск: копия на месте, новое сохранение уже нормальное — повторной копии нет.
+    const r2 = await new GameStorage({ kv, ls: null }).load(NOW + 1);
+    expect(r2.kept).toHaveLength(0);
+    expect((await kv.keys()).filter((k) => k.startsWith(KEYS.kept))).toHaveLength(1);
+  });
+
+  it('сохранение из будущей версии (v=99): копия как есть, с незнакомыми полями', async () => {
+    const kv = memoryKV();
+    const future = { ...newSave(NOW), v: 99, newField: { a: 1 } };
+    await kv.setMany([[KEYS.save, future]]);
+    const r = await new GameStorage({ kv, ls: null }).load(NOW + 5);
+    expect(r.created).toBe(false);
+    expect(r.kept.map((k) => k.reason)).toEqual(['newer']);
+    expect(await kv.get(r.kept[0]!.key)).toEqual(future);
+  });
+
+  it('IndexedDB не ответил при старте: пустое сохранение из localStorage потом не затирает настоящее', async () => {
+    const ls = new MemLS();
+    const real = memoryKV();
+    const realSave = await withGarden(real, NOW);
+    // Запуск 1: основное хранилище «зависло» (таймаут) — цепочка ушла в localStorage, там создано пустое.
+    const hung: KV = {
+      kind: 'idb',
+      get: () => Promise.reject(new Error('IndexedDB: get timeout')),
+      setMany: () => Promise.reject(new Error('IndexedDB: set timeout')),
+      del: () => Promise.reject(new Error('timeout')),
+      keys: () => Promise.reject(new Error('timeout')),
+    };
+    const { FallbackKV, lsKV } = await import('../src/systems/platform/storage');
+    const a = new GameStorage({ kv: new FallbackKV([hung, lsKV(ls)]), ls });
+    const ra = await a.load(NOW + 60_000);
+    expect(ra.created).toBe(true);
+    expect(ls.getItem(KEYS.save)).not.toBeNull();
+    // Запуск 2: IndexedDB жив. Раньше более свежее пустое из localStorage побеждало.
+    const b = new GameStorage({ kv: real, ls });
+    const rb = await b.load(NOW + 120_000);
+    expect(rb.save.created).toBe(realSave.created);
+    expect(rb.save.position).toEqual({ map: 'farm', x: 3, y: 3, facing: 'up' });
+    expect(rb.kept.map((k) => k.reason)).toEqual(['stray']);
+    expect(ls.getItem(KEYS.save)).toBeNull();
+    // То же сохранение, записанное в localStorage позже (IndexedDB падал посреди игры), по-прежнему берётся.
+    ls.setItem(KEYS.save, JSON.stringify({ ...rb.save, updated: NOW + 999_999, position: { map: 'home', x: 6, y: 5, facing: 'up' } }));
+    const rc = await new GameStorage({ kv: real, ls }).load(NOW + 1_000_000);
+    expect(rc.save.position?.map).toBe('home');
   });
 });

@@ -32,7 +32,7 @@ export interface AnswerResult {
   /** Действие героя по ответу (для итога раунда: полито, выросло, собрано, опыт). */
   act?: { kind: 'water' | 'grow' | 'harvest' | 'miss'; xp: number };
   /** Путь к A1 до и после ответа (позиция в уровнях) и звание после ответа — для строки итога раунда. */
-  path?: { from: number; to: number; sub: number; pl: string };
+  path?: { from: number; to: number; sub: number; pl: string; pct?: number };
 }
 
 export interface MinigameDeps {
@@ -154,7 +154,11 @@ export function optSizeClass(text: string): '' | ' long' | ' xlong' | ' xxlong' 
 export const MODE_SHORT: Record<GameMode, string> = { 1: 'Слово → перевод', 2: 'Перевод → слово', 3: 'Фраза по-польски', 4: 'Фраза по-русски', 5: 'Собери слово' };
 
 /** Строка прогресса растения с большой буквы. */
-const progressLine = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
+/** Строка прогресса с заглавной; в самой игре 5 «в игре «Собери слово»» лишнее и не влезало на 375 (t30). */
+const progressLine = (t: string, mode?: number): string => {
+  const s = mode === 5 ? t.replace(` в игре «${MODE_NAME[5].ru}»`, '') : t;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
 
 /** Через сколько после проверки «Dalej» начинает нажиматься. */
 export const NEXT_DELAY_MS = 300;
@@ -282,7 +286,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     } else {
       fb.append(fbRow(el('div', { class: 'big' }, el('span', { class: 'lbl' }, 'Правильно:'), r.correct), r.pl), el('div', { class: 'sub' }, `${r.pl} — ${r.ru} · ${r.tr}`));
     }
-    if (r.progress) fb.append(el('div', { class: 'pq-progress', 'data-progress-after': '' }, `🌱 ${progressLine(r.progress)}`));
+    if (r.progress) fb.append(el('div', { class: 'pq-progress', 'data-progress-after': '' }, `🌱 ${progressLine(r.progress, q?.mode)}`));
     if (r.tomorrow !== undefined) {
       soon.hidden = r.tomorrow < 1;
       soon.textContent = r.tomorrow > 0 ? `🌾 созреет завтра: ${r.tomorrow}` : '';
@@ -445,7 +449,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     // Польский вопрос (игры 1 и 4, игра 5 наоборот) — с 🔊 рядом; русский (игры 2, 3, 5) — без.
     const qHead = q.promptLang === 'pl' ? el('div', { class: 'pq-qrow' }, qText, sayButton(q.prompt, say, { main: true })) : qText;
     const qb = el('div', { class: q.kind === 'tiles' ? '' : q.kind === 'spell' ? 'pq-spell-q' : 'pq-qblock', 'data-qblock': '' }, qHead, el('div', { class: 'pq-q-hint' }, hint[q.mode]));
-    if (q.progress) qb.append(el('div', { class: 'pq-progress', 'data-progress': '' }, `🌱 ${progressLine(q.progress)}`));
+    if (q.progress) qb.append(el('div', { class: 'pq-progress', 'data-progress': '' }, `🌱 ${progressLine(q.progress, q.mode)}`));
     paper.append(qb);
     if (q.kind === 'choice') renderChoice(q);
     else if (q.kind === 'spell') {

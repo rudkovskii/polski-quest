@@ -167,6 +167,14 @@ export function pathOf(p: { grown: number; partial: number }, total: number = BA
 
 const round2 = (x: number): number => Math.round(x * 100) / 100;
 
+/** «12%» для доли пути до A1; меньше 10 % — с десятыми вниз («0,2%»), иначе первые раунды показывали «0%» (t29). */
+export function a1PctText(pct: number): string {
+  const p = Math.max(0, pct) * 100;
+  if (p === 0 || p >= 10) return `${Math.floor(p)}%`;
+  const t = Math.floor(p * 10) / 10;
+  return `${String(t < 0.1 ? 0.1 : t).replace('.', ',')}%`;
+}
+
 /** «+0,4 уровня»: рост позиции, одна цифра после запятой; меньше 0,05 — пусто. */
 export function growthText(delta: number): string {
   const d = Math.round(delta * 10) / 10;

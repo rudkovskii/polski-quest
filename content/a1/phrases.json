@@ -631,7 +631,7 @@
   "id": "p.nie_ma_problemu",
   "pl": "Nie ma problemu.",
   "ru": "Нет проблем.",
-  "tr": "нье ма пробле́му.",
+  "tr": "нье ма проблэ́му.",
   "words": [
    "w.nie_ma_problemu"
   ],
@@ -1045,7 +1045,7 @@
   "id": "p.ile_masz_lat",
   "pl": "Ile masz lat?",
   "ru": "Сколько тебе лет?",
-  "tr": "и́ле маш лат?",
+  "tr": "и́лэ маш лат?",
   "words": [
    "w.ile",
    "w.miec",
@@ -2148,7 +2148,7 @@
   "id": "p.moj_kolega_jest_niemcem",
   "pl": "Mój kolega jest Niemcem.",
   "ru": "Мой приятель немец.",
-  "tr": "муй коле́га ест нье́мцэм.",
+  "tr": "муй колэ́га ест нье́мцэм.",
   "words": [
    "w.moj",
    "w.kolega",
@@ -2336,7 +2336,7 @@
   "id": "p.o_ktorej_jest_obiad",
   "pl": "O której jest obiad?",
   "ru": "Во сколько обед?",
-  "tr": "о кту́рэй ест о́бят?",
+  "tr": "о кту́рэй ест о́бьят?",
   "words": [
    "w.o_ktorej",
    "w.byc",
@@ -2531,7 +2531,7 @@
   "id": "p.we_wtorek_mam_lekcje",
   "pl": "We wtorek mam lekcję.",
   "ru": "Во вторник у меня урок.",
-  "tr": "вэ фто́рэк мам ле́кце.",
+  "tr": "вэ фто́рэк мам лэ́кце.",
   "words": [
    "w.w",
    "w.wtorek",
@@ -3075,7 +3075,7 @@
   "id": "p.ile_to_kosztuje",
   "pl": "Ile to kosztuje?",
   "ru": "Сколько это стоит?",
-  "tr": "и́ле то кошту́е?",
+  "tr": "и́лэ то кошту́е?",
   "words": [
    "w.ile",
    "w.to",
@@ -3273,7 +3273,7 @@
   "id": "p.jaki_jest_twoj_numer_telefonu",
   "pl": "Jaki jest twój numer telefonu?",
   "ru": "Какой у тебя номер телефона?",
-  "tr": "я́ки ест тфуй ну́мэр тэлефо́ну?",
+  "tr": "я́ки ест тфуй ну́мэр тэлэфо́ну?",
   "words": [
    "w.jaki",
    "w.byc",
@@ -3831,7 +3831,7 @@
   "id": "p.klucz_jest_na_stole",
   "pl": "Klucz jest na stole.",
   "ru": "Ключ на столе.",
-  "tr": "клуч ест на сто́ле.",
+  "tr": "клуч ест на сто́лэ.",
   "words": [
    "w.klucz",
    "w.byc",
@@ -3897,7 +3897,7 @@
   "id": "p.lozko_jest_w_sypialni",
   "pl": "Łóżko jest w sypialni.",
   "ru": "Кровать в спальне.",
-  "tr": "ўу́шко ест ф сыпя́лни.",
+  "tr": "ўу́шко ест ф сыпья́лни.",
   "words": [
    "w.lozko",
    "w.byc",
@@ -4187,7 +4187,7 @@
   "id": "p.ile_kosztuje_czynsz",
   "pl": "Ile kosztuje czynsz?",
   "ru": "Сколько стоит квартплата?",
-  "tr": "и́ле кошту́е чынш?",
+  "tr": "и́лэ кошту́е чынш?",
   "words": [
    "w.ile",
    "w.kosztowac",
@@ -4352,7 +4352,7 @@
   "id": "p.poprosze_kawe_z_mlekiem",
   "pl": "Poproszę kawę z mlekiem.",
   "ru": "Мне, пожалуйста, кофе с молоком.",
-  "tr": "попро́шэ ка́вэ с мле́кем.",
+  "tr": "попро́шэ ка́вэ с млэ́кем.",
   "words": [
    "w.poprosze",
    "w.kawa",
@@ -4746,7 +4746,7 @@
   "id": "p.czy_to_jest_wegetarianskie",
   "pl": "Czy to jest wegetariańskie?",
   "ru": "Это вегетарианское?",
-  "tr": "чы то ест вэгэтаря́ньске?",
+  "tr": "чы то ест вэгэтарья́ньске?",
   "words": [
    "w.czy",
    "w.to",
@@ -5124,7 +5124,7 @@
   "id": "p.mleko_jest_w_lodowce",
   "pl": "Mleko jest w lodówce.",
   "ru": "Молоко в холодильнике.",
-  "tr": "мле́ко ест ф лоду́фцэ.",
+  "tr": "млэ́ко ест ф лоду́фцэ.",
   "words": [
    "w.mleko",
    "w.byc",
@@ -5374,7 +5374,7 @@
   "id": "p.gdzie_jest_sklep",
   "pl": "Gdzie jest sklep?",
   "ru": "Где магазин?",
-  "tr": "гдже ест склеп?",
+  "tr": "гдже ест склэп?",
   "words": [
    "w.gdzie",
    "w.byc",
@@ -5404,7 +5404,7 @@
   "id": "p.sklep_jest_otwarty",
   "pl": "Sklep jest otwarty.",
   "ru": "Магазин открыт.",
-  "tr": "склеп ест отфа́рты.",
+  "tr": "склэп ест отфа́рты.",
   "words": [
    "w.sklep",
    "w.byc",
@@ -5590,7 +5590,7 @@
   "id": "p.potrzebuje_chleba",
   "pl": "Potrzebuję chleba.",
   "ru": "Мне нужен хлеб.",
-  "tr": "потшэбу́е хле́ба.",
+  "tr": "потшэбу́е хлэ́ба.",
   "words": [
    "w.potrzebowac",
    "w.chleb"
@@ -5677,7 +5677,7 @@
   "id": "p.kupuje_chleb_i_mleko",
   "pl": "Kupuję chleb i mleko.",
   "ru": "Я покупаю хлеб и молоко.",
-  "tr": "купу́е хлеп и мле́ко.",
+  "tr": "купу́е хлэп и млэ́ко.",
   "words": [
    "w.kupowac",
    "w.chleb",
@@ -5740,7 +5740,7 @@
   "id": "p.ile_kosztuje_kilogram_jablek",
   "pl": "Ile kosztuje kilogram jabłek?",
   "ru": "Сколько стоит килограмм яблок?",
-  "tr": "и́ле кошту́е кило́грам я́бўэк?",
+  "tr": "и́лэ кошту́е кило́грам я́бўэк?",
   "words": [
    "w.ile",
    "w.kosztowac",
@@ -5806,7 +5806,7 @@
   "id": "p.jaki_jest_twoj_rozmiar",
   "pl": "Jaki jest twój rozmiar?",
   "ru": "Какой у тебя размер?",
-  "tr": "я́ки ест тфуй ро́змяр?",
+  "tr": "я́ки ест тфуй ро́змьяр?",
   "words": [
    "w.jaki",
    "w.byc",
@@ -5840,7 +5840,7 @@
   "id": "p.poprosze_mniejszy_rozmiar",
   "pl": "Poproszę mniejszy rozmiar.",
   "ru": "Размер поменьше, пожалуйста.",
-  "tr": "попро́шэ мнье́йшы ро́змяр.",
+  "tr": "попро́шэ мнье́йшы ро́змьяр.",
   "words": [
    "w.poprosze",
    "w.mniejszy",
@@ -6058,7 +6058,7 @@
   "id": "p.robie_zakupy_w_sklepie",
   "pl": "Robię zakupy w sklepie.",
   "ru": "Я делаю покупки в магазине.",
-  "tr": "ро́бе заку́пы ф скле́пе.",
+  "tr": "ро́бе заку́пы ф склэ́пе.",
   "words": [
    "w.robic",
    "w.zakupy",
@@ -6241,7 +6241,7 @@
   "id": "p.skrec_w_lewo",
   "pl": "Skręć w lewo.",
   "ru": "Поверни налево.",
-  "tr": "скрэньчь ф ле́во.",
+  "tr": "скрэньчь ф лэ́во.",
   "words": [
    "w.skrecac",
    "w.w_lewo"
@@ -6299,7 +6299,7 @@
   "id": "p.idz_prosto_i_skrec_w_lewo",
   "pl": "Idź prosto i skręć w lewo.",
   "ru": "Иди прямо и поверни налево.",
-  "tr": "ичь про́сто и скрэньчь ф ле́во.",
+  "tr": "ичь про́сто и скрэньчь ф лэ́во.",
   "words": [
    "w.isc",
    "w.prosto",
@@ -6337,7 +6337,7 @@
   "id": "p.sklep_jest_po_lewej",
   "pl": "Sklep jest po lewej.",
   "ru": "Магазин слева.",
-  "tr": "склеп ест по ле́вэй.",
+  "tr": "склэп ест по лэ́вэй.",
   "words": [
    "w.sklep",
    "w.byc",
@@ -6429,7 +6429,7 @@
   "id": "p.szpital_jest_daleko",
   "pl": "Szpital jest daleko.",
   "ru": "Больница далеко.",
-  "tr": "шпи́тал ест дале́ко.",
+  "tr": "шпи́тал ест далэ́ко.",
   "words": [
    "w.szpital",
    "w.byc",
@@ -6459,7 +6459,7 @@
   "id": "p.sklep_jest_blisko",
   "pl": "Sklep jest blisko.",
   "ru": "Магазин близко.",
-  "tr": "склеп ест бли́ско.",
+  "tr": "склэп ест бли́ско.",
   "words": [
    "w.sklep",
    "w.byc",
@@ -6776,7 +6776,7 @@
   "id": "p.mam_mape_w_telefonie",
   "pl": "Mam mapę w telefonie.",
   "ru": "У меня карта в телефоне.",
-  "tr": "мам ма́пэ ф тэлефо́нье.",
+  "tr": "мам ма́пэ ф тэлэфо́нье.",
   "words": [
    "w.miec",
    "w.mapa",
@@ -6938,7 +6938,7 @@
   "id": "p.lece_samolotem",
   "pl": "Lecę samolotem.",
   "ru": "Я лечу на самолёте.",
-  "tr": "ле́цэ самоло́тэм.",
+  "tr": "лэ́цэ самоло́тэм.",
   "words": [
    "w.leciec",
    "w.samolot"
@@ -6968,7 +6968,7 @@
   "id": "p.biore_taksowke",
   "pl": "Biorę taksówkę.",
   "ru": "Я беру такси.",
-  "tr": "бёрэ таксу́фкэ.",
+  "tr": "бьо́рэ таксу́фкэ.",
   "words": [
    "w.brac",
    "w.taksowka"
@@ -6997,7 +6997,7 @@
   "id": "p.poprosze_bilet",
   "pl": "Poproszę bilet.",
   "ru": "Билет, пожалуйста.",
-  "tr": "попро́шэ би́лет.",
+  "tr": "попро́шэ би́лэт.",
   "words": [
    "w.poprosze",
    "w.bilet"
@@ -7025,7 +7025,7 @@
   "id": "p.poprosze_bilet_do_krakowa",
   "pl": "Poproszę bilet do Krakowa.",
   "ru": "Билет до Кракова, пожалуйста.",
-  "tr": "попро́шэ би́лет до крако́ва.",
+  "tr": "попро́шэ би́лэт до крако́ва.",
   "words": [
    "w.poprosze",
    "w.bilet",
@@ -7059,7 +7059,7 @@
   "id": "p.ile_kosztuje_bilet",
   "pl": "Ile kosztuje bilet?",
   "ru": "Сколько стоит билет?",
-  "tr": "и́ле кошту́е би́лет?",
+  "tr": "и́лэ кошту́е би́лэт?",
   "words": [
    "w.ile",
    "w.kosztowac",
@@ -7090,7 +7090,7 @@
   "id": "p.gdzie_kupic_bilet",
   "pl": "Gdzie kupić bilet?",
   "ru": "Где купить билет?",
-  "tr": "гдже ку́пичь би́лет?",
+  "tr": "гдже ку́пичь би́лэт?",
   "words": [
    "w.gdzie",
    "w.kupic",
@@ -7282,7 +7282,7 @@
   "id": "p.mam_bilet",
   "pl": "Mam bilet.",
   "ru": "У меня есть билет.",
-  "tr": "мам би́лет.",
+  "tr": "мам би́лэт.",
   "words": [
    "w.miec",
    "w.bilet"
@@ -7312,7 +7312,7 @@
   "id": "p.nie_mam_biletu",
   "pl": "Nie mam biletu.",
   "ru": "У меня нет билета.",
-  "tr": "нье мам биле́ту.",
+  "tr": "нье мам билэ́ту.",
   "words": [
    "w.nie",
    "w.miec",
@@ -7640,7 +7640,7 @@
   "id": "p.bola_mnie_plecy",
   "pl": "Bolą mnie plecy.",
   "ru": "У меня болит спина.",
-  "tr": "бо́лоў мнье пле́цы.",
+  "tr": "бо́лоў мнье плэ́цы.",
   "words": [
    "w.bolec",
    "w.ja",
@@ -7764,7 +7764,7 @@
   "id": "p.zle_sie_czuje",
   "pl": "Źle się czuję.",
   "ru": "Мне плохо.",
-  "tr": "жьле ще чу́е.",
+  "tr": "жьлэ ще чу́е.",
   "words": [
    "w.zle",
    "w.sie",
@@ -7826,7 +7826,7 @@
   "id": "p.potrzebuje_lekarza",
   "pl": "Potrzebuję lekarza.",
   "ru": "Мне нужен врач.",
-  "tr": "потшэбу́е лека́жа.",
+  "tr": "потшэбу́е лэка́жа.",
   "words": [
    "w.potrzebowac",
    "w.lekarz"
@@ -7855,7 +7855,7 @@
   "id": "p.potrzebuje_lekarstwa",
   "pl": "Potrzebuję lekarstwa.",
   "ru": "Мне нужно лекарство.",
-  "tr": "потшэбу́е лека́рстфа.",
+  "tr": "потшэбу́е лэка́рстфа.",
   "words": [
    "w.potrzebowac",
    "w.lekarstwo"
@@ -7884,7 +7884,7 @@
   "id": "p.mam_wizyte_u_lekarza",
   "pl": "Mam wizytę u lekarza.",
   "ru": "У меня приём у врача.",
-  "tr": "мам визы́тэ у лека́жа.",
+  "tr": "мам визы́тэ у лэка́жа.",
   "words": [
    "w.miec",
    "w.wizyta",
@@ -7919,7 +7919,7 @@
   "id": "p.ide_do_lekarza",
   "pl": "Idę do lekarza.",
   "ru": "Я иду к врачу.",
-  "tr": "и́дэ до лека́жа.",
+  "tr": "и́дэ до лэка́жа.",
   "words": [
    "w.isc",
    "w.do",
@@ -8012,7 +8012,7 @@
   "id": "p.biore_tabletke",
   "pl": "Biorę tabletkę.",
   "ru": "Я принимаю таблетку.",
-  "tr": "бёрэ табле́ткэ.",
+  "tr": "бьо́рэ таблэ́ткэ.",
   "words": [
    "w.brac",
    "w.tabletka"
@@ -8103,7 +8103,7 @@
   "id": "p.mam_alergie",
   "pl": "Mam alergię.",
   "ru": "У меня аллергия.",
-  "tr": "мам але́рге.",
+  "tr": "мам алэ́рге.",
   "words": [
    "w.miec",
    "w.alergia"
@@ -8850,7 +8850,7 @@
   "id": "p.mam_lekcje_polskiego",
   "pl": "Mam lekcję polskiego.",
   "ru": "У меня урок польского.",
-  "tr": "мам ле́кце полске́го.",
+  "tr": "мам лэ́кце полске́го.",
   "words": [
    "w.miec",
    "w.lekcja",
@@ -10124,7 +10124,7 @@
   "id": "p.krowa_daje_mleko",
   "pl": "Krowa daje mleko.",
   "ru": "Корова даёт молоко.",
-  "tr": "кро́ва да́е мле́ко.",
+  "tr": "кро́ва да́е млэ́ко.",
   "words": [
    "w.krowa",
    "w.dawac",
@@ -10186,7 +10186,7 @@
   "id": "p.kwiaty_rosna_w_ogrodzie",
   "pl": "Kwiaty rosną w ogrodzie.",
   "ru": "Цветы растут в огороде.",
-  "tr": "кфя́ты ро́сноў ф огро́дже.",
+  "tr": "кфья́ты ро́сноў ф огро́дже.",
   "words": [
    "w.kwiat",
    "w.rosnac",
@@ -10220,7 +10220,7 @@
   "id": "p.sadze_kwiaty_w_ogrodzie",
   "pl": "Sadzę kwiaty w ogrodzie.",
   "ru": "Я сажаю цветы в огороде.",
-  "tr": "са́дзэ кфя́ты ф огро́дже.",
+  "tr": "са́дзэ кфья́ты ф огро́дже.",
   "words": [
    "w.sadzic",
    "w.kwiat",
@@ -10255,7 +10255,7 @@
   "id": "p.podlewam_kwiaty",
   "pl": "Podlewam kwiaty.",
   "ru": "Я поливаю цветы.",
-  "tr": "подле́вам кфя́ты.",
+  "tr": "подлэ́вам кфья́ты.",
   "words": [
    "w.podlewac",
    "w.kwiat"
@@ -10440,7 +10440,7 @@
   "id": "p.w_lesie_rosna_grzyby",
   "pl": "W lesie rosną grzyby.",
   "ru": "В лесу растут грибы.",
-  "tr": "ф ле́ще ро́сноў гжы́бы.",
+  "tr": "ф лэ́ще ро́сноў гжы́бы.",
   "words": [
    "w.w",
    "w.las",
@@ -10921,7 +10921,7 @@
   "id": "p.skad_masz_ten_telefon",
   "pl": "Skąd masz ten telefon?",
   "ru": "Откуда у тебя этот телефон?",
-  "tr": "сконт маш тэн тэле́фон?",
+  "tr": "сконт маш тэн тэлэ́фон?",
   "words": [
    "w.skad",
    "w.miec",
@@ -11049,7 +11049,7 @@
   "id": "p.czy_to_jest_daleko",
   "pl": "Czy to jest daleko?",
   "ru": "Это далеко?",
-  "tr": "чы то ест дале́ко?",
+  "tr": "чы то ест далэ́ко?",
   "words": [
    "w.czy",
    "w.to",
@@ -11346,7 +11346,7 @@
  {
   "id": "p.ciesze_sie",
   "pl": "Cieszę się.",
-  "ru": "Я рад.",
+  "ru": "Я рад(а).",
   "tr": "че́шэ ще.",
   "words": [
    "w.cieszyc_sie",
@@ -11358,7 +11358,7 @@
   ],
   "tiles_ru": [
    "Я",
-   "рад"
+   "рад(а)"
   ],
   "distract_pl": [
    "boję",
@@ -11532,7 +11532,7 @@
   "id": "p.gdzie_jest_moj_telefon",
   "pl": "Gdzie jest mój telefon?",
   "ru": "Где мой телефон?",
-  "tr": "гдже ест муй тэле́фон?",
+  "tr": "гдже ест муй тэлэ́фон?",
   "words": [
    "w.gdzie",
    "w.byc",
@@ -11565,7 +11565,7 @@
   "id": "p.moj_telefon_jest_w_torbie",
   "pl": "Mój telefon jest w torbie.",
   "ru": "Мой телефон в сумке.",
-  "tr": "муй тэле́фон ест ф то́рбе.",
+  "tr": "муй тэлэ́фон ест ф то́рбе.",
   "words": [
    "w.moj",
    "w.telefon",
@@ -11661,7 +11661,7 @@
   "id": "p.pisze_wiadomosc",
   "pl": "Piszę wiadomość.",
   "ru": "Я пишу сообщение.",
-  "tr": "пи́шэ вядо́мощчь.",
+  "tr": "пи́шэ вьядо́мощчь.",
   "words": [
    "w.pisac",
    "w.wiadomosc"
@@ -11881,7 +11881,7 @@
   "id": "p.chce_kupic_chleb",
   "pl": "Chcę kupić chleb.",
   "ru": "Я хочу купить хлеб.",
-  "tr": "хцэ ку́пичь хлеп.",
+  "tr": "хцэ ку́пичь хлэп.",
   "words": [
    "w.chciec",
    "w.kupic",
@@ -12070,7 +12070,7 @@
   "id": "p.wiem_gdzie_jest_sklep",
   "pl": "Wiem, gdzie jest sklep.",
   "ru": "Я знаю, где магазин.",
-  "tr": "вем, гдже ест склеп.",
+  "tr": "вем, гдже ест склэп.",
   "words": [
    "w.wiedziec",
    "w.gdzie",
