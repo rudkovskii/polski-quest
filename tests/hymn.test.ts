@@ -304,6 +304,9 @@ describe('через общий движок: раунд и выход', () => {
     document.body.append(root);
     const ui = mountPolskaGame(root, { bus: s.bus, games: GAMES, polska: s.p, now: () => NOW, rand: seeded(9), say: () => {} });
     ui.start('hymn');
+    // Экран чтения гимна → «Dalej», карточка нового куплета → «Rozumiem».
+    root.querySelector<HTMLButtonElement>('[data-hy-go]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-understood]')?.click();
     expect(ui.isOpen).toBe(true);
     vi.useFakeTimers();
     const kinds = new Set<string>();
@@ -333,5 +336,74 @@ describe('через общий движок: раунд и выход', () => {
     for (const id of s.p.content.drillSeed) expect(s.p.info(id).stage, id).toBe('bush');
     const w = s.p.pick('hymn', {});
     expect(w).toMatchObject({ side: 'B', self: true });
+  });
+});
+
+describe('чтение гимна (27.10: «приходится наугад учить»)', () => {
+  const mount = () => {
+    const s = mkPolska();
+    const root = document.createElement('div');
+    document.body.append(root);
+    const said: string[] = [];
+    const ui = mountPolskaGame(root, { bus: s.bus, games: GAMES, polska: s.p, now: () => NOW, rand: seeded(9), say: (t) => said.push(t) });
+    ui.start('hymn');
+    return { s, root, ui, said };
+  };
+  const lines = (root: HTMLElement): string[] => [...root.querySelectorAll('[data-hy-text] [data-line]')].map((x) => x.getAttribute('data-line')!);
+
+  it('перед раундом — текст куплета с транскрипцией, переводом и 🔊; переключатели и вкладки куплетов', () => {
+    const { root, ui, said } = mount();
+    expect(root.querySelector('[data-hymn-read]')).toBeTruthy();
+    expect(ui.task).toBeNull();
+    expect(lines(root)).toEqual(['hymn.s1.1', 'hymn.s1.2', 'hymn.s1.3', 'hymn.s1.4']);
+    const first = root.querySelector('[data-line="hymn.s1.1"]')!;
+    expect(first.querySelector('.pl')!.textContent).toBe('Jeszcze Polska nie zginęła,');
+    expect(first.querySelector('.ru')!.textContent).toBe('Ещё Польша не погибла,');
+    expect(first.querySelector('.tr')).toBeTruthy();
+    first.querySelector<HTMLElement>('[data-saytext]')!.click();
+    expect(said).toEqual(['Jeszcze Polska nie zginęła']);
+    root.querySelector<HTMLElement>('[data-show-ru]')!.click();
+    expect(root.querySelector('[data-hy-text] .ru')).toBeNull();
+    root.querySelector<HTMLElement>('[data-stanza="s4"]')!.click();
+    expect(lines(root)[0]).toBe('hymn.s4.1');
+    ui.stop();
+    root.remove();
+  });
+
+  it('«Проверь себя» прикрывает строки, тап открывает одну и озвучивает', () => {
+    const { root, ui, said } = mount();
+    root.querySelector<HTMLElement>('[data-hide]')!.click();
+    expect(root.querySelectorAll('.hy-line.hid').length).toBe(4);
+    root.querySelector<HTMLElement>('[data-peek="hymn.s1.2"]')!.click();
+    expect(root.querySelectorAll('.hy-line.hid').length).toBe(3);
+    expect(said.at(-1)).toBe('kiedy my żyjemy.');
+    ui.stop();
+    root.remove();
+  });
+
+  it('«Учить» ведёт раунд только по выбранному куплету; прочитанный куплет без карточки', () => {
+    const { root, ui } = mount();
+    root.querySelector<HTMLElement>('[data-stanza="ref"]')!.click();
+    root.querySelector<HTMLElement>('[data-learn="ref"]')!.click();
+    expect(ui.task!.id).toMatch(/^hymn\.ref\./);
+    expect(root.querySelector('[data-stanza-card]')).toBeNull();
+    ui.stop();
+    root.remove();
+  });
+
+  it('новый куплет в раунде сначала карточкой целиком, «Rozumiem» → задание', () => {
+    const s = mkPolska();
+    const ctx = { ...ctxOf(s), seen: () => false };
+    const t = makeTask({ ...ctx }, { id: 'hymn.s2.3', side: 'A', self: false, stage: 'seed' })!;
+    const panel = mkPanel();
+    let seen = 0;
+    game.render(t, panel, { ...ctx, markSeen: () => void seen++ });
+    const card = panel.body.querySelector('[data-stanza-card="s2"]')!;
+    expect(card.querySelectorAll('[data-line]').length).toBe(4);
+    expect(card.querySelector('.hy-line.cur')!.getAttribute('data-line')).toBe('hymn.s2.3');
+    panel.foot.querySelector<HTMLElement>('[data-understood]')!.click();
+    expect(seen).toBe(4);
+    expect(panel.body.querySelector('[data-stanza-card]')).toBeNull();
+    expect(panel.body.childElementCount).toBeGreaterThan(0);
   });
 });

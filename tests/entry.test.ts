@@ -201,6 +201,9 @@ describe('v2: «Wróć», выход и «Na pole!»', () => {
     const { bus, got, root, ui } = mk();
     interact(bus, 'farm', 'mast', [20, 8], 'up');
     ui.start('hymn');
+    // Экран чтения гимна → «Dalej», карточка нового куплета → «Rozumiem».
+    root.querySelector<HTMLButtonElement>('[data-hy-go]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-understood]')?.click();
     bus.emit('farm:auto', { on: true, bottom: 300 });
     stand(bus, 'zagroda', 8, 14, 'right');
     root.querySelector<HTMLElement>('[data-exit]')!.click();
@@ -212,6 +215,9 @@ describe('v2: «Wróć», выход и «Na pole!»', () => {
     const { bus, got, root, ui } = mk();
     interact(bus, 'farm', 'mast', [20, 8], 'up');
     ui.start('hymn');
+    // Экран чтения гимна → «Dalej», карточка нового куплета → «Rozumiem».
+    root.querySelector<HTMLButtonElement>('[data-hy-go]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-understood]')?.click();
     for (let i = 0; i < 10; i++) {
       ui.submit('zzz-неверно');
       vi.advanceTimersByTime(NEXT_DELAY_MS + 5);

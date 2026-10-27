@@ -217,6 +217,9 @@ describe('v2: движок — отзыв, клавиша G, без автопе
   it('клавиша G (intent say): вариант под рамкой, без рамки — вопрос', () => {
     const { s, said, root, ui } = fixture();
     ui.start('hymn');
+    // Экран чтения гимна → «Dalej», карточка нового куплета → «Rozumiem».
+    root.querySelector<HTMLButtonElement>('[data-hy-go]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-understood]')?.click();
     const t = ui.task as unknown as { mode: string; options: string[]; prompt: string; lang: string };
     said.length = 0;
     s.bus.emit('input:intent', { type: 'say', to: 'ui', source: 'keyboard' });

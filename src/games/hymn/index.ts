@@ -2,7 +2,10 @@
 // «Jaki jest następny wers?» (собрать строку из плиток); перевод — справкой после ответа. Символы с 26.10 — отдельная игра `games/symbole`
 // (просьба Шэфа), задания у обеих в `tasks.ts` этой папки. Посадка (`pool`): куплет 1 и припев, следующий куплет — когда посаженное подросло до ростка;
 // строки из дриля собеса (`drillSeed`) движок сажает кустиками (решение Шэфа №4).
-import type { GameCtx, PolskaGame } from '../../types/polska';
+// С 27.10 перед раундом — чтение гимна (`reader.ts`, экран выбора), новый куплет в раунде — сначала карточкой.
+import { el } from '../../ui/dom';
+import type { GameCtx, GamePanel, PolskaGame } from '../../types/polska';
+import { markStanzaSeen, needsCard, renderReader, stanzaCard } from './reader';
 import { renderTask } from './view';
 import { checkTask, makeTask, type HymnTask } from './tasks';
 
@@ -27,16 +30,43 @@ export function hymnPool(ctx: GameCtx): string[] {
   return out;
 }
 
+function render(task: HymnTask, panel: GamePanel, ctx: GameCtx): void {
+  // Порядок куплетов идёт по первым строкам всех куплетов — карточка одного куплета там ни к чему.
+  if (task.kind === 'order-stanzas' || !needsCard(ctx, task.id)) return renderTask(task, panel);
+  const card = stanzaCard(ctx, task.id, panel.say);
+  panel.body.append(card);
+  panel.foot.replaceChildren(
+    el(
+      'button',
+      {
+        type: 'button',
+        class: 'pq-btn',
+        'data-nav': '',
+        'data-understood': '',
+        onclick: () => {
+          markStanzaSeen(ctx, task.id);
+          card.remove();
+          panel.foot.replaceChildren();
+          renderTask(task, panel);
+        },
+      },
+      'Rozumiem · Понятно →',
+    ),
+  );
+}
+
 export const game: PolskaGame<HymnTask> = {
   id: 'hymn',
   title: { pl: 'Hymn', ru: 'Гимн' },
-  desc: 'Mazurek Dąbrowskiego строка за строкой: пропуски, что дальше, порядок',
+  desc: 'Mazurek Dąbrowskiego: сначала читаешь куплет с переводом, потом строка за строкой — пропуски, что дальше, порядок',
   entry: 'mast',
   plot: 'pasieka',
   kinds: ['hymn'],
   layout: 'panel',
   pool: hymnPool,
   nextTask: makeTask,
-  render: (task, panel) => renderTask(task, panel),
+  render: (task, panel, ctx) => render(task, panel, ctx),
   check: (task, answer) => checkTask(task, answer),
+  hub: (panel, ctx, begin) => renderReader(panel, ctx, () => hymnPool(ctx), (ids, size) => begin(ids, size)),
+  hubBack: 'К тексту гимна',
 };

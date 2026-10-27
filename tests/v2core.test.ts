@@ -349,6 +349,9 @@ describe('движок раунда v2', () => {
     s.bus.on('polska:auto', (a) => autos.push(`${a.on}:${a.layout}:${a.plot ?? ''}`));
     const ui = mountPolskaGame(root, { bus: s.bus, games: GAMES, polska: s.p, now: () => NOW, rand: seeded(5), say: () => {} });
     ui.start('hymn');
+    // Экран чтения гимна → «Dalej», карточка нового куплета → «Rozumiem».
+    root.querySelector<HTMLButtonElement>('[data-hy-go]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-understood]')?.click();
     expect(ui.isOpen).toBe(true);
     expect(autos[0]).toBe('true:panel:pasieka');
     expect(focus.some((o) => o?.startsWith('hive_'))).toBe(true);
