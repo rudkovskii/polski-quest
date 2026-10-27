@@ -10,6 +10,7 @@ import type { BeaverApi } from '../systems/beaver';
 import { FarmLayer } from './farmLayer';
 import { ZagrodaLayer, applyEntries } from './zagrodaLayer';
 import { pickZoom } from '../world/camera';
+import { SIGN_BUBBLE, signsOf, type Sign } from '../world/signs';
 import { COVER_ALPHA, coveringKeys, type CoverCandidate } from '../world/cover';
 import { LocationModel, type Actor, type WorldEvent } from '../world/location';
 import { PositionGate } from '../world/positionGate';
@@ -123,6 +124,9 @@ export class World extends Phaser.Scene {
   private beaver: BeaverLayer | null = null;
   /** Спрайты объектов карты по ключу `prop:<id>` (слой Zagroda меняет их вид по прогрессу). */
   private propSprites = new Map<string, Phaser.GameObjects.Sprite>();
+  /** Таблички интерактивных объектов в пикселях мира и ключ последнего положения камеры, с которым они ушли в DOM. */
+  private signs: Sign[] = [];
+  private signsKey = '';
   /** Спрайты, сейчас полупрозрачные из-за героя за ними (`fadeCover`). */
   private faded = new Set<string>();
   private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
@@ -171,6 +175,8 @@ export class World extends Phaser.Scene {
     this.propSprites.clear();
     this.faded = new Set();
     this.buildProps();
+    this.signs = signsOf(this.mapDef, T, (sprite) => this.sprites[sprite]?.size[1]);
+    this.signsKey = '';
     this.buildActors();
     this.marker = this.add.graphics().setDepth(10_000);
     this.farm = this.mapDef.id === 'farm' ? new FarmLayer({ scene: this, model: this.model, sprites: this.sprites, hero: this.hero, soil: (c) => this.soil(c), toScreen: (x, y) => this.toScreen(x, y), inputOn: () => this.inputOn }) : null;
@@ -213,6 +219,7 @@ export class World extends Phaser.Scene {
     const onDpad = (): void => this.layout();
     watchers.add(onDpad);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      bus.emit('fx:signs', []);
       offIntent();
       offInput();
       offSettled();
@@ -339,6 +346,7 @@ export class World extends Phaser.Scene {
     this.fadeCover();
     this.updateCamera();
     this.drawActionBubble(time);
+    this.emitSigns();
     this.emitGuide();
   }
 
@@ -450,6 +458,20 @@ export class World extends Phaser.Scene {
     }
     const p = this.toScreen((o.at[0] + o.size[0] / 2) * T, this.propTop(o.at, o.size, o.key) - 22);
     bus.emit('fx:near', { use: o.use, id: o.id, x: p.x, y: p.y });
+  }
+
+  /**
+   * Таблички объектов (`world/signs.ts`) в экранных px: шлём, только когда сдвинулась камера, окно или пузырёк «A» (табличку под ним
+   * поднимаем над пузырьком); пока ввод выключен (открыт экран, идёт игра) — прячем.
+   */
+  private emitSigns(): void {
+    const cam = this.cameras.main;
+    const r = this.game.canvas.getBoundingClientRect();
+    const near = this.markerKey.split('@')[0] ?? '';
+    const key = this.inputOn ? `${cam.worldView.x},${cam.worldView.y},${cam.zoom},${r.left},${r.top},${r.width},${near}` : '';
+    if (key === this.signsKey) return;
+    this.signsKey = key;
+    bus.emit('fx:signs', key ? this.signs.map((s) => ({ key: s.key, text: s.text, ...this.toScreen(s.x, s.y - (s.key === near ? SIGN_BUBBLE : 0)) })) : []);
   }
 
   /** Верх спрайта объекта в пикселях мира (пузырёк стоит над ним). */
@@ -621,6 +643,7 @@ export class World extends Phaser.Scene {
   private go(map: string, spawn: string | readonly number[], facing?: Dir): void {
     if (this.leaving) return;
     this.leaving = true;
+    bus.emit('fx:signs', []);
     this.model.halt();
     this.emitGuide();
     const cam = this.cameras.main;
