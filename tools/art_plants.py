@@ -66,10 +66,9 @@ def build() -> None:
     meta = json.loads(PLANTS.read_text('utf8'))
     for v in meta['variants']:
         n = v['n']
-        # Новый визуал (28.10): готовые кусты 24×32 из art/png/plants в клетке 32×32; нет картинок — рисует art_garden.
-        grids = plant_frames(n, STAGES)
-        sh = Sheet(v['sheet'], 32, 32, anchor=[16, 31]) if grids else Sheet(v['sheet'], 16, 32, anchor=[8, 31])
-        grids = grids or [frame(n, st) for st in STAGES]
+        # Новый визуал (28.10): готовые кусты из art/png/plants (уменьшены до клетки, `art_png.PLANT_SCALE`); нет картинок — рисует art_garden.
+        sh = Sheet(v['sheet'], 16, 32, anchor=[8, 31])
+        grids = plant_frames(n, STAGES) or [frame(n, st) for st in STAGES]
         for g in grids:
             sh.add(g)
         emit(sh)

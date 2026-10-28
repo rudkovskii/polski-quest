@@ -13,7 +13,7 @@
   зеркало востока. Позы, которых нет в пакете (умывается, спит, лежит, нюхает, крадётся, прыжок), — сидячий кадр в ту же
   сторону (прыжок — шаг). В мире кот меньше героя: `CAT_SCALE` в `scenes/World.ts`.
 - `cat_portrait` 64×64 (если есть) — портрет в реплике кота.
-- предметы дома 32×32 (`art/png/props/<id>.png`), растения `plant_vNN` 32×32 из `art/png/plants/vNN_<стадия>.png` (24×32 по центру).
+- предметы дома 32×32 (`art/png/props/<id>.png`), растения `plant_vNN` 16×32 из `art/png/plants/vNN_<стадия>.png` (24×32, уменьшены `PLANT_SCALE`).
 """
 from __future__ import annotations
 
@@ -56,8 +56,10 @@ def stats() -> dict[str, int]:
     return dict(_STATS)
 
 
-def grid_of(path: Path):
+def grid_of(path: Path, scale: float = 1):
     im = Image.open(path).convert('RGBA')
+    if scale != 1:
+        im = im.resize((round(im.width * scale), round(im.height * scale)), Image.NEAREST)
     w, h = im.size
     px = im.load()
     return [[name_of(px[x, y][:3]) if px[x, y][3] else None for x in range(w)] for y in range(h)]
@@ -182,15 +184,20 @@ def build_props() -> None:
         emit(sh)
 
 
+# Кусты 24×32 шире клетки грядки: соседи на шаге 16 px сливались (28.10, Шэф: «уменьши в коде»). Ближайший пиксель на 2/3
+# даёт 16×21 — куст ровно в клетку и остаётся резким (усреднение размывало мелкие цветы).
+PLANT_SCALE = 2 / 3
+
+
 def plant_frames(n: int, stages: tuple[str, ...]):
-    """Кадры куста `plant_vNN` 32×32 (24×32 по центру, низ к низу) или None, если картинок нет."""
+    """Кадры куста `plant_vNN` 16×32 (картинка ×`PLANT_SCALE` по центру, низ к низу) или None, если картинок нет."""
     ps = [SRC / 'plants' / f'v{n:02d}_{st}.png' for st in stages]
     if not all(p.exists() for p in ps):
         return None
     out = []
     for p in ps:
-        g = grid_of(p)
-        out.append(place(g, 32, 32, 16, 31, len(g[0]) // 2, len(g) - 1, p.name))
+        g = grid_of(p, PLANT_SCALE)
+        out.append(place(g, 16, 32, 8, 31, len(g[0]) // 2, len(g) - 1, p.name))
     return out
 
 
