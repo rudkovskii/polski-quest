@@ -146,10 +146,10 @@ export interface Outcome {
 export const isPhrase = (id: string): boolean => id.startsWith('p.');
 
 /** Вид растения (v2): слово и фраза (v1, тема «Święta i zwyczaje» — тоже слова) и единицы игр о Польше. */
-export type PlantKind = 'word' | 'phrase' | 'geo' | 'hymn' | 'symbol' | 'date' | 'holiday';
+export type PlantKind = 'word' | 'phrase' | 'geo' | 'hymn' | 'symbol' | 'date' | 'holiday' | 'month';
 /** Виды единиц игр о Польше (v2): у них своя шкала «Wiedza o Polsce», в путь к A1 они не идут. */
-export const POLSKA_KINDS: readonly PlantKind[] = ['geo', 'hymn', 'symbol', 'date', 'holiday'];
-/** Префикс id → вид: `geo.city.wroclaw`, `hymn.s1.1`, `symbol.godlo`, `date.konstytucja`, `hol.wigilia`; `p.` фраза; остальное (`w.`, `sw.`) слово. */
+export const POLSKA_KINDS: readonly PlantKind[] = ['geo', 'hymn', 'symbol', 'date', 'holiday', 'month'];
+/** Префикс id → вид: `geo.city.wroclaw`, `hymn.s1.1`, `symbol.godlo`, `date.konstytucja`, `hol.wigilia`, `month.3`; `p.` фраза; остальное (`w.`, `sw.`) слово. */
 export function kindOf(id: string): PlantKind {
   if (id.startsWith('p.')) return 'phrase';
   if (id.startsWith('geo.')) return 'geo';
@@ -157,6 +157,7 @@ export function kindOf(id: string): PlantKind {
   if (id.startsWith('symbol.')) return 'symbol';
   if (id.startsWith('date.')) return 'date';
   if (id.startsWith('hol.')) return 'holiday';
+  if (id.startsWith('month.')) return 'month';
   return 'word';
 }
 export const isPolskaKind = (k: PlantKind): boolean => POLSKA_KINDS.includes(k);

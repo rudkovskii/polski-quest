@@ -10,17 +10,22 @@ import type { Topic, Word } from '../types/content';
 import type { PolskaGameId, PolskaKind, PolskaUnit } from '../types/polska';
 import { kindOf } from './garden';
 
-export const POLSKA_KIND_LIST: readonly PolskaKind[] = ['geo', 'hymn', 'symbol', 'date', 'holiday'];
+export const POLSKA_KIND_LIST: readonly PolskaKind[] = ['geo', 'hymn', 'symbol', 'date', 'holiday', 'month'];
 
 /** Игра → виды её единиц и файл данных. */
 export const GAME_KINDS: Readonly<Record<PolskaGameId, readonly PolskaKind[]>> = {
   geo: ['geo'],
-  hymn: ['hymn', 'symbol'],
+  // Гимн и символы — две игры с 26.10 (просьба Шэфа); данные у обеих в hymn.json.
+  hymn: ['hymn'],
+  symbole: ['symbol'],
   daty: ['date'],
+  // Месяцы (26.10): 12 единиц `month.<n>` из справочника `daty.json:months`, растут на грядках месяцев.
+  miesiace: ['month'],
   swieta: ['holiday'],
 };
-export const GAME_IDS: readonly PolskaGameId[] = ['geo', 'daty', 'swieta', 'hymn'];
-export const gameOfKind = (k: PolskaKind): PolskaGameId => (k === 'geo' ? 'geo' : k === 'date' ? 'daty' : k === 'holiday' ? 'swieta' : 'hymn');
+export const GAME_IDS: readonly PolskaGameId[] = ['geo', 'daty', 'miesiace', 'swieta', 'hymn', 'symbole'];
+const KIND_GAME: Record<PolskaKind, PolskaGameId> = { geo: 'geo', hymn: 'hymn', symbol: 'symbole', date: 'daty', month: 'miesiace', holiday: 'swieta' };
+export const gameOfKind = (k: PolskaKind): PolskaGameId => KIND_GAME[k];
 
 export type V2Docs = { geo: unknown; hymn: unknown; daty: unknown; swieta: unknown; words: unknown };
 
@@ -72,6 +77,23 @@ function drillSeedOf(hymn: unknown, lines: readonly PolskaUnit[]): string[] {
   return list.map((x) => (typeof x === 'number' ? ordered.find((u) => u.raw.n === x)?.id ?? '' : str(x))).filter((id) => ordered.some((u) => u.id === id));
 }
 
+/** Месяцы как единицы (`month.1` … `month.12`) из справочника `daty.json:months`: pl — именительный, raw — вся запись (gen, loc, tr, ru). */
+function monthsOf(daty: unknown, errors: string[]): PolskaUnit[] {
+  const list = Array.isArray(obj(daty).months) ? (obj(daty).months as unknown[]) : [];
+  const out: PolskaUnit[] = [];
+  for (const r of list) {
+    const x = obj(r);
+    const n = typeof x.n === 'number' ? x.n : 0;
+    if (n < 1 || n > 12 || !str(x.nom) || !str(x.gen) || !str(x.nom_ru)) {
+      errors.push(`daty.months: запись ${JSON.stringify(r).slice(0, 40)} — нет n/nom/gen/nom_ru`);
+      continue;
+    }
+    out.push({ id: `month.${n}`, kind: 'month', type: 'month', pl: str(x.nom), ru: str(x.nom_ru), tr: str(x.nom_tr), band: 1, facts: [], raw: { ...x, month: n } });
+  }
+  if (list.length && out.length !== 12) errors.push(`daty.months: месяцев ${out.length}, нужно 12`);
+  return out;
+}
+
 function wordsOf(doc: unknown, errors: string[]): { words: Word[]; topic: Topic } {
   const d = obj(doc);
   const list = Array.isArray(doc) ? doc : Array.isArray(d.words) ? d.words : [];
@@ -111,13 +133,15 @@ export function parseV2(docs: V2Docs): V2Content {
   const errors: string[] = [];
   const per: Record<PolskaGameId, PolskaUnit[]> = {
     geo: unitsOf(docs.geo, 'geografia', errors),
-    hymn: unitsOf(docs.hymn, 'hymn', errors),
+    hymn: unitsOf(docs.hymn, 'hymn', errors).filter((u) => u.kind === 'hymn'),
+    symbole: unitsOf(docs.hymn, 'hymn', errors).filter((u) => u.kind === 'symbol'),
     daty: unitsOf(docs.daty, 'daty', errors),
+    miesiace: monthsOf(docs.daty, errors),
     swieta: unitsOf(docs.swieta, 'swieta', errors),
   };
   for (const [g, list] of Object.entries(per) as [PolskaGameId, PolskaUnit[]][])
     for (const u of list) if (!GAME_KINDS[g].includes(u.kind)) errors.push(`${g}: ${u.id} — kind "${u.kind}" не из этой игры`);
-  const units = [...per.geo, ...per.hymn, ...per.daty, ...per.swieta];
+  const units = [...per.geo, ...per.hymn, ...per.symbole, ...per.daty, ...per.miesiace, ...per.swieta];
   const byId = new Map<string, PolskaUnit>();
   for (const u of units) {
     if (byId.has(u.id)) errors.push(`повтор id ${u.id}`);
@@ -132,7 +156,7 @@ export function parseV2(docs: V2Docs): V2Content {
   return {
     units: [...byId.values()],
     byId,
-    docs: { geo: obj(docs.geo), hymn: obj(docs.hymn), daty: obj(docs.daty), swieta: obj(docs.swieta) },
+    docs: { geo: obj(docs.geo), hymn: obj(docs.hymn), symbole: obj(docs.hymn), daty: obj(docs.daty), miesiace: obj(docs.daty), swieta: obj(docs.swieta) },
     drillSeed: drillSeedOf(docs.hymn, per.hymn),
     words,
     topic,

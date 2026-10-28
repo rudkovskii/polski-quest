@@ -414,7 +414,7 @@ export function createFarm(d: FarmDeps): Farm {
               ? `Засчитано с подсказкой${notSelf}`
               : undefined;
       const day = today();
-      return { ok: r.ok, correct: r.correct, ...c, ...(note ? { note } : {}), act, path: { from: p0.pos, to: p1.pos, sub: p1.sub, pl: p1.pl }, progress: progressText(st.items.get(q.id), now, day), tomorrow: ripeSoon(st, day).tomorrow };
+      return { ok: r.ok, correct: r.correct, ...c, ...(note ? { note } : {}), act, path: { from: p0.pos, to: p1.pos, sub: p1.sub, pl: p1.pl, pct: p1.pct }, progress: progressText(st.items.get(q.id), now, day), tomorrow: ripeSoon(st, day).tomorrow };
     },
     ripeSoon: () => ripeSoon(st, today()),
     reviewMode(id) {

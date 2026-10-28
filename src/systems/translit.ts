@@ -16,6 +16,7 @@ const STRESS: Record<string, number> = {
 const OVERRIDE: Record<string, string> = {
   'pięćdziesiąt': 'пеньдже́щонт',
   'weekend': 'уи́кэнт', 'mail': 'мэйл', 'hobby': 'хо́бы', 'pizza': 'пи́цца', 'kiosk': 'кьоск',
+  'unesco': 'унэ́ско', 'auschwitz': 'а́ушвиц', 'birkenau': 'би́ркенау', 'auschwitz-birkenau': 'а́ушвиц-би́ркенау',
 };
 const has = (o: object, k: string): boolean => Object.prototype.hasOwnProperty.call(o, k);
 
@@ -173,7 +174,8 @@ function render(toks: Tok[], word: string): Item[] {
         else if (kind === 'ch') s = VAFTER_CH[val];
         else s = VPLAIN[val];
         if (val === 'e' && prev !== null && prev[0] === 'C' && prev[1] === 'ń') s = 'ье';
-        if (val === 'e' && prev !== null && prev[0] === 'C' && prev[1] === 'l') s = 'е';
+        // i после твёрдой согласной перед o/a: мягкий знак, а не йотированная («кьоск», «пьянино»), t37.
+        if ((val === 'o' || val === 'a') && kind === 'iot' && prev !== null && prev[0] === 'C' && !has(SOFT_V, prev[1])) s = val === 'a' ? 'ья' : 'ьо';
         out.push([s, true]);
       } else { // ą ę
         let nx = k + 1 < n && toks[k + 1][0] === 'C' ? toks[k + 1][1] : '';

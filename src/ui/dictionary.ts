@@ -128,7 +128,8 @@ ${SAY_CSS}
   .dict-add { right: 10px; height: 28px; }
   .dict-add::after { inset: -5px -6px; }
   .dict-filters { gap: 4px; flex-wrap: nowrap; }
-  .dict-filters .pq-btn { flex: 1 1 auto; min-width: 0; padding: 6px 3px; font-size: 12px; white-space: nowrap; }
+  /* t30: .pq-btn.small из панели перебивал этот отступ, и на 375 «Не посажено» и «Выращено» обрезались. */
+  .dict-filters .pq-btn, .pq-panel .dict-filters .pq-btn.small { flex: 1 1 auto; min-width: max-content; padding: 6px 4px; font-size: 13px; white-space: nowrap; }
 }
 `;
 
@@ -259,6 +260,8 @@ export function mountDictionary(parent: HTMLElement, api: FarmApi, bus?: Bus<Bus
   const placeTopics = (): void => {
     if (mql?.matches) head.insertBefore(topicsCol, bulkRow);
     else cols.prepend(topicsCol);
+    // t30: на телефоне поле поиска ≈ 100 px — длинная подсказка с примерами обрезалась.
+    search.placeholder = mql?.matches ? 'Поиск' : 'Поиск: kot, кот, zolw…';
   };
   mql?.addEventListener?.('change', placeTopics);
   placeTopics();

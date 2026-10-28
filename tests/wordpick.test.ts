@@ -292,6 +292,39 @@ describe('вариант ответа: долгое нажатие — слов�
     expect(g.isOpen).toBe(false);
   });
 
+  it('клик мышью точно по слову в варианте — слово в поповере, не ответ; клик по кнопке мимо слова — ответ', async () => {
+    const { overlay, pick, answers } = setup();
+    const w = optWord(overlay, 'dom');
+    w.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, pointerType: 'mouse' }));
+    await vi.waitFor(() => expect(pick.info?.lemma).toBe('dom'));
+    expect(answers).toEqual([]);
+    pick.close();
+    w.closest<HTMLElement>('[data-opt]')!.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, pointerType: 'mouse' }));
+    expect(answers).toEqual(['dom']);
+  });
+
+  it('плитка сборки: клик мышью по слову ставит плитку, словарь не открывается', async () => {
+    const { overlay, pick } = setup();
+    let placed = 0;
+    const tile = Object.assign(document.createElement('button'), { onclick: () => placed++ });
+    tile.dataset.opt = 'zginęła';
+    tile.dataset.tile = 'zginęła';
+    tile.lang = 'pl';
+    tile.textContent = 'zginęła';
+    overlay.append(tile);
+    await vi.waitFor(() => expect(tile.querySelector('.pq-w')).not.toBeNull());
+    tile.querySelector('.pq-w')!.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, pointerType: 'mouse' }));
+    expect(placed).toBe(1);
+    expect(pick.isOpen).toBe(false);
+  });
+
+  it('касание пальцем по слову в варианте — ответ', () => {
+    const { overlay, pick, answers } = setup();
+    optWord(overlay, 'kot').dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, pointerType: 'touch' }));
+    expect(answers).toEqual(['kot']);
+    expect(pick.isOpen).toBe(false);
+  });
+
   it('короткий тап по варианту (по слову внутри) — ответ, поповер не открывается', () => {
     vi.useFakeTimers();
     const { overlay, pick, answers } = setup();

@@ -4,11 +4,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import polandJson from '../public/maps-art/poland.json';
 import { game, geoPool } from '../src/games/geo';
-import { createMap } from '../src/games/geo/mapview';
+import { createMap, LOOK_MULT } from '../src/games/geo/mapview';
 import { canvasSize, canvasToMap, mapToCanvas, pickScale, planFit, type FitInput } from '../src/games/geo/fit';
 import { checkTask, makeKind, makeTask, statusOf, verdict, type DirAnswer, type GeoKind, type GeoTask } from '../src/games/geo/tasks';
 import { anchorOf, centroid, clusterOf, dist, groupOf, hits, inMap, inRings, MAP_H, MAP_W, pathOf, posOf, project, ringsOf, tolPx } from '../src/games/geo/world';
 import { REGION_RINGS } from '../src/games/geo/geodata';
+import { levelFlag, levelOf, levelsOf, levelViews, nextLevel, OPEN_SHARE } from '../src/games/geo/levels';
 import { createPolska, newPolskaSave, type PolskaSave } from '../src/systems/polska';
 import type { GameCtx, GamePanel, PolskaUnit, Want } from '../src/types/polska';
 import { mountPolskaGame, NEXT_DELAY_MS } from '../src/ui/polskaGame';
@@ -269,12 +270,18 @@ describe('задания', () => {
     expect(a).not.toBe(b);
   });
 
-  it('порядок посадки: все единицы по одному разу, полоса 1 раньше, первые 8 семян разных видов', () => {
+  it('порядок посадки: все единицы по одному разу, уровни по очереди, внутри уровня полоса 1 раньше, первые 8 семян разных видов', () => {
     const pool = geoPool(ctx);
     expect(pool.length).toBe(ctx.units.length);
     expect(new Set(pool).size).toBe(pool.length);
-    expect(Math.max(...pool.slice(0, 20).map((id) => U(id).band))).toBe(1);
-    expect(new Set(pool.slice(0, 8).map((id) => U(id).type)).size).toBeGreaterThanOrEqual(4);
+    const lv = levelsOf(ctx.doc);
+    const nums = pool.map((id) => levelOf(U(id), lv));
+    expect(nums).toEqual([...nums].sort((a, b) => a - b));
+    const first = pool.filter((id) => levelOf(U(id), lv) === 1);
+    const band1 = first.filter((id) => U(id).band === 1).length;
+    expect(Math.max(...first.slice(0, band1).map((id) => U(id).band))).toBe(1);
+    expect(new Set(first.slice(0, 8).map((id) => U(id).type)).size).toBeGreaterThanOrEqual(4);
+    expect(U(first[0]!).type).toBe('city');
   });
 });
 
@@ -299,7 +306,7 @@ describe('экран: рисуется, отвечает', () => {
     const t = makeKind(ctx, U('geo.nb.niemcy'), 'dir')!;
     const { panel, body, given } = panelOf();
     game.render(t, panel, ctx);
-    body.querySelector<HTMLElement>('[data-opt="Czechy"], [data-opt="Ukraina"]')?.click();
+    body.querySelector<HTMLElement>('[data-opt]:not([data-opt="Niemcy"])')!.click();
     expect(given).toEqual([{ nb: expect.any(String) }]);
     expect(game.check(t, given[0], ctx).ok).toBe(false);
 
@@ -400,6 +407,8 @@ describe('движок: Geografia целым раундом', () => {
     const ui = mountPolskaGame(root, { bus: s.bus, games: [game as never], polska: s.p, now: () => NOW, rand: seeded(7), say: () => {} });
     vi.useFakeTimers();
     ui.start('geo');
+    expect(ui.task, 'сначала экран уровней').toBeNull();
+    root.querySelector<HTMLButtonElement>('[data-level-go="1"]')!.click();
     let shows = 0;
     let ok = 0;
     for (let i = 0; i < 10; i++) {
@@ -569,5 +578,205 @@ describe('раскладка карты и заданий (planFit)', () => {
   it('тесно: масштаб меньше 1 или карты нет, ничего не падает', () => {
     expect(planFit({ ...base, innerW: 200, innerH: 300 }).scale).toBeLessThan(1);
     expect(planFit({ ...base, innerW: 90, innerH: 90 }).scale).toBe(0);
+  });
+});
+
+describe('уровни карты (решение Шэфа 23.10)', () => {
+  const answer = (ui: ReturnType<typeof mountPolskaGame>, p: ReturnType<typeof mk>['p'], ok = true): void => {
+    const t = ui.task as GeoTask;
+    const u = p.unit(t.id)!;
+    if (t.t === 'show') ui.submit(ok ? anchorOf(u) : { x: 1, y: 1 });
+    else if (t.t === 'build') ui.submit(t.need);
+    else if (t.t === 'dir') ui.submit({ nb: t.answer, form: t.form!.answer });
+    else ui.submit(t.answer);
+  };
+  const levelCtx = (s: ReturnType<typeof mk>) => ({ units: s.p.units('geo'), info: (id: string) => s.p.info(id), doc: s.p.content.docs.geo, flag: (k: string) => s.p.flag(k) });
+
+  it('данные: 5 уровней по порядку, каждая единица ровно в одном; 23 парка, 16 мест UNESCO', () => {
+    const lv = levelsOf(ctx.doc);
+    expect(lv.map((l) => l.pl)).toEqual(['Miasta i przyroda', 'Sąsiedzi', 'Parki narodowe', 'UNESCO', 'Województwa']);
+    for (const u of ctx.units) expect(levelOf(u, lv), u.id).toBeGreaterThan(0);
+    const views = levelViews({ ...ctx, flag: () => false });
+    expect(views.map((v) => v.total)).toEqual([OF('city').length + OF('river').length + OF('mountain').length + OF('sea').length + OF('nature').length, 7, 23, 16, 16]);
+  });
+
+  it('новый игрок: открыт только уровень 1; каждый следующий ждёт предыдущий', () => {
+    const s = mk();
+    const v = levelViews(levelCtx(s));
+    expect(v.map((x) => x.why)).toEqual(['first', 'locked', 'locked', 'locked', 'locked']);
+    expect(v.slice(1).map((x) => x.after?.level.n)).toEqual([1, 2, 3, 4]);
+    expect(nextLevel(v)?.level.n).toBe(1);
+  });
+
+  it('уровень открывается: кустики предыдущего ≥ 60 %, ручное «Otwórz teraz» (флаг в сохранении), уже что-то посажено', () => {
+    const s = mk();
+    const base = levelCtx(s);
+    const l1 = levelViews(base)[0]!.ids;
+    const need = Math.ceil(l1.length * OPEN_SHARE);
+    const bushy = (n: number) => new Set(l1.slice(0, n));
+    const fake = (n: number) => ({ ...base, info: (id: string) => ({ ...s.p.info(id), ...(bushy(n).has(id) ? { stage: 'bush' as const, planted: true } : {}) }) });
+    expect(levelViews(fake(need - 1))[1]!.why).toBe('locked');
+    expect(levelViews(fake(need))[1]!.why).toBe('prev');
+    // вручную: флаг переживает перезапуск
+    let save = newPolskaSave();
+    const bus = testBus();
+    const p1 = createPolska({ bus, load: () => save, save: (x) => (save = x), now: () => NOW, tz: () => 0 });
+    p1.setFlag(levelFlag(2));
+    const p2 = createPolska({ bus, load: () => save, save: (x) => (save = x), now: () => NOW, tz: () => 0 });
+    expect(p2.flag(levelFlag(2))).toBe(true);
+    expect(levelViews({ units: p2.units('geo'), info: (id) => p2.info(id), doc: p2.content.docs.geo, flag: (k) => p2.flag(k) })[1]!.why).toBe('manual');
+    // посажен сосед — уровень открыт
+    s.p.plant(['geo.nb.niemcy']);
+    expect(levelViews(levelCtx(s))[1]!.why).toBe('started');
+  });
+
+  it('движок: экран уровней → «Otwórz teraz» → раунд соседей: досадка своих 7 при 8 растущих в уровне 1, вопросы только про соседей', () => {
+    const s = mk();
+    const root = document.createElement('div');
+    document.body.append(root);
+    const ui = mountPolskaGame(root, { bus: s.bus, games: [game as never], polska: s.p, now: () => NOW, rand: seeded(5), say: () => {} });
+    vi.useFakeTimers();
+    ui.start('geo');
+    expect(root.querySelector('[data-geo-levels]')).toBeTruthy();
+    expect(root.querySelector('[data-level-play="2"]')).toBeNull();
+    // экран уровней досадил рекомендованный уровень 1 (до 8 растущих)
+    const l1 = levelViews(levelCtx(s))[0]!;
+    expect(l1.planted).toBe(8);
+    root.querySelector<HTMLButtonElement>('[data-level-open="2"]')!.click();
+    expect(s.p.flag(levelFlag(2))).toBe(true);
+    root.querySelector<HTMLButtonElement>('[data-level-play="2"]')!.click();
+    const asked = new Set<string>();
+    for (let i = 0; i < 10; i++) {
+      const t = ui.task as GeoTask;
+      expect(t, `задание ${i + 1}`).toBeTruthy();
+      asked.add(t.id);
+      expect(s.p.unit(t.id)!.type, t.id).toBe('neighbor');
+      answer(ui, s.p);
+      vi.advanceTimersByTime(NEXT_DELAY_MS + 10);
+      root.querySelector<HTMLButtonElement>('[data-next]')?.click();
+    }
+    expect(levelViews(levelCtx(s))[1]!.planted).toBe(7);
+    expect(asked.size).toBeGreaterThan(3);
+    // итог: «Ещё раунд» — тот же уровень, «К уровням» — экран уровней
+    expect(root.querySelector('[data-round-summary]')).toBeTruthy();
+    expect(root.querySelector('[data-to-hub]')?.textContent).toBe('К уровням');
+    root.querySelector<HTMLButtonElement>('[data-more]')!.click();
+    expect(s.p.unit((ui.task as GeoTask).id)!.type).toBe('neighbor');
+    vi.advanceTimersByTime(10);
+    answer(ui, s.p);
+    vi.advanceTimersByTime(NEXT_DELAY_MS + 10);
+    root.querySelector<HTMLButtonElement>('[data-next]')!.click();
+    expect(ui.task).toBeTruthy();
+    ui.stop();
+    ui.start('geo');
+    expect(root.querySelector('[data-geo-levels]')).toBeTruthy();
+    // соседи начаты — уровень открыт и без флага; «Dalej» всё ещё уровень 1 (там не всё дошло до кустика)
+    expect(root.querySelector('[data-level-go]')?.getAttribute('data-level-go')).toBe('1');
+    vi.useRealTimers();
+    ui.stop();
+  });
+
+  it('перезревшая единица другого уровня возвращается в раунд уровня', () => {
+    const s = mk();
+    const root = document.createElement('div');
+    document.body.append(root);
+    const ui = mountPolskaGame(root, { bus: s.bus, games: [game as never], polska: s.p, now: () => NOW, rand: seeded(5), say: () => {} });
+    const real = s.p.info.bind(s.p);
+    const over = 'geo.nb.niemcy';
+    s.p.plant([over]);
+    const spy = vi.spyOn(s.p, 'info').mockImplementation((id: string) => (id === over ? { ...real(id), stage: 'overripe' } : real(id)));
+    const pick = vi.spyOn(s.p, 'pick');
+    ui.start('geo');
+    root.querySelector<HTMLButtonElement>('[data-level-go="1"]')!.click();
+    const ex = pick.mock.calls.at(-1)?.[1]?.exclude;
+    expect(ex?.has(over)).toBe(false);
+    expect(ex?.has('geo.nb.czechy')).toBe(true);
+    expect(ex?.has('geo.city.warszawa')).toBe(false);
+    spy.mockRestore();
+    pick.mockRestore();
+    ui.stop();
+  });
+});
+
+describe('карта: подписи собранного', () => {
+  it('known: золотые единицы подписаны мелко, кроме цели «покажи» и подсвеченной; без known подписей нет; подписи не налезают', () => {
+    const gold = new Set(['geo.city.warszawa', 'geo.city.krakow', 'geo.city.wieliczka', 'geo.city.gdansk', 'geo.city.sopot', 'geo.river.wisla', 'geo.city.poznan']);
+    const mk2 = (known: boolean) =>
+      createMap({ units: ctx.units, status: (id) => (gold.has(id) ? 'gold' : 'gray'), maxW: MAP_W * 2, maxH: MAP_H * 2, hide: 'geo.city.poznan', mark: ['geo.city.gdansk'], known, bus: testBus() });
+    const on = mk2(true);
+    const ids = [...on.el.querySelectorAll<HTMLElement>('[data-known]')].map((e) => e.dataset.known);
+    expect(ids).toContain('geo.city.warszawa');
+    expect(ids).not.toContain('geo.city.poznan');
+    expect(ids).not.toContain('geo.city.gdansk');
+    // Kraków и Wieliczka рядом: подписан только один
+    expect(ids.filter((i) => i === 'geo.city.krakow' || i === 'geo.city.wieliczka').length).toBe(1);
+    expect(mk2(false).el.querySelectorAll('[data-known]').length).toBe(0);
+    on.destroy();
+  });
+});
+
+describe('лупа «Крупнее»', () => {
+  it('zoomTo(c, LOOK_MULT): втрое крупнее, спрайты ×2; без множителя — прежние ×8 и ×3; «вся карта» возвращает', () => {
+    const m = createMap({ units: ctx.units, status: () => 'gray', maxW: MAP_W * 1.125, maxH: MAP_H * 1.125, interactive: true, bus: testBus() });
+    const base = m.sprite;
+    m.zoomTo({ x: 200, y: 130 }, LOOK_MULT);
+    expect(m.zoomed).toBe(true);
+    expect(m.sprite).toBe(2 * base);
+    m.zoomOut();
+    expect(m.zoomed).toBe(false);
+    m.zoomTo({ x: 200, y: 130 });
+    expect(m.sprite).toBe(3 * base);
+    m.destroy();
+  });
+
+  it('в «Pokaż na mapie» на маленькой карте есть кнопка лупы, на крупной (×2) её нет', () => {
+    const u = U('geo.city.lodz');
+    const t = makeKind(ctx, u, 'show')!;
+    const small = panelOf();
+    small.panel.fit = (measure) => void measure({ w: 360, h: 640 });
+    document.body.append(small.body);
+    game.render(t, small.panel, ctx);
+    expect(small.body.querySelector<HTMLElement>('[data-look]')?.hidden).toBe(false);
+    const big = panelOf();
+    big.panel.fit = (measure) => void measure({ w: MAP_W * 3, h: MAP_H * 3 });
+    document.body.append(big.body);
+    game.render(t, big.panel, ctx);
+    expect(big.body.querySelector<HTMLElement>('[data-look]')?.hidden).toBe(true);
+    small.body.remove();
+    big.body.remove();
+  });
+});
+
+describe('парки народове (уровень 3) и UNESCO (уровень 4)', () => {
+  it('16 мест UNESCO: покажи, какое место, воеводство, фразы собираются; Беловежа не дублируется', () => {
+    const list = OF('unesco');
+    expect(list.length).toBe(16);
+    expect(list.some((u) => /Białowiesk/.test(u.pl))).toBe(false);
+    for (const u of list) {
+      expect(inMap(posOf(u)!), u.id).toBe(true);
+      for (const k of ['show', 'name', 'region', 'build'] as GeoKind[]) {
+        const t = makeKind(ctx, u, k);
+        expect(t, `${u.id} ${k}`).toBeTruthy();
+        const right = k === 'show' ? anchorOf(u) : k === 'build' ? t!.need : t!.answer;
+        expect(checkTask(t!, right, ctx).ok, `${u.id} ${k}`).toBe(true);
+      }
+    }
+    expect(U('geo.unesco.auschwitz').tr).toBe('а́ушвиц-би́ркенау');
+  });
+
+  it('23 парка внутри Польши: «покажи» по точке, «какой парк», воеводство, форма «w … Parku Narodowym», фразы собираются', () => {
+    const parks = OF('park');
+    expect(parks.length).toBe(23);
+    for (const u of parks) {
+      const p = posOf(u)!;
+      expect(inRings(p, REGION_RINGS[u.raw.region as string]!) || dist(p, anchorOf(U(u.raw.region as string))) < 60, u.id).toBe(true);
+      for (const k of ['show', 'name', 'region', 'form', 'build'] as GeoKind[]) {
+        const t = makeKind(ctx, u, k);
+        expect(t, `${u.id} ${k}`).toBeTruthy();
+        const right = k === 'show' ? anchorOf(u) : k === 'build' ? t!.need : t!.answer;
+        expect(checkTask(t!, right, ctx).ok, `${u.id} ${k}`).toBe(true);
+      }
+      expect(makeKind(ctx, u, 'form')!.answer).toMatch(/^w (\S+m Parku Narodowym|Parku Narodowym )/);
+    }
   });
 });

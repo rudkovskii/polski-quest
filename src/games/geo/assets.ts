@@ -1,4 +1,4 @@
-// Картинки Geografia: карта `maps-art/poland.png` и атлас `atlas/custom.png` (кадры `geo_*`). Кадры берутся из `custom.json`
+// Картинки Geografia: карта `maps-art/poland.png` (+ `poland@2x.png` для крупного масштаба) и атлас `atlas/custom.png` (кадры `geo_*`). Кадры берутся из `custom.json`
 // (он импортируется, поэтому сдвиг атласа после `npm run sprites` подхватывается сам), картинки грузятся один раз.
 import atlasJson from '../../../public/atlas/custom.json';
 
@@ -25,7 +25,10 @@ export const ANIMS = {
 } as const;
 
 export interface Assets {
+  /** Карта 320×304 (`poland.png`): масштаб < 2 (телефон). */
   map: HTMLImageElement;
+  /** Карта 640×608 (`poland@2x.png`, `tools/art_map2.py`): масштаб ≥ 2 и увеличение. null — не загрузилась, рисуем `map`. */
+  map2: HTMLImageElement | null;
   atlas: HTMLImageElement;
 }
 
@@ -49,8 +52,8 @@ export const assetsNow = (): Assets | null => loaded;
 /** Загрузить картинки (один раз). Нет `Image` (тесты без DOM) или ошибка загрузки — null. */
 export function loadAssets(): Promise<Assets | null> {
   if (typeof Image === 'undefined') return Promise.resolve(null);
-  loading ??= Promise.all([img(url('maps-art/poland.png')), img(url('atlas/custom.png'))])
-    .then(([map, atlas]) => (loaded = { map, atlas }))
+  loading ??= Promise.all([img(url('maps-art/poland.png')), img(url('atlas/custom.png')), img(url('maps-art/poland@2x.png')).catch(() => null)])
+    .then(([map, atlas, map2]) => (loaded = { map, map2, atlas }))
     .catch(() => {
       loading = null;
       return null;

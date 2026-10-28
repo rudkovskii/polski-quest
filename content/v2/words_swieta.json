@@ -25,7 +25,7 @@
   "id": "sw.wigilia",
   "pl": "Wigilia",
   "ru": "Сочельник, канун Рождества (24 декабря)",
-  "tr": "виги́ля",
+  "tr": "виги́лья",
   "pos": "noun",
   "gender": "f",
   "forms": {
@@ -46,7 +46,7 @@
   "id": "sw.pierwsza_gwiazdka",
   "pl": "pierwsza gwiazdka",
   "ru": "первая звезда (с неё начинают сочельничный ужин)",
-  "tr": "пе́рфша гвя́стка",
+  "tr": "пе́рфша гвья́стка",
   "pos": "phrase",
   "forms": {},
   "topic": "swieta_i_zwyczaje",
@@ -291,7 +291,7 @@
  {
   "id": "sw.mikolaj",
   "pl": "Mikołaj",
-  "ru": "Николай (святой), Дед Мороз",
+  "ru": "святой Николай (приносит подарки)",
   "tr": "мико́ўай",
   "pos": "noun",
   "gender": "m",
@@ -829,7 +829,7 @@
   "id": "sw.biala_kielbasa",
   "pl": "biała kiełbasa",
   "ru": "белая колбаса (пасхальная)",
-  "tr": "бя́ўа кеўба́са",
+  "tr": "бья́ўа кеўба́са",
   "pos": "phrase",
   "forms": {},
   "topic": "swieta_i_zwyczaje",
@@ -908,7 +908,7 @@
   "id": "sw.oblewac_sie",
   "pl": "oblewać się",
   "ru": "обливаться, обливать друг друга",
-  "tr": "обле́вачь ще",
+  "tr": "облэ́вачь ще",
   "pos": "verb",
   "forms": {
    "1sg": "oblewam",
@@ -1062,7 +1062,7 @@
   "id": "sw.wianek",
   "pl": "wianek",
   "ru": "венок (из цветов)",
-  "tr": "вя́нэк",
+  "tr": "вья́нэк",
   "pos": "noun",
   "gender": "m",
   "forms": {

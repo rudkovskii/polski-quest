@@ -128,6 +128,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   let only: string | undefined;
   /** Игры с экраном выбора (`PolskaGame.hub`): единица текущего раунда, длина раунда и «сейчас идёт экран выбора». */
   let focus: string | undefined;
+  /** Раунд по набору единиц (уровень карты, `begin(ids, size)`): порядок досадки и множество для отбора. */
+  let scope: { ids: readonly string[]; set: ReadonlySet<string> } | null = null;
   let limit = ROUND_SIZE;
   let hubOn = false;
   let task: GameTask | null = null;
@@ -154,6 +156,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     info: (id) => deps.polska.info(id),
     seen: (id) => deps.polska.seen(id),
     markSeen: (id) => deps.polska.markSeen(id),
+    flag: (key) => deps.polska.flag(key),
+    setFlag: (key) => deps.polska.setFlag(key),
     doc: deps.polska.content.docs[g.id],
     now: deps.now,
     date: () => dateOf(deps.now()),
@@ -234,8 +238,10 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     box.style.removeProperty('height');
     if (!game) return;
     const ctx = ctxOf(game);
-    if (!only) deps.polska.autoPlant(game.id, game.pool(ctx));
+    if (!only) deps.polska.autoPlant(game.id, scope ? scope.ids : game.pool(ctx), scope?.set);
     const skip = new Set<string>();
+    // Раунд уровня: единицы других уровней не спрашиваем, кроме перезревших (им один верный ответ — и обратно в коллекцию).
+    if (scope && !only) for (const u of ctx.units) if (!scope.set.has(u.id) && deps.polska.info(u.id).stage !== 'overripe') skip.add(u.id);
     const one = only ?? focus;
     for (let i = 0; i < 6 && !task; i++) {
       const want = deps.polska.pick(game.id, { recent, ...(one ? { only: one } : {}), exclude: skip });
@@ -275,6 +281,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     clearTimers();
     hubOn = true;
     focus = undefined;
+    scope = null;
     limit = ROUND_SIZE;
     answered = false;
     paper.dataset.quiz = 'done';
@@ -298,12 +305,19 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     requestAnimationFrame(reportHeight);
   };
 
-  /** Раунд из `size` заданий про одну единицу (её досаживаем, если ещё не растёт). */
-  const begin = (id: string, size: number): void => {
+  /** Раунд из `size` заданий про одну единицу (её досаживаем, если ещё не растёт) или по набору единиц (уровень). */
+  const begin = (id: string | readonly string[], size: number): void => {
     if (!open || !game || !hubOn) return;
-    deps.polska.plant([id]);
+    if (typeof id === 'string') {
+      deps.polska.plant([id]);
+      focus = id;
+      scope = null;
+    } else {
+      if (!id.length) return;
+      focus = undefined;
+      scope = { ids: [...id], set: new Set(id) };
+    }
     hubOn = false;
-    focus = id;
     limit = Math.max(1, Math.trunc(size));
     if (round.count > 0) roundN++;
     round.reset();
@@ -337,10 +351,13 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       card.append(el('div', { class: 'way2 pq-fbrow', 'data-round-line': '' }, el('span', {}, line), lineSay ? sayButton(lineSay, panel.say, { inline: true }) : null));
     }
     paper.replaceChildren(card);
-    const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, game?.hub ? 'К колесу' : 'Ещё раунд');
+    const hubLabel = game?.hubBack ?? 'К колесу';
+    // Раунд уровня: «Ещё раунд» — тот же уровень, отдельная кнопка — к экрану уровней.
+    const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, game?.hub && !scope ? hubLabel : 'Ещё раунд');
+    const toHub = game?.hub && scope ? el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-to-hub': '', onclick: () => summaryOpen && showHub() }, hubLabel) : null;
     // «Wróć»: выйти и мгновенно вернуться к месту, откуда запустил игру (`systems/entryPoint.ts`); в фокусе по умолчанию.
     const end = el('button', { type: 'button', class: 'pq-btn pq-back', 'data-nav': '', 'data-end': '', 'data-back-entry': '', onclick: () => api.stop() }, '↩ Wróć · Назад');
-    foot.replaceChildren(end, more);
+    foot.replaceChildren(...[end, toHub, more].filter((b): b is HTMLButtonElement => !!b));
     summaryAt = performance.now();
     paintRound();
     setFocus(navs().indexOf(end));
@@ -350,7 +367,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
 
   const nextRound = (): void => {
     if (!open || !summaryOpen) return;
-    if (game?.hub) return showHub();
+    if (game?.hub && !scope) return showHub();
     round.reset();
     roundN++;
     scaleFrom = scaleTo = null;
@@ -419,6 +436,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
         recent.length = 0;
         grownObjs = [];
         focus = undefined;
+        scope = null;
         limit = ROUND_SIZE;
         hubOn = false;
       }
@@ -445,6 +463,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       if (g?.layout === 'full' && grownObjs.length) bus.emit('polska:tour', { plot: g.plot, objs: [...grownObjs], ...(go ? { go: true } : {}) });
       grownObjs = [];
       focus = undefined;
+      scope = null;
       limit = ROUND_SIZE;
       hubOn = false;
       game = null;

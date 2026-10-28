@@ -6,7 +6,7 @@ import { createFarm } from '../src/systems/farm';
 import { DAY_MS, derive, newGarden, type GardenSave, type ItemState } from '../src/systems/garden';
 import { connectSfx } from '../src/systems/platform/sfx';
 import { canAssemble } from '../src/systems/quiz';
-import { A1_LEVEL, BASE, SUBLEVELS, SUB_COUNT, THRESHOLDS, baseOf, growthText, levelLabel, nextTarget, pathOf, pointsOf, thresholds, weightOf } from '../src/systems/xp';
+import { A1_LEVEL, BASE, SUBLEVELS, a1PctText, SUB_COUNT, THRESHOLDS, baseOf, growthText, levelLabel, nextTarget, pathOf, pointsOf, thresholds, weightOf } from '../src/systems/xp';
 import { mountHud } from '../src/ui/hud';
 import { CARD_MS, mountLevelUp, mountPath } from '../src/ui/levelUp';
 import { Round, renderRoundSummary } from '../src/ui/roundSummary';
@@ -265,5 +265,41 @@ describe('V11c: HUD, карточка, путь, итоги', () => {
     flat.add({ ok: false, path: { from: 2, to: 2, sub: 2, pl: 'Poziom 2' } });
     expect(renderRoundSummary(1, flat.stats).querySelector('[data-round-way]')!.textContent).toBe('Уровень 2/20');
     expect(renderRoundSummary(1, new Round().stats).querySelector('[data-round-way]')).toBeNull();
+  });
+});
+
+describe('t29: шкала «до A1» двигается с первых раундов', () => {
+  it('доля пути меньше 10 % — с десятыми, ноль — «0%», дальше целые', () => {
+    expect(a1PctText(0)).toBe('0%');
+    expect(a1PctText(0.0002)).toBe('0,1%');
+    expect(a1PctText(0.002)).toBe('0,2%');
+    expect(a1PctText(0.0149)).toBe('1,4%');
+    expect(a1PctText(0.123)).toBe('12%');
+  });
+
+  it('два раунда с опытом: HUD «до A1» и строка итога раунда меняются', () => {
+    const s = setup();
+    const root = document.createElement('div');
+    mountHud(root, { bus: s.bus, onSettings: () => {} });
+    const next = () => root.querySelector('[data-xp-next]')!.textContent;
+    s.farm.refresh();
+    const seen = [next()];
+    const ways: string[] = [];
+    s.farm.plant(WORDS.slice(0, 8).map((w) => w.id));
+    for (let r = 0; r < 2; r++) {
+      const round = new Round();
+      for (let i = 0; i < 10; i++) {
+        const q = s.farm.next(r ? 2 : 1)!;
+        round.add(s.farm.answer(q, q.answer));
+      }
+      seen.push(next());
+      const card = document.createElement('div');
+      card.append(renderRoundSummary(r + 1, round.stats));
+      ways.push(card.querySelector('[data-round-way]')!.textContent!);
+    }
+    expect(seen[0]).toBe('до A1: 0%');
+    expect(new Set(seen).size).toBe(3);
+    expect(ways[0]).toMatch(/до A1: \d+(,\d)?%/);
+    expect(ways[0]).not.toBe(ways[1]);
   });
 });

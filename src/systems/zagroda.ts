@@ -87,6 +87,10 @@ export function plotOf(u: PolskaUnit, holidayIndex = 0): PlotRef {
       const m = typeof u.raw.month === 'number' && u.raw.month >= 1 && u.raw.month <= 12 ? u.raw.month : 1;
       return { plot: 'miesiace', obj: `bed_${m}`, group: `month:${m}` };
     }
+    case 'month': {
+      const m = typeof u.raw.month === 'number' && u.raw.month >= 1 && u.raw.month <= 12 ? u.raw.month : 1;
+      return { plot: 'miesiace', obj: `bed_${m}`, group: `month:${m}` };
+    }
     case 'holiday': {
       const season = typeof u.raw.season === 'string' ? u.raw.season : 'rok';
       return { plot: 'klumba', obj: `klumba_${holidayIndex % KLUMBA_SIZE}`, group: `season:${season}` };

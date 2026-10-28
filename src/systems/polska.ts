@@ -87,8 +87,14 @@ export interface Polska {
   markSeen(id: string): void;
   /** Посадить (строки гимна из `drillSeed` — сразу кустиком). Возвращает добавленные id. */
   plant(ids: readonly string[]): string[];
-  /** Досадить из `pool` игры, пока семян и ростков этой игры меньше ACTIVE_MAX. */
-  autoPlant(game: PolskaGameId, pool: readonly string[]): string[];
+  /**
+   * Досадить из `pool` игры, пока семян и ростков меньше ACTIVE_MAX. `scope` — считать растущие только среди этих единиц
+   * (уровень карты: у каждого уровня свои 8 растущих, иначе семена уровня 1 не дают посадить соседей).
+   */
+  autoPlant(game: PolskaGameId, pool: readonly string[], scope?: ReadonlySet<string>): string[];
+  /** Флаг игры в сохранении («уровень 2 открыт вручную»). Ключ свой у каждой игры: `geo.level.2`. */
+  flag(key: string): boolean;
+  setFlag(key: string): void;
   /** Какую единицу и как спросить (null — нечего). `only` — эту единицу. */
   pick(game: PolskaGameId, opts?: { recent?: readonly string[]; only?: string; exclude?: ReadonlySet<string> }): Want | null;
   answer(t: { id: string; side: 'A' | 'B'; self?: boolean }, ok: boolean): PolskaAnswerOut;
@@ -212,6 +218,14 @@ export function createPolska(d: PolskaDeps): Polska {
     d.save(p);
   };
 
+  /** Флаги лежат в том же `seen` под префиксом `flag:` (старые сохранения читаются как есть, схема не меняется). */
+  const flag = (key: string): boolean => seen(`flag:${key}`);
+  const setFlag = (key: string): void => {
+    if (!key || flag(key)) return;
+    p = { ...p, seen: { ...p.seen, [`flag:${key}`]: new Date(d.now()).toISOString().slice(0, 10) } };
+    d.save(p);
+  };
+
   const plant = (ids: readonly string[]): string[] => {
     const now = d.now();
     const added: PlantEntry[] = [];
@@ -232,17 +246,19 @@ export function createPolska(d: PolskaDeps): Polska {
   const api: Polska = {
     seen,
     markSeen,
+    flag,
+    setFlag,
     content,
     units,
     unit: (id) => content.byId.get(id),
     info,
     plant,
-    autoPlant(game, pool) {
+    autoPlant(game, pool, scope) {
       const now = d.now();
       const mine = new Set(units(game).map((u) => u.id));
       let active = 0;
       for (const it of st.items.values()) {
-        if (!mine.has(it.id)) continue;
+        if (!mine.has(it.id) || (scope && !scope.has(it.id))) continue;
         const s = stageOf(it, now);
         if (s === 'seed' || s === 'sprout') active++;
       }

@@ -561,7 +561,9 @@ def build(data: Path, cities_path: Path | None) -> None:
         'ring': [[round(a, 3), round(b, 3)] for a, b in outline]}, ensure_ascii=False) + '\n', 'utf8')
 
     OUT.mkdir(parents=True, exist_ok=True)
-    img.save(OUT / 'poland.png', optimize=True)
+    # Саму картинку с 23.10.2026 рисует tools/art_map2.py (детальнее, ×1 и ×2); здесь — только poland.json, слой городов и контур.
+    if '--legacy-image' in sys.argv:
+        img.save(OUT / 'poland.png', optimize=True)
 
     # слой городов: точки 5×5 серые, столица звёздой; прозрачный фон (альфа 0/255)
     layer = Image.new('RGBA', (W, H), (0, 0, 0, 0))
@@ -609,6 +611,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--data', required=True, help='папка с ne_10m_*.geojson (Natural Earth)')
     ap.add_argument('--cities', help='data/v2/geografia.json: города с lat/lon (иначе 26 по умолчанию)')
+    ap.add_argument('--legacy-image', action='store_true', help='записать и старую картинку poland.png (по умолчанию её рисует art_map2.py)')
     a = ap.parse_args()
     build(Path(a.data), Path(a.cities) if a.cities else None)
     return 0

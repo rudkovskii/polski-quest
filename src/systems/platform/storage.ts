@@ -3,12 +3,19 @@
 // подписчики (`onWrite`) узнают об успехе и о сбое (HUD: галочка «сохранено», тост «Не сохранилось, повторяю»); при уходе со страницы — немедленная
 // запись плюс синхронная аварийная копия в localStorage, чтобы закрытие вкладки не теряло последние ответы.
 import { createStore, del, get, keys, setMany, type UseStore } from 'idb-keyval';
-import { newSave, normalizeSave, type Save } from '../save';
+import { SAVE_V, newSave, normalizeSave, type Save } from '../save';
+
+const isNewer = (raw: unknown): boolean => {
+  const v = (raw as { v?: unknown } | null)?.v;
+  return typeof v === 'number' && v > SAVE_V;
+};
 
 export const KEYS = {
   save: 'pq_save',
   /** Аварийная копия сохранения в localStorage (pagehide), удаляется после успешной записи в IndexedDB. */
   tail: 'pq_save_tail',
+  /** Копия нечитаемого сохранения или сохранения из более новой версии игры: `pq_save_kept_<причина>_<время>`. Не стирается ничем, кроме «Сбросить». */
+  kept: 'pq_save_kept_',
 } as const;
 
 export type BackendKind = 'idb' | 'local' | 'memory';
@@ -217,6 +224,9 @@ export interface LoadResult {
   /** Взята аварийная копия из localStorage (прошлая вкладка закрылась до записи в IndexedDB). */
   recovered: boolean;
   backend: BackendKind;
+  /** Что было в хранилище и сохранено копией под ключом `key` до того, как игра пошла дальше: `broken` — нечитаемые данные (начали заново),
+   *  `newer` — сохранение из более новой версии игры (читаем знакомую часть), `stray` — второе сохранение из запасного хранилища, не то, что в основном. */
+  kept: { reason: 'broken' | 'newer' | 'stray'; key: string }[];
 }
 
 export class GameStorage {
@@ -296,17 +306,37 @@ export class GameStorage {
     } catch (e) {
       console.warn('storage: чтение не удалось', e);
     }
+    const kept: LoadResult['kept'] = [];
+    const keep = async (reason: LoadResult['kept'][number]['reason'], data: unknown): Promise<void> => {
+      const key = `${KEYS.kept}${reason}_${now}`;
+      try {
+        await this.kv.setMany([[key, data]]);
+        kept.push({ reason, key });
+      } catch (e) {
+        console.warn('storage: копия не записана', e);
+      }
+    };
     let save = normalizeSave(raw);
+    // Что-то лежит, но это не сохранение: копия до того, как его заменит новое.
+    if (raw !== undefined && raw !== null && !save) await keep('broken', raw);
+    // Сохранение из более новой версии игры: запись этим клиентом потеряет незнакомые ему поля — сначала копия как есть.
+    else if (save && isNewer(raw)) await keep('newer', raw);
     // Записи шли в localStorage (IndexedDB падал), а теперь IndexedDB жив, но с прошлой версией: берём более свежую.
+    // Только то же самое сохранение (`created` совпадает): пустое, созданное в localStorage, когда IndexedDB не ответил вовремя, не затирает настоящее.
     const lsSave = this.readLsSave();
-    if (lsSave && (!save || lsSave.updated > save.updated) && this.kv.kind !== 'local') {
-      save = lsSave;
-      this.dirty0 = true;
+    if (lsSave && this.kv.kind !== 'local') {
+      if (!save || (lsSave.created === save.created && lsSave.updated > save.updated)) {
+        save = lsSave;
+        this.dirty0 = true;
+      } else if (lsSave.created !== save.created) {
+        await keep('stray', lsSave);
+        this.clearLsSave();
+      }
     }
     let recovered = false;
     const tail = this.readTail();
     // Аварийная копия новее записи в IndexedDB: прошлая вкладка закрылась до записи.
-    if (tail && (!save || tail.updated > save.updated)) {
+    if (tail && (!save || (tail.created === save.created && tail.updated > save.updated))) {
       save = tail;
       recovered = true;
       this.dirty0 = true;
@@ -315,7 +345,50 @@ export class GameStorage {
     this.s = save ?? newSave(now);
     if (created) this.dirty0 = true;
     if (this.dirty0) await this.flush();
-    return { save: this.s, created, recovered, backend: this.kv.kind };
+    return { save: this.s, created, recovered, backend: this.kv.kind, kept };
+  }
+
+  /** Копии, отложенные при загрузке (`KEYS.kept`): ключ и данные как были. */
+  async keptCopies(): Promise<{ key: string; data: unknown }[]> {
+    let ks: string[] = [];
+    try {
+      ks = (await this.kv.keys()).filter((k) => k.startsWith(KEYS.kept)).sort();
+    } catch {
+      return [];
+    }
+    const out: { key: string; data: unknown }[] = [];
+    for (const key of ks) {
+      try {
+        out.push({ key, data: await this.kv.get(key) });
+      } catch {
+        // бэкенд сменился посреди чтения
+      }
+    }
+    return out;
+  }
+
+  /** Сохранение в памяти или null, если `load()` ещё не прошёл (экран ошибки). */
+  peek(): Save | null {
+    return this.s;
+  }
+
+  /** Сырые данные основного ключа как есть (экран ошибки, когда `load()` не дошёл): хранилище, затем localStorage и аварийная копия. */
+  async readRaw(): Promise<unknown> {
+    try {
+      const raw = await this.kv.get(KEYS.save);
+      if (raw !== undefined) return raw;
+    } catch {
+      // дальше запасные места
+    }
+    for (const k of [KEYS.tail, KEYS.save]) {
+      try {
+        const s = this.ls?.getItem(this.ns + k);
+        if (s) return JSON.parse(s) as unknown;
+      } catch {
+        // мусор в localStorage
+      }
+    }
+    return undefined;
   }
 
   /** Изменить сохранение; запись отложится на debounce. */
@@ -461,6 +534,14 @@ export class GameStorage {
       return raw ? normalizeSave(JSON.parse(raw)) : null;
     } catch {
       return null;
+    }
+  }
+
+  private clearLsSave(): void {
+    try {
+      this.ls?.removeItem(this.ns + KEYS.save);
+    } catch {
+      // приватный режим
     }
   }
 

@@ -4,7 +4,7 @@
 // Бонусный опыт за закрытый набор (воеводство, куплет +25; месяц +10; сезон праздников +25) — только в опыт v2, не в очки шкалы.
 import type { PolskaGameId, PolskaUnit } from '../types/polska';
 import type { ItemState } from './garden';
-import { gameOfKind } from './v2content';
+import { GAME_IDS, gameOfKind } from './v2content';
 import { plotMap, type PlotRef } from './zagroda';
 
 export interface PolskaLevel {
@@ -68,7 +68,7 @@ const round2 = (x: number): number => Math.round(x * 100) / 100;
 /** Шкала по единицам v2 и состоянию огорода v2. Чистая функция. */
 export function polskaScale(units: readonly PolskaUnit[], items: ReadonlyMap<string, ItemState>, refs: Map<string, PlotRef> = plotMap(units)): PolskaScale {
   const games = {} as Record<PolskaGameId, PolskaGameBar>;
-  for (const g of ['geo', 'hymn', 'daty', 'swieta'] as PolskaGameId[]) games[g] = { game: g, units: 0, grown: 0, growing: 0, pct: 0, medal: 0 };
+  for (const g of GAME_IDS) games[g] = { game: g, units: 0, grown: 0, growing: 0, pct: 0, medal: 0 };
   let grown = 0;
   let partial = 0;
   const groups = new Map<string, { n: number; grown: number }>();

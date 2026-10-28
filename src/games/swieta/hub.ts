@@ -284,9 +284,9 @@ function drawFace(date: { y: number; m: number; d: number }, markers: readonly M
     const color = CLASS_INFO[m.node.cls].color;
     const [a0x, a0y] = pt(R_IN - 1, m.angle);
     const [b0x, b0y] = pt(R_IN + 6, m.angle);
-    if (m.track > 0) {
-      const [lx, ly] = pt(m.r + MARK_UNITS / 2, m.angle);
-      g.append(svg('line', { x1: f2(lx), y1: f2(ly), x2: f2(a0x), y2: f2(a0y), stroke: color, 'stroke-width': 0.8, opacity: 0.7 }));
+    // Выноска от значка к засечке даты: после расталкивания (t30) значок может стоять в стороне от своего дня.
+    if (Math.hypot(a0x - m.x, a0y - m.y) > MARK_UNITS / 2 + 3) {
+      g.append(svg('line', { x1: f2(m.x), y1: f2(m.y), x2: f2(a0x), y2: f2(a0y), stroke: color, 'stroke-width': 0.8, opacity: 0.7 }));
     }
     g.append(svg('line', { x1: f2(a0x), y1: f2(a0y), x2: f2(b0x), y2: f2(b0y), stroke: '#2a1418', 'stroke-width': 2.4 }), svg('line', { x1: f2(a0x), y1: f2(a0y), x2: f2(b0x), y2: f2(b0y), stroke: color, 'stroke-width': 1.3 }));
   }

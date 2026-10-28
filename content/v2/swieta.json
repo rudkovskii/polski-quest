@@ -12,7 +12,7 @@
    "daty Dnia Babci/Dziadka 21-22.01",
    "dekoracje 2-3.05 vs 1-3.05"
   ],
-  "wheel": "wheel: колесо праздников из ПМЖ/Собес/swieta-kolo (даты, тип, справка RU/PL, фраза, картины Wikimedia Commons: автор и лицензия в credit). Ключ unit — праздник игры, по которому идут вопросы; null — только справка.",
+  "wheel": "wheel: колесо праздников (даты, тип, справка RU/PL, фраза, картины Wikimedia Commons: автор и лицензия в credit). Ключ unit — праздник игры, по которому идут вопросы; null — только справка.",
   "about": "about {ru, pl[], key[]} у каждого узла wheel (19.10.2026): справка-контекст для карточки выбранного праздника на колесе и для «Poznaj święto»; источники и сверка — README_swieta.md"
  },
  "tasks": {
@@ -107,8 +107,18 @@
     1
    ],
    "free": true,
-   "shops": "open",
-   "checked": "2026-10-18",
+   "shops": "partial",
+   "checked": "2026-10-26",
+   "shops_q": [
+    {
+     "say": "trzydziestego pierwszego grudnia",
+     "shops": "open"
+    },
+    {
+     "say": "pierwszego stycznia",
+     "shops": "closed"
+    }
+   ],
    "free_note": {
     "pl": "Sylwester (31.12) to zwykły dzień, wolne jest tylko 1 stycznia.",
     "ru": "31.12 обычный день, выходной только 1 января."
@@ -1972,7 +1982,7 @@
    "kind": "holiday",
    "pl": "Wigilia",
    "ru": "Сочельник (24 декабря)",
-   "tr": "виги́ля",
+   "tr": "виги́лья",
    "when": {
     "day": 24,
     "month": 12

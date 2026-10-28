@@ -13,7 +13,7 @@ import { GAMES } from '../src/games/registry';
 import { forgetSelection, renderHub, nodeItem } from '../src/games/swieta/hub';
 import { buildRound, clearSession, slotsOf, startSession, takeTask } from '../src/games/swieta/plan';
 import { boldRuns, isFirst, sentences, shopsLine, shortIntro, shownCustoms } from '../src/games/swieta/story';
-import { CLASSES, MARK_UNITS, TRACKS, markerOfUnit, parseWheel, placeMarkers, todayAngle, growthOf, type Marker, type WheelNode } from '../src/games/swieta/wheel';
+import { CLASSES, SPREAD_R, SPREAD_UNITS, markerOfUnit, parseWheel, placeMarkers, todayAngle, growthOf, type Marker, type WheelNode } from '../src/games/swieta/wheel';
 import { createPolska, newPolskaSave, type PolskaSave } from '../src/systems/polska';
 import { mountPolskaGame, NEXT_DELAY_MS } from '../src/ui/polskaGame';
 import { ROUND_SIZE } from '../src/ui/roundSummary';
@@ -498,16 +498,23 @@ describe('колесо: позиции дат, «сегодня», ближай�
     expect(markerOfUnit(placeAt(2026, 12, 28).placed, 'hol.nowy_rok')!.days).toBeLessThanOrEqual(4);
   });
 
-  it('значки не налезают друг на друга и сидят на дорожках внутри кольца месяцев', () => {
-    for (const [y, m, d] of [[2026, 10, 18], [2027, 3, 29], [2028, 4, 16], [2029, 1, 1]] as const) {
+  it('t30: значки-квадраты не налезают друг на друга и сидят между центром и кольцом месяцев, рядом со своим месяцем', () => {
+    for (const [y, m, d] of [[2026, 10, 18], [2026, 10, 26], [2027, 3, 29], [2028, 4, 16], [2029, 1, 1]] as const) {
       const { placed } = placeAt(y, m, d);
       let min = Infinity;
       for (let i = 0; i < placed.length; i++) {
-        expect(TRACKS).toContain(placed[i]!.r);
-        expect(Math.hypot(placed[i]!.x, placed[i]!.y)).toBeCloseTo(placed[i]!.r, 5);
-        for (let j = i + 1; j < placed.length; j++) min = Math.min(min, Math.hypot(placed[i]!.x - placed[j]!.x, placed[i]!.y - placed[j]!.y));
+        const p = placed[i]!;
+        const r = Math.hypot(p.x, p.y);
+        expect(r).toBeCloseTo(p.r, 5);
+        expect(r).toBeGreaterThanOrEqual(SPREAD_R[0] - 1e-6);
+        expect(r).toBeLessThanOrEqual(SPREAD_R[1] + 1e-6);
+        // Ушёл от своего дня не дальше полутора месяцев по кругу.
+        const a = (Math.atan2(p.x, -p.y) * 180) / Math.PI;
+        const da = Math.abs(((a - p.angle + 540) % 360) - 180);
+        expect(da, p.node.id).toBeLessThan(45);
+        for (let j = i + 1; j < placed.length; j++) min = Math.min(min, Math.max(Math.abs(p.x - placed[j]!.x), Math.abs(p.y - placed[j]!.y)));
       }
-      expect(min, `${y}-${m}-${d}`).toBeGreaterThan(MARK_UNITS * 0.8);
+      expect(min, `${y}-${m}-${d}`).toBeGreaterThan(SPREAD_UNITS - 0.1);
     }
   });
 });

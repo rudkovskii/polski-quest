@@ -373,7 +373,7 @@ describe('F5b: «созреет 0» и «до A0.1»', () => {
     s.farm.refresh();
     expect(tip()).toContain('уже растут 3');
     s.bus.emit('hud:xp', { level: 'Уровень 2', ratio: 0.1, sub: 2, of: 20, pct: 0.0149, toNext: 14, growing: 11 });
-    expect(next()).toBe('до A1: 1%');
+    expect(next()).toBe('до A1: 1,4%');
     expect(tip()).toBe('До уровня 3: 14 оч. · уже растут 11');
   });
 });

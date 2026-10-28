@@ -16,6 +16,7 @@ import json
 
 from art_core import KEYCHARS, Sheet, emit
 from art_garden import FRUITS, V, fruit_frame, frame
+from art_png import plant_frames
 from art_ramp import ROOT, load_materials, ramp_colors
 
 PALETTE = set(ramp_colors(load_materials()))
@@ -65,8 +66,9 @@ def build() -> None:
     meta = json.loads(PLANTS.read_text('utf8'))
     for v in meta['variants']:
         n = v['n']
+        # Новый визуал (28.10): готовые кусты из art/png/plants (уменьшены до клетки, `art_png.PLANT_SCALE`); нет картинок — рисует art_garden.
         sh = Sheet(v['sheet'], 16, 32, anchor=[8, 31])
-        grids = [frame(n, st) for st in STAGES]
+        grids = plant_frames(n, STAGES) or [frame(n, st) for st in STAGES]
         for g in grids:
             sh.add(g)
         emit(sh)

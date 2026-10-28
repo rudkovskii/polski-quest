@@ -5,6 +5,7 @@ import type { BusEvents } from '../types/bus';
 import { el } from './dom';
 import { THEME_CSS } from './theme';
 import { LEVEL } from '../systems/edition';
+import { a1PctText } from '../systems/xp';
 
 const css = `
 ${THEME_CSS}
@@ -32,6 +33,9 @@ ${THEME_CSS}
 .pq-goal { max-width: calc(100vw - 80px); padding: 5px 9px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); border-radius: 8px; box-shadow: 0 3px 0 var(--pq-ink);
   color: var(--pq-cream); font: 700 12px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; text-align: left; touch-action: manipulation; }
 .pq-goal[hidden] { display: none; }
+.pq-goal-part { display: inline-block; white-space: nowrap; }
+/* t30: справа на той же высоте шкала «Wiedza o Polsce» (~140 px) — на телефоне плашка цели её не заходит. */
+@media (max-width: 520px) { .pq-goal { max-width: calc(100vw - 170px); } }
 .pq-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 /* Индикатор сохранения (V11a): галочка в углу на секунду после записи; сбой записи — тост с повтором. */
 .pq-saved { min-width: 22px; height: 22px; padding: 0 5px; box-sizing: border-box; border-radius: 11px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); color: #9be07a;
@@ -110,7 +114,8 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
   const paintGoal = (): void => {
     const g = o.goal?.() ?? null;
     goalEl.hidden = !g;
-    if (g) goalEl.textContent = goalText(g);
+    // Части «Сегодня: полито N» и «к урожаю идут M» не рвутся внутри: на узком экране вторая уходит строкой ниже (t30).
+    if (g) goalEl.replaceChildren(...goalText(g).split(' · ').flatMap((part, i) => [i ? ' · ' : '', el('span', { class: 'pq-goal-part' }, part)]));
   };
   paintGoal();
   const onVisible = (): void => {
@@ -124,7 +129,7 @@ export function mountHud(parent: HTMLElement, o: HudOptions): Hud {
     else lvl.textContent = ev.level;
     // «до A1: 12%»: доля всей базы (слово 1, фраза сборки 2, растущее частично); нет поля — молчим.
     if (ev.pct === undefined) nextEl.textContent = '';
-    else nextEl.textContent = ev.pct >= 1 ? `${LEVEL} достигнут` : `до ${LEVEL}: ${Math.floor(ev.pct * 100)}%`;
+    else nextEl.textContent = ev.pct >= 1 ? `${LEVEL} достигнут` : `до ${LEVEL}: ${a1PctText(ev.pct)}`;
     const target = ev.sub === undefined || ev.of === undefined ? 'следующего уровня' : ev.sub >= ev.of ? LEVEL : `уровня ${ev.sub + 1}`;
     xp.title = ev.toNext != null ? `До ${target}: ${ev.toNext} оч.${ev.growing ? ` · уже растут ${ev.growing}` : ''}` : '';
     bar.setAttribute('aria-valuetext', `${lvl.textContent}. ${nextEl.textContent}`);

@@ -1,4 +1,4 @@
-// Игра «Święta»: колесо года без DOM. Данные узлов — `swieta.json:wheel` (19 праздников колеса из ПМЖ/Собес/swieta-kolo: тип, справка RU/PL,
+// Игра «Święta»: колесо года без DOM. Данные узлов — `swieta.json:wheel` (19 праздников колеса: тип, справка RU/PL,
 // картина и её автор) плюс праздники игры без пары в колесе (значок вместо картины). Узел указывает на единицу игры (`unit`), по которой
 // идут вопросы, или `null` (только справка). Позиции — по дню года реального года (`ctx.date()`), Новый год наверху, как в колесе.
 import type { PolskaUnit, UnitInfo } from '../../types/polska';
@@ -101,6 +101,13 @@ export function parseWheel(doc: Readonly<Record<string, unknown>>, units: readon
 export const TRACKS: readonly number[] = [72, 57, 42, 27];
 export const MARK_UNITS = 17;
 const GAP_UNITS = 1.5;
+/**
+ * t30: настоящий значок — квадрат 16·ico + 14 px, на любом размере колеса это ≈ 18 единиц, плюс уголок прогресса снаружи. Дорожек на
+ * плотные месяцы (декабрь, май) не хватало, значки налезали и плохо тапались. После дорожек значки расталкиваются до этого шага
+ * (по большей из осей: квадраты) и остаются между центром и кольцом месяцев; дату показывает выноска к засечке на кольце.
+ */
+export const SPREAD_UNITS = 20;
+export const SPREAD_R: readonly [number, number] = [28, 71];
 
 export interface Marker {
   node: WheelNode;
@@ -166,7 +173,45 @@ export function placeMarkers(nodes: readonly WheelNode[], units: readonly Polska
     m.x = m.r * Math.sin(rad(m.angle));
     m.y = -m.r * Math.cos(rad(m.angle));
   }
+  spread(list);
   return { placed: list, undated };
+}
+
+/** Расталкивание значков до `SPREAD_UNITS` по большей из осей; радиус держится в `SPREAD_R`. Детерминировано (порядок — по углу). */
+function spread(list: Marker[]): void {
+  const [rMin, rMax] = SPREAD_R;
+  const clamp = (m: Marker): void => {
+    const r = Math.hypot(m.x, m.y) || rMin;
+    const k = Math.min(rMax, Math.max(rMin, r)) / r;
+    m.x *= k;
+    m.y *= k;
+  };
+  for (let it = 0; it < 400; it++) {
+    let worst = 0;
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        const a = list[i]!;
+        const b = list[j]!;
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const over = SPREAD_UNITS - Math.max(Math.abs(dx), Math.abs(dy));
+        if (over <= 0) continue;
+        worst = Math.max(worst, over);
+        // Толкаем вдоль соединяющей линии: и по кругу, и по радиусу, так что прижатые к краю уходят внутрь.
+        const d = Math.hypot(dx, dy) || 1;
+        const ux = d > 1e-6 ? dx / d : Math.cos(rad(a.angle));
+        const uy = d > 1e-6 ? dy / d : Math.sin(rad(a.angle));
+        const step = (over / 2 + 0.05) * 0.6;
+        a.x -= ux * step;
+        a.y -= uy * step;
+        b.x += ux * step;
+        b.y += uy * step;
+      }
+    }
+    for (const m of list) clamp(m);
+    if (worst < 0.01) break;
+  }
+  for (const m of list) m.r = Math.hypot(m.x, m.y);
 }
 
 /** Угол «сегодня» на кольце. */

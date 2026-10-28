@@ -2,15 +2,16 @@
 // реки линиями. Задания: «Pokaż na mapie» (тап или курсор + A: мини-герой бежит к месту и втыкает флажок, кот рядом),
 // «Co to za miasto?», «Nad jaką rzeką leży…?», «Z kim graniczy Polska na zachodzie?» (сосед + форма «z Niemcami»), столица воеводства,
 // сторона света, падежные формы и сборка фраз из плиток (`want.self`).
-import type { GameCheck, GameCtx, GamePanel, PolskaGame, PolskaUnit, Want } from '../../types/polska';
+import type { GameCheck, GameCtx, GamePanel, PolskaGame, Want } from '../../types/polska';
 import { el } from '../../ui/dom';
 import { sayButton } from '../../ui/sayButton';
 import { choiceGrid } from './choice';
 import { canvasSize, planFit, type FitPlan } from './fit';
-import { createMap, type MapView } from './mapview';
+import { createMap, LOOK_MULT, type MapView } from './mapview';
 import { checkTask, makeTask, statusOf, verdict, type DirAnswer, type GeoTask } from './tasks';
 import { clusterOf, anchorOf, centroid, dist, MAP_H, MAP_W, type Pt } from './world';
 import { prompt, tiles } from '../kit';
+import { levelViews, nextLevel, renderLevels } from './levels';
 
 /** Высота кнопки варианта в полосе под картой и в узком окне (≥ 44 px под палец). */
 const OPT_ROW = 46;
@@ -34,6 +35,7 @@ const CSS = `
 .geo-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
 .geo-label { position: absolute; transform: translate(-50%, -100%); font: 700 12px/1 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink);
   background: var(--pq-cream); border: 2px solid var(--pq-ink); border-radius: 3px; padding: 2px 4px; white-space: nowrap; }
+.geo-label.known { font-size: 10px; font-weight: 700; padding: 1px 3px; border-width: 1px; background: rgba(255, 250, 235, .88); opacity: .95; }
 .geo-side { flex: 0 0 auto; min-width: 0; width: 100%; box-sizing: border-box; }
 .geo.wide .geo-side { width: ${SIDE_W}px; align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
 .geo-hint { font-size: 13px; opacity: .75; text-align: center; min-height: 18px; }
@@ -43,6 +45,7 @@ const CSS = `
 .geo-bar .geo-hint { flex: 1 1 auto; min-height: 0; }
 .geo-bar .geo-back { flex: 0 0 auto; margin: 0; }
 .geo-back[hidden] { display: none; }
+.geo-back.on { background: var(--pq-accent); }
 .geo .pq-opts { width: 100%; grid-template-columns: repeat(var(--geo-cols, 2), 1fr); grid-auto-rows: ${OPT_ROW}px; gap: 8px; }
 .geo .pq-opt { padding: 4px 9px; }
 @media (max-width: 519px) { .geo-side { padding: 0 8px; } .geo .pq-opts { grid-auto-rows: ${OPT_ROW_NARROW}px; } }
@@ -51,18 +54,17 @@ const CSS = `
 /** Сколько зелёный флажок виден после анимации, прежде чем движок листает дальше. */
 export const SUCCESS_SHOW_MS = 800;
 
-/** Порядок посадки: по полосам, внутри полосы виды чередуются (город, река, сосед, гора…), чтобы первые 8 семян были разными. */
+/** Порядок посадки всей карты: уровни по очереди (`levels.ts`), внутри уровня полосы и чередование видов. */
 export function geoPool(ctx: GameCtx): readonly string[] {
-  const out: string[] = [];
-  const bands = [...new Set(ctx.units.map((u) => u.band))].sort((a, b) => a - b);
-  const order = ['city', 'river', 'neighbor', 'mountain', 'sea', 'region', 'nature'];
-  for (const b of bands) {
-    const by = new Map<string, PolskaUnit[]>();
-    for (const u of ctx.units.filter((x) => x.band === b)) by.set(u.type, [...(by.get(u.type) ?? []), u]);
-    const types = [...by.keys()].sort((a, c) => (order.indexOf(a) + 100) % 100 - (order.indexOf(c) + 100) % 100);
-    for (let i = 0; types.some((t) => (by.get(t)?.length ?? 0) > i); i++) for (const t of types) if (by.get(t)![i]) out.push(by.get(t)![i]!.id);
-  }
-  return out;
+  return levelViews(ctx).flatMap((v) => v.ids);
+}
+
+/**
+ * Что движок досаживает вне раунда уровня (экран уровней, «Повторить» без `only`): только рекомендованный уровень, чтобы не сажать
+ * соседей и воеводства, пока игрок их не выбрал. Раунд уровня досаживает из своего набора сам (`begin(ids)`).
+ */
+export function geoNextPool(ctx: GameCtx): readonly string[] {
+  return nextLevel(levelViews(ctx))?.ids ?? [];
 }
 
 function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
@@ -84,6 +86,8 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
     mark: task.mark ? [task.mark] : [],
     hide: task.t === 'show' ? task.id : null,
     interactive: task.t === 'show',
+    // Собранные места подписаны, где подпись не выдаёт ответ: «покажи на карте» и сборка фразы.
+    known: task.t === 'show' || task.t === 'build',
   });
   root.append(map.el);
   const side = el('div', { class: 'geo-side' });
@@ -112,9 +116,45 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
   switch (task.t) {
     case 'show': {
       const hintEl = el('div', { class: 'geo-hint', 'data-hint': '' }, 'Тап по карте · стрелки и A: курсор');
-      const back = el('button', { type: 'button', class: 'pq-btn geo-back', 'data-nav': '', 'data-back': '', hidden: true, onclick: () => ((map.zoomOut(), (back.hidden = true), (hintEl.textContent = 'Тап по карте · стрелки и A: курсор'), map.unlock())) }, 'Cała mapa · Вся карта');
+      /** Лупа (маленький экран): следующий тап не отвечает, а приближает карту втрое к этому месту. */
+      let looking = false;
+      const back = el(
+        'button',
+        {
+          type: 'button',
+          class: 'pq-btn geo-back',
+          'data-nav': '',
+          'data-back': '',
+          hidden: true,
+          onclick: () => {
+            map.zoomOut();
+            back.hidden = true;
+            looking = false;
+            hintEl.textContent = 'Тап по карте · стрелки и A: курсор';
+            map.unlock();
+            fitHooks.forEach((h) => h());
+          },
+        },
+        'Cała mapa · Вся карта',
+      );
+      const look = el(
+        'button',
+        {
+          type: 'button',
+          class: 'pq-btn geo-back',
+          'data-nav': '',
+          'data-look': '',
+          hidden: true,
+          onclick: () => {
+            looking = !looking;
+            look.classList.toggle('on', looking);
+            hintEl.textContent = looking ? 'Тапни, где приблизить' : 'Тап по карте · стрелки и A: курсор';
+          },
+        },
+        '🔍 Крупнее',
+      );
       side.classList.add('geo-bar');
-      side.append(hintEl, back);
+      side.append(hintEl, look, back);
       const finish = (p: Pt): void => {
         const ok = verdict(task, p, ctx);
         back.hidden = true;
@@ -124,12 +164,23 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
         });
       };
       map.onPick = (p) => {
+        if (looking && !map.zoomed) {
+          looking = false;
+          look.classList.remove('on');
+          look.hidden = true;
+          map.zoomTo(p, LOOK_MULT);
+          hintEl.textContent = 'Крупнее: выбери точку (тап или стрелки и A)';
+          back.hidden = false;
+          map.unlock();
+          return;
+        }
         const cl = unit && !map.zoomed ? clusterOf(ctx.units, unit) : [];
         // Рядом несколько городов (Gdańsk · Gdynia · Sopot, Kraków · Wieliczka): сначала приближаем, потом выбираем точку.
         if (cl.length > 1 && dist(p, centroid(cl)) <= 18) {
           map.zoomTo(centroid(cl));
           hintEl.textContent = 'Приблизили: выбери точку (тап или стрелки и A)';
           back.hidden = false;
+          look.hidden = true;
           map.unlock();
           return;
         }
@@ -138,6 +189,8 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
       // Совсем нет места: карту не рисуем, остаётся «Не знаю» без флажка (кнопка появляется и пропадает вместе с картой).
       const noMap = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-nomap': '', onclick: () => panel.submit({ x: -1, y: -1 }) }, 'Nie wiem · Не знаю');
       fitHooks.push(() => {
+        // лупа — только на маленькой карте (телефон: масштаб меньше 2) и пока карта целиком
+        look.hidden = !map.scale || map.scale >= 2 || map.zoomed;
         if (map.scale) {
           noMap.remove();
           if (!map.zoomed) hintEl.textContent = 'Тап по карте · стрелки и A: курсор';
@@ -235,12 +288,14 @@ function render(task: GeoTask, panel: GamePanel, ctx: GameCtx): void {
 export const game: PolskaGame<GeoTask> = {
   id: 'geo',
   title: { pl: 'Mapa Polski', ru: 'Карта Польши' },
-  desc: 'Города, реки, горы и соседи: найди на карте, назови и скажи фразу',
+  desc: 'По уровням: города и природа, соседи, парки, UNESCO, воеводства. Найди на карте, назови, скажи фразу',
   entry: 'map',
   plot: 'sad',
   kinds: ['geo'],
   layout: 'full',
-  pool: geoPool,
+  pool: geoNextPool,
+  hub: (panel, ctx, begin) => renderLevels(panel, ctx, (ids, size) => begin(ids, size)),
+  hubBack: 'К уровням',
   nextTask: (ctx: GameCtx, want: Want) => makeTask(ctx, want),
   render,
   check: (task: GeoTask, answer: unknown, ctx: GameCtx): GameCheck => checkTask(task, answer, ctx),

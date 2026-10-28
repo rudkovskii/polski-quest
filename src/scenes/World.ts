@@ -11,6 +11,7 @@ import { FarmLayer } from './farmLayer';
 import { ZagrodaLayer, applyEntries } from './zagrodaLayer';
 import { pickZoom } from '../world/camera';
 import { SIGN_BUBBLE, signsOf, type Sign } from '../world/signs';
+import { COVER_ALPHA, coveringKeys, type CoverCandidate } from '../world/cover';
 import { LocationModel, type Actor, type WorldEvent } from '../world/location';
 import { PositionGate } from '../world/positionGate';
 import { getMap, resolveSpawn, routeTo, START, withDecor } from '../world/maps';
@@ -23,8 +24,10 @@ const ATLAS = 'custom';
 const TILESET = 'farm';
 /** Высота d-pad снизу в CSS-пикселях (крест 120 px + отступ 16 px + запас): пока он виден, карта не прячет низ под ним. */
 export const DPAD_INSET = 148;
-/** Сверху кнопки HUD. */
+/** Сверху кнопки HUD (для масштаба комнаты). */
 export const HUD_TOP_INSET = 52;
+/** Вся левая колонка HUD (уровень + плашка «Сегодня», ≈ 100 px): камера у верхнего края карты не прячет героя под ней (t30). */
+export const HUD_FOLLOW_INSET = 108;
 /** Цвет за краем карты: тёмная листва. */
 export const BG_COLOR = '#2e5b3b';
 
@@ -77,6 +80,8 @@ let pendingReturn: BusEvents['world:return'] | null = null;
 
 /** Радиус попадания по стрелке указателя, CSS px (палец шире треугольника 30×15). */
 const ARROW_HIT = 30;
+/** Кот в мире примерно на четверть меньше героя (ТЗ-визуал: кадры обоих 32×32 в клетке 48×48). */
+const CAT_SCALE = 0.75;
 
 /** Цель указателя первых шагов (`guide:goal` из ui/hintsGuide.ts): переживает перезапуск сцены при смене карты. */
 let guideGoal: string | null = null;
@@ -113,7 +118,7 @@ export class World extends Phaser.Scene {
   private leaving = false;
   private readonly posGate = new PositionGate();
   private inputOn = true;
-  private insets = { top: HUD_TOP_INSET, bottom: 0 };
+  private insets = { top: HUD_TOP_INSET, follow: HUD_FOLLOW_INSET, bottom: 0 };
   private cam0: { zoom: number; mw: number; mh: number; fitsW: boolean; fitsH: boolean } | null = null;
   private farm: FarmLayer | null = null;
   private zagroda: ZagrodaLayer | null = null;
@@ -124,6 +129,8 @@ export class World extends Phaser.Scene {
   /** Таблички интерактивных объектов в пикселях мира и ключ последнего положения камеры, с которым они ушли в DOM. */
   private signs: Sign[] = [];
   private signsKey = '';
+  /** Спрайты, сейчас полупрозрачные из-за героя за ними (`fadeCover`). */
+  private faded = new Set<string>();
   private groundLayer: Phaser.Tilemaps.TilemapLayer | null = null;
   private tileset: TilesetMeta | null = null;
   private soilKey = '';
@@ -168,6 +175,7 @@ export class World extends Phaser.Scene {
     this.createAnims();
     this.buildTiles();
     this.propSprites.clear();
+    this.faded = new Set();
     this.buildProps();
     this.signs = signsOf(this.mapDef, T, (sprite) => this.sprites[sprite]?.size[1]);
     this.signsKey = '';
@@ -337,6 +345,7 @@ export class World extends Phaser.Scene {
     if (pos) bus.emit('world:position', pos);
     this.syncHero(time);
     this.syncCat();
+    this.fadeCover();
     this.updateCamera();
     this.drawActionBubble(time);
     this.emitSigns();
@@ -375,7 +384,7 @@ export class World extends Phaser.Scene {
     const mw = this.model.parsed.w * T;
     const mh = this.model.parsed.h * T;
     const safe = safeArea();
-    this.insets = { top: HUD_TOP_INSET + safe.top, bottom: Math.max(dpadVisible ? DPAD_INSET + safe.bottom : 0, this.panelBottom) };
+    this.insets = { top: HUD_TOP_INSET + safe.top, follow: HUD_FOLLOW_INSET + safe.top, bottom: Math.max(dpadVisible ? DPAD_INSET + safe.bottom : 0, this.panelBottom) };
     // Масштаб не прыгает от панели мини-игры: для укрупнения комнаты считаем только HUD и d-pad.
     const zoom = pickZoom(width, height, mw, mh, height - HUD_TOP_INSET - safe.top - (dpadVisible ? DPAD_INSET + safe.bottom : 0));
     cam.setZoom(zoom);
@@ -400,7 +409,10 @@ export class World extends Phaser.Scene {
     const [px, py] = LocationModel.pos(this.model.player);
     const shift = (bz - tz) / 2;
     const cx = c0.fitsW ? c0.mw / 2 : Math.min(Math.max(Math.round((px + 0.5) * T), W / 2), c0.mw - W / 2);
-    const cy = c0.fitsH ? c0.mh / 2 + shift : Math.min(Math.max(Math.round(py * T + T / 2) + shift, H / 2 - tz), c0.mh - H / 2 + bz);
+    // Карта выше экрана: у верхнего края камера уходит дальше (под всю колонку HUD), у нижнего — под d-pad.
+    const fz = this.insets.follow / z;
+    const fshift = (bz - fz) / 2;
+    const cy = c0.fitsH ? c0.mh / 2 + shift : Math.min(Math.max(Math.round(py * T + T / 2) + fshift, H / 2 - fz), c0.mh - H / 2 + bz);
     this.cameras.main.centerOn(Math.round(cx * z) / z, Math.round(cy * z) / z);
   }
 
@@ -586,15 +598,24 @@ export class World extends Phaser.Scene {
   private buildActors(): void {
     const p = this.model.player;
     this.heroShadow = this.placeShadow(0, 0, 12, 9);
-    this.hero = this.add.sprite(0, 0, ATLAS, 'hero/0').setOrigin(0.5, 1);
+    this.hero = this.add.sprite(0, 0, ATLAS, 'hero/0');
+    this.footOrigin(this.hero, 'hero');
     this.syncHero(0);
     void p;
     const c = this.model.cat;
     if (c) {
       this.catShadow = this.placeShadow(0, 0, 10, 9);
-      this.catSprite = this.add.sprite(0, 0, ATLAS, 'cat/0').setOrigin(0.5, 1);
+      this.catSprite = this.add.sprite(0, 0, ATLAS, 'cat/0').setScale(CAT_SCALE);
+      this.footOrigin(this.catSprite, 'cat');
       this.syncCat();
     }
+  }
+
+  /** Origin по якорю листа (ноги): у кадров героя и кота 48×48 ниже ног остаётся место брызгам лейки. */
+  private footOrigin(s: Phaser.GameObjects.Sprite, id: string): void {
+    const m = this.sprites[id];
+    if (m) s.setOrigin(m.anchor[0] / m.size[0], (m.anchor[1] + 1) / m.size[1]);
+    else s.setOrigin(0.5, 1);
   }
 
   // ───────────── ввод и события ─────────────
@@ -666,6 +687,23 @@ export class World extends Phaser.Scene {
     this.hero.setDepth(this.hero.depth + 0.5);
     const key = this.farm?.heroAnim(a.facing, !!a.step, (k) => this.anims.exists(k)) ?? `hero:${a.step ? 'walk' : 'idle'}_${a.facing}`;
     if (this.hero.anims.currentAnim?.key !== key) this.hero.play(key);
+  }
+
+  /** Кроны и крыши, которые закрывают героя, полупрозрачны (t30: у края карты герой пропадал под деревьями). */
+  private fadeCover(): void {
+    const h = this.hero;
+    if (!h) return;
+    const hb = h.getBounds();
+    const cands: CoverCandidate[] = [];
+    for (const [key, s] of this.propSprites) {
+      if (!s.visible || s.depth < 10) continue;
+      const b = s.getBounds();
+      cands.push({ key, depth: s.depth, x0: b.x, y0: b.y, x1: b.right, y1: b.bottom });
+    }
+    const now = coveringKeys(cands, { depth: h.depth, x0: hb.x + 3, y0: hb.y + 4, x1: hb.right - 3, y1: hb.bottom });
+    for (const key of this.faded) if (!now.has(key)) this.propSprites.get(key)?.setAlpha(1);
+    for (const key of now) this.propSprites.get(key)?.setAlpha(COVER_ALPHA);
+    this.faded = now;
   }
 
   private syncCat(): void {
