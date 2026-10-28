@@ -3,14 +3,14 @@
 import type { ItemInfo } from '../types/farm';
 import { el } from './dom';
 
-export const ATLAS_SIZE = { w: 256, h: 1488 } as const;
+export const ATLAS_SIZE = { w: 256, h: 3200 } as const;
 export type IconKey = 'icon_seed' | 'icon_sprout' | 'icon_bush' | 'icon_ripe' | 'icon_overripe';
 export const ICON_FRAMES: Record<IconKey, readonly [number, number]> = {
-  icon_seed: [235, 273],
-  icon_sprout: [1, 291],
-  icon_bush: [181, 273],
-  icon_ripe: [217, 273],
-  icon_overripe: [199, 273],
+  icon_seed: [199, 1851],
+  icon_sprout: [217, 1851],
+  icon_bush: [145, 1851],
+  icon_ripe: [181, 1851],
+  icon_overripe: [163, 1851],
 };
 
 export const STAGE_ICON_CSS = `

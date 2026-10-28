@@ -27,8 +27,10 @@ import art_tiles  # noqa: E402
 import art_world2  # noqa: E402
 import art_plants  # noqa: E402
 import art_beaver  # noqa: E402
+import art_png  # noqa: E402
 
-MODULES = [art_hero, art_cat, art_props, art_tiles, art_crops, art_world2, art_plants, art_beaver]
+# art_png последним: готовые картинки (art/png) заменяют листы героя, кота и предметов дома.
+MODULES = [art_hero, art_cat, art_props, art_tiles, art_crops, art_world2, art_plants, art_beaver, art_png]
 
 
 def preview(path: Path, scale: int = 6) -> None:
@@ -83,7 +85,8 @@ def main() -> int:
             p.unlink()
         for sid, sh in SHEETS.items():
             (OUT / f'{sid}.sprite.json').write_text(json.dumps(sh.to_json(), ensure_ascii=False) + '\n', 'utf8')
-        print(f'gen_sprites: {len(SHEETS)} спрайтов в art/sprites')
+        st = art_png.stats()
+        print(f'gen_sprites: {len(SHEETS)} спрайтов в art/sprites; art/png: {st["moved"]} из {st["px"]} пикселей приведены к палитре')
     return 0
 
 

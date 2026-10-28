@@ -80,6 +80,8 @@ let pendingReturn: BusEvents['world:return'] | null = null;
 
 /** Радиус попадания по стрелке указателя, CSS px (палец шире треугольника 30×15). */
 const ARROW_HIT = 30;
+/** Кот в мире примерно на четверть меньше героя (ТЗ-визуал: кадры обоих 32×32 в клетке 48×48). */
+const CAT_SCALE = 0.75;
 
 /** Цель указателя первых шагов (`guide:goal` из ui/hintsGuide.ts): переживает перезапуск сцены при смене карты. */
 let guideGoal: string | null = null;
@@ -596,15 +598,24 @@ export class World extends Phaser.Scene {
   private buildActors(): void {
     const p = this.model.player;
     this.heroShadow = this.placeShadow(0, 0, 12, 9);
-    this.hero = this.add.sprite(0, 0, ATLAS, 'hero/0').setOrigin(0.5, 1);
+    this.hero = this.add.sprite(0, 0, ATLAS, 'hero/0');
+    this.footOrigin(this.hero, 'hero');
     this.syncHero(0);
     void p;
     const c = this.model.cat;
     if (c) {
       this.catShadow = this.placeShadow(0, 0, 10, 9);
-      this.catSprite = this.add.sprite(0, 0, ATLAS, 'cat/0').setOrigin(0.5, 1);
+      this.catSprite = this.add.sprite(0, 0, ATLAS, 'cat/0').setScale(CAT_SCALE);
+      this.footOrigin(this.catSprite, 'cat');
       this.syncCat();
     }
+  }
+
+  /** Origin по якорю листа (ноги): у кадров героя и кота 48×48 ниже ног остаётся место брызгам лейки. */
+  private footOrigin(s: Phaser.GameObjects.Sprite, id: string): void {
+    const m = this.sprites[id];
+    if (m) s.setOrigin(m.anchor[0] / m.size[0], (m.anchor[1] + 1) / m.size[1]);
+    else s.setOrigin(0.5, 1);
   }
 
   // ───────────── ввод и события ─────────────
