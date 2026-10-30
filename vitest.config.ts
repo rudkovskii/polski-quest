@@ -9,5 +9,10 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.ts'],
     environment: 'node',
+    // Тяжёлые симуляции (бобёр, все игры v2) под нагрузкой полного прогона шли до 5 с и падали по таймауту.
+    testTimeout: 20_000,
+    // Не больше 4 потоков (30.10, Шэф: «комп начинает тормозить»): по умолчанию vitest занимает почти все 12 ядер.
+    // Тихий режим (`npm run test:quiet`, `check:quiet`): 2 потока в фоне на экономичных ядрах (`taskpolicy -b`), браузер и Zoom не тормозят.
+    maxWorkers: Number(process.env.PQ_WORKERS) || 4,
   },
 });

@@ -14,11 +14,13 @@
     "check:layers": "tsx tools/check_layers.ts",
     "check:banned": "tsx tools/check_banned.ts",
     "test": "vitest run",
+    "test:quiet": "PQ_WORKERS=2 taskpolicy -b vitest run",
     "sprites": "python3 tools/sprites_build.py",
     "sprites:check": "python3 tools/sprites_build.py --check",
     "audio": "python3 tools/build_audio.py",
     "audio:check": "python3 tools/build_audio.py --check",
     "check": "npm run typecheck && npm run audio:check && npm run check:layers && npm run check:banned && npm run test && npm run sprites:check && npm run build",
+    "check:quiet": "PQ_WORKERS=2 taskpolicy -b npm run check",
     "art": "python3 tools/gen_sprites.py",
     "icons": "python3 tools/gen_icons.py",
     "sobes": "tsx tools/sobes_import.ts"
