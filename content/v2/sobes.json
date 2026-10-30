@@ -1,0 +1,538 @@
+{
+ "version": 1,
+ "src": "ПМЖ/Собес: drill/progress.md (STATUSY) + Miso-baza-voprosov.md (Kawałki, Ru, Sedno)",
+ "units": [
+  {
+   "id": "ans.4",
+   "kind": "answer",
+   "type": "core",
+   "n": 4,
+   "pl": "Jak nazywa się hymn Polski i kto napisał słowa?",
+   "ru": "Как называется гимн и кто написал слова?",
+   "tr": "",
+   "band": 1,
+   "answer": "Hymn Polski to Mazurek Dąbrowskiego. Słowa napisał Józef Wybicki w 1797 roku.",
+   "chunks": [
+    "Hymn Polski to Mazurek Dąbrowskiego.",
+    "Słowa napisał Józef Wybicki",
+    "w 1797 roku."
+   ],
+   "sedno": [
+    "Mazurek Dąbrowskiego",
+    "слова — Józef Wybicki",
+    "1797 год"
+   ],
+   "status": "учу",
+   "last": "30.10.2026"
+  },
+  {
+   "id": "ans.17",
+   "kind": "answer",
+   "type": "core",
+   "n": 17,
+   "pl": "Jakie święto obchodzi się 1 listopada?",
+   "ru": "Какой праздник 1 ноября?",
+   "tr": "",
+   "band": 1,
+   "answer": "1 listopada obchodzi się Wszystkich Świętych. Ludzie chodzą na cmentarz i palą świeczki.",
+   "chunks": [
+    "1 listopada obchodzi się",
+    "Wszystkich Świętych.",
+    "Ludzie chodzą na cmentarz",
+    "i palą świeczki."
+   ],
+   "sedno": [
+    "Wszystkich Świętych",
+    "идут на кладбище",
+    "зажигают свечи"
+   ],
+   "status": "учу",
+   "last": "30.10.2026"
+  },
+  {
+   "id": "ans.77",
+   "kind": "answer",
+   "type": "core",
+   "n": 77,
+   "pl": "Jaka jest stolica Polski i jakie inne duże miasta znasz?",
+   "ru": "Какая столица и какие ещё крупные города ты знаешь?",
+   "tr": "",
+   "band": 1,
+   "answer": "Stolicą Polski jest Warszawa. Inne duże miasta to Kraków, Łódź, Wrocław, Poznań i Gdańsk.",
+   "chunks": [
+    "Stolicą Polski jest Warszawa.",
+    "Inne duże miasta to",
+    "Kraków, Łódź, Wrocław,",
+    "Poznań i Gdańsk."
+   ],
+   "sedno": [
+    "Warszawa",
+    "Kraków, Łódź, Wrocław, Poznań, Gdańsk"
+   ],
+   "status": "учу",
+   "last": "30.10.2026"
+  },
+  {
+   "id": "ans.87",
+   "kind": "answer",
+   "type": "core",
+   "n": 87,
+   "pl": "Ile województw jest w Polsce?",
+   "ru": "Сколько в Польше воеводств?",
+   "tr": "",
+   "band": 1,
+   "answer": "W Polsce jest szesnaście województw. Podział istnieje od 1999 roku.",
+   "chunks": [
+    "W Polsce jest",
+    "szesnaście województw.",
+    "Podział istnieje",
+    "od 1999 roku."
+   ],
+   "sedno": [
+    "16",
+    "такое деление с 1999 года"
+   ],
+   "status": "учу",
+   "last": "30.10.2026"
+  },
+  {
+   "id": "ans.119",
+   "kind": "answer",
+   "type": "core",
+   "n": 119,
+   "pl": "Kto jest teraz prezydentem Polski?",
+   "ru": "Кто сейчас президент Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Prezydentem Polski jest Karol Nawrocki. Objął urząd w 2025 roku, po Andrzeju Dudzie.",
+   "chunks": [
+    "Prezydentem Polski jest Karol Nawrocki.",
+    "Objął urząd w 2025 roku,",
+    "po Andrzeju Dudzie."
+   ],
+   "sedno": [
+    "Karol Nawrocki",
+    "с 2025 года",
+    "после Andrzej Duda"
+   ],
+   "status": "учу",
+   "last": "30.10.2026"
+  },
+  {
+   "id": "ans.121",
+   "kind": "answer",
+   "type": "core",
+   "n": 121,
+   "pl": "Kto jest teraz premierem Polski?",
+   "ru": "Кто сейчас премьер Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Premierem Polski jest Donald Tusk, od grudnia 2023 roku.",
+   "chunks": [
+    "Premierem Polski jest Donald Tusk,",
+    "od grudnia 2023 roku."
+   ],
+   "sedno": [
+    "Donald Tusk",
+    "с декабря 2023 года"
+   ],
+   "status": "учу",
+   "last": "30.10.2026"
+  },
+  {
+   "id": "ans.191",
+   "kind": "answer",
+   "type": "core",
+   "n": 191,
+   "pl": "Jakie były stolice Polski?",
+   "ru": "Какие были столицы Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Najpierw stolicą było Gniezno, potem Kraków, a teraz Warszawa.",
+   "chunks": [
+    "Najpierw stolicą było Gniezno,",
+    "potem Kraków,",
+    "a teraz Warszawa."
+   ],
+   "sedno": [
+    "Gniezno → Kraków → Warszawa"
+   ],
+   "status": "учу",
+   "last": "30.10.2026"
+  },
+  {
+   "id": "ans.193",
+   "kind": "answer",
+   "type": "core",
+   "n": 193,
+   "pl": "Co jest symbolem Warszawy?",
+   "ru": "Что символ Варшавы?",
+   "tr": "",
+   "band": 1,
+   "answer": "Symbolem Warszawy jest Syrenka z mieczem i tarczą.",
+   "chunks": [
+    "Symbolem Warszawy jest Syrenka",
+    "z mieczem i tarczą."
+   ],
+   "sedno": [
+    "Syrenka",
+    "с мечом и щитом"
+   ],
+   "status": "учу",
+   "last": "30.10.2026"
+  },
+  {
+   "id": "ans.1",
+   "kind": "answer",
+   "type": "core",
+   "n": 1,
+   "pl": "Jak wygląda godło Polski?",
+   "ru": "Как выглядит герб Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Godło Polski to biały orzeł w złotej koronie na czerwonym tle.",
+   "chunks": [
+    "Godło Polski to",
+    "biały orzeł",
+    "w złotej koronie",
+    "na czerwonym tle."
+   ],
+   "sedno": [
+    "белый орёл",
+    "золотая корона",
+    "красный фон"
+   ],
+   "status": "учу",
+   "last": "26.10.2026"
+  },
+  {
+   "id": "ans.2",
+   "kind": "answer",
+   "type": "core",
+   "n": 2,
+   "pl": "Jakie kolory ma flaga Polski?",
+   "ru": "Какие цвета у флага Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Flaga Polski ma dwa kolory: biały na górze i czerwony na dole.",
+   "chunks": [
+    "Flaga Polski ma dwa kolory:",
+    "biały na górze",
+    "i czerwony na dole."
+   ],
+   "sedno": [
+    "два цвета",
+    "белый сверху",
+    "красный снизу"
+   ],
+   "status": "учу",
+   "last": "26.10.2026"
+  },
+  {
+   "id": "ans.189",
+   "kind": "answer",
+   "type": "core",
+   "n": 189,
+   "pl": "Jaka jest pełna nazwa Polski?",
+   "ru": "Какое полное название Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Pełna nazwa Polski to Rzeczpospolita Polska.",
+   "chunks": [
+    "Pełna nazwa Polski to",
+    "Rzeczpospolita Polska."
+   ],
+   "sedno": [
+    "Rzeczpospolita Polska"
+   ],
+   "status": "учу",
+   "last": "26.10.2026"
+  },
+  {
+   "id": "ans.190",
+   "kind": "answer",
+   "type": "core",
+   "n": 190,
+   "pl": "Jakie są symbole narodowe Polski?",
+   "ru": "Какие национальные символы Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Symbole narodowe Polski to godło, flaga i hymn.",
+   "chunks": [
+    "Symbole narodowe Polski to",
+    "godło, flaga i hymn."
+   ],
+   "sedno": [
+    "герб",
+    "флаг",
+    "гимн"
+   ],
+   "status": "учу",
+   "last": "26.10.2026"
+  },
+  {
+   "id": "ans.194",
+   "kind": "answer",
+   "type": "core",
+   "n": 194,
+   "pl": "Co śpiewa się w Polsce na urodziny?",
+   "ru": "Что поют в Польше на день рождения?",
+   "tr": "",
+   "band": 1,
+   "answer": "Na urodziny śpiewa się „Sto lat”.",
+   "chunks": [
+    "Na urodziny",
+    "śpiewa się „Sto lat”."
+   ],
+   "sedno": [
+    "«Sto lat»"
+   ],
+   "status": "учу",
+   "last": "26.10.2026"
+  },
+  {
+   "id": "ans.62",
+   "kind": "answer",
+   "type": "core",
+   "n": 62,
+   "pl": "Co to było powstanie warszawskie 1944 roku?",
+   "ru": "Что такое Варшавское восстание 1944 года?",
+   "tr": "",
+   "band": 1,
+   "answer": "Powstanie warszawskie to był zryw przeciwko Niemcom. Wybuchło 1 sierpnia 1944 roku i trwało 63 dni. Niestety zakończyło się klęską — miasto zostało zniszczone. Byłem w Muzeum Powstania Warszawskiego i zrobiło to na mnie ogromne wrażenie.",
+   "chunks": [
+    "Powstanie warszawskie to był zryw",
+    "przeciwko Niemcom.",
+    "Wybuchło 1 sierpnia 1944 roku",
+    "i trwało 63 dni.",
+    "Niestety zakończyło się klęską —",
+    "miasto zostało zniszczone.",
+    "Byłem w Muzeum Powstania Warszawskiego",
+    "i zrobiło to na mnie ogromne wrażenie."
+   ],
+   "sedno": [
+    "против немцев",
+    "1 августа 1944",
+    "63 дня",
+    "поражение, город разрушен",
+    "был в музее — сильное впечатление"
+   ],
+   "short": "Powstanie warszawskie wybuchło 1 sierpnia 1944 roku przeciwko Niemcom i zakończyło się klęską.",
+   "status": "учу",
+   "last": "13.10.2026"
+  },
+  {
+   "id": "ans.76",
+   "kind": "answer",
+   "type": "core",
+   "n": 76,
+   "pl": "Czy Polska ma dostęp do morza? Do jakiego?",
+   "ru": "Есть ли у Польши выход к морю? К какому?",
+   "tr": "",
+   "band": 1,
+   "answer": "Tak, Polska ma dostęp do Morza Bałtyckiego na północy kraju.",
+   "chunks": [
+    "Tak, Polska ma dostęp",
+    "do Morza Bałtyckiego",
+    "na północy kraju."
+   ],
+   "sedno": [
+    "да",
+    "Балтийское море",
+    "на севере"
+   ],
+   "status": "учу",
+   "last": "10.08.2026"
+  },
+  {
+   "id": "ans.108",
+   "kind": "answer",
+   "type": "core",
+   "n": 108,
+   "pl": "Kim jest Lech Wałęsa?",
+   "ru": "Кто такой Lech Wałęsa?",
+   "tr": "",
+   "band": 1,
+   "answer": "Lech Wałęsa był przywódcą Solidarności i pierwszym prezydentem wybranym w wolnych wyborach. Dostał Pokojową Nagrodę Nobla.",
+   "chunks": [
+    "Lech Wałęsa był przywódcą Solidarności",
+    "i pierwszym prezydentem",
+    "wybranym w wolnych wyborach.",
+    "Dostał Pokojową Nagrodę Nobla."
+   ],
+   "sedno": [
+    "лидер Solidarności",
+    "первый президент, избранный на свободных выборах",
+    "Нобелевская премия мира"
+   ],
+   "status": "учу",
+   "last": "07.08.2026"
+  },
+  {
+   "id": "ans.26",
+   "kind": "answer",
+   "type": "core",
+   "n": 26,
+   "pl": "Kto był pierwszym królem Polski?",
+   "ru": "Кто был первым королём Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Pierwszym królem Polski był Bolesław Chrobry, koronowany w 1025 roku.",
+   "chunks": [
+    "Pierwszym królem Polski",
+    "był Bolesław Chrobry,",
+    "koronowany w 1025 roku."
+   ],
+   "sedno": [
+    "Bolesław Chrobry",
+    "коронован в 1025 году"
+   ],
+   "status": "учу",
+   "last": "06.08.2026"
+  },
+  {
+   "id": "ans.90",
+   "kind": "answer",
+   "type": "core",
+   "n": 90,
+   "pl": "Co to jest Wigilia i kiedy się ją obchodzi?",
+   "ru": "Что такое Wigilia и когда её отмечают?",
+   "tr": "",
+   "band": 1,
+   "answer": "Wigilia to uroczysta kolacja 24 grudnia. Rodzina czeka na pierwszą gwiazdkę, żeby zacząć kolację.",
+   "chunks": [
+    "Wigilia to uroczysta kolacja",
+    "24 grudnia.",
+    "Rodzina czeka na pierwszą gwiazdkę,",
+    "żeby zacząć kolację."
+   ],
+   "sedno": [
+    "торжественный ужин",
+    "24 декабря",
+    "ждут первую звезду"
+   ],
+   "status": "учу",
+   "last": "02.08.2026"
+  },
+  {
+   "id": "ans.12",
+   "kind": "answer",
+   "type": "core",
+   "n": 12,
+   "pl": "Jakich znasz znanych polskich kompozytorów?",
+   "ru": "Каких польских композиторов ты знаешь?",
+   "tr": "",
+   "band": 1,
+   "answer": "Najbardziej znany polski kompozytor to Fryderyk Chopin.",
+   "chunks": [
+    "Najbardziej znany polski kompozytor",
+    "to Fryderyk Chopin."
+   ],
+   "sedno": [
+    "самый известный",
+    "Fryderyk Chopin"
+   ],
+   "status": "тетрадка",
+   "last": "20.07.2026"
+  },
+  {
+   "id": "ans.104",
+   "kind": "answer",
+   "type": "core",
+   "n": 104,
+   "pl": "Kim był Fryderyk Chopin?",
+   "ru": "Кем был Fryderyk Chopin?",
+   "tr": "",
+   "band": 1,
+   "answer": "Fryderyk Chopin był polskim kompozytorem i pianistą. Komponował muzykę na fortepian, np. mazurki i polonezy.",
+   "chunks": [
+    "Fryderyk Chopin był",
+    "polskim kompozytorem i pianistą.",
+    "Komponował muzykę na fortepian,",
+    "np. mazurki i polonezy."
+   ],
+   "sedno": [
+    "композитор и пианист",
+    "музыка для фортепиано",
+    "мазурки, полонезы"
+   ],
+   "status": "тетрадка",
+   "last": "20.07.2026"
+  },
+  {
+   "id": "ans.107",
+   "kind": "answer",
+   "type": "core",
+   "n": 107,
+   "pl": "Kim był Jan Paweł II?",
+   "ru": "Кем был Jan Paweł II?",
+   "tr": "",
+   "band": 1,
+   "answer": "Jan Paweł II, czyli Karol Wojtyła, był polskim papieżem od 1978 do 2005 roku.",
+   "chunks": [
+    "Jan Paweł II,",
+    "czyli Karol Wojtyła,",
+    "był polskim papieżem",
+    "od 1978 do 2005 roku."
+   ],
+   "sedno": [
+    "Karol Wojtyła",
+    "польский папа",
+    "1978–2005"
+   ],
+   "status": "учу",
+   "last": "09.07.2026"
+  },
+  {
+   "id": "ans.92",
+   "kind": "answer",
+   "type": "core",
+   "n": 92,
+   "pl": "Co to jest opłatek i co się z nim robi?",
+   "ru": "Что такое opłatek и что с ним делают?",
+   "tr": "",
+   "band": 1,
+   "answer": "Opłatek to cienki biały chlebek. Przed kolacją wigilijną ludzie dzielą się nim i składają życzenia.",
+   "chunks": [
+    "Opłatek to cienki biały chlebek.",
+    "Przed kolacją wigilijną",
+    "ludzie dzielą się nim",
+    "i składają życzenia."
+   ],
+   "sedno": [
+    "тонкий белый хлебец",
+    "перед ужином делятся",
+    "желают друг другу"
+   ],
+   "status": "тетрадка",
+   "last": "05.07.2026"
+  },
+  {
+   "id": "ans.94",
+   "kind": "answer",
+   "type": "core",
+   "n": 94,
+   "pl": "Jakie tradycyjne potrawy je się na Wigilii?",
+   "ru": "Что едят на Wigilię?",
+   "tr": "",
+   "band": 1,
+   "answer": "Na Wigilię je się barszcz z uszkami, karpia, pierogi i kutię. Potrawy są postne, bez mięsa.",
+   "chunks": [
+    "Na Wigilię je się",
+    "barszcz z uszkami, karpia,",
+    "pierogi i kutię.",
+    "Potrawy są postne,",
+    "bez mięsa."
+   ],
+   "sedno": [
+    "barszcz z uszkami",
+    "карп",
+    "pierogi",
+    "kutia",
+    "постное, без мяса"
+   ],
+   "status": "учу",
+   "last": "05.07.2026"
+  }
+ ]
+}

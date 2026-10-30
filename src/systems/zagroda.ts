@@ -91,6 +91,9 @@ export function plotOf(u: PolskaUnit, holidayIndex = 0): PlotRef {
       const m = typeof u.raw.month === 'number' && u.raw.month >= 1 && u.raw.month <= 12 ? u.raw.month : 1;
       return { plot: 'miesiace', obj: `bed_${m}`, group: `month:${m}` };
     }
+    // Ответы собеса растут в пасеке рядом с символами (своего участка нет; личная версия).
+    case 'answer':
+      return { plot: 'pasieka', obj: 'hive_ref', group: 'sobes' };
     case 'holiday': {
       const season = typeof u.raw.season === 'string' ? u.raw.season : 'rok';
       return { plot: 'klumba', obj: `klumba_${holidayIndex % KLUMBA_SIZE}`, group: `season:${season}` };

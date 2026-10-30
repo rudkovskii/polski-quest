@@ -267,14 +267,14 @@ describe('Zagroda: участки и точки входа', () => {
 });
 
 describe('реестр игр и маршрутизация', () => {
-  it('6 игр (26.10: гимн и символы раздельно, месяцы — своя игра): 4 точки входа, у мачты и календаря по две игры', () => {
-    expect(GAMES.map((g) => g.id).sort()).toEqual(['daty', 'geo', 'hymn', 'miesiace', 'swieta', 'symbole']);
+  it('7 игр (26.10: гимн и символы раздельно, месяцы — своя игра; 30.10: собес): 4 точки входа, у мачты три игры, у календаря две', () => {
+    expect(GAMES.map((g) => g.id).sort()).toEqual(['daty', 'geo', 'hymn', 'miesiace', 'sobes', 'swieta', 'symbole']);
     expect(new Set(GAMES.map((g) => g.entry)).size).toBe(4);
     expect(new Set(GAMES.map((g) => g.plot)).size).toBe(4);
     for (const g of GAMES) expect([...g.kinds]).toEqual([...GAME_KINDS[g.id]]);
     const ids = (use: 'map' | 'mast' | 'calendar' | 'seasonBoard') => GAMES_BY_ENTRY.get(use)?.map((g) => g.id);
     expect(ids('map')).toEqual(['geo']);
-    expect(ids('mast')).toEqual(['hymn', 'symbole']);
+    expect(ids('mast')).toEqual(['hymn', 'symbole', 'sobes']);
     expect(ids('calendar')).toEqual(['daty', 'miesiace']);
     expect(ids('seasonBoard')).toEqual(['swieta']);
     // Каждая единица — ровно в одной игре; месяцев 12.

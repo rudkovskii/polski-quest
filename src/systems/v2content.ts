@@ -4,13 +4,14 @@
 import datyJson from '../../content/v2/daty.json';
 import geoJson from '../../content/v2/geografia.json';
 import hymnJson from '../../content/v2/hymn.json';
+import sobesJson from '../../content/v2/sobes.json';
 import swietaJson from '../../content/v2/swieta.json';
 import wordsSwietaJson from '../../content/v2/words_swieta.json';
 import type { Topic, Word } from '../types/content';
 import type { PolskaGameId, PolskaKind, PolskaUnit } from '../types/polska';
 import { kindOf } from './garden';
 
-export const POLSKA_KIND_LIST: readonly PolskaKind[] = ['geo', 'hymn', 'symbol', 'date', 'holiday', 'month'];
+export const POLSKA_KIND_LIST: readonly PolskaKind[] = ['geo', 'hymn', 'symbol', 'date', 'holiday', 'month', 'answer'];
 
 /** Игра → виды её единиц и файл данных. */
 export const GAME_KINDS: Readonly<Record<PolskaGameId, readonly PolskaKind[]>> = {
@@ -22,12 +23,14 @@ export const GAME_KINDS: Readonly<Record<PolskaGameId, readonly PolskaKind[]>> =
   // Месяцы (26.10): 12 единиц `month.<n>` из справочника `daty.json:months`, растут на грядках месяцев.
   miesiace: ['month'],
   swieta: ['holiday'],
+  // Ответы собеса (30.10, личная версия Шэфа): `sobes.json` пишет `npm run sobes` из `ПМЖ/Собес` (что сейчас учится в дриле).
+  sobes: ['answer'],
 };
-export const GAME_IDS: readonly PolskaGameId[] = ['geo', 'daty', 'miesiace', 'swieta', 'hymn', 'symbole'];
-const KIND_GAME: Record<PolskaKind, PolskaGameId> = { geo: 'geo', hymn: 'hymn', symbol: 'symbole', date: 'daty', month: 'miesiace', holiday: 'swieta' };
+export const GAME_IDS: readonly PolskaGameId[] = ['geo', 'daty', 'miesiace', 'swieta', 'hymn', 'symbole', 'sobes'];
+const KIND_GAME: Record<PolskaKind, PolskaGameId> = { geo: 'geo', hymn: 'hymn', symbol: 'symbole', date: 'daty', month: 'miesiace', holiday: 'swieta', answer: 'sobes' };
 export const gameOfKind = (k: PolskaKind): PolskaGameId => KIND_GAME[k];
 
-export type V2Docs = { geo: unknown; hymn: unknown; daty: unknown; swieta: unknown; words: unknown };
+export type V2Docs = { geo: unknown; hymn: unknown; daty: unknown; swieta: unknown; words: unknown; sobes?: unknown };
 
 /** Тема словаря «Święta i zwyczaje» (вне A1: в путь к A1 не идёт). */
 export const SWIETA_TOPIC: Topic = { id: 'swieta', pl: 'Święta i zwyczaje', ru: 'Праздники и обычаи' };
@@ -138,10 +141,11 @@ export function parseV2(docs: V2Docs): V2Content {
     daty: unitsOf(docs.daty, 'daty', errors),
     miesiace: monthsOf(docs.daty, errors),
     swieta: unitsOf(docs.swieta, 'swieta', errors),
+    sobes: unitsOf(docs.sobes ?? {}, 'sobes', errors),
   };
   for (const [g, list] of Object.entries(per) as [PolskaGameId, PolskaUnit[]][])
     for (const u of list) if (!GAME_KINDS[g].includes(u.kind)) errors.push(`${g}: ${u.id} — kind "${u.kind}" не из этой игры`);
-  const units = [...per.geo, ...per.hymn, ...per.symbole, ...per.daty, ...per.miesiace, ...per.swieta];
+  const units = [...per.geo, ...per.hymn, ...per.symbole, ...per.daty, ...per.miesiace, ...per.swieta, ...per.sobes];
   const byId = new Map<string, PolskaUnit>();
   for (const u of units) {
     if (byId.has(u.id)) errors.push(`повтор id ${u.id}`);
@@ -156,7 +160,7 @@ export function parseV2(docs: V2Docs): V2Content {
   return {
     units: [...byId.values()],
     byId,
-    docs: { geo: obj(docs.geo), hymn: obj(docs.hymn), symbole: obj(docs.hymn), daty: obj(docs.daty), miesiace: obj(docs.daty), swieta: obj(docs.swieta) },
+    docs: { geo: obj(docs.geo), hymn: obj(docs.hymn), symbole: obj(docs.hymn), daty: obj(docs.daty), miesiace: obj(docs.daty), swieta: obj(docs.swieta), sobes: obj(docs.sobes) },
     drillSeed: drillSeedOf(docs.hymn, per.hymn),
     words,
     topic,
@@ -165,7 +169,7 @@ export function parseV2(docs: V2Docs): V2Content {
 }
 
 /** Контент v2 игры (бандлится в код). */
-export const V2: V2Content = parseV2({ geo: geoJson, hymn: hymnJson, daty: datyJson, swieta: swietaJson, words: wordsSwietaJson });
+export const V2: V2Content = parseV2({ geo: geoJson, hymn: hymnJson, daty: datyJson, swieta: swietaJson, words: wordsSwietaJson, sobes: sobesJson });
 
 /** Единицы игры (по её видам), в порядке данных. */
 export function unitsOfGame(c: V2Content, game: PolskaGameId): PolskaUnit[] {

@@ -5,11 +5,12 @@ import { game as daty } from './daty';
 import { game as geo } from './geo';
 import { game as hymn } from './hymn';
 import { game as miesiace } from './miesiace';
+import { game as sobes } from './sobes';
 import { game as swieta } from './swieta';
 import { game as symbole } from './symbole';
 
 /** Порядок на доске: Mapa → Kalendarz (Daty, Miesiące) → Święta → Maszt (Hymn, Symbole) (ФЕРМА_v2 §6; разделение 26.10). */
-export const GAMES: readonly PolskaGame[] = [geo, daty, miesiace, swieta, hymn, symbole] as unknown as PolskaGame[];
+export const GAMES: readonly PolskaGame[] = [geo, daty, miesiace, swieta, hymn, symbole, sobes] as unknown as PolskaGame[];
 
 export const GAME_BY_ID: ReadonlyMap<PolskaGameId, PolskaGame> = new Map(GAMES.map((g) => [g.id, g]));
 

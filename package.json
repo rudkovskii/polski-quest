@@ -20,7 +20,8 @@
     "audio:check": "python3 tools/build_audio.py --check",
     "check": "npm run typecheck && npm run audio:check && npm run check:layers && npm run check:banned && npm run test && npm run sprites:check && npm run build",
     "art": "python3 tools/gen_sprites.py",
-    "icons": "python3 tools/gen_icons.py"
+    "icons": "python3 tools/gen_icons.py",
+    "sobes": "tsx tools/sobes_import.ts"
   },
   "dependencies": {
     "idb-keyval": "6.3.0",
