@@ -8,7 +8,7 @@ import type { Polska } from '../systems/polska';
 import { growthText } from '../systems/xp';
 import { PLOT_NAME } from '../systems/zagroda';
 import type { BusEvents } from '../types/bus';
-import type { GameCtx, GamePanel, GameTask, PolskaGame, PolskaGameId } from '../types/polska';
+import type { GameCtx, GamePanel, GameQueue, GameTask, PolskaGame, PolskaGameId } from '../types/polska';
 import { el } from './dom';
 import { wordPopGuard } from './wordPick';
 import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
@@ -132,6 +132,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   let scope: { ids: readonly string[]; set: ReadonlySet<string> } | null = null;
   let limit = ROUND_SIZE;
   let hubOn = false;
+  /** Раунд своей очередью игры (`PolskaGame.queue`, связки «Собеседования»): задания отдаёт игра, итог — когда она вернёт null. */
+  let seq: GameQueue | null = null;
   let task: GameTask | null = null;
   let answered = false;
   let summaryOpen = false;
@@ -174,6 +176,10 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
   };
   const paintRound = (): void => {
     roundNo.hidden = !!only || hubOn;
+    if (seq) {
+      roundNo.textContent = summaryOpen ? `${round.count}` : seq.counter();
+      return;
+    }
     const shown = summaryOpen ? round.count : Math.min(limit, round.count + (answered ? 0 : 1));
     roundNo.textContent = `${shown} / ${limit}`;
   };
@@ -238,12 +244,16 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     box.style.removeProperty('height');
     if (!game) return;
     const ctx = ctxOf(game);
-    if (!only) deps.polska.autoPlant(game.id, scope ? scope.ids : game.pool(ctx), scope?.set);
+    if (seq) {
+      task = seq.next();
+      if (!task) return showSummary();
+    }
+    if (!only && !seq) deps.polska.autoPlant(game.id, scope ? scope.ids : game.pool(ctx), scope?.set);
     const skip = new Set<string>();
     // Раунд уровня: единицы других уровней не спрашиваем, кроме перезревших (им один верный ответ — и обратно в коллекцию).
     if (scope && !only) for (const u of ctx.units) if (!scope.set.has(u.id) && deps.polska.info(u.id).stage !== 'overripe') skip.add(u.id);
     const one = only ?? focus;
-    for (let i = 0; i < 6 && !task; i++) {
+    for (let i = 0; i < 6 && !task && !seq; i++) {
       const want = deps.polska.pick(game.id, { recent, ...(one ? { only: one } : {}), exclude: skip });
       if (!want) break;
       task = game.nextTask(ctx, want);
@@ -272,7 +282,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     clearTimers();
     if (!open || !game) return;
     if (only && answered) return api.stop();
-    if (!only && round.count >= limit) return showSummary();
+    if (!only && !seq && round.count >= limit) return showSummary();
     render();
   };
 
@@ -282,6 +292,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     hubOn = true;
     focus = undefined;
     scope = null;
+    seq = null;
     limit = ROUND_SIZE;
     answered = false;
     paper.dataset.quiz = 'done';
@@ -316,6 +327,11 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       if (!id.length) return;
       focus = undefined;
       scope = { ids: [...id], set: new Set(id) };
+    }
+    seq = null;
+    if (typeof id !== 'string' && game.queue) {
+      deps.polska.plant(id);
+      seq = game.queue(ctxOf(game), id);
     }
     hubOn = false;
     limit = Math.max(1, Math.trunc(size));
@@ -353,7 +369,8 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
     paper.replaceChildren(card);
     const hubLabel = game?.hubBack ?? 'К колесу';
     // Раунд уровня: «Ещё раунд» — тот же уровень, отдельная кнопка — к экрану уровней.
-    const more = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, game?.hub && !scope ? hubLabel : 'Ещё раунд');
+    // Своя очередь игры (связка): «Ещё раунд» не предлагаем — новое лучше закрепить, чем добавлять; выбор следующей — на экране выбора.
+    const more = seq ? null : el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-more': '', onclick: () => nextRound() }, game?.hub && !scope ? hubLabel : 'Ещё раунд');
     const toHub = game?.hub && scope ? el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-to-hub': '', onclick: () => summaryOpen && showHub() }, hubLabel) : null;
     // «Wróć»: выйти и мгновенно вернуться к месту, откуда запустил игру (`systems/entryPoint.ts`); в фокусе по умолчанию.
     const end = el('button', { type: 'button', class: 'pq-btn pq-back', 'data-nav': '', 'data-end': '', 'data-back-entry': '', onclick: () => api.stop() }, '↩ Wróć · Назад');
@@ -437,6 +454,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
         grownObjs = [];
         focus = undefined;
         scope = null;
+        seq = null;
         limit = ROUND_SIZE;
         hubOn = false;
       }
@@ -464,6 +482,7 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       grownObjs = [];
       focus = undefined;
       scope = null;
+      seq = null;
       limit = ROUND_SIZE;
       hubOn = false;
       game = null;
@@ -485,6 +504,9 @@ export function mountPolskaGame(parent: HTMLElement, deps: PolskaGameDeps): Pols
       scaleTo = { pos: out.scale.to, sub: out.scale.sub, pl: out.scale.pl };
       round.add({ ok: r.ok, act: out.act });
       if (game.layout === 'full' && out.obj && (out.act.kind === 'grow' || out.act.kind === 'harvest') && !grownObjs.includes(out.obj)) grownObjs.push(out.obj);
+      seq?.answered(task, r.ok, answer);
+      // «Сказал» в связке: ответ только что сверен — без экрана результата, сразу следующее задание.
+      if (r.skipFeedback) return advance();
       paintRound();
       paper.classList.add(r.ok ? 'ok' : 'bad');
       const u = deps.polska.unit(task.id);

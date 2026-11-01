@@ -72,6 +72,19 @@ export interface GameCheck {
   note?: string;
   /** Что озвучить после ответа (польский текст); по умолчанию `unit.pl`. Звук только под выключателем, на проверках `?mute=1`. */
   say?: string;
+  /** Без экрана результата: ответ записан, сразу следующее задание (самооценка «Сказал» — ответ только что сверен). */
+  skipFeedback?: boolean;
+}
+
+/**
+ * Своя очередь заданий раунда (связки «Собеседования», D-88): движок не выбирает единицу через `pick`, а берёт задание у игры, пока та
+ * не вернёт null (тогда итог). Ответы пишутся в огород как обычно (`side`/`self` задания).
+ */
+export interface GameQueue<T extends GameTask = GameTask> {
+  next(): T | null;
+  answered(task: T, ok: boolean, answer: unknown): void;
+  /** Текст счётчика в шапке («4 / 9 · +2»). */
+  counter(): string;
 }
 
 /** Что движок даёт игре на время задания. Игра рисует DOM в `body`, свои кнопки — в `foot`, ответ отдаёт через `submit`. */
@@ -149,6 +162,8 @@ export interface PolskaGame<T extends GameTask = GameTask> {
   hub?(panel: GamePanel, ctx: GameCtx, begin: (id: string | readonly string[], size: number) => void): void;
   /** Подпись кнопки итога «назад к экрану выбора» (по умолчанию «К колесу»). */
   hubBack?: string;
+  /** Раунд `begin(ids, …)` идёт своей очередью игры (`GameQueue`), а не выбором движка; итог без «Ещё раунд». */
+  queue?(ctx: GameCtx, ids: readonly string[]): GameQueue<T>;
 }
 
 /** Вид объекта на участке Zagroda по прогрессу (для сцены). */
