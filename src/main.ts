@@ -61,6 +61,8 @@ import { mountPolskaHud } from './ui/polskaHud';
 import { mountPolskaPlot } from './ui/polskaPlot';
 import { passGate } from './ui/gate';
 import { EDITION, LEVEL } from './systems/edition';
+import { applyFeed, feedLine, parseFeed } from './systems/wordFeed';
+import { WORD_FEED_URL, fetchWordFeed } from './systems/platform/wordFeed';
 import { ONBOARDING_HINT, mountOnboarding, shouldShowOnboarding } from './ui/onboarding';
 
 const params = new URLSearchParams(location.search);
@@ -548,6 +550,42 @@ async function main(): Promise<void> {
     bus.emit('beaver:settled', {});
   };
   setInterval(maybeSettle, 2000);
+
+  // Лента своих слов: при запуске и при возврате на вкладку; только версия Шэфа (ветки ed/* при merge main её не включают).
+  // Во время мини-игры не применяем: слово могло бы исчезнуть из раунда, запись подождёт следующего возврата.
+  let feedAt = 0;
+  const syncFeed = async (): Promise<void> => {
+    const custom = farm.custom;
+    const t = clock.now();
+    if (EDITION.id !== 'main' || !custom || t - feedAt < 60_000) return;
+    feedAt = t;
+    const entries = parseFeed(await fetchWordFeed(WORD_FEED_URL, t));
+    if (game.isOpen || polskaGame.isOpen) {
+      feedAt = 0;
+      return;
+    }
+    const line = feedLine(applyFeed(entries, {
+      started: farm.garden.planted.length > 0,
+      seen: hasHint,
+      mark: addHint,
+      find: (pl) => custom.list().find((w) => w.pl.toLowerCase() === pl.trim().toLowerCase())?.id ?? null,
+      add: (w) => {
+        const r = custom.add(w);
+        return r.ok ? r.id : null;
+      },
+      plant: (ids) => {
+        const r = farm.plant(ids);
+        return r.planted + r.bag;
+      },
+      update: (id, patch) => custom.update(id, patch),
+      remove: (id) => custom.remove(id),
+    }));
+    if (line) hud.toast(line, undefined, 15_000);
+  };
+  void syncFeed();
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') void syncFeed();
+  });
 
   if (dev) (window as unknown as { __pq?: Record<string, unknown> }).__pq = { bus, game: phaser, store, world, settings, input, farm, minigame: game, clock, music, polska, polskaGame, beaver, wordPick };
 }

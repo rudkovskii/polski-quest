@@ -23,7 +23,8 @@
     "check:quiet": "PQ_WORKERS=2 taskpolicy -b npm run check",
     "art": "python3 tools/gen_sprites.py",
     "icons": "python3 tools/gen_icons.py",
-    "sobes": "tsx tools/sobes_import.ts"
+    "sobes": "tsx tools/sobes_import.ts",
+    "words": "python3 tools/words_push.py"
   },
   "dependencies": {
     "idb-keyval": "6.3.0",

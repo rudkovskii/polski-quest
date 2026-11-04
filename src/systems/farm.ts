@@ -233,6 +233,7 @@ export function createFarm(d: FarmDeps): Farm {
       if (customs.some((c) => c.id === id)) return { ok: true, id, existed: true };
       if (customs.length >= CUSTOM_LIMIT) return { ok: false, reason: 'limit' };
       const exPl = cleanLine(input.ex?.pl, MAX_EX);
+      const tr = cleanLine(input.tr, MAX_RU);
       const c: CustomWord = {
         id,
         pl,
@@ -240,6 +241,7 @@ export function createFarm(d: FarmDeps): Farm {
         pos: input.pos ?? (pl.includes(' ') ? 'phrase' : 'noun'),
         ...(input.gender ? { gender: input.gender } : {}),
         ...(exPl ? { ex: { pl: exPl, ru: cleanLine(input.ex?.ru, MAX_EX) } } : {}),
+        ...(tr ? { tr } : {}),
         added: d.now(),
       };
       saveCustoms([...customs, c]);
@@ -253,8 +255,10 @@ export function createFarm(d: FarmDeps): Farm {
       if (!pl || !ru) return false;
       const exPl = patch.ex === undefined ? (c.ex?.pl ?? '') : cleanLine(patch.ex?.pl, MAX_EX);
       const exRu = patch.ex === undefined ? (c.ex?.ru ?? '') : cleanLine(patch.ex?.ru, MAX_EX);
-      const { ex: _drop, ...rest } = c;
-      saveCustoms(customs.map((x) => (x.id === id ? { ...rest, pl, ru, ...(exPl ? { ex: { pl: exPl, ru: exRu } } : {}) } : x)));
+      const { ex: _drop, tr: oldTr, ...rest } = c;
+      // Своя транскрипция относится к прежнему написанию: поменялось польское без новой — снова строится на лету.
+      const tr = patch.tr !== undefined ? cleanLine(patch.tr, MAX_RU) : pl === c.pl ? oldTr : undefined;
+      saveCustoms(customs.map((x) => (x.id === id ? { ...rest, pl, ru, ...(exPl ? { ex: { pl: exPl, ru: exRu } } : {}), ...(tr ? { tr } : {}) } : x)));
       return true;
     },
     remove(id) {

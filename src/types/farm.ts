@@ -76,6 +76,8 @@ export interface PhraseHint {
 
 /** Что можно сохранить как своё слово (карточка «＋ Своё слово»). Пример — необязательный. */
 export interface CustomInput {
+  /** Своя транскрипция; нет — строится на лету. */
+  tr?: string;
   pl: string;
   ru: string;
   pos?: Pos;
@@ -91,7 +93,7 @@ export interface CustomApi {
   /** Сохранить слово (то же польское+русское второй раз не дублируется: existed). Сажает отдельно `FarmApi.plant`. */
   add(input: CustomInput): CustomAdd;
   /** Поправить польское, перевод, пример; id не меняется. false — нет такого своего слова. */
-  update(id: string, patch: Partial<Pick<CustomInput, 'pl' | 'ru' | 'ex'>>): boolean;
+  update(id: string, patch: Partial<Pick<CustomInput, 'pl' | 'ru' | 'ex' | 'tr'>>): boolean;
   /** Удалить слово и его растение (посадка, ответы, грядка). false — нет такого. */
   remove(id: string): boolean;
   /** Слова базы (A1 и тема праздников) с таким русским переводом: «это слово уже есть в базе». */

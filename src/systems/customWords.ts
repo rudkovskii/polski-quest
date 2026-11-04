@@ -27,6 +27,8 @@ export interface CustomWord {
   pos: Pos;
   gender?: Gender;
   ex?: { pl: string; ru: string };
+  /** Своя транскрипция; нет — строится на лету. */
+  tr?: string;
   /** Когда добавлено (мс по часам игры). */
   added: number;
 }
@@ -73,7 +75,7 @@ export function toWord(c: CustomWord, i = 0): Word {
     id: c.id,
     pl: c.pl,
     ru: c.ru,
-    tr: translit(c.pl),
+    tr: c.tr ?? translit(c.pl),
     pos: c.pos,
     ...(c.gender ? { gender: c.gender } : {}),
     forms: {},
@@ -101,6 +103,7 @@ export function normalizeCustom(raw: unknown): CustomWord[] {
     seen.add(id);
     const ex = r.ex && typeof r.ex === 'object' ? (r.ex as Record<string, unknown>) : null;
     const exPl = ex ? cleanLine(ex.pl, MAX_EX) : '';
+    const tr = cleanLine(r.tr, MAX_RU);
     out.push({
       id,
       pl,
@@ -108,6 +111,7 @@ export function normalizeCustom(raw: unknown): CustomWord[] {
       pos: typeof r.pos === 'string' && POS_SET.has(r.pos) ? (r.pos as Pos) : 'noun',
       ...(typeof r.gender === 'string' && GENDERS.has(r.gender) ? { gender: r.gender as Gender } : {}),
       ...(exPl ? { ex: { pl: exPl, ru: cleanLine(ex?.ru, MAX_EX) } } : {}),
+      ...(tr ? { tr } : {}),
       added: typeof r.added === 'number' && Number.isFinite(r.added) ? r.added : 0,
     });
     if (out.length >= CUSTOM_LIMIT) break;
