@@ -23,6 +23,8 @@ export interface Settings {
   sound: boolean;
   /** Громкость эффектов (шаги, урожай, ответы), 0–100 %. По умолчанию SFX_VOLUME_DEFAULT. */
   sfxVolume: number;
+  /** Свет, ветер и частицы в мире. По умолчанию включено; без них мир рисуется ровным светом. */
+  fx: boolean;
   /** Музыка (V11b): вкл/выкл, громкость, трек, повтор. По умолчанию выключена. */
   music: MusicSettings;
 }
@@ -49,7 +51,7 @@ export interface Save {
 }
 
 export function newSave(now: number): Save {
-  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT, music: { ...MUSIC_DEFAULT } }, garden: newGarden(), polska: newPolskaSave(), custom: [], hints: [], beaver: newBeaverSave() };
+  return { v: SAVE_V, created: now, updated: now, position: null, settings: { sound: true, sfxVolume: SFX_VOLUME_DEFAULT, fx: true, music: { ...MUSIC_DEFAULT } }, garden: newGarden(), polska: newPolskaSave(), custom: [], hints: [], beaver: newBeaverSave() };
 }
 
 const DIRS: readonly Dir[] = ['up', 'down', 'left', 'right'];
@@ -73,7 +75,7 @@ export function normalizeSave(raw: unknown): Save | null {
     created: isNum(r.created) ? r.created : 0,
     updated: isNum(r.updated) ? r.updated : 0,
     position,
-    settings: { sound: st.sound !== false, sfxVolume: isNum(st.sfxVolume) ? Math.min(100, Math.max(0, Math.round(st.sfxVolume))) : SFX_VOLUME_DEFAULT, music: normalizeMusic(st.music) },
+    settings: { sound: st.sound !== false, sfxVolume: isNum(st.sfxVolume) ? Math.min(100, Math.max(0, Math.round(st.sfxVolume))) : SFX_VOLUME_DEFAULT, fx: st.fx !== false, music: normalizeMusic(st.music) },
     garden: normalizeGarden(r.garden),
     polska: normalizePolska(r.polska),
     custom: normalizeCustom(r.custom),

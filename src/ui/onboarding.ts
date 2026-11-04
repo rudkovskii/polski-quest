@@ -97,9 +97,9 @@ const css = `
 .pq-ob-icon { font-size: 38px; line-height: 1; text-align: center; }
 .pq-ob-title { margin: 0; font-size: 21px; text-align: center; }
 .pq-ob-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 16px; line-height: 1.35; }
-.pq-ob-list li { padding: 7px 10px; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; }
+.pq-ob-list li { padding: 7px 10px; background: var(--pq-paper); border: var(--pq-line); border-radius: var(--pq-r-l); }
 .pq-ob-dots { display: flex; justify-content: center; gap: 6px; }
-.pq-ob-dots i { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--pq-ink); background: #fffaf0; }
+.pq-ob-dots i { width: 9px; height: 9px; border-radius: 50%; border: var(--pq-line-ink); background: var(--pq-paper); }
 .pq-ob-dots i.on { background: var(--pq-accent); }
 .pq-ob-nav { display: flex; gap: 8px; }
 .pq-ob-nav .pq-btn { flex: 1; }

@@ -27,10 +27,11 @@ import art_tiles  # noqa: E402
 import art_world2  # noqa: E402
 import art_plants  # noqa: E402
 import art_beaver  # noqa: E402
+import art_decor  # noqa: E402
 import art_png  # noqa: E402
 
 # art_png последним: готовые картинки (art/png) заменяют листы героя, кота и предметов дома.
-MODULES = [art_hero, art_cat, art_props, art_tiles, art_crops, art_world2, art_plants, art_beaver, art_png]
+MODULES = [art_hero, art_cat, art_props, art_tiles, art_crops, art_world2, art_plants, art_beaver, art_decor, art_png]
 
 
 def preview(path: Path, scale: int = 6) -> None:

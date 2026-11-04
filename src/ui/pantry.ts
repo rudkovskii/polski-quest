@@ -13,23 +13,23 @@ ${TIP_CSS}
 .pantry-sum { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
 .pantry-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 14px 10px; padding-bottom: 6px; }
 .jar-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; font: inherit; color: var(--pq-ink); background: none; border: 0; border-bottom: 6px solid var(--pq-wood);
-  padding: 4px 2px 6px; cursor: pointer; border-radius: 4px; }
+  padding: 4px 2px 6px; cursor: pointer; border-radius: var(--pq-r-s); }
 .jar { position: relative; width: 58px; height: 78px; }
-.jar .lid { position: absolute; left: 8px; right: 8px; top: 0; height: 11px; background: var(--pq-wood); border: 2px solid var(--pq-ink); border-radius: 3px; z-index: 2; }
-.jar .glass { position: absolute; left: 2px; right: 2px; top: 9px; bottom: 0; border: 3px solid var(--pq-ink); border-radius: 8px 8px 12px 12px; background: rgba(255, 255, 255, .45); overflow: hidden; }
-.jar .fill { position: absolute; left: 0; right: 0; bottom: 0; background: var(--jar); border-top: 2px solid var(--pq-ink); }
-.jar .shine { position: absolute; left: 5px; top: 6px; width: 5px; height: 26px; background: rgba(255, 255, 255, .55); border-radius: 3px; z-index: 1; }
+.jar .lid { position: absolute; left: 8px; right: 8px; top: 0; height: 11px; background: var(--pq-wood); border: var(--pq-line-ink); border-radius: var(--pq-r-s); z-index: 2; }
+.jar .glass { position: absolute; left: 2px; right: 2px; top: 9px; bottom: 0; border: var(--pq-line-bold); border-radius: 8px 8px 12px 12px; background: rgba(255, 255, 255, .45); overflow: hidden; }
+.jar .fill { position: absolute; left: 0; right: 0; bottom: 0; background: var(--jar); border-top: var(--pq-line-ink); }
+.jar .shine { position: absolute; left: 5px; top: 6px; width: 5px; height: 26px; background: rgba(255, 255, 255, .55); border-radius: var(--pq-r-s); z-index: 1; }
 .jar-btn.empty .jar { opacity: .4; }
 .jar-btn .name { font-size: 14px; font-weight: 700; text-align: center; line-height: 1.1; }
 .jar-btn .cnt { font-size: 13px; opacity: .75; }
 .pantry-back { margin-bottom: 10px; }
 .pantry-list { display: flex; flex-direction: column; gap: 5px; }
-.pantry-item { display: flex; align-items: center; gap: 8px; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 6px; padding: 6px 8px; }
+.pantry-item { display: flex; align-items: center; gap: 8px; background: var(--pq-paper); border: var(--pq-line); border-radius: var(--pq-r-m); padding: 6px 8px; }
 .pantry-item .txt { flex: 1 1 auto; min-width: 0; }
 .pantry-item .pq-aico { margin: -2px 0; }
 .pantry-item .pl { font-size: 19px; font-weight: 700; overflow-wrap: anywhere; }
 .pantry-item .ru { font-size: 14px; opacity: .8; overflow-wrap: anywhere; }
-.pantry-item .over { font-size: 12px; color: #a8453a; font-weight: 600; }
+.pantry-item .over { font-size: 12px; color: var(--pq-red); font-weight: 600; }
 .pantry-empty { opacity: .7; padding: 10px 2px; }
 `;
 

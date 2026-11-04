@@ -3,7 +3,7 @@
 import type { ItemInfo } from '../types/farm';
 import { el } from './dom';
 
-export const ATLAS_SIZE = { w: 256, h: 2992 } as const;
+export const ATLAS_SIZE = { w: 256, h: 3072 } as const;
 export type IconKey = 'icon_seed' | 'icon_sprout' | 'icon_bush' | 'icon_ripe' | 'icon_overripe';
 export const ICON_FRAMES: Record<IconKey, readonly [number, number]> = {
   icon_seed: [235, 1801],

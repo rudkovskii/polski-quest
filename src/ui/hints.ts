@@ -17,8 +17,8 @@ export const HINT_MS = 4500;
 const css = `
 ${THEME_CSS}
 .pq-hint { position: fixed; z-index: 36; pointer-events: none; transform: translate(-50%, -100%); max-width: min(220px, calc(100vw - 24px)); padding: 6px 10px;
-  background: var(--pq-cream); color: var(--pq-ink); border: 2px solid var(--pq-ink); border-radius: 8px; box-shadow: 0 2px 0 var(--pq-ink); text-align: center;
-  font: 600 13px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; animation: pq-hint-in .18s ease-out; }
+  background: var(--pq-cream); color: var(--pq-ink); border: var(--pq-line-ink); border-radius: var(--pq-r-l); box-shadow: var(--pq-step-2); text-align: center;
+  font: 600 13px/1.2 var(--pq-font); animation: pq-hint-in .18s ease-out; }
 .pq-hint b { display: block; font-size: 15px; font-weight: 800; }
 .pq-hint[hidden] { display: none; }
 @keyframes pq-hint-in { from { opacity: 0; margin-top: 6px; } to { opacity: 1; margin-top: 0; } }

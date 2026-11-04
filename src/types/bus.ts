@@ -54,6 +54,8 @@ export interface BusEvents {
   /** Герой шагнул в дверь: карта сменится сама (`to` и имя спавна). */
   'world:exit': { from: string; to: string; spawn: string };
   /** Карта загружена: роутер переключает режим ввода. */
+  /** Настройка «Свет и эффекты» сменилась: сцена перестраивается на той же клетке. */
+  'world:fx': Record<string, never>;
   'world:location': { id: string; controls: MapControls };
   /** Герой остановился: склейка пишет позицию в сохранение. */
   'world:position': { location: string; x: number; y: number; facing: Dir };

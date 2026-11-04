@@ -1,6 +1,6 @@
 {
   "tiles": {
-    "grass": { "variants": [ {"sprite":"t_grass","frame":0}, {"sprite":"t_grass","frame":1}, {"sprite":"t_grass","frame":2}, {"sprite":"t_grass","frame":3} ] },
+    "grass": { "bands": 3, "variants": [ {"sprite":"t_grass","frame":0}, {"sprite":"t_grass","frame":1}, {"sprite":"t_grass","frame":2}, {"sprite":"t_grass","frame":3}, {"sprite":"t_grass","frame":4}, {"sprite":"t_grass","frame":5}, {"sprite":"t_grass","frame":6}, {"sprite":"t_grass","frame":7}, {"sprite":"t_grass","frame":8}, {"sprite":"t_grass","frame":9}, {"sprite":"t_grass","frame":10}, {"sprite":"t_grass","frame":11} ] },
     "path": { "sprite": "t_path", "mask": "auto16" },
     "soil": { "sprite": "t_soil", "mask": "auto16" },
     "fence": { "sprite": "t_fence", "mask": "auto16" },

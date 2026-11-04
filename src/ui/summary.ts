@@ -12,16 +12,16 @@ const css = `
 ${TIP_CSS}
 .sum { display: flex; flex-direction: column; gap: 10px; }
 .sum-hero { display: flex; gap: 10px; }
-.sum-big { flex: 1 1 0; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; padding: 10px; text-align: center; }
+.sum-big { flex: 1 1 0; background: var(--pq-paper); border: var(--pq-line); border-radius: var(--pq-r-l); padding: 10px; text-align: center; }
 .sum-big b { display: block; font-size: 34px; line-height: 1.1; }
 .sum-big span { font-size: 14px; opacity: .75; }
 .sum-rows { display: flex; flex-direction: column; gap: 4px; }
 .sum-row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 4px; border-bottom: 1px dashed var(--pq-wood-dark); font-size: 16px; }
 .sum-row b { font-size: 17px; }
-.sum-level { background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; padding: 10px; }
+.sum-level { background: var(--pq-paper); border: var(--pq-line); border-radius: var(--pq-r-l); padding: 10px; }
 .sum-level .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
 .sum-level .lvl { font-size: 26px; font-weight: 700; }
-.sum-bar { height: 16px; background: #e4d4a8; border: 2px solid var(--pq-ink); border-radius: 8px; overflow: hidden; }
+.sum-bar { height: 16px; background: var(--pq-tan); border: var(--pq-line-ink); border-radius: var(--pq-r-l); overflow: hidden; }
 .sum-bar i { display: block; height: 100%; background: var(--pq-leaf); }
 .sum-hint { font-size: 14px; opacity: .8; }
 `;

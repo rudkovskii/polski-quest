@@ -11,20 +11,21 @@ const css = `
 ${THEME_CSS}
 .pq-modal { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; background: rgba(42, 20, 24, .55); padding: 16px; }
 .pq-modal[hidden] { display: none; }
-.pq-card { width: min(360px, 100%); background: var(--pq-cream); color: var(--pq-ink); border: 3px solid var(--pq-ink); border-radius: 12px; box-shadow: 0 5px 0 var(--pq-ink);
-  padding: 16px; display: flex; flex-direction: column; gap: 10px; font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+.pq-card { width: min(360px, 100%); background: var(--pq-cream); color: var(--pq-ink); border: var(--pq-line-bold); border-radius: var(--pq-r-l); box-shadow: var(--pq-card-edge);
+  padding: 16px; display: flex; flex-direction: column; gap: 10px; font: 16px/1.3 var(--pq-font);
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); overflow-y: auto; box-sizing: border-box; }
 .pq-card h2 { margin: 0 0 4px; font-size: 20px; }
 .pq-card .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .pq-card .note { font-size: 13px; opacity: .75; min-height: 1.3em; }
 .pq-card .pq-btn { width: 100%; }
-.pq-toggle[aria-pressed=true] { background: #5a8f3e; }
-.pq-toggle:disabled { opacity: .6; cursor: default; }
+.pq-toggle[aria-pressed=true] { background: var(--pq-green); }
+.pq-toggle:disabled { background: var(--pq-off-bg); color: var(--pq-off-ink); cursor: default; }
 .pq-vol { display: flex; align-items: center; gap: 10px; }
 .pq-vol input { flex: 1 1 auto; min-width: 0; accent-color: var(--pq-wood); }
 .pq-vol input:disabled { opacity: .5; }
 .pq-vol output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; }
-.pq-select { flex: 1 1 auto; min-width: 0; font: 600 15px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; color: var(--pq-ink); background: #fffaf0; border: 2px solid var(--pq-ink); border-radius: 6px; padding: 8px; }
-.pq-card .ver { font-size: 11px; opacity: .55; text-align: center; user-select: text; -webkit-user-select: text; }
+.pq-select { flex: 1 1 auto; min-width: 0; font: 600 15px/1.2 var(--pq-font); color: var(--pq-ink); background: var(--pq-paper); border: var(--pq-line-ink); border-radius: var(--pq-r-m); padding: 8px; }
+.pq-card .ver { font-size: 12px; color: var(--pq-ink-3); text-align: center; user-select: text; -webkit-user-select: text; }
 .pq-card .ver:empty { display: none; }
 `;
 
@@ -41,6 +42,8 @@ export interface SettingsDeps {
   importSave(text: string): Promise<{ ok: boolean; message: string }>;
   /** Сброс: автоэкспорт, стирание, перезагрузка. */
   reset(): Promise<void>;
+  /** Свет, ветер и частицы в мире: выключатель для слабых телефонов. */
+  fx?: { get(): boolean; set(on: boolean): void };
   /** Музыка (V11b): вкл/выкл, трек, громкость. С `?mute=1` переключатели работают, но аудио нет. */
   music?: MusicControl;
   /** Когда сохранение последний раз записано (мс); null — пока не писали. Показывается как «Последнее сохранение: ЧЧ:ММ». */
@@ -74,6 +77,17 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     if (deps.backupDue?.()) note.textContent = 'Копию не скачивали больше недели: нажми «Экспорт сохранения».';
   };
   const sound = el('button', { type: 'button', class: 'pq-btn pq-toggle', 'aria-pressed': String(deps.getSound()) });
+  const fxBtn = el('button', { type: 'button', class: 'pq-btn pq-toggle', 'data-fx': '' });
+  const paintFx = (): void => {
+    const on = deps.fx?.get() ?? false;
+    fxBtn.setAttribute('aria-pressed', String(on));
+    fxBtn.textContent = on ? 'Вкл' : 'Выкл';
+  };
+  fxBtn.onclick = () => {
+    deps.fx?.set(!deps.fx.get());
+    paintFx();
+  };
+  paintFx();
   const paintSound = (): void => {
     const on = !deps.muted && deps.getSound();
     sound.setAttribute('aria-pressed', String(on));
@@ -151,6 +165,7 @@ export function mountSettings(parent: HTMLElement, deps: SettingsDeps): Settings
     { class: 'pq-card', role: 'dialog', 'aria-label': 'Настройки' },
     el('h2', {}, 'Настройки'),
     el('div', { class: 'row' }, el('span', {}, 'Звук'), sound),
+    ...(deps.fx ? [el('div', { class: 'row' }, el('span', {}, 'Свет и эффекты'), fxBtn)] : []),
     el('label', { class: 'pq-vol' }, el('span', {}, 'Громкость эффектов'), vol, volOut),
     ...musicRows,
     deps.onHowTo ? el('button', { type: 'button', class: 'pq-btn', 'data-howto': '', onclick: () => (api.close(), deps.onHowTo?.()) }, 'Как играть') : null,

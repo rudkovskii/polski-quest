@@ -4,18 +4,18 @@ import type { BusEvents } from '../types/bus';
 import { el } from './dom';
 
 const css = `
-.pq-float { position: fixed; z-index: 35; pointer-events: none; transform: translate(-50%, -100%); font: 800 16px/1 -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #fff8e8; text-shadow: 0 2px 0 #2a1418, 1px 0 0 #2a1418, -1px 0 0 #2a1418, 0 -1px 0 #2a1418; animation: pq-float-up 1.1s ease-out forwards; white-space: nowrap; }
-.pq-float.xp { color: #f2d552; }
+.pq-float { position: fixed; z-index: 35; pointer-events: none; transform: translate(-50%, -100%); font: 800 16px/1 var(--pq-font);
+  color: var(--pq-paper); text-shadow: var(--pq-step-2), 1px 0 0 var(--pq-ink), -1px 0 0 var(--pq-ink), 0 -1px 0 var(--pq-ink); animation: pq-float-up 1.1s ease-out forwards; white-space: nowrap; }
+.pq-float.xp { color: var(--pq-gold); }
 .pq-float.miss { color: #a9d4ec; }
 @keyframes pq-float-up { from { opacity: 1; margin-top: 0; } to { opacity: 0; margin-top: -28px; } }
-.pq-label { position: fixed; z-index: 34; pointer-events: none; transform: translate(-50%, -100%); padding: 3px 7px; border-radius: 6px; background: #fff8e8; color: #2a1418;
-  border: 2px solid #2a1418; font: 700 14px/1.1 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; box-shadow: 0 2px 0 #2a1418; }
+.pq-label { position: fixed; z-index: 34; pointer-events: none; transform: translate(-50%, -100%); padding: 3px 7px; border-radius: var(--pq-r-m); background: var(--pq-paper); color: var(--pq-ink);
+  border: var(--pq-line-ink); font: 700 14px/1.1 var(--pq-font); white-space: nowrap; box-shadow: var(--pq-step-2); }
 .pq-label[hidden] { display: none; }
 .pq-word { position: fixed; z-index: 32; pointer-events: none; transform: translate(-50%, -100%); padding: 0 4px; border-radius: 4px; background: rgba(255, 248, 232, .85); color: #2a1418; font: 700 11px/14px -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
-.pq-sign { position: fixed; z-index: 33; pointer-events: none; transform: translate(-50%, -100%); padding: 1px 6px; border-radius: 5px; background: rgba(255, 248, 232, .9);
-  color: #2a1418; border: 1.5px solid #2a1418; font: 700 12px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
-.pq-sign.edge { background: #fff8e8; border-width: 2px; padding: 2px 7px; font-size: 13px; box-shadow: 0 2px 0 #2a1418; }
+.pq-sign { position: fixed; z-index: 33; pointer-events: none; transform: translate(-50%, -100%); padding: 1px 6px; border-radius: var(--pq-r-m); background: rgba(255, 248, 232, .9);
+  color: var(--pq-ink); border: 1.5px solid var(--pq-ink); font: 700 12px/1.2 var(--pq-font); white-space: nowrap; }
+.pq-sign.edge { background: var(--pq-paper); border-width: 2px; padding: 2px 7px; font-size: 13px; box-shadow: var(--pq-step-2); }
 `;
 
 /** Выход за кадром прижимается к краю экрана со стрелкой (просьба Шэфа 27.10: «как мне отсюда выйти?»). Отступы — под HUD сверху. */

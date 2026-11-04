@@ -17,18 +17,18 @@ export interface AtlasFrame {
 export { ATLAS_SIZE };
 
 export const FRAMES = {
-  'w2_pisanki/0': { x: 55, y: 2235, w: 16, h: 16 },
-  'w2_znicz/0': { x: 109, y: 2235, w: 16, h: 16 },
-  'w2_choinka/0': { x: 159, y: 1991, w: 16, h: 32 },
-  'w2_palma/0': { x: 37, y: 2041, w: 16, h: 32 },
-  'w2_fl_chrys/2': { x: 227, y: 2199, w: 16, h: 16 },
-  'w2_flag/0': { x: 217, y: 2217, w: 16, h: 16 },
-  'w2_basket/0': { x: 235, y: 2181, w: 16, h: 16 },
-  'w2_basket/1': { x: 1, y: 2199, w: 16, h: 16 },
-  'w2_season_board/0': { x: 55, y: 2041, w: 32, h: 32 },
-  'w2_season_board/1': { x: 89, y: 2041, w: 32, h: 32 },
-  'w2_season_board/2': { x: 123, y: 2041, w: 32, h: 32 },
-  'w2_season_board/3': { x: 157, y: 2041, w: 32, h: 32 },
+  'w2_pisanki/0': { x: 181, y: 2203, w: 16, h: 16 },
+  'w2_znicz/0': { x: 235, y: 2203, w: 16, h: 16 },
+  'w2_choinka/0': { x: 35, y: 2009, w: 16, h: 32 },
+  'w2_palma/0': { x: 161, y: 2009, w: 16, h: 32 },
+  'w2_fl_chrys/2': { x: 105, y: 2185, w: 16, h: 16 },
+  'w2_flag/0': { x: 91, y: 2203, w: 16, h: 16 },
+  'w2_basket/0': { x: 109, y: 2167, w: 16, h: 16 },
+  'w2_basket/1': { x: 127, y: 2167, w: 16, h: 16 },
+  'w2_season_board/0': { x: 179, y: 2009, w: 32, h: 32 },
+  'w2_season_board/1': { x: 213, y: 2009, w: 32, h: 32 },
+  'w2_season_board/2': { x: 1, y: 2043, w: 32, h: 32 },
+  'w2_season_board/3': { x: 35, y: 2043, w: 32, h: 32 },
 } as const satisfies Record<string, AtlasFrame>;
 export type FrameKey = keyof typeof FRAMES;
 

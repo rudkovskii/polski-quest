@@ -5,8 +5,8 @@ import { el } from './dom';
 
 const css = `
 .pq-audio-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 50;
-  font: inherit; font-size: 16px; padding: 12px 18px; border: 2px solid #f4f4f4; border-radius: 6px; background: #b13e53; color: #f4f4f4;
-  box-shadow: 0 3px 0 #5d275d; cursor: pointer; touch-action: manipulation; }
+  font: inherit; font-size: 16px; padding: 12px 18px; border: var(--pq-line-ink); border-radius: var(--pq-r-m); background: var(--pq-red); color: var(--pq-cream);
+  box-shadow: var(--pq-bevel), var(--pq-step-3); cursor: pointer; touch-action: manipulation; }
 `;
 
 export function mountAudioToast(root: HTMLElement): () => void {

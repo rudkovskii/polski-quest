@@ -8,8 +8,8 @@ import { THEME_CSS } from './theme';
 const css = `
 ${THEME_CSS}
 .pq-bubble { position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 64px); transform: translateX(-50%); z-index: 40; pointer-events: none;
-  max-width: calc(100vw - 40px); padding: 10px 16px; background: var(--pq-cream); color: var(--pq-ink); border: 2px solid var(--pq-ink); border-radius: 10px;
-  box-shadow: 0 3px 0 var(--pq-ink); font: 700 18px/1.25 -apple-system, BlinkMacSystemFont, sans-serif; text-align: center; }
+  max-width: calc(100vw - 40px); padding: 10px 16px; background: var(--pq-cream); color: var(--pq-ink); border: var(--pq-line-ink); border-radius: var(--pq-r-l);
+  box-shadow: var(--pq-step-3); font: 700 18px/1.25 var(--pq-font); text-align: center; }
 .pq-bubble[hidden] { display: none; }
 `;
 

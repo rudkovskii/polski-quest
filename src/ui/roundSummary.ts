@@ -78,9 +78,9 @@ export const roundCss = `
 .pq-round dt { display: flex; align-items: baseline; gap: 6px; overflow: hidden; white-space: nowrap; }
 .pq-round dt::after { content: ''; flex: 1 1 auto; border-bottom: 2px dotted rgba(42, 20, 24, .35); transform: translateY(-3px); }
 .pq-round dd { margin: 0; font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
-.pq-round .xp dd { color: #4a6b2a; }
-.pq-round .way { margin-top: 6px; padding: 6px 8px; text-align: center; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; font-size: 15px; font-weight: 700; }
-.pq-round .way b { color: #4a6b2a; }
+.pq-round .xp dd { color: var(--pq-green-text); }
+.pq-round .way { margin-top: 6px; padding: 6px 8px; text-align: center; background: var(--pq-paper); border: var(--pq-line); border-radius: var(--pq-r-l); font-size: 15px; font-weight: 700; }
+.pq-round .way b { color: var(--pq-green-text); }
 /* Узко: итог в две колонки и без подзаголовка, чтобы все 6 строк влезали в панель без прокрутки. */
 @media (max-width: 520px) { .pq-round h3 { font-size: 18px; } .pq-round .sub { display: none; } .pq-round dl { grid-template-columns: 1fr auto 1fr auto; column-gap: 8px; row-gap: 8px; font-size: 14px; } }
 `;

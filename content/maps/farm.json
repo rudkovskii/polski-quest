@@ -1355,6 +1355,349 @@
    ],
    "shadow": 30,
    "unlock": "beaver.home"
+  },
+  {
+   "type": "prop",
+   "id": "lantern_door",
+   "sprite": "v3_lantern",
+   "at": [
+    4,
+    9
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "lantern_gate",
+   "sprite": "v3_lantern",
+   "at": [
+    14,
+    11
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "lantern_well",
+   "sprite": "v3_lantern",
+   "at": [
+    21,
+    9
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "logs",
+   "sprite": "v3_logs",
+   "at": [
+    8,
+    9
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "barrel",
+   "sprite": "v3_barrel",
+   "at": [
+    12,
+    6
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "crate",
+   "sprite": "v3_crate",
+   "at": [
+    12,
+    5
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "hay",
+   "sprite": "v3_hay",
+   "at": [
+    17,
+    9
+   ],
+   "size": [
+    2,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "pumpkins",
+   "sprite": "v3_pumpkins",
+   "at": [
+    15,
+    7
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "stump",
+   "sprite": "v3_stump",
+   "at": [
+    20,
+    9
+   ],
+   "size": [
+    1,
+    1
+   ]
+  },
+  {
+   "type": "prop",
+   "id": "pond",
+   "sprite": "v3_pond",
+   "at": [
+    14,
+    3
+   ],
+   "size": [
+    5,
+    3
+   ],
+   "anim": 2
+  },
+  {
+   "type": "prop",
+   "id": "bit0",
+   "sprite": "v3_mushrooms",
+   "at": [
+    25,
+    9
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit1",
+   "sprite": "v3_mushrooms",
+   "at": [
+    9,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit2",
+   "sprite": "v3_mushrooms",
+   "at": [
+    2,
+    7
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit3",
+   "sprite": "v3_pebbles",
+   "at": [
+    19,
+    6
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit4",
+   "sprite": "v3_pebbles",
+   "at": [
+    13,
+    8
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit5",
+   "sprite": "v3_pebbles",
+   "at": [
+    23,
+    11
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit6",
+   "sprite": "v3_pebbles",
+   "at": [
+    7,
+    11
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit7",
+   "sprite": "v3_twigs",
+   "at": [
+    13,
+    7
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit8",
+   "sprite": "v3_twigs",
+   "at": [
+    6,
+    11
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit9",
+   "sprite": "v3_twigs",
+   "at": [
+    25,
+    11
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit10",
+   "sprite": "v3_leaves",
+   "at": [
+    4,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit11",
+   "sprite": "v3_leaves",
+   "at": [
+    24,
+    2
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit12",
+   "sprite": "v3_leaves",
+   "at": [
+    15,
+    20
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit13",
+   "sprite": "v3_leaves",
+   "at": [
+    19,
+    3
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
+  },
+  {
+   "type": "prop",
+   "id": "bit14",
+   "sprite": "v3_leaves",
+   "at": [
+    3,
+    11
+   ],
+   "size": [
+    1,
+    1
+   ],
+   "solid": false
   }
  ]
 }

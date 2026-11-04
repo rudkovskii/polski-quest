@@ -10,14 +10,14 @@ import { createPanel, nav } from './panel';
 const css = `
 .rd { display: flex; flex-direction: column; gap: 10px; }
 .rd-power { width: 100%; font-size: 20px; padding: 14px 12px; background: var(--pq-wood-dark); }
-.rd-power[aria-pressed=true] { background: #5a8f3e; }
-.rd-now { background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; padding: 8px 10px; font-size: 15px; min-height: 2.6em; }
+.rd-power[aria-pressed=true] { background: var(--pq-green); }
+.rd-now { background: var(--pq-paper); border: var(--pq-line); border-radius: var(--pq-r-l); padding: 8px 10px; font-size: 15px; min-height: 2.6em; }
 .rd-now b { font-size: 17px; }
 .rd-now small { display: block; opacity: .72; font-size: 13px; }
 .rd-list { display: flex; flex-direction: column; gap: 6px; }
 .rd-track { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--pq-wood); padding: 8px 12px; }
 .rd-track .mark { width: 1.2em; text-align: center; }
-.rd-track .ru { opacity: .75; font-weight: 400; font-size: 13px; margin-left: auto; }
+.rd-track .ru { opacity: .92; font-weight: 400; font-size: 13px; margin-left: auto; }
 .rd-track.sel { background: var(--pq-accent); color: var(--pq-ink); }
 .rd-row { display: flex; align-items: center; gap: 8px; }
 .rd-row .pq-btn { flex: 1 1 0; }
