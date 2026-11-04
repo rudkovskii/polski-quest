@@ -164,10 +164,10 @@ describe('рост', () => {
 });
 
 describe('грядки', () => {
-  it('24 грядки, потом резерв 10×6, потом ряды и второй участок; дальше мешок', () => {
-    expect(TIER_CAP).toEqual([24, 60, 80, 120]);
-    expect(PLOT_CELLS.length).toBe(120);
-    expect(PLOT_CELLS[0]).toEqual([12, 14]);
+  it('24 грядки, потом ряды посередине, влево и вправо до забора; мест не меньше 120; дальше мешок', () => {
+    expect(TIER_CAP).toEqual([24, 72, 108, 132]);
+    expect(PLOT_CELLS.length).toBe(132);
+    expect(PLOT_CELLS[0]).toEqual([8, 15]);
     const ids = WORDS.slice(0, 30).map((w) => w.id);
     let g = garden(ids.slice(0, 24));
     expect(g.tier).toBe(0);
@@ -175,11 +175,11 @@ describe('грядки', () => {
     g = syncSlots(plant(g, derive(g), ids.slice(24), T0).save, derive(plant(g, derive(g), ids.slice(24), T0).save), T0);
     expect(g.tier).toBe(1);
     expect(Object.keys(g.slots).length).toBe(30);
-    const all = WORDS.slice(0, 130).map((w) => w.id);
+    const all = WORDS.slice(0, 140).map((w) => w.id);
     const big = garden(all);
     expect(big.tier).toBe(3);
-    expect(Object.keys(big.slots).length).toBe(120);
-    expect(statusOf(derive(big), big, all[125]!, T0)).toBe('bag');
+    expect(Object.keys(big.slots).length).toBe(132);
+    expect(statusOf(derive(big), big, all[135]!, T0)).toBe('bag');
     expect(statusOf(derive(big), big, all[0]!, T0)).toBe('growing');
   });
 

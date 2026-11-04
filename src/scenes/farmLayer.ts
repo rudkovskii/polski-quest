@@ -6,6 +6,7 @@ import type { Dir } from '../types/input';
 import type { Xy } from '../world/ascii';
 import { LocationModel } from '../world/location';
 import { LabelGate } from '../world/labelGate';
+import { pickWordLabels } from '../world/wordLabels';
 
 // Огород на ферме: растения на грядках (спрайты стадий), вскопанные клетки, подпись над растением у героя и автобег во
 // время мини-игры: очередь действий (полив, удобрение, урожай → коробка). Ответы не ждут анимацию: действия копятся и
@@ -70,6 +71,7 @@ export class FarmLayer {
   private focusWalked = '';
   private item: Phaser.GameObjects.Sprite | null = null;
   private lastLabel = '';
+  private lastWords = '';
   private labelGate = new LabelGate();
   private offs: (() => void)[] = [];
   private views: PlantView[] = [];
@@ -118,6 +120,7 @@ export class FarmLayer {
     for (const off of this.offs) off();
     this.offs = [];
     bus.emit('fx:label', null);
+    bus.emit('fx:words', []);
   }
 
   private frame(name: string): string | null {
@@ -233,6 +236,7 @@ export class FarmLayer {
     if (this.deferred.size && !this.job && !this.queue.length) for (const id of [...this.deferred]) this.rebuild(id, false);
     this.syncItem();
     this.drawLabel(time);
+    this.drawWords();
   }
 
   private growPending(id: string): boolean {
@@ -484,13 +488,6 @@ export class FarmLayer {
     if (this.auto && this.focus) {
       target = this.focus;
       sticky = true;
-    } else if (!this.auto && this.h.inputOn()) {
-      const hint = this.h.model.actionHint();
-      if (hint && hint.key.startsWith('plant:')) {
-        const id = hint.key.slice(6);
-        const v = this.views.find((p) => p.id === id);
-        if (v) target = { label: v.label, tile: v.tile };
-      }
     }
     // Вне мини-игры подпись гаснет через пару секунд: не висит над героем, пока он стоит у грядки.
     if (!this.labelGate.show(target ? `${sticky ? 'q' : 'p'}:${target.label}@${target.tile.join(',')}` : null, time, sticky)) target = null;
@@ -504,6 +501,23 @@ export class FarmLayer {
     if (key === this.lastLabel) return;
     this.lastLabel = key;
     bus.emit('fx:label', { text: target.label, x: p.x, y: p.y });
+  }
+
+  /** Слова над растениями вне мини-игры: ближние к герою, сколько влезает без наложения (t99). */
+  private drawWords(): void {
+    const hero = this.h.model.player.tile;
+    const on = !this.auto && this.h.inputOn();
+    const list = on
+      ? pickWordLabels(
+          this.views.map((v) => ({ id: v.id, text: v.label, ...this.h.toScreen(v.tile[0] * T + T / 2, v.tile[1] * T - 2), dist: Math.abs(v.tile[0] - hero[0]) + Math.abs(v.tile[1] - hero[1]) })),
+          window.innerWidth,
+          window.innerHeight,
+        )
+      : [];
+    const key = list.map((w) => `${w.id}@${Math.round(w.x)},${Math.round(w.y)}`).join(';');
+    if (key === this.lastWords) return;
+    this.lastWords = key;
+    bus.emit('fx:words', list);
   }
 
   /** Ключ анимации героя с учётом действия и ноши (нет таких кадров в атласе — null). */

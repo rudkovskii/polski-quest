@@ -76,7 +76,7 @@ export function mountPlantCard(parent: HTMLElement, api: FarmApi, opts: PlantCar
               opts.onReview(cur);
             },
           },
-          'Повторить сейчас',
+          '💧 Полить',
         ),
       ),
     );

@@ -271,7 +271,8 @@ export class BeaverLife implements BeaverRef {
   }
 
   private abort(host: BeaverHost): void {
-    this.plan = { kind: 'sit', beats: [{ k: 'pose', mode: 'sit', ms: this.pause(host) }] };
+    // Путь перекрыли на клетке, где стоять нельзя (подход к объекту, дорожка): садиться здесь не будет, идёт дальше.
+    this.plan = host.rest(this.tile) ? { kind: 'sit', beats: [{ k: 'pose', mode: 'sit', ms: this.pause(host) }] } : this.pick(host);
     this.beat = 0;
     this.t = 0;
     this.posed = false;
@@ -374,6 +375,8 @@ export class BeaverLife implements BeaverRef {
         if (host.rest(c) && this.free(c, host) && cheb(c, host.hero) >= 2) cells.push(c);
       }
     const spots = host.spots().filter((s) => cheb(s.stand, anchor) <= radius + 4 && host.rest(s.stand) && this.free(s.stand, host) && cheb(s.stand, host.hero) >= 2);
+    // Гость остался на клетке, где стоять нельзя (подход к объекту, дорожка): сначала уйти с неё.
+    if (!resident && !host.rest(this.tile) && cells.length) return { kind: 'wander', beats: [{ k: 'go', cell: cells[Math.floor(r() * cells.length)]! }] };
     const heroNear = cheb(this.tile, host.hero) <= 9 && !host.heroBusy;
     const cand: { kind: keyof typeof WEIGHT; w: number }[] = [];
     const add = (kind: keyof typeof WEIGHT, ok: boolean): void => {

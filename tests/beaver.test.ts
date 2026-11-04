@@ -228,6 +228,7 @@ function scenario(kind: 'visit' | 'resident', seed: number, hero: [number, numbe
   m.beaver = life;
   const modes = new Set<string>();
   let badSeen: string | null = null;
+  let badMs = 0;
   let overlap: string | null = null;
   let visibleMs = 0;
   let goneAt: number | null = null;
@@ -240,8 +241,11 @@ function scenario(kind: 'visit' | 'resident', seed: number, hero: [number, numbe
     modes.add(life.mode);
     if (life.visible && !life.step && !badSeen) {
       const b = bad(m, life.tile);
-      if (b && !(kind === 'resident' && host.water(life.tile))) badSeen = b;
-    }
+      // Кадр между шагами — это проход, а не стоянка: считаем, только если задержался на клетке.
+      if (b && !(kind === 'resident' && host.water(life.tile))) {
+        if ((badMs += 100) >= 500) badSeen = b;
+      } else badMs = 0;
+    } else badMs = 0;
     // шаги бобра не идут по грядкам и дорожкам-«стояночным» клеткам нельзя, а вот проходимость и участок — всегда
     if (life.step && life.visible) {
       const tgt = life.step.to;

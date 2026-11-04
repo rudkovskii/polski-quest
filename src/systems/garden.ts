@@ -19,35 +19,41 @@ export const XP = { correct: 1, stage: 3, word: 10, phrase: 25 } as const;
 export const SPROUT_DROPS = 2;
 export const HARVEST_DAYS = 3;
 
-/** Грядки: прямоугольники [x, y, w, h] на карте фермы по ступеням расширения (каждая следующая включает прежнюю). */
+/** Ступени огорода: прямоугольник [x, y, w, h], внутри него грядки только в рядах `BED_ROWS` и вне прохода `WALK_COLS`. */
 export const PLOT_TIERS: readonly (readonly [number, number, number, number])[] = [
-  [12, 14, 6, 4], // участок 6×4 (plot:garden)
-  [11, 13, 10, 6], // резерв 10×6
-  [11, 12, 10, 8], // новые ряды сверху и снизу
-  [21, 12, 5, 8], // второй участок справа
+  [8, 15, 14, 2], // два ряда у калитки
+  [8, 12, 14, 8], // все ряды посередине
+  [2, 12, 20, 8], // влево до забора
+  [2, 12, 24, 8], // вправо до забора
 ];
+/** Двойные ряды: у каждого растения рядом свободная дорожка (t99, D-106). */
+const BED_ROWS: ReadonlySet<number> = new Set([12, 13, 15, 16, 18, 19]);
+/** Проход от калитки вниз. */
+const WALK_COLS: ReadonlySet<number> = new Set([15, 16]);
 
-/** Клетки грядок по порядку номеров: сначала участок, потом резерв, потом ряды, потом второй участок. */
+const tierCells = (tier: readonly [number, number, number, number]): [number, number][] => {
+  const [x0, y0, w, h] = tier;
+  const out: [number, number][] = [];
+  for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) if (BED_ROWS.has(y) && !WALK_COLS.has(x)) out.push([x, y]);
+  return out;
+};
+
+/** Клетки грядок по порядку номеров: номер в сохранении остаётся, расширение только дописывает новые клетки в конец. */
 export const PLOT_CELLS: readonly (readonly [number, number])[] = (() => {
   const out: [number, number][] = [];
   const seen = new Set<string>();
-  for (const [x0, y0, w, h] of PLOT_TIERS)
-    for (let y = y0; y < y0 + h; y++)
-      for (let x = x0; x < x0 + w; x++) {
-        const k = `${x},${y}`;
-        if (seen.has(k)) continue;
-        seen.add(k);
-        out.push([x, y]);
-      }
+  for (const t of PLOT_TIERS)
+    for (const c of tierCells(t)) {
+      const k = c.join(',');
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push(c);
+    }
   return out;
 })();
 
 /** Сколько грядок на каждой ступени. */
-export const TIER_CAP: readonly number[] = PLOT_TIERS.map((_, i) => {
-  const seen = new Set<string>();
-  for (const [x0, y0, w, h] of PLOT_TIERS.slice(0, i + 1)) for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) seen.add(`${x},${y}`);
-  return seen.size;
-});
+export const TIER_CAP: readonly number[] = PLOT_TIERS.map((_, i) => new Set(PLOT_TIERS.slice(0, i + 1).flatMap((t) => tierCells(t).map((c) => c.join(',')))).size);
 
 export interface PlantEntry {
   t: number;

@@ -92,13 +92,14 @@ describe('карты: форма и ссылки', () => {
     }
   });
 
-  it('грядки: участок 6×4 из земли, с запасом на расширение внутри забора', () => {
+  it('грядки: два ряда из земли у калитки, с запасом на расширение внутри забора', () => {
     const farm = getMap('farm');
     const plot = farm.objects.find((o) => o.type === 'plot')!;
     if (plot.type !== 'plot') throw new Error();
-    expect(plot.size).toEqual([6, 4]);
+    expect(plot.size).toEqual([14, 2]);
     const parsed = parseAscii(farm);
-    for (let y = plot.at[1]; y < plot.at[1] + 4; y++) for (let x = plot.at[0]; x < plot.at[0] + 6; x++) expect(parsed.ground[y]![x]).toBe('s');
+    const walk = new Set([15, 16]);
+    for (let y = plot.at[1]; y < plot.at[1] + 2; y++) for (let x = plot.at[0]; x < plot.at[0] + 14; x++) expect(parsed.ground[y]![x]).toBe(walk.has(x) ? 'p' : 's');
     expect(plot.reserve!.size[0] * plot.reserve!.size[1]).toBeGreaterThan(24);
   });
 

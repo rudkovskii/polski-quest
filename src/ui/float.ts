@@ -12,6 +12,7 @@ const css = `
 .pq-label { position: fixed; z-index: 34; pointer-events: none; transform: translate(-50%, -100%); padding: 3px 7px; border-radius: 6px; background: #fff8e8; color: #2a1418;
   border: 2px solid #2a1418; font: 700 14px/1.1 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; box-shadow: 0 2px 0 #2a1418; }
 .pq-label[hidden] { display: none; }
+.pq-word { position: fixed; z-index: 32; pointer-events: none; transform: translate(-50%, -100%); padding: 0 4px; border-radius: 4px; background: rgba(255, 248, 232, .85); color: #2a1418; font: 700 11px/14px -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
 .pq-sign { position: fixed; z-index: 33; pointer-events: none; transform: translate(-50%, -100%); padding: 1px 6px; border-radius: 5px; background: rgba(255, 248, 232, .9);
   color: #2a1418; border: 1.5px solid #2a1418; font: 700 12px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
 .pq-sign.edge { background: #fff8e8; border-width: 2px; padding: 2px 7px; font-size: 13px; box-shadow: 0 2px 0 #2a1418; }
@@ -39,7 +40,9 @@ export function mountFloats(parent: HTMLElement, bus: Bus<BusEvents> = globalBus
   const label = el('div', { class: 'pq-label', hidden: true, 'data-plant-label': '', lang: 'pl' });
   const signs = el('div', { 'data-signs': '' });
   const signNodes = new Map<string, HTMLElement>();
-  parent.append(el('style', {}, css), signs, label);
+  const words = el('div', { 'data-words': '' });
+  const wordNodes = new Map<string, HTMLElement>();
+  parent.append(el('style', {}, css), words, signs, label);
   const offs = [
     bus.on('fx:float', ({ x, y, text, kind }) => {
       const n = el('div', { class: `pq-float ${kind}`, style: `left:${Math.round(x)}px;top:${Math.round(y)}px` }, text);
@@ -57,6 +60,20 @@ export function mountFloats(parent: HTMLElement, bus: Bus<BusEvents> = globalBus
       label.hidden = false;
     }),
     // Камера едет за героем — таблички двигаются каждый кадр: узлы переиспользуем, меняем только место.
+    bus.on('fx:words', (list) => {
+      const keep = new Set(list.map((w) => w.id));
+      for (const [k, n] of wordNodes) if (!keep.has(k)) (n.remove(), wordNodes.delete(k));
+      for (const w of list) {
+        let n = wordNodes.get(w.id);
+        if (!n) {
+          n = el('div', { class: 'pq-word', 'data-word': w.id, lang: 'pl' }, w.text);
+          words.append(n);
+          wordNodes.set(w.id, n);
+        }
+        n.style.left = `${Math.round(w.x)}px`;
+        n.style.top = `${Math.round(w.y)}px`;
+      }
+    }),
     bus.on('fx:signs', (list) => {
       const keep = new Set(list.map((s) => s.key));
       for (const [k, n] of signNodes) if (!keep.has(k)) (n.remove(), signNodes.delete(k));

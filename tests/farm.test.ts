@@ -52,7 +52,7 @@ describe('ферма: фасад', () => {
     s.setNow(s.now() + DAY_MS);
     expect(f.info('w.dzien_dobry')).toMatchObject({ prod: false, next: 'Осталось: собери слово в игре «Собери слово» — и урожай' });
     const last = solveId(f, 5, 'w.dzien_dobry');
-    expect(last.act).toMatchObject({ kind: 'harvest', id: 'w.dzien_dobry', tile: [12, 14], xp: 11 });
+    expect(last.act).toMatchObject({ kind: 'harvest', id: 'w.dzien_dobry', tile: [8, 15], xp: 11 });
     expect(f.info('w.dzien_dobry').status).toBe('grown');
     expect(f.stats()).toMatchObject({ grownToday: 1, grownTotal: 1, grownWords: 1 });
     expect(f.pantry()).toEqual([{ topic: 'powitania', ids: ['w.dzien_dobry'] }]);
