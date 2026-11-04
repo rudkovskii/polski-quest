@@ -474,6 +474,23 @@ export interface PickOpts {
 }
 
 /** Сколько заданий подряд одно растение не повторяется (P3a: было 5; при 5 очередь вынужденно крутит ≥ 6 растений и не концентрируется). */
+/** Режим «Новые слова»: сколько дней слово после посадки считается новым. */
+export const FRESH_DAYS = 3;
+
+/** Новые слова: посажены за последние `FRESH_DAYS`, растут и ещё ни разу не собраны. */
+export function freshItems(st: GardenState, now: number): ItemState[] {
+  return [...st.items.values()].filter((it) => !it.phrase && it.stage !== null && it.harvests === 0 && now - it.plantedAt < FRESH_DAYS * DAY_MS);
+}
+
+/** Следующее новое слово: по кругу — сначала давно не спрошенные, среди них свежее посаженные; только что спрошенные ждут. */
+export function pickFresh(st: GardenState, now: number, recent: readonly string[]): string | null {
+  const pool = freshItems(st, now);
+  const banned = new Set(recent.slice(-Math.min(3, pool.length - 1)));
+  if (pool.length < 2) banned.clear();
+  const [first] = pool.filter((it) => !banned.has(it.id)).sort((a, b) => (a.lastAnswer ?? 0) - (b.lastAnswer ?? 0) || b.plantedAt - a.plantedAt);
+  return first?.id ?? null;
+}
+
 export const REPEAT_GAP = 3;
 /** Сколько заданий подряд одно растение не повторяется: min(REPEAT_GAP, в пуле − 1). */
 export const repeatGap = (pool: number): number => Math.max(0, Math.min(REPEAT_GAP, pool - 1));

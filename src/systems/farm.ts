@@ -13,6 +13,8 @@ import {
   derive,
   dueAt,
   nextText,
+  freshItems,
+  pickFresh,
   pickTask,
   plant,
   progressText,
@@ -76,6 +78,10 @@ export interface Farm extends FarmApi {
   ripeSoon(): { today: number; tomorrow: number; soon: number };
   /** Режим для «Повторить сейчас»: тот, что продвинет растение. */
   reviewMode(id: string): GameMode;
+  /** Сколько новых слов (режим «Новые слова»). */
+  freshCount(): number;
+  /** Следующее новое слово и игра под него; null — новых нет. */
+  freshTask(): { id: string; mode: GameMode } | null;
   plants(): PlantView[];
   /**
    * На грядках: слов, фраз всего и сколько из фраз годятся для сборки (игры 3 и 4; остальные идут в игры 1 и 2);
@@ -421,6 +427,11 @@ export function createFarm(d: FarmDeps): Farm {
       return { ok: r.ok, correct: r.correct, ...c, ...(note ? { note } : {}), act, path: { from: p0.pos, to: p1.pos, sub: p1.sub, pl: p1.pl, pct: p1.pct }, progress: progressText(st.items.get(q.id), now, day), tomorrow: ripeSoon(st, day).tomorrow };
     },
     ripeSoon: () => ripeSoon(st, today()),
+    freshCount: () => freshItems(st, d.now()).length,
+    freshTask() {
+      const id = pickFresh(st, d.now(), recent);
+      return id ? { id, mode: farm.reviewMode(id) } : null;
+    },
     reviewMode(id) {
       const it = st.items.get(id);
       if (isPhraseId(id) && assemble(id)) return it && !it.sides.rp ? 3 : it && !it.sides.pr ? 4 : 3;

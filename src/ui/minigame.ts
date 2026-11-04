@@ -41,6 +41,8 @@ export interface MinigameDeps {
   next(mode: GameMode, only?: string, opts?: { dir?: Side }): Question | null;
   answer(q: Question, given: string | readonly string[]): AnswerResult;
   say(id: string): void;
+  /** Режим «Новые слова»: следующее слово и игра под него; null — новых нет. */
+  fresh?(): { id: string; mode: GameMode } | null;
   /** Мини-игра закрылась. */
   onExit?(): void;
   /** Сенсорный экран (игра 5: польскую печать ведёт экранная клавиатура, системная спрятана). По умолчанию `pointer: coarse`. */
@@ -49,6 +51,8 @@ export interface MinigameDeps {
 
 export interface Minigame {
   start(mode: GameMode, only?: string): void;
+  /** Раунд только из новых слов: вид задания меняется под каждое слово. */
+  startFresh(): void;
   stop(): void;
   readonly isOpen: boolean;
   readonly mode: GameMode | null;
@@ -185,6 +189,8 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   let open = false;
   let mode: GameMode | null = null;
   let only: string | undefined;
+  /** Режим «Новые слова»: `mode` меняется от задания к заданию. */
+  let fresh = false;
   let q: Question | null = null;
   let answered = false;
   let built: number[] = [];
@@ -262,7 +268,20 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     spell?.detach();
     spell = null;
   };
-  const nextQ = (m: GameMode): Question | null => (m === 5 ? deps.next(m, only, { dir }) : deps.next(m, only));
+  const paintTitle = (m: GameMode): void => {
+    if (fresh) title.replaceChildren(el('span', { class: 'full' }, 'Новые слова'), el('small', {}, 'Nowe słowa'), el('span', { class: 'short' }, 'Nowe'));
+    else title.replaceChildren(el('span', { class: 'full' }, MODE_NAME[m].ru), el('small', {}, MODE_NAME[m].pl), el('span', { class: 'short' }, MODE_SHORT[m]));
+  };
+  const nextQ = (m: GameMode): Question | null => {
+    if (fresh) {
+      const t = deps.fresh?.();
+      if (!t) return null;
+      mode = t.mode;
+      paintDir();
+      return deps.next(t.mode, t.id, { dir: 'rp' });
+    }
+    return m === 5 ? deps.next(m, only, { dir }) : deps.next(m, only);
+  };
 
   /** Строка отзыва с 🔊 справа: польское слово или фраза ответа (`r.pl`) всегда по-польски. */
   const fbRow = (line: HTMLElement, pl: string): HTMLElement => (polishPart(pl) ? el('div', { class: 'pq-fbrow' }, line, sayButton(pl, say, { inline: true })) : line);
@@ -368,7 +387,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
 
   /** «↔ наоборот» в игре 5: другая сторона сборки; неотвеченное задание пересобирается в новую сторону. */
   const toggleDir = (): void => {
-    if (mode !== 5) return;
+    if (mode !== 5 || fresh) return;
     dir = dir === 'rp' ? 'pr' : 'rp';
     paintDir();
     if (open && !answered && !summaryOpen) {
@@ -377,7 +396,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     }
   };
   const paintDir = (): void => {
-    dirBtn.hidden = mode !== 5;
+    dirBtn.hidden = mode !== 5 || fresh;
     dirBtn.setAttribute('aria-pressed', dir === 'pr' ? 'true' : 'false');
   };
 
@@ -574,35 +593,45 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   });
   void offIntent;
 
+  const begin = (m: GameMode, onlyId?: string): void => {
+    mode = m;
+    only = onlyId;
+    // Раунд начинается при открытии; перезапуск из карточки «Фраз мало» (панель уже открыта) его не сбрасывает.
+    if (!open) {
+      round.reset();
+      roundN = 1;
+      summaryOpen = false;
+    }
+    paintTitle(m);
+    // Игра 5 «Повторить» открывает по-польски (ответ «сам» нужен для урожая); с доски — сторона прошлого захода.
+    if (onlyId) dir = 'rp';
+    paintDir();
+    kbNav = false;
+    root.classList.remove('kb');
+    soon.hidden = true;
+    soon.textContent = '';
+    if (!open) {
+      open = true;
+      root.hidden = false;
+      bus.emit('world:input', { enabled: false });
+    }
+    q = nextQ(m);
+    render();
+  };
+
   const api: Minigame = {
     root,
     start(m, onlyId) {
-      mode = m;
-      only = onlyId;
-      // Раунд начинается при открытии; перезапуск из карточки «Фраз мало» (панель уже открыта) его не сбрасывает.
-      if (!open) {
-        round.reset();
-        roundN = 1;
-        summaryOpen = false;
-      }
-      title.replaceChildren(el('span', { class: 'full' }, MODE_NAME[m].ru), el('small', {}, MODE_NAME[m].pl), el('span', { class: 'short' }, MODE_SHORT[m]));
-      // Игра 5 «Повторить» открывает по-польски (ответ «сам» нужен для урожая); с доски — сторона прошлого захода.
-      if (onlyId) dir = 'rp';
-      paintDir();
-      kbNav = false;
-      root.classList.remove('kb');
-      soon.hidden = true;
-      soon.textContent = '';
-      if (!open) {
-        open = true;
-        root.hidden = false;
-        bus.emit('world:input', { enabled: false });
-      }
-      q = nextQ(m);
-      render();
+      fresh = false;
+      begin(m, onlyId);
+    },
+    startFresh() {
+      fresh = true;
+      begin(1);
     },
     stop() {
       if (!open) return;
+      fresh = false;
       clearTimer();
       detachKb();
       box.classList.remove('spell', 'typing');

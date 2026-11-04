@@ -330,6 +330,7 @@ async function main(): Promise<void> {
       if (!q && !only) queueMicrotask(() => gapCard.check(mode));
       return q;
     },
+    fresh: () => farm.freshTask(),
     answer: (q, given) => farm.answer(q, given),
     say: (id) => farm.say(id),
   });
@@ -366,6 +367,7 @@ async function main(): Promise<void> {
   const board = mountBoard(overlay, {
     counts: () => (farm.refresh(), farm.counts()),
     onPick: (mode) => game.start(mode),
+    fresh: { count: () => farm.freshCount(), start: () => game.startFresh() },
     phraseHint: () => farm.phraseHint(),
     plant: (ids) => farm.plant(ids),
     ...(EDITION.languageOnly ? {} : { polska: {

@@ -1,6 +1,7 @@
 // Доска на ферме: выбор мини-игры из четырёх. Недоступные видны, и написано почему.
 // v2: вкладка «Polska» — четыре игры о Польше с прогрессом, «Idź» (герой сам идёт к точке входа) и «Graj tu» (открыть сразу).
 import type { Bus } from '../systems/bus';
+import { FRESH_DAYS } from '../systems/garden';
 import type { BusEvents } from '../types/bus';
 import type { GameMode, PhraseHint } from '../types/farm';
 import { el } from './dom';
@@ -12,6 +13,8 @@ export interface BoardDeps {
   /** Сколько на грядках слов и фраз; `spell` — кустов слов, которым для урожая не хватает слова, собранного самому (игра 5). */
   counts(): { words: number; phrases: number; assemble: number; spell?: number };
   onPick(mode: GameMode): void;
+  /** Режим «Новые слова»: сколько их сейчас и запуск раунда. Нет — строки нет. */
+  fresh?: { count(): number; start(): void };
   /** Ближайшая фраза для сборки и что ей нужно (P3a); без неё — только общая подсказка. */
   phraseHint?(): PhraseHint | null;
   /** Посадить по кнопке подсказки. */
@@ -87,6 +90,18 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(tab?: B
     const t = tabs();
     if (t) list.append(t);
     list.append(el('div', { class: 'pq-muted' }, `На грядках: слов ${c.words}, фраз ${c.phrases}. Пока отвечаешь, фермер сам поливает.`));
+    if (deps.fresh) {
+      const { count, start } = deps.fresh;
+      const n = count();
+      list.append(
+        el(
+          'button',
+          { type: 'button', class: 'pq-btn', 'data-fresh': '', disabled: n === 0, style: 'text-align:left;line-height:1.3', ...nav('modes', 'v', 'mode:fresh'), onclick: () => (panel.close(), start()) },
+          el('div', { style: 'font-size:18px;font-weight:800' }, `🌱 Новые слова (${n}) `, el('small', { class: 'board-pl', lang: 'pl', style: 'font-size:12px;font-weight:600;opacity:.65;white-space:nowrap' }, 'Nowe słowa')),
+          el('div', { style: 'font-weight:500;font-size:14px;opacity:.85' }, n ? `Раунд только из слов, посаженных за ${FRESH_DAYS} дня` : 'Свежих слов нет: посади их в словаре дома'),
+        ),
+      );
+    }
     for (const m of [1, 2, 3, 4, 5] as GameMode[]) {
       // Фразы короче 3 плиток растут в играх 1 и 2 как слова; сборка — только из длинных; игра 5 — только слова.
       const why =
