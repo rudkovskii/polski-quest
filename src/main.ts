@@ -71,6 +71,8 @@ const dev = devProfile !== null;
 const profile = devProfile ?? EDITION.profile;
 // Без звука вслух: `?mute=1` — `audio:play` только в консоль.
 const mute = params.get('mute') === '1';
+/** `?hour=21.5` — зафиксировать час света для проверки. */
+const hourParam = params.get('hour') && Number.isFinite(Number(params.get('hour'))) ? Number(params.get('hour')) : null;
 
 const storageOptions = (): StorageOptions => (params.get('mem') === '1' ? { kv: memoryKV(), ls: null } : profile ? { profile } : {});
 /** Хранилище, когда оно уже создано: экран «Что-то сломалось» берёт сохранение из него, иначе читает с диска сам. */
@@ -141,6 +143,8 @@ async function main(): Promise<void> {
   mountAudioToast(overlay);
   mountUpdateToast(overlay);
 
+  // Мир заводится позже настроек: выключатель эффектов дотягивается до него через эту ячейку.
+  const worldFx = { set: (_on: boolean): void => {} };
   const settings = mountSettings(overlay, {
     muted: mute,
     version: __BUILD_ID__,
@@ -149,6 +153,13 @@ async function main(): Promise<void> {
     setSound: (on) => {
       if (!on) bus.emit('audio:stop', {});
       store.update((s) => ({ ...s, settings: { ...s.settings, sound: on } }), Date.now());
+    },
+    fx: {
+      get: () => store.save.settings.fx,
+      set: (on) => {
+        store.update((s) => ({ ...s, settings: { ...s.settings, fx: on } }), Date.now());
+        worldFx.set(on);
+      },
     },
     music,
     ...(EDITION.onboarding ? { onHowTo: () => onboarding.open() } : {}),
@@ -470,6 +481,17 @@ async function main(): Promise<void> {
     scene: [Boot, World],
   });
   phaser.registry.set('boot:start', start);
+  // Свет суток от часов игрока (`?hour=` на стенде — зафиксировать час для проверки).
+  phaser.registry.set('fx', store.save.settings.fx);
+  phaser.registry.set('hourNow', () => {
+    if (hourParam !== null) return hourParam;
+    const d = new Date(clock.now());
+    return d.getHours() + d.getMinutes() / 60;
+  });
+  worldFx.set = (on) => {
+    phaser.registry.set('fx', on);
+    bus.emit('world:fx', {});
+  };
   // Украшения мира к реальной дате (часы игры, `?now=`): знич 1–2.11, флажки 2–3.05 и 11.11, ёлка 24.12–6.01, пальма и писанки к Пасхе.
   const today = new Date(clock.now());
   const decor0 = EDITION.languageOnly ? [] : activeDecor(parseDecor((V2.docs.swieta as { decor?: unknown }).decor), { y: today.getFullYear(), m: today.getMonth() + 1, d: today.getDate() });

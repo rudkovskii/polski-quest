@@ -6,9 +6,9 @@ import { el } from './dom';
 
 const css = `
 .pq-update-toast { position: fixed; left: 50%; transform: translateX(-50%); top: calc(64px + env(safe-area-inset-top)); z-index: 90; width: min(92vw, 440px); box-sizing: border-box;
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 10px 10px 16px; border: 3px solid #f4f4f4; border-radius: 10px;
-  background: #29366f; color: #f4f4f4; box-shadow: 0 4px 0 #1a1c2c, 0 0 0 3px #29366f; font: 800 22px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; animation: pq-upd-in .35s ease-out; }
-.pq-update-toast button { font: inherit; font-weight: 800; min-height: 52px; padding: 8px 20px; font-size: 20px; border: 2px solid #1a1c2c; border-radius: 8px; background: #f2d552; color: #1a1c2c; cursor: pointer; white-space: nowrap; }
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 10px 10px 16px; border: var(--pq-line-bold); border-radius: var(--pq-r-l);
+  background: var(--pq-board); color: var(--pq-cream); box-shadow: var(--pq-board-edge); font: 800 22px/1.2 var(--pq-font); animation: pq-upd-in .35s ease-out; }
+.pq-update-toast button { font: inherit; font-weight: 800; min-height: 52px; padding: 8px 20px; font-size: 20px; border: var(--pq-line-ink); border-radius: var(--pq-r-l); background: var(--pq-gold); color: var(--pq-ink); box-shadow: var(--pq-step-2); cursor: pointer; white-space: nowrap; }
 @keyframes pq-upd-in { from { transform: translate(-50%, -24px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 `;
 

@@ -13,39 +13,39 @@ ${THEME_CSS}
   padding: calc(env(safe-area-inset-top) + 8px) calc(env(safe-area-inset-right) + 10px) 0 calc(env(safe-area-inset-left) + 10px);
   display: flex; justify-content: space-between; align-items: flex-start; }
 .pq-hud > * { pointer-events: auto; }
-.pq-xp { display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 6px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); border-radius: 8px;
-  box-shadow: 0 3px 0 var(--pq-ink); color: var(--pq-cream); font: 700 15px/1 -apple-system, BlinkMacSystemFont, sans-serif; }
+.pq-xp { display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 6px; box-sizing: border-box; min-height: 44px; background: var(--pq-plate); border: var(--pq-line-ink); border-radius: var(--pq-r-l);
+  box-shadow: var(--pq-bevel), var(--pq-step-3); color: var(--pq-cream); font: 700 15px/1 var(--pq-font); }
 .pq-xp-lvl { white-space: nowrap; line-height: 1.1; }
-.pq-xp-lvl b { color: var(--pq-accent); font-weight: 800; }
+.pq-xp-lvl b { color: var(--pq-gold); font-weight: 800; }
 .pq-xp { cursor: pointer; touch-action: manipulation; text-align: left; margin: 0; }
 .pq-xp-col { display: flex; flex-direction: column; gap: 3px; }
-.pq-xp-next { font: 600 11px/1 -apple-system, BlinkMacSystemFont, sans-serif; opacity: .85; white-space: nowrap; }
+.pq-xp-next { font: 600 12px/1 var(--pq-font); white-space: nowrap; }
 .pq-xp-next:empty { display: none; }
-.pq-xp-bar { position: relative; width: 104px; height: 10px; background: #2a1418; border-radius: 3px; overflow: hidden; }
+.pq-xp-bar { position: relative; width: 104px; height: 10px; background: var(--pq-ink); border-radius: var(--pq-r-s); overflow: hidden; }
 .pq-xp-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--pq-leaf); box-shadow: inset 0 2px 0 rgba(255,255,255,.35); }
 .pq-xp { position: relative; }
-.pq-xp-gain { position: absolute; left: 100%; top: 4px; margin-left: 6px; color: #f2d552; font: 800 15px/1 -apple-system, sans-serif; text-shadow: 0 2px 0 var(--pq-ink);
+.pq-xp-gain { position: absolute; left: 100%; top: 4px; margin-left: 6px; color: var(--pq-gold); font: 800 15px/1 var(--pq-font); text-shadow: var(--pq-step-2);
   pointer-events: none; animation: pq-gain 1s ease-out forwards; white-space: nowrap; }
 @keyframes pq-gain { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-18px); } }
 .pq-xp.flash { animation: pq-flash 1.6s ease-out; }
-@keyframes pq-flash { 0%, 30%, 60% { background: #f2d552; color: var(--pq-ink); transform: scale(1.12); } 15%, 45%, 100% { background: var(--pq-wood-dark); transform: scale(1); } }
+@keyframes pq-flash { 0%, 30%, 60% { background: var(--pq-gold); color: var(--pq-ink); transform: scale(1.12); } 15%, 45%, 100% { background: var(--pq-plate); transform: scale(1); } }
 .pq-left { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
-.pq-goal { max-width: calc(100vw - 80px); padding: 5px 9px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); border-radius: 8px; box-shadow: 0 3px 0 var(--pq-ink);
-  color: var(--pq-cream); font: 700 12px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; cursor: pointer; text-align: left; touch-action: manipulation; }
+.pq-goal { max-width: calc(100vw - 80px); min-height: 32px; padding: 5px 9px; background: var(--pq-plate); border: var(--pq-line-ink); border-radius: var(--pq-r-l); box-shadow: var(--pq-bevel), var(--pq-step-3);
+  color: var(--pq-cream); font: 700 12px/1.2 var(--pq-font); cursor: pointer; text-align: left; touch-action: manipulation; }
 .pq-goal[hidden] { display: none; }
 .pq-goal-part { display: inline-block; white-space: nowrap; }
 /* t30: справа на той же высоте шкала «Wiedza o Polsce» (~140 px) — на телефоне плашка цели её не заходит. */
 @media (max-width: 520px) { .pq-goal { max-width: calc(100vw - 170px); } }
 .pq-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 /* Индикатор сохранения (V11a): галочка в углу на секунду после записи; сбой записи — тост с повтором. */
-.pq-saved { min-width: 22px; height: 22px; padding: 0 5px; box-sizing: border-box; border-radius: 11px; background: var(--pq-wood-dark); border: 2px solid var(--pq-ink); color: #9be07a;
-  font: 800 13px/18px -apple-system, BlinkMacSystemFont, sans-serif; text-align: center; pointer-events: none; opacity: 0; transition: opacity .25s; }
+.pq-saved { min-width: 22px; height: 22px; padding: 0 5px; box-sizing: border-box; border-radius: 11px; background: var(--pq-plate); border: var(--pq-line-ink); color: #9be07a;
+  font: 800 13px/18px var(--pq-font); text-align: center; pointer-events: none; opacity: 0; transition: opacity .25s; }
 .pq-saved.on { opacity: .95; }
 .pq-toast { position: fixed; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top) + 64px); z-index: 85; max-width: min(92vw, 420px); box-sizing: border-box; display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px; background: var(--pq-wood-dark); color: var(--pq-cream); border: 2px solid var(--pq-ink); border-radius: 8px; box-shadow: 0 3px 0 var(--pq-ink); font: 700 14px/1.25 -apple-system, BlinkMacSystemFont, sans-serif; }
+  padding: 8px 12px; background: var(--pq-plate); color: var(--pq-cream); border: var(--pq-line-ink); border-radius: var(--pq-r-l); box-shadow: var(--pq-bevel), var(--pq-step-3); font: 700 14px/1.25 var(--pq-font); }
 .pq-toast.err { background: #8a2f2a; }
 .pq-toast[hidden] { display: none; }
-.pq-toast button { font: inherit; font-weight: 800; padding: 6px 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #f2d552; color: var(--pq-ink); cursor: pointer; white-space: nowrap; }
+.pq-toast button { font: inherit; font-weight: 800; padding: 6px 10px; border: var(--pq-line-ink); border-radius: var(--pq-r-m); background: var(--pq-gold); color: var(--pq-ink); box-shadow: var(--pq-step-2); cursor: pointer; white-space: nowrap; }
 .pq-gear { width: 44px; height: 44px; padding: 0; font-size: 22px; line-height: 40px; text-align: center; }
 `;
 

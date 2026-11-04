@@ -38,15 +38,15 @@ export const WORD_CSS = `
 .pq-wpop { position: fixed; inset: 0; z-index: 95; }
 .pq-wpop[hidden] { display: none; }
 .wp-card { position: fixed; box-sizing: border-box; width: min(340px, calc(100vw - 16px)); max-height: calc(100dvh - 16px); overflow-y: auto; overscroll-behavior: contain;
-  background: var(--pq-cream, #fff6e0); color: var(--pq-ink, #2a1418); border: 2px solid var(--pq-ink, #2a1418); border-radius: 8px; box-shadow: 0 4px 0 rgba(42, 20, 24, .35);
-  padding: 10px 12px 12px; font: 15px/1.35 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; flex-direction: column; gap: 6px; }
+  background: var(--pq-cream); color: var(--pq-ink); border: var(--pq-line-ink); border-radius: var(--pq-r-l); box-shadow: var(--pq-step-big);
+  padding: 10px 12px 12px; font: 15px/1.35 var(--pq-font); display: flex; flex-direction: column; gap: 6px; }
 .wp-card.form { width: min(380px, calc(100vw - 16px)); }
-.wp-x { position: absolute; top: 6px; right: 6px; width: 32px; height: 32px; padding: 0; font: 700 16px/1 inherit; color: var(--pq-ink, #2a1418); background: transparent; border: 0; cursor: pointer; }
+.wp-x { position: absolute; top: 6px; right: 6px; width: 32px; height: 32px; padding: 0; font: 700 16px/1 inherit; color: var(--pq-ink); background: transparent; border: 0; cursor: pointer; }
 .wp-from { font-size: 13px; opacity: .7; padding-right: 30px; overflow-wrap: anywhere; }
 .wp-head { display: flex; align-items: center; gap: 8px; padding-right: 30px; min-width: 0; }
 .wp-lemma { font-size: 22px; font-weight: 800; overflow-wrap: anywhere; min-width: 0; }
 .wp-meta { font-size: 13px; opacity: .8; }
-.wp-maybe { display: inline-block; font-size: 12px; font-weight: 700; padding: 0 5px; border-radius: 4px; background: #ffe9c2; border: 1px dashed var(--pq-accent, #c86a1c); }
+.wp-maybe { display: inline-block; font-size: 12px; font-weight: 700; padding: 0 5px; border-radius: var(--pq-r-s); background: var(--pq-note); border: 1px dashed var(--pq-accent); }
 .wp-ru { font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
 .wp-ru.none { font-weight: 400; font-size: 14px; opacity: .75; }
 .wp-st { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 14px; border-top: 1px dashed rgba(42, 20, 24, .3); padding-top: 7px; margin-top: 2px; }

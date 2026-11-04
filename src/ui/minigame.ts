@@ -63,60 +63,61 @@ ${SAY_CSS}
 ${SPELL_CSS}
 .pq-game { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: flex; justify-content: center; pointer-events: none;
   padding: 0 calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 8px);
-  font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); hyphens: none; -webkit-hyphens: none; }
+  font: 16px/1.3 var(--pq-font); color: var(--pq-ink); hyphens: none; -webkit-hyphens: none; }
 /* P4a (B4): ни заголовок, ни слова в панели не рвутся по слогам. */
 .pq-game * { hyphens: none; -webkit-hyphens: none; }
 .pq-game[hidden] { display: none; }
-.pq-game-box { pointer-events: auto; width: min(720px, 100%); box-sizing: border-box; background: var(--pq-wood); border: 3px solid var(--pq-ink); border-radius: 12px;
-  box-shadow: 0 4px 0 var(--pq-ink), inset 0 0 0 2px var(--pq-wood-dark); padding: 6px 8px 8px; height: clamp(250px, 56dvh, 400px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; }
+.pq-game-box { pointer-events: auto; width: min(720px, 100%); box-sizing: border-box; background: var(--pq-board); border: var(--pq-line-bold); border-radius: var(--pq-r-l);
+  box-shadow: var(--pq-board-edge); padding: 6px 8px 8px; height: clamp(250px, 56dvh, 400px); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; }
 .pq-game-head { flex: 0 0 auto; min-height: 38px; flex-wrap: nowrap; display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--pq-cream); padding: 0 2px 6px; font-weight: 700; font-size: 14px; }
 .pq-game-head .pq-btn { padding: 6px 10px; font-size: 14px; }
-.pq-game-paper { flex: 1 1 auto; min-height: 0; background: var(--pq-cream); border: 2px solid var(--pq-ink); border-radius: 6px; padding: 10px 12px; overflow-y: auto; overflow-x: hidden; transition: background .15s; }
+.pq-game-paper { flex: 1 1 auto; min-height: 0; background: var(--pq-cream); border: var(--pq-line-ink); border-radius: var(--pq-r-m); box-shadow: var(--pq-paper-edge); padding: 10px 12px; overflow-y: auto; overflow-x: hidden; transition: background .15s; }
 /* Закреплённая полоса действий: «Sprawdź / Dalej» всегда на одном месте и не уходят за край. */
 .pq-game-foot { flex: 0 0 auto; display: flex; gap: 8px; align-items: stretch; min-height: 46px; padding-top: 8px; }
 .pq-game-foot .pq-btn { flex: 1 1 auto; }
-.pq-game-foot .pq-btn.wait { opacity: .5; }
+.pq-game-foot .pq-btn.wait { background: var(--pq-wood-dark); box-shadow: var(--pq-step-1); }
 .pq-game-foot .pq-btn[data-next] { font-size: 18px; font-weight: 800; padding-top: 12px; padding-bottom: 12px; }
-.pq-game-foot .pq-btn.pq-back { flex: 1.3 1 0; background: #f2d552; white-space: nowrap; padding-left: 6px; padding-right: 6px; }
+.pq-game-foot .pq-btn.pq-back { flex: 1.3 1 0; background: var(--pq-gold); color: var(--pq-ink); white-space: nowrap; padding-left: 6px; padding-right: 6px; }
 .pq-game-paper.ok { background: #d6efc0; }
 .pq-game-paper.bad { background: #f6d7cc; }
 .pq-q { font-size: 24px; font-weight: 800; margin: 0 0 4px; overflow-wrap: break-word; }
 .pq-q-hint { font-size: 13px; opacity: .7; margin-bottom: 8px; }
-.pq-progress { font-size: 13px; margin: -4px 0 8px; color: #4a6b2a; font-weight: 600; }
+.pq-progress { font-size: 13px; margin: -4px 0 8px; color: var(--pq-green-text); font-weight: 600; }
 .pq-fb .pq-progress { margin: 4px 0 0; }
-.pq-rev { font-size: 12px; font-weight: 700; background: var(--pq-cream); color: var(--pq-ink); border-radius: 6px; padding: 1px 6px; }
-.pq-roundno { flex: 0 0 auto; font-size: 13px; font-weight: 800; background: var(--pq-wood-dark); border: 1px solid var(--pq-cream); border-radius: 6px; padding: 1px 7px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pq-rev { font-size: 12px; font-weight: 700; background: var(--pq-cream); color: var(--pq-ink); border-radius: var(--pq-r-m); padding: 1px 6px; }
+.pq-roundno { flex: 0 0 auto; font-size: 13px; font-weight: 800; background: var(--pq-wood-dark); border: 1px solid var(--pq-cream); border-radius: var(--pq-r-m); padding: 1px 7px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .pq-roundno[hidden] { display: none; }
 .pq-soon { margin-left: auto; font-weight: 600; font-size: 13px; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 0 1 auto; }
 .pq-rev { white-space: nowrap; flex: 0 0 auto; }
 .pq-game-title { min-width: 0; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pq-game-head .pq-btn { flex: 0 0 auto; }
-.pq-game-title small { font-size: 11px; font-weight: 600; opacity: .7; margin-left: 4px; }
+.pq-game-title small { font-size: 12px; font-weight: 600; opacity: .85; margin-left: 4px; }
 /* Блок вопроса (P3b): высота фиксирована, длинный текст прокручивается, поэтому ряд вариантов и ввод всегда на одном месте. */
 .pq-qblock { flex: 0 0 auto; height: 104px; overflow-y: auto; overflow-x: hidden; margin-bottom: 6px; }
 .pq-qblock .pq-q { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .pq-qblock .pq-progress { margin: 0; }
 /* Ряд вариантов: высота кнопки фиксирована (до 3 строк), длинный ответ переносится внутри кнопки и не двигает остальные. */
 .pq-opts { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 74px; gap: 8px; }
-.pq-game .pq-opt { display: flex; align-items: center; gap: 4px; box-sizing: border-box; height: 100%; text-align: left; color: var(--pq-ink); background: #fffaf0; font-size: 17px; line-height: 1.15; padding: 8px 10px; overflow: hidden; }
-.pq-game .pq-opt .n { flex: 0 0 auto; min-width: 18px; opacity: .5; font-size: 13px; }
+.pq-game .pq-opt { display: flex; align-items: center; gap: 4px; box-sizing: border-box; height: 100%; text-align: left; color: var(--pq-ink); background: var(--pq-paper); font-size: 17px; line-height: 1.15; padding: 8px 10px; overflow: hidden; }
+.pq-game .pq-opt .n { flex: 0 0 auto; min-width: 18px; opacity: .85; font-size: 13px; }
 .pq-game .pq-opt .t { flex: 1 1 auto; min-width: 0; hyphens: none; word-break: normal; overflow-wrap: break-word; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
 .pq-game .pq-opt.long .t { font-size: 15px; }
 .pq-game .pq-opt.xlong .t { font-size: 13px; }
 .pq-game .pq-opt.xxlong .t { font-size: 11px; overflow-wrap: anywhere; }
 .pq-game .pq-opt.right { background: #8cc66a; }
 .pq-game .pq-opt.wrong { background: #e88e7c; }
-.pq-built { min-height: 44px; display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 2px dashed var(--pq-wood); border-radius: 6px; margin-bottom: 8px; background: #fffaf0; }
+.pq-built { min-height: 44px; display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; border: 2px dashed var(--pq-wood); border-radius: var(--pq-r-m); margin-bottom: 8px; background: var(--pq-paper); }
 .pq-pool { display: flex; flex-wrap: wrap; gap: 6px; }
-.pq-game .pq-tile { color: var(--pq-ink); background: #f2dcae; font-size: 17px; padding: 8px 10px; }
+.pq-game .pq-tile { color: var(--pq-ink); background: var(--pq-tile); font-size: 17px; padding: 8px 10px; }
 .pq-game .pq-tile[disabled] { opacity: .25; }
 .pq-dir { flex: 0 0 auto; font-size: 13px !important; padding: 5px 8px !important; }
-.pq-dir[aria-pressed='true'] { background: #f2d552; color: var(--pq-ink); }
+.pq-dir[aria-pressed='true'] { background: var(--pq-gold); color: var(--pq-ink); }
 .pq-dir[hidden] { display: none; }
-.pq-type { width: 100%; box-sizing: border-box; font-size: 20px; padding: 8px 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fffaf0; color: var(--pq-ink); }
+.pq-type { width: 100%; box-sizing: border-box; font-size: 20px; padding: 8px 10px; border: var(--pq-line-ink); border-radius: var(--pq-r-m); background: var(--pq-paper); color: var(--pq-ink); }
 .pq-fb { margin-top: 8px; font-size: 15px; }
 .pq-fb .big { font-size: 20px; font-weight: 800; }
-.pq-game.kb .is-focus, .pq-game :focus-visible { outline: 3px solid var(--pq-accent); outline-offset: 1px; }
+.pq-game.kb .is-focus, .pq-game :focus-visible { outline: 3px solid var(--pq-focus); outline-offset: 1px; }
+.pq-game.kb .pq-game-foot .is-focus, .pq-game.kb .pq-game-head .is-focus, .pq-game .pq-game-foot :focus-visible, .pq-game .pq-game-head :focus-visible { outline-color: var(--pq-gold); }
 /* F5a: после ответа лист не прокручивается, результат стоит на месте вопроса (в блоке той же высоты). */
 .pq-game-paper.fit { overflow: hidden; }
 .pq-qblock .pq-fb, .pq-pool .pq-fb { margin: 0; width: 100%; }
@@ -124,7 +125,7 @@ ${SPELL_CSS}
 .pq-fb .big .lbl { font-size: 13px; font-weight: 600; opacity: .75; margin-right: 4px; }
 .pq-fb .sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pq-qblock .pq-fb .pq-progress { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pq-fb .tmr { display: none; font-size: 13px; font-weight: 600; color: #4a6b2a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pq-fb .tmr { display: none; font-size: 13px; font-weight: 600; color: var(--pq-green-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pq-game-title .short { display: none; }
 @media (max-width: 520px) {
   /* Узко: шапка в одну строку. Приоритет метке «наоборот», название сокращено, «созреет завтра» уходит в блок результата, «Выйти» — крестик. */

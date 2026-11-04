@@ -13,7 +13,7 @@ const css = `
 .pc-rows { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
 .pc-row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 2px; border-bottom: 1px dashed var(--pq-wood-dark); font-size: 16px; }
 .pc-row b { text-align: right; }
-.pc-next { background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; padding: 8px 10px; font-size: 15px; }
+.pc-next { background: var(--pq-paper); border: var(--pq-line); border-radius: var(--pq-r-l); padding: 8px 10px; font-size: 15px; }
 .pc-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .pc-btns .pq-btn { flex: 1 1 auto; }
 `;

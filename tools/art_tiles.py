@@ -13,19 +13,36 @@ def grid(fill: str) -> list[list[str | None]]:
     return [[fill] * T for _ in range(T)]
 
 
-def grass(seed: int):
+def blob(g, rng, tone: str, steps: int) -> None:
+    """Плотное пятно с неровным краем, с заворотом через край: клетки стыкуются без шва."""
+    cx, cy = rng.randrange(T), rng.randrange(T)
+    r = 1 + steps / 6
+    for dy in range(-3, 4):
+        for dx in range(-3, 4):
+            if (dx / r) ** 2 + (dy / (r * 0.75)) ** 2 + rng.random() * 0.5 <= 1:
+                g[(cy + dy) % T][(cx + dx) % T] = tone
+
+
+def blade(g, x: int, y: int, dark: str, tip: str) -> None:
+    """Травинка: тёмный стебель, светлая вершина."""
+    g[y % T][x % T] = dark
+    g[(y - 1) % T][x % T] = dark
+    g[(y - 2) % T][(x + 1) % T] = tip
+
+
+def grass(seed: int, band: int = 1):
+    """Трава: крупные мягкие пятна вместо пиксельного шума. band 0 — темнее, 1 — средняя, 2 — светлая поляна."""
     rng = random.Random(seed)
     g = grid('grass.2')
-    for _ in range(9):
-        x, y = rng.randrange(T), rng.randrange(T)
-        g[y][x] = 'grass.3'
-    for _ in range(6):
-        x, y = rng.randrange(T), rng.randrange(T)
-        g[y][x] = 'grass.1'
-    for _ in range(2):
-        # травинка: тёмный стебель с светлой вершиной
-        x, y = rng.randrange(1, T - 1), rng.randrange(3, T)
-        g[y][x] = 'grass.1'; g[y - 1][x] = 'grass.1'; g[y - 2][x] = 'grass.3'
+    dark, light = ((2, 0), (1, 1), (0, 2))[band]
+    for _ in range(dark):
+        blob(g, rng, 'grass.1', rng.randrange(5, 10))
+    for _ in range(light):
+        blob(g, rng, 'grass.3', rng.randrange(5, 10))
+    blade(g, rng.randrange(T), rng.randrange(T), 'grass.1', 'grass.3')
+    if band == 2:
+        for _ in range(3):
+            g[rng.randrange(T)][rng.randrange(T)] = 'grass.4'
     return g
 
 
@@ -63,6 +80,45 @@ def patch(mat: str, seed: int, mask: int, furrow: bool):
                 g[y][x] = 'grass.1' if (x + y) % 2 else 'grass.2'
             elif d == 1:
                 g[y][x] = f'{mat}.0' if furrow else f'{mat}.1'
+    return g
+
+
+# Глубина рваного края дорожки по сторонам: период 16, поэтому соседние клетки стыкуются.
+EDGE = {
+    N: (1, 2, 2, 1, 1, 2, 3, 2, 1, 1, 2, 2, 3, 2, 1, 1),
+    S: (2, 1, 1, 2, 3, 2, 1, 1, 2, 3, 3, 2, 1, 2, 2, 1),
+    W: (2, 2, 1, 1, 2, 3, 2, 1, 1, 2, 2, 1, 2, 3, 2, 1),
+    E: (1, 2, 3, 2, 1, 1, 2, 1, 2, 2, 3, 2, 1, 1, 2, 2),
+}
+
+
+def path_patch(seed: int, mask: int):
+    """Тропа: утоптанная земля пятнами и камешками, край рваный, трава заходит на неё неровно, без прямой линии."""
+    rng = random.Random(seed)
+    g = [['dirt.2'] * T for _ in range(T)]
+    for _ in range(3):
+        blob(g, rng, 'dirt.3', rng.randrange(6, 12))
+    for _ in range(3):
+        blob(g, rng, 'dirt.1', rng.randrange(3, 7))
+    for _ in range(3):
+        x, y = rng.randrange(T), rng.randrange(T - 1)
+        g[y][x] = 'dirt.4'
+        g[y + 1][x] = 'dirt.1'
+    def inset(x: int, y: int) -> int:
+        """Сколько пикселей до края с учётом рваной глубины; <0 — трава."""
+        ds = []
+        if not mask & N: ds.append(y - EDGE[N][x])
+        if not mask & S: ds.append(T - 1 - y - EDGE[S][x])
+        if not mask & W: ds.append(x - EDGE[W][y])
+        if not mask & E: ds.append(T - 1 - x - EDGE[E][y])
+        return min(ds) if ds else 99
+    for y in range(T):
+        for x in range(T):
+            d = inset(x, y)
+            if d < 0 or corner_cut(mask, x, y):
+                g[y][x] = 'grass.3' if rng.random() < 0.12 else 'grass.2' if rng.random() < 0.75 else 'grass.1'
+            elif d == 0 and rng.random() < 0.55:
+                g[y][x] = 'dirt.1'
     return g
 
 
@@ -108,18 +164,25 @@ def soil_patch(seed: int, mask: int):
 
 
 def floor(seed: int):
+    """Половицы: три длинные доски на клетку, мягкий шов, волокна штрихами, стык редко. Без «кирпичной» светлой кромки."""
     rng = random.Random(seed)
     g = grid('plank.2')
-    for row in range(4):
-        y0 = row * 4
+    tops = (0, 5, 10)
+    for i, y0 in enumerate(tops):
+        y1 = (tops + (T,))[i + 1]
         for x in range(T):
-            g[y0][x] = 'plank.3'
-            g[y0 + 3][x] = 'plank.1'
-        jx = (seed * 5 + row * 7) % T
-        for y in range(y0, y0 + 4):
-            g[y][jx] = 'plank.1'
-        for _ in range(3):
-            g[y0 + rng.randrange(1, 3)][rng.randrange(T)] = 'plank.1' if rng.random() < 0.5 else 'plank.3'
+            g[y1 - 1][x] = 'plank.1'
+            if rng.random() < 0.35:
+                g[y0][x] = 'plank.3'
+        for _ in range(2):
+            y = rng.randrange(y0 + 1, y1 - 1)
+            x = rng.randrange(T)
+            for k in range(rng.randrange(3, 7)):
+                g[y][(x + k) % T] = 'plank.1' if seed % 2 else 'plank.3'
+    jy = tops[seed % 3]
+    jx = (seed * 5 + 3) % T
+    for y in range(jy, jy + 4):
+        g[y][jx] = 'plank.1'
     return g
 
 
@@ -189,13 +252,14 @@ def fence(mask: int):
 
 def build() -> None:
     sh = Sheet('t_grass', T, T, anchor=[8, 15])
-    for i in range(4):
-        sh.add(grass(i + 1))
+    for band in range(3):
+        for i in range(4):
+            sh.add(grass(band * 10 + i + 1, band))
     emit(sh)
     for sid, mat, furrow, seed in (('t_path', 'dirt', False, 21), ('t_soil', 'soil', True, 31)):
         s = Sheet(sid, T, T, anchor=[8, 15])
         for mask in range(16):
-            s.add(soil_patch(seed + mask, mask) if furrow else patch(mat, seed + mask, mask, furrow))
+            s.add(soil_patch(seed + mask, mask) if furrow else path_patch(seed + mask, mask) if mat == 'dirt' else patch(mat, seed + mask, mask, furrow))
         emit(s)
     f = Sheet('t_fence', T, T, anchor=[8, 15])
     for mask in range(16):

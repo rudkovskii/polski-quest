@@ -12,25 +12,27 @@ import { THEME_CSS } from './theme';
 export const PANEL_CSS = `
 ${THEME_CSS}
 .pq-panel { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 12px;
-  background: rgba(42, 20, 24, .55); font: 16px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: var(--pq-ink); }
+  background: rgba(42, 20, 24, .55); font: 16px/1.3 var(--pq-font); color: var(--pq-ink); }
 .pq-panel[hidden] { display: none; }
 .pq-frame { width: min(560px, 100%); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; box-sizing: border-box;
-  background: var(--pq-wood); border: 3px solid var(--pq-ink); border-radius: 12px; box-shadow: 0 4px 0 var(--pq-ink), inset 0 0 0 2px var(--pq-wood-dark); padding: 8px; }
+  background: var(--pq-board); border: var(--pq-line-bold); border-radius: var(--pq-r-l); box-shadow: var(--pq-board-edge); padding: 8px; }
 .pq-frame.wide { width: min(940px, 100%); }
 .pq-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--pq-cream); padding: 2px 4px 8px; }
-.pq-head h2 { margin: 0; font-size: 21px; letter-spacing: .3px; }
-.pq-x { font-family: inherit; font-weight: 700; font-size: 18px; line-height: 1; width: 36px; height: 36px; padding: 0; color: var(--pq-cream); background: var(--pq-wood-dark); border: 2px solid var(--pq-ink);
-  border-radius: 6px; box-shadow: 0 2px 0 var(--pq-ink); cursor: pointer; touch-action: manipulation; }
-.pq-body { background: var(--pq-cream); border: 2px solid var(--pq-ink); border-radius: 6px; padding: 12px; overflow-y: auto; overflow-x: hidden; flex: 1 1 auto; min-height: 0;
+.pq-head h2 { margin: 0; font-size: 21px; letter-spacing: .3px; text-shadow: 0 2px 0 var(--pq-wood-dark); }
+.pq-x { font-family: inherit; font-weight: 700; font-size: 18px; line-height: 1; width: 36px; height: 36px; padding: 0; color: var(--pq-cream); background: var(--pq-wood-dark); border: var(--pq-line-ink);
+  border-radius: var(--pq-r-m); box-shadow: var(--pq-bevel), var(--pq-step-2); cursor: pointer; touch-action: manipulation; }
+.pq-body { background: var(--pq-cream); border: var(--pq-line-ink); border-radius: var(--pq-r-m); box-shadow: var(--pq-paper-edge); padding: 12px; overflow-y: auto; overflow-x: hidden; flex: 1 1 auto; min-height: 0;
   box-sizing: border-box; -webkit-overflow-scrolling: touch; }
 .pq-foot { color: var(--pq-cream); padding: 8px 4px 0; font-size: 14px; }
 .pq-foot[hidden] { display: none; }
-.pq-panel .is-focus { outline: 3px solid var(--pq-accent); outline-offset: 1px; }
+.pq-panel .is-focus { outline: 3px solid var(--pq-focus); outline-offset: 1px; }
 /* F5a: после касания рамки выбора нет (на телефоне она читалась как «нажми сюда»); вернётся от стрелок и клавиш. */
 .pq-panel.touch .is-focus { outline: none; }
-.pq-panel .pq-btn[disabled] { opacity: .45; cursor: default; box-shadow: 0 3px 0 var(--pq-ink); }
+.pq-panel .pq-btn[disabled] { background: var(--pq-off-bg); color: var(--pq-off-ink); cursor: default; box-shadow: var(--pq-step-3); }
+/* Польское название на кнопке доски (стиль прописан в разметке): на дереве нужен контраст 4.5:1. */
+.board-pl { opacity: .85 !important; }
 .pq-panel .pq-btn.small { padding: 7px 10px; font-size: 14px; }
-.pq-panel .pq-btn.on { background: var(--pq-accent); }
+.pq-panel .pq-btn.on { background: var(--pq-accent); color: var(--pq-ink); }
 .pq-pl { font-weight: 700; }
 .pq-muted { opacity: .72; }
 @media (max-width: 640px) {

@@ -104,7 +104,8 @@ export interface TilesetMeta {
   spacing: number;
   columns: number;
   count: number;
-  tiles: Record<string, { kind: 'single' | 'variants' | 'auto16'; frames: number[] }>;
+  /** `bands`: кадры `variants` идут равными группами по тону, группу выбирает пятно на карте (`patchBand`). */
+  tiles: Record<string, { kind: 'single' | 'variants' | 'auto16'; frames: number[]; bands?: number }>;
 }
 
 /** Детерминированный выбор варианта по клетке: одна и та же карта всегда выглядит одинаково. */
@@ -112,6 +113,24 @@ export function cellHash(x: number, y: number): number {
   let n = (x * 374761393 + y * 668265263) | 0;
   n = Math.imul(n ^ (n >>> 13), 1274126177);
   return (n ^ (n >>> 16)) >>> 0;
+}
+
+const smooth = (t: number): number => t * t * (3 - 2 * t);
+
+/** Шаг крупных пятен, клеток: трава лежит полянами, а не шумом. */
+const PATCH = 5;
+
+/** Какая группа тона на клетке: гладкий шум по редкой сетке с лёгким дрожанием на границе. */
+export function patchBand(x: number, y: number, bands: number): number {
+  const ix = Math.floor(x / PATCH);
+  const iy = Math.floor(y / PATCH);
+  const fx = smooth(x / PATCH - ix);
+  const fy = smooth(y / PATCH - iy);
+  const at = (a: number, b: number): number => (cellHash(a + 11, b + 29) % 1000) / 1000;
+  const top = at(ix, iy) * (1 - fx) + at(ix + 1, iy) * fx;
+  const bottom = at(ix, iy + 1) * (1 - fx) + at(ix + 1, iy + 1) * fx;
+  const v = top * (1 - fy) + bottom * fy + ((cellHash(x, y) % 100) / 100 - 0.5) * 0.14;
+  return Math.max(0, Math.min(bands - 1, Math.floor(v * bands)));
 }
 
 /** Индекс кадра тайлсета для клетки или -1 (пусто). Неизвестный тайл = ошибка контента. */
@@ -131,8 +150,11 @@ export function frameFor(
   switch (t.kind) {
     case 'single':
       return t.frames[0]!;
-    case 'variants':
-      return t.frames[cellHash(x, y) % t.frames.length]!;
+    case 'variants': {
+      if (!t.bands) return t.frames[cellHash(x, y) % t.frames.length]!;
+      const size = Math.floor(t.frames.length / t.bands);
+      return t.frames[patchBand(x, y, t.bands) * size + (cellHash(x, y) % size)]!;
+    }
     case 'auto16':
       // Без `auto` в легенде берётся «центр» (все соседи такие же).
       return t.frames[e.auto ? neighborMask(grid, x, y) : 15]!;

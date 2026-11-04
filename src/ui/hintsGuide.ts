@@ -22,12 +22,12 @@ export const GUIDE_GOAL: Readonly<Record<GuideStage, 'desk' | 'board'>> = { desk
 const css = `
 ${THEME_CSS}
 .pq-guide { position: fixed; z-index: 33; pointer-events: none; transform: translate(-50%, -100%); max-width: min(240px, calc(100vw - 24px)); padding: 5px 10px;
-  background: var(--pq-cream); color: var(--pq-ink); border: 2px solid var(--pq-ink); border-radius: 8px; box-shadow: 0 2px 0 var(--pq-ink); text-align: center;
-  font: 700 14px/1.2 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
+  background: var(--pq-cream); color: var(--pq-ink); border: var(--pq-line-ink); border-radius: var(--pq-r-l); box-shadow: var(--pq-step-2); text-align: center;
+  font: 700 14px/1.2 var(--pq-font); white-space: nowrap; }
 .pq-guide[data-stage="replant"] { white-space: normal; width: max-content; }
 .pq-guide::after { content: ''; position: absolute; left: 50%; bottom: -7px; margin-left: -6px; border: 6px solid transparent; border-bottom: 0; border-top-color: var(--pq-ink); }
 .pq-guide-arrow { position: fixed; z-index: 33; pointer-events: none; width: 0; height: 0; margin: -16px 0 0 -15px; border: 15px solid transparent; border-bottom: 0;
-  border-top: 22px solid var(--pq-accent); filter: drop-shadow(0 2px 0 var(--pq-ink)); transform-origin: 50% 50%; }
+  border-top: 22px solid var(--pq-accent); filter: drop-shadow(var(--pq-step-2)); transform-origin: 50% 50%; }
 .pq-guide-arrow[data-bob] { animation: pq-guide-bob .9s ease-in-out infinite; }
 .pq-guide[hidden], .pq-guide-arrow[hidden] { display: none; }
 @keyframes pq-guide-bob { 0%, 100% { translate: 0 -6px; } 50% { translate: 0 0; } }

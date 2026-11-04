@@ -60,5 +60,5 @@ export function createTips(deps: TipsDeps): Tips {
 }
 
 export const TIP_CSS = `
-.pq-tip { background: #ffe9c2; border: 2px dashed var(--pq-accent); border-radius: 6px; padding: 6px 9px; font-size: 14px; font-weight: 600; }
+.pq-tip { background: var(--pq-note); border: var(--pq-line-note); border-radius: var(--pq-r-m); padding: 6px 9px; font-size: 14px; font-weight: 600; }
 `;

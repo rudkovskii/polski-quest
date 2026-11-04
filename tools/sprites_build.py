@@ -42,7 +42,7 @@ T = 16  # тайл и кратность кадров
 PAD = 1  # extrude вокруг кадра
 LATE_PREFIXES = ('w2_', 'geo_', 't2_')  # спрайты v2: порядок упаковки после всех прочих
 LAST_PREFIXES = ('plant_',)  # «пёстрый огород» (кусты, плоды, мини-иконки): после v2, координаты прежних кадров не двигаются
-FINAL_PREFIXES = ('beaver',)  # бобёр, хатка и пруд: после всего, координаты прежних кадров не двигаются
+FINAL_PREFIXES = ('beaver', 'v3_')  # бобёр, хатка и пруд: после всего, координаты прежних кадров не двигаются
 
 RGBA = tuple[int, int, int, int]
 
@@ -369,6 +369,8 @@ def build_tileset(tsid: str, sprites: dict[str, SpriteDef], pal: Palette) -> tup
             tiles[name] = {'kind': 'single', 'frames': [add(stack(t['stack'], where))]}
         elif 'variants' in t:
             tiles[name] = {'kind': 'variants', 'frames': [add(cell(r, where)) for r in t['variants']]}
+            if t.get('bands'):
+                tiles[name]['bands'] = t['bands']
         elif 'auto16' in t:
             key, bx, by = t['auto16']
             tiles[name] = {'kind': 'auto16', 'frames': [add(cell([key, bx + ox, by + oy], where)) for ox, oy in AUTO16_OFFSETS]}

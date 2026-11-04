@@ -2525,7 +2525,15 @@
    "t_grass/0",
    "t_grass/1",
    "t_grass/2",
-   "t_grass/3"
+   "t_grass/3",
+   "t_grass/4",
+   "t_grass/5",
+   "t_grass/6",
+   "t_grass/7",
+   "t_grass/8",
+   "t_grass/9",
+   "t_grass/10",
+   "t_grass/11"
   ],
   "anims": {}
  },
@@ -2654,6 +2662,219 @@
   ],
   "frames": [
    "tree2/0"
+  ],
+  "anims": {}
+ },
+ "v3_barrel": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_barrel/0"
+  ],
+  "anims": {}
+ },
+ "v3_crate": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_crate/0"
+  ],
+  "anims": {}
+ },
+ "v3_hay": {
+  "size": [
+   32,
+   16
+  ],
+  "anchor": [
+   16,
+   15
+  ],
+  "frames": [
+   "v3_hay/0"
+  ],
+  "anims": {}
+ },
+ "v3_lantern": {
+  "size": [
+   16,
+   32
+  ],
+  "anchor": [
+   8,
+   31
+  ],
+  "frames": [
+   "v3_lantern/0"
+  ],
+  "anims": {}
+ },
+ "v3_leaves": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_leaves/0"
+  ],
+  "anims": {}
+ },
+ "v3_logs": {
+  "size": [
+   32,
+   16
+  ],
+  "anchor": [
+   16,
+   15
+  ],
+  "frames": [
+   "v3_logs/0"
+  ],
+  "anims": {}
+ },
+ "v3_mushrooms": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_mushrooms/0"
+  ],
+  "anims": {}
+ },
+ "v3_pebbles": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_pebbles/0"
+  ],
+  "anims": {}
+ },
+ "v3_pond": {
+  "size": [
+   80,
+   48
+  ],
+  "anchor": [
+   40,
+   47
+  ],
+  "frames": [
+   "v3_pond/0",
+   "v3_pond/1",
+   "v3_pond/2",
+   "v3_pond/3"
+  ],
+  "anims": {}
+ },
+ "v3_pumpkins": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_pumpkins/0"
+  ],
+  "anims": {}
+ },
+ "v3_stump": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_stump/0"
+  ],
+  "anims": {}
+ },
+ "v3_tuft": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_tuft/0"
+  ],
+  "anims": {}
+ },
+ "v3_tuft2": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_tuft2/0"
+  ],
+  "anims": {}
+ },
+ "v3_tuft3": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_tuft3/0"
+  ],
+  "anims": {}
+ },
+ "v3_twigs": {
+  "size": [
+   16,
+   16
+  ],
+  "anchor": [
+   8,
+   15
+  ],
+  "frames": [
+   "v3_twigs/0"
   ],
   "anims": {}
  },

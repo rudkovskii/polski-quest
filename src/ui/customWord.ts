@@ -12,27 +12,27 @@ export const CUSTOM_CSS = `
 .dict [hidden] { display: none !important; }
 .cw { display: flex; flex-direction: column; gap: 10px; }
 .cw-ask { display: flex; gap: 8px; align-items: center; }
-.cw-ask input { flex: 1 1 auto; min-width: 0; height: 44px; font: inherit; font-size: 18px; padding: 0 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fffaf0; color: var(--pq-ink); box-sizing: border-box; }
+.cw-ask input { flex: 1 1 auto; min-width: 0; height: 44px; font: inherit; font-size: 18px; padding: 0 10px; border: var(--pq-line-ink); border-radius: var(--pq-r-m); background: var(--pq-paper); color: var(--pq-ink); box-sizing: border-box; }
 .cw-ask .pq-btn { flex: 0 0 auto; height: 44px; }
 .cw-lead { font-size: 14px; opacity: .8; }
 .cw-msg { font-size: 15px; }
-.cw-msg.warn { background: #ffe9c2; border: 2px dashed var(--pq-accent); border-radius: 6px; padding: 7px 9px; }
-.cw-msg.ok { background: #e3f0c8; border: 2px solid var(--pq-wood-dark); border-radius: 6px; padding: 8px 10px; }
+.cw-msg.warn { background: var(--pq-note); border: var(--pq-line-note); border-radius: var(--pq-r-m); padding: 7px 9px; }
+.cw-msg.ok { background: var(--pq-ok-soft); border: var(--pq-line); border-radius: var(--pq-r-m); padding: 8px 10px; }
 .cw-h { font-size: 14px; font-weight: 700; opacity: .85; margin-top: 2px; }
 .cw-list { display: flex; flex-direction: column; gap: 6px; }
-.cw-var { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 8px; align-items: center; text-align: left; font: inherit; color: var(--pq-ink); background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 6px; padding: 8px 10px; min-height: 52px; cursor: pointer; box-sizing: border-box; }
+.cw-var { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 8px; align-items: center; text-align: left; font: inherit; color: var(--pq-ink); background: var(--pq-paper); border: var(--pq-line); border-radius: var(--pq-r-m); padding: 8px 10px; min-height: 52px; cursor: pointer; box-sizing: border-box; }
 .cw-varrow { display: flex; align-items: center; gap: 8px; } .cw-varrow > .cw-var { flex: 1 1 auto; min-width: 0; }
 .cw-base .plrow { grid-column: 1; display: flex; align-items: center; gap: 8px; min-width: 0; } .cw-base .plrow .pl { flex: 0 1 auto; }
 .cw-var .pl { font-size: 20px; font-weight: 700; overflow-wrap: anywhere; }
 .cw-var .meta { grid-column: 1; font-size: 13px; opacity: .75; overflow-wrap: anywhere; }
 .cw-var .go { grid-row: 1 / span 2; grid-column: 2; font-size: 20px; opacity: .6; }
-.cw-base { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; background: #e3f0c8; border: 2px solid var(--pq-wood-dark); border-radius: 6px; padding: 8px 10px; }
+.cw-base { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: center; background: var(--pq-ok-soft); border: var(--pq-line); border-radius: var(--pq-r-m); padding: 8px 10px; }
 .cw-base .pl { font-size: 19px; font-weight: 700; overflow-wrap: anywhere; }
 .cw-base .ru { grid-column: 1; font-size: 14px; opacity: .8; overflow-wrap: anywhere; }
 .cw-base .act { grid-row: 1 / span 2; grid-column: 2; font-size: 14px; }
-.cw-form { display: flex; flex-direction: column; gap: 8px; background: #fffaf0; border: 2px solid var(--pq-wood-dark); border-radius: 8px; padding: 12px; }
+.cw-form { display: flex; flex-direction: column; gap: 8px; background: var(--pq-paper); border: var(--pq-line); border-radius: var(--pq-r-l); padding: 12px; }
 .cw-form label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; opacity: .9; }
-.cw-form input { font: inherit; font-size: 17px; height: 42px; padding: 0 10px; border: 2px solid var(--pq-ink); border-radius: 6px; background: #fff; color: var(--pq-ink); box-sizing: border-box; min-width: 0; }
+.cw-form input { font: inherit; font-size: 17px; height: 42px; padding: 0 10px; border: var(--pq-line-ink); border-radius: var(--pq-r-m); background: #fff; color: var(--pq-ink); box-sizing: border-box; min-width: 0; }
 .cw-form .tr { font-style: italic; opacity: .75; min-height: 20px; }
 .cw-form .opt { display: grid; grid-template-columns: 1fr; gap: 6px; }
 .cw-form .btns { display: flex; flex-wrap: wrap; gap: 8px; }

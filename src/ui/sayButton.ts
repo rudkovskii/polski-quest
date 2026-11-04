@@ -52,10 +52,10 @@ export function polishPart(text: string): string {
 
 export const SAY_CSS = `
 .pq-say { position: relative; box-sizing: border-box; flex: 0 0 auto; width: 28px; height: 28px; min-width: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
-  color: var(--pq-ink); background: #f2d552; border: 2px solid var(--pq-ink); border-radius: 6px; box-shadow: 0 2px 0 var(--pq-ink); cursor: pointer; touch-action: manipulation; font: 14px/1 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  color: var(--pq-ink); background: var(--pq-gold); border: var(--pq-line-ink); border-radius: var(--pq-r-m); box-shadow: var(--pq-step-2); cursor: pointer; touch-action: manipulation; font: 14px/1 var(--pq-font); }
 .pq-say::before { content: '\\1F50A'; pointer-events: none; }
 .pq-say::after { content: ''; position: absolute; inset: -5px; }
-.pq-say:active { transform: translateY(1px); box-shadow: 0 1px 0 var(--pq-ink); }
+.pq-say:active { transform: translateY(1px); box-shadow: var(--pq-step-1); }
 .pq-say.inline { margin: -6px 0; }
 .pq-qrow { display: flex; align-items: flex-start; gap: 8px; }
 .pq-qrow > .pq-q, .pq-qrow > .txt { flex: 1 1 auto; min-width: 0; }

@@ -39,13 +39,13 @@ export const SPELL_CSS = `
 .pq-spell-q .pq-progress { margin: 0; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
 .pq-spell-q .pq-hintline { font-size: 13px; font-weight: 700; color: #7a4a00; }
 .pq-sw { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; max-width: 100%; }
-.pq-slots { display: flex; flex-wrap: wrap; align-items: center; column-gap: 12px; row-gap: 3px; min-height: 40px; padding: 4px; border: 2px dashed var(--pq-wood); border-radius: 6px; background: #fffaf0; }
-.pq-game .pq-slot { box-sizing: border-box; min-width: 30px; height: 36px; padding: 0 5px; font-size: 19px; font-weight: 700; color: var(--pq-ink); background: #fffaf0; border: 2px solid #c9b48a; border-radius: 6px; box-shadow: none; }
-.pq-game .pq-slot.full { background: #f2dcae; border-color: var(--pq-ink); }
+.pq-slots { display: flex; flex-wrap: wrap; align-items: center; column-gap: 12px; row-gap: 3px; min-height: 40px; padding: 4px; border: 2px dashed var(--pq-wood); border-radius: var(--pq-r-m); background: var(--pq-paper); }
+.pq-game .pq-slot { box-sizing: border-box; min-width: 30px; height: 36px; padding: 0 5px; font-size: 19px; font-weight: 700; color: var(--pq-ink); background: var(--pq-paper); border: 2px solid #c9b48a; border-radius: var(--pq-r-m); box-shadow: none; }
+.pq-game .pq-slot.full { background: var(--pq-tile); border-color: var(--pq-ink); }
 .pq-game .pq-slot.lock { background: #ffe9a8; }
 .pq-slot-fix { font-size: 19px; font-weight: 700; padding: 0 1px; }
 .pq-letters { display: flex; flex-wrap: wrap; gap: 5px; }
-.pq-game .pq-letter { min-width: 38px; height: 40px; padding: 0 6px; font-size: 20px; font-weight: 700; color: var(--pq-ink); background: #f2dcae; }
+.pq-game .pq-letter { min-width: 38px; height: 40px; padding: 0 6px; font-size: 20px; font-weight: 700; color: var(--pq-ink); background: var(--pq-tile); }
 .pq-game .pq-letter[disabled] { opacity: .2; }
 .pq-spell form { margin: 0; }
 .pq-spell .pq-type { font-size: 20px; padding: 6px 10px; }
@@ -58,7 +58,7 @@ export const SPELL_CSS = `
 .pq-spell-diff { font-size: 20px; font-weight: 800; letter-spacing: .5px; overflow-wrap: anywhere; line-height: 1.2; }
 .pq-spell-diff .lbl { font-size: 13px; font-weight: 600; opacity: .75; margin-right: 4px; letter-spacing: 0; }
 .pq-spell-diff .bad { color: #b3261e; text-decoration: line-through; }
-.pq-spell-diff .fix { color: #1d6b2a; background: #c6efb0; border-radius: 3px; text-decoration: underline; }
+.pq-spell-diff .fix { color: #1d6b2a; background: #c6efb0; border-radius: var(--pq-r-s); text-decoration: underline; }
 .pq-spell-diff.mine { font-size: 15px; font-weight: 700; opacity: .9; }
 @media (max-width: 520px) {
   .pq-game .pq-letter { min-width: 34px; height: 36px; font-size: 19px; padding: 0 4px; }

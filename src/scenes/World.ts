@@ -5,11 +5,14 @@ import type { BusEvents } from '../types/bus';
 import type { Dir, RoutedIntent } from '../types/input';
 import type { LocationMap, PropObject } from '../types/map';
 import { frameFor, tileLayers, type TilesetMeta, type Xy } from '../world/ascii';
+import { Atmosphere } from './atmosphere';
 import { BeaverLayer } from './beaverLayer';
 import type { BeaverApi } from '../systems/beaver';
 import { FarmLayer } from './farmLayer';
 import { ZagrodaLayer, applyEntries } from './zagrodaLayer';
 import { pickZoom } from '../world/camera';
+import { reducedMotion } from './motion';
+import { FxBudget } from '../world/fxBudget';
 import { SIGN_BUBBLE, signsOf, type Sign } from '../world/signs';
 import { COVER_ALPHA, coveringKeys, type CoverCandidate } from '../world/cover';
 import { LocationModel, type Actor, type WorldEvent } from '../world/location';
@@ -124,6 +127,9 @@ export class World extends Phaser.Scene {
   private zagroda: ZagrodaLayer | null = null;
   /** Бобёр (только ферма): гость на уровнях 0–9, хозяин хатки с 10-го; `api` кладёт в реестр main.ts. */
   private beaver: BeaverLayer | null = null;
+  /** Свет, ветер, частицы (`scenes/atmosphere.ts`); нет — настройка выключена или не WebGL. */
+  private atm: Atmosphere | null = null;
+  private readonly fxBudget = new FxBudget();
   /** Спрайты объектов карты по ключу `prop:<id>` (слой Zagroda меняет их вид по прогрессу). */
   private propSprites = new Map<string, Phaser.GameObjects.Sprite>();
   /** Таблички интерактивных объектов в пикселях мира и ключ последнего положения камеры, с которым они ушли в DOM. */
@@ -180,6 +186,7 @@ export class World extends Phaser.Scene {
     this.signs = signsOf(this.mapDef, T, (sprite) => this.sprites[sprite]?.size[1]);
     this.signsKey = '';
     this.buildActors();
+    this.buildAtmosphere();
     this.marker = this.add.graphics().setDepth(10_000);
     this.farm = this.mapDef.id === 'farm' ? new FarmLayer({ scene: this, model: this.model, sprites: this.sprites, hero: this.hero, soil: (c) => this.soil(c), toScreen: (x, y) => this.toScreen(x, y), inputOn: () => this.inputOn }) : null;
     this.zagroda = this.mapDef.id === 'zagroda' ? new ZagrodaLayer({ scene: this, model: this.model, sprites: this.sprites, props: this.propSprites, toScreen: (x, y) => this.toScreen(x, y) }) : null;
@@ -195,6 +202,10 @@ export class World extends Phaser.Scene {
     const offGoto = bus.on('world:goto', () => setTimeout(() => this.runGoto(), 0));
     const offTour = bus.on('polska:tour', ({ go }) => go && setTimeout(() => this.runGoto(), 0));
     const offPolska = bus.on('polska:auto', () => this.polskaToZagroda());
+    const stay = (): void => {
+      if (!this.leaving) this.go(this.mapDef.id, [this.model.player.tile[0], this.model.player.tile[1]], this.model.player.facing);
+    };
+    const offFx = bus.on('world:fx', stay);
     // Возврат к точке входа после игры: сцена дослушивает все обработчики шины (флаги автобега гаснут) и только потом ставит героя.
     const offReturn = bus.on('world:return', (s) => {
       pendingReturn = s;
@@ -231,12 +242,15 @@ export class World extends Phaser.Scene {
       offGoto();
       offTour();
       offPolska();
+      offFx();
       offReturn();
       offEntries();
       this.farm?.dispose();
       this.farm = null;
       this.zagroda?.dispose();
       this.zagroda = null;
+      this.atm?.dispose();
+      this.atm = null;
       watchers.delete(onDpad);
       this.game.events.off(Phaser.Core.Events.HIDDEN, onHidden);
       this.scale.off(Phaser.Scale.Events.RESIZE, this.layout, this);
@@ -347,6 +361,8 @@ export class World extends Phaser.Scene {
     this.syncCat();
     this.fadeCover();
     this.updateCamera();
+    this.atm?.update(time, delta, this.hero);
+    if (this.atm && this.fxBudget.tick(delta, 60)) this.atm.cutMotion();
     this.drawActionBubble(time);
     this.emitSigns();
     this.emitGuide();
@@ -392,6 +408,7 @@ export class World extends Phaser.Scene {
     cam.removeBounds();
     this.cam0 = { zoom, mw, mh, fitsW: mw * zoom <= width, fitsH: mh * zoom <= height - this.insets.top - this.insets.bottom };
     this.updateCamera();
+    this.atm?.layout(width, height, zoom);
   }
 
   /**
@@ -589,10 +606,40 @@ export class World extends Phaser.Scene {
         if (!this.anims.exists(key)) this.anims.create({ key, frames: meta.frames.map((f) => ({ key: ATLAS, frame: f })), frameRate: src.unlock ? 1.5 : 4, repeat: -1 });
         s.play(key);
       }
-      if (src.shadow) this.placeShadow(cx, bottom - 1, src.shadow, 2.5);
+      if (src.anim && meta.frames.length > 1 && !reducedMotion()) {
+        const key = `prop:${src.sprite}`;
+        if (!this.anims.exists(key)) this.anims.create({ key, frames: meta.frames.map((f) => ({ key: ATLAS, frame: f })), frameRate: src.anim, repeat: -1 });
+        s.play(key);
+      }
+      if (src.shadow && !this.fxOn()) this.placeShadow(cx, bottom - 1, src.shadow, 2.5);
       s.setData('sprite', src.sprite);
       this.propSprites.set(o.key, s);
     }
+  }
+
+  /** Настройка «Свет и эффекты»; эффекты только в WebGL. */
+  private fxOn(): boolean {
+    return this.registry.get('fx') === true && this.game.renderer.type === Phaser.WEBGL;
+  }
+
+  private buildAtmosphere(): void {
+    if (!this.fxOn()) return;
+    const hour = this.registry.get('hourNow') as (() => number) | undefined;
+    const solid = this.model.parsed;
+    const occupied = new Set<string>();
+    for (const o of this.model.objects) for (let x = 0; x < o.size[0]; x++) for (let y = 0; y < o.size[1]; y++) occupied.add(`${o.at[0] + x},${o.at[1] + y}`);
+    this.atm = new Atmosphere({
+      scene: this,
+      map: this.mapDef,
+      hour: () => hour?.() ?? 12,
+      props: this.propSprites,
+      sprites: this.sprites,
+      taken: (x, y) => occupied.has(`${x},${y}`) || solid.solid[y]?.[x] === true || solid.ground[y]?.[x] !== this.mapDef.defaultGround,
+      motion: !reducedMotion(),
+    });
+    const soft = this.atm.shadowAlpha;
+    this.heroShadow.setAlpha(soft);
+    this.catShadow?.setAlpha(soft);
   }
 
   private buildActors(): void {
@@ -671,7 +718,8 @@ export class World extends Phaser.Scene {
     const bottom = Math.round(fy * T + T + oy);
     s.setPosition(x, bottom);
     s.setDepth(10 + bottom);
-    shadow?.setPosition(x, bottom - 1);
+    const sh = this.atm?.shadowShift;
+    shadow?.setPosition(x + (sh?.dx ?? 0), bottom - 1 + (sh?.dy ?? 0));
   }
 
   private syncHero(time: number): void {
