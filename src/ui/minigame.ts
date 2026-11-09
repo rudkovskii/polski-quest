@@ -10,7 +10,7 @@ import type { GameMode, Side } from '../types/farm';
 import { el } from './dom';
 import { wordPopGuard } from './wordPick';
 import { MODE_NAME } from './glossary';
-import { Round, renderRoundSummary, roundCss, ROUND_SIZE } from './roundSummary';
+import { Round, renderRoundSummary, roundCss, roundNoText, ROUND_SIZE, type RoundLen } from './roundSummary';
 import { polishPart, sayButton, sayFocused, SAY_CSS, withSay, type SayFn } from './sayButton';
 import { renderSpell, spellFeedback, SPELL_CSS, type SpellView } from './spell';
 import { THEME_CSS } from './theme';
@@ -43,6 +43,8 @@ export interface MinigameDeps {
   say(id: string): void;
   /** Режим «Новые слова»: следующее слово и игра под него; null — новых нет. */
   fresh?(): { id: string; mode: GameMode } | null;
+  /** Длина раунда, выбранная на доске (09.11): «по 10» или «без конца». По умолчанию по 10. */
+  roundLen?(): RoundLen;
   /** Мини-игра закрылась. */
   onExit?(): void;
   /** Сенсорный экран (игра 5: польскую печать ведёт экранная клавиатура, системная спрятана). По умолчанию `pointer: coarse`. */
@@ -251,8 +253,9 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   /** «3 / 10»: номер текущего задания; после ответа остаётся тем же. В одиночном повторе растения счётчика нет. */
   const paintRound = (): void => {
     roundNo.hidden = !!only;
-    const shown = summaryOpen ? round.count : Math.min(ROUND_SIZE, round.count + (answered ? 0 : 1));
-    roundNo.textContent = `${shown} / ${ROUND_SIZE}`;
+    const next = round.count + (answered ? 0 : 1);
+    const shown = summaryOpen ? round.count : round.len === 'endless' ? next : Math.min(ROUND_SIZE, next);
+    roundNo.textContent = roundNoText(shown, round.len);
   };
   const reportHeight = (): void => {
     if (!open) return;
@@ -600,6 +603,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     // Раунд начинается при открытии; перезапуск из карточки «Фраз мало» (панель уже открыта) его не сбрасывает.
     if (!open) {
       round.reset();
+      round.len = deps.roundLen?.() ?? 'ten';
       roundN = 1;
       summaryOpen = false;
     }

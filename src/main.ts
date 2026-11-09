@@ -41,6 +41,7 @@ import { LONG_PRESS_MS, mountWordPick } from './ui/wordPick';
 import { mountDictionary } from './ui/dictionary';
 import { mountFloats } from './ui/float';
 import { mountMinigame } from './ui/minigame';
+import { ROUND_ENDLESS_HINT, type RoundLen } from './ui/roundSummary';
 import { mountMorning } from './ui/morning';
 import { mountPantry } from './ui/pantry';
 import { mountPlantCard } from './ui/plantCard';
@@ -335,7 +336,12 @@ async function main(): Promise<void> {
     restart: (mode) => game.start(mode),
     exit: () => game.stop(),
   });
+  // Длина раунда мини-игр (09.11): «по 10» или «без конца», выбор на доске, флаг в `Save.hints`.
+  const roundLen = (): RoundLen => (hasHint(ROUND_ENDLESS_HINT) ? 'endless' : 'ten');
+  const setRoundLen = (v: RoundLen): void =>
+    store.update((s: Save) => ({ ...s, hints: v === 'endless' ? [...s.hints.filter((h) => h !== ROUND_ENDLESS_HINT), ROUND_ENDLESS_HINT] : s.hints.filter((h) => h !== ROUND_ENDLESS_HINT) }), Date.now());
   const game = mountMinigame(overlay, {
+    roundLen,
     next: (mode, only, opts) => {
       const q = farm.next(mode, only, opts);
       if (!q && !only) queueMicrotask(() => gapCard.check(mode));
@@ -378,6 +384,7 @@ async function main(): Promise<void> {
   const board = mountBoard(overlay, {
     counts: () => (farm.refresh(), farm.counts()),
     onPick: (mode) => game.start(mode),
+    round: { get: roundLen, set: setRoundLen },
     fresh: { count: () => farm.freshCount(), start: () => game.startFresh() },
     phraseHint: () => farm.phraseHint(),
     plant: (ids) => farm.plant(ids),

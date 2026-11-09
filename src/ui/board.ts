@@ -7,6 +7,7 @@ import type { GameMode, PhraseHint } from '../types/farm';
 import { el } from './dom';
 import { MODE_ICON, MODE_NAME } from './glossary';
 import { createPanel, nav } from './panel';
+import { ROUND_SIZE, type RoundLen } from './roundSummary';
 
 export interface BoardDeps {
   bus?: Bus<BusEvents>;
@@ -21,6 +22,8 @@ export interface BoardDeps {
   plant?(ids: readonly string[]): void;
   /** v2: игры о Польше для вкладки «Polska»; нет — вкладки нет. */
   polska?: BoardPolska;
+  /** Длина раунда перед игрой (09.11): «по 10» или «без конца»; нет — переключателя нет. */
+  round?: { get(): RoundLen; set(v: RoundLen): void };
 }
 
 /** Вкладка «Polska»: строка игры, «Idź» и «Graj tu». */
@@ -90,6 +93,17 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(tab?: B
     const t = tabs();
     if (t) list.append(t);
     list.append(el('div', { class: 'pq-muted' }, `На грядках: слов ${c.words}, фраз ${c.phrases}. Пока отвечаешь, фермер сам поливает.`));
+    if (deps.round) {
+      const r = deps.round;
+      const cur = r.get();
+      const b = (v: RoundLen, label: string): HTMLElement =>
+        el(
+          'button',
+          { type: 'button', class: `pq-btn small${cur === v ? ' on' : ''}`, 'data-round-len': v, 'aria-pressed': cur === v ? 'true' : 'false', style: 'flex:1', ...nav('round', 'h', `round:${v}`), onclick: () => (r.set(v), render(), panel.syncFocus()) },
+          label,
+        );
+      list.append(el('div', { class: 'board-round', style: 'display:flex;align-items:center;gap:6px' }, el('span', { style: 'font-weight:700;font-size:14px' }, 'Раунд:'), b('ten', `По ${ROUND_SIZE}`), b('endless', '∞ Без конца')));
+    }
     if (deps.fresh) {
       const { count, start } = deps.fresh;
       const n = count();

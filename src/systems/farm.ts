@@ -22,6 +22,7 @@ import {
   REVERSE_AFTER,
   REVERSE_EVERY,
   FOCUS_EVERY,
+  NEW_EVERY,
   wantsReverse,
   isAssembleMode,
   needsProd,
@@ -353,6 +354,8 @@ export function createFarm(d: FarmDeps): Farm {
       // «Наоборот» не в первые REVERSE_AFTER ответов: сначала привычная сторона (P3a).
       const canReverse = !only && !isAssembleMode(mode) && sinceReverse >= REVERSE_EVERY - 1 && g.log.length >= REVERSE_AFTER;
       const outside = !only && ++issued % FOCUS_EVERY === 0;
+      // Новое слово — 1-е, 3-е, 5-е… задание (09.11): посаженное не стоит неполитым, пока очередь крутит повторения.
+      const fresh = !only && issued % NEW_EVERY === 1;
       const exclude = !only && isAssembleMode(mode) ? pausedAssemble() : undefined;
       const spellable = (x: string, side: Side): boolean => {
         const w = WORD_BY_ID.get(x);
@@ -360,7 +363,7 @@ export function createFarm(d: FarmDeps): Farm {
       };
       const id =
         only ??
-        pickTask(g, st, mode, now, today(), { recent, assemble, reverse: canReverse, outside, ...(exclude?.size ? { exclude } : {}), ...(mode === 5 ? { side: dir, spellable } : {}) });
+        pickTask(g, st, mode, now, today(), { recent, assemble, reverse: canReverse, outside, fresh, ...(exclude?.size ? { exclude } : {}), ...(mode === 5 ? { side: dir, spellable } : {}) });
       if (!id) {
         d.bus.emit('farm:focus', { id: null, tile: null, label: '' });
         return null;
