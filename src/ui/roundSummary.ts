@@ -6,6 +6,11 @@ import { el } from './dom';
 
 /** Заданий в одном раунде. */
 export const ROUND_SIZE = 10;
+/** Длина раунда на выбор перед игрой (09.11): «по 10» или «без конца» (итог — только когда поливать нечего). */
+export type RoundLen = 'ten' | 'endless';
+export const ROUND_ENDLESS_HINT = 'round:endless';
+/** Счётчик в шапке: «3 / 10» или «3 · ∞». */
+export const roundNoText = (n: number, len: RoundLen): string => (len === 'endless' ? `${n} · ∞` : `${n} / ${ROUND_SIZE}`);
 
 /** Что нужно раунду от результата ответа (подмножество `AnswerResult`). */
 export interface RoundAnswer {
@@ -35,6 +40,8 @@ export interface RoundStats {
 export class Round {
   private s: RoundStats = emptyStats();
   private streak = 0;
+  /** «Без конца»: раунд не заканчивается сам. */
+  len: RoundLen = 'ten';
 
   get stats(): Readonly<RoundStats> {
     return this.s;
@@ -43,7 +50,7 @@ export class Round {
     return this.s.total;
   }
   get done(): boolean {
-    return this.s.total >= ROUND_SIZE;
+    return this.len === 'ten' && this.s.total >= ROUND_SIZE;
   }
   add(r: RoundAnswer): void {
     const s = this.s;

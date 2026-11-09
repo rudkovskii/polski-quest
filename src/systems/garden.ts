@@ -464,6 +464,8 @@ export interface PickOpts {
   reverse?: boolean;
   /** Это «редкое» задание: взять растение из-за пределов рабочего набора (каждое FOCUS_EVERY-е). */
   outside?: boolean;
+  /** Слот нового слова (каждое NEW_EVERY-е задание): первым идёт ещё не политое растение, давно посаженные раньше (09.11). */
+  fresh?: boolean;
   /** Растения на паузе (игры 3 и 4 с одной-двумя фразами, F5b): их не берём вовсе, даже если больше брать нечего (тогда null). */
   exclude?: ReadonlySet<string>;
   /** Игра 5: сторона сборки (по умолчанию rp — по-польски, ответ «сам»; pr — по-русски). */
@@ -510,8 +512,24 @@ export const REVERSE_EVERY = 3;
 export const REVERSE_MIN_DIRECT = 2;
 /** «Наоборот» не в первые столько заданий за всё время (первый день: новичку сначала нужна привычная сторона). */
 export const REVERSE_AFTER = 10;
-/** Рабочий набор очереди: столько ближайших к урожаю растений получают почти все задания (P3a). */
+/** Рабочий набор очереди: столько растений получают почти все задания (P3a). */
 export const FOCUS_SIZE = 8;
+/**
+ * Из рабочего набора столько мест — младшим начатым растениям (семечко или росток с ответами): начатое слово
+ * доходит до ростка в тот же заход, пока свежо (09.11, жалоба Шэфа: неполитые семечки стояли, очередь крутила повторения).
+ */
+export const FOCUS_YOUNG = 4;
+/** Каждое столько-е задание (1-е, 3-е, 5-е…) — новое, ещё не политое слово, пока такие есть на грядках (09.11). */
+export const NEW_EVERY = 2;
+
+/**
+ * Слот нового слова выдаётся, пока начатых и ещё не проросших семечек меньше этого: новое идёт постоянно,
+ * но не копится полуначатым (как лимит новых карточек в интервальном повторении).
+ */
+export const LEARNING_CAP = 10;
+
+/** Растение посажено, но ещё ни разу не полито (ни одного верного ответа). */
+export const unstarted = (it: ItemState): boolean => it.stage === 'seed' && it.drops === 0 && !it.sides.pr && !it.sides.rp;
 /** Из скольких заданий одно берётся из-за пределов рабочего набора. */
 export const FOCUS_EVERY = 5;
 
@@ -580,14 +598,22 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
   const direct = (it: ItemState): boolean => mode !== 5 || spellable(it.id, side);
   const settled = (it: ItemState): boolean => settledToday(it, day, now, mode === 5);
   const progressOf = (it: ItemState): number => (STAGE_RANK[it.stage ?? 'seed'] ?? 0) * 100 + it.days.size * 10 + it.drops;
-  // Рабочий набор (P3a): FOCUS_SIZE ближайших к урожаю растений, которым сегодня ещё есть что дать; порядок устойчивый (по посадке).
-  const focus = new Set(
-    pool
-      .filter((it) => it.stage !== null && !settled(it))
-      .sort((a, b) => progressOf(b) - progressOf(a) || b.answers - a.answers || a.plantedAt - b.plantedAt || (g.slots[a.id] ?? 0) - (g.slots[b.id] ?? 0))
-      .slice(0, FOCUS_SIZE)
-      .map((it) => it.id),
-  );
+  // Рабочий набор (P3a): FOCUS_SIZE растений, которым сегодня ещё есть что дать; порядок устойчивый (по посадке).
+  // 09.11: до FOCUS_YOUNG мест — младшим начатым (семечко/росток с ответами, свежее начатые раньше), остальное — ближайшим к урожаю.
+  const live = pool.filter((it) => it.stage !== null && !settled(it));
+  const learning = pool.filter((it) => it.stage === 'seed' && !unstarted(it)).length;
+  const freshSlot = !!opts.fresh && learning < LEARNING_CAP;
+  const young = live
+    .filter((it) => (it.stage === 'seed' || it.stage === 'sprout') && !unstarted(it))
+    .sort((a, b) => (b.lastAnswer ?? 0) - (a.lastAnswer ?? 0) || a.plantedAt - b.plantedAt)
+    .slice(0, FOCUS_YOUNG);
+  const focus = new Set(young.map((it) => it.id));
+  for (const it of live
+    .filter((x) => !focus.has(x.id))
+    .sort((a, b) => progressOf(b) - progressOf(a) || b.answers - a.answers || a.plantedAt - b.plantedAt || (g.slots[a.id] ?? 0) - (g.slots[b.id] ?? 0))) {
+    if (focus.size >= FOCUS_SIZE) break;
+    focus.add(it.id);
+  }
   const key = (it: ItemState): number[] => {
     const over = isOverripe(it, now);
     const r = revFor(it);
@@ -602,7 +628,11 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
     // Ответу в этой игре сегодня нечего дать (ни стадии, ни зачёта дня): в конец, даже если растение в рабочем наборе
     // (P4a: `Dobranoc` 3 раза за 18 заданий без пользы).
     const useless = !helps && !harvest && it.days.has(day);
+    const fresh0 = freshSlot && !over && unstarted(it) && d;
     return [
+      // Слот нового слова: неполитое семечко вперёд всех, давно посаженное раньше.
+      fresh0 ? 0 : 1,
+      fresh0 ? it.plantedAt : 0,
       // Созревшее на сегодня (зачёт дня есть, до урожая нужен только следующий день) — в самый конец.
       settled(it) ? 1 : 0,
       useless ? 1 : 0,

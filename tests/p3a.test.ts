@@ -33,11 +33,13 @@ function play(seed: number, per = 15, acc = 0.75): number {
 
 describe('P3a: фокус-грядка', () => {
   // С 19.10 слову для урожая нужна ещё сборка в игре 5: в среднем ≈ 4,9 (порядок 1-5-2 — 4,75, 5-1-2 — 5,2; до игры 5 было ≈ 5,3).
-  it('19 слов, 3 дня по 15 ответов, 75% верно (игры 1, 2, 5): в среднем по 20 прогонам не меньше 4,7 урожая, лучшие прогоны ≥ 6', () => {
+  // 09.11: новое слово каждым 2-м заданием (newfirst.test.ts) — за 3 дня в среднем ≈ 3 урожая (было ≈ 4,9), зато начато больше слов;
+  // за 7 дней урожай не ниже прежнего (там же).
+  it('19 слов, 3 дня по 15 ответов, 75% верно (игры 1, 2, 5): в среднем по 20 прогонам не меньше 2,8 урожая, лучшие прогоны ≥ 5', () => {
     const res = Array.from({ length: 20 }, (_, i) => play(i + 1));
-    expect(res.reduce((a, b) => a + b, 0) / res.length).toBeGreaterThanOrEqual(4.7);
-    expect(Math.max(...res)).toBeGreaterThanOrEqual(6);
-    expect(Math.min(...res)).toBeGreaterThanOrEqual(3);
+    expect(res.reduce((a, b) => a + b, 0) / res.length).toBeGreaterThanOrEqual(2.8);
+    expect(Math.max(...res)).toBeGreaterThanOrEqual(5);
+    expect(Math.min(...res)).toBeGreaterThanOrEqual(1);
   });
 
   it('очередь не размазана по всем 19: первые 20 заданий — рабочий набор и редкие «чужие» (1 из 5)', () => {
@@ -52,8 +54,9 @@ describe('P3a: фокус-грядка', () => {
     }
     const counts = new Map<string, number>();
     for (const id of seen) counts.set(id, (counts.get(id) ?? 0) + 1);
-    expect([...counts.values()].filter((n) => n >= 2).length).toBeGreaterThanOrEqual(FOCUS_SIZE - 2);
-    expect(counts.size).toBeLessThanOrEqual(FOCUS_SIZE + 5);
+    // 09.11: каждое 2-е задание — новое слово, поэтому повторов меньше, а разных растений больше.
+    expect([...counts.values()].filter((n) => n >= 2).length).toBeGreaterThanOrEqual(FOCUS_SIZE - 4);
+    expect(counts.size).toBeLessThanOrEqual(FOCUS_SIZE + 6);
   });
 });
 

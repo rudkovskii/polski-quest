@@ -151,6 +151,10 @@ describe('игра 5 в модели роста: ответ «сам» (producti
     // Новый заход (очередь «не повторять подряд» пуста): ферма из того же сохранения.
     let g = s.saved();
     const f = createFarm({ bus: testBus(), load: () => g, save: (x) => (g = x), now: () => T0 + 2 * DAY_MS + 60_000, tz: () => 0, say: () => {}, rand: seeded(5) });
+    // 09.11: первое задание захода — новое, ещё не политое слово (NEW_EVERY), куст — следующим.
+    const first = f.next(5)!.id;
+    expect(first).not.toBe(ids[3]);
+    expect(ids).toContain(first);
     expect(f.next(5)!.id).toBe(ids[3]);
     const pr = f.next(5, undefined, { dir: 'pr' })!;
     expect(pr).toMatchObject({ kind: 'spell', dir: 'pr' });
