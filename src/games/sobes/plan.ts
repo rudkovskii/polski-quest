@@ -184,7 +184,8 @@ export class Ladder implements GameQueue<SobesTask> {
 /** Новые (ещё не читанные) по порядку пула, похожие не вместе. */
 export function newBundle(ctx: GameCtx, pool: readonly string[]): string[] {
   // «Новый» = ещё не читан карточкой (`seen`): экран выбора досаживает пул сам, посадка — не знакомство.
-  const fresh = pool.filter((id) => !ctx.seen(id));
+  // Вопрос со статусом «знаю» в дриле (лента собеса, 10.11) — только для повторения, в новые не идёт.
+  const fresh = pool.filter((id) => !ctx.seen(id) && ctx.unit(id)?.raw.status !== 'знаю');
   const known = pool.filter((id) => ctx.seen(id));
   return fitBundle(ctx, fresh, { avoidKin: true, known, rest: fresh });
 }

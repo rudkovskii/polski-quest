@@ -26,13 +26,18 @@ import {
   type PlantEntry,
 } from './garden';
 import { polskaScale, type PolskaScale } from './polskaScale';
-import { V2, unitsOfGame, type V2Content } from './v2content';
+import { V2, answerHash, unitsOfGame, type V2Content } from './v2content';
+import { forgetItem } from './customWords';
 import { entryFrames, plotMap, plotViews, type PlotRef } from './zagroda';
 
 export interface PolskaSave {
   garden: GardenSave;
   /** Знакомство («Poznaj datę», «Poznaj święto») показано и принято кнопкой «Понятно»: id единицы → ISO-дата. Старое сохранение без поля — пусто. */
   seen: Record<string, string>;
+  /** Отпечатки ответов собеса (`answerHash`): id → хеш. По ним лента ловит изменённый ответ (10.11). Старое сохранение — пусто. */
+  hashes?: Record<string, string>;
+  /** Последний применённый документ ленты собеса (`slowa/sobes.json`): главнее вшитого, работает и без сети. */
+  sobesFeed?: unknown;
 }
 
 export const newPolskaSave = (): PolskaSave => ({ garden: newGarden(), seen: {} });
@@ -43,7 +48,12 @@ export function normalizePolska(raw: unknown): PolskaSave {
   if (r.seen && typeof r.seen === 'object' && !Array.isArray(r.seen)) {
     for (const [id, v] of Object.entries(r.seen as Record<string, unknown>)) if (typeof v === 'string' && v) seen[id] = v;
   }
-  return { garden: normalizeGarden(r.garden), seen };
+  const hashes: Record<string, string> = {};
+  if (r.hashes && typeof r.hashes === 'object' && !Array.isArray(r.hashes)) {
+    for (const [id, v] of Object.entries(r.hashes as Record<string, unknown>)) if (typeof v === 'string' && v) hashes[id] = v;
+  }
+  const feed = r.sobesFeed && typeof r.sobesFeed === 'object' && Array.isArray((r.sobesFeed as { units?: unknown }).units) ? { sobesFeed: r.sobesFeed } : {};
+  return { garden: normalizeGarden(r.garden), seen, ...(Object.keys(hashes).length ? { hashes } : {}), ...feed };
 }
 
 /** Сколько семян и ростков одной игры растёт одновременно: движок досаживает из `pool` до этого числа. */
@@ -106,6 +116,13 @@ export interface Polska {
   /** Строка прогресса игры для доски: «12 из 72 · sad 3/16». */
   progress(game: PolskaGameId): { units: number; planted: number; grown: number; growing: number; objDone: number; objTotal: number };
   refresh(): void;
+  /**
+   * Контент сменился (лента собеса): сбросить кэши и сверить отпечатки ответов. Изменённый ответ — прогресс и знакомство
+   * по нему стираются (старые куски не показываем); новый — запоминается; первый раз (вшитое, старое сохранение) — без сброса.
+   */
+  syncContent(): { added: string[]; reset: string[] };
+  /** Запомнить документ ленты собеса в сохранении. */
+  setSobesFeed(doc: unknown): void;
   onChange(fn: () => void): () => void;
   readonly save: PolskaSave;
   readonly state: GardenState;
@@ -159,7 +176,7 @@ export function wantOf(it: ItemState, now: number, todayAnswers = 0): Omit<Want,
 
 export function createPolska(d: PolskaDeps): Polska {
   const content = d.content ?? V2;
-  const refs = plotMap(content.units);
+  let refs = plotMap(content.units);
   const drill = new Set(content.drillSeed);
   let p: PolskaSave = d.load();
   let st: GardenState = derive(p.garden);
@@ -347,6 +364,41 @@ export function createPolska(d: PolskaDeps): Polska {
       return { units: list.length, planted, grown, growing, objDone: views.filter((v) => v.pct >= 1).length, objTotal: views.length };
     },
     refresh: () => emit(),
+    syncContent() {
+      byGame.clear();
+      refs = plotMap(content.units);
+      const hashes = { ...(p.hashes ?? {}) };
+      const seenMap = { ...p.seen };
+      let g = p.garden;
+      const added: string[] = [];
+      const reset: string[] = [];
+      for (const u of content.units) {
+        if (u.kind !== 'answer') continue;
+        const h = answerHash(u);
+        const old = hashes[u.id];
+        if (old === undefined) {
+          if (!seenMap[u.id] && !st.items.has(u.id)) added.push(u.id);
+        } else if (old !== h) {
+          g = forgetItem(g, u.id);
+          delete seenMap[u.id];
+          reset.push(u.id);
+        }
+        hashes[u.id] = h;
+      }
+      const same = Object.keys(hashes).length === Object.keys(p.hashes ?? {}).length && Object.entries(hashes).every(([k, v]) => p.hashes?.[k] === v);
+      if (!same || reset.length) {
+        p = { ...p, garden: g, seen: seenMap, hashes };
+        if (reset.length) st = derive(g);
+        d.save(p);
+        for (const fn of [...listeners]) fn();
+      }
+      emit();
+      return { added, reset };
+    },
+    setSobesFeed(doc) {
+      p = { ...p, sobesFeed: doc };
+      d.save(p);
+    },
     onChange(fn) {
       listeners.add(fn);
       return () => listeners.delete(fn);

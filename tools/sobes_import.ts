@@ -1,5 +1,6 @@
 // Импорт вопросов собеса в игру «Sobes» (личная версия Шэфа, 30.10.2026): что сейчас учится в дриле → `content/v2/sobes.json`.
 //   npm run sobes            # записать sobes.json
+//   npm run sobes:feed        # лента: тот же документ на ветку `slowa` (игра читает его без выкладки сайта)
 //   npm run sobes -- --check # только сверить: файл совпадает с источником (exit 1, если нет)
 // Источники — папка `ПМЖ/Собес` (путь можно задать `SOBES_DIR`), своих копий текстов игра не держит:
 //   - `drill/progress.md`, таблица между якорями STATUSY: берутся слои «ядро» и «личное» со статусом «учу» или «тетрадка»,
@@ -7,6 +8,7 @@
 //   - `Miso-baza-voprosov.md`: вопрос, ответ и три строки разметки под ним — `**Kawałki:**` (ответ, порезанный « / »),
 //     `**Ru:**` (суть вопроса по-русски), `**Sedno:**` (факты ответа по-русски, через « · »). Склейка кусков обязана равняться ответу.
 // Вопрос в работе без разметки в игру не попадает и печатается списком: его размечают в базе (KM или руками) и запускают импорт снова.
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { isMain, ROOT } from './lib/files';
@@ -52,7 +54,7 @@ export function activeRows(progress: string): { n: number; status: string; layer
     if (c.length < 10 || !/^\d+$/.test(c[1]!)) continue;
     const layer = c[4]!;
     const status = c[5]!;
-    if (!['ядро', 'личное'].includes(layer) || !['учу', 'тетрадка'].includes(status)) continue;
+    if (!['ядро', 'личное'].includes(layer) || !['учу', 'тетрадка', 'знаю'].includes(status)) continue;
     const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(c[8]!);
     rows.push({ n: Number(c[1]), status, layer, last: c[8]!, at: m ? Number(`${m[3]}${m[2]}${m[1]}`) : 0 });
   }
@@ -106,11 +108,12 @@ export function buildSobes(base: string, progress: string): { doc: SobesDoc; mis
   for (const r of activeRows(progress)) {
     const c = cards.get(r.n);
     if (!c) {
-      errors.push(`№${r.n}: в базе нет вопроса`);
+      if (r.status !== 'знаю') errors.push(`№${r.n}: в базе нет вопроса`);
       continue;
     }
     if (!c.chunks || !c.ru || !c.sedno) {
-      missing.push(r.n);
+      // «знаю» без разметки в игру и не просится (10.11: выученные остаются только для повторения).
+      if (r.status !== 'знаю') missing.push(r.n);
       continue;
     }
     if (norm(c.chunks.join(' ')) !== c.answer) {
@@ -156,6 +159,14 @@ if (isMain(import.meta.url)) {
   for (const e of errors) console.error(`ошибка: ${e}`);
   if (missing.length) console.log(`без разметки (в игру не попали): ${missing.map((n) => `№${n}`).join(', ')}`);
   const text = `${JSON.stringify(doc, null, 1)}\n`;
+  if (process.argv.includes('--feed')) {
+    // Лента (10.11): тот же документ — на ветку `slowa` рядом с moje_slowa.json; main и рабочее дерево не трогаются.
+    if (errors.length) process.exit(1);
+    const r = spawnSync('python3', [join(ROOT, 'tools', 'feed_push.py'), 'sobes.json', '-', 'Лента собеса'], { input: text, encoding: 'utf8', cwd: ROOT });
+    process.stdout.write(r.stdout ?? '');
+    process.stderr.write(r.stderr ?? '');
+    process.exit(r.status ?? 1);
+  }
   if (process.argv.includes('--check')) {
     const same = existsSync(SOBES_JSON) && readFileSync(SOBES_JSON, 'utf8') === text;
     console.log(same ? `sobes.json актуален: ${doc.units.length} вопросов` : 'sobes.json отстал от источника: npm run sobes');

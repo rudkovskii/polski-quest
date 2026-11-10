@@ -24,7 +24,11 @@
     "art": "python3 tools/gen_sprites.py",
     "icons": "python3 tools/gen_icons.py",
     "sobes": "tsx tools/sobes_import.ts",
-    "words": "python3 tools/words_push.py"
+    "sobes:feed": "tsx tools/sobes_import.ts --feed",
+    "words": "python3 tools/words_push.py",
+    "feed:run": "python3 tools/feed_watch.py",
+    "feed:install": "python3 tools/feed_install.py install",
+    "feed:uninstall": "python3 tools/feed_install.py uninstall"
   },
   "dependencies": {
     "idb-keyval": "6.3.0",

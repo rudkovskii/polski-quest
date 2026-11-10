@@ -7,14 +7,14 @@ npm run words -- --check  только проверка
 Коммит собирается без переключения веток: рабочее дерево и main не меняются.
 """
 import json
-import os
-import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from feed_push import BRANCH, push_file  # noqa: E402
+
 APP = Path(__file__).resolve().parent.parent
 SRC = APP.parent / 'data' / 'moje_slowa.json'
-BRANCH = 'slowa'
 NAME = 'moje_slowa.json'
 POS = {'noun', 'verb', 'adj', 'adv', 'num', 'pron', 'prep', 'conj', 'part', 'intj', 'phrase'}
 
@@ -55,13 +55,6 @@ def check(feed):
     return errs
 
 
-def git(*args, stdin=None, env=None):
-    r = subprocess.run(['git', *args], cwd=APP, input=stdin, capture_output=True, text=True, env=env)
-    if r.returncode:
-        sys.exit(f'git {args[0]}: {r.stderr.strip()}')
-    return r.stdout.strip()
-
-
 def main():
     force = '--force' in sys.argv
     text = SRC.read_text(encoding='utf-8')
@@ -77,22 +70,11 @@ def main():
     print(f'ok: записей {len(feed)}')
     if '--check' in sys.argv:
         return
-    remote = git('ls-remote', '--heads', 'origin', BRANCH)
-    parent = remote.split()[0] if remote else None
-    if parent:
-        git('fetch', '-q', 'origin', BRANCH)
-        if git('rev-parse', f'{parent}:{NAME}') == git('hash-object', '--stdin', stdin=text):
-            print('без изменений')
-            return
-    blob = git('hash-object', '-w', '--stdin', stdin=text)
-    tree = git('mktree', stdin=f'100644 blob {blob}\t{NAME}\n')
-    args = ['commit-tree', tree, '-m', 'Лента своих слов']
-    if parent:
-        args += ['-p', parent]
-    commit = git(*args)
-    git('push', '-q', 'origin', f'{commit}:refs/heads/{BRANCH}')
+    commit = push_file(NAME, text, 'Лента своих слов')
+    if commit is None:
+        print('без изменений')
+        return
     print(f'выложено на {BRANCH}: {commit[:7]}. Игра подхватит при запуске или возврате на вкладку')
-
 
 if __name__ == '__main__':
     main()

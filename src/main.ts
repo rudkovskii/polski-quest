@@ -14,7 +14,7 @@ import { PLOT_NAME } from './systems/zagroda';
 import { activeDecor, parseDecor } from './systems/decor';
 import { MAPS, getMap } from './world/maps';
 import { HOME_KEY, createBeaver } from './systems/beaver';
-import { V2 } from './systems/v2content';
+import { V2, replaceSobes } from './systems/v2content';
 import type { PolskaEntry, PolskaGameId } from './types/polska';
 import { audioContext, connectAudio } from './systems/platform/audio';
 import { createMusicPlayer } from './systems/platform/music';
@@ -63,7 +63,8 @@ import { mountPolskaPlot } from './ui/polskaPlot';
 import { passGate } from './ui/gate';
 import { EDITION, LEVEL } from './systems/edition';
 import { applyFeed, feedLine, parseFeed } from './systems/wordFeed';
-import { WORD_FEED_URL, fetchWordFeed } from './systems/platform/wordFeed';
+import { SOBES_FEED_URL, WORD_FEED_URL, fetchWordFeed } from './systems/platform/wordFeed';
+import { sobesFeedLine } from './systems/sobesFeed';
 import { ONBOARDING_HINT, mountOnboarding, shouldShowOnboarding } from './ui/onboarding';
 
 const params = new URLSearchParams(location.search);
@@ -359,6 +360,12 @@ async function main(): Promise<void> {
     now: () => clock.now(),
     tz: (t) => new Date(t).getTimezoneOffset(),
   });
+  // Лента собеса (10.11): документ ленты, запомненный в сохранении, главнее вшитого — работает и без сети. Отпечатки ответов сверяются всегда.
+  if (EDITION.id === 'main' && store.save.polska.sobesFeed) {
+    const errs = replaceSobes(V2, store.save.polska.sobesFeed);
+    if (errs.length) console.warn('[sobes] сохранённая лента не применена:', errs);
+  }
+  polska.syncContent();
   // Точка входа в игру и возврат к ней при выходе (`world:return`); после «Na pole!» — тост «Wróć».
   const entry = createEntryPoint(bus);
   // Герой уйдёт в Zagroda или к грядкам; в сохранении остаётся точка входа (вкладку закрыли посреди игры — вернёмся к мачте, а не в сад).
@@ -611,6 +618,21 @@ async function main(): Promise<void> {
       update: (id, patch) => custom.update(id, patch),
       remove: (id) => custom.remove(id),
     }));
+    if (line) hud.toast(line, undefined, 15_000);
+    await syncSobes(t);
+  };
+  // Лента собеса: `slowa/sobes.json`. Новый документ (не тот, что уже применён) заменяет вопросы; битый — в консоль, игра на прошлом.
+  const syncSobes = async (t: number): Promise<void> => {
+    const doc = await fetchWordFeed(SOBES_FEED_URL, t);
+    if (!doc || polskaGame.isOpen) return;
+    if (JSON.stringify(doc) === JSON.stringify(polska.save.sobesFeed ?? null)) return;
+    const errs = replaceSobes(V2, doc);
+    if (errs.length) {
+      console.warn('[sobes] лента не применена:', errs);
+      return;
+    }
+    polska.setSobesFeed(doc);
+    const line = sobesFeedLine(polska.syncContent());
     if (line) hud.toast(line, undefined, 15_000);
   };
   void syncFeed();

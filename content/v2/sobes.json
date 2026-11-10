@@ -3,27 +3,220 @@
  "src": "ПМЖ/Собес: drill/progress.md (STATUSY) + Miso-baza-voprosov.md (Kawałki, Ru, Sedno)",
  "units": [
   {
-   "id": "ans.4",
+   "id": "ans.62",
    "kind": "answer",
    "type": "core",
-   "n": 4,
-   "pl": "Jak nazywa się hymn Polski i kto napisał słowa?",
-   "ru": "Как называется гимн и кто написал слова?",
+   "n": 62,
+   "pl": "Co to było powstanie warszawskie 1944 roku?",
+   "ru": "Что такое Варшавское восстание 1944 года?",
    "tr": "",
    "band": 1,
-   "answer": "Hymn Polski to Mazurek Dąbrowskiego. Słowa napisał Józef Wybicki w 1797 roku.",
+   "answer": "Powstanie warszawskie to był zryw przeciwko Niemcom. Wybuchło 1 sierpnia 1944 roku i trwało 63 dni. Niestety zakończyło się klęską — miasto zostało zniszczone. Byłem w Muzeum Powstania Warszawskiego i zrobiło to na mnie ogromne wrażenie.",
    "chunks": [
-    "Hymn Polski to Mazurek Dąbrowskiego.",
-    "Słowa napisał Józef Wybicki",
-    "w 1797 roku."
+    "Powstanie warszawskie to był zryw",
+    "przeciwko Niemcom.",
+    "Wybuchło 1 sierpnia 1944 roku",
+    "i trwało 63 dni.",
+    "Niestety zakończyło się klęską —",
+    "miasto zostało zniszczone.",
+    "Byłem w Muzeum Powstania Warszawskiego",
+    "i zrobiło to na mnie ogromne wrażenie."
    ],
    "sedno": [
-    "Mazurek Dąbrowskiego",
-    "слова — Józef Wybicki",
-    "1797 год"
+    "против немцев",
+    "1 августа 1944",
+    "63 дня",
+    "поражение, город разрушен",
+    "был в музее — сильное впечатление"
+   ],
+   "short": "Powstanie warszawskie wybuchło 1 sierpnia 1944 roku przeciwko Niemcom i zakończyło się klęską.",
+   "status": "учу",
+   "last": "10.11.2026"
+  },
+  {
+   "id": "ans.165",
+   "kind": "answer",
+   "type": "core",
+   "n": 165,
+   "pl": "Co to jest Godzina W?",
+   "ru": "Что такое час «W»?",
+   "tr": "",
+   "band": 1,
+   "answer": "Godzina W to siedemnasta, pierwszego sierpnia. Tego dnia wybuchło powstanie warszawskie. Co roku o tej godzinie jest minuta ciszy.",
+   "chunks": [
+    "Godzina W to siedemnasta,",
+    "pierwszego sierpnia.",
+    "Tego dnia wybuchło",
+    "powstanie warszawskie.",
+    "Co roku o tej godzinie",
+    "jest minuta ciszy."
+   ],
+   "sedno": [
+    "17:00, 1 августа",
+    "в этот день началось восстание",
+    "каждый год минута тишины"
    ],
    "status": "учу",
-   "last": "30.10.2026"
+   "last": "10.11.2026"
+  },
+  {
+   "id": "ans.70",
+   "kind": "answer",
+   "type": "core",
+   "n": 70,
+   "pl": "Kim był Józef Piłsudski?",
+   "ru": "Кем был Юзеф Пилсудский?",
+   "tr": "",
+   "band": 1,
+   "answer": "Józef Piłsudski to twórca Legionów Polskich i pierwszy marszałek Polski. 11 listopada 1918 roku Polska odzyskała niepodległość.",
+   "chunks": [
+    "Józef Piłsudski to twórca",
+    "Legionów Polskich",
+    "i pierwszy marszałek Polski.",
+    "11 listopada 1918 roku",
+    "Polska odzyskała niepodległość."
+   ],
+   "sedno": [
+    "создатель Легионов",
+    "первый маршал",
+    "11 ноября 1918 — Польша вернула независимость"
+   ],
+   "short": "Józef Piłsudski był marszałkiem Polski. W 1918 roku stanął na czele niepodległej Polski, a w 1920 roku wygrał Bitwę Warszawską.",
+   "status": "учу",
+   "last": "09.11.2026"
+  },
+  {
+   "id": "ans.168",
+   "kind": "answer",
+   "type": "core",
+   "n": 168,
+   "pl": "Kiedy wybuchła druga wojna światowa?",
+   "ru": "Когда началась Вторая мировая война?",
+   "tr": "",
+   "band": 1,
+   "answer": "Druga wojna światowa wybuchła pierwszego września tysiąc dziewięćset trzydziestego dziewiątego roku. Niemcy zaatakowali Westerplatte.",
+   "chunks": [
+    "Druga wojna światowa wybuchła",
+    "pierwszego września",
+    "tysiąc dziewięćset trzydziestego dziewiątego roku.",
+    "Niemcy zaatakowali Westerplatte."
+   ],
+   "sedno": [
+    "1 сентября 1939",
+    "немцы напали на Вестерплатте"
+   ],
+   "status": "учу",
+   "last": "09.11.2026"
+  },
+  {
+   "id": "ans.169",
+   "kind": "answer",
+   "type": "core",
+   "n": 169,
+   "pl": "Kiedy Armia Czerwona wkroczyła do Polski?",
+   "ru": "Когда Красная армия вошла в Польшу?",
+   "tr": "",
+   "band": 1,
+   "answer": "Armia Czerwona wkroczyła do Polski siedemnastego września tysiąc dziewięćset trzydziestego dziewiątego roku.",
+   "chunks": [
+    "Armia Czerwona wkroczyła do Polski",
+    "siedemnastego września",
+    "tysiąc dziewięćset trzydziestego dziewiątego roku."
+   ],
+   "sedno": [
+    "17 сентября 1939"
+   ],
+   "status": "учу",
+   "last": "09.11.2026"
+  },
+  {
+   "id": "ans.121",
+   "kind": "answer",
+   "type": "core",
+   "n": 121,
+   "pl": "Kto jest teraz premierem Polski?",
+   "ru": "Кто сейчас премьер Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Premierem Polski jest Donald Tusk, od grudnia 2023 roku.",
+   "chunks": [
+    "Premierem Polski jest Donald Tusk,",
+    "od grudnia 2023 roku."
+   ],
+   "sedno": [
+    "Donald Tusk",
+    "с декабря 2023 года"
+   ],
+   "status": "учу",
+   "last": "05.11.2026"
+  },
+  {
+   "id": "ans.188",
+   "kind": "answer",
+   "type": "core",
+   "n": 188,
+   "pl": "Którzy prezydenci Polski mieli dwie kadencje?",
+   "ru": "Какие президенты Польши были два срока?",
+   "tr": "",
+   "band": 1,
+   "answer": "Dwie kadencje mieli Aleksander Kwaśniewski i Andrzej Duda.",
+   "chunks": [
+    "Dwie kadencje mieli",
+    "Aleksander Kwaśniewski",
+    "i Andrzej Duda."
+   ],
+   "sedno": [
+    "Квасьневский",
+    "Дуда"
+   ],
+   "status": "учу",
+   "last": "05.11.2026"
+  },
+  {
+   "id": "ans.192",
+   "kind": "answer",
+   "type": "core",
+   "n": 192,
+   "pl": "W jakim województwie złożył Pan wniosek?",
+   "ru": "В каком воеводстве вы подали заявление?",
+   "tr": "",
+   "band": 1,
+   "answer": "Wniosek złożyłem w województwie mazowieckim, w Mazowieckim Urzędzie Wojewódzkim w Warszawie.",
+   "chunks": [
+    "Wniosek złożyłem",
+    "w województwie mazowieckim,",
+    "w Mazowieckim Urzędzie Wojewódzkim",
+    "w Warszawie."
+   ],
+   "sedno": [
+    "Мазовецкое воеводство",
+    "Мазовецкий воеводский ужонд в Варшаве"
+   ],
+   "status": "учу",
+   "last": "05.11.2026"
+  },
+  {
+   "id": "ans.119",
+   "kind": "answer",
+   "type": "core",
+   "n": 119,
+   "pl": "Kto jest teraz prezydentem Polski?",
+   "ru": "Кто сейчас президент Польши?",
+   "tr": "",
+   "band": 1,
+   "answer": "Prezydentem Polski jest Karol Nawrocki. Objął urząd w 2025 roku, po Andrzeju Dudzie.",
+   "chunks": [
+    "Prezydentem Polski jest Karol Nawrocki.",
+    "Objął urząd w 2025 roku,",
+    "po Andrzeju Dudzie."
+   ],
+   "sedno": [
+    "Karol Nawrocki",
+    "с 2025 года",
+    "после Andrzej Duda"
+   ],
+   "status": "учу",
+   "last": "03.11.2026"
   },
   {
    "id": "ans.17",
@@ -47,30 +240,7 @@
     "зажигают свечи"
    ],
    "status": "учу",
-   "last": "30.10.2026"
-  },
-  {
-   "id": "ans.77",
-   "kind": "answer",
-   "type": "core",
-   "n": 77,
-   "pl": "Jaka jest stolica Polski i jakie inne duże miasta znasz?",
-   "ru": "Какая столица и какие ещё крупные города ты знаешь?",
-   "tr": "",
-   "band": 1,
-   "answer": "Stolicą Polski jest Warszawa. Inne duże miasta to Kraków, Łódź, Wrocław, Poznań i Gdańsk.",
-   "chunks": [
-    "Stolicą Polski jest Warszawa.",
-    "Inne duże miasta to",
-    "Kraków, Łódź, Wrocław,",
-    "Poznań i Gdańsk."
-   ],
-   "sedno": [
-    "Warszawa",
-    "Kraków, Łódź, Wrocław, Poznań, Gdańsk"
-   ],
-   "status": "учу",
-   "last": "30.10.2026"
+   "last": "02.11.2026"
   },
   {
    "id": "ans.87",
@@ -93,48 +263,50 @@
     "такое деление с 1999 года"
    ],
    "status": "учу",
-   "last": "30.10.2026"
+   "last": "02.11.2026"
   },
   {
-   "id": "ans.119",
+   "id": "ans.4",
    "kind": "answer",
    "type": "core",
-   "n": 119,
-   "pl": "Kto jest teraz prezydentem Polski?",
-   "ru": "Кто сейчас президент Польши?",
+   "n": 4,
+   "pl": "Jak nazywa się hymn Polski i kto napisał słowa?",
+   "ru": "Как называется гимн и кто написал слова?",
    "tr": "",
    "band": 1,
-   "answer": "Prezydentem Polski jest Karol Nawrocki. Objął urząd w 2025 roku, po Andrzeju Dudzie.",
+   "answer": "Hymn Polski to Mazurek Dąbrowskiego. Słowa napisał Józef Wybicki w 1797 roku.",
    "chunks": [
-    "Prezydentem Polski jest Karol Nawrocki.",
-    "Objął urząd w 2025 roku,",
-    "po Andrzeju Dudzie."
+    "Hymn Polski to Mazurek Dąbrowskiego.",
+    "Słowa napisał Józef Wybicki",
+    "w 1797 roku."
    ],
    "sedno": [
-    "Karol Nawrocki",
-    "с 2025 года",
-    "после Andrzej Duda"
+    "Mazurek Dąbrowskiego",
+    "слова — Józef Wybicki",
+    "1797 год"
    ],
    "status": "учу",
    "last": "30.10.2026"
   },
   {
-   "id": "ans.121",
+   "id": "ans.77",
    "kind": "answer",
    "type": "core",
-   "n": 121,
-   "pl": "Kto jest teraz premierem Polski?",
-   "ru": "Кто сейчас премьер Польши?",
+   "n": 77,
+   "pl": "Jaka jest stolica Polski i jakie inne duże miasta znasz?",
+   "ru": "Какая столица и какие ещё крупные города ты знаешь?",
    "tr": "",
    "band": 1,
-   "answer": "Premierem Polski jest Donald Tusk, od grudnia 2023 roku.",
+   "answer": "Stolicą Polski jest Warszawa. Inne duże miasta to Kraków, Łódź, Wrocław, Poznań i Gdańsk.",
    "chunks": [
-    "Premierem Polski jest Donald Tusk,",
-    "od grudnia 2023 roku."
+    "Stolicą Polski jest Warszawa.",
+    "Inne duże miasta to",
+    "Kraków, Łódź, Wrocław,",
+    "Poznań i Gdańsk."
    ],
    "sedno": [
-    "Donald Tusk",
-    "с декабря 2023 года"
+    "Warszawa",
+    "Kraków, Łódź, Wrocław, Poznań, Gdańsk"
    ],
    "status": "учу",
    "last": "30.10.2026"
@@ -289,37 +461,6 @@
    ],
    "status": "учу",
    "last": "26.10.2026"
-  },
-  {
-   "id": "ans.62",
-   "kind": "answer",
-   "type": "core",
-   "n": 62,
-   "pl": "Co to było powstanie warszawskie 1944 roku?",
-   "ru": "Что такое Варшавское восстание 1944 года?",
-   "tr": "",
-   "band": 1,
-   "answer": "Powstanie warszawskie to był zryw przeciwko Niemcom. Wybuchło 1 sierpnia 1944 roku i trwało 63 dni. Niestety zakończyło się klęską — miasto zostało zniszczone. Byłem w Muzeum Powstania Warszawskiego i zrobiło to na mnie ogromne wrażenie.",
-   "chunks": [
-    "Powstanie warszawskie to był zryw",
-    "przeciwko Niemcom.",
-    "Wybuchło 1 sierpnia 1944 roku",
-    "i trwało 63 dni.",
-    "Niestety zakończyło się klęską —",
-    "miasto zostało zniszczone.",
-    "Byłem w Muzeum Powstania Warszawskiego",
-    "i zrobiło to na mnie ogromne wrażenie."
-   ],
-   "sedno": [
-    "против немцев",
-    "1 августа 1944",
-    "63 дня",
-    "поражение, город разрушен",
-    "был в музее — сильное впечатление"
-   ],
-   "short": "Powstanie warszawskie wybuchło 1 sierpnia 1944 roku przeciwko Niemcom i zakończyło się klęską.",
-   "status": "учу",
-   "last": "13.10.2026"
   },
   {
    "id": "ans.76",

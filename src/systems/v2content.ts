@@ -168,6 +168,47 @@ export function parseV2(docs: V2Docs): V2Content {
   };
 }
 
+/** Ответы собеса из документа `sobes.json` (вшитого или ленты): единицы `ans.*` и ошибки формы. */
+export function sobesUnitsOf(doc: unknown): { units: PolskaUnit[]; errors: string[] } {
+  const errors: string[] = [];
+  const list = obj(doc).units;
+  if (!Array.isArray(list)) return { units: [], errors: ['sobes: нет списка units'] };
+  const units = unitsOf({ units: list }, 'sobes', errors).filter((u) => u.kind === 'answer');
+  const ids = new Set<string>();
+  for (const u of units) {
+    const ch = u.raw.chunks;
+    if (!str(u.raw.answer).trim()) errors.push(`sobes: ${u.id} — нет answer`);
+    if (!Array.isArray(ch) || ch.length < 2 || !ch.every((c) => typeof c === 'string' && c.trim())) errors.push(`sobes: ${u.id} — нужно хотя бы два куска`);
+    if (ids.has(u.id)) errors.push(`sobes: повтор id ${u.id}`);
+    ids.add(u.id);
+  }
+  if (!units.length && !errors.length) errors.push('sobes: ни одного вопроса');
+  return { units, errors };
+}
+
+/**
+ * Лента собеса (10.11, ТЗ-лента-прогресса): заменить ответы собеса в контенте **на месте** (`V2` читают все модули).
+ * Битый документ не трогает контент и возвращает ошибки. Вопросы, которых нет в документе, пропадают из игры (прогресс в сохранении остаётся).
+ */
+export function replaceSobes(c: V2Content, doc: unknown): string[] {
+  const { units, errors } = sobesUnitsOf(doc);
+  if (errors.length) return errors;
+  for (const u of c.units) if (u.kind === 'answer') c.byId.delete(u.id);
+  c.units = [...c.units.filter((u) => u.kind !== 'answer'), ...units];
+  for (const u of units) c.byId.set(u.id, u);
+  c.docs.sobes = obj(doc);
+  return [];
+}
+
+/** Отпечаток ответа (текст и куски): изменился — прежние куски неверны, прогресс по вопросу сбрасывается. */
+export function answerHash(u: PolskaUnit): string {
+  const ch = Array.isArray(u.raw.chunks) ? u.raw.chunks.join('\u0001') : '';
+  const s = `${str(u.raw.answer)}\n${ch}`;
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+
 /** Контент v2 игры (бандлится в код). */
 export const V2: V2Content = parseV2({ geo: geoJson, hymn: hymnJson, daty: datyJson, swieta: swietaJson, words: wordsSwietaJson, sobes: sobesJson });
 
