@@ -545,6 +545,8 @@ export const FOCUS_SIZE = 8;
 export const FOCUS_YOUNG = 4;
 /** Каждое столько-е задание (1-е, 3-е, 5-е…) — новое, ещё не политое слово, пока такие есть на грядках (09.11). */
 export const NEW_EVERY = 2;
+/** Пауза между заданиями, после которой заход считается новым и первое задание снова слот нового слова (10.11). */
+export const FRESH_RESET_MS = 5 * 60_000;
 
 /**
  * Слот нового слова выдаётся, пока начатых и ещё не проросших семечек меньше этого: новое идёт постоянно,
@@ -626,10 +628,14 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
   // 09.11: до FOCUS_YOUNG мест — младшим начатым (семечко/росток с ответами, свежее начатые раньше), остальное — ближайшим к урожаю.
   const live = pool.filter((it) => it.stage !== null && !settled(it));
   const learning = pool.filter((it) => it.stage === 'seed' && !unstarted(it)).length;
-  const freshSlot = !!opts.fresh && learning < LEARNING_CAP;
+  // 10.11 (Шэф: «сперва старые, потом новые»): в слоте нового первыми идут неполитые слова, посаженные за FRESH_DAYS (свежее — раньше),
+  // без лимита начатых; давно посаженные неполитые — только после них и пока начатых < LEARNING_CAP. Начатые свежие держит рабочий набор.
+  const recent = (it: ItemState): boolean => (it.stage === 'seed' || it.stage === 'sprout') && it.harvests === 0 && now - it.plantedAt < FRESH_DAYS * DAY_MS;
+  const freshSlot = !!opts.fresh;
+  const backlogOk = learning < LEARNING_CAP;
   const young = live
     .filter((it) => (it.stage === 'seed' || it.stage === 'sprout') && !unstarted(it))
-    .sort((a, b) => (b.lastAnswer ?? 0) - (a.lastAnswer ?? 0) || a.plantedAt - b.plantedAt)
+    .sort((a, b) => Number(recent(b)) - Number(recent(a)) || (b.lastAnswer ?? 0) - (a.lastAnswer ?? 0) || a.plantedAt - b.plantedAt)
     .slice(0, FOCUS_YOUNG);
   const focus = new Set(young.map((it) => it.id));
   for (const it of live
@@ -652,11 +658,12 @@ export function pickTask(g: GardenSave, st: GardenState, mode: GameMode, now: nu
     // Ответу в этой игре сегодня нечего дать (ни стадии, ни зачёта дня): в конец, даже если растение в рабочем наборе
     // (P4a: `Dobranoc` 3 раза за 18 заданий без пользы).
     const useless = !helps && !harvest && it.days.has(day);
-    const fresh0 = freshSlot && !over && unstarted(it) && d;
+    const new0 = freshSlot && !over && d && recent(it) && unstarted(it);
+    const back0 = freshSlot && !over && d && !new0 && backlogOk && unstarted(it);
     return [
-      // Слот нового слова: неполитое семечко вперёд всех, давно посаженное раньше.
-      fresh0 ? 0 : 1,
-      fresh0 ? it.plantedAt : 0,
+      // Слот нового слова: свежепосаженное вперёд всех (неполитое раньше, потом свежее посаженное), затем давний неполитый запас (старое раньше).
+      new0 ? 0 : back0 ? 1 : 2,
+      new0 ? -it.plantedAt : back0 ? it.plantedAt : 0,
       // Созревшее на сегодня (зачёт дня есть, до урожая нужен только следующий день) — в самый конец.
       settled(it) ? 1 : 0,
       useless ? 1 : 0,

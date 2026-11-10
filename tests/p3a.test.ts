@@ -93,7 +93,10 @@ describe('P3a: созревшее на сегодня — в конец', () => 
     // а на следующий день оно снова в очереди и даёт урожай
     s.setNow(T0 + 2 * DAY_MS + 1000);
     expect(settledToday(s.farm.state.items.get(id)!, dayOf(s.now()), s.now())).toBe(false);
-    expect(s.farm.next(2)!.id).toBe(id);
+    // 10.11: первое задание захода — свежее неполитое слово, урожай следом.
+    const a = s.farm.next(2)!;
+    s.farm.answer(a, a.answer);
+    expect([a.id, s.farm.next(2)!.id]).toContain(id);
   });
 
   it('pickTask: единственное созревшее на сегодня всё же выдаётся, если больше нечего', () => {

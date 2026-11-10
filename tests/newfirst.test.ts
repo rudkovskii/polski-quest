@@ -75,6 +75,56 @@ describe('Очередь: новые слова не стоят неполиты
   });
 });
 
+describe('10.11: свежепосаженное раньше давнего запаса', () => {
+  /** Неделя игры (много давних неполитых и начатых семечек), потом посажено 10 свежих слов и пауза. */
+  function afterWeek(seed: number) {
+    const s = setup(seed);
+    const r = seeded(seed + 50);
+    s.farm.plant(s.farm.words.slice(0, 60).map((w) => w.id));
+    let t = T0;
+    for (let d = 0; d < 7; d++)
+      for (let i = 0; i < 25; i++) {
+        t = T0 + d * DAY_MS + (i + 1) * 60_000;
+        s.setNow(t);
+        const q = s.farm.next(([1, 2, 5] as GameMode[])[i % 3]!);
+        if (q) s.farm.answer(q, r() < 0.7 ? q.answer : 'zzz');
+      }
+    const fresh = s.farm.words.slice(60, 70).map((w) => w.id);
+    t = T0 + 8 * DAY_MS;
+    s.setNow(t);
+    s.farm.plant(fresh);
+    return { s, fresh: new Set(fresh), t: t + 600_000 };
+  }
+
+  for (const seed of [1, 2, 3])
+    it(`зерно ${seed}: первое задание захода и каждое 2-е — свежее слово, хотя давних неполитых много`, () => {
+      const { s, fresh, t } = afterWeek(seed);
+      const seen: boolean[] = [];
+      for (let i = 0; i < 12; i++) {
+        s.setNow(t + i * 60_000);
+        const q = s.farm.next(2)!;
+        seen.push(fresh.has(q.id));
+        s.farm.answer(q, q.answer);
+      }
+      for (let i = 0; i < 12; i += NEW_EVERY) expect(seen[i]).toBe(true);
+    });
+
+  it('лимит начатых семечек свежие слова не держит', () => {
+    const s = setup();
+    const started = s.farm.words.slice(0, LEARNING_CAP + 4).map((w) => w.id);
+    s.farm.plant(started);
+    for (const id of started) {
+      const q = s.farm.next(1, id)!;
+      s.farm.answer(q, q.answer);
+    }
+    s.setNow(T0 + DAY_MS);
+    const fresh = s.farm.words.slice(40, 43).map((w) => w.id);
+    s.farm.plant(fresh);
+    s.setNow(T0 + DAY_MS + 600_000);
+    expect(fresh).toContain(s.farm.next(2)!.id);
+  });
+});
+
 describe('Неделя: урожай не хуже прежней очереди', () => {
   // Прежняя очередь (до 09.11) на этом прогоне: в среднем 15,5 урожая и 10,6 неполитых из 40.
   function week(words: number, per: number, acc: number, seed: number) {
