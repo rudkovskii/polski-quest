@@ -21,6 +21,7 @@ import {
   REVERSE_EVERY,
   FOCUS_EVERY,
   NEW_EVERY,
+  FRESH_RESET_MS,
   wantsReverse,
   isAssembleMode,
   needsProd,
@@ -114,6 +115,8 @@ export function createFarm(d: FarmDeps): Farm {
   let sinceReverse = REVERSE_EVERY - 1;
   /** Заданий выдано (P3a: каждое FOCUS_EVERY-е берётся из-за пределов рабочего набора). */
   let issued = 0;
+  /** Время последнего задания: после паузы больше FRESH_RESET_MS счёт начинается заново, первое задание захода — новое слово (10.11). */
+  let issuedAt = -Infinity;
   /** Ответов дано (любая игра): отсчёт паузы фраз сборки. */
   let answered = 0;
   /** Фраза сборки → после какого числа ответов она снова в очереди (пока в пуле сборки < ASSEMBLE_POOL_MIN). */
@@ -343,6 +346,8 @@ export function createFarm(d: FarmDeps): Farm {
       const dir: Side = opts?.dir ?? 'rp';
       // «Наоборот» не в первые REVERSE_AFTER ответов: сначала привычная сторона (P3a).
       const canReverse = !only && !isAssembleMode(mode) && sinceReverse >= REVERSE_EVERY - 1 && g.log.length >= REVERSE_AFTER;
+      if (!only && d.now() - issuedAt > FRESH_RESET_MS) issued = 0;
+      if (!only) issuedAt = d.now();
       const outside = !only && ++issued % FOCUS_EVERY === 0;
       // Новое слово — 1-е, 3-е, 5-е… задание (09.11): посаженное не стоит неполитым, пока очередь крутит повторения.
       const fresh = !only && issued % NEW_EVERY === 1;
