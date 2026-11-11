@@ -12,7 +12,7 @@ const css = `
 .pq-label { position: fixed; z-index: 34; pointer-events: none; transform: translate(-50%, -100%); padding: 3px 7px; border-radius: var(--pq-r-m); background: var(--pq-paper); color: var(--pq-ink);
   border: var(--pq-line-ink); font: 700 14px/1.1 var(--pq-font); white-space: nowrap; box-shadow: var(--pq-step-2); }
 .pq-label[hidden] { display: none; }
-.pq-word { position: fixed; z-index: 32; pointer-events: none; transform: translate(-50%, -100%); padding: 0 4px; border-radius: 4px; background: rgba(255, 248, 232, .85); color: #2a1418; font: 700 11px/14px -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
+.pq-word { position: fixed; z-index: 32; pointer-events: none; transform: translate(-50%, -100%); padding: 0 3px; border-radius: 4px; background: rgba(255, 248, 232, .85); color: #2a1418; font: 700 11px/1.25 -apple-system, BlinkMacSystemFont, sans-serif; white-space: nowrap; }
 .pq-sign { position: fixed; z-index: 33; pointer-events: none; transform: translate(-50%, -100%); padding: 1px 6px; border-radius: var(--pq-r-m); background: rgba(255, 248, 232, .9);
   color: var(--pq-ink); border: 1.5px solid var(--pq-ink); font: 700 12px/1.2 var(--pq-font); white-space: nowrap; }
 .pq-sign.edge { background: var(--pq-paper); border-width: 2px; padding: 2px 7px; font-size: 13px; box-shadow: var(--pq-step-2); }
@@ -70,6 +70,9 @@ export function mountFloats(parent: HTMLElement, bus: Bus<BusEvents> = globalBus
           words.append(n);
           wordNodes.set(w.id, n);
         }
+        if (n.textContent !== w.text) n.textContent = w.text;
+        const fs = `${w.size}px`;
+        if (n.style.fontSize !== fs) n.style.fontSize = fs;
         n.style.left = `${Math.round(w.x)}px`;
         n.style.top = `${Math.round(w.y)}px`;
       }

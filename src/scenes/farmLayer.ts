@@ -6,7 +6,7 @@ import type { Dir } from '../types/input';
 import type { Xy } from '../world/ascii';
 import { LocationModel } from '../world/location';
 import { LabelGate } from '../world/labelGate';
-import { pickWordLabels } from '../world/wordLabels';
+import { layoutWordLabels } from '../world/wordLabels';
 
 // Огород на ферме: растения на грядках (спрайты стадий), вскопанные клетки, подпись над растением у героя и автобег во
 // время мини-игры: очередь действий (полив, удобрение, урожай → коробка). Ответы не ждут анимацию: действия копятся и
@@ -503,18 +503,19 @@ export class FarmLayer {
     bus.emit('fx:label', { text: target.label, x: p.x, y: p.y });
   }
 
-  /** Слова над растениями вне мини-игры: ближние к герою, сколько влезает без наложения (t99). */
+  /** Слова над растениями вне мини-игры: у каждого растения, не зависит от места героя (t115, D-147). */
   private drawWords(): void {
-    const hero = this.h.model.player.tile;
     const on = !this.auto && this.h.inputOn();
-    const list = on
-      ? pickWordLabels(
-          this.views.map((v) => ({ id: v.id, text: v.label, ...this.h.toScreen(v.tile[0] * T + T / 2, v.tile[1] * T - 2), dist: Math.abs(v.tile[0] - hero[0]) + Math.abs(v.tile[1] - hero[1]) })),
+    const o = on ? this.h.toScreen(0, 0) : null;
+    const list = o
+      ? layoutWordLabels(
+          this.views.map((v) => ({ id: v.id, text: v.label, col: v.tile[0], ...this.h.toScreen(v.tile[0] * T + T / 2, v.tile[1] * T - 2) })),
+          this.h.toScreen(T, 0).x - o.x,
           window.innerWidth,
           window.innerHeight,
         )
       : [];
-    const key = list.map((w) => `${w.id}@${Math.round(w.x)},${Math.round(w.y)}`).join(';');
+    const key = list.map((w) => `${w.id}@${Math.round(w.x)},${Math.round(w.y)},${w.size}`).join(';');
     if (key === this.lastWords) return;
     this.lastWords = key;
     bus.emit('fx:words', list);

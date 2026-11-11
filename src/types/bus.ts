@@ -76,8 +76,8 @@ export interface BusEvents {
   /** Подпись над растением у героя (экранные CSS px); null — спрятать. */
   'fx:label': { text: string; x: number; y: number } | null;
   /** Таблички у интерактивных объектов карты (`world/signs.ts`): низ-середина в экранных CSS px; пустой список — спрятать все. */
-  /** Слова над растениями (t99): только те, что влезают без наложения. */
-  'fx:words': { id: string; text: string; x: number; y: number }[];
+  /** Слова над растениями (t99, t115): у каждого растения на экране, `size` — кегль CSS px. */
+  'fx:words': { id: string; text: string; x: number; y: number; size: number }[];
   'fx:signs': { key: string; text: string; x: number; y: number }[];
   /** Бобёр (`systems/beaver.ts`): с ним заговорили (тап или A) — пузырь «Bóbr · бобёр» с 🔊 над ним (экранные CSS px). */
   'beaver:talk': { x: number; y: number };
