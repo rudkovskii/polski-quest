@@ -129,6 +129,56 @@ describe('P3b: панель мини-игры', () => {
     expect(root.querySelector<HTMLButtonElement>('[data-check]')!.disabled).toBe(false);
   });
 
+  it('«🤷 Не знаю» на месте «Sprawdź», пока ответ не собран: показывает ответ и уходит ферме пустым (игра 5)', () => {
+    const given: unknown[] = [];
+    const spell = { mode: 5, id: 'w.kot', kind: 'spell', dir: 'rp', prompt: 'кот', promptLang: 'ru', answer: 'kot', accept: ['kot'], units: ['k', 'o', 't'], tiles: ['t', 'ó', 'k', 'o', 'l'], layout: [null, null, null] };
+    const { root, g } = mk(spell as Question, given);
+    g.start(5);
+    const give = root.querySelector<HTMLButtonElement>('[data-giveup]')!;
+    const check = root.querySelector<HTMLButtonElement>('[data-check]')!;
+    expect(give.hidden).toBe(false);
+    expect(check.hidden).toBe(true);
+    // Собрано частично — всё ещё «Не знаю»; собрано целиком — «Sprawdź».
+    root.querySelector<HTMLButtonElement>('[data-letter="k"]')!.click();
+    expect(give.hidden).toBe(false);
+    root.querySelector<HTMLButtonElement>('[data-letter="o"]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-letter="t"]')!.click();
+    expect(give.hidden).toBe(true);
+    expect(give.disabled).toBe(true);
+    expect(check.hidden).toBe(false);
+    root.querySelector<HTMLButtonElement>('[data-reset]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-letter="k"]')!.click();
+    root.querySelector<HTMLButtonElement>('[data-giveup]')!.click();
+    expect(given).toEqual(['']);
+    expect(root.querySelector('[data-feedback="bad"]')).not.toBeNull();
+    expect(root.querySelector('[data-gaveup]')).not.toBeNull();
+    expect(root.querySelector('[data-diff]')).toBeNull();
+    expect(root.querySelector('[data-next]')).not.toBeNull();
+  });
+
+  it('«🤷 Не знаю» и при вводе с клавиатуры, и в сборке фразы', () => {
+    const given: unknown[] = [];
+    const spell = { mode: 5, id: 'w.kot', kind: 'spell', dir: 'rp', prompt: 'кот', promptLang: 'ru', answer: 'kot', accept: ['kot'], units: ['k', 'o', 't'], tiles: ['t', 'ó', 'k', 'o', 'l'], layout: [null, null, null] };
+    const a = mk(spell as Question, given);
+    a.g.start(5);
+    a.root.querySelector<HTMLButtonElement>('[data-typemode]')!.click();
+    const input = a.root.querySelector<HTMLInputElement>('[data-type]')!;
+    expect(a.root.querySelector<HTMLButtonElement>('[data-giveup]')!.hidden).toBe(false);
+    input.value = 'ko';
+    input.dispatchEvent(new Event('input'));
+    expect(a.root.querySelector<HTMLButtonElement>('[data-giveup]')!.hidden).toBe(true);
+    input.value = '';
+    input.dispatchEvent(new Event('input'));
+    a.root.querySelector<HTMLButtonElement>('[data-giveup]')!.click();
+    expect(given).toEqual(['']);
+    const t: unknown[] = [];
+    const b = mk({ mode: 3, id: 'p.a', kind: 'tiles', prompt: 'a b c', promptLang: 'ru', tiles: ['a', 'b', 'c'], answer: ['a', 'b', 'c'] } as unknown as Question, t);
+    b.g.start(3);
+    b.root.querySelector<HTMLButtonElement>('[data-giveup]')!.click();
+    expect(t).toEqual([[]]);
+    expect(b.root.querySelector('[data-gaveup]')).not.toBeNull();
+  });
+
   it('блок вопроса фиксированной высоты; слова в вариантах не рвутся по слогам', () => {
     const { root, g } = mk({ ...Q, options: ['присаживайтесь', 'кот', 'дом', 'сверхъестественнопротивоположный'] } as Question);
     g.start(1);

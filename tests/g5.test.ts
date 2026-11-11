@@ -76,6 +76,9 @@ describe('игра 5: плитки и ловушки', () => {
     expect(grade(q, 'dzień dobry')).toMatchObject({ ok: true, verdict: 'exact' });
     expect(grade(q, 'dzien dobry').ok).toBe(false);
     expect(grade({ ...q, typed: true }, 'dzien dobry')).toMatchObject({ ok: true, verdict: 'diacritics' });
+    // «🤷 Не знаю»: пустой ответ — ошибка и при вводе, где прощаются опечатки.
+    expect(grade({ ...q, typed: true }, '')).toMatchObject({ ok: false, verdict: 'wrong', correct: q.answer });
+    expect(grade(q, '  ').ok).toBe(false);
     expect(grade({ ...q, typed: true }, 'Dzień dobry')).toMatchObject({ ok: true, verdict: 'exact' });
     expect(gradeSpell('еще', 'ещё', ['ещё'], 'ru', true).ok).toBe(true);
     expect(gradeSpell('еще', 'ещё', ['ещё'], 'ru', false).ok).toBe(false);

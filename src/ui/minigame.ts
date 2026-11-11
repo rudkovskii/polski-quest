@@ -116,6 +116,8 @@ ${SPELL_CSS}
 .pq-pool { display: flex; flex-wrap: wrap; gap: 6px; }
 .pq-game .pq-tile { color: var(--pq-ink); background: var(--pq-tile); font-size: 17px; padding: 8px 10px; }
 .pq-game .pq-tile[disabled] { opacity: .25; }
+/* «🤷 Не знаю» и «Sprawdź» делят одно место: видна одна из двух. */
+.pq-game .pq-giveup[hidden], .pq-game [data-check][hidden] { display: none; }
 .pq-dir { flex: 0 0 auto; font-size: 13px !important; padding: 5px 8px !important; }
 .pq-dir[aria-pressed='true'] { background: var(--pq-gold); color: var(--pq-ink); }
 .pq-dir[hidden] { display: none; }
@@ -290,7 +292,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
   /** Строка отзыва с 🔊 справа: польское слово или фраза ответа (`r.pl`) всегда по-польски. */
   const fbRow = (line: HTMLElement, pl: string): HTMLElement => (polishPart(pl) ? el('div', { class: 'pq-fbrow' }, line, sayButton(pl, say, { inline: true })) : line);
 
-  const finish = (r: AnswerResult): void => {
+  const finish = (r: AnswerResult, gaveUp = false): void => {
     answered = true;
     paper.dataset.quiz = 'done';
     round.add(r);
@@ -300,6 +302,10 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     if (r.ok) {
       fb.append(fbRow(el('div', { class: 'big' }, `✓ ${r.pl}`), r.pl), el('div', { class: 'sub' }, `${r.ru} · ${r.tr}`));
       if (r.note) fb.append(el('div', { class: 'pq-muted sub', 'data-note': '' }, r.note));
+      if (q) deps.say(q.id);
+    } else if (gaveUp) {
+      // «🤷 Не знаю»: только правильный ответ, без разбора пустой сборки.
+      fb.append(fbRow(el('div', { class: 'big' }, el('span', { class: 'lbl' }, 'Ответ:'), r.correct), r.pl), el('div', { class: 'sub' }, `${r.pl} — ${r.ru} · ${r.tr}`), el('div', { class: 'pq-muted sub', 'data-gaveup': '' }, '🤷 Пропущено — засчитано как ошибка, слово вернётся на повтор'));
       if (q) deps.say(q.id);
     } else if (q?.kind === 'spell') {
       // Игра 5: правильное с подсвеченными буквами и собранное с зачёркнутыми; польское слово звучит и после ошибки.
@@ -330,7 +336,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       host.scrollTop = 0;
       paper.classList.add('fit');
     } else paper.append(fb);
-    for (const b of box.querySelectorAll<HTMLButtonElement>('.pq-opt, .pq-tile, [data-check], [data-reset], [data-hint], [data-typemode]')) b.disabled = true;
+    for (const b of box.querySelectorAll<HTMLButtonElement>('.pq-opt, .pq-tile, [data-check], [data-giveup], [data-reset], [data-hint], [data-typemode]')) b.disabled = true;
     foot.replaceChildren(dalej);
     detachKb();
     const input = paper.querySelector<HTMLInputElement>('.pq-type');
@@ -345,6 +351,13 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     // Пустой ответ не отправляем: ни ввод, ни пустая сборка не считаются ошибкой.
     if (typeof given === 'string' ? !given.trim() : given.length === 0) return;
     finish(deps.answer(q, given));
+  };
+
+  /** «🤷 Не знаю»: пустой ответ уходит ферме как ошибка, на экране — правильный ответ. */
+  const giveUp = (): void => {
+    if (!q || answered || q.kind === 'choice') return;
+    lastGiven = '';
+    finish(deps.answer(q, q.kind === 'tiles' ? [] : ''), true);
   };
 
   const renderChoice = (qq: Extract<Question, { kind: 'choice' }>): void => {
@@ -386,6 +399,11 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
         q = { ...sq, ...(q.progress ? { progress: q.progress } : {}), ...(q.reverse ? { reverse: true } : {}) };
         finish(deps.answer(q, given));
       },
+      giveUp: (sq) => {
+        if (!q || answered) return;
+        q = { ...sq, ...(q.progress ? { progress: q.progress } : {}), ...(q.reverse ? { reverse: true } : {}) };
+        giveUp();
+      },
     });
   };
 
@@ -406,6 +424,7 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
 
   const renderTiles = (qq: Extract<Question, { kind: 'tiles' }>): void => {
     let checkBtn: HTMLButtonElement | null = null;
+    let giveBtn: HTMLButtonElement | null = null;
     const row = el('div', { class: 'pq-built', 'data-built': '' });
     const pool = el('div', { class: 'pq-pool' });
     const paint = (): void => {
@@ -413,7 +432,11 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
       pool.replaceChildren(
         ...qq.tiles.map((t, i) => el('button', { type: 'button', class: 'pq-btn pq-tile', 'data-nav': '', 'data-tile': t, disabled: built.includes(i), onclick: () => addTile(i) }, t)),
       );
-      if (checkBtn) checkBtn.disabled = built.length === 0;
+      if (checkBtn && giveBtn) {
+        const ready = built.length > 0;
+        checkBtn.disabled = checkBtn.hidden = !ready;
+        giveBtn.disabled = giveBtn.hidden = ready;
+      }
       requestAnimationFrame(reportHeight);
     };
     const addTile = (i: number): void => {
@@ -426,9 +449,11 @@ export function mountMinigame(parent: HTMLElement, deps: MinigameDeps): Minigame
     tileAdder = addTile;
     const check = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-check': '', onclick: () => submit(built.map((i) => qq.tiles[i]!)) }, 'Sprawdź · Проверить');
     checkBtn = check;
+    // Пока не выбрано ни одной плитки, на месте «Sprawdź» — «🤷 Не знаю» (11.11).
+    giveBtn = el('button', { type: 'button', class: 'pq-btn pq-giveup', 'data-nav': '', 'data-giveup': '', title: 'Показать ответ (засчитается ошибкой)', onclick: () => giveUp() }, '🤷 Не знаю · Ответ');
     const reset = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-reset': '', onclick: () => ((built = []), paint()) }, 'Сбросить');
     paper.append(row, pool);
-    foot.replaceChildren(reset, check);
+    foot.replaceChildren(reset, giveBtn, check);
     paint();
   };
   let tileAdder: ((i: number) => void) | null = null;

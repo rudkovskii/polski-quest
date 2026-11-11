@@ -169,6 +169,8 @@ export function grade(q: Question, given: string | readonly string[]): Graded {
     const ok = typeof given === 'string' && given.trim() === q.answer.trim();
     return { ok, verdict: ok ? 'exact' : 'wrong', correct: q.answer };
   }
+  // Пустой ответ («🤷 Не знаю») — всегда ошибка, даже там, где проверка прощает опечатки.
+  if (typeof given === 'string' ? !given.trim() : given.length === 0) return { ok: false, verdict: 'wrong', correct: q.kind === 'spell' ? q.answer : q.answer.join(' ') };
   if (q.kind === 'spell') {
     const r = gradeSpell(typeof given === 'string' ? given : given.join(''), q.answer, q.accept, q.dir === 'rp' ? 'pl' : 'ru', !!q.typed);
     return { ...r, correct: q.answer };

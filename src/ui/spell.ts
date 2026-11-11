@@ -12,6 +12,8 @@ export interface SpellCtx {
   foot: HTMLElement;
   /** Отправить ответ (экран уже поставил `hinted`/`typed` в задание). */
   submit(q: SpellQuestion, given: string): void;
+  /** «🤷 Не знаю»: показать ответ, задание засчитывается ошибкой. */
+  giveUp(q: SpellQuestion): void;
   /** Высота панели поменялась (режим ввода, перенос плиток). */
   relayout(): void;
   /** Сенсорный экран: на нём системную клавиатуру прячем (`inputmode=none`), печатают экранной. */
@@ -114,6 +116,15 @@ export function renderSpell(q: SpellQuestion, ctx: SpellCtx): SpellView {
   const check = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-check': '', disabled: true, onclick: () => send() }, 'Sprawdź · Проверить');
   // «Сбросить»: плитки обратно (запертая подсказка остаётся), при вводе — поле пустое (или с первой буквой подсказки).
   const reset = el('button', { type: 'button', class: 'pq-btn', 'data-nav': '', 'data-reset': '', onclick: () => clear() }, 'Сбросить');
+  // «🤷 Не знаю» стоит на месте «Sprawdź», пока ответ не собран: из задания всегда есть ход дальше (11.11).
+  const giveUp = el('button', { type: 'button', class: 'pq-btn pq-giveup', 'data-nav': '', 'data-giveup': '', title: 'Показать ответ (засчитается ошибкой)', onclick: () => ctx.giveUp({ ...q, ...(hinted ? { hinted: true } : {}), ...(typing ? { typed: true } : {}) }) }, '🤷 Не знаю · Ответ');
+  /** Ответ не собран — вместо «Sprawdź» видна «Не знаю» (скрытая кнопка ещё и выключена, чтобы стрелки её пропускали). */
+  const syncCheck = (ready: boolean): void => {
+    check.disabled = !ready;
+    check.hidden = !ready;
+    giveUp.disabled = ready;
+    giveUp.hidden = ready;
+  };
   const hintBtn = el(
     'button',
     { type: 'button', class: 'pq-btn pq-tool', 'data-nav': '', 'data-hint': '', title: 'Первая буква (ответ засчитается, но не как «сам»)', 'aria-label': 'Подсказка: первая буква', onclick: () => takeHint() },
@@ -190,7 +201,7 @@ export function renderSpell(q: SpellQuestion, ctx: SpellCtx): SpellView {
       ...q.tiles.map((t, i) => el('button', { type: 'button', class: 'pq-btn pq-letter', 'data-nav': '', 'data-letter': t, lang, disabled: picked.includes(i), onclick: () => add(i) }, t)),
     );
     area.replaceChildren(slots, letters);
-    check.disabled = picked.length < slotsN;
+    syncCheck(picked.length >= slotsN);
     reset.disabled = picked.length <= (hintAt >= 0 ? 1 : 0);
     ctx.relayout();
   };
@@ -227,7 +238,7 @@ export function renderSpell(q: SpellQuestion, ctx: SpellCtx): SpellView {
     });
     if (hinted) input.value = q.units[0] ?? '';
     const sync = (): void => {
-      check.disabled = !input!.value.trim();
+      syncCheck(!!input!.value.trim());
     };
     input.addEventListener('input', sync);
     sync();
@@ -258,7 +269,7 @@ export function renderSpell(q: SpellQuestion, ctx: SpellCtx): SpellView {
 
   // Буквы в слотах и разбор ошибки по буквам — не слова: узнаваемые слова (ui/wordPick.ts) здесь не размечаются.
   paper.append(el('div', { class: 'pq-spell', 'data-nopick': '' }, hintLine, area));
-  foot.replaceChildren(hintBtn, typeBtn, reset, check);
+  foot.replaceChildren(hintBtn, typeBtn, reset, giveUp, check);
   setTyping(typing);
 
   return {
