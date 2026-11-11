@@ -25,10 +25,14 @@
     "icons": "python3 tools/gen_icons.py",
     "sobes": "tsx tools/sobes_import.ts",
     "sobes:feed": "tsx tools/sobes_import.ts --feed",
-    "words": "python3 tools/words_push.py",
+    "words": "python3 tools/words_feed.py",
     "feed:run": "python3 tools/feed_watch.py",
     "feed:install": "python3 tools/feed_install.py install",
-    "feed:uninstall": "python3 tools/feed_install.py uninstall"
+    "feed:uninstall": "python3 tools/feed_install.py uninstall",
+    "local": "python3 tools/local_deploy.py",
+    "local:serve": "python3 tools/local_server.py",
+    "local:install": "python3 tools/local_install.py install",
+    "local:uninstall": "python3 tools/local_install.py uninstall"
   },
   "dependencies": {
     "idb-keyval": "6.3.0",

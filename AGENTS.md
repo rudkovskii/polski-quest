@@ -30,7 +30,7 @@
 # AGENTS.md: «Ферма» (polski-quest)
 
 Браузерная пиксельная игра по польскому в духе Stardew Valley для Димы («Шэф»): фермер выращивает слова и фразы.
-Репозиторий = папка `Игра/app/` (`rudkovskii/polski-quest`, Pages `/polski-quest/`). Запрос и решения — `../ФЕРМА.md`.
+Репозиторий = папка `Игра/app/` (`rudkovskii/polski-quest`, публичный). **Игра Шэфа с 11.11 живёт только на его маке** (`http://127.0.0.1:5321/`, `npm run local`, раздел «Личная версия на маке»); Pages — только персональные версии (`deploy/editions.json`). Запрос и решения — `../ФЕРМА.md`.
 Старая игра («Pierogi i Przypadki») убрана из дерева: тег `archive-v1`, ветка `archive/v1`. Модули оттуда бери только оттуда.
 `CLAUDE.md` — копия этого файла (не симлинк): меняешь AGENTS.md → скопируй.
 
@@ -51,11 +51,20 @@
 - Склейка слоёв только в `src/main.ts`. Связь мира и экранов — только через `bus` (`src/types/bus.ts`).
 
 ## Лента своих слов (правка без выкладки)
-- Слова Шэфа из чата не вшиваем в сборку. Источник — `../data/moje_slowa.json` (вне репозитория), выкладка — `npm run words`: проверка файла и коммит на ветку `slowa`. Сайт не пересобирается, main не меняется.
+- Слова Шэфа из чата не вшиваем в сборку. Источник — `../data/moje_slowa.json` (вне репозитория), выкладка — `npm run words` (`tools/words_feed.py`): проверка файла и запись в `../local-site/feed/moje_slowa.json` на маке. Игра не пересобирается, в интернет ничего не уходит (ветки `slowa` с 11.11 нет; `feed_push.py`/`words_push.py` — заглушки с ошибкой).
 - Файл — журнал записей, каждая применяется один раз на сохранение (`feed:<id>` в `Save.hints`). Старые записи не правь и не удаляй: новая правка = новая запись в конец с новым `id`. `add`: `{pl, ru, tr?, pos?, ex?}`, слова сразу сажаются. `edit`: `{pl, set: {...}}`. `remove`: список польских написаний. Править и убирать можно только свои слова («Moje słowa»), база A1 не трогается.
 - Игра читает файл при запуске и при возврате на вкладку (`systems/wordFeed.ts`, `systems/platform/wordFeed.ts`), только `edition.id === 'main'`. Пустое сохранение лента ждёт до первой посадки. Слово, добавленное в игре руками: `npm run words -- --force`.
-- **Лента собеса** (10.11, `../ТЗ-лента-прогресса.md`): `npm run sobes:feed` собирает тот же документ, что `npm run sobes`, из `ПМЖ/Собес` и кладёт `sobes.json` на ветку `slowa` рядом с `moje_slowa.json` (`tools/feed_push.py`: файл заменяется, остальные файлы ветки остаются; тот же файл — коммита нет; ошибка склейки кусков — выкладки нет). Игра (только `main`) читает `slowa/sobes.json` вместе с лентой слов; документ ленты главнее вшитого `content/v2/sobes.json` и запоминается в `Save.polska.sobesFeed` (работает без сети); битый — в консоль, игра на прошлом. Применение — `replaceSobes` (`systems/v2content.ts`, контент меняется на месте) + `polska.syncContent()`: отпечаток ответа (`answerHash`: текст + куски) в `Save.polska.hashes`; изменился — прогресс и знакомство по вопросу стираются (старые куски не показываем); новый — нечитанный в «Новой связке»; статус «знаю» — в игре для повторения, в «Новую связку» не идёт (`newBundle`); пропал из ленты — скрыт, прогресс остаётся. Первая сверка (старое сохранение) ничего не сбрасывает. Экспорт берёт статусы «учу», «тетрадка», «знаю». Тесты `tests/sobesfeed.test.ts`.
-- **Автовыкладка с мака** (LaunchAgent `com.rudkovskiid.polski-feed`, `npm run feed:install` / `feed:uninstall`, в реестре ноута `scripts/laptop/registry.json`): `tools/feed_watch.py` по изменению `../data/moje_slowa.json`, `ПМЖ/Собес/Miso-baza-voprosov.md`, `ПМЖ/Собес/drill/progress.md` и раз в 5 минут; ждёт 60 с тишины, выкладывает только изменившуюся часть (`words` / `sobes`), итог — `../data/feed-status.json` (`ok`, `pushed` с хешами, `errors` дословно). Агент чата ПМЖ только правит исходники и читает этот файл; ручной прогон — `npm run feed:run` (`-- --force` — обе части). Логи — `/tmp/polski-feed.*.log`.
+- **Лента собеса** (10.11, `../ТЗ-лента-прогресса.md`): `npm run sobes:feed` собирает тот же документ, что `npm run sobes`, из `ПМЖ/Собес` и кладёт `sobes.json` в `../local-site/feed/` рядом с `moje_slowa.json` (`tools/feed_local.py`: запись атомарная, тот же текст — файл не трогается; ошибка склейки кусков — записи нет). Игра (только `main`) читает `feed/sobes.json` вместе с лентой слов (адреса — `systems/platform/wordFeed.ts`, от `BASE_URL`); документ ленты главнее вшитого `content/v2/sobes.json` и запоминается в `Save.polska.sobesFeed` (работает без сети); битый — в консоль, игра на прошлом. Применение — `replaceSobes` (`systems/v2content.ts`, контент меняется на месте) + `polska.syncContent()`: отпечаток ответа (`answerHash`: текст + куски) в `Save.polska.hashes`; изменился — прогресс и знакомство по вопросу стираются (старые куски не показываем); новый — нечитанный в «Новой связке»; статус «знаю» — в игре для повторения, в «Новую связку» не идёт (`newBundle`); пропал из ленты — скрыт, прогресс остаётся. Первая сверка (старое сохранение) ничего не сбрасывает. Экспорт берёт статусы «учу», «тетрадка», «знаю». Тесты `tests/sobesfeed.test.ts`.
+- **Автовыкладка с мака** (LaunchAgent `com.rudkovskiid.polski-feed`, `npm run feed:install` / `feed:uninstall`, в реестре ноута `scripts/laptop/registry.json`): `tools/feed_watch.py` по изменению `../data/moje_slowa.json`, `ПМЖ/Собес/Miso-baza-voprosov.md`, `ПМЖ/Собес/drill/progress.md` и раз в 5 минут; ждёт 60 с тишины, пишет в `../local-site/feed/` только изменившуюся часть (`words` / `sobes`), итог — `../data/feed-status.json` (`ok`, `written` — какие части обновлены, `errors` дословно). Агент чата ПМЖ только правит исходники и читает этот файл; ручной прогон — `npm run feed:run` (`-- --force` — обе части). Логи — `/tmp/polski-feed.*.log`.
+
+## Личная версия на маке (11.11, `../ТЗ-локальная-версия.md`)
+- Игра Шэфа — только на его ноуте, в облаке её нет: `http://127.0.0.1:5321/`. Сервер `tools/local_server.py` (стандартная библиотека Python, слушает только 127.0.0.1), LaunchAgent `com.rudkovskiid.polski-local` (`npm run local:install` / `local:uninstall`, RunAtLoad + KeepAlive, логи `/tmp/polski-local.*.log`), в реестре ноута `scripts/laptop/registry.json`.
+- Папка `../local-site/` (вне git): `current` → `builds/<метка>` (что раздаётся), `builds/` (две последние сборки), `feed/` (ленты, сервер отдаёт по `/feed/*`, `Cache-Control: no-store`). Пути — `tools/lib/local_site.py`.
+- Выкладка новой версии — **`npm run local`, только по слову Шэфа (D-137)**: `check:quiet` → копия `dist/` во временную папку → переименование → атомарное переключение ссылки `current`. Откат — `npm run local -- --rollback`. Ленты выкладка не трогает.
+- `edition.json` main: `base: "/"`. PWA и офлайн-кэш работают (127.0.0.1 — безопасный адрес для service worker'а).
+- Пуш в `main` игру Шэфа больше не выкладывает: `deploy.yml` после `npm run check` кладёт в корень Pages пустую страницу и `deploy/root/sw.js` (снимает старый service worker игры с корня, кэши и сохранения персональных версий не трогает) и собирает только `deploy/editions.json`. Пуш в `main` по-прежнему меняет Pages (корень и пересборку версии Оли с её ветки) — только по слову Шэфа.
+- При merge main → `ed/<id>` у персональной версии остаётся свой `edition.json` (base `/polski-quest/p/<ключ>/`): конфликт по `base` решать в пользу ветки версии.
+- Тест `tests/localfeed.test.ts`: адреса лент локальные, в `src/` нет `raw.githubusercontent.com` и `github.io`, base `/`.
 
 ## Запрещено (ловит `npm run check:banned`)
 - Phaser 3 API (`preFX`, `postFX`, `BitmapMask`, `Geom.Point`, `tintFill`, `Pipeline`, `Mesh`, `Plane`, `Phaser.CANVAS`…).
@@ -183,7 +192,7 @@ V11a: запись после каждого ответа и посадки (д�
 
 ## Проверка
 `npm run check` = typecheck + audio:check + check:layers + check:banned + test + sprites:check + build. Dev: `npm run dev`
-(`http://localhost:5173/polski-quest/?mute=1&dev=1&mem=1`: без звука, `window.__pq`, сохранение в памяти).
+(`http://localhost:5173/?mute=1&dev=1&mem=1`: без звука, `window.__pq`, сохранение в памяти).
 `?dev=<id>` — dev-режим и отдельный профиль сохранения `polski-farm-<id>` (IndexedDB и ключи localStorage), игра Шэфа не задета.
 Версия сборки видна внизу настроек; при `?mute=1` звук там «Выкл».
 Браузерная панель, в которой вкладка скрыта, не рисует кадры: покажи панель (`show_pane preview`), иначе экран пустой.
@@ -313,7 +322,7 @@ V11a: запись после каждого ответа и посадки (д�
 ### Знакомство и справка (Daty, Święta)
 - «Первый раз» = флаг `Save.polska.seen: Record<id, ISO-дата>` (`systems/polska.ts`, в `ctx` — `seen(id)`/`markSeen(id)`), **не** число ответов: по умолчанию игрок ничего не знает, карточка знакомства показывается до первого вопроса, пока флага нет (и для единиц, на которые уже отвечали). Флаг ставит только «Rozumiem · Понятно». Старое сохранение без `seen` — пустой флаг.
 - Daty: у каждой даты `history {ru, pl, key}` (`content/v2/daty.json` = `../data/v2/daty.json`, проверка `check_daty.py`, источники `../data/v2/README_daty.md`); справка в блоке отзыва после любого ответа и в карточке «Poznaj datę». Święta — карточка «Poznaj święto».
-- Тестировать только на localhost с `?dev=<id>` — прогресс Шэфа на rudkovskii.github.io (другое хранилище) не трогать.
+- Тестировать только на dev-сервере (`localhost:5173`) с `?dev=<id>` — прогресс Шэфа на `127.0.0.1:5321` (другое хранилище) не трогать и эту вкладку не открывать.
 
 ### Święta: колесо (игра `swieta`, `layout: 'full'`)
 - Основа — «Колесо праздников» `ПМЖ/Собес/swieta-kolo` (только чтение): `swieta.json:wheel` — 27 узлов (`id`, `unit` — единица игры или null, `when`, `class`/`class2` state|rel|folk, `off`, `pl`, `ru`, `img`, `pic`, `credit {author, license, page, title}`, `intro {ru[], pl[]}`, `phrase`). 19 узлов колеса (3 майских дня и 15.08 ведут в `hol.majowka` и `hol.zielna`, `pic: false` — картина не про единицу; Popielec, 1.08 и 11.11 — только справка) и 8 праздников игры без пары (значок предмета вместо картины). Все 22 `hol.*` на месте, прогресс игрока не тронут; `wheel` без `kind`, `parseV2` его пропускает. Правится в `../data/v2/swieta.json` (+ `check_swieta.py`), копируется сюда.

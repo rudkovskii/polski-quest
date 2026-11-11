@@ -27,6 +27,9 @@ jobs:
           python-version: '3.12'
       - run: pip install Pillow==12.2.0
       - run: npm run check
+      # С 11.11 (ТЗ-локальная-версия) игра Шэфа живёт только на его маке (`npm run local`). На Pages — только персональные
+      # версии из deploy/editions.json; в корень сайта — пустая страница и sw.js, который снимает старый service worker игры.
+      - run: rm -rf dist && mkdir dist && cp -R deploy/root/. dist/
       - run: deploy/build_editions.sh
       - uses: actions/upload-pages-artifact@v5
         with:

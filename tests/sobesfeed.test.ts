@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// Лента собеса (10.11, ТЗ-лента-прогресса): `slowa/sobes.json` применяется без выкладки сайта.
+// Лента собеса (10.11, ТЗ-лента-прогресса): `feed/sobes.json` (с 11.11 на маке, ТЗ-локальная-версия) применяется без выкладки.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { newBundle } from '../src/games/sobes/plan';
 import { fetchWordFeed, SOBES_FEED_URL } from '../src/systems/platform/wordFeed';

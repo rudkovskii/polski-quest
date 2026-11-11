@@ -1,6 +1,6 @@
 // Импорт вопросов собеса в игру «Sobes» (личная версия Шэфа, 30.10.2026): что сейчас учится в дриле → `content/v2/sobes.json`.
 //   npm run sobes            # записать sobes.json
-//   npm run sobes:feed        # лента: тот же документ на ветку `slowa` (игра читает его без выкладки сайта)
+//   npm run sobes:feed        # лента: тот же документ в Игра/local-site/feed/ на маке (игра читает его без выкладки)
 //   npm run sobes -- --check # только сверить: файл совпадает с источником (exit 1, если нет)
 // Источники — папка `ПМЖ/Собес` (путь можно задать `SOBES_DIR`), своих копий текстов игра не держит:
 //   - `drill/progress.md`, таблица между якорями STATUSY: берутся слои «ядро» и «личное» со статусом «учу» или «тетрадка»,
@@ -160,9 +160,9 @@ if (isMain(import.meta.url)) {
   if (missing.length) console.log(`без разметки (в игру не попали): ${missing.map((n) => `№${n}`).join(', ')}`);
   const text = `${JSON.stringify(doc, null, 1)}\n`;
   if (process.argv.includes('--feed')) {
-    // Лента (10.11): тот же документ — на ветку `slowa` рядом с moje_slowa.json; main и рабочее дерево не трогаются.
+    // Лента (10.11, локально с 11.11): тот же документ — в Игра/local-site/feed/ рядом с moje_slowa.json; в интернет не уходит.
     if (errors.length) process.exit(1);
-    const r = spawnSync('python3', [join(ROOT, 'tools', 'feed_push.py'), 'sobes.json', '-', 'Лента собеса'], { input: text, encoding: 'utf8', cwd: ROOT });
+    const r = spawnSync('python3', [join(ROOT, 'tools', 'feed_local.py'), 'sobes.json', '-'], { input: text, encoding: 'utf8', cwd: ROOT });
     process.stdout.write(r.stdout ?? '');
     process.stderr.write(r.stderr ?? '');
     process.exit(r.status ?? 1);

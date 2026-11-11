@@ -3,9 +3,9 @@
 
 import edition from '../../edition.json';
 
-/** Путь сборки: `/polski-quest/` у игры Шэфа, `/polski-quest/p/<ключ>/` у персональной версии (`edition.json`). */
+/** Путь сборки: `/` у игры Шэфа (с 11.11 только на маке, http://127.0.0.1:5321/), `/polski-quest/p/<ключ>/` у персональной версии на Pages (`edition.json`). */
 export const BASE: string = edition.base;
-/** Персональные версии лежат внутри scope игры Шэфа: его service worker не отдаёт им свою страницу. */
+/** Персональные версии лежали внутри scope игры Шэфа на Pages: его service worker не отдаёт им свою страницу (на ветках `ed/*`). */
 const EDITIONS_PATH = /^\/polski-quest\/p\//;
 
 /** Опции `workbox` для VitePWA (generateSW). */
@@ -19,7 +19,7 @@ export function workboxOptions() {
     globIgnores: ['**/version.json'],
     maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
     navigateFallback: 'index.html',
-    navigateFallbackDenylist: [/supabase/, ...(EDITIONS_PATH.test(BASE) ? [] : [EDITIONS_PATH])],
+    navigateFallbackDenylist: [/supabase/, /^\/feed\//, ...(EDITIONS_PATH.test(BASE) ? [] : [EDITIONS_PATH])],
     // Параметры адреса (?dev, ?mute…) — только для клиента: страница из precache и с ними.
     ignoreURLParametersMatching: [/.*/],
     runtimeCaching: [

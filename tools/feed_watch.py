@@ -1,22 +1,21 @@
 #!/usr/bin/env python3
-"""Выкладка лент с мака сама (10.11, ТЗ-лента-прогресса Р2). Запускает LaunchAgent `com.rudkovskiid.polski-feed`
-(`npm run feed:install`): по изменению источников и раз в 5 минут.
+"""Ленты с мака сами (10.11, ТЗ-лента-прогресса Р2; с 11.11 только локально, ТЗ-локальная-версия). Запускает LaunchAgent
+`com.rudkovskiid.polski-feed` (`npm run feed:install`): по изменению источников и раз в 5 минут.
 
-Источники → что выкладывается на ветку `slowa`:
+Источники → что пишется в Игра/local-site/feed/ (игру раздаёт локальный сервер, в интернет ничего не уходит):
   Игра/data/moje_slowa.json                         → npm run words      (moje_slowa.json)
   ПМЖ/Собес/Miso-baza-voprosov.md, drill/progress.md → npm run sobes:feed (sobes.json)
 
 Пауза: источник менялся меньше 60 с назад — ждём, чтобы не выкладывать файл посреди записи.
 Часть выкладывается, только если её источники изменились с последней удачной выкладки (или прошлая упала).
-Итог — `Игра/data/feed-status.json`: время, что выложено, хеш коммита, ошибка проверки дословно. Агент чата читает его в конце занятия.
+Итог — `Игра/data/feed-status.json`: время, что записано (`written`), ошибка проверки дословно. Агент чата читает его в конце занятия.
 
 python3 tools/feed_watch.py          один прогон
-python3 tools/feed_watch.py --force  выложить обе части, даже если источники не менялись
+python3 tools/feed_watch.py --force  записать обе части, даже если источники не менялись
 """
 import hashlib
 import json
 import os
-import re
 import subprocess
 import sys
 import time
@@ -24,13 +23,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 APP = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(APP / 'tools' / 'lib'))
+from local_site import atomic_write  # noqa: E402
+
 GAME = APP.parent
 SOBES = Path(os.environ.get('SOBES_DIR', GAME.parent.parent / 'ПМЖ' / 'Собес'))
 STATUS = GAME / 'data' / 'feed-status.json'
 QUIET_S = 60
 MAX_WAIT_S = 600
 PARTS = {
-    'words': {'sources': [GAME / 'data' / 'moje_slowa.json'], 'cmd': ['python3', 'tools/words_push.py']},
+    'words': {'sources': [GAME / 'data' / 'moje_slowa.json'], 'cmd': ['python3', 'tools/words_feed.py']},
     'sobes': {'sources': [SOBES / 'Miso-baza-voprosov.md', SOBES / 'drill' / 'progress.md'], 'cmd': ['npx', 'tsx', 'tools/sobes_import.ts', '--feed']},
 }
 
@@ -68,12 +70,9 @@ def load_status() -> dict:
 def run_part(name: str, part: dict) -> dict:
     r = subprocess.run(part['cmd'], cwd=APP, capture_output=True, text=True, timeout=300)
     out = (r.stdout + r.stderr).strip()
-    m = re.search(r'выложено на slowa: ([0-9a-f]{7,})', out)
     res = {'ok': r.returncode == 0, 'at': now_iso(), 'output': out[-2000:]}
     if r.returncode == 0:
-        res['pushed'] = bool(m)
-        if m:
-            res['commit'] = m.group(1)
+        res['written'] = 'записано в ленту' in out
     else:
         res['error'] = out[-2000:] or f'код выхода {r.returncode}'
     return res
@@ -101,13 +100,13 @@ def main() -> None:
         'at': now_iso(),
         'ok': not errors,
         'ran': ran,
-        'pushed': {n: parts[n]['commit'] for n in ran if parts[n].get('commit')},
+        'written': [n for n in ran if parts[n].get('written')],
         **({'errors': errors} if errors else {}),
         'parts': parts,
-        'about': 'Итог автовыкладки лент на ветку slowa (tools/feed_watch.py, LaunchAgent com.rudkovskiid.polski-feed). ok=false — ошибка проверки в errors дословно, игра работает на прошлой ленте.',
+        'about': 'Итог записи лент в Игра/local-site/feed/ на маке (tools/feed_watch.py, LaunchAgent com.rudkovskiid.polski-feed). written — какие части обновлены; ok=false — ошибка проверки в errors дословно, игра работает на прошлой ленте.',
     }
-    STATUS.write_text(json.dumps(status, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
-    print(json.dumps({k: status[k] for k in ('at', 'ok', 'ran', 'pushed')}, ensure_ascii=False))
+    atomic_write(STATUS, json.dumps(status, ensure_ascii=False, indent=1) + '\n')
+    print(json.dumps({k: status[k] for k in ('at', 'ok', 'ran', 'written')}, ensure_ascii=False))
 
 
 if __name__ == '__main__':
