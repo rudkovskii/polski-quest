@@ -5,5 +5,10 @@
   "gate": null,
   "level": "A1",
   "languageOnly": false,
-  "onboarding": false
+  "onboarding": false,
+  "dailyRandom": 5,
+  "modes": [
+    1,
+    2
+  ]
 }

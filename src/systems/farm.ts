@@ -51,6 +51,8 @@ export interface FarmDeps {
   rand?: () => number;
   /** Свои слова (`Save.custom`). Нет — своих слов не бывает (тесты). */
   customs?: { load(): CustomWord[]; save(list: CustomWord[]): void };
+  /** Мини-игры этой версии (`edition.modes`); нет — все пять. Без игры 5 урожаю слова не нужен ответ «сам». */
+  modes?: readonly GameMode[];
 }
 
 export interface AnswerOut {
@@ -106,6 +108,8 @@ export interface Farm extends FarmApi {
 const STAGE_RANK: Record<string, number> = { seed: 0, sprout: 1, bush: 2, overripe: 3 };
 
 export function createFarm(d: FarmDeps): Farm {
+  const modes: readonly GameMode[] = d.modes ?? [1, 2, 3, 4, 5];
+  const rules = { prod: modes.includes(5) };
   const rand = d.rand ?? Math.random;
   // Сохранение до игры 5: отметка, с какого ответа слову нужен «сам» (старые ответы — по прежнему правилу).
   let g: GardenSave = withProdFrom(d.load());
@@ -114,7 +118,19 @@ export function createFarm(d: FarmDeps): Farm {
   setCustomWords(customs);
   // Растения своих слов, которых нет в сохранении (битый импорт): убираем, чтобы задание не вышло без слова.
   for (const id of new Set([...g.planted.map((p) => p.id), ...g.log.map((a) => a.id)])) if (isCustomId(id) && !WORD_BY_ID.has(id)) g = forgetItem(g, id);
-  let st: GardenState = derive(g);
+  let st: GardenState = derive(g, rules);
+  /** Какая игра нужна растению, если в версии есть все пять (сужает `reviewMode`). */
+  function reviewModeAll(id: string): GameMode {
+    const it = st.items.get(id);
+    if (isPhraseId(id) && assemble(id)) return it && !it.sides.rp ? 3 : it && !it.sides.pr ? 4 : 3;
+    if (!it) return 1;
+    if (it.stage === 'seed') return 1;
+    // Кусту слова для урожая не хватает слова, собранного самому: «Повторить» открывает игру 5.
+    if (needsProd(it)) return 5;
+    if (!it.sides.rp || !it.rpOk) return 2;
+    if (!it.sides.pr) return 1;
+    return 2;
+  }
   /** Последние показанные id: основа правила «не повторять чаще, чем раз в N заданий». */
   const recent: string[] = [];
   /** Заданий с последнего «наоборот» (P2a: не чаще, чем каждое 3-е). */
@@ -275,7 +291,7 @@ export function createFarm(d: FarmDeps): Farm {
       if (!customs.some((x) => x.id === id)) return false;
       const now = d.now();
       const left = forgetItem(g, id);
-      st = derive(left);
+      st = derive(left, rules);
       g = syncSlots(left, st, now);
       customs = customs.filter((x) => x.id !== id);
       setCustomWords(customs);
@@ -309,7 +325,7 @@ export function createFarm(d: FarmDeps): Farm {
       const ok = ids.filter((id) => (WORD_BY_ID.has(id) || PHRASE_BY_ID.has(id)) && (!isPhraseId(id) || missingWords(id).length === 0));
       const r = plant(g, st, ok, now);
       if (!r.added.length) return { planted: 0, bag: 0, skipped: ids.length };
-      g = syncSlots(r.save, (st = derive(r.save)), now);
+      g = syncSlots(r.save, (st = derive(r.save, rules)), now);
       const onPlot = r.added.filter((id) => g.slots[id] !== undefined).length;
       emitPlants();
       changed();
@@ -441,15 +457,10 @@ export function createFarm(d: FarmDeps): Farm {
       return id ? { id, mode: farm.reviewMode(id) } : null;
     },
     reviewMode(id) {
-      const it = st.items.get(id);
-      if (isPhraseId(id) && assemble(id)) return it && !it.sides.rp ? 3 : it && !it.sides.pr ? 4 : 3;
-      if (!it) return 1;
-      if (it.stage === 'seed') return 1;
-      // Кусту слова для урожая не хватает слова, собранного самому: «Повторить» открывает игру 5.
-      if (needsProd(it)) return 5;
-      if (!it.sides.rp || !it.rpOk) return 2;
-      if (!it.sides.pr) return 1;
-      return 2;
+      const m = reviewModeAll(id);
+      // Игры, которой в версии нет, не открываем: «с польского» (1) для фраз сборки и семечек, иначе «по-польски» (2).
+      if (modes.includes(m)) return m;
+      return m === 4 && modes.includes(1) ? 1 : modes.includes(2) ? 2 : modes[0]!;
     },
     plants,
     counts() {

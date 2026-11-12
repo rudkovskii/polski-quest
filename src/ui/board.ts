@@ -14,6 +14,8 @@ export interface BoardDeps {
   /** Сколько на грядках слов и фраз; `spell` — кустов слов, которым для урожая не хватает слова, собранного самому (игра 5). */
   counts(): { words: number; phrases: number; assemble: number; spell?: number };
   onPick(mode: GameMode): void;
+  /** Игры этой версии (`edition.modes`); нет — все пять. */
+  modes?: readonly GameMode[];
   /** Режим «Новые слова»: сколько их сейчас и запуск раунда. Нет — строки нет. */
   fresh?: { count(): number; start(): void };
   /** Ближайшая фраза для сборки и что ей нужно (P3a); без неё — только общая подсказка. */
@@ -116,7 +118,7 @@ export function mountBoard(parent: HTMLElement, deps: BoardDeps): { open(tab?: B
         ),
       );
     }
-    for (const m of [1, 2, 3, 4, 5] as GameMode[]) {
+    for (const m of deps.modes ?? ([1, 2, 3, 4, 5] as GameMode[])) {
       // Фразы короче 3 плиток растут в играх 1 и 2 как слова; сборка — только из длинных; игра 5 — только слова.
       const why =
         m <= 2

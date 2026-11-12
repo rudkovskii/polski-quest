@@ -1,6 +1,9 @@
 // Чья это копия игры (`edition.json` в корне). На `main` — игра Шэфа; персональные версии живут на ветках `ed/<id>`
 // со своим `edition.json` и собираются в `/polski-quest/p/<ключ>/` (см. `deploy/editions.json`, `.github/workflows/deploy.yml`).
 import editionJson from '../../edition.json';
+import type { GameMode } from '../types/farm';
+
+const ALL_MODES: readonly GameMode[] = [1, 2, 3, 4, 5];
 
 export interface Edition {
   /** `main` — Шэф, иначе id игрока (`olya`). */
@@ -19,6 +22,8 @@ export interface Edition {
   onboarding: boolean;
   /** Сколько случайных новых слов базы садится само в первый вход нового дня (`systems/dailySeeds.ts`); 0 — выключено. */
   dailyRandom: number;
+  /** Мини-игры фермы, которые есть в этой версии (12.11, Шэф: «оставить только слово → перевод и перевод → слово»). Без игры 5 урожаю слова не нужен ответ «сам». */
+  modes: readonly GameMode[];
 }
 
 /** Старые `edition.json` без новых флагов читаются как `false` (число — как 0). */
@@ -31,6 +36,7 @@ export function normalizeEdition(e: Partial<Edition>): Edition {
     languageOnly: e.languageOnly === true,
     onboarding: e.onboarding === true,
     dailyRandom: typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0,
+    modes: Array.isArray(e.modes) && e.modes.some((m) => ALL_MODES.includes(m)) ? ALL_MODES.filter((m) => e.modes!.includes(m)) : ALL_MODES,
   };
 }
 /** Название цели пути: «Путь к A1», «до B1: 12%». */

@@ -187,7 +187,12 @@ export function stageOf(it: ItemState, now: number): Stage | null {
   return isOverripe(it, now) ? 'overripe' : null;
 }
 
-function plantItem(st: GardenState, e: PlantEntry): void {
+/** Правила роста версии: `prod: false` — игры 5 нет, слову для урожая не нужен ответ «сам». */
+export interface GrowRules {
+  prod?: boolean;
+}
+
+function plantItem(st: GardenState, e: PlantEntry, rules: GrowRules = {}): void {
   if (st.items.has(e.id)) return;
   const kind = kindOf(e.id);
   const bush = e.start === 'bush';
@@ -197,7 +202,7 @@ function plantItem(st: GardenState, e: PlantEntry): void {
     kind,
     needSelf: isPolskaKind(kind),
     selfOk: false,
-    needProd: kind === 'word',
+    needProd: kind === 'word' && rules.prod !== false,
     prodOk: bush,
     plantedAt: e.t,
     stage: bush ? 'bush' : 'seed',
@@ -282,7 +287,7 @@ export function applyAnswer(st: GardenState, a: AnswerEntry, legacy = false): Ou
 }
 
 /** Состояние из сохранения: посадки и ответы по времени (посадка раньше ответа в тот же миг). */
-export function derive(g: GardenSave): GardenState {
+export function derive(g: GardenSave, rules: GrowRules = {}): GardenState {
   const st: GardenState = { items: new Map(), xp: 0, grownByDay: new Map(), answersByDay: new Map() };
   const ev: ({ p: PlantEntry } | { a: AnswerEntry })[] = [...g.planted.map((p) => ({ p })), ...g.log.map((a) => ({ a }))];
   // Стабильная сортировка: при равном времени посадка первой.
@@ -290,7 +295,7 @@ export function derive(g: GardenSave): GardenState {
   // Нет отметки — сохранение до игры 5: весь журнал по прежнему правилу.
   const prodFrom = g.prodFrom ?? Infinity;
   for (const e of ev) {
-    if ('p' in e) plantItem(st, e.p);
+    if ('p' in e) plantItem(st, e.p, rules);
     else applyAnswer(st, e.a, e.a.t < prodFrom);
   }
   return st;

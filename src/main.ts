@@ -202,6 +202,8 @@ async function main(): Promise<void> {
     say: (id, slow) => bus.emit('audio:play', { id, text: farm.word(id)?.pl ?? farm.phrase(id)?.pl ?? '', ...(slow ? { slow } : {}) }),
     // Свои слова («Moje słowa»): раздел Save.custom; озвучка — Web Speech pl-PL (в манифесте их нет), при ?mute=1 тишина.
     customs: { load: () => store.save.custom, save: (custom) => store.update((s: Save) => ({ ...s, custom }), clock.now()) },
+    // Мини-игры версии (12.11: у Шэфа только 1 и 2, урожаю слова не нужен «сам» из игры 5).
+    modes: EDITION.modes,
   });
   // Узнаваемые слова (просьба Шэфа 19.10): любое польское слово в игре — тап (в тексте) или долгое нажатие/правый клик (на кнопке-ответе)
   // → лемма, перевод, 🔊, статус и «＋ В словарь». Словарь plru грузится при первом слове (не в precache).
@@ -391,6 +393,7 @@ async function main(): Promise<void> {
   const board = mountBoard(overlay, {
     counts: () => (farm.refresh(), farm.counts()),
     onPick: (mode) => game.start(mode),
+    modes: EDITION.modes,
     round: { get: roundLen, set: setRoundLen },
     fresh: { count: () => farm.freshCount(), start: () => game.startFresh() },
     phraseHint: () => farm.phraseHint(),
